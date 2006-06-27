@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Country;
 import org.lamsfoundation.lams.usermanagement.Language;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -95,6 +96,7 @@ public class UserAction extends LamsDispatchAction {
 			User user = (User)service.findById(User.class,userId);
 			DynaActionForm userForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(userForm, user);
+			BeanUtils.setProperty(userForm,"password2",user.getPassword());
 			
 			// get system's roles
 			List allRoles = service.findAll(Role.class);
@@ -127,6 +129,15 @@ public class UserAction extends LamsDispatchAction {
 			
 		}
 		
+		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+		Organisation pOrg = org.getParentOrganisation();
+		if(pOrg!=null){
+			request.setAttribute("pOrgId",pOrg.getOrganisationId());
+			request.setAttribute("pOrgName",pOrg.getName());
+		}
+		request.setAttribute("orgId",orgId);
+		request.setAttribute("orgName",org.getName());
+		request.setAttribute("orgType",org.getOrganisationType().getOrganisationTypeId());
 		request.setAttribute("countries",countries);
 		request.setAttribute("languages",languages);
 		return mapping.findForward("user");

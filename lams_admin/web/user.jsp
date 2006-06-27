@@ -10,6 +10,11 @@
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
 <h4 align="left">
+    <logic:notEmpty name="pOrgId">
+        <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
+    </logic:notEmpty>
+    <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="orgId" />">
+      <bean:write name="orgName"/></a> ::
 	<logic:notEmpty name="UserForm" property="userId">
 		<fmt:message key="admin.edit"/> User
 	</logic:notEmpty>
@@ -27,7 +32,11 @@
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.user.password"/> *:</td>
-		<td><html-el:text property="password" size="20" maxlength="50" /></td>
+		<td><html-el:password property="password" size="20" maxlength="50" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="admin.user.password.confirm"/> *:</td>
+		<td><html-el:password property="password2" size="20" maxlength="50" /></td>
 	</tr>
 	<tr>
 	<td><fmt:message key="admin.user.title"/>:</td>
@@ -109,10 +118,10 @@
 	    <tr>
 	        <td><fmt:message key="admin.user.roles"/>:</td>
 	        <td>
-                <logic:iterate id="role" name="rolelist">
-                    <html-el:multibox property="roles" value="${role.roleId}"/>
+                <c:forEach items="${rolelist}" var="role">
+                    <html-el:multibox name="UserForm" property="roles" value="${role.roleId}"/>
                     <c:out value="${role.name}"/><br/>
-                </logic:iterate>
+                </c:forEach>
 	        </td>
 	    </tr>
 	</logic:notEmpty>
@@ -123,5 +132,5 @@
 			<html-el:cancel><fmt:message key="admin.cancel"/></html-el:cancel>
 		</td>
 	</tr>
-<table>
+</table>
 </html-el:form>

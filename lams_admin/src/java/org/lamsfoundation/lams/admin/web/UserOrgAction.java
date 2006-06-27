@@ -90,6 +90,11 @@ public class UserOrgAction extends Action {
 		String orgName = organisation.getName();
 		log.debug("orgName: "+orgName);
 		Organisation parentOrg = organisation.getParentOrganisation();
+		if(parentOrg!=null){
+			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
+			request.setAttribute("pOrgName",parentOrg.getName());
+		}
+		request.setAttribute("orgType",organisation.getOrganisationType().getOrganisationTypeId());
 		
 		// check user permission
 		//String username = request.getRemoteUser();

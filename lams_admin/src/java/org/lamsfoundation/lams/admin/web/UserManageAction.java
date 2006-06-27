@@ -120,12 +120,27 @@ public class UserManageAction extends Action {
 			User user = (User)users.get(i);
 			UserManageBean userManageBean = new UserManageBean();
 			BeanUtils.copyProperties(userManageBean, user);
-			userManageBean.setRoles(service.getRolesForUserByOrganisation(user, orgId));
+			List roles;
+			try{
+				roles = service.getRolesForUserByOrganisation(user, orgId);
+			} catch(NullPointerException e){
+				roles = new ArrayList();
+				log.debug("no roles found for user: "+user);
+			}
+			userManageBean.setRoles(roles);
 			userManageBeans.add(userManageBean);
 		}
 		
 		userManageForm.setUserManageBeans(userManageBeans);
 		request.setAttribute("UserManageForm", userManageForm);
+		
+		Organisation pOrg = organisation.getParentOrganisation();
+		if(pOrg!=null){
+			request.setAttribute("pOrgId",pOrg.getOrganisationId());
+			request.setAttribute("pOrgName",pOrg.getName());
+		}
+		request.setAttribute("orgType",organisation.getOrganisationType().getOrganisationTypeId());
+		
 		return mapping.findForward("userlist");
 	}
 }

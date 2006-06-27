@@ -6,10 +6,19 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <form>
-<h4 align="left"><fmt:message key="admin.user.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>: <bean:write name="UserManageForm" property="orgName"/></h4>
+<h4 align="left">
+  <logic:notEmpty name="pOrgId">
+    <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
+  </logic:notEmpty>
+  <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserManageForm" property="orgId" />">
+    <bean:write name="UserManageForm" property="orgName"/></a> ::
+  <fmt:message key="admin.user.manage" />
+</h4>
 <p align="right">
 <input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=1' />
-<input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' /></p>
+<logic:notEqual name="UserManageForm" property="orgId" value="1">
+  <input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' /></p>
+</logic:notEqual>
 <table width=100%>
 <tr>
 	<th></th>
@@ -47,7 +56,7 @@
 		<td>
 				<a href="user.do?method=edit&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.edit"/></a>
 				&nbsp;
-				<a href="user.do?method=remove&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.user.remove"/></a>
+				<a href="user.do?method=remove&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.user.delete"/></a>
 				<br/>
 		</td>		
 	</tr>

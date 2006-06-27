@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,11 +44,14 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Country;
+import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
@@ -87,9 +91,11 @@ public class UserSaveAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		DynaActionForm userForm = (DynaActionForm)form;
+		Boolean edit = false;
+		Integer orgId = (Integer)userForm.get("orgId");
 		
 		if(isCancelled(request)){
-			request.setAttribute("org",userForm.get("orgId"));
+			request.setAttribute("org",orgId);
 			return mapping.findForward("userlist");
 		}
 		
@@ -100,12 +106,18 @@ public class UserSaveAction extends Action {
 		if((userForm.get("password")==null)||(((String)userForm.getString("password").trim()).length()==0)){
 			errors.add("password",new ActionMessage("error.password.required"));
 		}
+		log.debug("password: "+userForm.get("password"));
+		log.debug("password2: "+userForm.get("password2"));
+		if(!userForm.get("password").equals(userForm.get("password2"))){
+			errors.add("password",new ActionMessage("error.newpassword.mismatch"));
+		}
 		
 		if(errors.isEmpty()){
 			Integer userId = (Integer)userForm.get("userId");
-			Integer orgId = (Integer)userForm.get("orgId");
 			User user;
+			log.debug("got userId: "+userId);
 			if(userId!=0){    // edit user
+				edit = true;
 				log.debug("editing userId: "+userId);
 				user = (User)service.findById(User.class,userId);
 				BeanUtils.copyProperties(user,userForm);
@@ -165,30 +177,57 @@ public class UserSaveAction extends Action {
 
 			}else{    // create user
 				log.debug("creating user...");
-				user = new User();
+				user = new User((String)userForm.get("login"), (String)userForm.get("password"), 
+						false, new Date(), 
+						new Workspace(userForm.get("firstName")+" "+userForm.get("lastName")), (AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,"authenticationMethodName","LAMS-Database").get(0), 
+						null, null, null, null, null, null);
 				BeanUtils.copyProperties(user,userForm);
-				if(service.getUserByLogin(user.getLogin())!=null) {
+				log.debug("new login: "+user.getLogin());
+				/*if(service.getUserByLogin(user.getLogin())!=null) {
 					errors.add("loginUnique",new ActionMessage("error.login.unique"));
-				}
-				user.setDisabledFlag(false);
+				}*/
+				/*user.setDisabledFlag(false);
 				user.setCreateDate(new Date());
-				user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,"name","LAMS-Database").get(0));
-				log.debug(user.toString());
-				service.save(user);
-				user = service.getUserByLogin((String)userForm.get("login"));
-				UserOrganisation userOrganisation = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
-				service.save(userOrganisation);
-				// set default role to learner
-				Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
-				UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, role);
-				service.save(userOrganisationRole);
+				user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,"authenticationMethodName","LAMS-Database").get(0));*/
+				log.debug("user: "+user.toString());
+				try{
+					service.save(user);
+					log.debug("user: "+user.toString());
+					/*user = service.getUserByLogin((String)userForm.get("login"));
+					UserOrganisation userOrganisation = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
+					Set uos = user.getUserOrganisations();
+					uos.add(userOrganisation);
+					user.setUserOrganisations(uos);
+					service.save(userOrganisation);*/
+				} catch(Exception e) {
+					log.debug("exception: "+e);
+					errors.add("loginUnique",new ActionMessage("error.login.unique"));
+					userForm.set("userId",null);
+					saveErrors(request,errors);
+					request.setAttribute("countries",service.findAll(Country.class));
+					request.setAttribute("languages",service.findAll(Language.class));
+					return mapping.findForward("user");
+				}
 			}
 			request.setAttribute("org",orgId);
 			log.debug("orgId: "+orgId);
 			return mapping.findForward("userlist");
 		}else{
-			saveErrors(request,errors);
-			return mapping.findForward("user");
+			if(!edit){  // error screen on create user shouldn't show empty roles
+			    userForm.set("userId",null);
+			}
+		    saveErrors(request,errors);
+		    Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+			Organisation pOrg = org.getParentOrganisation();
+			if(pOrg!=null){
+				request.setAttribute("pOrgId",pOrg.getOrganisationId());
+				request.setAttribute("pOrgName",pOrg.getName());
+			}
+			request.setAttribute("orgId",orgId);
+			request.setAttribute("orgName",org.getName());
+		    request.setAttribute("countries",service.findAll(Country.class));
+		    request.setAttribute("languages",service.findAll(Language.class));
+		    return mapping.findForward("user");
 		}
 	}
 }
