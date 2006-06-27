@@ -34,6 +34,8 @@
 <%@ attribute name="text" required="true" rtexprvalue="true"%>
 <%@ attribute name="small" required="false" rtexprvalue="true"%>
 <%@ attribute name="key" required="false" rtexprvalue="true"%>
+<%@ attribute name="alt" required="false" rtexprvalue="true"%> <!--  default true -->
+
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -56,27 +58,33 @@
 	<c:set var="txtClassName" value="smallTextareaPanel" />
 </c:if>
 
+<c:set var="fieldName" value="field-name" />
+<c:if test="${alt}">
+<c:set var="fieldName" value="field-name-alternative-color" />
+</c:if>
+
 <div id="preview${id}" style="visibility: hidden; display: none;">
 	<div>
-		<c:if test="${key != null}">
-			<fmt:message key="${key}"/>
-		</c:if>
-		<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)">
-			<img src="${lams}images/html.gif" border="0" alt="Open HTML Editor">
-		</a>
+		<p class="button">
+			<c:if test="${key != null}">
+				<span class="${fieldName}"><fmt:message key="${key}" /></span>
+			</c:if>
+			<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)" class="button-html-editor">HTML Editor</a>
+		</p>
 	</div>
 	<div class="${previewClassName}" id="preview${id}.text"></div>
-
-
 </div>
+
+
 <div id="tx${id}">
 	<div>
-		<c:if test="${key != null}">
-			<fmt:message key="${key}"/>
-		</c:if>		
-		<a href="javascript:doTextToHTML('${id}');doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)">
-			<img src="${lams}images/html.gif" border="0" alt="Open HTML Editor">
-		</a>
+
+		<p class="button">
+			<c:if test="${key != null}">
+				<span class="${fieldName}"><fmt:message key="${key}" /></span>
+			</c:if>
+			<a href="javascript:doTextToHTML('${id}');doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)" class="button-html-editor">HTML Editor</a>
+		</p>
 	</div>
 	<textarea class="${txtClassName}" name="${fn:toLowerCase(id_a)}${id_b}" id="tx${id}.textarea"><c:out value="${text}" escapeXml="false" /></textarea>
 </div>
