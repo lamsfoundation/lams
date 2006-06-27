@@ -178,10 +178,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         =================*/
         file_menu = _mb.addMenu(Dictionary.getValue('mnu_file'));
         
-        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_refresh'), instanceName:"refreshItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_refresh'), instanceName:"refreshItem", enabled:true});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_editclass'), instanceName:"editClassItem", enabled:false});
-		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_start'), instanceName:"startItem"});
-        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_schedule'), instanceName:"scheduleItem"});
+		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_start'), instanceName:"startItem", enabled:false});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_schedule'), instanceName:"scheduleItem", enabled:false});
         
 		file_menu.addMenuItem({type:"separator"});
 		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_exit'), instanceName:"exitItem"});
@@ -203,7 +203,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		//_global.breakpoint();
         view_menu = _mb.addMenu(Dictionary.getValue('mnu_view'));
 		
-        view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_learners'), instanceName:"viewLearners"});
+        view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_learners'), instanceName:"viewLearners", enabled:false});
 		
 		/*=================
             GO MENU
@@ -276,12 +276,16 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().launchExportWindow();
 				break;
 			case eventObj.menu.editClassItem:
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMM().setDialogOpen("LM_DIALOG");
 				break;
 			case eventObj.menu.refreshItem:
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMM().refreshAllData();
 				break;
 			case eventObj.menu.startItem:
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().startLesson(false, _root.lessonID);
 				break;
 			case eventObj.menu.scheduleItem:
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMV().getLessonTabView().scheduleLessonStart();
 				break;
 			case eventObj.menu.exitItem:
 				getURL('javascript: window.close();');
@@ -319,15 +323,22 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     * event handler for go menu click
     */
     private function goMenuClicked(eventObj:Object):Void{
+		var tab:MovieClip = org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMV().getMonitorTab();
 		switch(eventObj.menuItem) {
 			case eventObj.menu.goLessonTab : 
+				tab.selectedIndex = 0;
 				break;
 			case eventObj.menu.goScheduleTab : 
+				tab.selectedIndex = 1;
 				break;
 			case eventObj.menu.goLearnerTab : 
+				tab.selectedIndex = 2;
 				break;
-			case eventObj.menu.goTodoTab : 
+			case eventObj.menu.goTodoTab :
+				tab.selectedIndex = 3;
 				break;
+				
+			dispatchEvent({type:'change', target: tab});
 		}
 	}
     
@@ -337,6 +348,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     private function viewMenuClicked(eventObj:Object):Void{
 		switch(eventObj.menuItem) {
 			case eventObj.menu.viewLearners : 
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMM().setDialogOpen("VM_DIALOG");
 				break;
 		}
 	}
@@ -390,6 +402,23 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     
 	public function enableExport(enable:Boolean){
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(7), enable);
+	}
+	
+	public function get fileMenu():Menu {
+		return file_menu;
+	}
+	
+	public function get viewMenu():Menu {
+		return view_menu;
+	}
+	
+	public function setDefaults():Void{
+		//file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(0), true);
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(1), false);
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(2), false);
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(3), false);
+		
+		view_menu.setMenuItemEnabled(view_menu.getMenuItemAt(0), false);
 	}
 	
     /**
