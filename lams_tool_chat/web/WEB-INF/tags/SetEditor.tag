@@ -33,9 +33,11 @@
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="text" required="true" rtexprvalue="true"%>
 <%@ attribute name="small" required="false" rtexprvalue="true"%>
+<%@ attribute name="key" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
 
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -53,15 +55,28 @@
 	<c:set var="previewClassName" value="smallPreviewPanel" />
 	<c:set var="txtClassName" value="smallTextareaPanel" />
 </c:if>
+
 <div id="preview${id}" style="visibility: hidden; display: none;">
 	<div>
-		<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)"><img src="${lams}images/html.gif" border="0" alt="Open HTML Editor"></a>
+		<c:if test="${key != null}">
+			<fmt:message key="${key}"/>
+		</c:if>
+		<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)">
+			<img src="${lams}images/html.gif" border="0" alt="Open HTML Editor">
+		</a>
 	</div>
 	<div class="${previewClassName}" id="preview${id}.text"></div>
+
+
 </div>
 <div id="tx${id}">
 	<div>
-		<a href="javascript:doTextToHTML('${id}');doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)"><img src="${lams}images/html.gif" border="0" alt="Open HTML Editor"></a>
+		<c:if test="${key != null}">
+			<fmt:message key="${key}"/>
+		</c:if>		
+		<a href="javascript:doTextToHTML('${id}');doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)">
+			<img src="${lams}images/html.gif" border="0" alt="Open HTML Editor">
+		</a>
 	</div>
 	<textarea class="${txtClassName}" name="${fn:toLowerCase(id_a)}${id_b}" id="tx${id}.textarea"><c:out value="${text}" escapeXml="false" /></textarea>
 </div>
