@@ -31,7 +31,7 @@
 			<div id="content">
 				<p><fmt:message key="msg.export.loading" /></p>
 				<p>
-					<a href="javascript:;" onclick="closeWin();"><fmt:message key="button.close" /></a>
+					<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
 				</p>
 			</div>
 			<div id="footer"></div>

@@ -31,7 +31,7 @@
 				<p><fmt:message key="label.ld.zip.file" />
 				:
 				<input type="file" name="UPLOAD_FILE" />
-				<input type="submit" name="import" value="<fmt:message key="button.import" />"/></p>
+				<input type="submit" name="import" value="<fmt:message key="button.import" />" /></p>
 			</form>
 		</div>
 		<div id="footer"></div>
