@@ -55,6 +55,7 @@ class Sequence {
 	// sequence dates
 	private var _seqCreatedDate:Date;
 	private var _seqStartDate:Date;
+	private var _seqScheduleStartDate:Date;
 	
 	// organisation data
 	private var _organisationID:Number;
@@ -115,6 +116,7 @@ class Sequence {
 		
 		_seqCreatedDate = dto.createDateTime;
 		_seqStartDate = dto.startDateTime;
+		_seqScheduleStartDate = dto.scheduleStartDate;
 		
 		_organisationID = dto.organisationID;
 		_organisationName = dto.organisationName;
@@ -278,12 +280,12 @@ class Sequence {
 	public function getStartDateTime():String{
 		var dateFormated:String
 		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null){
-			dateFormated = "Not Started"
+			//dateFormated = "Not Started"
+			return null;
 		}else{
 			var dateFormated:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()+1))+" "+_seqStartDate.getFullYear());;
 		}
 		return dateFormated;
-		//return _seqStartDate;
 	}
 	
 	public function get startdate():Date{
@@ -292,6 +294,44 @@ class Sequence {
 	
 	public function get isStarted():Boolean{
 		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null){
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public function setScheduleDateTime(seqScheduleDate:Date){
+		_seqScheduleStartDate = seqScheduleDate;
+	}
+	
+	public function getScheduleDateTime():String{
+		var dateFormated:String;
+		var timeFormated:String;
+		if (_seqScheduleStartDate.getDate() == undefined || _seqScheduleStartDate.getDate() == null){
+			//dateFormated = "Not Scheduled"
+			return null;
+		}else{
+			var hours = _seqScheduleStartDate.getHours();
+			var mins = _seqScheduleStartDate.getMinutes();
+			var mins_str;
+			if(mins < 10){
+				mins_str = '0' + mins.toString();
+			} else {
+				mins_str = mins.toString();
+			}
+			
+			timeFormated = hours + ":" + mins_str;
+			dateFormated = (_seqScheduleStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqScheduleStartDate.getMonth()+1))+" "+_seqScheduleStartDate.getFullYear());;
+		}
+		return timeFormated + " " + dateFormated;
+	}
+	
+	public function get scheduledate():Date{
+		return _seqScheduleStartDate;
+	}
+	
+	public function get isScheduled():Boolean{
+		if (_seqScheduleStartDate.getDate() == undefined || _seqScheduleStartDate.getDate() == null){
 			return false;
 		}
 		

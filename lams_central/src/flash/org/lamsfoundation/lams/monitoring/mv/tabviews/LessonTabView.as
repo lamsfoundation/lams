@@ -53,6 +53,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var ARCHIVE_CBI:Number = 3;
 	public static var UNARCHIVE_CBI:Number = 4;
 	
+	public static var NOT_STARTED_STATUS:Number = 2;
 	public static var STARTED_STATUS:Number = 3;
 	public static var SUSPENDED_STATUS:Number = 4;
 	public static var ARCHIVED_STATUS:Number = 6;
@@ -82,6 +83,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var manageStatus_lbl:Label;
 	private var manageStart_lbl:Label;
 	private var manageDate_lbl:Label;
+	private var start_date_lbl:Label;
+	private var schedule_date_lbl:Label;
 	private var btnLabel:String;
 		
 	//Text Items
@@ -231,12 +234,13 @@ public function update (o:Observable,infoObj:Object):Void{
 		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
 
 	}
-	
+
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
 	}
 	
+
 	/**
 	 * Reloads the learner Progress and 
 	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
@@ -347,28 +351,44 @@ public function update (o:Observable,infoObj:Object):Void{
 		}
 	
 	}
+	
 	private function enableEditClass(stateID:Number):Void{
 		
 		switch(stateID){
 			case Sequence.ACTIVE_STATE_ID :
-				showStartFields(true);
+				showStartFields(true, true);
 				editClass_btn.enabled = true;
 				break;
 			case Sequence.NOTSTARTED_STATE_ID :
-				showStartFields(true);
+				showStartFields(true, false);
 				editClass_btn.enabled = true;
 				break;
 			default :
-				showStartFields(false);
+				showStartFields(false, false);
 				editClass_btn.enabled = false;
 			
 		}
 	}
 	
-	private function showStartFields(b:Boolean){
+	private function showStartFields(a:Boolean, b:Boolean){
+		var s:Object = mm.getSequence();
+		
+		// is started?
+		if(a){
+			start_date_lbl.text = s.getStartDateTime();
+		}
+		
+		start_btn.visible = a;
+		start_date_lbl.visible = a;
+		
+		// is scheduled to start?
+		if(b){
+			schedule_date_lbl.text = s.getScheduleDateTime();
+		}
+		
+		schedule_date_lbl.visible = b;
 		scheduleTime._visible = b;
 		scheduleDate_dt.visible = b;
-		start_btn.visible = b;
 		schedule_btn.visible = b;
 		manageDate_lbl.visible = b;
 		
@@ -385,6 +405,7 @@ public function update (o:Observable,infoObj:Object):Void{
 
 	private function showStatus(seqStatus:Number):String{
 		var seqStat:String;
+		var s:Object = mm.getSequence();
 		
 		switch(seqStatus){
 			case LessonTabView.ARCHIVED_STATUS :
@@ -395,6 +416,12 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case LessonTabView.SUSPENDED_STATUS :
 				seqStat = Dictionary.getValue('ls_status_disabled_lbl');
+				break;
+			case LessonTabView.NOT_STARTED_STATUS:
+				if(s.isScheduled){ seqStat = Dictionary.getValue('ls_status_scheduled_lbl', [s.getScheduleDateTime()]); }
+				else {
+					seqStat = Dictionary.getValue('ls_status_active_lbl');
+				}
 				break;
 			default:
 				seqStat = Dictionary.getValue('ls_status_active_lbl');
