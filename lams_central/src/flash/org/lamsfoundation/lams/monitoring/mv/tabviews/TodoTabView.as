@@ -116,6 +116,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					this._visible = true;
+					hideMainExp(mm);
 					//mm.setDirty();
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 				}else {
@@ -126,6 +127,11 @@ public function update (o:Observable,infoObj:Object):Void{
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.ToDoTabView');
 		}
 
+	}
+	
+	private function hideMainExp(mm:MonitorModel):Void{
+		//var mcontroller = getController();
+		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
 	}
 	
 	/**

@@ -163,6 +163,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					this._visible = true;
+					hideMainExp(mm);
 					//mm.setDirty();
 					//MovieClipUtils.doLater(Proxy.create(this,draw));
 					if(mm.getIsProgressChanged()){
@@ -177,6 +178,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
 					this._visible = true;
+					hideMainExp(mm);
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 					
 				}else {
@@ -228,6 +230,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
 		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
 
+	}
+	
+	private function hideMainExp(mm:MonitorModel):Void{
+		//var mcontroller = getController();
+		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
 	}
 	
 	/**

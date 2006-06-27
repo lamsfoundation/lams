@@ -126,6 +126,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					trace("isChanged value in monitorModel is: "+mm.getIsProgressChanged())
 					if (infoObj.tabID == _tabID){
 						this._visible = true;
+						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
@@ -216,6 +217,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		setStyles();
 		
 		dispatchEvent({type:'load',target:this});
+	}
+	
+	
+	private function hideMainExp(mm:MonitorModel):Void{
+		//var mcontroller = getController();
+		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true)
 	}
 	
 	/**

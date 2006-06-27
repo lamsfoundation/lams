@@ -137,6 +137,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
 						this._visible = true;
+						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
@@ -222,7 +223,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		dispatchEvent({type:'load',target:this});
 	}
 	
-	
+	private function hideMainExp(mm:MonitorModel):Void{
+		//var mcontroller = getController();
+		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
+	}
 	
 	//private function initEventListeners(){
 		//refresh_btn.addEventListener("click", Delegate.create(this, reloadProgress));
@@ -346,6 +350,43 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var s:Boolean = (r==null) ? false : true;
 		
 	}
+	
+	private function printLearner(a:Activity,mm:MonitorModel, learner:Object){
+		var z:Object = mm.getSize();
+		var styleObj = _tm.getStyleObject('button');
+		var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn')
+		var nameTextFormat = new TextFormat();
+		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
+		trace("Monitor Tab Grid Width: "+z.w+" Monitor Tab Grid Height: "+z.h);
+		
+		_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y, z.w-20, 20);
+		_activityLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _activityLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2} )
+		var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
+		
+		var learnerExp_btn = _activityLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
+		learnerExp_btn.setSize(90, 17);
+		learnerExp_btn.setStyle('styleName',styleObj);
+		learnerExp_btn.onRelease = function (){
+					//trace("Contribute Type is: "+o.taskURL);
+					JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 300, 400, true, true, false, false, false);
+					
+					//getURL(String(o.taskURL), "_blank");
+					//getURL("http://localhost:8080/lams/monitoring/monitoring.do?method=getAllContributeActivities&lessonID=4", "_blank");
+				}
+			
+		nameTextFormat.bold = true;
+		nameTextFormat.font = "Verdana";
+		nameTextFormat.size = 11;
+		learnerName_txt.border = true;
+		learnerName_txt.selectable = false;
+		learnerName_txt.background = true;
+		learnerName_txt.backgroundColor = 0xCCCCCC;
+		learnerName_txt.setNewTextFormat(nameTextFormat);
+		learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
+		trace("Ypos for name field is: "+ACT_Y)
+	}
+
+	
 	/**
 	 * Draws new activity to monitor tab view stage.
 	 * @usage   
@@ -357,7 +398,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
 		if (ACT_X == 0){
-			 var z:Object = mm.getSize();
+			printLearner(a, mm, learner)
+			 /*var z:Object = mm.getSize();
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 			_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y, z.w-20, 20);
 			var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
@@ -372,7 +414,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			learnerName_txt.backgroundColor = 0xCCCCCC;
 			learnerName_txt.setNewTextFormat(nameTextFormat);
 			learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
-			trace("Ypos for name field is: "+ACT_Y)
+			trace("Ypos for name field is: "+ACT_Y)*/
 		}
 		var s:Boolean = false;
 		
