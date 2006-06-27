@@ -36,6 +36,46 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
 	protected String selectedToolSessionId;
 	protected String isToolSessionChanged;
 	
+	protected String hideResponse;
+	protected String showResponse;
+	protected String currentUid;
+	
+    /**
+     * @return Returns the currentUid.
+     */
+    public String getCurrentUid() {
+        return currentUid;
+    }
+    /**
+     * @param currentUid The currentUid to set.
+     */
+    public void setCurrentUid(String currentUid) {
+        this.currentUid = currentUid;
+    }
+    /**
+     * @return Returns the hideResponse.
+     */
+    public String getHideResponse() {
+        return hideResponse;
+    }
+    /**
+     * @param hideResponse The hideResponse to set.
+     */
+    public void setHideResponse(String hideResponse) {
+        this.hideResponse = hideResponse;
+    }
+    /**
+     * @return Returns the showResponse.
+     */
+    public String getShowResponse() {
+        return showResponse;
+    }
+    /**
+     * @param showResponse The showResponse to set.
+     */
+    public void setShowResponse(String showResponse) {
+        this.showResponse = showResponse;
+    }
 	/**
 	 * @return Returns the isToolSessionChanged.
 	 */

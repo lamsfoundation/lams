@@ -58,6 +58,23 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
         return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, new Long(responseId));
     }
 
+    public QaUsrResp getAttemptByUID(Long uid)
+	{
+		String query = "from QaUsrResp attempt where attempt.responseId=?";
+		
+		HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(query)
+		.setLong(0,uid.longValue())
+		.list();
+		
+		if(list != null && list.size() > 0){
+		    QaUsrResp attempt = (QaUsrResp) list.get(0);
+			return attempt;
+		}
+		return null;	
+	}
+	
+	
 	
 	/**
      * @see org.lamsfoundation.lams.tool.qa.dao.interfaces.IQaUsrRespDAO#saveUserResponse(com.lamsinternational.tool.qa.domain.QaUsrResp)

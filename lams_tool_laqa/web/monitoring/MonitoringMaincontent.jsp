@@ -94,6 +94,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMonitoringMethod(actionMethod);
 		}
 
+		function submitResponse(currentUid, actionMethod)
+		{
+			document.QaMonitoringForm.currentUid.value=currentUid;
+	        submitMethod(actionMethod);
+		}
+
+
 
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
@@ -142,6 +149,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
     <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 	<html:hidden property="method"/>
+	<html:hidden property="currentUid"/>
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
 

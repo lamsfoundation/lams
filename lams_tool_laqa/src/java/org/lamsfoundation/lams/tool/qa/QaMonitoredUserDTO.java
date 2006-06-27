@@ -52,6 +52,8 @@ public class QaMonitoredUserDTO implements Comparable
 	private String sessionId;
 	
 	private String questionUid;
+	
+	private String visible;
     
     private Map usersAttempts;
 	
@@ -191,4 +193,16 @@ public class QaMonitoredUserDTO implements Comparable
 	public void setQuestionUid(String questionUid) {
 		this.questionUid = questionUid;
 	}
+    /**
+     * @return Returns the visible.
+     */
+    public String getVisible() {
+        return visible;
+    }
+    /**
+     * @param visible The visible to set.
+     */
+    public void setVisible(String visible) {
+        this.visible = visible;
+    }
 }

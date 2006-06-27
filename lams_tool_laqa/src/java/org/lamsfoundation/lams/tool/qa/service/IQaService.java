@@ -94,6 +94,8 @@ public interface IQaService
 	
 	public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
 	
+	public void updateUserResponse(QaUsrResp resp) throws QaApplicationException;
+	
 	public QaUsrResp retrieveQaUsrResp(long responseId) throws QaApplicationException;
 	
 	public void updateQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
@@ -143,6 +145,12 @@ public interface IQaService
 	
 	public void createQa(QaContent qa) throws QaApplicationException;
 	
+	public QaUsrResp getAttemptByUID(Long uid) throws QaApplicationException;
+	
+    public void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
+
+    public void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
+    
 	public void deleteQa(QaContent qa) throws QaApplicationException;
     
 	public void deleteQaSession(QaSession QaSession) throws QaApplicationException;

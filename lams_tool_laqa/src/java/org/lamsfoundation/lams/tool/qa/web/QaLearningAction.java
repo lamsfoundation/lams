@@ -181,12 +181,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     		    logger.debug("populating mapAnswers...");
     		    mapAnswers=populateAnswersMap(mapping, form, request, response);
     		    logger.debug("mapAnswers: " + mapAnswers);
-    		    /*
-    			logger.debug("totalQuestionCount is > 1: " + qaLearningForm.getAnswer());
-    			int mapSize=mapAnswers.size();
-    			logger.debug("mapSize: " + mapSize);
-    			mapAnswers.put(new Long(mapSize).toString() , qaLearningForm.getAnswer());
-    			*/
     		}
     		
     	}
@@ -263,12 +257,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         logger.debug("start generating learning report...");
         Long toolContentID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    logger.debug("toolContentID: " + toolContentID);
-	    
-    	/*the report should have all the users' entries OR
-    	 * the report should have only the current session's entries*/
-	    //logger.debug("generating summary data: ");
-    	//qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionId.toString(), userID);
-
 	    
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
     	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionId.toString(), null);

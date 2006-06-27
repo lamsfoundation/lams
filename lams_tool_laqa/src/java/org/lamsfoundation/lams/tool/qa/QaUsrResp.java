@@ -60,6 +60,8 @@ public class QaUsrResp implements Serializable, Comparable {
     /** nullable persistent field */
     private QaQueContent qaQueContent;
     
+    private boolean visible;
+    
     /** nullable persistent field */
     private Long qaQueContentId; //added to enable deletion by the resp dao
     
@@ -105,6 +107,24 @@ public class QaUsrResp implements Serializable, Comparable {
 		this.qaQueUser = qaQueUser;
 	}
      
+
+    public QaUsrResp(String answer,
+			boolean hidden,
+			Date attemptTime,
+			String timezone,
+			QaQueContent qaQueContent, 
+			QaQueUsr qaQueUser,
+			boolean visible) {
+	this.answer = answer;
+	this.hidden = hidden;
+	this.attemptTime = attemptTime;
+	this.timezone = timezone;
+	this.qaQueContent = qaQueContent;
+	this.qaQueUser = qaQueUser;
+	this.visible=visible;
+}
+
+    
     public QaUsrResp(String answer,
     				boolean hidden,
     				Date attemptTime,
@@ -374,4 +394,18 @@ public class QaUsrResp implements Serializable, Comparable {
 	public void setTimezone(String timezone) {
 		this.timezone = timezone;
 	}
+	
+    /**
+     * @return Returns the visible.
+     */
+    public boolean isVisible() {
+        return visible;
+    }
+    /**
+     * @param visible The visible to set.
+     */
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+	
 }

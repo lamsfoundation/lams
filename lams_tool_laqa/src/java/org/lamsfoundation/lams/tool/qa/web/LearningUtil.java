@@ -164,7 +164,8 @@ public class LearningUtil implements QaAppConstants{
         						new Date(System.currentTimeMillis()),
         						timezoneId,
         						qaQueContent,
-        						qaQueUsr); 
+        						qaQueUsr,
+        						true); 
 
         				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
         				if (qaUsrResp != null)

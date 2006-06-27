@@ -385,6 +385,7 @@ public class MonitoringUtil implements QaAppConstants{
 		    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
 		    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
 		    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+		    	    			qaMonitoredUserDTO.setVisible(new Boolean(qaUsrResp.isVisible()).toString());
 		    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
 		    	    		}
 		    			}
@@ -428,6 +429,7 @@ public class MonitoringUtil implements QaAppConstants{
 			    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
 			    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
 			    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+			    	    			qaMonitoredUserDTO.setVisible(new Boolean(qaUsrResp.isVisible()).toString());
 			    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
 			    	    		}
 			    			}
@@ -482,6 +484,7 @@ public class MonitoringUtil implements QaAppConstants{
 				    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
 				    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
 				    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+				    	    			qaMonitoredUserDTO.setVisible(new Boolean(qaUsrResp.isVisible()).toString());
 				    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
 				    	    		}
 				    			}
@@ -524,6 +527,7 @@ public class MonitoringUtil implements QaAppConstants{
 			    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
 			    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
 			    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+			    	    			qaMonitoredUserDTO.setVisible(new Boolean(qaUsrResp.isVisible()).toString());
 			    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
 		    	    			}
 		    	    		}

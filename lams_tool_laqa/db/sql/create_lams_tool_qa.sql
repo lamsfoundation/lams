@@ -66,6 +66,7 @@ CREATE TABLE tl_laqa11_usr_resp (
      , attempt_time DATETIME
      , que_usr_id BIGINT(20) NOT NULL
      , qa_que_content_id BIGINT(20) NOT NULL
+     , visible TINYINT(1) NOT NULL DEFAULT 1
      , PRIMARY KEY (response_id)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_3 FOREIGN KEY (que_usr_id)
@@ -86,7 +87,6 @@ CREATE TABLE tl_laqa11_uploadedfile (
      , CONSTRAINT FK_tl_laqa11_uploadedfile_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
 )TYPE=InnoDB;
-
 
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, 	creation_date)  VALUES (${default_content_id}, NOW());

@@ -422,6 +422,34 @@ public class QaServicePOJO
 														   e);
         }
 	}
+    
+    public QaUsrResp getAttemptByUID(Long uid) throws QaApplicationException
+    {
+        try
+        {
+        	return qaUsrRespDAO.getAttemptByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting response by uid: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
+    public void updateUserResponse(QaUsrResp resp) throws QaApplicationException
+    {
+        try
+        {
+        	qaUsrRespDAO.updateUserResponse(resp);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is updating response"
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
 
     
     public List getUserBySessionOnly(final QaSession qaSession) throws QaApplicationException
@@ -677,6 +705,28 @@ public class QaServicePOJO
                                                  + e.getMessage(),e);
         }
 	}
+    
+
+    /**
+     * logs hiding of a user entered vote 
+     */
+    public void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException
+    {
+        logger.debug("hiding user entry: " + qaUsrResp.getAnswer());
+		auditService.logHideEntry(MY_SIGNATURE, qaUsrResp.getQueUsrId(), 
+		        qaUsrResp.getQaQueUser().getUsername(), qaUsrResp.getAnswer());
+    }
+
+    /**
+     * logs showing of a user entered vote 
+     */
+    public void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException
+    {
+        logger.debug("showing user entry: " + qaUsrResp.getAnswer());
+		auditService.logShowEntry(MY_SIGNATURE, qaUsrResp.getQueUsrId(), 
+		        qaUsrResp.getQaQueUser().getUsername(), qaUsrResp.getAnswer());
+    }
+
     
     
     public void deleteUsrRespByQueId(Long qaQueId) throws QaApplicationException

@@ -895,6 +895,133 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	
 	
+    public ActionForward showResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     {
+        logger.debug("dispatching showResponse...");
+        IQaService qaService=null;
+	    qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		}
+		logger.debug("qaService: " + qaService);
+		
+    	QaMonitoringForm voteMonitoringForm = (QaMonitoringForm) form;
+
+    	String currentUid=voteMonitoringForm.getCurrentUid();
+    	logger.debug("currentUid: " + currentUid);
+        QaUsrResp qaUsrResp =qaService.getAttemptByUID(new Long(currentUid));
+        logger.debug("qaUsrResp: " + qaUsrResp);
+        qaUsrResp.setVisible(true);
+        qaService.updateUserResponse(qaUsrResp);
+        qaService.showResponse(qaUsrResp);
+        logger.debug("qaUsrResp: " + qaUsrResp);
+
+    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+		logger.debug("existing qaContent:" + qaContent);
+
+
+    	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+
+	    if (currentMonitoredToolSession.equals(""))
+	    {
+	        currentMonitoredToolSession="All";
+	    }
+
+	    refreshSummaryData(request, qaContent, qaService, true, false, null, null);
+		
+		
+		if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+
+	    logger.debug("submitting session to refresh the data from the database: ");
+	    return (mapping.findForward(LOAD_MONITORING));
+     }
+	
+
+    public ActionForward hideResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     {
+        logger.debug("dispatching hideResponse...");
+        IQaService qaService=null;
+	    qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		}
+		logger.debug("qaService: " + qaService);
+		
+    	QaMonitoringForm voteMonitoringForm = (QaMonitoringForm) form;
+
+    	String currentUid=voteMonitoringForm.getCurrentUid();
+    	logger.debug("currentUid: " + currentUid);
+        QaUsrResp qaUsrResp =qaService.getAttemptByUID(new Long(currentUid));
+        logger.debug("qaUsrResp: " + qaUsrResp);
+        qaUsrResp.setVisible(false);
+        qaService.updateUserResponse(qaUsrResp);
+        qaService.hideResponse(qaUsrResp);
+        logger.debug("qaUsrResp: " + qaUsrResp);
+
+    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+		logger.debug("existing qaContent:" + qaContent);
+
+
+    	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	    if (currentMonitoredToolSession.equals(""))
+	    {
+	        currentMonitoredToolSession="All";
+	    }
+
+	    refreshSummaryData(request, qaContent, qaService, true, false, null, null);
+		
+		
+		if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+
+	    logger.debug("submitting session to refresh the data from the database: ");
+	    return (mapping.findForward(LOAD_MONITORING));
+     }
+    
+	
 	/**
 	 * populates data for instructions screen
 	 * @param request

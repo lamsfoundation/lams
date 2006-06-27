@@ -35,6 +35,8 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 public interface IQaUsrRespDAO
 {
 	public void saveUserResponse(QaUsrResp resp);
+	
+	public QaUsrResp getAttemptByUID(Long uid);
 
 	public void updateUserResponse(QaUsrResp resp);
 	
