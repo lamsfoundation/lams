@@ -53,7 +53,7 @@ public class LibraryActivityDTO extends BaseDTO
 	private Long groupingID;
 	private Integer groupingUIID;
 	private String description;
-	private String title;
+	private String activityTitle;
 	private String helpText;
 	private Integer xCoord;
 	private Integer yCoord;
@@ -110,7 +110,7 @@ public class LibraryActivityDTO extends BaseDTO
 	    this.groupingID = activity.getGrouping()!= null? activity.getGrouping().getGroupingId(): null;
 	    this.groupingUIID = activity.getGroupingUIID();
 	    this.description = activity.getDescription();
-	    this.title = activity.getTitle();
+	    this.activityTitle = activity.getTitle();
 	    this.helpText = activity.getHelpText();
 	    this.xCoord = activity.getXcoord();
 	    this.yCoord = activity.getYcoord();
@@ -324,8 +324,8 @@ public class LibraryActivityDTO extends BaseDTO
     /**
      * @return Returns the title.
      */
-    public String getTitle() {
-        return title;
+    public String getActivityTitle() {
+        return activityTitle;
     }
    
     /**
@@ -471,8 +471,8 @@ public class LibraryActivityDTO extends BaseDTO
 	}
 
 	/** Set the activity's title */
-	public void setTitle(String title) {
-		this.title = title;
+	public void setActivityTitle(String title) {
+		this.activityTitle = title;
 	}
 
 	/** Set the tool's display name (similar to title) */

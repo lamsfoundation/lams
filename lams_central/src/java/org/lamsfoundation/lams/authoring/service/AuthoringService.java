@@ -567,11 +567,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			if ( languageFilename  != null ) {
 				MessageSource toolMessageSource = toolActMessageService.getMessageService(languageFilename);
 				if ( toolMessageSource != null ) {
-					activity.setTitle(toolMessageSource.getMessage(Activity.I18N_TITLE,null,activity.getTitle(),locale));
+					activity.setActivityTitle(toolMessageSource.getMessage(Activity.I18N_TITLE,null,activity.getActivityTitle(),locale));
 					activity.setDescription(toolMessageSource.getMessage(Activity.I18N_DESCRIPTION,null,activity.getDescription(),locale));
 					activity.setHelpText(toolMessageSource.getMessage(Activity.I18N_HELP_TEXT,null,activity.getHelpText(),locale));
 				} else {
-					log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
+					log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getActivityTitle()
 							+" message file "+activity.getLanguageFile()+". Activity Message source not available");
 				}
 
@@ -582,12 +582,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 					if ( toolMessageSource != null ) {
 						activity.setToolDisplayName(toolMessageSource.getMessage(Tool.I18N_DISPLAY_NAME,null,activity.getToolDisplayName(),locale));
 					} else {
-						log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
+						log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getActivityTitle()
 							+" message file "+activity.getLanguageFile()+". Tool Message source not available");
 					}
 				}
 			} else {
-				log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
+				log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getActivityTitle()
 						+". No message file supplied.");
 			}
 		}
