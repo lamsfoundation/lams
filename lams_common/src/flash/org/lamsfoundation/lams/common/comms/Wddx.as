@@ -112,6 +112,7 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 		etRev["&lt;"] = "<";
 		etRev["&gt;"] = ">";
 		etRev["&amp;"] = "&";
+		
 		at[ord("<")] = "&lt;";
 		at[ord(">")] = "&gt;";
 		at[ord("&")] = "&amp;";
@@ -234,7 +235,11 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 			var char:String = substring(s, i+1, 1);
 			var ord:String = ord(substring(s, i+1, 1));
 			if(ord < 256) {
-				tempString += (this.et[ord(substring(s, i+1, 1))]);
+				if(char == et[13]){
+					tempString += "%0D%0A";
+				} else {
+					tempString += (this.et[ord(substring(s, i+1, 1))]);
+				}
 			} else {
 				tempString += "&#" + ord + ";";
 			}
