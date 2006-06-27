@@ -722,7 +722,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			List<LearningDesign> ldList = learningDesignDAO.getAllLearningDesignsInFolder(folder.getWorkspaceFolderId());
 			String newName = ld.getTitle();
 			int idx = 1;
+			
+			//contruct middle part of name by timestamp
 			Calendar calendar = Calendar.getInstance();
+			int mth = calendar.get(Calendar.MONTH) + 1;
+			String mthStr = new Integer(mth).toString();
+			if(mth < 10)
+				mthStr = "0" + mthStr;
+			int day = calendar.get(Calendar.DAY_OF_MONTH);
+			String dayStr = new Integer(day).toString();
+			if(day < 10)
+				dayStr = "0" + dayStr;
+			String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
 			while(true){
 				dupName = false;
 				for(LearningDesign eld :ldList){
@@ -733,7 +744,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 				if(!dupName)
 					break;
-				newName = ld.getTitle() + "_" + calendar.get(Calendar.DAY_OF_MONTH)+calendar.get(Calendar.MONTH) + calendar.get(Calendar.YEAR) + "_" + idx;
+				newName = ld.getTitle() + "_" + nameMid + "_" + idx;
 				idx++;
 			}
 			ld.setTitle(newName);
