@@ -12,7 +12,12 @@
 </HEAD>
 
 <BODY>
-<p><fmt:message key="msg.loading.add.lesson.window"/></p>
+	<div id="page">	
+		<div id="content">
+			<p><fmt:message key="msg.loading.add.lesson.window"/></p>
+		</div>
+		<div id="footer"></div>
+	</div>
 </BODY>
 	
 </HTML>
