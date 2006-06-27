@@ -169,11 +169,15 @@ public function update (o:Observable,infoObj:Object):Void{
 					hideMainExp(mm);
 					//mm.setDirty();
 					//MovieClipUtils.doLater(Proxy.create(this,draw));
+					
 					if(mm.getIsProgressChanged()){
 						trace("I am calling reloadProgress now")
 						reloadProgress(false);
 					}
-				}else {
+					
+					setMenu();
+				
+				} else {
 					this._visible = false;
 				}
 				break;
@@ -183,7 +187,6 @@ public function update (o:Observable,infoObj:Object):Void{
 					this._visible = true;
 					hideMainExp(mm);
 					MovieClipUtils.doLater(Proxy.create(this,draw));
-					
 				}else {
 					this._visible = false;
 				}
@@ -300,7 +303,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			mm.getMonitor().getContributeActivities(mm.getSequence().ID);
 		}
 		
-		
+		setMenu();
 		setStyles();
 		
 		dispatchEvent({type:'load',target:this});
@@ -440,7 +443,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		dispatchEvent({type:"apply", target: this});
 	}
 	
-	private function scheduleLessonStart(evt:Object):Void{
+	public function scheduleLessonStart(evt:Object):Void{
 		var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
 		mm.getMonitor().startLesson(true, _root.lessonID, datetime);
 	}
@@ -680,6 +683,16 @@ public function update (o:Observable,infoObj:Object):Void{
 		reqTasks_scp.border_mc.setStyle('_visible',false);
 		
     }
+	
+	private function setMenu():Void{
+		var fm:Menu = LFMenuBar.getInstance().fileMenu;
+		fm.setMenuItemEnabled(fm.getMenuItemAt(1), editClass_btn.enabled);
+		fm.setMenuItemEnabled(fm.getMenuItemAt(2), start_btn.visible);
+		fm.setMenuItemEnabled(fm.getMenuItemAt(3), schedule_btn.visible);
+		
+		var vm:Menu = LFMenuBar.getInstance().viewMenu;
+		vm.setMenuItemEnabled(vm.getMenuItemAt(0), true);
+	}
     
 	public function getScheduleDateTime(date:Date, timeStr:String):String{
 		var bs:String = "%2F";		// backslash char

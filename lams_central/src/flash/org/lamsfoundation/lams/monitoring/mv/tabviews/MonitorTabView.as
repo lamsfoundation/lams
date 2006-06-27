@@ -137,6 +137,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 							trace("I am calling reloadProgress now")
 							reloadProgress(false);
 						}
+						
+						LFMenuBar.getInstance().setDefaults();
+						
 					}else {
 						this._visible = false;
 					}

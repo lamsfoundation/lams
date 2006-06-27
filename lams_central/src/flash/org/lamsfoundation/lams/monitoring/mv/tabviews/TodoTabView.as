@@ -119,7 +119,9 @@ public function update (o:Observable,infoObj:Object):Void{
 					hideMainExp(mm);
 					//mm.setDirty();
 					MovieClipUtils.doLater(Proxy.create(this,draw));
-				}else {
+					
+					LFMenuBar.getInstance().setDefaults();
+				} else {
 					this._visible = false;
 				}
 				break;

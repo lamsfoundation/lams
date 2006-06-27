@@ -139,18 +139,25 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 						this._visible = true;
 						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
+						
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
 							break;
 						}
+						
 						trace("learnerDrawn are: "+learnersDrawn)
 						trace("all learner progress length is: "+mm.allLearnersProgress.length)
+						
 						if (learnersDrawn != mm.allLearnersProgress.length){
 							drawAllLearnersDesign(mm, infoObj.tabID)
 						}
+						
 						if(mm.getIsProgressChanged()){
 							reloadProgress(false);
 						}
+						
+						LFMenuBar.getInstance().setDefaults();
+						
 					}else {
 						this._visible = false;
 					}
@@ -217,6 +224,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);
 		trace("Help layer path: "+ learnerMenuBar.refresh_btn.label)
 		//setSize (mm)
+		
 		
 		setStyles();
 		
