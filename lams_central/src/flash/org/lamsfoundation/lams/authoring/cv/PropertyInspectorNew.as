@@ -71,6 +71,9 @@ class PropertyInspectorNew extends MovieClip{
     private var runOffline_chk:CheckBox;
     private var defineLater_chk:CheckBox;
 	
+	//genral info
+	private var total_num_activities_lbl:Label;
+	
 	//gates
 	private var gateType_lbl:Label;
 	private var gateType_cmb:ComboBox;
@@ -174,7 +177,7 @@ class PropertyInspectorNew extends MovieClip{
 		numRandomGroups_stp.addEventListener("change",Delegate.create(this,updateGroupingMethodData));
 		numRandomGroups_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
 		
-		dispatchEvent({type:'load',target:this});
+		
 		this.onEnterFrame = setupLabels;
 		
 	}
@@ -227,8 +230,9 @@ class PropertyInspectorNew extends MovieClip{
 		showToolActivityControls(false);
 		showGateControls(false);
 		showAppliedGroupingControls(false);
+		showGeneralInfo(true);
 		
-		
+		dispatchEvent({type:'load',target:this});
 	}
 	
 	
@@ -295,9 +299,10 @@ class PropertyInspectorNew extends MovieClip{
 				delimitLine._visible = true;
 				showGroupingControls(false);
 				showToolActivityControls(false);
+				showGeneralInfo(false);
 				showOptionalControls(false);
 				showGateControls(true);
-				showAppliedGroupingControls(true);
+				showAppliedGroupingControls(false);
 				//showGeneralProperties(a)
 				checkEnableGateControls();
 				showGateActivityProperties(GateActivity(a));
@@ -314,6 +319,7 @@ class PropertyInspectorNew extends MovieClip{
 				showGroupingControls(true);
 				showGeneralControls(true);
 				showOptionalControls(false);
+				showGeneralInfo(false);
 				showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
@@ -332,6 +338,7 @@ class PropertyInspectorNew extends MovieClip{
 				showOptionalControls(false);
 				showGeneralControls(true);
 				showGroupingControls(false);
+				showGeneralInfo(false);
 				showAppliedGroupingControls(true);
 				showToolActivityControls(true);
 				showGateControls(false);
@@ -357,6 +364,7 @@ class PropertyInspectorNew extends MovieClip{
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
+				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
 				showOptionalControls(true);
 				//showGeneralProperties(cca)
@@ -374,6 +382,7 @@ class PropertyInspectorNew extends MovieClip{
 				//its an parallel activity
 				showOptionalControls(false);
 				showGeneralControls(true);
+				showGeneralInfo(false);
 				showGroupingControls(false);
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
@@ -393,6 +402,7 @@ class PropertyInspectorNew extends MovieClip{
 				delimitLine._visible = false;
 				showTransitionProperties(t);
 				//showGeneralProperties(t)
+				showGeneralInfo(false);
 				showGeneralControls(false);
 				showOptionalControls(false);
 				showGroupingControls(false);
@@ -403,8 +413,9 @@ class PropertyInspectorNew extends MovieClip{
 			
 		}else{
 				Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','PropertyInspector');
+				showGeneralInfo(true);
 				delimitLine._visible = false;
-				toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>"
+				toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> "//Dictionary.getValue('pi_title_generalinfo');
 				showGroupingControls(false);
 				showGeneralControls(false);
 				showOptionalControls(false);
@@ -441,6 +452,11 @@ class PropertyInspectorNew extends MovieClip{
 		editGrouping_btn.visible = v;
 	}
 	
+	
+	private function showGeneralInfo(v:Boolean){
+
+		total_num_activities_lbl.visible = v;
+	} 
 	
 	private function showGeneralControls(v:Boolean){
 
