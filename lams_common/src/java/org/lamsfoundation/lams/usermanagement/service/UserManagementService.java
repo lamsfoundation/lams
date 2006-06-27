@@ -420,4 +420,22 @@ public class UserManagementService implements IUserManagementService {
 		return workspace;
 	}
 	
+    public Organisation saveOrganisation( Organisation organisation, Integer userID ) 	 
+    { 	 
+	 
+            if ( organisation.getOrganisationId() == null ) { 	 
+                    Date createDateTime = new Date(); 	 
+                    organisation.setCreateDate(createDateTime); 	 
+	 
+                    if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){ 	 
+                            Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime); 	 
+                            organisation.setWorkspace(workspace); 	 
+                    } 	 
+            } 	 
+	 
+            save(organisation); 	 
+            return organisation; 	 
+    } 	 
+
+	
 }
