@@ -38,6 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
 		<link href="css/learner.css" rel="stylesheet" type="text/css">
+		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	</head>
 
 	<c:choose>
