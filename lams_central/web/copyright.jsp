@@ -12,40 +12,23 @@
 	<lams:css/>
 </head>
 <body>
-	<table width="95%" height="95%" border="0" cellspacing="0" cellpadding="0" align="center">
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
-	<tr>
-		<td width="100%" align="center">
-			<table bgcolor="#ffffff" width="100%" height="100%" cellspacing="5" cellpadding="5" align="center">
-				<tr>
-					<td align="left">
-						<H2><fmt:message key="msg.LAMS.copyright.statement.1"/></H2>
-					</td>
-				</tr>
-				<tr>
-					<td align="left">
-						<fmt:message key="msg.LAMS.copyright.statement.2"/>
-					</td>
-				</tr>
-				<tr>
-					<td align="left">
-						<fmt:message key="msg.LAMS.copyright.statement.3"/>
-					</td>
-				</tr>
-				<tr>
-					<td align="left">
-						<A HREF="http://www.gnu.org/licenses/gpl.txt"  target='copyright2'
-						onClick="window.open('http://www.gnu.org/licenses/gpl.txt','copyright2','resizable,width=650,height=650,scrollbars');return false;">
-							http://www.gnu.org/licenses/gpl.txt
-						</a>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	</table>
+	<div id="page">	
+		<h1 class="no-tabs-below">
+			<fmt:message key="msg.LAMS.copyright.statement.1"/>
+		</h1>
+		<div id="header-no-tabs"></div>
+		<div id="content">
+			<p><fmt:message key="msg.LAMS.copyright.statement.2"/></p>
+			<p><fmt:message key="msg.LAMS.copyright.statement.3"/></p>
+			<p><A HREF="http://www.gnu.org/licenses/gpl.txt"  target='copyright2'
+					onClick="window.open('http://www.gnu.org/licenses/gpl.txt','copyright2','resizable,width=650,height=650,scrollbars');return false;">
+						http://www.gnu.org/licenses/gpl.txt
+					</a>
+			</p>
+		</div>
+		<div id="footer"></div>
+	</div>
+
 </body>	
 </html>
 
