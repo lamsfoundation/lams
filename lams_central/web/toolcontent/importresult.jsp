@@ -16,40 +16,50 @@
 	</head>
 
 	<BODY>
+		<div id="page">	
+
+		<h1 class="no-tabs-below">
+			<fmt:message key="title.import" />
+		</h1>
+		<div id="header-no-tabs"></div>
+		<div id="content">
+
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
 				<c:choose>
 					<c:when test="${empty toolsErrorMessages}">
-						<h1>
-							<fmt:message key="msg.import.success" />
-						</h1>
+						<p><fmt:message key="msg.import.success"/></p>
 					</c:when>
 					<c:otherwise>
-						<h1>
-							<fmt:message key="msg.import.ld.success" />
-						</h1>
-						<h2>
-							<fmt:message key="msg.import.tool.error.prefix" />
-						</h2>
+						<p><fmt:message key="msg.import.ld.success" /></p>
+						<p><fmt:message key="msg.import.tool.error.prefix" /></p>
+						<div id="error"/>
+						<UL>
 						<c:forEach var="toolError" items="${toolsErrorMessages}">
 							<li>
 								${toolError}
 							</li>
 						</c:forEach>
-					</c:otherwise>
+						</UL>
+						</div/>
+						</c:otherwise>
 				</c:choose>
 				<%-- display new learing desing in Flash side even some tool import failed --%>
 				<%@include file="import_passon.jsp"%>
 			</c:when>
 			<c:otherwise>
-				<h1>
-					<fmt:message key="msg.import.failed" />
-				</h1>
-				<b><fmt:message key="msg.reason.is" /> ${ldErrorMessages}</b>
+					<p><fmt:message key="msg.import.failed" /></p>
+					<div id="error"/>
+						<fmt:message key="msg.reason.is" /> ${ldErrorMessages}
+					</div>
 			</c:otherwise>
 		</c:choose>
-		<div align="center">
-			<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
+		
+		<P><a href="javascript:;" onclick="closeWin();"><fmt:message key="button.close" /></a></p>
 		</div>
+		<div id="footer"></div>
+		
+		</div>
+		
 	</BODY>
 </HTML>

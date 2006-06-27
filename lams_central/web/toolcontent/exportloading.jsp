@@ -23,15 +23,20 @@
 	</head>
 
 	<BODY onload="download()">
-		<p></p>
-		<div align="center">
-			<h1>
-				<fmt:message key="msg.export.loading" />
+		<div id="page">	
+			<h1 class="no-tabs-below">
+				<fmt:message key="title.export.loading" />
 			</h1>
-			<p>
-				<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
-			</p>
+			<div id="header-no-tabs"></div>
+			<div id="content">
+				<p><fmt:message key="msg.export.loading" /></p>
+				<p>
+					<a href="javascript:;" onclick="closeWin();"><fmt:message key="button.close" /></a>
+				</p>
+			</div>
+			<div id="footer"></div>
 		</div>
+
 
 	</BODY>
 </HTML>

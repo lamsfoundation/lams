@@ -17,19 +17,26 @@
 	</head>
 
 	<BODY>
-		<h1>
+	<div id="page">	
+		<h1 class="no-tabs-below">
 			<fmt:message key="title.import" />
 		</h1>
-		<h2>
-			<fmt:message key="title.import.instruction" />
-		</h2>
-
-		<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
-			<fmt:message key="label.ld.zip.file" />
-			:
-			<input type="file" name="UPLOAD_FILE" />
-			<input type="submit" name="import" value="<fmt:message key="button.import" />" class="buttonStyle"/>
-		</form>
-
+		<div id="header-no-tabs"></div>
+		<div id="content">
+			<h2>
+				<fmt:message key="title.import.instruction" />
+			</h2>
+			<p>&nbsp;</p>
+			<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
+				<p><fmt:message key="label.ld.zip.file" />
+				:
+				<input type="file" name="UPLOAD_FILE" />
+				<input type="submit" name="import" value="<fmt:message key="button.import" />"/></p>
+			</form>
+		</div>
+		<div id="footer"></div>
+	</div>
+		
+			
 	</BODY>
 </HTML>

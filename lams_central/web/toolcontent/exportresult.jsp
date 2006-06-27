@@ -16,37 +16,57 @@
 	</head>
 
 	<BODY>
+		<div id="page">	
+	
+	
+	
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
 				<c:choose>
 					<c:when test="${empty toolsErrorMessages}">
-						<h1>
+						<h1 class="no-tabs-below">
 							<fmt:message key="msg.export.success" />
 						</h1>
+						<div id="header-no-tabs"></div>
+						<div id="content">
 					</c:when>
 					<c:otherwise>
-						<h1>
+						<h1 class="no-tabs-below">
 							<fmt:message key="msg.export.ld.success" />
 						</h1>
-						<h2>
-							<fmt:message key="msg.export.tool.error.prefix" />
-						</h2>
-						<c:forEach var="toolError" items="${toolsErrorMessages}">
-							<li>
-								${toolError}
-							</li>
-						</c:forEach>
+						<div id="header-no-tabs"></div>
+						<div id="content">
+							<h2>
+								<fmt:message key="msg.export.tool.error.prefix" />
+							</h2>
+							<div id="error"/>
+							<UL>
+							<c:forEach var="toolError" items="${toolsErrorMessages}">
+								<li>
+									${toolError}
+								</li>
+							</c:forEach>
+							</UL>
+							</div/>
 					</c:otherwise>
 				</c:choose>
 			</c:when>
 			<c:otherwise>
-				<h1>
+				<h1 class="no-tabs-below">
 					<fmt:message key="msg.export.failed" />
 				</h1>
-				<b><fmt:message key="msg.reason.is" /> ${ldErrorMessages}</b>
-				<br>
+				<div id="header-no-tabs"></div>
+				<div id="content">
+					<div id="error"/>
+						<fmt:message key="msg.reason.is" /> ${ldErrorMessages}
+					</div>
 			</c:otherwise>
 		</c:choose>
-		<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
+		
+			<P><a href="javascript:;" onclick="closeWin();"><fmt:message key="button.close" /></a></p>
+			</div>
+			<div id="footer"></div>
+		</div>
+
 	</BODY>
 </HTML>
