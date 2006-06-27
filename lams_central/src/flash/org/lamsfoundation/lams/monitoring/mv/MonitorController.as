@@ -88,7 +88,9 @@ class MonitorController extends AbstractController {
 		}
 
 		//Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','MonitorModel');
-		getURL(URLToSend,"_blank");		
+		
+		JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+			
 		//}else{
 			//TODO: Show the property inspector if its a parralel activity or whatever
 		//}

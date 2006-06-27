@@ -777,8 +777,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				}
 			
 				Debugger.log('Opening url:'+url,Debugger.GEN,'openToolActivityContent','CanvasModel');
-				getURL(url,"_blank");
-			
+				
+				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent', 600, 800, true, true, false, false, false);
 			
 			}else{
 				new LFError("We dont have a valid toolContentID","openToolActivityContent",this);
