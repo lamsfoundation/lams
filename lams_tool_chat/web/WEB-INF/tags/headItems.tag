@@ -44,18 +44,18 @@
 
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-<link href="${tool}includes/css/aqua.css" rel="stylesheet" type="text/css">
+<lams:css />
 <!--[if IE]>
 <style type="text/css">
 @import url(${tool}includes/css/ie-styles.css);
 </style>
 <![endif]-->
 
-<link href="${tool}includes/css/fckeditor_style.css" rel="stylesheet" type="text/css">
+<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-<script type="text/javascript" src="${tool}includes/javascript/tabcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
 
