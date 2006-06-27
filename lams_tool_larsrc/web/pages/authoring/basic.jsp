@@ -8,7 +8,7 @@
 	 */
 	function showMessage(url) {
 		var area=document.getElementById("reourceInputArea");
-		area.style.width="100%";
+		area.style.width="670px";
 		area.style.height="100%";
 		area.src=url;
 		area.style.display="block";
@@ -60,13 +60,11 @@
 	<!---------------------------Basic Tab Content ------------------------>
 	<table class="forms">
 		<tr>
-			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
-			<td NOWRAP width="700"><lams:SetEditor id="Resource.title" text="${formBean.resource.title}" small="true"/></td>
+			<td colspan="2"><lams:SetEditor id="Resource.title" text="${formBean.resource.title}" small="true" key="label.authoring.basic.title" /></td>
 		</tr>
 		<tr>
-			<td class="formlabel"><fmt:message key="label.authoring.basic.instruction" />:</td>
-			<td NOWRAP width="700">
-				<lams:SetEditor id="Resource.instructions" text="${formBean.resource.instructions}"/>
+			<td colspan="2">
+				<lams:SetEditor id="Resource.instructions" text="${formBean.resource.instructions}"  key="label.authoring.basic.instruction"/>
 			</td>
 		</tr>
 		<tr>

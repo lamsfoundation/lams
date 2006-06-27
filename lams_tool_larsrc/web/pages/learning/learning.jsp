@@ -96,17 +96,20 @@
 				<a href="#" class="button" onclick="return finishSession()">
 					<fmt:message key="label.finished" />
 				</a>
+				<c:if test="${resource.miniViewResourceNumber <= 0}">
+					<p>&nbsp;</p>
+				</c:if>
 			</td>
 		</tr>
 		<c:if test="${resource.miniViewResourceNumber > 0}">
 			<tr>
-				<td colspan="4" align="left">
+				<td colspan="3" align="left">
 					<b>${resource.miniViewNumberStr}</b>
+					<p>&nbsp;</p>
 				</td>
 			</tr>
 		</c:if>
 	</table>
-	<p>&nbsp;</p>
 	<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
 		<table border="0" align="center" class="forms" width="95%">
 			<tr>

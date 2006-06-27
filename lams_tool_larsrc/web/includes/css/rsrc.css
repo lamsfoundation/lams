@@ -1,10 +1,9 @@
 .tabpart{
-	width: 100%;
-	
-	background-color : #D9E8FF;
+	background-color : #000000;
 	float:left;
-
 	margin : 0px 0px 0px 0px;
+	background:;
+	margin-left: 0px;
 }
 
 .innerforms {
@@ -12,14 +11,6 @@
 	font-size: small;
 	font-style: normal;
 	width:100%;
-}
-
-.buttonStyle{
-	font-size: 12px;
-	color: #000000;
-	text-decoration:none;
-	text-align: center;
-	background-color:#B4C8FE;
 }
 
 div.error, div.message {

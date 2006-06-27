@@ -10,7 +10,9 @@
 			pageContext.setAttribute("tabs", tabs);
 
 			%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <html:html locale="true">
 <head>
 	<title><fmt:message key="label.author.title" /></title>
@@ -95,21 +97,22 @@
     </script>
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
 
-
+ 
 </head>
 <body onLoad="init()">
-
+<div id="page">
 	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
-
+<div id="header">
 		<h1>
 			<fmt:message key="label.authoring.heading" />
 		</h1>
-
-		<!-- start tabs -->
 		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
+</div>
+		<!-- start tabs -->
+<div id="content">
 		<!-- end tab buttons -->
 		<div class="tabbody">
 			<table align=center>
@@ -143,9 +146,12 @@
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" />
 
 		</div>
-		<lams:HTMLEditor />
-
+</div>
 
 	</html:form>
+<div id="footer"></div>
+<lams:HTMLEditor />
+<!-- end page div -->
+</div>
 </body>
 </html:html>

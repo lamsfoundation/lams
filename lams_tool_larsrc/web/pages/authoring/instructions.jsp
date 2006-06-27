@@ -58,10 +58,8 @@
 		</tr>
 		<!-- Instructions Row -->
 		<tr>
-			<td class="formlabel"><fmt:message
-				key="label.authoring.online.instruction" />:</td>
-			<td NOWRAP width="700">
-				<lams:SetEditor id="Resource.onlineInstructions" text="${formBean.resource.onlineInstructions}"/>
+			<td colspan="2">
+				<lams:SetEditor id="Resource.onlineInstructions" text="${formBean.resource.onlineInstructions}" key="label.authoring.online.instruction" />
 			</td>
 		</tr>
 		<tr>
@@ -88,10 +86,8 @@
 		</tr>	
 		<!------------Offline Instructions ----------------------->
 		<tr>
-			<td class="formlabel"><fmt:message
-				key="label.authoring.offline.instruction" />:</td>
-			<td NOWRAP width="700">
-			<lams:SetEditor id="Resource.offlineInstructions" text="${formBean.resource.offlineInstructions}"/>
+			<td colspan="2">
+			<lams:SetEditor id="Resource.offlineInstructions" text="${formBean.resource.offlineInstructions}" key="label.authoring.offline.instruction"/>
 			</td>
 		</tr>
 		<tr>
