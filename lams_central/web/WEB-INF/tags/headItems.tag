@@ -47,7 +47,7 @@
 <lams:css />
 <!--[if IE]>
 <style type="text/css">
-@import url(${tool}includes/css/ie-styles.css);
+@import url(${lams}/css/ie-styles.css);
 </style>
 <![endif]-->
 
