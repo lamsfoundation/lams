@@ -127,6 +127,12 @@ class MonitorController extends AbstractController {
 	
 	
 	}
+	
+	private function exportClassPortfolio():Void{
+		var exp_url:String = _root.serverURL+"learning/exportWaitingPage.jsp?mode=teacher&lessonID="+_root.lessonID;
+		
+		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 300, 400, true, true, false, false, false);
+	}
 
 	public function click(evt):Void{
 		trace(evt.target);
@@ -139,7 +145,10 @@ class MonitorController extends AbstractController {
 		} else if(tgt.indexOf("start_btn") != -1){
 			trace('you clicked start class button..');
 			_monitorModel.getMonitor().startLesson(false, _root.lessonID);
-		} else if(tgt.indexOf("refresh_btn") != -1){
+		} else if(tgt.indexOf("exportPortfolio_btn") != -1){
+			trace('you clicked exportPortfolio button..');
+			exportClassPortfolio();
+		}else if(tgt.indexOf("refresh_btn") != -1){
 			trace('you clicked refresh button..');
 			_monitorModel.refreshAllData();
 		}
@@ -173,6 +182,7 @@ class MonitorController extends AbstractController {
         }
     }
 	
+
 	/**
     * Workspace dialog OK button clicked handler
     */
