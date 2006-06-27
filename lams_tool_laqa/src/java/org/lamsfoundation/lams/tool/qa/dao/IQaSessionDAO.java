@@ -38,6 +38,8 @@ public interface IQaSessionDAO
 	public int countSessionIncomplete();
 	
 	public int countSessionComplete();
+	
+	public int countSessionComplete(QaContent qa);
 		    
 	public QaSession getQaSessionById(long qaSessionId);
 	

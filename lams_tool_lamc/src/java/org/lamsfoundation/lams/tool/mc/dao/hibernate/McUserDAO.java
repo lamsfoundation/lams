@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -147,5 +148,30 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 		String query="from obj in class McQueUsr"; 
 		return this.getHibernateTemplate().find(query).size();
 	}
+    
+    
+    public int getTotalNumberOfUsers(McContent mcContent)
+    {
+		String strGetUser = "from mcQueUsr in class McQueUsr";
+        HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(strGetUser)
+			.list();
+		logger.debug("strGetUser: " + strGetUser);
+		
+		int totalUserCount=0;
+		if(list != null && list.size() > 0){
+		    McQueUsr usr = (McQueUsr) list.get(0);
+			logger.debug("usr: " + usr);
+			logger.debug("local usr content uid versus incoming content uid: " + 
+			        usr.getMcSession().getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
+			
+			if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
+			{
+			    ++totalUserCount;
+			}
+		}
+		logger.debug("final totalUserCount: " + totalUserCount);
+        return totalUserCount;
+    }
     
 }

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 
@@ -88,6 +89,8 @@ public interface IMcUserDAO {
     public int getNumberOfUsers(McSession mcSession);
     
     public List getMcUserBySessionOnly(final McSession mcSession);
+    
+    public int getTotalNumberOfUsers(McContent mcContent);
     
     public int getTotalNumberOfUsers();
    

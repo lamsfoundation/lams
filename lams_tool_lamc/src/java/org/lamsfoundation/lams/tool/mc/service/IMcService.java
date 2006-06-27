@@ -152,6 +152,8 @@ public interface IMcService
 	public User getCurrentUserData(String username) throws McApplicationException;
 	
 	public int getTotalNumberOfUsers() throws McApplicationException;
+	
+	public int getTotalNumberOfUsers(McContent mcContent) throws McApplicationException;
     
     public Lesson getCurrentLesson(long lessonId) throws McApplicationException;
     
@@ -246,6 +248,8 @@ public interface IMcService
 	public List getMarks() throws McApplicationException;
 	
 	public int countSessionComplete() throws McApplicationException;
+	
+    public int countSessionComplete(McContent mcContent) throws McApplicationException;
 	
 	public McSession findMcSessionById(Long mcSessionId) throws McApplicationException;
 	

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
@@ -138,4 +139,30 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 			String query="from obj in class QaQueUsr"; 
 			return this.getHibernateTemplate().find(query).size();
 		}
+	    
+	    
+	    public int getTotalNumberOfUsers(QaContent qa)
+	    {
+			String strGetUser = "from qaQueUsr in class QaQueUsr";
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(strGetUser)
+				.list();
+			logger.debug("strGetUser: " + strGetUser);
+			
+			int totalUserCount=0;
+			if(list != null && list.size() > 0){
+				QaQueUsr usr = (QaQueUsr) list.get(0);
+				logger.debug("usr: " + usr);
+				logger.debug("local usr content uid versus incoming content uid: " + 
+				        usr.getQaSession().getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
+				
+				if (usr.getQaSession().getQaContent().getUid().intValue() == qa.getUid().intValue())
+				{
+				    ++totalUserCount;
+				}
+			}
+			logger.debug("final totalUserCount: " + totalUserCount);
+	        return totalUserCount;
+	    }
+	    
 } 

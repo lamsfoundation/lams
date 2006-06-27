@@ -89,6 +89,31 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 		else return 0;
 	}
 
+    
+    public int countSessionComplete(McContent mcContent)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+    	List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
+    	.list();
+
+    	int sessionCount=0;
+    	if(list != null && list.size() > 0){
+    		McSession mcSession = (McSession) list.get(0);
+    		logger.debug("mcSession: " + mcSession);
+    		logger.debug("local session's content uid versus incoming content uid: " + 
+    		        mcSession.getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
+    		
+    		if (mcSession.getMcContent().getUid().intValue() == mcContent.getUid().intValue())
+    		{
+    		    ++sessionCount;
+    		}
+    	}
+    	logger.debug("sessionCount: " + sessionCount);
+    	return sessionCount;
+        
+    }
+    
+    
     public int countSessionIncomplete()
     {
     	HibernateTemplate templ = this.getHibernateTemplate();

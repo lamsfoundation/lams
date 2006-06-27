@@ -792,6 +792,21 @@ public class McServicePOJO implements
         }
     }
 
+    
+    public int countSessionComplete(McContent mcContent) throws McApplicationException
+	{
+		try
+        {
+			return mcSessionDAO.countSessionComplete(mcContent);
+        }
+		catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is counting incomplete sessions"
+                                                 + e.getMessage(),e);
+        }		
+	}
+
+    
 	public int countSessionComplete() throws McApplicationException
 	{
 		try
@@ -1149,6 +1164,21 @@ public class McServicePOJO implements
         }
 	}
 
+    
+    public int getTotalNumberOfUsers(McContent mcContent) throws McApplicationException
+	{
+ 	   try
+       {
+	   		return mcUserDAO.getTotalNumberOfUsers(mcContent);
+       }
+       catch (DataAccessException e)
+       {
+           throw new McApplicationException("Exception occured when lams is retrieving total number of McQueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+    
     
     public int getTotalNumberOfUsers() throws McApplicationException
 	{

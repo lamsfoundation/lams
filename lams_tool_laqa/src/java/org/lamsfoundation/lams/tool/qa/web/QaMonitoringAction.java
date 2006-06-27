@@ -877,8 +877,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 			logger.debug("retrieving qaService from session: " + qaService);
 		}
 
-		
-	    int countAllUsers=qaService.getTotalNumberOfUsers();
+        Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("toolContentId: " + toolContentId);
+        
+        QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+    	logger.debug("existing qaContent:" + qaContent);
+
+		//int countAllUsers=qaService.getTotalNumberOfUsers();
+    	int countAllUsers=qaService.getTotalNumberOfUsers(qaContent);
 		logger.debug("countAllUsers: " + countAllUsers);
 		
 		if (countAllUsers == 0)
@@ -889,7 +895,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
 		
-		int countSessionComplete=qaService.countSessionComplete();
+		//int countSessionComplete=qaService.countSessionComplete();
+		int countSessionComplete=qaService.countSessionComplete(qaContent);
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
 	}

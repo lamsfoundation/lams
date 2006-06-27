@@ -527,6 +527,20 @@ public class QaServicePOJO
         }
     }
 	
+    
+    public int countSessionComplete(QaContent qa) throws QaApplicationException
+    {
+		try
+        {
+			return qaSessionDAO.countSessionComplete(qa);
+        }
+		catch(DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is counting complete sessions"
+                                                 + e.getMessage(),e);
+        }
+    }
+    
 	public int countSessionComplete() throws QaApplicationException
 	{
 		try
@@ -768,6 +782,21 @@ public class QaServicePOJO
         }
     }
 
+    
+    public int getTotalNumberOfUsers(QaContent qa)
+    {
+  	   try
+       {
+	   		return qaQueUsrDAO.getTotalNumberOfUsers(qa);
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is retrieving total number of QaQueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+    }
+    
     public int getTotalNumberOfUsers() throws QaApplicationException
 	{
  	   try
@@ -780,7 +809,6 @@ public class QaServicePOJO
                                                         + e.getMessage(),
 														   e);
        }
-    	
 	}
 
     public int countTotalNumberOfUserResponsed(QaContent qa) throws QaApplicationException

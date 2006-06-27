@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 
@@ -52,6 +53,8 @@ public interface IQaQueUsrDAO
     public int countSessionUser(QaSession qaSession);
     
     public int getTotalNumberOfUsers();
+    
+    public int getTotalNumberOfUsers(QaContent qa);
     
     public List getUserBySessionOnly(final QaSession qaSession);
 }

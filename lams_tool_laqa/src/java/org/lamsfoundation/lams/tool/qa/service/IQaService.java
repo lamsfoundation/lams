@@ -72,6 +72,10 @@ public interface IQaService
 	
 	public int getTotalNumberOfUsers() throws QaApplicationException;
 	
+	public int getTotalNumberOfUsers(QaContent qa) throws QaApplicationException;
+	
+	public int countSessionComplete(QaContent qa) throws QaApplicationException;
+	
 	public int countSessionComplete() throws QaApplicationException;
 	
     public void updateQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;

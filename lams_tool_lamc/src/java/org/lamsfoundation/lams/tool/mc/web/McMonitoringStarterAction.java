@@ -364,8 +364,10 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	    
 	    /* it is possible that no users has ever logged in for the activity yet*/ 
-	    int countAllUsers=mcService.getTotalNumberOfUsers();
+	    //int countAllUsers=mcService.getTotalNumberOfUsers();
+	    int countAllUsers=mcService.getTotalNumberOfUsers(mcContent);
 		logger.debug("countAllUsers: " + countAllUsers);
+		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(false));
 		if (countAllUsers == 0)
 		{
@@ -383,7 +385,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		}
 		
 		/* this section is related to Stats tab. Starts here. */
-		int countSessionComplete=mcService.countSessionComplete();
+		//int countSessionComplete=mcService.countSessionComplete();
+		int countSessionComplete=mcService.countSessionComplete(mcContent);
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		
 		int countMaxAttempt=1;
