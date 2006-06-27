@@ -168,8 +168,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_y = _activity.yCoord;
 		
 		//dimentions of container (this)
-		if (_locked)		{
+		if (_locked){
 			padlockClosed_mc._visible = true;
+			padlockOpen_mc._visible = false;
 			clickTarget_mc._height = container_pnl._height;
 		}else{
 			padlockOpen_mc._visible = true;
