@@ -136,11 +136,12 @@ class WorkspaceDialog extends MovieClip{
         currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
         license_lbl.text = Dictionary.getValue('ws_license_lbl');
 		license_comment_lbl.text = Dictionary.getValue('ws_license_comment_lbl');
-		
+		name_lbl.text = Dictionary.getValue('ws_dlg_filename');
         //Set the text for buttons
 		ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
 		viewLicense_btn.label = Dictionary.getValue('ws_view_license_button');
+		
 		new_btn.label = Dictionary.getValue('new_btn');
 		copy_btn.label = Dictionary.getValue('copy_btn');
 		paste_btn.label = Dictionary.getValue('paste_btn');
