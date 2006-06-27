@@ -1,4 +1,4 @@
-﻿/*
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -28,7 +28,7 @@ var FCKeditor = function( instanceName, width, height, toolbarSet, value )
 	this.InstanceName	= instanceName ;
 	this.Width			= width			|| '100%' ;
 	this.Height			= height		|| '200' ;
-	this.ToolbarSet		= toolbarSet	|| 'Default' ;
+	this.ToolbarSet		= toolbarSet	|| 'Lams_Toolbar' ;
 	this.Value			= value			|| '' ;
 	this.BasePath		= '/fckeditor/' ;
 	this.CheckBrowser	= true ;

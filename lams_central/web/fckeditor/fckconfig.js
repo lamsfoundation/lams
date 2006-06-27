@@ -107,6 +107,20 @@ FCKConfig.ToolbarSets["Default"] = [
 	['About']
 ] ;
 
+FCKConfig.ToolbarSets["Lams_Toolbar"] = [
+	['Source','DocProps','-','Preview'],
+	['PasteWord'],
+	['Undo','Redo'],
+	['Bold','Italic','Underline', '-','Subscript','Superscript'],
+	['OrderedList','UnorderedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
+	['Image','Table','Rule','Smiley','SpecialChar','PageBreak','UniversalKey'],
+	'/',
+	['FontFormat','FontName','FontSize'],
+	['TextColor','BGColor'],
+	['About']
+] ;
+
 FCKConfig.ToolbarSets["Basic"] = [
 	['Bold','Italic','-','OrderedList','UnorderedList','-','Link','Unlink','-','About']
 ] ;
