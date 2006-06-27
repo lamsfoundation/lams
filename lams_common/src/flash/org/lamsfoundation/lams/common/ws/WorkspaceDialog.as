@@ -422,7 +422,11 @@ class WorkspaceDialog extends MovieClip{
 		
 		}
 		
-		resourceDesc_txa.text = details.description;
+		if(StringUtils.isNull(resourceDesc_txa.text)){
+			resourceDesc_txa.text = "";
+		} else {
+			resourceDesc_txa.text = details.description;
+		}
 			
 		if(details.licenseID > 0){
 			
