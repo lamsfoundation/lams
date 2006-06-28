@@ -632,15 +632,21 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 	}
 	
-	public function getTransitionsForActivityUIID(UIID):Array{
+	public function getTransitionsForActivityUIID(UIID):Object{
 		var ts:Array = _transitions.values();
+		var transObj = new Object();
 		var myTransitions:Array = new Array();
+		var hasTrans:Boolean = false;
 		for(var i=0; i<ts.length;i++){
 			if(ts[i].toUIID == UIID || ts[i].fromUIID == UIID){
 				myTransitions.push(ts[i]);
+				hasTrans = true;
 			}
+			
 		}
-		return myTransitions;
+		transObj.myTransitions = myTransitions;
+		transObj.hasTrans = hasTrans;
+		return transObj;
 	}
 	
 	
