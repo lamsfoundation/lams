@@ -93,9 +93,10 @@ public class UserManagementService implements IUserManagementService {
 		try{
 			if(object instanceof User){
 				User user = (User)object;
-				object = createWorkspaceForUser(user);
 				if(user.getUserId()==null){
 					user.setPassword(HashUtil.sha1(user.getPassword()));
+					baseDAO.insertOrUpdate(user);  // creating a workspace needs a userId
+					object = createWorkspaceForUser(user);
 				}
 			}
 			baseDAO.insertOrUpdate(object);
@@ -376,16 +377,14 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	private User createWorkspaceForUser(User user) {
-		if(user.getUserId()==null){//new User
-			Workspace workspace = new Workspace(user.getFullName());
-			save(workspace);
-			WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL);
-			save(folder);
-			if ( workspace.getFolders() == null )
-				workspace.setFolders(new HashSet());
-			workspace.getFolders().add(folder);
-			user.setWorkspace(workspace);
-		}
+		Workspace workspace = new Workspace(user.getFullName());
+		save(workspace);
+		WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL);
+		save(folder);
+		if ( workspace.getFolders() == null )
+			workspace.setFolders(new HashSet());
+		workspace.getFolders().add(folder);
+		user.setWorkspace(workspace);
 		return user;
 	}
 
