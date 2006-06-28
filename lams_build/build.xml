@@ -313,8 +313,8 @@
 	<!-- Build the parallel activities and other complex activities. Must be done after -->
 	<!-- the tools are deployed -->
 	
-	<!-- Generate the deployment package for nb/submit parallel activity. -->
-	<target name="deploy-nbsubmit-deploy-package-library" depends="">
+	<!-- Generate the deployment package for share resources / forum parallel activity. -->
+	<target name="deploy-shareresourcesforum-deploy-package-library" depends="">
 
 			<path id="deploy.lib.classpath">
 				<fileset dir="${deploy.tool.dir}">
@@ -322,8 +322,8 @@
 				</fileset>
 			</path> 
 				  
-			<property name="assembly.activity" value="${basedir}/assembly/nbsubmit"/>
-			<property name="package.cfg" value="librarypackages/nbsubmit"/>
+			<property name="assembly.activity" value="${basedir}/assembly/shareresourcesforum"/>
+			<property name="package.cfg" value="librarypackages/shareresourcesforum"/>
 		
 			<mkdir dir="${assembly.activity}/"/>
 			<mkdir dir="${assembly.activity}/lib"/> 
@@ -402,98 +402,9 @@
 		
 		</target>
 
-	<!-- Generate the deployment package for nb/submit parallel activity. -->
-	<target name="deploy-doublevote-deploy-package-library" depends="">
-
-			<path id="deploy.lib.classpath">
-				<fileset dir="${deploy.tool.dir}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
-				  
-			<property name="dv.assembly.activity" value="${basedir}/assembly/doublevote"/>
-			<property name="dv.package.cfg" value="librarypackages/doublevote"/>
-		
-			<mkdir dir="${dv.assembly.activity}/"/>
-			<mkdir dir="${dv.assembly.activity}/lib"/> 
-			<mkdir dir="${dv.assembly.activity}/sql"/> 
-			<mkdir dir="${dv.assembly.activity}/language"/> 
-		
-			<copy overwrite="yes" todir="${dv.assembly.activity}/sql">
-				<fileset dir="${dv.package.cfg}">
-					<include name="learninglibrary1_insert.sql"/>
-					<include name="libraryActivity1_insert.sql"/>
-					<include name="toolActivity1_insert.sql"/>
-					<include name="toolActivity2_insert.sql"/>
-				</fileset>
-			</copy>
-
-			<copy overwrite="yes" todir="${dv.assembly.activity}/language">
-				<fileset dir="${dv.package.cfg}/language">
-					<include name="*.*"/>
-				</fileset>
-			</copy>
-
-		<copy overwrite="yes" file="${dv.package.cfg}/deployLibrary.xml"
-					   	tofile="${dv.assembly.activity}/deploy.xml" >
-			  <!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
-		        <filterchain>
-		            <striplinecomments>
-		               <comment value="!"/>
-		            </striplinecomments>
-		           <replacetokens>
-		                <token key="assemblydir" value="${dv.assembly.activity}/sql"/>
-		            </replacetokens>
-		            <replacetokens>
-			            <token key="assemblylangdir" value="${dv.assembly.activity}/language"/>
-			        </replacetokens>
-		            <replacetokens>
-			             <token key="lamsear" value="${jboss.deploy}"/>
-			        </replacetokens>
-		        </filterchain>
-		    </copy>
-
-			<copy overwrite="yes" todir="${dv.assembly.activity}/lib">
-				<fileset dir="${deploy.tool.dir}/lib">
-					<include name="*.jar"/>
-				</fileset>
-			</copy>
-
-			<taskdef name="generateDeployLibraryProperties" 
-				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
-			    <classpath refid="deploy.lib.classpath"/>
-			</taskdef>
-
-			<generateDeployLibraryProperties depends="compile" 
-				mode="development" 
-				outputPath="${dv.assembly.activity}"
-				configFile="${dv.assembly.activity}/deploy.xml"
-				dbPassword="${db.password}"
-				dbUsername="${db.username}"
-				dbDriverUrl="${db.url}"
-				dbDriverClass="com.mysql.jdbc.Driver"	
-				/>
-		
-			<!-- Do the actual deployment -->
-			<path id="deploy.classpath">
-				<fileset dir="${dv.assembly.activity}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
-	
-			<java
-				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
-				classpathref="deploy.classpath"
-				fork="true">
-					<arg file="${dv.assembly.activity}/deploy.xml"/>
-					<arg file="${dv.assembly.activity}/language"/>
-			</java>
-		
-		</target>
-
 		<!-- deploy the complex activities to the library -->
 		<target name="deploy-learning-libraries" 
-			depends="deploy-nbsubmit-deploy-package-library,deploy-doublevote-deploy-package-library">
+			depends="deploy-shareresourcesforum-deploy-package-library">
 
 			<echo>Deploying Library Activities</echo>
 	

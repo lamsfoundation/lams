@@ -7,10 +7,10 @@ gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activ
 grouping_support_type_id, apply_grouping_flag,activity_category_id,
 language_file)
 values
-(null,null,'Parallel NB Activity','Parallel NB Activity',null,null,${parent_activity_id},'Help Text for Activity',
+(null,null,'Share Resources','Share Resources',null,null,${parent_activity_id},'Share Resources',
 1,null,null,0,
 null,null,now(),0,
 null,null,${tool_id},null,
-null,null,null,'tool/lanb11/images/icon_noticeboard.swf',
+null,null,null,'tool/larsrc11/images/icon_rsrc.swf',
 2,0,4,
-'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources');
+'org.lamsfoundation.lams.tool.rsrc.web.ApplicationResources');

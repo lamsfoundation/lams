@@ -11,11 +11,11 @@
 			<templateActivityInsertScriptPath>@assemblydir@/libraryActivity1_insert.sql</templateActivityInsertScriptPath>
 			<toolActivityList>
 				<toolActivity>
-					<toolSignature>lanb11</toolSignature>
+					<toolSignature>larsrc11</toolSignature>
 					<toolActivityInsertScriptPath>@assemblydir@/toolActivity1_insert.sql</toolActivityInsertScriptPath>	
 				</toolActivity>
 				<toolActivity>
-					<toolSignature>lasbmt11</toolSignature> 
+					<toolSignature>lafrum11</toolSignature> 
 					<toolActivityInsertScriptPath>@assemblydir@/toolActivity2_insert.sql</toolActivityInsertScriptPath>	
 				</toolActivity>
 			</toolActivityList>
