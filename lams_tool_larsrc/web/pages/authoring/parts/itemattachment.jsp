@@ -3,12 +3,12 @@
 <input type="hidden" name="hasFile" value="${itemAttachment.hasFile}"/>
 <c:choose>
 	<c:when test="${itemAttachment.hasFile}">
-		<table border="0">
+		<table border="0" style="align:left;width:400px">
 		<tr><td>
 			<c:out value="${itemAttachment.fileName}" />
 		</td>
 		<td>
-			<a href="#" onclick="removeItemAttachment(${itemAttachment.itemIndex})" style="button">
+			<a href="#" onclick="removeItemAttachment(${itemAttachment.itemIndex})" class="button">
 				<fmt:message key="label.delete" />
 			</a>	
 		</td>

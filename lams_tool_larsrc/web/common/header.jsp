@@ -15,6 +15,11 @@
 
  	<!-- ********************  CSS ********************** -->
 	<lams:css />
+	<!--[if IE]>
+	<style type="text/css">
+	@import url(${lams}/css/ie-styles.css);
+	</style>
+	<![endif]-->
 
 	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
 	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">

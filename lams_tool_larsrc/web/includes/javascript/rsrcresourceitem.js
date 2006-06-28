@@ -109,7 +109,7 @@
 	
 	function submitResourceItem(){
 		$("instructionList").value = Form.serialize("instructionForm");
-		$(resourceItemForm).submit();
+		$("resourceItemForm").submit();
 		//after submit, it direct to itemlist.jsp, 
 		// then refresh "basic tab" resourcelist and close this window.
 	}

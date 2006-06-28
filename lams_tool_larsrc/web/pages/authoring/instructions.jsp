@@ -63,8 +63,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td></td>
-			<td class="formcontrol">
+			<td colspan="2">
 				<c:set var="onlineFileList" value="${formBean.onlineFileList}"/>
 				<div id="onlinefileArea">
 					<%@ include file="parts/onlinefilelist.jsp" %>
@@ -72,16 +71,16 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="formlabel">
+			<td nowrap="nowrap">
 				<fmt:message key="label.authoring.online.file" />:
 			</td>
 			<td class="formcontrol">
 				<html:file property="onlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:button onclick="javascript:doUploadOnline();" property="uploadOnlineSubmit" styleClass="buttonStyle">
+				<a href="#" onclick="javascript:doUploadOnline();" class="button">
 					<fmt:message key="label.authoring.upload.online.button" />
-				</html:button>
+				</a>
 			</td>
 		</tr>	
 		<!------------Offline Instructions ----------------------->
@@ -91,8 +90,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td></td>
-			<td class="formcontrol">
+			<td colspan="2">
 				<c:set var="offlineFileList" value="${formBean.offlineFileList}"/>
 				<div id="offlinefileArea">
 					<%@ include file="parts/offlinefilelist.jsp" %>
@@ -100,16 +98,17 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="formlabel">
+			<td nowrap="nowrap" valign="top">
 				<fmt:message key="label.authoring.offline.file" />:
 			</td>
-			<td class="formcontrol">
+			<td valign="top">
 				<html:file property="offlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:button onclick="javascript:doUploadOffline();" property="uploadOfflineSubmit" styleClass="buttonStyle">
+				<a href="#" onclick="javascript:doUploadOffline();" class="button">
 					<fmt:message key="label.authoring.upload.offline.button" />
-				</html:button>
+				</a>
+				<p>&nbsp;</p>
 			</td>
 		</tr>			
 		</table>

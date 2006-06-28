@@ -17,7 +17,7 @@
 		 }
 	
 	td { 
-		padding:0px; 
+		padding:4px; 
 		font-size:12px;
 	}
 	hr {
@@ -34,6 +34,9 @@
 <body class="tabpart">
 	<table class="forms" border="0">
 		<!-- Basic Info Form-->
+		<tr>
+			<td><hr></td>
+		</tr>
 		<tr>
 			<td>
 			<%@ include file="/common/messages.jsp" %>
@@ -64,9 +67,6 @@
 			</td>
 		</tr>
 		<tr>
-			<td><hr></td>
-		</tr>
-		<tr>
 			
 			<!-- Instructions -->
 			<td>
@@ -75,17 +75,19 @@
 						<td>
 							<%@ include file="instructions.jsp" %>
 						</td>
-						<td width="70px" align="right" valign="bottom">
-							<input onclick="cancelResourceItem()" type="button" name="cancel" value="<fmt:message key="label.cancel"/>" class="buttonStyle">
-						</td>						
-						<td width="70px" align="right" valign="bottom">
-							<input onclick="submitResourceItem()" type="button" name="add" value="<fmt:message key="label.authoring.basic.add.url"/>" class="buttonStyle">
-						</td>
 					</tr>
 				</table>
 			</td>
 		</tr>
+		<tr>
+			<td align="center" valign="bottom">
+				<a href="javascript:;" onclick="cancelResourceItem()" class="button"><fmt:message key="label.cancel"/></a>
+				<a href="#" onclick="submitResourceItem()" class="button"><fmt:message key="label.authoring.basic.add.url"/></a>
+			</td>
+		</tr>
+		<tr>
+			<td><hr></td>
+		</tr>
 	</table>
-
 </body>
 </html>

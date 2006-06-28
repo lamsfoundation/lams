@@ -3,7 +3,8 @@
 <div id="itemList">
 <h2><fmt:message key="label.authoring.basic.resource.list.title" />
 <img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" /></h2>
-<table class="forms" id="itemTable">
+
+<table id="itemTable" style="align:left;width:650px" >
 <c:forEach var="resource" items="${resourceList}" varStatus="status">
 	<tr>
 	<%-- Resource Type:1=URL,2=File,3=Website,4=Learning Object --%>
@@ -12,17 +13,20 @@
 			<fmt:message key="label.authoring.basic.resource.url" />:
 		</td>
 		<td>${resource.title}</td>
-		<td width="50px">
-			<input type="button" name="vu" value="<fmt:message key="label.authoring.basic.resource.verify.url" />" 
-				onclick="previewItem(1,${status.index})" class="button">
+		<td width="130px" nowrap="nowrap" align="center">
+			<a href="#" onclick="previewItem(1,${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.verify.url" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="ei" value="<fmt:message key="label.authoring.basic.resource.edit" />"
-				onclick="editItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="editItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.edit" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="di"  value="<fmt:message key="label.authoring.basic.resource.delete" />"
-				onclick="deleteItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="deleteItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.delete" />
+			</a>
 		</td>
 	</c:if>
 	<c:if test="${resource.type == 2}">
@@ -30,17 +34,20 @@
 			<fmt:message key="label.authoring.basic.resource.file" />:
 		</td>
 		<td>${resource.title}</td>
-		<td width="50px">
-			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
-				onclick="previewItem(2,${status.index})" class="button">
+		<td width="130px" nowrap="nowrap" align="center">
+			<a href="#" onclick="previewItem(2,${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.preview" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
-				onclick="editItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="editItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.edit" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="di" value="<fmt:message key="label.authoring.basic.resource.delete" />"
-					onclick="deleteItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="deleteItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.delete" />
+			</a>
 		</td>
 	</c:if>
 	<c:if test="${resource.type == 3}">
@@ -48,17 +55,20 @@
 			<fmt:message key="label.authoring.basic.resource.website" />:
 		</td>
 		<td>${resource.title}</td>
-		<td width="50px">
-			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
-				onclick="previewItem(3,${status.index})" class="button">
+		<td width="130px" nowrap="nowrap" align="center">
+			<a href="#" onclick="previewItem(3,${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.preview" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
-				onclick="editItem(${status.index})" class="button">
+			<td width="80px" align="center">
+			<a href="#" onclick="editItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.edit" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="di" value="<fmt:message key="label.authoring.basic.resource.delete" />"
-					onclick="deleteItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="deleteItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.delete" />
+			</a>
 		</td>
 	</c:if>
 	<c:if test="${resource.type == 4}">
@@ -66,17 +76,20 @@
 			<fmt:message key="label.authoring.basic.resource.learning.object" />:
 		</td>
 		<td>${resource.title}</td>
-		<td width="50px">
-			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
-				onclick="previewItem(4,${status.index})" class="button">
+		<td width="130px" nowrap="nowrap" align="center">
+			<a href="#" onclick="previewItem(4,${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.preview" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
-				onclick="editItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="editItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.edit" />
+			</a>
 		</td>
-		<td width="50px">
-			<input type="button" name="di" value="<fmt:message key="label.authoring.basic.resource.delete" />"
-					onclick="deleteItem(${status.index})" class="button">
+		<td width="80px" align="center">
+			<a href="#" onclick="deleteItem(${status.index})" class="button">
+				<fmt:message key="label.authoring.basic.resource.delete" />
+			</a>
 		</td>
 	</c:if>
 	</tr>

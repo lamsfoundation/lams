@@ -4,18 +4,18 @@
 <div id="instructionArea">
 	<form id="instructionForm">
 	<input type="hidden" name="instructionCount" id="instructionCount">
-	<table border="0" style="width:500px">
+	<table border="0" style="width:400px">
 		<tr>
 			<td colspan="5">
 				<fmt:message key="label.authoring.basic.resource.instructions"/>
-				<input type="button" onclick="addInstruction()" value="<fmt:message key="label.authoring.basic.resource.add.instruction"/>" class="buttonStyle">  
+				<a href="javascript:;" onclick="addInstruction()" class="button"><fmt:message key="label.authoring.basic.resource.add.instruction"/></a>
 				<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="instructionArea_Busy" />
 			</td>
 		</tr>
 		<c:forEach var="item" items="${instructionList}" varStatus="status">
 			<tr id="instructionItem${status.index}">
 				<td width="3px">${status.index+1}</td>
-				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="55" value="${item}"></td>
+				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="70" value="${item}"></td>
 				
 				<td width="20px">
 					<%-- Don't display down icon if last line --%>
@@ -33,7 +33,7 @@
 						</a>
 					</c:if>
 				</td>
-				<td width="40px" align="center">
+				<td width="30px" align="center">
 					<a href="javascript:;" onclick="removeInstruction('${status.index}')">
 						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0">
 					</a>
