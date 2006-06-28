@@ -1018,7 +1018,9 @@ class PropertyInspectorNew extends MovieClip{
 			_canvasModel.selectedItem.activity.description= desc_txt.text;
 		}
 		_canvasModel.selectedItem.refresh();
-		
+		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+			_canvasModel.selectedItem.init();
+		}
 		
 	}
 	
