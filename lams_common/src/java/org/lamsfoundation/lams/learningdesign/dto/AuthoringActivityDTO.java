@@ -58,7 +58,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private String description;
 
 	/** Title of the activity*/
-	private String title;
+	private String activityTitle;
 	
 	/** Help text for the activity*/
 	private String helpText;
@@ -214,7 +214,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.activityID = activityID;
 		this.activityUIID = activityUIID;
 		this.description = description;
-		this.title = title;
+		this.activityTitle = title;
 		this.helpText = helpText;
 		this.xCoord = xcoord;
 		this.yCoord = ycoord;
@@ -257,7 +257,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
-		this.title = activity.getTitle();
+		this.activityTitle = activity.getTitle();
 		this.helpText = activity.getHelpText();
 		this.xCoord = activity.getXcoord();
 		this.yCoord = activity.getYcoord();
@@ -545,8 +545,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/**
 	 * @return Returns the title.
 	 */
-	public String getTitle() {
-		return title;
+	public String getActivityTitle() {
+		return activityTitle;
 	}
 	/**
 	 * @return Returns the toolContentID.
@@ -778,9 +778,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/**
 	 * @param title The title to set.
 	 */
-	public void setTitle(String title) {
+	public void setActivityTitle(String title) {
 		if(!title.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.title = title;
+			this.activityTitle = title;
 	}
 	/**
 	 * @param toolContentID The toolContentID to set.

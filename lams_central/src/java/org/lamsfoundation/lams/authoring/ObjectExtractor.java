@@ -624,8 +624,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	        activity.setActivityUIID(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID));
 	    if (keyExists(activityDetails, WDDXTAGS.DESCRIPTION))
 	        activity.setDescription(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.DESCRIPTION));
-	    if (keyExists(activityDetails, WDDXTAGS.TITLE))
-	        activity.setTitle(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.TITLE));
+	    if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_TITLE))
+	        activity.setTitle(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.ACTIVITY_TITLE));
 	    if (keyExists(activityDetails, WDDXTAGS.HELP_TEXT))
 	        activity.setHelpText(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.HELP_TEXT));
 	    if (keyExists(activityDetails, WDDXTAGS.XCOORD))

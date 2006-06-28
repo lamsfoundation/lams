@@ -74,6 +74,7 @@ public interface WDDXTAGS {
 	/*Activity specific tags*/
 	public static final String ACTIVITY_ID ="activityID";
 	public static final String ACTIVITY_UIID ="activityUIID";
+	public static final String ACTIVITY_TITLE = "activityTitle";
 	
 	public static final String PARENT_ACTIVITY_ID ="parentActivityID";
 	public static final String PARENT_UIID ="parentUIID";

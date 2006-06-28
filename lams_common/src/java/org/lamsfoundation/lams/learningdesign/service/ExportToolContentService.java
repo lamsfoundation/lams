@@ -320,7 +320,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				if(activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE)
 					continue;
 				ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity.getToolID()));
-				log.debug("Tool export content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
+				log.debug("Tool export content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
 				try{
 					contentManager.exportToolContent(activity.getToolContentID(),contentDir);
 				}catch (Exception e) {
@@ -452,7 +452,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//Invoke tool's importToolContent() method.
 				try{
 					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
-					log.debug("Tool begin to import content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
+					log.debug("Tool begin to import content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
 					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
 					log.debug("Tool content import success.");
 				}catch (Exception e) {
@@ -998,7 +998,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		act.setParentUIID(actDto.getParentUIID());
 		act.setRunOffline(actDto.getRunOffline());
-		act.setTitle(actDto.getTitle());
+		act.setTitle(actDto.getActivityTitle());
 		
 		//relation will be decide in Transition object.
 //		act.setTransitionFrom();
