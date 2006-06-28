@@ -1,42 +1,30 @@
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
+<%@ include file="/includes/taglibs.jsp"%>
 
+<table cellpadding="0">
+	<tr>
+		<td>
+			<h1>
+				<c:out value="${NbLearnerForm.title}" escapeXml="false" />
+			</h1>
 
-<html:form action="/learner" target="_self" >
-<hr>
-<BR>
-<div id="datatablecontainer">
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<p>
+				<c:out value="${NbLearnerForm.content}" escapeXml="false" />
+			</p>
+		</td>
+	</tr>
+
+	<c:if test="${sessionScope.readOnlyMode != 'true'}">
 		<tr>
-			<td align="center">
-			<c:out value="${NbLearnerForm.title}" escapeXml="false"/>
+			<td align="right">
+				<html:form action="/learner" target="_self">
+					<html:submit property="method">
+						<fmt:message key="button.finish" />
+					</html:submit>
+				</html:form>
 			</td>
 		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td align="left">
-				<c:out value="${NbLearnerForm.content}" escapeXml="false"/>
-			</td>
-		</tr>
-		
-	</table>
-</div>
-
-<div id="formtablecontainer">
-<c:if test="${sessionScope.readOnlyMode != 'true'}" >
-<table width="100%">
-<tr>
-	<td align="right">
-		<html:submit property="method"><fmt:message key="button.finish"/></html:submit>
-	</td>	
-</tr>
+	</c:if>
 </table>
-</c:if>
-</div>
-<BR>
-<hr>
-</html:form>
+
+
+
