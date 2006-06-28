@@ -299,35 +299,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function toData(){
 		var dto:Object = new Object();
 		//DC - Changed mode of toData to be ommiting fields with undefined values
-		/*
-		dto.objectType = (_objectType) ?  _objectType : Config.STRING_NULL_VALUE;
-		dto.activityTypeID = (_activityTypeID) ?  _activityTypeID : Config.NUMERIC_NULL_VALUE;
-		dto.activityID = (_activityID) ?  _activityID : Config.NUMERIC_NULL_VALUE;
-		dto.activityCategoryID = (_activityCategoryID) ?  _activityCategoryID : Config.NUMERIC_NULL_VALUE;
-		dto.activityUIID = (_activityUIID) ?  _activityUIID : Config.NUMERIC_NULL_VALUE;
-		dto.learningLibraryID = (_learningLibraryID) ?  _learningLibraryID : Config.NUMERIC_NULL_VALUE;
-		dto.learningDesignID = (_learningDesignID) ?  _learningDesignID : Config.NUMERIC_NULL_VALUE;
-		dto.libraryActivityID = (_libraryActivityID) ?  _libraryActivityID : Config.NUMERIC_NULL_VALUE;
-		dto.parentActivityID = (_parentActivityID) ?  _parentActivityID : Config.NUMERIC_NULL_VALUE;
-		dto.parentUIID = (_parentUIID) ?  _parentUIID : Config.NUMERIC_NULL_VALUE;
-		dto.orderID = (_orderID) ?  _orderID : Config.NUMERIC_NULL_VALUE;
-		dto.groupingID = (_groupingID) ?  _groupingID : Config.NUMERIC_NULL_VALUE;
-		dto.groupingUIID = (_groupingUIID) ?  _groupingUIID : Config.NUMERIC_NULL_VALUE;
-		dto.title = (_title) ?  _title : Config.STRING_NULL_VALUE;
-		dto.description = (_description) ?  _description : Config.STRING_NULL_VALUE;
-		dto.helpText = (_helpText) ?  _helpText : Config.STRING_NULL_VALUE;
-		dto.yCoord = (_yCoord) ?  _yCoord : Config.NUMERIC_NULL_VALUE;
-		dto.xCoord = (_xCoord) ?  _xCoord : Config.NUMERIC_NULL_VALUE;
-		dto.libraryActivityUIImage = (_libraryActivityUIImage) ?  _libraryActivityUIImage : Config.STRING_NULL_VALUE;
-		dto.applyGrouping= (_applyGrouping!=null) ?  _applyGrouping : Config.BOOLEAN_NULL_VALUE;
-		dto.runOffline= (_runOffline!=null) ?  _runOffline : Config.BOOLEAN_NULL_VALUE;
-		//dto.onlineInstructions = (_onlineInstructions) ?  _onlineInstructions: Config.STRING_NULL_VALUE;
-		//dto.offlineInstructions = (_offlineInstructions) ?  _offlineInstructions : Config.STRING_NULL_VALUE;
-		dto.defineLater= (_defineLater!=null) ?  _defineLater : Config.BOOLEAN_NULL_VALUE;
-		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
-		//dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
-		dto.groupingSupportType = 2;
-		*/
+		
 		if(_activityTypeID){		dto.activityTypeID 		= _activityTypeID;			}
 		if(_activityID){			dto.activityID			= _activityID;				}
 		if(_activityCategoryID){	dto.activityCategoryID	= _activityCategoryID;		}
