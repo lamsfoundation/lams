@@ -355,6 +355,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var optAct = new ComplexActivity(_cv.ddm.newUIID());
 		optAct.learningDesignID = _cv.ddm.learningDesignID;
 		optAct.activityTypeID = Activity.OPTIONAL_ACTIVITY_TYPE;
+		optAct.title = Dictionary.getValue('opt_activity_title');
 		optAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		optAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		optAct.yCoord = pos.y;
