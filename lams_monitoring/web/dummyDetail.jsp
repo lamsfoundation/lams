@@ -95,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- should use Activity.PARALLEL_ACTIVITY_TYPE but that doesn't work -->
 		<TR>
 			<TD class="formcontrol" colspan="3">
-				Parallel Activity <c:out value="${activity.activityID}"/>: <c:out value="${activity.title}"/><BR/>
+				Parallel Activity <c:out value="${activity.activityID}"/>: <c:out value="${activity.activityTitle}"/><BR/>
 
 				<TABLE border="0" summary="This table is being used for layout purposes only">
 				<!-- go through all the activities and see if any are the child of the parallel activity -->
@@ -103,7 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${possibleChildActivity.parentActivityID eq activity.activityID}">
 				<TR>
 					<TD class="formcontrol">
-						--> Activity <c:out value="${possibleChildActivity.activityID}"/> <c:out value="${possibleChildActivity.title}"/>:
+						--> Activity <c:out value="${possibleChildActivity.activityID}"/> <c:out value="${possibleChildActivity.activityTitle}"/>:
 					</TD>
 					<TD class="formcontrol">
 						 <A HREF="javascript:launchPopup('/lams/monitoring/monitoring.do?method=getActivityMonitorURL&lessonID=<c:out value="${lesson.lessonId}"/>&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
@@ -125,7 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- Only show the activities without a parent. Those with a parent will be displayed by the parent activity -->
 		<TR>
 			<TD class="formcontrol">
-				Activity <c:out value="${activity.activityID}"/> <c:out value="${activity.title}"/>:
+				Activity <c:out value="${activity.activityID}"/> <c:out value="${activity.activityTitle}"/>:
 			</TD>
 			<TD class="formcontrol">
 				 <A HREF="javascript:launchPopup('/lams/monitoring/monitoring.do?method=getActivityMonitorURL&lessonID=<c:out value="${lesson.lessonId}"/>&activityID=<c:out value="${activity.activityID}"/>');">
