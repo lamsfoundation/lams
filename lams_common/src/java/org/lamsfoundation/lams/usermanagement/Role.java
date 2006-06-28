@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *         table="lams_role"
  *     
 */
-public class Role implements Serializable {
+public class Role implements Serializable,Comparable{
 
 	public static final String LEARNER = "LEARNER";
 	
@@ -197,6 +197,11 @@ public class Role implements Serializable {
         return new EqualsBuilder()
             .append(this.getRoleId(), castOther.getRoleId())
             .isEquals();
+    }
+    
+    public int compareTo(Object role){
+    	Role r = (Role)role;
+	    return name.compareTo(r.getName());
     }
 
     public int hashCode() {
