@@ -100,13 +100,15 @@ public class UserAction extends LamsDispatchAction {
 			
 			// get system's roles
 			List allRoles = service.findAll(Role.class);
-			ArrayList<RoleDTO> rolelist = new ArrayList<RoleDTO>();
+			/*ArrayList<RoleDTO> rolelist = new ArrayList<RoleDTO>();
 			for(int i=0; i<allRoles.size(); i++){
 				Role r = (Role)allRoles.get(i);
 			    rolelist.add(new RoleDTO(r));
 			}
 			Collections.sort(rolelist);
-			request.setAttribute("rolelist",rolelist);
+			request.setAttribute("rolelist",rolelist);*/
+			Collections.sort(allRoles);
+			request.setAttribute("rolelist",allRoles);
 			
 			// get user's roles
 			Iterator iter = user.getUserOrganisations().iterator();

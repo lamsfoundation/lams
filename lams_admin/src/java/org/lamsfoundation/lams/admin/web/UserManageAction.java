@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -123,6 +124,7 @@ public class UserManageAction extends Action {
 			List roles;
 			try{
 				roles = service.getRolesForUserByOrganisation(user, orgId);
+				Collections.sort(roles);
 			} catch(NullPointerException e){
 				roles = new ArrayList();
 				log.debug("no roles found for user: "+user);
