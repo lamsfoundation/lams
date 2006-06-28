@@ -1,8 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <%@ include file="/common/taglibs.jsp"%>
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-
+		<style type="text/css">
+		<!--
+		table { 
+			 width:650px;
+			 margin-left:0px; 
+			 text-align:left; 
+			 }
+		
+		td { 
+			padding:4px; 
+			font-size:12px;
+		}
+		hr {
+			border: none 0;
+			border-top: 1px solid #ccc;
+			width: 650px;
+			height: 1px;
+			margin: 0px 10px 10px 0px;
+		}
+			
+		-->
+		</style>
 	</head>
 	<body>
 	<table width="100%" border="0" align="left" cellpadding="0" cellspacing="0">
@@ -43,7 +67,9 @@
 									<input type="file" name="file" size="25"  /> 
 								</td>
 								<td  align="center" valign="bottom">
-									<input type="submit" name="add" value="<fmt:message key="button.upload"/>" class="buttonStyle">
+									<a href="#" onclick="document.getElementById('resourceItemForm').submit()" class="button">
+										<fmt:message key="button.upload"/>
+									</a>
 								</td>
 							</tr>
 						</table>

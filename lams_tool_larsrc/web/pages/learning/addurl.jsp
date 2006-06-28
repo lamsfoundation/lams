@@ -2,7 +2,28 @@
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-
+		<style type="text/css">
+		<!--
+		table { 
+			 width:650px;
+			 margin-left:0px; 
+			 text-align:left; 
+			 }
+		
+		td { 
+			padding:4px; 
+			font-size:12px;
+		}
+		hr {
+			border: none 0;
+			border-top: 1px solid #ccc;
+			width: 650px;
+			height: 1px;
+			margin: 0px 10px 10px 0px;
+		}
+			
+		-->
+		</style>
 	</head>
 	<body>
 	<table width="100%" border="0" align="left" cellpadding="0" cellspacing="0">
@@ -44,7 +65,9 @@
 									<html:checkbox property="openUrlNewWindow"><fmt:message key="open.in.new.window"/></html:checkbox>									
 								</td>
 								<td align="center" valign="bottom">
-									<input type="submit" name="add" value="<fmt:message key="button.upload"/>" class="buttonStyle">
+									<a href="#" onclick="document.getElementById('resourceItemForm').submit()" class="button">
+										<fmt:message key="button.add"/>
+									</a>
 								</td>
 							</tr>
 						</table>

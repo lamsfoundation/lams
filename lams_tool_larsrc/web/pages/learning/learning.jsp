@@ -1,3 +1,6 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <%@ include file="/common/taglibs.jsp"%>
 <html:html locale="true">
 <head>
@@ -46,6 +49,8 @@
     </script>
 </head>
 <body>
+<div id="page">
+	<div id="header">
 	<table border="0" align="center" class="forms" width="95%">
 		<tr>
 			<td>
@@ -58,17 +63,19 @@
 			</td>
 		</tr>
 	</table>
+	</div>
+	<div id="content">
 	<%@ include file="/common/messages.jsp"%>
 	<table border="0" align="center" class="forms" width="95%">
 		<tr>
-			<th scope="col">
+			<th width="400px">
 				<fmt:message key="label.resoruce.to.review" />
 			</th>
 			<th scope="col" width="50px">
 				<fmt:message key="label.completed" />
 			</th>
-			<th scope="col" style="width:200px">
-				<a href="#" style="width:120px" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
+			<th scope="col" align="center">
+				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
 			</th>
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
@@ -96,22 +103,18 @@
 				<a href="#" class="button" onclick="return finishSession()">
 					<fmt:message key="label.finished" />
 				</a>
-				<c:if test="${resource.miniViewResourceNumber <= 0}">
-					<p>&nbsp;</p>
-				</c:if>
 			</td>
 		</tr>
 		<c:if test="${resource.miniViewResourceNumber > 0}">
 			<tr>
 				<td colspan="3" align="left">
 					<b>${resource.miniViewNumberStr}</b>
-					<p>&nbsp;</p>
 				</td>
 			</tr>
 		</c:if>
 	</table>
 	<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
-		<table border="0" align="center" class="forms" width="95%">
+		<table border="0" align="center" width="100%">
 			<tr>
 				<td style="align:left" >
 					<fmt:message key="label.suggest.new"/> 
@@ -161,6 +164,9 @@
 			</script>
 		</c:when>
 	</c:choose>		
+	</div>
+	<div id="footer"></div>
+</div>
 </body>
 </html:html>
 
