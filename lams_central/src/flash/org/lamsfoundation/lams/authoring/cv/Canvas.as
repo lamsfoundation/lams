@@ -751,7 +751,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function doImportLaunch():Void{
 		var serverUrl = Config.getInstance().serverUrl;
-		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import', 398, 570, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import', 298, 712, true, true, false, false, false);
 	}
 	
 	/**
@@ -773,7 +773,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function doExportLaunch():Void{
 		var serverUrl = Config.getInstance().serverUrl;
 		var learningDesignID = _ddm.learningDesignID;
-		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export', 398, 570, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export', 298, 712, true, true, false, false, false);
 	}
 	/*
 	public function cut():Void{
