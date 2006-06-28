@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp" %>
 <c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
-<!---------------------------Advance Tab Content ------------------------>	
+<!-- Advance Tab Content -->	
 	<table class="forms">
 		<!-- Instructions Row -->
 		<tr>

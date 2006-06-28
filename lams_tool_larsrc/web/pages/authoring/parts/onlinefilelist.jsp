@@ -13,7 +13,7 @@
 				<fmt:message key="label.view"/>
 			</html:link>
 		</td>
-		<td width="80px" align="center">
+		<td width="100px" align="center">
 			<c:set var="downloadURL">
 					<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"/>
 			</c:set>

@@ -51,7 +51,7 @@
 		hideBusy(onlineArea);
 	}
 </script>
-	<!---------------------------Instruction Tab Content ------------------------>
+	<!-- Instruction Tab Content -->
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
 		<tr>
@@ -83,7 +83,7 @@
 				</a>
 			</td>
 		</tr>	
-		<!------------Offline Instructions ----------------------->
+		<!-- Offline Instructions -->
 		<tr>
 			<td colspan="2">
 			<lams:SetEditor id="Resource.offlineInstructions" text="${formBean.resource.offlineInstructions}" key="label.authoring.offline.instruction"/>

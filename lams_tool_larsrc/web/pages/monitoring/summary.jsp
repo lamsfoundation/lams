@@ -18,22 +18,22 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
-						<table border="0" cellspacing="3" width="98%">
+					<td style="padding:3px">
+						<table border="0" cellspacing="3" width="100%">
 							<tr>
 								<th width="50">
 									<fmt:message key="monitoring.label.type" />
 								</th>
-								<th width="200">
+								<th width="150">
 									<fmt:message key="monitoring.label.title" />
 								</th>
-								<th width="130">
+								<th width="70">
 									<fmt:message key="monitoring.label.suggest" />
 								</th>
-								<th width="170" align="center">
+								<th width="100" align="center">
 									<fmt:message key="monitoring.label.number.learners" />
 								</th>
-								<th width="30">
+								<th width="70">
 									<!--hide/show-->
 								</th>
 							</tr>
