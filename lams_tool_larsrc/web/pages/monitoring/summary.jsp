@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
-<table border="0" cellspacing="3" width="98%">
+<table border="0" cellspacing="3" style="width:650px">
 	<c:if test="${empty summaryList}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
@@ -25,13 +24,13 @@
 								<th width="50">
 									<fmt:message key="monitoring.label.type" />
 								</th>
-								<th width="300">
+								<th width="200">
 									<fmt:message key="monitoring.label.title" />
 								</th>
-								<th width="150">
+								<th width="130">
 									<fmt:message key="monitoring.label.suggest" />
 								</th>
-								<th width="180" align="center">
+								<th width="170" align="center">
 									<fmt:message key="monitoring.label.number.learners" />
 								</th>
 								<th width="30">

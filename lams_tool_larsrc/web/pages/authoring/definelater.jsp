@@ -7,7 +7,6 @@
 			pageContext.setAttribute("tabs", tabs);
 
 			%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
 	<title><fmt:message key="label.author.title" /></title>
@@ -48,7 +47,7 @@
 
 </head>
 <body onLoad="init()">
-
+<div id="page">
 	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="toolContentID" />
@@ -57,9 +56,11 @@
 		<h1>
 			<fmt:message key="label.authoring.heading" />
 		</h1>
-
+<div id="header">
 		<!-- start tabs -->
 		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
+</div>
+<div id="content">
 		<!-- end tab buttons -->
 		<div class="tabbody">
 			<!-- tab content 1 (Basic) -->
@@ -75,5 +76,9 @@
 
 
 	</html:form>
+	
+</div>
+<div id="footer"></div>
+</div>
 </body>
 </html:html>
