@@ -1,6 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
-
 <%@ include file="/common/taglibs.jsp"%>
 <html>
 	<head>
@@ -54,7 +51,9 @@
 							<tr>
 								<td valign="top">
 									<fmt:message key="label.authoring.basic.resource.title.input" /><BR>
-									<html:text property="title" size="40" tabindex="1" />
+									<html:text property="title" size="40" tabindex="1" /><BR><BR>
+									<fmt:message key="label.authoring.basic.resource.file.input" /><BR>
+									<input type="file" name="file" size="25"/> 
 								</td>
 								<td valign="top">
 									<fmt:message key="label.learning.comment.or.instruction" /><BR>
@@ -62,11 +61,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td>
-									<fmt:message key="label.authoring.basic.resource.file.input" />
-									<input type="file" name="file" size="25"  /> 
-								</td>
-								<td  align="center" valign="bottom">
+								<td  colspan="2" align="center" valign="bottom">
 									<a href="#" onclick="document.getElementById('resourceItemForm').submit()" class="button">
 										<fmt:message key="button.upload"/>
 									</a>

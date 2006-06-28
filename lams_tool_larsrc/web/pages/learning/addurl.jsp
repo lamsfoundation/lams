@@ -51,7 +51,11 @@
 							<tr>
 								<td valign="top">
 									<fmt:message key="label.authoring.basic.resource.title.input" /><BR>
-									<html:text property="title" size="40" tabindex="1" />
+									<html:text property="title" size="40" tabindex="1" /><BR><BR>
+									<fmt:message key="label.authoring.basic.resource.url.input" /><BR>
+									<input type="url" name="url" size="40"  /> <BR>
+									<html:checkbox property="openUrlNewWindow"><fmt:message key="open.in.new.window"/></html:checkbox>									
+									
 								</td>
 								<td valign="top">
 									<fmt:message key="label.learning.comment.or.instruction" /><BR>
@@ -59,12 +63,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td>
-									<fmt:message key="label.authoring.basic.resource.url.input" />
-									<input type="url" name="url" size="40"  /> 
-									<html:checkbox property="openUrlNewWindow"><fmt:message key="open.in.new.window"/></html:checkbox>									
-								</td>
-								<td align="center" valign="bottom">
+								<td colspan="2" align="center" valign="bottom">
 									<a href="#" onclick="document.getElementById('resourceItemForm').submit()" class="button">
 										<fmt:message key="button.add"/>
 									</a>

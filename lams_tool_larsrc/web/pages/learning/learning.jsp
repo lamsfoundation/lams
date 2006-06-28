@@ -50,8 +50,7 @@
 </head>
 <body>
 <div id="page">
-	<div id="header">
-	<table border="0" align="center" class="forms" width="95%">
+	<table border="0" align="center" width="95%">
 		<tr>
 			<td>
 				<h1>
@@ -63,27 +62,28 @@
 			</td>
 		</tr>
 	</table>
-	</div>
+	<br>
 	<div id="content">
+	<BR>
 	<%@ include file="/common/messages.jsp"%>
-	<table border="0" align="center" class="forms" width="95%">
+	<table border="0" align="center" width="95%">
 		<tr>
-			<th width="400px">
+			<th width="400px" align="center">
 				<fmt:message key="label.resoruce.to.review" />
 			</th>
-			<th scope="col" width="50px">
+			<th width="50px">
 				<fmt:message key="label.completed" />
 			</th>
-			<th scope="col" align="center">
-				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
+			<th align="center">
+			
 			</th>
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
 			<tr>
-				<td>${item.title}
-				<c:if test="${!item.createByAuthor}">
-					[${item.createBy.loginName}]
-				</c:if>
+				<td  align="center">${item.title}
+					<c:if test="${!item.createByAuthor}">
+						[${item.createBy.loginName}]
+					</c:if>
 				</td>
 				<td align="center">
 					<c:if test="${item.complete}">
@@ -100,6 +100,8 @@
 		</c:forEach>
 		<tr>
 			<td colspan="3" align="right">
+				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
+				&nbsp;
 				<a href="#" class="button" onclick="return finishSession()">
 					<fmt:message key="label.finished" />
 				</a>

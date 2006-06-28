@@ -101,20 +101,15 @@
 </head>
 <body onLoad="init()">
 <div id="page">
-	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="toolContentID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-<div id="header">
 		<h1>
 			<fmt:message key="label.authoring.heading" />
 		</h1>
+<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
 </div>
 		<!-- start tabs -->
 <div id="content">
 		<!-- end tab buttons -->
-		<div class="tabbody">
 			<table align=center>
 				<tr>
 					<td NOWRAP>
@@ -122,6 +117,10 @@
 					</td>
 				</tr>
 			</table>
+	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<html:hidden property="toolContentID" />
+		<html:hidden property="currentTab" styleId="currentTab" />
 
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
@@ -144,11 +143,10 @@
 				accessMode="author"
 			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" />
+	</html:form>
 
-		</div>
 </div>
 
-	</html:form>
 <div id="footer"></div>
 <lams:HTMLEditor />
 <!-- end page div -->

@@ -10,11 +10,8 @@
 	    
 	    	var imgRoot="${lams}images/";
 		    var themeName="aqua";
-	        
 	        function init(){
-	        
 	            initTabSize(4);
-	            
                 selectTab(1); //select the default tab;
 	        }     
 	        
@@ -31,6 +28,9 @@
 	</head>
 	<body onLoad="init()">
 	<div id="page">
+		<h1>
+			<fmt:message key="label.authoring.heading" />
+		</h1>
 	<div id="header">
 		<lams:Tabs>
 			<lams:Tab id="1" key="monitoring.tab.summary" />
@@ -41,15 +41,13 @@
 	</div>
 	<div id="content">
 
-		<div class="tabbody">
 			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="monitoring.tab.instructions" page="instructions.jsp"/>
 			<lams:TabBody id="3" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
 			<lams:TabBody id="4" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
-		</div>
-		</div>
-		<div id="footer"></div>
-		
+	</div>
+	<div id="footer"></div>
+	
 	</div>
 	</body>
 </html>
