@@ -62,15 +62,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 			//-->
 		</script>
 		
-		<div align="center">
-			<table width="100%" border="0" align="center" summary="This table is being used for layout purposes">
-				<tr>
-					<td valign="top">
-						<H1><fmt:message key="message.activity.loading" /></H1>
-					</td>
-				</tr>
-				<!-- Tool summary is <c:out value="${activityForm.progressSummary}" escapeXml="false" /> -->
-			</table>
-		</div>
+	<H1><fmt:message key="message.activity.loading" /></H1>
+	<!-- Tool summary is <c:out value="${activityForm.progressSummary}" escapeXml="false" /> -->
 			
 	</c:if>

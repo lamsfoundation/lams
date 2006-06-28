@@ -42,16 +42,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 
 	<c:choose>
-		<c:when test="${includeBodyTag}">
-		
-			<body>
-				<tiles:insert attribute="body" />
-			</body>
-			
-		</c:when>
-		<c:otherwise>
-			<tiles:insert attribute="body" />
-		</c:otherwise>
+			<c:when test="${includeBodyTag}">
+				<body>
+					<div id="page">	
+					<div id="content">
+						<tiles:insert attribute="body" />
+					</div>
+					</div>
+				</body>
+				
+			</c:when>
+			<c:otherwise>
+				<div id="page">	
+				<div id="content">
+					<tiles:insert attribute="body" />
+				</div>
+				</div>
+			</c:otherwise>
+
 	</c:choose>
 	
 </html:html>

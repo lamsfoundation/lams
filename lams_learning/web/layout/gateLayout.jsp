@@ -41,12 +41,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  </head>
 
 	<body>
-		<table width="95%" border="0" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
-		<!-- Table has one column -->
-			<tiles:insert attribute="body" />
-			<tr><td>&nbsp;</td></tr>
-			<%@ include file="../gate/gateNext.jsp" %>			  
-		</table>
+		<div id="page">	
+			<div id="content">
+				<tiles:insert attribute="body" />
+				<%@ include file="../gate/gateNext.jsp" %>			  
+			</div>
+			<div id="footer"></div>
+		</div>
+
 	</body>
 
 </html:html>

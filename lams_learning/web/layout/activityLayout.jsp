@@ -48,13 +48,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  </head>
 
 	<body>
-		<table width="95%" border="0" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
-			<tr>
-				<td valign="top">
-						<tiles:insert attribute="body" />
-				</td>
-			</tr>
-		</table>
+		<div id="page">	
+		<div id="content">
+			<tiles:insert attribute="body" />
+		</div>
+		</div>
 	</body>
 
 </html:html>

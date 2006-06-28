@@ -40,7 +40,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${activity.activityId}">
 	  </head>
 
-      <tiles:insert attribute="body" />
+	<body>
+		<div id="page">	
+		<div id="content">
+	      <tiles:insert attribute="body" />
+		</div>
+		</div>
 	</body>
 
 </html:html>

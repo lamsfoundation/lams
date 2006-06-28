@@ -45,17 +45,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
     </head>
     
-    <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-      <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
-        <!-- header -->
-		<tiles:insert attribute="header" />
-        <!-- end of header -->
-        <!-- main content -->
-        <tiles:insert attribute="content" />
-        <!--end of main content-->
-        <!--footer-->
-        <tiles:insert attribute="footer" />
-        <!-- end of footer -->
-      </table>
+    <body>
+		<div id="page">	
+			<div id="content">
+				<tiles:insert attribute="content" />
+ 			</div>
+			<div id="footer"></div>
+		</div>
     </body>
 </html:html>

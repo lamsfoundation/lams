@@ -26,10 +26,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<div align="center" class="mainHeader"> 
  	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
  
-    <p class="heading"><fmt:message key="message.lesson.finished" /></p>
-    <p class="body"><fmt:message key="message.lesson.finishedCont" /></p>
+    <H1><fmt:message key="message.lesson.finished" /></H2>
+	<P>&nbsp;</p>
+    <p><fmt:message key="message.lesson.finishedCont" /></p>
     
- </div>

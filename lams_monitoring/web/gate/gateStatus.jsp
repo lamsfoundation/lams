@@ -19,9 +19,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<p align="right">
 		<c:if test="${not GateForm.map.gate.gateOpen}">
 			<img height="43" src="../images/synch_active.gif" width="37"><br><span class="bodyBold"><fmt:message key="label.gate.closed"/></span>
 		</c:if>
 		<c:if test="${GateForm.map.gate.gateOpen}">
 			<img height="43" src="../images/synch_not_active.gif" width="37"><br><span class="bodyBold"><fmt:message key="label.gate.gate.open"/></span>
 		</c:if>
+</p>

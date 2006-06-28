@@ -22,8 +22,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 
-<tr><td>
-<div align="center">
-	<p><fmt:message key="not.supported"/></p>
-</div>
-</td></tr>
+	<H1><fmt:message key="not.supported"/></H1>

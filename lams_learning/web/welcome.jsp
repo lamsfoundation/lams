@@ -19,15 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<table width="100%" height="295" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
-	<tr> 
-		<td valign="middle"> 
-			<div align="center">
-            	<p class="body"><fmt:message key="message.activity.loading"/></p>
-          	</div>
-        </td>
-    </tr>
-</table>
+<p><fmt:message key="message.activity.loading"/></p>

@@ -25,41 +25,34 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<div align="center">
+<div id="page">	
+	<div id="content">
 
-	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
+		<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
 
 		<h1><fmt:message key="label.view.groups.title"/></h1>
-		<table width="100%" border="0" cellpadding="3" cellspacing="4" class="body" summary="This table is being used for layout purposes">
+		<table class="alternative-color">
 			<logic:iterate id="group" name="groups"> 
 			<tr>
-				<td align="right" class="bodyBold" style="{border-right: solid #CCCCCC 1px; border-bottom: solid #CCCCCC 1px; }">
+				<td width="25%">
 					<c:out value="${group.groupName}"/>
 				</td>
-				<td width="85%" align="left" class="body"  style="{border-bottom: solid #CCCCCC 1px; }">
-					<table width="100%" border="0" cellpadding="0" cellspacing="0">
-						<c:forEach items="${group.users}" var="user">
-						<tr>
-							<td class="bodyBold">
-								<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
-							</td>
-						</tr>
-						</c:forEach>
-					</table>		
+				<td>
+					<c:forEach items="${group.users}" var="user">
+						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
+					</c:forEach>
 				</td>
 			</tr>
 			</logic:iterate>
-			
-			<c:if test="${finishedButton}">
-			<tr> 
-				<td align="right" valign="top" class="bodyBold">&nbsp;</td>
-				<td align="right">
-					<html:submit styleClass="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"><fmt:message key="label.finish.button"/></html:submit>
-				</td>
-			</tr>
-			</c:if>
 		</table>
+
+		<c:if test="${finishedButton}">
+			<p align="right">
+				<html:submit styleClass="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"><fmt:message key="label.finish.button"/></html:submit>
+			</p>
+		</c:if>
 
 	</html:form>
 
+	</div>
 </div>

@@ -41,6 +41,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 
 	<body>
+	<div id="page">	
+		<div id="content">
+
 		<H1><c:out value="${pageTitle}"/></H1>
 		
 		<p>	<fmt:message key="${error.export.portfolio.not.supported}">
@@ -48,6 +51,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</fmt:message>
 		</p>
 		
+		</div>
+	</div>
+
 	</body>
 	
 </html:html>

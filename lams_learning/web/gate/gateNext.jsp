@@ -1,23 +1,17 @@
 <c:set var="formAction" value="/gate?method=knockGate&activityID=${GateForm.map.activityId}"/>
 
-
-<tr>
-	<td><fmt:message key="label.gate.refresh.message"/></td>
-</tr>
+<p><fmt:message key="label.gate.refresh.message"/></p>
 
 <c:if test="${GateForm.map.previewLesson == true}">
-<tr><td>&nbsp;</td></tr>
-<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
-<tr>
-	<td><em><fmt:message key="label.gate.preview.message"/></em></td>
-</tr>
-<tr><td>&nbsp;</td></tr>
+	<p>&nbsp;</p>
+	<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
+	<p><em><fmt:message key="label.gate.preview.message"/></em></p>
+	<p>&nbsp;<p>
 </c:if>
 
-<tr>
-	<td align="right">
-			<html:form action="${formAction}" target="_self">
-				<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
-			</html:form>
-	</td>
-<tr>
+<html:form action="${formAction}" target="_self">
+<p align="right">
+	<html:submit><fmt:message key="label.next.button"/></html:submit>
+</p>
+</html:form>
+	

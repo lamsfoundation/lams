@@ -25,34 +25,21 @@
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<tr>
-		<td>
-			<!-- Page Content table--> 
-			<table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
-				<tr><td>&nbsp; </td></tr> 
-				<tr> 
-					<td><H1><fmt:message key="label.permission.gate.title"/></H1></td> 
-				</tr> 					  
-				<%@ include file="gateInfo.jsp" %>
-				<tr><td>&nbsp; </td></tr>
-				<tr><td>&nbsp; </td></tr>
-				<tr> 
-					<td class="body" valign="middle"><fmt:message key="label.gate.you.open.message"/>
+	<H1><fmt:message key="label.permission.gate.title"/></H1>
+	<p>&nbsp;</p> 
 
-					<%-- set to read only if in export portfolio --%>
-					<c:if test="${not GateForm.map.readOnly}"> 
-					<c:if test="${not GateForm.map.gate.gateOpen}" >
-						<html:form action="/gate?method=openGate" target="_self">
-							<html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit> 
-						</html:form>
-					</c:if>
-					</c:if>
-				</td>
-				</tr>
-				<tr>
-					<td align="right"><%@ include file="gateStatus.jsp" %></td>
-				</tr>
-			</table> 
-			<!-- end of Page Content table--> 
-		</td>
-	</tr>
+	<%@ include file="gateInfo.jsp" %>
+	<p><fmt:message key="label.gate.you.open.message"/>
+
+	<%-- set to read only if in export portfolio --%>
+	<c:if test="${not GateForm.map.readOnly}"> 
+		<c:if test="${not GateForm.map.gate.gateOpen}" >
+			<html:form action="/gate?method=openGate" target="_self">
+				<p><html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit></p>
+			</html:form>
+		</c:if>
+	</c:if>
+
+	</p>
+
+	<%@ include file="gateStatus.jsp" %>

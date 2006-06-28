@@ -35,15 +35,8 @@ String pathToShare = cprotocol+request.getServerName()+":"+request.getServerPort
 %>
 
 <logic:messagesPresent> 
-<table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
-<tr>
-	<td width="10%"  align="right" >
-		<img src="<%=pathToShare%>/images/error.jpg" alt='<fmt:message key="error.title"/>'/>
-	</td>
-	<td width="90%" valign="middle" class="body" colspan="2">
-		 <html:messages id="error" message="false"> 
-			 <c:out value="${error}" escapeXml="false"/><BR>
-		 </html:messages> 
-	</td>
-</tr>
+	<p><img src="<%=pathToShare%>/images/error.jpg" alt='<fmt:message key="error.title"/>'/></p>
+	 <html:messages id="error" message="false"> 
+		 <P class="warning"><c:out value="${error}" escapeXml="false"/></p>
+	 </html:messages> 
 </logic:messagesPresent>

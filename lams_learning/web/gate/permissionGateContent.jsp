@@ -25,9 +25,6 @@
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<tr> 
-		<td colspan="3"><H1><fmt:message key="label.permission.gate.title"/></H1></td> 
-	</tr> 					  
-	<tr> 
-		<td colspan="3"><fmt:message key="label.permission.gate.message"/></td> 
-	</tr> 	
+	<H1><fmt:message key="label.permission.gate.title"/></H1>
+	<p>&nbsp;</p>
+	<p><fmt:message key="label.permission.gate.message"/></p>

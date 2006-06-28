@@ -38,24 +38,34 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 
 <body>
-	<H1><c:out value="${portfolio.lessonName}"/></H1>
-	
-	<p><c:out value="${portfolio.lessonDescription}"/></p>
+	<div id="page">	
+		<h1 class="no-tabs-below">
+			<c:out value="${portfolio.lessonName}"/>
+		</h1>
+		<div id="header-no-tabs"></div>
+		<div id="content">
 
-	<c:if test="${empty portfolio.activityPortfolios}">
-		<fmt:message key="export.portfolio.noneAttempted.message"/>
-	</c:if>
+		<p><c:out value="${portfolio.lessonDescription}"/></p>
 
-	<c:forEach var="actport" items="${portfolio.activityPortfolios}" varStatus="status">
-		<c:if test="${status.first}">
-			<UL>
+		<c:if test="${empty portfolio.activityPortfolios}">
+			<fmt:message key="export.portfolio.noneAttempted.message"/>
 		</c:if>
 
-		<lams:ExportPortOutput actport="${actport}"/>
-		<c:if test="${status.last}">
-			</UL>
-		</c:if>
-	</c:forEach>
-</body>
+		<c:forEach var="actport" items="${portfolio.activityPortfolios}" varStatus="status">
+			<c:if test="${status.first}">
+				<UL>
+			</c:if>
+
+			<lams:ExportPortOutput actport="${actport}"/>
+			<c:if test="${status.last}">
+				</UL>
+			</c:if>
+		</c:forEach>
+
+		</div>
+		<div id="footer"></div>
+	</div>
+
+<</body>
 	
 </html:html>

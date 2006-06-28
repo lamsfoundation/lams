@@ -410,10 +410,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <body onLoad="init()">
 
+<div id="page">	
+	
+	<div id="content">
+
+	<h1 class="no-tabs-below">
+		<c:out value="${title}"/>
+	</h1>
+
 	<form>
 
-	<h1><c:out value="${title}"/></h1>
-	
 	<p><c:out value="${description}"/></p>
 	
 	<p><STRONG><fmt:message key="label.grouping.max.num.in.group.heading"/></STRONG> <c:out value="${maxNumberOfGroups}"/> 
@@ -423,41 +429,45 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<p><fmt:message key="label.grouping.general.instructions.line2"/></p>
 
-	<table cellspacing="5" cellpadding="4" class="flatborder">
+	<table>
 		<tr>
-			<th width="20%" class="shaded"><fmt:message key="label.grouping.group.heading"/></th>
-			<th width="20%" class="shaded"><fmt:message key="label.grouping.non.grouped.users.heading"/></th>
-			<th width="20%" class="shaded"><fmt:message key="label.grouping.grouped.users.heading"/></th>
+			<th><fmt:message key="label.grouping.group.heading"/></th>
+			<th><fmt:message key="label.grouping.non.grouped.users.heading"/></th>
+			<th><fmt:message key="label.grouping.grouped.users.heading"/></th>
    		 </tr>
 		<tr align="center" valign="top">
-			<td>
-					<select class="nav" id="groups" name="groups" size="15" onChange="getMembers(this)">
+			<td width="34%">
+					<select id="groups" name="groups" size="15" onChange="getMembers(this)">
 					</select>
 				<p>
-					<input type="button" id="groupremove" name="groupremove" value="<fmt:message key="button.grouping.remove.selected.group"/>" onclick="removeGroup()" disabled=true class="nav" />
+					<input type="button" id="groupremove" name="groupremove" value="<fmt:message key="button.grouping.remove.selected.group"/>" onclick="removeGroup()" disabled=true />
 				</p>
 				<p>
-		   			<input id="newgroupname" name="newgroupname" type="text" size="50" class="nav" />
-					<input type="button" id="groupadd" name="groupadd" value="<fmt:message key="button.grouping.add.group"/>" onclick="addGroup()" class="nav" />
+		   			<input id="newgroupname" name="newgroupname" type="text" size="25"  />
+					<input type="button" id="groupadd" name="groupadd" value="<fmt:message key="button.grouping.add.group"/>" onclick="addGroup()"  />
 				</p>
 			</td>
-			<td>
-					<select class="nav" id="nonmembers[]" name="nonmembers[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
+			<td width="33%">
+					<select  id="nonmembers[]" name="nonmembers[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
 					</select>
 				<p>
-					<input type="button" id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.grouping.add.user.to.group"/>" onclick="addMembersToGroup()" disabled=true class="nav" />
+					<input type="button" id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.grouping.add.user.to.group"/>" onclick="addMembersToGroup()" disabled=true  />
 				</p>
 			</td>
-			<td>
-					<select class="nav" id="members[]" name="members[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
+			<td width="33%">
+					<select  id="members[]" name="members[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
 					</select>
         			<p>
-			        <input type="button" id="membersremove" name="membersremove" value="<fmt:message key="button.grouping.remove.user.from.group"/>" onclick="removeMembersFromGroup()" disabled=true class="nav" />
+			        <input type="button" id="membersremove" name="membersremove" value="<fmt:message key="button.grouping.remove.user.from.group"/>" onclick="removeMembersFromGroup()" disabled=true  />
 				</p>
 			</td>
 		</tr>
 	</table>
-		<a href="javascript:window.close();" class="button"><fmt:message key="button.finished"/></a>
+	<p align="right"><a href="javascript:window.close();" class="button"><fmt:message key="button.finished"/></a></p>
 	</form>
+
+	</div>
+</div>
+
 </body>
 </html:html>

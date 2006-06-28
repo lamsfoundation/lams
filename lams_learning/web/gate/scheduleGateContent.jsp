@@ -25,15 +25,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<tr> 
-	<td><H1><fmt:message key="label.schedule.gate.title"/></H1></td> 
-</tr> 					  
-<tr>
-	<td><fmt:message key="label.schedule.gate.open.message"/> <fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/></td>
-</tr>
+<H1><fmt:message key="label.schedule.gate.title"/></H1>
+<p>&nbsp;</p>
+<p><fmt:message key="label.schedule.gate.open.message"/> <fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
 <c:if test="${GateForm.map.endingTime!=null}">
-<tr>
-	<td><fmt:message key="label.schedule.gate.close.message"/> <fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/></td>
-</tr>
+<p><fmt:message key="label.schedule.gate.close.message"/> <fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
 </c:if>
 	

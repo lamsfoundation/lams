@@ -121,7 +121,10 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
   </head>
   
   <body>
-
-    <div id="message"></div>
+		<div id="page">	
+			<div id="content">
+			    <div id="message"></div>
+			</div>
+		</div>
   </body>
 </html>

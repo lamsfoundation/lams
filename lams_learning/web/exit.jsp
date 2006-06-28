@@ -22,13 +22,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<table width="100%" height="295" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
-	<tr> 
-		<td valign="middle"> 
-			<div align="center">
-				<p class="heading"><fmt:message key="exit.heading"/></p>
-            	<p class="body"><fmt:message key="exit.message"/></p>
-          	</div>
-        </td>
-    </tr>
-</table>
+<H1><fmt:message key="exit.heading"/></H1>
+<P>&nbsp;</p>
+<p><fmt:message key="exit.message"/></p>

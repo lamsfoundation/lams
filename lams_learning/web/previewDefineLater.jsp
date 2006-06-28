@@ -26,19 +26,10 @@
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
 	<%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<tr> 
-		<td colspan="3"><H1><fmt:message key="label.preview.definelater.title"/></H1></td> 
-	</tr> 					  
-	<tr> 
-		<td colspan="3">
-			<fmt:message key="label.preview.definelater.message">
-				<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
-			</fmt:message>
-		</td> 
-	</tr> 	
-	<tr> 
-		<td colspan="3">
-			<a href="<lams:LAMSURL/>${requestScope.activityURL}" class="button"><fmt:message key="label.next.button"/></a>
-		</td> 
-	</tr> 	
+	<H1><fmt:message key="label.preview.definelater.title"/></H1>
+	<p><fmt:message key="label.preview.definelater.message">
+			<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
+		</fmt:message>
+	</p>
+	<p><a href="<lams:LAMSURL/>${requestScope.activityURL}" class="button"><fmt:message key="label.next.button"/></a></p>	
 	

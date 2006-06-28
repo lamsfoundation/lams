@@ -6,7 +6,6 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 	
-<div align="center">
 	<script language="JavaScript" type="text/JavaScript"><!--
 		function selectActivity(activityId) {
 			// find the activity in the form
@@ -56,111 +55,61 @@
 		//-->
 	</script>
 	
-	<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
+	<div id="page">	
+		<div id="content">
+
+		<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
 	
 		<html:form action="/ChooseActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		
-		<table width="100%" height="231" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes">
-			<tr> 
-				<td height="179" valign="top" align="center">
-					<table width="90%" border="0" cellspacing="1" cellpadding="0" summary="This table is being used for layout purposes">
-						<tr> 
-							<td colspan="3"> <div align="center"></div></td>
-						</tr>
-						<tr> 
-							<td width="28%" height="31">&nbsp;</td>
-							<td width="44%">
-								<div align="center" class="mainHeader">
-									<c:out value="${optionsActivityForm.title}"/>
-								</div>
-							</td>
-							<td width="28%">&nbsp;</td>
-						</tr>
-						<tr> 
-							<td colspan="3">&nbsp;</td>
-						</tr>
-						<tr> 
-							<td colspan="3" class="body">
-								<c:out value="${optionsActivityForm.description}"/><p>&nbsp;</p>
-							</td>
-						</tr>
-						<tr>
-							<td colspan="3">
-								<div align="center" class="bodyBold">
-									<fmt:message key="message.activity.options.activityCount">
-										<fmt:param value="${optionsActivityForm.minimum}" />
-										<fmt:param value="${optionsActivityForm.maximum}" />
-									</fmt:message>
-								</div>
-							</td>
-						</tr>
-						<tr> 
-							<td colspan="3">&nbsp;</td>
-						</tr>
-						<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL" varStatus="loop">
-							<c:set var="rowColor" value="#B5D2E3" />
-							<c:if test="${loop.index % 2 == 0}">
-								<c:set var="rowColor" value="#B5CECE" />
-							</c:if>
-							<tr bgcolor="<c:out value="${rowColor}"/>">
-								<td colspan="3">
-									<table width="100%" border="0" cellspacing="1" cellpadding="0" summary="This table is being used for layout purposes">
-										<tr onclick="selectActivity(<c:out value="${activityURL.activityId}" />)">
-											<td width="6%">
-												<c:choose>
-													<c:when test="${activityURL.complete}">
-														<%--html:img page="/images/tick.gif" /--%>
-													</c:when>
-													<c:otherwise>
-														<input type="radio" name="activityID"
-															value="<c:out value="${activityURL.activityId}"/>" />
-													</c:otherwise>
-												</c:choose>
-											</td>
-											<td width="55%" class="bodyBold">
-												<c:out value="${activityURL.title}"/>
-											</td>
-											<td width="38%" class="body"><c:out value="${activityURL.description}"/></td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-						</c:forEach> 
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td valign="bottom">
-					<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
-						<tr>
-							<td colspan="3" class="body">
-								<p><font size="1"><fmt:message key="message.activity.options.note" /></font>
-								</p>
-								<p>&nbsp;</p>
-							</td>
-						</tr>
-						<tr>
-							<td width="28%">
-								<%--input name="submit" type="button" id="submit" class="button" onClick="validateSubmit()" onMouseOver="pviiClassNew(this,'buttonover')" onMouseOut="pviiClassNew(this,'button')" value="Finish"--%>
-								<%--html:submit value="Choose" styleClass="button" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" /--%>
-								<input name="chooseBtn" type="button" class="button" id="chooseBtn" onClick="submitChoose()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.activity.options.choose" />">
-							</td>
-              				<td width="31%" align="right" valign="bottom">&nbsp;</td>
-              				<td width="41%" align="right" valign="bottom">
-              					<c:if test="${optionsActivityForm.finished}">
-									<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.finish.button" />">
-								</c:if>
-              				</td>
-      					</tr>
-  					</table>
-  				</td>
-  			</tr>
+		<H1><c:out value="${optionsActivityForm.title}"/></H1>
+		<p>&nbsp;</p>
+		<p><c:out value="${optionsActivityForm.description}"/></p>
+		<p><fmt:message key="message.activity.options.activityCount">
+				<fmt:param value="${optionsActivityForm.minimum}" />
+				<fmt:param value="${optionsActivityForm.maximum}" />
+			</fmt:message>
+		</p>
+
+		<table class="alternative-color">
+			<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL" varStatus="loop">
+				<tr onclick="selectActivity(<c:out value="${activityURL.activityId}" />)">
+					<td >
+						<c:choose>
+							<c:when test="${activityURL.complete}">
+								<%--html:img page="/images/tick.gif" /--%>
+							</c:when>
+							<c:otherwise>
+								<input type="radio" name="activityID"
+									value="<c:out value="${activityURL.activityId}"/>" />
+							</c:otherwise>
+						</c:choose>
+					</td>
+					<td >
+						<c:out value="${activityURL.title}"/>
+					</td>
+					<td ><c:out value="${activityURL.description}"/></td>
+				</tr>
+			</c:forEach> 
 		</table>
+
+		<p><font size="1"><fmt:message key="message.activity.options.note" /></font></p>
+		<p>&nbsp;</p>
+
+		<p align="right">
+			<input name="chooseBtn" type="button" class="button" id="chooseBtn" onClick="submitChoose()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.activity.options.choose" />">
+			<c:if test="${optionsActivityForm.finished}">
+				<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.finish.button" />">
+			</c:if>
+		</p>
+
 	</html:form>
+
 	<html:form action="/CompleteActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityID}" />" />
 	</html:form>
+</div>
 </div>
 

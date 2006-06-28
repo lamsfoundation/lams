@@ -19,20 +19,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<!-- general information section--> 
-<tr>
-    <td class="body"><c:out value="${GateForm.map.gate.description}"/></td>
-</tr> 
-<!-- end of general information section--> 
-    <tr> 
-<td class="body">&nbsp;</td> 
-</tr>
+<c:if test="${not empty GateForm.map.gate.description}">
+	<!-- general information section--> 
+	<p><c:out value="${GateForm.map.gate.description}"/></p>
+</c:if>
+	
 <!--waiting learner information table-->
-<tr> 
-	<td class="bodyBold">
+<p><strong>
 		<fmt:message key="label.gate.waiting.learners">  
 			<fmt:param value="${GateForm.map.waitingLearners}"/>
 			<fmt:param value="${GateForm.map.totalLearners}"/>
 		</fmt:message>
-	</td>
-</tr>
+	</strong>
+</p>
+

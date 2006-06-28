@@ -22,9 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <tiles-definitions>
 <!-- ============= template Definitions ====================== -->
 	<definition name=".baseDef" path="/template/template.jsp">
-		<put name="header" value="/header.jsp"/>
 		<put name="content" value="/template/baseContent.jsp" />	
-		<put name="footer" value="/footer.jsp"/>	
 	</definition>
 <!-- ============= Error/ Exception Page Definitions ====================== -->	
 	<definition name=".systemError" extends=".baseDef" >
@@ -43,9 +41,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".viewScheduleGate" extends=".baseDef" >
 		<put name="content" value="/gate/scheduleGateContent.jsp" />	
 	</definition>
-	<definition name=".openGate" extends=".baseDef" >
-		<put name="content" value="/gate/openGateContent.jsp" />	
-	</definition>	
 <!-- ============= Grouping Page Definitions ====================== -->	
 	<definition name=".viewGroups" extends=".baseDef" >
 		<put name="content" value="/grouping/viewGroups.jsp" />	
