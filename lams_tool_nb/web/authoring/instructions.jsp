@@ -4,30 +4,17 @@
 
 <table>
 	<tr>
-		<td class="field-name">
-			<fmt:message key="instructions.onlineInstructions" />
-		</td>
-	</tr>
-	<tr>
 		<td>
-			<FCK:editor id="onlineInstructions" basePath="/lams/fckeditor/" height="200" width="100%">
-				<c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false" />
-			</FCK:editor>
+			<lams:SetEditor id="onlineInstructions" text="${NbAuthoringForm.onlineInstructions}" key="instructions.onlineInstructions" />
 		</td>
 	</tr>
 
-	<tr>
-		<td class="field-name">
-			<fmt:message key="instructions.uploadOnlineInstr" />
-		</td>
-	</tr>
 	<tr>
 		<td>
 			<html:file property="onlineFile" />
 			<html:submit property="method">
 				<fmt:message key="button.upload" />
 			</html:submit>
-
 		</td>
 	</tr>
 </table>
@@ -36,22 +23,11 @@
 
 <table>
 	<tr>
-		<td class="field-name-alternative-color">
-			<fmt:message key="instructions.offlineInstructions" />
+		<td >
+			<lams:SetEditor id="offlineInstructions" text="${NbAuthoringForm.onlineInstructions}" key="instructions.onlineInstructions" alt="true" />
 		</td>
 	</tr>
-	<tr>
-		<td>
-			<FCK:editor id="offlineInstructions" basePath="/lams/fckeditor/" width="100%" height="200">
-				<c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />
-			</FCK:editor>
-		</td>
-	</tr>
-	<tr>
-		<td class="field-name-alternative-color">
-			<fmt:message key="instructions.uploadOfflineInstr" />
-		</td>
-	</tr>
+
 	<tr>
 		<td>
 			<html:file property="offlineFile" />
@@ -71,7 +47,7 @@
 			<fmt:message key="label.attachments" />
 		</h2>
 
-		<table width="70%" align="left">
+		<table>
 			<tr>
 				<th>
 					<fmt:message key="label.filename" />

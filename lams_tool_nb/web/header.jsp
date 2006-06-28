@@ -1,6 +1,5 @@
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+<%@ include file="/includes/taglibs.jsp"%>
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <tr>

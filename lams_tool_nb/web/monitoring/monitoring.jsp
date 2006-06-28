@@ -1,32 +1,25 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/includes/taglibs.jsp"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+<%@ page import="java.util.HashMap"%>
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"%>
+
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
 <html:html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title><fmt:message key="activity.title"/></title>
+	<lams:headItems />
+	<title><fmt:message key="activity.title" /></title>
 
-	<lams:css/>
-    
-	<!-- this is the custom CSS for the tool -->
-	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
-
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
-	
 	<script type="text/javascript">
+
 		var imgRoot="${lams}images/";
 	    var themeName="aqua";
 	
@@ -72,59 +65,44 @@
         }
 
 	</script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-    
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-  </head>
-  
+</head>
+
 <body onLoad='init()'>
 
-<html:form action="/monitoring" target="_self">
-<html:hidden property="method"/>
-<html:hidden property="currentTab" styleId="currentTab" />
+	<div id="page">
+		<html:form action="/monitoring" target="_self">
+			<html:hidden property="method" />
+			<html:hidden property="currentTab" styleId="currentTab" />
 
-<c:set var="monitoringURL">
-	<html:rewrite page="/monitoring.do" />
-</c:set>
+			<c:set var="monitoringURL">
+				<html:rewrite page="/monitoring.do" />
+			</c:set>
 
-<!-- start tabs -->
-<lams:Tabs control="true">
-	<lams:Tab id="<%=NbMonitoringAction.SUMMARY_TABID%>" key="titleHeading.summary" methodCall="doSwitchSummary"/>
-	<lams:Tab id="<%=NbMonitoringAction.INSTRUCTIONS_TABID%>" key="titleHeading.instructions" methodCall="doSwitchInstructions"/>
-	<lams:Tab id="<%=NbMonitoringAction.EDITACTIVITY_TABID%>" key="titleHeading.editActivity" methodCall="doSwitchEditActivity"/>
-	<lams:Tab id="<%=NbMonitoringAction.STATISTICS_TABID%>" key="titleHeading.statistics" methodCall="doSwitchStatistics"/>
-</lams:Tabs>
-<!-- end tab buttons -->
+			<h1>
+				<fmt:message key="activity.title" />
+			</h1>
+			<div id="header">
 
-<div class="tabbody">
+				<lams:Tabs control="true">
+					<lams:Tab id="<%=NbMonitoringAction.SUMMARY_TABID%>" key="titleHeading.summary" methodCall="doSwitchSummary" />
+					<lams:Tab id="<%=NbMonitoringAction.INSTRUCTIONS_TABID%>" key="titleHeading.instructions" methodCall="doSwitchInstructions" />
+					<lams:Tab id="<%=NbMonitoringAction.EDITACTIVITY_TABID%>" key="titleHeading.editActivity" methodCall="doSwitchEditActivity" />
+					<lams:Tab id="<%=NbMonitoringAction.STATISTICS_TABID%>" key="titleHeading.statistics" methodCall="doSwitchStatistics" />
+				</lams:Tabs>
 
-<!-- tab content 1 (Summary) -->
-<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp"/>
-<!-- end of content (Basic) -->
-      
-<!-- tab content 2 (Advanced) -->
-<lams:TabBody id="2" titleKey="titleHeading.instructions" page="m_Instructions.jsp" />
-<!-- end of content (Advanced) -->
+			</div>
 
-<!-- tab content 3 (Instructions) -->
-<lams:TabBody id="3" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
-<!-- end of content (Instructions) -->
+			<div id="content">
+				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" />
+				<lams:TabBody id="2" titleKey="titleHeading.instructions" page="m_Instructions.jsp" />
+				<lams:TabBody id="3" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
+				<lams:TabBody id="4" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
 
-<!-- tab content 4 (Statistics) -->
-<lams:TabBody id="4" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
-<!-- end of content (Instructions) -->
-
-<!-- Button Row -->
-<hr>
-<p align="right">
-	<html:link href="javascript:;" property="submit" onclick="window.close()" styleClass="button">
-		<fmt:message key="button.done" />
-	</html:link>
-</p>
-</div>
-    
-</html:form>
+			</div>
+			<div id="footer" />
+				<lams:HTMLEditor />
+		</html:form>
+	</div>
 
 </body>
 

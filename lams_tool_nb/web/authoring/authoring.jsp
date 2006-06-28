@@ -14,10 +14,15 @@
 	    var themeName="aqua";
         
         function init(){
-						
+			
+			initEditor("title");						
+			initEditor("content");
 			var showBasicContent = "${requestScope.showBasicContent}";
 			if (showBasicContent != "true") {
 	            initTabSize(3);
+	            
+       			initEditor("onlineInstructions");						
+       			initEditor("offlineInstructions");
 	        }
 	        
 	        var tag = document.getElementById("currentTab");
@@ -45,6 +50,7 @@
 </head>
 
 <body onLoad="init()">
+
 	<div id="page">
 		<html:form action="/authoring" styleId="authoringForm" target="_self" enctype="multipart/form-data">
 			<html:hidden property="currentTab" styleId="currentTab" />
@@ -98,6 +104,7 @@
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lanb11" toolContentID="${toolContentID}" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" />
 			</div>
 			<div id="footer" />
+				<lams:HTMLEditor />
 		</html:form>
 	</div>
 </body>

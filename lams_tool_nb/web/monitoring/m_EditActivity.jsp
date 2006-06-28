@@ -1,53 +1,42 @@
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
+<%@ include file="/includes/taglibs.jsp"%>
 
-<div id="datatablecontainer">
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-		<c:choose>
-			<c:when test='${requestScope.isPageEditable == "true"}'>
-				<tr>
-					<td><fmt:message key="basic.title"/></td>
-					<td>
-						<c:out value="${sessionScope.title}" escapeXml="false"/>
-					</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="basic.content"/></td>
-					<td>
-						<c:out value="${sessionScope.content}" escapeXml="false"/>
-					</td>
-				</tr>
-			</c:when>
-			<c:otherwise>
-				<tr>
-					<td><font color="red"><fmt:message key="message.contentInUseSet"/></font></td>
-				
-				</tr>			
-			</c:otherwise>
-		
-		</c:choose>
-	</table>
-</div>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<c:choose>
+		<c:when test='${requestScope.isPageEditable == "true"}'>
+			<tr>
+				<td class="field-name">
+					<fmt:message key="basic.title" />
+				</td>
+				<td>
+					<c:out value="${sessionScope.title}" escapeXml="false" />
+				</td>
+			</tr>
 
-<div id="formtablecontainer">
-<table width="100%">
-	<c:if test='${requestScope.isPageEditable == "true"}'>
-		<tr>
-			<td align="right">
-			<!--	<html:link forward="forwardToAuthorPage" paramName="NbMonitoringForm" paramProperty="toolContentID" paramId="toolContentID" styleClass="button">
-					<fmt:message key="button.edit" />
-				</html:link> -->
-				<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">
-					<fmt:message key="button.edit" />
-				</html:link> 
-			</td>	
-		</tr>
-	</c:if>
+			<tr>
+				<td class="field-name">
+					<fmt:message key="basic.content" />
+				</td>
+				<td>
+					<c:out value="${sessionScope.content}" escapeXml="false" />
+				</td>
+			</tr>
+		</c:when>
+		<c:otherwise>
+			<tr>
+				<td>
+					<p class="warning">
+						<fmt:message key="message.contentInUseSet" />
+					</p>
+				</td>
+			</tr>
+		</c:otherwise>
+	</c:choose>
 </table>
-</div>
 
+<c:if test='${requestScope.isPageEditable == "true"}'>
+	<p align="right">
+		<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">
+			<fmt:message key="button.edit" />
+		</html:link>
+	</p>
+</c:if>
