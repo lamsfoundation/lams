@@ -50,6 +50,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	//Set by the init obj
 	private var _activity : Activity;
 	private var _children : Array;
+	private var children_mc : Array 
 	private var panelHeight : Number;
 	//refs to screen items:
 	private var container_pnl : Panel;
@@ -89,11 +90,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_dictionary = Dictionary.getInstance();
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
+		//_activity.title = Dictionary.getValue('opt_activity_title')
 		//init();
 		MovieClipUtils.doLater (Proxy.create (this, init));
 	}
 	
 	public function init () : Void	{
+		
 		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
@@ -101,9 +104,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		_locked = false;
 		showStatus(false);
-		childActivities_mc = this;
-		var children_mc : Array = new Array ();
 		
+		CHILD_OFFSET_X = 8;
+		CHILD_OFFSET_Y = 57;
+		childActivities_mc = this;
+		for (var j=0; j<children_mc.length; j++){
+			children_mc[j].removeMovieClip();
+		}
+		children_mc = new Array();
+		
+		//childActivities_mc.removeMovieClip();
 		for (var i = 0; i < _children.length; i ++)		{
 			if (fromModuleTab == "monitorMonitorTab"){
 				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring"});
@@ -152,7 +162,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		setStyles ()
 		//write text
-		title_lbl.text = Dictionary.getValue('opt_activity_title'); //'Optional Activities'
+		title_lbl.text = _activity.title 		//Dictionary.getValue('opt_activity_title'); //'Optional Activities'
 		//_activity.title = 'Optional Activities';
 		actCount_lbl.text = _children.length +" - "+ Dictionary.getValue('lbl_num_activities'); //" activities";
 		header_pnl.borderType = 'outset';
