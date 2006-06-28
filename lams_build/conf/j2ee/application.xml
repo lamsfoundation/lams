@@ -88,6 +88,9 @@
 		<java>commons-beanutils.jar</java>
 	</module>
 	<module>
+		<java>commons-codec-1.3.jar</java>
+	</module>
+	<module>
 		<java>commons-collections.jar</java>
 	</module>
 	<module>
