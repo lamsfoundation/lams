@@ -161,6 +161,43 @@ VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.',
 	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
+-- Supported Locales
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (1, 'en', 'AU', 'English (Australia) - default');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (2, 'es', null, 'Spanish');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (3, 'mi', 'NZ', 'Maori (New Zealand)');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (4, 'de', null, 'German');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (5, 'zh', null, 'Chinese');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (6, 'fr', null, 'French');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (7, 'it', null, 'Italian');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (8, 'no', null, 'Norwegian');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (9, 'sw', null, 'Swedish');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (10, 'ko', null, 'Korean');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (11, 'pl', null, 'Polish');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (12, 'pt', 'BR', 'Portuguese (Brazil)');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (13, 'hu', null, 'Hungarian');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (14, 'bg', null, 'Bulgarian');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (15, 'cy', 'GB', 'Welsh (United Kingdom)');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (16, 'th', null, 'Thai');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (17, 'el', null, 'Greek');
+
+-- to be removed when the admin converted over to use lams_supported_locale
 INSERT INTO lams_country VALUES (1, 'AU');
 INSERT INTO lams_country VALUES (2, 'US');
 INSERT INTO lams_country VALUES (3, 'CN');

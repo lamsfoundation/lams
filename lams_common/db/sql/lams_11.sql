@@ -135,6 +135,16 @@ CREATE TABLE lams_organisation_state (
      , PRIMARY KEY (organisation_state_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_supported_locale (
+       locale_id TINYINT(4) NOT NULL
+     , language_iso_code VARCHAR(2) NOT NULL
+     , country_iso_code VARCHAR(2) NOT NULL
+     , description VARCHAR(255) NOT NULL
+     , user_id BIGINT(20) NOT NULL
+     , UNIQUE UQ_lams_supported_locale (language_iso_code, country_iso_code)
+     , PRIMARY KEY (locale_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -171,7 +181,7 @@ CREATE TABLE lams_workspace_folder (
 
 CREATE TABLE lams_workspace (
        workspace_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , default_fld_id BIGINT(20) NOT NULL
+     , default_fld_id BIGINT(20)
      , def_run_seq_fld_id BIGINT(20)
      , name VARCHAR(255)
      , PRIMARY KEY (workspace_id)
@@ -224,6 +234,9 @@ CREATE TABLE lams_user (
      , INDEX (html_theme_id)
      , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (locale_language, locale_country)
+     , CONSTRAINT FK_lams_user_locale FOREIGN KEY (locale_language, locale_country)
+                  REFERENCES lams_supported_locale (language_iso_code, country_iso_code) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 ALTER TABLE lams_user MODIFY COLUMN locale_language CHAR(2) NOT NULL DEFAULT 'en'
       COMMENT 'ISO 639-1 Language Code (2 letter version) Java only supports 2 letter properly, not the 3 letter codes.';
@@ -329,6 +342,9 @@ CREATE TABLE lams_organisation (
      , INDEX (organisation_state_id)
      , CONSTRAINT FK_lams_organisation_4 FOREIGN KEY (organisation_state_id)
                   REFERENCES lams_organisation_state (organisation_state_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (locale_language, locale_country)
+     , CONSTRAINT FK_lams_organisation_locale FOREIGN KEY (locale_language, locale_country)
+                  REFERENCES lams_supported_locale (language_iso_code, country_iso_code) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_activity (
