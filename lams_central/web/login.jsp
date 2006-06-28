@@ -67,18 +67,20 @@ j_security_login_page
 			 
 			  <ul>
 			  	<li>
-					<h3>News Item 1</h3> 
-					LAMS 2.0 Beta 1 Released 30 June 2006. 
+					<h3>LAMS 2.0 Beta1 Released!</h3> 
+					Finally, LAMS 2.0 Beta is ready for testing. Have a look at the <a href="http://wiki.lamsfoundation.org/display/lams/LAMS+2.0+Feature+List" target="_new">cool new features</a> packaged inside.<br>
+Found a bug? Report it in the <a href="http://lamscommunity.org/dotlrn/clubs/technicalcommunity/forums/" target="_new">LAMS Community</a>.<br>
+LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" target="_new">17 languages</a> by more than 25 volunteers. Want to <a href="http://lamscommunity.org/i18n" target="_new">help out</a>? 
 				</li>
 			  </ul>
 			  </div>
 				<!--closes left col-->
 				
 				<div id="login-right-col" class="row">
-				 <h2>Login</h2>
+				 <h2><fmt:message key="button.login"/></h2>
 				 <form action="j_security_check" method="post" name="loginForm" id="loginForm">
 					<c:if test="${!empty param.failed}">
-						<p>
+						<p class="warning">
 							<fmt:message key="error.login"/>
 						</p>
 					</c:if>	
