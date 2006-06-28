@@ -75,7 +75,7 @@ public class IndexAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.debug("User:"+request.getRemoteUser());
 		List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
-		headerLinks.add(new IndexLinkBean("index.dummymonitor","javascript:openDummyMonitor()"));
+		//headerLinks.add(new IndexLinkBean("index.dummymonitor","javascript:openDummyMonitor()"));
 		headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile('" + request.getRemoteUser()+"')"));
 		if (request.isUserInRole(Role.SYSADMIN)) {
 			log.debug("user is sysadmin");
