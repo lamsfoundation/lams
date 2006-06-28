@@ -62,24 +62,14 @@ j_security_login_page
 	
 	  <div id="login-content">	
 	  
-			  <div id="login-left-col" class="row"><h1><img src="images-for-css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
-			 <h2><img src="images-for-css/lams_news.gif" alt="LAMS News and Latest Updates" class="news" /></h2>
+			  <div id="login-left-col" class="row"><h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
+			 <h2><img src="<lams:LAMSURL/>/images/css/lams_news.gif" alt="LAMS News and Latest Updates" class="news" /></h2>
 			 
 			  <ul>
 			  	<li>
 					<h3>News Item 1</h3> 
-					Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+					LAMS 2.0 Beta 1 Released 30 June 2006. 
 				</li>
-			  	<li>
-					<h3>News Item 2</h3> 
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco. 
-				</li>
-			    <li>
-					<h3>News Item 3</h3> 
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco Ut enim ad minim veniam, quis nostrud exercitation ullamco 
-.				</li>
-			  
-			  
 			  </ul>
 			  </div>
 				<!--closes left col-->
