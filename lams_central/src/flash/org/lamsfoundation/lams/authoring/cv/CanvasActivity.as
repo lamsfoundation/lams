@@ -143,7 +143,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function showAssets(isVisible:Boolean){
 		groupIcon_mc._visible = isVisible;
 		title_lbl._visible = isVisible;
-		act_pnl._visible = isVisible;
+		//act_pnl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
@@ -157,12 +157,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @return  
 	 */
 	public function refresh():Void{
+		trace("called from PI")
 		draw();
 		setSelected(_isSelected);
 	}
 	
 	public function setSelected(isSelected){
 		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
+		//Debugger.log(_activity.title+" has StartTimeOffset:"+_activity.gateStartTimeOffset(),4,'setSelected','CanvasActivity');
 		var MARGIN = 5;
 		if(isSelected){
 			//draw a selected border
@@ -241,7 +243,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function draw(){
 		
 		//Code for Drawing learner on the activty. 
-		
+		trace("Activity type ID : "+_activity.activityTypeID)
 		trace("value of _Module in Canvas Activity: "+_module)
 		trace("Monitor Model is: "+_monitorController.getModel())
 		if (_module == "monitoring"){
@@ -287,7 +289,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		var theIcon_mc:MovieClip;
 		title_lbl._visible = true;
-		
+		//act_pnl.__visible = true;
 		clickTarget_mc._visible = true;
 		
 		if(_activity.isGateActivity()){
