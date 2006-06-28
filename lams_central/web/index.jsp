@@ -53,7 +53,7 @@
 				{
 					if (node.childNodes.item(0).nodeName == "IMG")
 					{
-						node.childNodes.item(0).src = "http://www.dddekerf.dds.nl/DHTML_Treeview/minus.gif";
+						node.childNodes.item(0).src = "images/tree_open.gif";
 					}
 				}
 		
@@ -67,7 +67,7 @@
 				{
 					if (node.childNodes.item(0).nodeName == "IMG")
 					{
-						node.childNodes.item(0).src = "http://www.dddekerf.dds.nl/DHTML_Treeview/plus.gif";
+						node.childNodes.item(0).src = "images/tree_closed.gif";
 					}
 				}
 		
