@@ -44,7 +44,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 		
 		<script language="JavaScript" type="text/JavaScript"><!--
 			function redirectPage() {
-				setTimeout("doRedirect()", 500);
+				setTimeout("doRedirect()", 1000);
 			}
 			function doRedirect() {
 				var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
