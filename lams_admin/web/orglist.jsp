@@ -7,7 +7,7 @@
 
 <form>
 <logic:equal name="OrgManageForm" property="type" value="1">
-	<h4 align="left"><fmt:message key="admin.course.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>: <bean:write name="OrgManageForm" property="parentName"/></h4>
+	<h2><fmt:message key="admin.course.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>: <bean:write name="OrgManageForm" property="parentName"/></h2>
 	<c:url var="editaction" value="organisation.do">
 		<c:param name="method" value="edit" />
 		<c:param name="typeId" value="2" />
@@ -26,18 +26,21 @@
 	</c:url>
 	<p align="right"><input type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
 </logic:equal>
-<table width=100%>
+<table class=alternative-color width=100%>
 <tr>
+	<th><fmt:message key="admin.number"/></th>
 	<th><fmt:message key="admin.organisation.name"/></th>
 	<th><fmt:message key="admin.organisation.code"/></th>
 	<th><fmt:message key="admin.organisation.description"/></th>
 	<th><fmt:message key="admin.organisation.language"/></th>
 	<th><fmt:message key="admin.organisation.country"/></th>
 	<th><fmt:message key="admin.organisation.status"/></th>
-	<th></th>
 </tr>
-<logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans">
+<logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
 	<tr>
+		<td>
+			<bean:write name="idx"/>
+		</td>
 		<td>
 			<bean:write name="orgManageBean" property="name" />
 		</td>
@@ -56,18 +59,22 @@
 		<td>
 			<fmt:message key="organisation.state.${orgManageBean.status}"/>
 		</td>
-		<td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="6">
 			<logic:equal name='orgManageBean' property='editable' value="true">
 				<a href="organisation.do?method=edit&orgId=<bean:write name='orgManageBean' property='organisationId' />"><fmt:message key="admin.edit"/></a>
 				&nbsp;
 				<a href="organisation.do?method=remove&orgId=<bean:write name='orgManageBean' property='organisationId' />&parentId=<bean:write name='OrgManageForm' property='parentId'/>"><fmt:message key="admin.remove"/></a>
-				<br/>
+				&nbsp;
 				<a href="usermanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>" target="_blank"><fmt:message key="admin.user.manage"/></a>
+				&nbsp;
 				<logic:equal name="OrgManageForm" property="type" value="1">
-					<br/><a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>" target="_blank"><fmt:message key="admin.class.manage"/></a>
+					<a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>" target="_blank"><fmt:message key="admin.class.manage"/></a>
 				</logic:equal>
 			</logic:equal>
-		</td>		
+		</td>
 	</tr>
 </logic:iterate>
 </table>

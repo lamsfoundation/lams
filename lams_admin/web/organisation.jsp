@@ -10,7 +10,7 @@
 <html-el:hidden property="orgId" />
 <html-el:hidden property="parentId" />
 <html-el:hidden property="typeId" />
-<h4 align="left">
+<h2>
 	<logic:notEmpty name="OrganisationForm" property="orgId">
 		<fmt:message key="admin.edit"/>
 	</logic:notEmpty>
@@ -33,7 +33,7 @@
 		<fmt:message key="admin.course"/>
 	</logic:equal>
 	: <bean:write name="OrganisationForm" property="parentName"/>
-</h4>
+</h2>
 
 <div align="center"><html-el:errors/></div>
 <table>
