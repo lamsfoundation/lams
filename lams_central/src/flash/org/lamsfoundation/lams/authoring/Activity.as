@@ -278,7 +278,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_orderID = dto.orderID
 			_groupingID = dto.groupingID;
 			_groupingUIID = dto.groupingUIID
-			_title = dto.title;
+			_title = dto.activityTitle;
 			_description = dto.description;
 			_helpText =  dto.helpText;
 			_yCoord = dto.yCoord;
@@ -340,7 +340,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_orderID){				dto.orderID				= _orderID;					}
 		if(_groupingID){			dto.groupingID			= _groupingID;				}
 		if(_groupingUIID){			dto.groupingUIID		= _groupingUIID;			}
-		if(_title){					dto.title				= _title;					}
+		if(_title){					dto.activityTitle		= _title;					}
 		if(_description){			dto.description			= _description;				}
 		if(_helpText){				dto.helpText			= _helpText;				}
 		if(_yCoord){				dto.yCoord				= _yCoord;					}
