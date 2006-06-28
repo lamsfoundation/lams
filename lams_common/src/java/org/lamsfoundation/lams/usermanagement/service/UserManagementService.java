@@ -356,7 +356,8 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	public User getUserByLogin(String login) {
-		return (User)baseDAO.findByProperty(User.class,"login",login).get(0);
+		List results = baseDAO.findByProperty(User.class,"login",login);
+		return results.isEmpty() ? null : (User)results.get(0);
 	}
 
 	public void updatePassword(String login, String password) {
