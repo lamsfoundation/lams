@@ -63,8 +63,11 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 		var updateOk:Boolean=false;
 		//clear the old lot:
 		_toolkitLearningLibraries.clear();
+		
+		//sort the array
+		tls.sortOn("activityTitle", Array.CASEINSENSITIVE);
+		
 		//populate the hashtable.
-
 		for(var i=0; i<tls.length;i++){			_toolkitLearningLibraries.put(tls[i].learningLibraryID,tls[i]);
 		}
 		Debugger.log('Added '+tls.length+' Libraries to _toolkitLearningLibraries',4,'setToolkitLibraryActivities','ToolkitModel');

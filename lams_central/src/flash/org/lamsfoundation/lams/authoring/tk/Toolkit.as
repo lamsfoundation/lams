@@ -202,7 +202,7 @@ class Toolkit {
 			
 			//put the instance ref array into the toolkit object
 			toolkit.classInstanceRefs = classInstanceRefs;
-			
+			toolkit.activityTitle = classInstanceRefs[0].title;
 			
 		}
 		
