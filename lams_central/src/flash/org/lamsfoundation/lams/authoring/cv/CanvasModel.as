@@ -435,7 +435,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 			
 		}
-		_cv.removeActivity(ca.activity.activityUIID);
+		removeActivityOnBin(ca.activity.activityUIID);
 		setDirty();
 	}
 	
@@ -452,6 +452,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			r.removeMovieClip();
 			//_cv.ddm.removeActivity(activityUIID);
+		}
+	}
+	
+	public function removeActivityOnBin(activityUIID):Object{
+		//dispatch an event to show the design  has changed
+				
+		var r:Object = _activitiesDisplayed.remove(activityUIID);
+		if(r==null){
+			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
+		}else{
+			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
+				//dispatchEvent({type:'ddmUpdate',target:this});
+			
+			r.removeMovieClip();
+			_cv.removeActivity(activityUIID);
 		}
 	}
 	
