@@ -8,17 +8,17 @@
 
 <html-el:form action="/userorgsave.do" method="post">
 <html-el:hidden property="orgId" />
-<h4 align="left">
+<h2 align="left">
     <logic:notEmpty name="pOrgId">
         <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
     </logic:notEmpty>
     <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgForm" property="orgId" />">
       <bean:write name="UserOrgForm" property="orgName"/></a> ::
     <fmt:message key="admin.user.add"/>
-</h4>
+</h2>
 
 <div align="center"><html-el:errors/></div>
-<table width=100%>
+<table class="alternative-color" width=100%>
 <tr>
 	<th></th>
 	<th><fmt:message key="admin.user.login"/></th>

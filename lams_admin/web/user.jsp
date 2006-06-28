@@ -9,7 +9,7 @@
 <html-el:form action="/usersave.do" method="post">
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
-<h4 align="left">
+<h2 align="left">
     <logic:notEmpty name="pOrgId">
         <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
     </logic:notEmpty>
@@ -21,7 +21,7 @@
 	<logic:empty name="UserForm" property="userId">
 		<fmt:message key="admin.create"/> User
 	</logic:empty>
-</h4>
+</h2>
 
 <div align="center"><html-el:errors/></div>
 <table>
