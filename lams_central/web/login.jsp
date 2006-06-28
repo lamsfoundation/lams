@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
+<%@ page language="java" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
 <%	
 	if (JspRedirectStrategy.loginPageRedirected(request,response))
@@ -8,23 +9,114 @@
 		return;
 	}		
 
-	String webAuthUser = (String) session.getAttribute("WEBAUTH_USER");
+	/*String webAuthUser = (String) session.getAttribute("WEBAUTH_USER");
 	if (webAuthUser != null)
 	{
 		response.sendRedirect("j_security_check?j_username=" + webAuthUser + "&j_password=Dummy");	
-	}
+	}*/
 %>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!--
 flash is searching for this string, so leave it!:
 j_security_login_page
 -->
-<tiles:insert page="template.jsp" flush="true">
-	<tiles:put name="titleKey" value="title.login.window"/>
-	<tiles:put name="header" value="loginHeader.jsp"/>
-	<tiles:put name="content" value="loginContent.jsp" />	
-	<tiles:put name="footer" value="footer.jsp"/>	
-</tiles:insert>
+<head>
+	<title><fmt:message key="title.login.window"/></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<lams:css/>
+	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
+	<!--[if IE]>
+	
+	  <style type="text/css">
+	  
+	    @import url(css/ie-styles.css);
+		
+	  </style>
+	  
+	<![endif]-->
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
+	<script>
+		function submitForm(){
+			  var password=document.loginForm.j_password.value;	 
+			  document.loginForm.j_password.value=hex_sha1(password);
+			  document.loginForm.submit();
+		}
+	</script>
+</head>
+
+<body>
+	<div id="login-page"><!--main box 'page'-->
+	
+		<h1 class="no-tabs-below">&nbsp;</h1>
+		
+		<div id="login-header">
+		
+		</div><!--closes header-->
+	
+	
+	
+	  <div id="login-content">	
+	  
+			  <div id="login-left-col" class="row"><h1><img src="images-for-css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
+			 <h2><img src="images-for-css/lams_news.gif" alt="LAMS News and Latest Updates" class="news" /></h2>
+			 
+			  <ul>
+			  	<li>
+					<h3>News Item 1</h3> 
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+				</li>
+			  	<li>
+					<h3>News Item 2</h3> 
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco. 
+				</li>
+			    <li>
+					<h3>News Item 3</h3> 
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+.				</li>
+			  
+			  
+			  </ul>
+			  </div>
+				<!--closes left col-->
+				
+				<div id="login-right-col" class="row">
+				 <h2>Login</h2>
+				 <form action="j_security_check" method="post" name="loginForm" id="loginForm">
+					<c:if test="${!empty param.failed}">
+						<p>
+							<fmt:message key="error.login"/>
+						</p>
+					</c:if>	
+				 <p class="first"><fmt:message key="label.username"/>: 
+				   <input name="j_username" type="text" size="16" />
+				  </p>
+				 <p><fmt:message key="label.password"/>: 
+				   <input name="j_password" type="password" size="16" autocomplete="off"/>
+				  </p>
+					
+					 <p><a href="javascript:submitForm()" class="button"><fmt:message key="button.login"/></a></p>
+				</form>	 
+				</div><!--closes right col-->
+	 
+	  <div class="clear"></div><!-- forces the CSS to display the columns-->
+	
+	  </div>  <!--closes content-->
+	   
+		
+		
+		
+		
+		<div id="footer">
+		</div><!--closes footer-->
+		
+	</div><!--closes page-->
+
+</body>
+
 
 </html>
