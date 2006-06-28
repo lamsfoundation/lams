@@ -25,7 +25,7 @@
 			var url = "index.do";
 			var params = "";
 			var myAjax = new Ajax.Updater(
-				"content",
+				"courselist",
 				url,
 				{
 					method: 'get',
@@ -78,44 +78,22 @@
 	</script>
 </head>
 <body onload="getContent()" bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-	<table width="95%" height="95%" border="0" cellspacing="0" cellpadding="0" align="center">
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
-	<tr>
-		<td width="100%" align="center">
-			<table bgcolor="#ffffff" width="100%" height="100%" cellspacing="5" cellpadding="5" align="center">
-				<tr>
-					<td align="left" style="font-size:20pt">
-						<fmt:message key="index.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/>
-					</td>
-					<td align="right">
-						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
-						<a href="home.do?method=logout"><fmt:message key="index.logout"/></a>
-					</td>
-				</tr>
-				<tr>
-					<td colspan=2 id="content" width="100%" align="center">
-						<img src="images/loading.gif" /> <font color="gray" size="4"><fmt:message key="msg.loading"/></font>
-					</td>
-				</tr>
-				<tr valign="bottom">
-					<td colspan="2" align="center">
-						<img src="images/launch_page_graphic.jpg"/>
-					</td>
-				</tr>
-				<tr valign="bottom">
-					<td align="left">
-						<A HREF="copyright.jsp" target='copyright' onClick="window.open('copyright.jsp','copyright','resizable,width=750,height=388,scrollbars');return false;">
-							&copy; <fmt:message key="msg.LAMS.copyright.short"/>
-						</a>
-					</td>
-					<td align="right"><fmt:message key="msg.LAMS.version"/></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	</table>
+	<div id="page">	
+		<H1 class="no-tabs-below"><fmt:message key="index.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/></H1>
+		<div id="header-no-tabs"></div>
+		<div id="content">
+			<p align="right"><fmt:message key="msg.LAMS.version"/></p>
+			<p align="right"><a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
+					<a href="home.do?method=logout"><fmt:message key="index.logout"/></a>
+				</p>
+			<div id="courselist" align="center">
+					<img src="images/loading.gif" /> <font color="gray" size="4"><fmt:message key="msg.loading"/></font>
+			</div>
+			<p><img src="images/launch_page_graphic.jpg"/></p>
+			<p><A HREF="copyright.jsp" target='copyright' onClick="window.open('copyright.jsp','copyright','resizable,width=750,height=388,scrollbars');return false;">
+						&copy; <fmt:message key="msg.LAMS.copyright.short"/></a></p>
+		</div>
+	</div>
 </body>	
 </html>
 
