@@ -95,27 +95,12 @@ FCKConfig.ToolbarSets["Default_original"] = [
 
 FCKConfig.ToolbarSets["Default"] = [
 	['Source','DocProps','-','Preview'],
-	['PasteWord','-','Print','SpellCheck'],
-	['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-	['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
-	['OrderedList','UnorderedList','-','Outdent','Indent'],
-	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
-	['Image','Table','Rule','Smiley','SpecialChar','PageBreak','UniversalKey'],
-	'/',
-	['Style','FontFormat','FontName','FontSize'],
-	['TextColor','BGColor'],
-	['About']
-] ;
-
-FCKConfig.ToolbarSets["Lams_Toolbar"] = [
-	['Source','DocProps','-','Preview'],
 	['PasteWord'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['OrderedList','UnorderedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
-	['Image','Table','Rule','Smiley','SpecialChar','PageBreak','UniversalKey'],
-	'/',
+	['Image','Table','Rule','Smiley','SpecialChar','UniversalKey'],
 	['FontFormat','FontName','FontSize'],
 	['TextColor','BGColor'],
 	['About']
