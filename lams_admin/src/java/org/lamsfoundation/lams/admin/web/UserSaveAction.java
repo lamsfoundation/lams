@@ -145,7 +145,7 @@ public class UserSaveAction extends Action {
 				        		Role currentRole = (Role)service.findById(Role.class,roleId);
 					            log.debug("setting role: "+currentRole);
 					            UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
-					            service.save(newUor);  // weird spring?/hibernate? behaviour where only first row is added
+					            service.save(newUor);
 					            /*uors.add(newUor);
 					            uo.setUserOrganisationRoles(uors);
 					            user.setUserOrganisations(uos);
@@ -189,11 +189,15 @@ public class UserSaveAction extends Action {
 					service.save(user);
 					log.debug("user: "+user.toString());
 					log.debug("organisation: "+service.findById(Organisation.class,orgId));
-					UserOrganisation userOrganisation = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
-					service.save(userOrganisation);
-					log.debug("userOrganisation: "+userOrganisation);
+					UserOrganisation uo = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
+					service.save(uo);
+					log.debug("userOrganisation: "+uo);
+					Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
+					UserOrganisationRole uor = new UserOrganisationRole(uo,role);
+					service.save(uor);
+					log.debug("userOrganisationRole: "+uor);
 					HashSet uos = new HashSet();
-					uos.add(userOrganisation);
+					uos.add(uo);
 					user.setUserOrganisations(uos);
 					//service.save(user);
 				}
