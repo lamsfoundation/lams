@@ -63,7 +63,7 @@
 				</tr>
 				<tr>
 					<td align="center" valign="bottom">
-						<a href="#" onclick="getElementById('topicFormId').submit();" class="button">
+						<a href="#" onclick="getElementById('topicFormId').submit();" class="button-add-item">
 							<bean:message key="button.add" />
 						</a>
 						&nbsp; &nbsp;

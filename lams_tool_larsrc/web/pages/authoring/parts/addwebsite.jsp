@@ -91,7 +91,7 @@
 			</tr>
 			<tr>
 				<td align="center" valign="bottom">
-					<a href="javascript:;" onclick="cancelResourceItem()" class="button"><fmt:message key="label.cancel" /></a> <a href="#" onclick="submitResourceItem()" class="button"><fmt:message key="label.authoring.basic.add.website" /></a>
+					<a href="javascript:;" onclick="cancelResourceItem()" class="button"><fmt:message key="label.cancel" /></a> <a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message key="label.authoring.basic.add.website" /></a>
 				</td>
 			</tr>
 			<tr>
