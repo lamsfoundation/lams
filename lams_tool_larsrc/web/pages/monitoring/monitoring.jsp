@@ -40,7 +40,6 @@
 		</lams:Tabs>
 	</div>
 	<div id="content">
-
 			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="monitoring.tab.instructions" page="instructions.jsp"/>
 			<lams:TabBody id="3" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			

@@ -9,7 +9,7 @@
 	<tr>
 	<%-- Resource Type:1=URL,2=File,3=Website,4=Learning Object --%>
 	<c:if test="${resource.type == 1}">
-		<td width="200px" align="right">
+		<td width="200px" align="right" class="field-name">
 			<fmt:message key="label.authoring.basic.resource.url" />:
 		</td>
 		<td>${resource.title}</td>
@@ -30,7 +30,7 @@
 		</td>
 	</c:if>
 	<c:if test="${resource.type == 2}">
-		<td  width="200px" align="right">
+		<td  width="200px" align="right" class="field-name">
 			<fmt:message key="label.authoring.basic.resource.file" />:
 		</td>
 		<td>${resource.title}</td>
@@ -51,7 +51,7 @@
 		</td>
 	</c:if>
 	<c:if test="${resource.type == 3}">
-		<td width="200px" align="right">
+		<td width="200px" align="right" class="field-name">
 			<fmt:message key="label.authoring.basic.resource.website" />:
 		</td>
 		<td>${resource.title}</td>
@@ -72,7 +72,7 @@
 		</td>
 	</c:if>
 	<c:if test="${resource.type == 4}">
-		<td width="200px" align="right">
+		<td width="200px" align="right" class="field-name">
 			<fmt:message key="label.authoring.basic.resource.learning.object" />:
 		</td>
 		<td>${resource.title}</td>
