@@ -21,8 +21,9 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.authoring.tb.ToolbarModel
+import org.lamsfoundation.lams.authoring.tb.*
 import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.*
 
@@ -37,14 +38,21 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 	* @param   cm   The model to modify.
 	*/
 	private var _app:Application;
+	private var _toolbarModel:ToolbarModel;
+	private var isflowActive:Boolean = false;
 	
 	public function ToolbarController (cm:Observable) {
 		super (cm);
 		_app = Application.getInstance();
+		_toolbarModel = ToolbarModel(getModel());
+		
 	}
     
-    
-    
+    public function hideFlow(){
+		isflowActive = false;
+		_toolbarModel.getToolbar().view.showHideAssets(false);
+	}
+	
 	/**
 	 * Recieves the click events from the Toolbar buttons.  Based on the label
 	 * the relevent method is called to action the user request
@@ -55,29 +63,51 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		var tgt:String = new String(evt.target);
 		
 		if(tgt.indexOf("new") != -1){
+			hideFlow();
 			_app.getCanvas().clearCanvas(false);
 		
 		}else if(tgt.indexOf("open") != -1){
+			hideFlow();
 			_app.getCanvas().openDesignBySelection();
 		}else if(tgt.indexOf("save") != -1){
+			hideFlow();
 			_app.getCanvas().saveDesign();
 		}else if(tgt.indexOf("copy") != -1){
+			hideFlow();
 			_app.copy();
 		}else if(tgt.indexOf("paste") != -1){
+			hideFlow();
 			_app.paste();
 		}else if(tgt.indexOf("trans") != -1){	
+			hideFlow();
 			_app.getCanvas().toggleTransitionTool();
 					
 		}else if(tgt.indexOf("optional") != -1){
+			hideFlow();
 			_app.getCanvas().toggleOptionalActivity();
 						
+		}else if(tgt.indexOf("flow") != -1){
+			if (!isflowActive){
+				var c:String = Cursor.getCurrentCursor();
+				if(c==Application.C_GATE){
+					_app.getCanvas().stopGateTool();
+				}
+				isflowActive = true;
+				_toolbarModel.getToolbar().view.showHideAssets(true);
+			}else {
+				hideFlow();
+			}
+						
 		}else if(tgt.indexOf("gate") != -1){
+			hideFlow();
 			_app.getCanvas().toggleGateTool();
 						
 		}else if(tgt.indexOf("group") != -1){
+			hideFlow();
 			_app.getCanvas().toggleGroupTool();
 			
 		}else if(tgt.indexOf("preview") != -1){
+			hideFlow();
 			_app.getCanvas().launchPreviewWindow();
 		}
 	}
