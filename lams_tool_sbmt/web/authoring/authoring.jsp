@@ -1,9 +1,9 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <%@include file="/common/taglibs.jsp"%>
-<%@ taglib uri="fck-editor" prefix="FCK"%>
 
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
-<%@ page import="java.util.HashSet"%>
-<%@ page import="java.util.Set"%>
 
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -11,22 +11,13 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<%Set tabs = new HashSet();
-			tabs.add("label.authoring.heading.basic");
-			tabs.add("label.authoring.heading.advance");
-			tabs.add("label.authoring.heading.instructions");
-			pageContext.setAttribute("tabs", tabs);
 
-		%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
+<html:html>
 <head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
-	<!-- this is the custom CSS for the tool -->
-	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
 
-	<script>
+	<script type="text/javascript">
     
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
@@ -45,7 +36,6 @@
             initEditor("Instructions");
             initEditor("OnlineInstruction");
             initEditor("OfflineInstruction");
-            
         }     
         
         function doSelectTab(tabId) {
@@ -62,59 +52,49 @@
         }
         
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-
 
 </head>
 <body onLoad="init()">
+	<div id="page">
 
-	<html:form action="authoring" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
-		<html:hidden property="toolContentID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch" value="updateContent" />
 
 		<h1>
 			<fmt:message key="label.authoring.heading" />
 		</h1>
-
-		<!-- start tabs -->
-		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
-		<!-- end tab buttons -->
-		<div class="tabbody">
-			<table align=center>
-				<tr>
-					<td NOWRAP>
-						<%@ include file="/common/messages.jsp"%>
-					</td>
-				</tr>
-			</table>
-
-			<!-- tab content 1 (Basic) -->
-			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
-			<!-- end of content (Basic) -->
-
-			<!-- tab content 2 (Advanced) -->
-			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
-			<!-- end of content (Advanced) -->
-
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-			<!-- end of content (Instructions) -->
-
-
-			<!-- Button Row -->
-			<%--  Default value 
-		cancelButtonLabelKey="label.authoring.cancel.button"
-		saveButtonLabelKey="label.authoring.save.button"
-		cancelConfirmMsgKey="authoring.msg.cancel.save"
-		accessMode="author"
-	--%>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" />
-
+		<div id="header">
+			<lams:Tabs control="true">
+				<lams:Tab id="1" key="label.authoring.heading.basic" />
+				<lams:Tab id="2" key="label.authoring.heading.advance" />
+				<lams:Tab id="3" key="label.authoring.heading.instructions" />
+			</lams:Tabs>
 		</div>
-		<lams:HTMLEditor />
 
+		<div id="content">
+			<html:form action="authoring" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+				<html:hidden property="toolContentID" />
+				<html:hidden property="currentTab" styleId="currentTab" />
+				<html:hidden property="dispatch" value="updateContent" />
+				<%@ include file="/common/messages.jsp"%>
 
-	</html:form>
+				<!-- tab content 1 (Basic) -->
+				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+				<!-- end of content (Basic) -->
+
+				<!-- tab content 2 (Advanced) -->
+				<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+				<!-- end of content (Advanced) -->
+
+				<!-- tab content 3 (Instructions) -->
+				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
+				<!-- end of content (Instructions) -->
+
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" />
+
+				<lams:HTMLEditor />
+			</html:form>
+		</div>
+		<div id="footer"></div>
+	</div>
+	<!--closes page-->
 </body>
 </html:html>

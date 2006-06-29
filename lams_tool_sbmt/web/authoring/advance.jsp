@@ -1,13 +1,10 @@
+<%@include file="/common/taglibs.jsp"%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-
-<!---------------------------Advance Tab Content ------------------------>
-<table class="forms">
+<!-- Advance Tab Content -->
+<table cellpadding="0">
 	<!-- Instructions Row -->
 	<tr>
-		<td colspan="2 class="formcontrol">
+		<td>
 			<html:checkbox property="lockOnFinished" value="1">
 				<fmt:message key="label.authoring.advance.lock.on.finished" />
 			</html:checkbox>

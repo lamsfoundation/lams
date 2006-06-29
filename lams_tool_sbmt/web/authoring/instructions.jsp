@@ -1,26 +1,15 @@
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@include file="/common/taglibs.jsp"%>
 
-<!---------------------------Instruction Tab Content ------------------------>
-<table class="forms">
-	<!--hidden field contentID passed by flash-->
-	<tr>
-	</tr>
+<!-- Instruction Tab Content -->
+<table cellpadding="0">
 	<!-- Instructions Row -->
 	<tr>
-		<td class="formlabel">
-			<fmt:message key="label.authoring.online.instruction" />
-			:
-		</td>
-		<td NOWRAP width="700">
-			<lams:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}" />
+		<td>
+			<lams:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}" key="label.authoring.online.instruction" />
 		</td>
 	</tr>
 	<tr>
-		<td></td>
-		<td class="formcontrol">
+		<td>
 			<div id="onlinefile">
 				<c:forEach var="file" items="${authoring.onlineFiles}">
 					<li>
@@ -45,11 +34,13 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="formlabel">
+		<td class="field-name">
 			<fmt:message key="label.authoring.online.file" />
 			:
 		</td>
-		<td class="formcontrol">
+	</tr>
+	<tr>
+		<td>
 			<html:file property="onlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
@@ -58,19 +49,20 @@
 			</html:button>
 		</td>
 	</tr>
-	<!------------Offline Instructions ----------------------->
+	<!-- Offline Instructions -->
+</table>
+
+<hr/>
+
+<table cellpadding="0">	
+	
 	<tr>
-		<td class="formlabel">
-			<fmt:message key="label.authoring.offline.instruction" />
-			:
-		</td>
-		<td NOWRAP width="700">
-			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}" />
+		<td>
+			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}" key="label.authoring.offline.instruction" alt="true"/>
 		</td>
 	</tr>
 	<tr>
-		<td></td>
-		<td class="formcontrol">
+		<td>
 			<div id="offlinefile">
 				<c:forEach var="file" items="${authoring.offlineFiles}">
 					<li>
@@ -96,11 +88,13 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="formlabel">
+		<td class="field-name-alternative-color">
 			<fmt:message key="label.authoring.offline.file" />
 			:
 		</td>
-		<td class="formcontrol">
+	</tr>
+	<tr>
+		<td>
 			<html:file property="offlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
