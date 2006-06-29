@@ -121,7 +121,7 @@ function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolba
 		//mozilla seems to want a full url
 		
 		//var args = getHostURL()+args;
-		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars="+scrollbar+",status="+status+",menubar="+menubar+", toolbar="+toolbar);
+		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=auto,status="+status+",menubar="+menubar+", toolbar="+toolbar);
 		//thePopUp = window.open(args,"learnerPop","HEIGHT=450,WIDTH=550,resizable,scrollbars");
 	}
 }
