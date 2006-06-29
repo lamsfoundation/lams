@@ -85,6 +85,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
 
+	private static var COMPONENT_NO = 5;
+
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
 	
@@ -161,6 +163,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _container_mc = container_mc;
         _UILoaded = false;
         
+		loader.start(COMPONENT_NO);
+		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
 		//Cursor.addCursor(C_OPTIONAL);
@@ -192,7 +196,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private function configLoaded(){
         //Now that the config class is ready setup the UI and data, call to setupData() first in 
 		//case UI element constructors use objects instantiated with setupData()
-        setupData();
+        loader.complete();
+		setupData();
 		checkDataLoaded();
 		
     }
@@ -350,6 +355,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
                     break;
                 default:
             }
+			
+			loader.complete();
             
             //If all of them are loaded set UILoad accordingly
 			if(_menuLoaded && _monitorLoaded){
@@ -454,15 +461,16 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     * work with the application
     */
     private function start(){
-		//TODO: Remove the loading screen
 		
         //Fire off a resize to set up sizes
         onResize();
-		//TODO Remove loading screen
+		
+		// Remove the loading screen
+		loader.stop();
+		
 		if(SHOW_DEBUGGER){
 			showDebugger();
 		}
-
     }
     
     /**

@@ -67,6 +67,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var WORKSPACE_W:Number = 300;
     private static var WORKSPACE_H:Number = 200;
     
+	private static var LOADING_ROOT_DEPTH:Number = 1000;	//depth of the loading movie
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
     private static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
     private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
@@ -91,6 +92,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	public static var CUT_TYPE:Number = 0;
 	public static var COPY_TYPE:Number = 1;
+	
+	private static var COMPONENT_NO = 9;
 
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
@@ -102,7 +105,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _workspace:Workspace;
 	private var _PI:PropertyInspectorNew;
 	private var _debugDialog:MovieClip;                //Reference to the debug dialog
-    
     
     private var _dialogueContainer_mc:MovieClip;       //Dialog container
     private var _tooltipContainer_mc:MovieClip;        //Tooltip container
@@ -144,6 +146,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _toolbarLoaded = false;  
 		_piLoaded = false;
 		_module = Application.MODULE;
+		
 		//Mouse.addListener(someListener);
     }
     
@@ -163,13 +166,16 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     public function main(container_mc:MovieClip){
         _container_mc = container_mc;
         _UILoaded = false;
-        
+
+		loader.start(COMPONENT_NO);
+		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
 		Cursor.addCursor(C_OPTIONAL);
 		Cursor.addCursor(C_TRANSITION);
 		Cursor.addCursor(C_GATE);
 		Cursor.addCursor(C_GROUP);
+		
 		
 		//Get the instance of config class
         _config = Config.getInstance();
@@ -189,7 +195,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private function configLoaded(){
         //Now that the config class is ready setup the UI and data, call to setupData() first in 
 		//case UI element constructors use objects instantiated with setupData()
-        setupData();
+        loader.complete();
+		setupData();
 		checkDataLoaded();
 		
     }
@@ -222,6 +229,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	* Periodically checks if data has been loaded
 	*/
 	private function checkDataLoaded() {
+		
 		// first time through set interval for method polling
 		if(!_DataLoadCheckIntervalID) {
 			_DataLoadCheckIntervalID = setInterval(Proxy.create(this, checkDataLoaded), DATA_LOAD_CHECK_INTERVAL);
@@ -230,7 +238,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			// if dictionary and theme data loaded setup UI
 			if(_dictionaryLoaded && _themeLoaded) {
 				clearInterval(_DataLoadCheckIntervalID);
-				
 				setupUI();
 				checkUILoaded();
 				
@@ -324,6 +331,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
                     break;
                 default:
             }
+			
+			loader.complete();
             
             //If all of them are loaded set UILoad accordingly
             if(_toolkitLoaded && _canvasLoaded && _menuLoaded && _toolbarLoaded){
@@ -390,7 +399,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         //Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
-        _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
+ 		_cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);			
 		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
 		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);
 		
@@ -427,14 +436,17 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * work with the application
     */
     private function start(){
-		//TODO: Remove the loading screen
 		
         //Fire off a resize to set up sizes
         onResize();
-		//TODO Remove loading screen
+		
+		//Remove the loading screen
+		loader.stop();
+		
 		if(SHOW_DEBUGGER){
 			showDebugger();
 		}
+		
     }
     
     /**
@@ -487,7 +499,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         //Canvas
         _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 		_canvas.setSize(w-_toolkit.width,h-(CANVAS_Y+_canvas.model.getPIHeight()));
-        //Toolbar
+       //Toolbar
         _toolbar.setSize(w, TOOLBAR_HEIGHT);
 		//Property Inspector
 		_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
@@ -733,4 +745,5 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			
         }
     }
+	
 }
