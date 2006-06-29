@@ -222,6 +222,10 @@ CREATE TABLE lams_organisation (
      , locale_language CHAR(2)
      , locale_country CHAR(2)
      , organisation_state_id INT(3) NOT NULL
+     , admin_add_new_users TINYINT(1) NOT NULL DEFAULT 0
+     , admin_browse_all_users TINYINT(1) NOT NULL DEFAULT 0
+     , admin_change_status TINYINT(1) NOT NULL DEFAULT 0
+     , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
      , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
@@ -619,6 +623,7 @@ CREATE TABLE lams_cr_node (
      , created_date_time DATETIME NOT NULL
      , next_version_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 1
      , parent_nv_id BIGINT(20) UNSIGNED
+     , user_id BIGINT(20)
      , PRIMARY KEY (node_id)
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_cr_node_1 FOREIGN KEY (workspace_id)

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -38,8 +39,9 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 */
 public class Organisation implements Serializable {
 
-	
-    /** identifier field */
+	private static final long serialVersionUID = -6742443056151585129L;
+
+	/** identifier field */
     private Integer organisationId;
 
     /** nullable persistent field */
@@ -77,9 +79,24 @@ public class Organisation implements Serializable {
 	private String localeLanguage;
 
 	private String localeCountry;
+	
+    /** persistent field */
+    private Boolean courseAdminCanAddNewUsers;
+
+    /** persistent field */
+    private Boolean courseAdminCanBrowseAllUsers;
     
+    /** persistent field */
+    private Boolean courseAdminCanChangeStatusOfCourse;
+
+    /** persistent field */
+    private Boolean courseAdminCanCreateGuestAccounts;
+
     /** full constructor */
-    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons) {
+    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, 
+    			OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons,
+    			Boolean courseAdminCanAddNewUsers, Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse, 
+    			Boolean courseAdminCanCreateGuestAccounts) {
         this.name = name;
         this.description = description;
         this.parentOrganisation = parentOrganisation;
@@ -89,10 +106,19 @@ public class Organisation implements Serializable {
         this.userOrganisations = userOrganisations;
         this.childOrganisations = childOrganisations;
         this.lessons = lessons;
+        this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
+        this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
+        this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
+        this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
     }
 
     /** default constructor */
     public Organisation() {
+        this.courseAdminCanAddNewUsers = Boolean.FALSE;
+        this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
+        this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
+        this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
+
     }
 
     /** minimal constructor */
@@ -102,6 +128,12 @@ public class Organisation implements Serializable {
         this.organisationType = organisationType;
         this.userOrganisations = userOrganisations;
         this.lessons = lessons;
+        
+        // mandatory fields in the db
+        this.courseAdminCanAddNewUsers = Boolean.FALSE;
+        this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
+        this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
+        this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
     }
     public Organisation(String name, 
     					String description,						
@@ -326,6 +358,68 @@ public class Organisation implements Serializable {
         this.organisationState = organisationState;
     }
 
+    /** 
+     *            @hibernate.property
+     *              column="admin_add_new_users"
+     *              length="1"
+     *              not-null="true"
+     *         
+     */
+    public Boolean getCourseAdminCanAddNewUsers() {
+        return this.courseAdminCanAddNewUsers;
+    }
+
+    public void setCourseAdminCanAddNewUsers(Boolean courseAdminCanAddNewUsers) {
+        this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
+    }
+
+    /** 
+     *            @hibernate.property
+     *              column="admin_browse_all_users"
+     *              length="1"
+     *              not-null="true"
+     *         
+     */
+    public Boolean getCourseAdminCanBrowseAllUsers() {
+        return this.courseAdminCanBrowseAllUsers;
+    }
+
+    public void setCourseAdminCanBrowseAllUsers(Boolean courseAdminCanBrowseAllUsers) {
+        this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
+    }
+
+    /** 
+     *            @hibernate.property
+     *              column="admin_change_status"
+     *              length="1"
+     *              not-null="true"
+     *         
+     */
+    public Boolean getCourseAdminCanChangeStatusOfCourse() {
+        return this.courseAdminCanChangeStatusOfCourse;
+    }
+
+    public void setCourseAdminCanChangeStatusOfCourse(Boolean courseAdminCanChangeStatusOfCourse) {
+        this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
+    }
+
+    /** 
+     *            @hibernate.property
+     *              column="admin_create_guest"
+     *              length="1"
+     *              not-null="true"
+     *         
+     */
+    public Boolean getCourseAdminCanCreateGuestAccounts() {
+        return this.courseAdminCanCreateGuestAccounts;
+    }
+
+    public void setCourseAdminCanCreateGuestAccounts(Boolean courseAdminCanCreateGuestAccounts) {
+        this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
+    }
+
+    
+   
 	public String toString() {
         return new ToStringBuilder(this)
             .append("organisationId", getOrganisationId())
