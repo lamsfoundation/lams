@@ -9,4 +9,5 @@
 <%@ taglib uri="tags-xml" prefix="x" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
 
