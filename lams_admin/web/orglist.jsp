@@ -54,7 +54,9 @@
 			<fmt:message key="locale.language.${orgManageBean.localeLanguage}"/>
 		</td>
 		<td>
-			<fmt:message key="locale.country.${orgManageBean.localeCountry}"/>
+			<c:if test="${!empty orgManageBean.localeCountry}">
+				<fmt:message key="locale.country.${orgManageBean.localeCountry}"/>
+			</c:if>
 		</td>
 		<td>
 			<fmt:message key="organisation.state.${orgManageBean.status}"/>

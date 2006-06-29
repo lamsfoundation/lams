@@ -50,21 +50,16 @@
 		<td><html-el:textarea property="description" cols="50" rows="3" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="admin.organisation.country"/>:</td>
-		<td>
-			<html-el:select property="localeCountry">
-				<c:forEach items="${countries}" var="country">
-					<html-el:option value="${country.isoCode}"><fmt:message key="locale.country.${country.isoCode}"/></html-el:option>
-				</c:forEach>
-			</html-el:select>
-		</td>
-	</tr>
-	<tr>
 		<td><fmt:message key="admin.organisation.language"/>:</td>
 		<td>
-			<html-el:select property="localeLanguage">
-				<c:forEach items="${languages}" var="language">
-					<html-el:option value="${language.isoCode}"><fmt:message key="locale.language.${language.isoCode}"/></html-el:option>
+			<html-el:select property="localeId">
+				<c:forEach items="${locales}" var="locale">
+					<html-el:option value="${locale.localeId}">
+						<fmt:message key="locale.language.${locale.languageIsoCode}"/>
+						<c:if test="${!empty locale.countryIsoCode}">
+							&nbsp;(<fmt:message key="locale.country.${locale.countryIsoCode}"/>)
+						</c:if>
+					</html-el:option>
 				</c:forEach>	
 			</html-el:select>
 		</td>

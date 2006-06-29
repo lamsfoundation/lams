@@ -23,7 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,10 +37,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.usermanagement.Country;
-import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -68,11 +70,15 @@ public class OrganisationAction extends LamsDispatchAction {
 	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
 
-	private static List countries = service.findAll(Country.class);
+	//private static List countries = service.findAll(Country.class);
 	
-	private static List languages = service.findAll(Language.class);
+	private static List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
 	
 	private static List status = service.findAll(OrganisationState.class);
+	
+	static{
+		Collections.sort(locales);
+	}
 
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
@@ -85,9 +91,16 @@ public class OrganisationAction extends LamsDispatchAction {
 			orgForm.set("parentName",org.getParentOrganisation().getName());
 			orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
 			orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put("languageIsoCode",org.getLocaleLanguage());
+			if(org.getLocaleCountry()!=null){
+				properties.put("countryIsoCode",org.getLocaleCountry());
+			}
+			SupportedLocale locale = (SupportedLocale)service.findByProperties(SupportedLocale.class,properties).get(0);
+			orgForm.set("localeId",locale.getLocaleId());
 		}
-		request.getSession().setAttribute("countries",countries);
-		request.getSession().setAttribute("languages",languages);
+		//request.getSession().setAttribute("countries",countries);
+		request.getSession().setAttribute("locales",locales);
 		request.getSession().setAttribute("status",status);
 		return mapping.findForward("organisation");
 	}

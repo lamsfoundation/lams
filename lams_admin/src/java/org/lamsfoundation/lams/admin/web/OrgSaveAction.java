@@ -40,6 +40,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -109,13 +110,18 @@ public class OrgSaveAction extends Action {
 
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
 
 			if(orgId!=0){
 				org = (Organisation)service.findById(Organisation.class,orgId);
 				BeanUtils.copyProperties(org,orgForm);
+				org.setLocaleCountry(locale.getCountryIsoCode());
+				org.setLocaleLanguage(locale.getLanguageIsoCode());
 			}else{
 				org = new Organisation();
 				BeanUtils.copyProperties(org,orgForm);
+				org.setLocaleCountry(locale.getCountryIsoCode());
+				org.setLocaleLanguage(locale.getLanguageIsoCode());
 				org.setParentOrganisation((Organisation)service.findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 			}
