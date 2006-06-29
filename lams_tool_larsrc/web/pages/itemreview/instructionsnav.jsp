@@ -31,6 +31,7 @@
 		</script>
 	</head>
 	<body>
+		
 		<div id="content" style="padding-bottom: 0px;float:none;margin: auto;">
 			<table cellpadding="0">
 				<tr valign="top">
@@ -51,12 +52,12 @@
 					<td width="25%" valign="middle">
 						<c:choose>
 							<c:when test="${instructions.current < instructions.total}">
-								<a id="NextInstruction" onClick="javascript:nextIns(${instructions.current})" class="button">
+								<a href="#" id="NextInstruction" onClick="javascript:nextIns(${instructions.current})" class="button">
 									<fmt:message key='label.next.instruction'/>
 								</a>
 							</c:when>
 							<c:otherwise>
-								<a id="FinishInstruction" onClick="javascript:finishIns()" class="button">
+								<a href="#" id="FinishInstruction" onClick="javascript:finishIns()" class="button">
 									<fmt:message key='label.finish'/>
 								</a>
 							</c:otherwise>

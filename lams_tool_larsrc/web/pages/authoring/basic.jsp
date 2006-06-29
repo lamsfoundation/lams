@@ -58,7 +58,7 @@
 
 </script>
 	<!-- Basic Tab Content -->
-	<table class="forms">
+	<table>
 		<tr>
 			<td colspan="2"><lams:SetEditor id="Resource.title" text="${formBean.resource.title}" small="true" key="label.authoring.basic.title" /></td>
 		</tr>
