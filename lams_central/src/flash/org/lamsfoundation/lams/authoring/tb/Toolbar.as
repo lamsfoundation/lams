@@ -45,10 +45,10 @@ class Toolbar {
 	*
 	* @param   target_mc	Target clip for attaching view
 	*/
-	function Toolbar (target_mc:MovieClip,x:Number,y:Number){
+	function Toolbar (target_mc:MovieClip,depth:Number,x:Number,y:Number){
         mx.events.EventDispatcher.initialize(this);
 		//Create the model
-		toolbarModel = new ToolbarModel();
+		toolbarModel = new ToolbarModel(this);
         
 		//Create the view
 		toolbarView_mc = target_mc.createChildAtDepth("toolbarView",DepthManager.kTop);		
@@ -107,4 +107,14 @@ class Toolbar {
 	public function get height(){
 		return toolbarModel.height;
 	}
+	
+	public function get view():MovieClip{
+		return getToolbarView();
+	}
+		
+	
+	public function getToolbarView():MovieClip{
+		return toolbarView;
+	}
+	
 }
