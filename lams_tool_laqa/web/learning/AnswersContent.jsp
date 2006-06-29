@@ -27,11 +27,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true">
 <head>
 	<title> <bean:message key="label.learning.qa"/> </title>
-
 	<%@ include file="/common/header.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
 
-	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
 		{
@@ -44,6 +42,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitLearningMethod(actionMethod);
 		}
 	</script>	
+
+
 </head>
 <body>
 

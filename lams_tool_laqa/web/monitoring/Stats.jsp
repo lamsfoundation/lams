@@ -23,7 +23,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<table class="forms">
 						<tr> 
-							<td NOWRAP valign=top>
+						<td NOWRAP valign=top>
 				  				<b> <bean:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>

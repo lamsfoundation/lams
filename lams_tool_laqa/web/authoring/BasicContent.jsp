@@ -27,8 +27,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-		           <h2> <b> <bean:message key="label.authoring.qa.basic"/> </b></h2>
-					<table class="forms">
+		           <h2>  <bean:message key="label.authoring.qa.basic"/> </h2>
+		           
+			    	<table align=center> 	  
 						<tr>   
 						<td NOWRAP class=error>
 							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
