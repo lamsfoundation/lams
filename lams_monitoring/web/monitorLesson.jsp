@@ -53,6 +53,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				//thePopUp = window.open(args,"learnerPop","HEIGHT=450,WIDTH=550,resizable,scrollbars");
 			}
 		}
+		
+	
+	//-->
 	</script>
 </head>
 
