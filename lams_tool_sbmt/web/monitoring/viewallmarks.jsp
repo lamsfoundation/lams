@@ -1,26 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+<table cellpadding="0">
 	<c:forEach items="${report}" var="user">
 		<c:set var="filesUploaded" value="${user.value}" />
 		<c:set var="first" value="true" />
 		<c:forEach items="${filesUploaded}" var="details">
-			<p>
-				<c:if test="${first}">
-					<c:set var="first" value="false" />
-					<tr>
-						<td colspan="2">
-							<c:out value="${details.userDTO.firstName}" />
-							<c:out value="${details.userDTO.lastName}" />
-							,
-							<c:out value="${details.userDTO.login}" />
-							,
-							<fmt:message key="label.submit.file.suffix" />
-							:
-						</td>
-					<tr>
-				</c:if>
+			<c:if test="${first}">
+				<c:set var="first" value="false" />
+				<tr>
+					<td colspan="2">
+						<c:out value="${details.userDTO.firstName}" />
+						<c:out value="${details.userDTO.lastName}" />
+						,
+						<c:out value="${details.userDTO.login}" />
+						,
+						<fmt:message key="label.submit.file.suffix" />
+						:
+					</td>
+				<tr>
+			</c:if>
+
 			<tr>
-				<td>
+				<td class="field-name">
 					<fmt:message key="label.learner.filePath" />
 					:
 				</td>
@@ -35,10 +36,9 @@
 					</c:set>
 					<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="label.download" /> </a>
 				</td>
-
 			</tr>
 			<tr>
-				<td>
+				<td class="field-name">
 					<fmt:message key="label.learner.fileDescription" />
 					:
 				</td>
@@ -47,7 +47,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="field-name">
 					<fmt:message key="label.learner.dateOfSubmission" />
 					:
 				</td>
@@ -56,7 +56,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="field-name">
 					<fmt:message key="label.learner.marks" />
 					:
 				</td>
@@ -72,7 +72,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="field-name">
 					<fmt:message key="label.learner.comments" />
 					:
 				</td>

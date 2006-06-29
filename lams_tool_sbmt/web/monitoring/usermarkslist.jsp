@@ -1,13 +1,24 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="filesUploaded" value="${userReport}" />
 <c:set var="user" value="${user}" />
-<b><c:out value="${user.login}" /> , <c:out value="${user.firstName}" /> <c:out value="${user.lastName}" />, <fmt:message key="label.submit.file.suffix" />: </b>
-</p>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+<table cellpadding="0">
+	<tr>
+		<td colspan="2">
+			<c:out value="${user.login}" />
+			,
+			<c:out value="${user.firstName}" />
+			<c:out value="${user.lastName}" />
+			,
+			<fmt:message key="label.submit.file.suffix" />
+			:
+		</td>
+	</tr>
 	<c:forEach var="details" items="${filesUploaded}">
 		<span><p>
 		<tr>
-			<td>
+			<td class="field-name">
 				<fmt:message key="label.learner.filePath" />
 				:
 			</td>
@@ -24,7 +35,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td class="field-name">
 				<fmt:message key="label.learner.fileDescription" />
 				:
 			</td>
@@ -33,7 +44,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td class="field-name">
 				<fmt:message key="label.learner.dateOfSubmission" />
 				:
 			</td>
@@ -42,7 +53,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td class="field-name">
 				<fmt:message key="label.learner.marks" />
 				:
 			</td>
@@ -58,7 +69,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td class="field-name">
 				<fmt:message key="label.learner.comments" />
 				:
 			</td>
