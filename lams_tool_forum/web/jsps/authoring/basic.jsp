@@ -9,7 +9,7 @@
 	 */
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
-		area.style.width="100%";
+		area.style.width="670px";
 		area.style.height="100%";
 		area.src=url;
 		area.style.display="block";
@@ -22,43 +22,28 @@
 	}
 </script>
 
-<table class="forms">
+<table >
 	<tr>
-		<td class="formlabel">
-			<fmt:message key="label.authoring.basic.title" />
-			:
-		</td>
-		<td class="formcontrol">
-			<lams:SetEditor id="forum.title" text="${forumForm.forum.title}" small="true"/>
+		<td  colspan="2">
+			<lams:SetEditor id="forum.title" text="${forumForm.forum.title}" small="true" key="label.authoring.basic.title" />
 		</td>
 	</tr>
 	<tr>
-		<td class="formlabel">
-			<fmt:message key="label.authoring.basic.instruction" />
-			:
-		</td>
-		<td NOWRAP width="700">
-			<lams:SetEditor id="forum.instructions" text="${forumForm.forum.instructions}"/>
+		<td  colspan="2">
+			<lams:SetEditor id="forum.instructions" text="${forumForm.forum.instructions}" key="label.authoring.basic.instruction"/>
 		</td>
 	</tr>
+</table>
 	<!-- Topics List Row -->
-	<tr>
-		<td colspan="2" class="formlabel">
-			<div id="messageListArea">
-				<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
-			</div>
-		</td>
-	</tr>
+	<div id="messageListArea">
+		<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
+	</div>
+<table >
 	<tr>
 		<td colspan="2" align="left">
 			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');" style="float:left;width:150px"  class="button">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<html:errors />
 		</td>
 	</tr>
 	<tr>

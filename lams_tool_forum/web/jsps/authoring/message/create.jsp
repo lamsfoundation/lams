@@ -1,3 +1,6 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <%@ include file="/common/taglibs.jsp"%>
 <html>
 	<head>
@@ -13,67 +16,57 @@
 				}
 			}
 		</script>
-
+		<style type="text/css">
+		<!--
+		td { 
+			padding:4px; 
+			font-size:12px;
+		}
+		-->
+		</style>
 	</head>
-	<body class="tabpart">
+	<body>
 		<script type="text/javascript">
 			success();
 		</script>
-		<table class="forms">
+		<table cellpadding="3">
 			<!-- Basic Info Form-->
-			<tr>
-				<td>
-					<div align="center">
-						<%@ include file="/common/messages.jsp"%>
-						<html:form action="/authoring/createTopic.do" focus="message.subject" enctype="multipart/form-data">
-							<table width="100%" cellspacing="8" border="0" align="left">
-								<tr>
-									<td>
-										<b><bean:message key="message.label.subject" /><b class="required">*</b></b>
-									</td>
-									<td align="left">
-										<html:text size="30" tabindex="1" property="message.subject" />
-										<BR>
-										<html:errors property="message.subject" />
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<b><bean:message key="message.label.body" /></b><b class="required">*</b>
-									</td>
-									<td>
-										<FCK:editor id="message.body" basePath="/lams/fckeditor/" height="200" width="100%">
-										</FCK:editor>
-										<BR>
-										<html:errors property="message.body" />
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<b><bean:message key="message.label.attachment" /></b>
-									</td>
-									<td>
-										<html:file tabindex="3" property="attachmentFile" />
-										<html:errors property="message.attachment" />
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td align="left" valign="bottom">
-										<html:submit style="width:120px" styleClass="buttonStyle">
-											<bean:message key="button.add" />
-										</html:submit>
-										<html:button property="cancel" onclick="javascript:window.parent.hideMessage()" styleClass="buttonStyle" style="width:120px">
-											<bean:message key="button.cancel" />
-										</html:button>
-									</td>
-								</tr>
-							</table>
-
-						</html:form>
-					</div>
-				</td>
-			</tr>
+			<%@ include file="/common/messages.jsp"%>
+			<html:form action="/authoring/createTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
+				<tr>
+					<td>
+						<b><bean:message key="message.label.subject" />*</b><BR>
+						<html:text size="30" tabindex="1" property="message.subject" /><BR>
+						<html:errors property="message.subject" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<b><bean:message key="message.label.body" />*</b><BR>
+						<FCK:editor id="message.body" basePath="/lams/fckeditor/" height="150" width="600">
+						</FCK:editor>
+						<html:errors property="message.body" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<b><bean:message key="message.label.attachment" /></b>
+						<html:file tabindex="3" property="attachmentFile" />
+					</td>
+				</tr>
+				<tr>
+					<td align="center" valign="bottom">
+						<a href="#" onclick="getElementById('topicFormId').submit();" class="button">
+							<bean:message key="button.add" />
+						</a>
+						&nbsp; &nbsp;
+						<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
+							<bean:message key="button.cancel" />
+						</a>
+						<BR><BR>
+					</td>
+				</tr>
+			</html:form>
 		</table>
 
 	</body>

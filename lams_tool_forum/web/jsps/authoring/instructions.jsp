@@ -2,20 +2,16 @@
 
 <!--   Instruction Tab Content -->
 
-<table class="forms">
+<table>
 	<!-- Instructions Row -->
 	<tr>
-		<td class="formlabel">
-			<fmt:message key="label.authoring.online.instruction" />
-			:
-		</td>
-		<td class="formcontrol">
-			<lams:SetEditor id="forum.onlineInstructions" text="${forumForm.forum.onlineInstructions}"/>
+		<td colspan="2">
+			<lams:SetEditor id="forum.onlineInstructions" text="${forumForm.forum.onlineInstructions}"  key="label.authoring.online.instruction" />
 		</td>
 	</tr>
 	<tr>
 		<td></td>
-		<td class="formcontrol">
+		<td>
 
 			<div id="onlinefile">
 				<c:forEach var="file" items="${forumForm.onlineFileList}">
@@ -47,35 +43,31 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="formlabel">
+		<td  class="field-name">
 			<fmt:message key="label.authoring.online.file" />
 			:
 		</td>
-		<td class="formcontrol">
+		<td>
 			<html:file property="onlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
 			<c:set var="uploadonline">
 				<html:rewrite page="/authoring/uploadOnline.do" />
 			</c:set>
-			<html:button property="onlineUpload" onclick="doSubmit('${uploadonline}')">
+			<a href="#" onclick="doSubmit('${uploadonline}')" class="button">
 				<fmt:message key="label.authoring.upload.online.button" />
-			</html:button>
+			</a>
 		</td>
 	</tr>
 	<!-- Offline Instructions -->
 	<tr>
-		<td class="formlabel">
-			<fmt:message key="label.authoring.offline.instruction" />
-			:
-		</td>
-		<td class="formcontrol">
-			<lams:SetEditor id="forum.offlineInstructions" text="${forumForm.forum.offlineInstructions}"/>
+		<td colspan="2">
+			<lams:SetEditor id="forum.offlineInstructions" text="${forumForm.forum.offlineInstructions}" key="label.authoring.offline.instruction" />
 		</td>
 	</tr>
 	<tr>
 		<td></td>
-		<td class="formcontrol">
+		<td>
 			<div id="offlinefile">
 				<c:forEach var="file" items="${forumForm.offlineFileList}">
 					<li>
@@ -104,25 +96,20 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="formlabel">
+		<td class="field-name">
 			<fmt:message key="label.authoring.offline.file" />
 			:
 		</td>
-		<td class="formcontrol">
+		<td>
 			<html:file property="offlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
 			<c:set var="uploadoffline">
 				<html:rewrite page="/authoring/uploadOffline.do" />
 			</c:set>
-			<html:button property="offlineUpload" onclick="doSubmit('${uploadoffline}')">
+			<a href="#" onclick="doSubmit('${uploadoffline}')" class="button">
 				<fmt:message key="label.authoring.upload.offline.button" />
-			</html:button>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<html:errors />
+			</a>
 		</td>
 	</tr>
 </table>

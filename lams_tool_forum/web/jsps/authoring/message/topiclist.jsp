@@ -1,16 +1,10 @@
 <%@ include file="/includes/taglibs.jsp" %>
-	
-<div align="center">
 <div id="topiclist">
-	<div id="datatablecontainer">
-	<table width="100%" align="CENTER" 	class="form">
-		<tr>
-			<td colspan="4"  valign="MIDDLE"><b><fmt:message key="title.message.view"/></b></td>
-		</tr>
+	<table class="alternative-color">
 		<tr>
 			<th scope="col" width="50%" colspan="2"><fmt:message key="lable.topic.title.subject"/></th>
-			<th scope="col" width="25%"><fmt:message key="lable.topic.title.startedby"/></th>
-			<th scope="col" width="25%"><fmt:message key="lable.topic.title.update"/></th>
+			<th scope="col" width="20%" align="center"><fmt:message key="lable.topic.title.startedby"/></th>
+			<th scope="col" width="30%" align="center"><fmt:message key="lable.topic.title.update"/></th>
 		</tr>
 		<c:forEach items="${topicList}" var="topic" varStatus="status">
 			<tr>
@@ -27,16 +21,14 @@
 						<img src="<html:rewrite page="/images/paperclip.gif"/>">
 					</c:if>
 				</td>
-				<td>
+				<td align="center">
 					<c:out value="${topic.author}"/>
 				</td>
-				<td>
+				<td align="center">
 					<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />
-					<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
+					<fmt:formatDate value="${topic.message.updated}" type="date" pattern="MMM dd"/>
 				</td>
 			</tr>
 		</c:forEach>
 	</table>
-	</div>
-</div>
 </div>
