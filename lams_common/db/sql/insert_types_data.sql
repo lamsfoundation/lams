@@ -171,7 +171,7 @@ VALUES (3, 'mi', 'NZ', 'Maori (New Zealand)');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (4, 'de', null, 'German');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (5, 'zh', 'CN', 'Chinese (China)');
+VALUES (5, 'zh', null, 'Chinese');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (6, 'fr', null, 'French');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
@@ -196,8 +196,6 @@ INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_cod
 VALUES (16, 'th', null, 'Thai');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (17, 'el', null, 'Greek');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (18, 'en', 'US', 'English (United States)');
 
 -- to be removed when the admin converted over to use lams_supported_locale
 INSERT INTO lams_country VALUES (1, 'AU');
