@@ -89,26 +89,19 @@ public class UserAction extends LamsDispatchAction {
 		    request.setAttribute("org",orgId);
 		}
 		
+        // get system's roles
+		List allRoles = service.findAll(Role.class);
+		Collections.sort(allRoles);
+		request.setAttribute("rolelist",allRoles);
+		
 		// editing a user
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		DynaActionForm userForm = (DynaActionForm)form;
 		if(userId != null) {
 			log.debug("got userid to edit: "+userId);
 			User user = (User)service.findById(User.class,userId);
-			DynaActionForm userForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(userForm, user);
 			BeanUtils.setProperty(userForm,"password2",user.getPassword());
-			
-			// get system's roles
-			List allRoles = service.findAll(Role.class);
-			/*ArrayList<RoleDTO> rolelist = new ArrayList<RoleDTO>();
-			for(int i=0; i<allRoles.size(); i++){
-				Role r = (Role)allRoles.get(i);
-			    rolelist.add(new RoleDTO(r));
-			}
-			Collections.sort(rolelist);
-			request.setAttribute("rolelist",rolelist);*/
-			Collections.sort(allRoles);
-			request.setAttribute("rolelist",allRoles);
 			
 			// get user's roles
 			Iterator iter = user.getUserOrganisations().iterator();
@@ -128,7 +121,9 @@ public class UserAction extends LamsDispatchAction {
 			        break;
 			    }
 			}
-			
+		}else{
+			String[] roles = new String[0];
+			userForm.set("roles",roles);
 		}
 		
 		Organisation org = (Organisation)service.findById(Organisation.class,orgId);

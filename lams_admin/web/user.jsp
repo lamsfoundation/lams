@@ -114,17 +114,15 @@
 			</html-el:select>
 		</td>
 	</tr>
-	<logic:notEmpty name="UserForm" property="userId">
-	    <tr>
-	        <td><fmt:message key="admin.user.roles"/>:</td>
-	        <td>
-                <c:forEach items="${rolelist}" var="role">
-                    <html-el:multibox name="UserForm" property="roles" value="${role.roleId}"/>
-                    <c:out value="${role.name}"/><br/>
-                </c:forEach>
-	        </td>
-	    </tr>
-	</logic:notEmpty>
+	<tr>
+	    <td><fmt:message key="admin.user.roles"/>:</td>
+	    <td>
+            <c:forEach items="${rolelist}" var="role">
+                <html-el:multibox name="UserForm" property="roles" value="${role.roleId}"/>
+                <c:out value="${role.name}"/><br/>
+            </c:forEach>
+	    </td>
+	</tr>
 	<tr>
 		<td colspan=2 align="right">
 			<html-el:submit><fmt:message key="admin.save"/></html-el:submit>

@@ -114,6 +114,7 @@ public class UserSaveAction extends Action {
 			Integer userId = (Integer)userForm.get("userId");
 			User user;
 			log.debug("got userId: "+userId);
+			String[] roles = (String[])userForm.get("roles");
 			if(userId!=0){    // edit user
 				edit = true;
 				log.debug("editing userId: "+userId);
@@ -121,7 +122,6 @@ public class UserSaveAction extends Action {
 				BeanUtils.copyProperties(user,userForm);
 				service.save(user);
 				
-				String[] roles = (String[])userForm.get("roles");
 				List rolesList = Arrays.asList(roles);
 				log.debug("rolesList.size: "+rolesList.size());
 				Set uos = user.getUserOrganisations();
@@ -146,11 +146,6 @@ public class UserSaveAction extends Action {
 					            log.debug("setting role: "+currentRole);
 					            UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
 					            service.save(newUor);
-					            /*uors.add(newUor);
-					            uo.setUserOrganisationRoles(uors);
-					            user.setUserOrganisations(uos);
-					            service.save(user);*/
-					            //log.debug("num roles: "+uo.getUserOrganisationRoles().size());
 				        	}
 				        }
 				        Iterator iter3 = uors.iterator();
@@ -192,10 +187,17 @@ public class UserSaveAction extends Action {
 					UserOrganisation uo = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
 					service.save(uo);
 					log.debug("userOrganisation: "+uo);
-					Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
+					for(int i=0; i<roles.length; i++){    // add new roles set by user
+			        	Integer roleId = Integer.valueOf(roles[i]);
+			            Role role = (Role)service.findById(Role.class,roleId);
+				        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
+				        service.save(uor);
+				        log.debug("role: "+role);
+			        }
+					/*Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
 					UserOrganisationRole uor = new UserOrganisationRole(uo,role);
 					service.save(uor);
-					log.debug("userOrganisationRole: "+uor);
+					log.debug("userOrganisationRole: "+uor);*/
 					HashSet uos = new HashSet();
 					uos.add(uo);
 					user.setUserOrganisations(uos);
