@@ -377,19 +377,25 @@ public function update (o:Observable,infoObj:Object):Void{
 		var s:Object = mm.getSequence();
 		
 		// is started?
-		if(a){
+		if(s.isStarted){
 			start_date_lbl.text = s.getStartDateTime();
+			start_date_lbl.visible = true;
+		} else {
+			start_date_lbl.visible = false;
 		}
 		
 		start_btn.visible = a;
-		start_date_lbl.visible = a;
+		
 		
 		// is scheduled to start?
-		if(b){
+		if(s.isScheduled){
 			schedule_date_lbl.text = s.getScheduleDateTime();
+			schedule_date_lbl.visible = true;
+		} else {
+			schedule_date_lbl.visible = false;
 		}
 		
-		schedule_date_lbl.visible = b;
+		
 		scheduleTime._visible = b;
 		scheduleDate_dt.visible = b;
 		schedule_btn.visible = b;
@@ -421,7 +427,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				seqStat = Dictionary.getValue('ls_status_disabled_lbl');
 				break;
 			case LessonTabView.NOT_STARTED_STATUS:
-				if(s.isScheduled){ seqStat = Dictionary.getValue('ls_status_scheduled_lbl', [s.getScheduleDateTime()]); }
+				if(s.isScheduled){ seqStat = Dictionary.getValue('ls_status_scheduled_lbl'); }
 				else {
 					seqStat = Dictionary.getValue('ls_status_active_lbl');
 				}
@@ -654,6 +660,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageStatus_lbl.setStyle('styleName',styleObj);
 		manageStart_lbl.setStyle('styleName',styleObj);
 		manageDate_lbl.setStyle('styleName',styleObj);
+		schedule_date_lbl.setStyle('styleName', styleObj);
 		
 		//BUTTONS
 		styleObj = _tm.getStyleObject('button');
