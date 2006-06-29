@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -94,39 +97,41 @@ public class UserOrgAction extends Action {
 			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
 			request.setAttribute("pOrgName",parentOrg.getName());
 		}
-		request.setAttribute("orgType",organisation.getOrganisationType().getOrganisationTypeId());
+		Integer orgType = organisation.getOrganisationType().getOrganisationTypeId();
+		request.setAttribute("orgType",orgType);
 		
 		// check user permission
 		//String username = request.getRemoteUser();
 		
 		// get list of users in org
-		List<User> users = service.getUsersFromOrganisation(parentOrg.getOrganisationId());
+		List<User> users = new ArrayList<User>();
+		if(request.isUserInRole(Role.SYSADMIN)){
+			users = service.findAll(User.class);
+		}else if(request.isUserInRole(Role.COURSE_ADMIN)){
+			if(true){  // org allows admin to add users
+				if(true){  // org allows admin to browse all users
+					users = service.findAll(User.class);
+				}else if(orgType.equals(new Integer(OrganisationType.CLASS_TYPE))){
+					users = service.getUsersFromOrganisation(parentOrg.getOrganisationId());
+				}else if(orgType.equals(new Integer(OrganisationType.COURSE_TYPE))){
+					users = service.getUsersFromOrganisation(orgId);
+					/*errors.add("permission",new ActionMessage("error.need.browse.permission"));
+					saveErrors(request,errors);
+					return mapping.findForward("userorg");*/
+				}
+			}else{
+				errors.add("permission",new ActionMessage("error.need.add.permission"));
+				saveErrors(request,errors);
+				return mapping.findForward("error");
+			}
+		}
 		request.setAttribute("userlist",users);
-		/*if(users==null){
-			errors.add("org",new ActionMessage("error.org.invalid"));
-			saveErrors(request,errors);
-			return mapping.findForward("error");
-		}*/
 		
 		// create form object
-		//UserListDTO userListForm = new UserListDTO();
 		DynaActionForm userOrgForm = (DynaActionForm)form;
 		userOrgForm.set("orgId",orgId);
 		userOrgForm.set("orgName",orgName);
-		//userOrgForm.set("userlist",users);
-		/*userListForm.setOrgId(orgId);
-		userListForm.setOrgName(orgName);
-		List<UserManageBean> userManageBeans = new ArrayList<UserManageBean>();
-		for(int i=0; i<users.size(); i++) {
-			User user = (User)users.get(i);
-			UserManageBean userManageBean = new UserManageBean();
-			BeanUtils.copyProperties(userManageBean, user);
-			userManageBeans.add(userManageBean);
-		}
-		
-		userListForm.setUserManageBeans(userManageBeans);
-		request.setAttribute("UserListForm", userListForm);*/
-		
+				
 		// create list of userids, members of this org
 		List<User> memberUsers = service.getUsersFromOrganisation(orgId);
 		String[] userIds = new String[memberUsers.size()];
