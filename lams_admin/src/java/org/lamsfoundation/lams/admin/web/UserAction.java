@@ -26,8 +26,10 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,11 +39,14 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Country;
 import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
@@ -76,23 +81,34 @@ public class UserAction extends LamsDispatchAction {
 					.getServletContext());
 	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
-    private static List countries = service.findAll(Country.class);
-	private static List languages = service.findAll(Language.class);
+    //private static List countries = service.findAll(Country.class);
+	//private static List languages = service.findAll(Language.class);
+	private static List allRoles = service.findAll(Role.class);
+	private static List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
+	static {
+		Collections.sort(allRoles);
+		Collections.sort(locales);
+	}
 	
 	public ActionForward edit(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        // retain orgId to return to userlist
+		ActionMessages errors = new ActionMessages();
+		if(!request.isUserInRole(Role.SYSADMIN) || !request.isUserInRole(Role.COURSE_ADMIN)){
+			errors.add("permission",new ActionMessage("errors.insufficient.permissions"));
+		    saveErrors(request,errors);
+			return mapping.findForward("error");
+		}
+		
+		// retain orgId to return to userlist
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		if(orgId != null) {
 		    request.setAttribute("org",orgId);
 		}
-		
-        // get system's roles
-		List allRoles = service.findAll(Role.class);
-		Collections.sort(allRoles);
+				
 		request.setAttribute("rolelist",allRoles);
+		request.setAttribute("locales",locales);
 		
 		// editing a user
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
@@ -121,6 +137,14 @@ public class UserAction extends LamsDispatchAction {
 			        break;
 			    }
 			}
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put("languageIsoCode",user.getLocaleLanguage());
+			if(user.getLocaleCountry()!=null){
+				properties.put("countryIsoCode",user.getLocaleCountry());
+			}
+			SupportedLocale locale = (SupportedLocale)service.findByProperties(SupportedLocale.class,properties).get(0);
+			userForm.set("localeId",locale.getLocaleId());
+			
 		}else{
 			String[] roles = new String[0];
 			userForm.set("roles",roles);
@@ -135,8 +159,8 @@ public class UserAction extends LamsDispatchAction {
 		request.setAttribute("orgId",orgId);
 		request.setAttribute("orgName",org.getName());
 		request.setAttribute("orgType",org.getOrganisationType().getOrganisationTypeId());
-		request.setAttribute("countries",countries);
-		request.setAttribute("languages",languages);
+		//request.setAttribute("countries",countries);
+		//request.setAttribute("languages",languages);
 		return mapping.findForward("user");
 	}
 	

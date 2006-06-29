@@ -48,7 +48,9 @@ import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Country;
 import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
@@ -110,6 +112,9 @@ public class UserSaveAction extends Action {
 			errors.add("password",new ActionMessage("error.newpassword.mismatch"));
 		}
 		
+		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)userForm.get("localeId"));
+		log.debug("locale: "+locale);
+		
 		if(errors.isEmpty()){
 			Integer userId = (Integer)userForm.get("userId");
 			User user;
@@ -120,7 +125,13 @@ public class UserSaveAction extends Action {
 				log.debug("editing userId: "+userId);
 				user = (User)service.findById(User.class,userId);
 				BeanUtils.copyProperties(user,userForm);
-				service.save(user);
+				log.debug("country: "+user.getLocaleCountry());
+				log.debug("language: "+user.getLocaleLanguage());
+				user.setLocaleCountry(locale.getCountryIsoCode());
+				user.setLocaleLanguage(locale.getLanguageIsoCode());
+				log.debug("country: "+user.getLocaleCountry());
+				log.debug("language: "+user.getLocaleLanguage());
+				//service.save(user);
 				
 				List rolesList = Arrays.asList(roles);
 				log.debug("rolesList.size: "+rolesList.size());
@@ -181,6 +192,8 @@ public class UserSaveAction extends Action {
 					user.setCreateDate(new Date());
 					user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,"authenticationMethodName","LAMS-Database").get(0));
 					user.setUserId(null);
+					user.setLocaleCountry(locale.getCountryIsoCode());
+					user.setLocaleLanguage(locale.getLanguageIsoCode());
 					service.save(user);
 					log.debug("user: "+user.toString());
 					HashSet uos = new HashSet();
@@ -189,7 +202,7 @@ public class UserSaveAction extends Action {
 					log.debug("organisation: "+orgId);
                     // if user is to be added to a class, make user a member of parent course also
 					Organisation org = (Organisation)service.findById(Organisation.class,orgId);
-					if(org.getOrganisationType().getOrganisationTypeId().equals(new Integer(3))){
+					if(org.getOrganisationType().getOrganisationTypeId().equals(new Integer(OrganisationType.CLASS_TYPE))){
 						Integer courseOrgId = org.getParentOrganisation().getOrganisationId();
 						orgs.add(courseOrgId);
 						log.debug("organisation: "+courseOrgId);

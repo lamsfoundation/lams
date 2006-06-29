@@ -30,8 +30,7 @@
 	<form-property name="mobilePhone" type="java.lang.String" />
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
-	<form-property name="localeLanguage" type="java.lang.String" />
-	<form-property name="localeCountry" type="java.lang.String" />
+	<form-property name="localeId" type="java.lang.Byte" />
     <form-property name="roles" type="java.lang.String[]" />
 </form-bean>
 
