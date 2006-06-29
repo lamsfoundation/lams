@@ -92,6 +92,7 @@ class ApplicationParent {
     */
     private function onDictionaryLoad(evt:Object){
         if(evt.type=='load'){
+			loader.complete();
             _dictionaryLoaded = true;
 			Debugger.log('Dictionary loaded :',Debugger.CRITICAL,'onDictionaryLoad','Application');			
         } else {
@@ -105,7 +106,8 @@ class ApplicationParent {
     */
     private function onThemeLoad(evt:Object) {
         if(evt.type=='load'){
-            _themeLoaded = true; 
+			loader.complete();
+            _themeLoaded = true;
 			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');		
         } else {
             Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onThemeLoad','Application');
@@ -152,6 +154,12 @@ class ApplicationParent {
 			
         }
     }
+	
+	public function get loader():LFLoader{
+		if(_root.loader != undefined) { return _root.loader; }
+		else {
+		}
+	}	
 	
 	public function get module():String{
 		return _module;
