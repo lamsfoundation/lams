@@ -5,8 +5,7 @@
 	<form-property name="name" type="java.lang.String" />
 	<form-property name="code" type="java.lang.String" />
 	<form-property name="description" type="java.lang.String" />
-	<form-property name="localeLanguage" type="java.lang.String" />
-	<form-property name="localeCountry" type="java.lang.String" />
+	<form-property name="localeId" type="java.lang.Byte" />
 	<form-property name="typeId" type="java.lang.Integer" />
 	<form-property name="stateId" type="java.lang.Integer" />
 </form-bean>
