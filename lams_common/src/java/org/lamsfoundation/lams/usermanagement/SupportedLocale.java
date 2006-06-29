@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *         table="lams_supported_locale"
  *     
 */
-public class SupportedLocale implements Serializable {
+public class SupportedLocale implements Serializable,Comparable {
 
 	/**
 	 * 
@@ -110,6 +110,11 @@ public class SupportedLocale implements Serializable {
 	            .append("countryIsoCode", getCountryIsoCode())
 	            .append("description", getDescription())
 	            .toString();
+	}
+
+	public int compareTo(Object o) {
+		SupportedLocale locale = (SupportedLocale)o;
+		return description.compareTo(locale.getDescription());
 	}
 
 
