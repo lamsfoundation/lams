@@ -5,7 +5,7 @@
 	<!-- Instructions Row -->
 	<tr>
 		<td>
-			<lams:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}" key="label.authoring.online.instruction" />
+			<lams:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}" key="label.authoring.online.instruction" small="true"/>
 		</td>
 	</tr>
 	<tr>
@@ -58,7 +58,7 @@
 	
 	<tr>
 		<td>
-			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}" key="label.authoring.offline.instruction" alt="true"/>
+			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}" key="label.authoring.offline.instruction" small="true" alt="true"/>
 		</td>
 	</tr>
 	<tr>
