@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.common.util.*;
 */
 class ToolbarModel extends Observable {
     
+	private var _tv:Toolbar;
 	private var __width:Number;
 	private var __height:Number;
 	private var __x:Number;
@@ -41,8 +42,8 @@ class ToolbarModel extends Observable {
 	/**
 	* Constructor.
 	*/
-	public function ToolbarModel (){
-		
+	public function ToolbarModel (tv:Toolbar){
+		_tv = tv;
 	}
     
     /**
@@ -156,4 +157,7 @@ class ToolbarModel extends Observable {
         return __height;
     }    
     
+	public function getToolbar():Toolbar{
+		return _tv;
+	}
 }
