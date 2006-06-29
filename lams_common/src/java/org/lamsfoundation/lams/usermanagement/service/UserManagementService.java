@@ -108,6 +108,7 @@ public class UserManagementService implements IUserManagementService {
 	public void saveAll(Collection objects) {
 		for(Object o:objects){
 			if(o instanceof User){
+				baseDAO.insertOrUpdate((User)o);  // creating a workspace needs a userId
 				o = createWorkspaceForUser((User)o);
 			}
 		}
@@ -385,6 +386,7 @@ public class UserManagementService implements IUserManagementService {
 		if ( workspace.getFolders() == null )
 			workspace.setFolders(new HashSet());
 		workspace.getFolders().add(folder);
+		workspace.setDefaultFolder(folder);
 		user.setWorkspace(workspace);
 		return user;
 	}
