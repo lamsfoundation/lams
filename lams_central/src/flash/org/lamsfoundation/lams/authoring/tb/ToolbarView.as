@@ -45,9 +45,12 @@ class ToolbarView extends AbstractView {
 	private var trans_btn:Button;
 	private var optional_btn:Button;
 	private var gate_btn:Button;
+	private var flow_btn:Button;
+	private var branch_btn:Button;
 	private var group_btn:Button;
 	private var preview_btn:Button;
 	private var bkg_pnl:Panel;
+	private var flow_bkg_pnl:Panel;
 	private var _dictionary:Dictionary;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
@@ -76,11 +79,18 @@ class ToolbarView extends AbstractView {
     public function init(m:Observable, c:Controller) {
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
-		
-		
-        //In one frame call createToolbar this gives components one frame to setup etc.
+		//In one frame call createToolbar this gives components one frame to setup etc.
         MovieClipUtils.doLater(Proxy.create(this,createToolbar));		
     }
+	
+	public function showHideAssets(v:Boolean){
+		trace("Method Called")
+		_toolbar_mc.branch_btn.enabled = false;
+		_toolbar_mc.gate_btn.visible = v;
+		_toolbar_mc.branch_btn.visible = v;
+		_toolbar_mc.flow_bkg_pnl.visible = v;
+		
+	}
     
 	/*
 	* Creates toolbar clip 
@@ -97,8 +107,6 @@ class ToolbarView extends AbstractView {
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
 		
-		
-		
 		_toolbar_mc.new_btn.addEventListener("click",controller);
 		_toolbar_mc.open_btn.addEventListener("click",controller);
 		_toolbar_mc.save_btn.addEventListener("click",controller);
@@ -106,14 +114,14 @@ class ToolbarView extends AbstractView {
 		_toolbar_mc.paste_btn.addEventListener("click",controller);
 		_toolbar_mc.trans_btn.addEventListener("click",controller);
 		_toolbar_mc.optional_btn.addEventListener("click",controller);
+		_toolbar_mc.flow_btn.addEventListener("click",controller);
 		_toolbar_mc.gate_btn.addEventListener("click",controller);
 		_toolbar_mc.group_btn.addEventListener("click",controller);
 		_toolbar_mc.preview_btn.addEventListener("click",controller);
 		
-		
-        Debugger.log('dispatch it',Debugger.GEN,'createToolbar','ToolbarView');
-        
-       //Now that view is setup dispatch loaded event
+		showHideAssets(false);
+		Debugger.log('dispatch it',Debugger.GEN,'createToolbar','ToolbarView');
+        //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
 	}
 	public function setupLabels(){
@@ -126,6 +134,8 @@ class ToolbarView extends AbstractView {
 		_toolbar_mc.trans_btn.label = Dictionary.getValue('trans_btn');
 		_toolbar_mc.optional_btn.label = Dictionary.getValue('optional_btn');
 		_toolbar_mc.gate_btn.label = Dictionary.getValue('gate_btn');
+		_toolbar_mc.branch_btn.gate_btn.label = Dictionary.getValue('branch_btn');
+		_toolbar_mc.flow_btn.gate_btn.label = Dictionary.getValue('flow_btn');
 		_toolbar_mc.group_btn.label = Dictionary.getValue('group_btn');
 		_toolbar_mc.preview_btn.label = Dictionary.getValue('preview_btn');
 			}
@@ -174,7 +184,7 @@ class ToolbarView extends AbstractView {
         var s:Object = tm.getSize();
         //Size panel
 		trace('toolbar view  setting width to '+s.w);
-		bkg_pnl.setSize(s.w,bkg_pnl._width);
+		bkg_pnl.setSize(s.w,bkg_pnl._height);
 	}
 	
     /**
@@ -201,10 +211,14 @@ class ToolbarView extends AbstractView {
 		trans_btn.setStyle('styleName',styleObj);
 		optional_btn.setStyle('styleName',styleObj);
 		gate_btn.setStyle('styleName',styleObj);
+		flow_btn.setStyle('styleName',styleObj);
+		branch_btn.setStyle('styleName',styleObj);
 		group_btn.setStyle('styleName', styleObj);
 		preview_btn.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('FlowPanel');
+		flow_bkg_pnl.setStyle('styleName',styleObj);
 		/*
 		_toolbar_mc.open_btn.addEventListener("click",controller);
 		_toolbar_mc.save_btn.addEventListener("click",controller);
@@ -216,6 +230,16 @@ class ToolbarView extends AbstractView {
 		_toolbar_mc.preview_btn.addEventListener("click",controller);
         */
     }
+	
+	/**
+	 * Overrides method in abstract view to ensure cortect type of controller is returned
+	 * @usage   
+	 * @return  ToolbarController
+	 */
+	public function getController():ToolbarController{
+		var c:Controller = super.getController();
+		return ToolbarController(c);
+	}
     
     /*
     * Returns the default controller for this view.
