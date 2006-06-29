@@ -19,18 +19,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt 
 --%>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <%@ include file="/common/taglibs.jsp"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
-	<style>
+	<style type="text/css">
+	<!--
+	table { 
+		 margin-left:0px; 
+		 text-align:left; 
+		 }
+	
+	td { 
+		padding:0px; 
+		font-size:12px;
+	}
 			a, A:link, a:visited, a:active
 				{color: #0000aa; text-decoration: none; font-family: Tahoma, Verdana; font-size: 15px}
 			A:hover
 				{color: #ff0000; text-decoration: none; font-family: Tahoma, Verdana; font-size: 15px}
-		</style>
+	-->
+	</style>
 	<script language="JavaScript" type="text/JavaScript">
 	        <!--
 	      	parent.contentFrame.location = "<c:url value="/download/?uuid=${cpPackage.fileUuid}&preferDownload=false"/>";
@@ -57,38 +70,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   	  </script>
 	<script language="JavaScript" src="${ctxPath}/includes/javascript/tree.js"></script>
 	<script language="JavaScript" src="${ctxPath}/includes/javascript/tree_tpl.js"></script>
+
 </head>
-
 <body>
-
-	<table width="100%" border="0" cellspacing="3" cellpadding="3" align="center" summary="This table is being used for layout purposes only">
-		<tr>
-			<td>
-
-				<c:choose>
-					<c:when test="${empty cpPackage.organizationXml}">
-						<p class="body">
-							The content package details are missing.
-						</p>
-					</c:when>
-					<c:otherwise>
-						<h2>
-							<c:out value="${cpPackage.title}" />
-						</h2>
-						<c:out value="${cpPackage.description}" escapeXml="false" />
-						<P>
-
-							<script language="JavaScript">
-								<!--//
-									new tree (TREE_ITEMS, TREE_TPL);
-								//-->
-							</script>
-						</div>
-
-					</c:otherwise>
-				</c:choose>
-			</td>
-		</tr>
-	</table>
+	<c:choose>
+		<c:when test="${empty cpPackage.organizationXml}">
+			<p class="body">
+				The content package details are missing.
+			</p>
+		</c:when>
+		<c:otherwise>
+			<h2>
+				<c:out value="${cpPackage.title}" />
+			</h2>
+			<c:out value="${cpPackage.description}" escapeXml="false" />
+			<BR><BR>
+			<script language="JavaScript">
+				<!--//
+					new tree (TREE_ITEMS, TREE_TPL);
+				//-->
+			</script>
+		</c:otherwise>
+	</c:choose>
 </body>
 </html:html>
