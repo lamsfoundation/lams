@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,7 +52,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
@@ -183,23 +183,30 @@ public class UserSaveAction extends Action {
 					user.setUserId(null);
 					service.save(user);
 					log.debug("user: "+user.toString());
-					log.debug("organisation: "+service.findById(Organisation.class,orgId));
-					UserOrganisation uo = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
-					service.save(uo);
-					log.debug("userOrganisation: "+uo);
-					for(int i=0; i<roles.length; i++){    // add new roles set by user
-			        	Integer roleId = Integer.valueOf(roles[i]);
-			            Role role = (Role)service.findById(Role.class,roleId);
-				        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
-				        service.save(uor);
-				        log.debug("role: "+role);
-			        }
-					/*Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
-					UserOrganisationRole uor = new UserOrganisationRole(uo,role);
-					service.save(uor);
-					log.debug("userOrganisationRole: "+uor);*/
 					HashSet uos = new HashSet();
-					uos.add(uo);
+					ArrayList<Integer> orgs = new ArrayList<Integer>();
+					orgs.add(orgId);
+					log.debug("organisation: "+orgId);
+                    // if user is to be added to a class, make user a member of parent course also
+					Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+					if(org.getOrganisationType().getOrganisationTypeId().equals(new Integer(3))){
+						Integer courseOrgId = org.getParentOrganisation().getOrganisationId();
+						orgs.add(courseOrgId);
+						log.debug("organisation: "+courseOrgId);
+					}
+					for(Integer id:orgs){
+						UserOrganisation uo = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,id));
+						uos.add(uo);
+						service.save(uo);
+						log.debug("userOrganisation: "+uo);
+						for(int i=0; i<roles.length; i++){    // add new roles set by user
+				        	Integer roleId = Integer.valueOf(roles[i]);
+				            Role role = (Role)service.findById(Role.class,roleId);
+					        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
+					        service.save(uor);
+					        log.debug("role: "+role);
+				        }
+					}
 					user.setUserOrganisations(uos);
 					//service.save(user);
 				}
