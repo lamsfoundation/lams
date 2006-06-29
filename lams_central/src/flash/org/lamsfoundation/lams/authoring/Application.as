@@ -48,6 +48,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	private static var _controlKeyPressed:String;
 	private static var TOOLBAR_X:Number = 0;
     private static var TOOLBAR_Y:Number = 21;
+	private static var TOOLBAR_HEIGHT:Number = 35;
 
     private static var TOOLKIT_X:Number = 0;
     private static var TOOLKIT_Y:Number = 55;
@@ -72,7 +73,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
     private static var MENU_DEPTH:Number = 25;   //depth of the menu
 	private static var PI_DEPTH:Number = 35;   //depth of the menu
-    
+    private static var TOOLBAR_DEPTH:Number = 50;   //depth of the menu
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
@@ -109,7 +110,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _menu_mc:MovieClip;                    //Menu bar clip
     private var _container_mc:MovieClip;              //Main container
 	private var _pi_mc:MovieClip;
-    
+    private var _toolbarContainer_mc:MovieClip;		//Container for Toolbar
     private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
     private var _UILoaded:Boolean;                     //UI Loading status
     
@@ -390,6 +391,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
+		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
 		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);
 		
 
@@ -397,16 +399,18 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {_x:0,_y:0});
         _menu_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
-        //TOOLBAR
+        
         var depth:Number = _appRoot_mc.getNextHighestDepth();
-        _toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
+		
+		//TOOLBAR
+        _toolbar = new Toolbar(_toolbarContainer_mc,_toolbarContainer_mc.getNextHighestDepth(),TOOLBAR_X,TOOLBAR_Y);
         _toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
-
-        //CANVAS
+		
+		//CANVAS
         _canvas = new Canvas(_appRoot_mc,depth++,CANVAS_X,CANVAS_Y,CANVAS_W,495);
         _canvas.addEventListener('load',Proxy.create(this,UIElementLoaded));
         
-        //WORKSPACE
+		//WORKSPACE
         _workspace = new Workspace();
         //_workspace.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
@@ -462,7 +466,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 			
 			//Toolbar
-			_toolbar.setSize(w,_toolbar.height);
+			_toolbar.setSize(w, TOOLBAR_HEIGHT);
 			
 			//Property Inspector
 			_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
@@ -484,7 +488,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 		_canvas.setSize(w-_toolkit.width,h-(CANVAS_Y+_canvas.model.getPIHeight()));
         //Toolbar
-        _toolbar.setSize(w,_toolbar.height);
+        _toolbar.setSize(w, TOOLBAR_HEIGHT);
 		//Property Inspector
 		_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
 		_pi_mc._y = h - _canvas.model.getPIHeight();
