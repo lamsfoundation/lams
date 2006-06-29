@@ -1,4 +1,4 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -20,18 +20,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.lamsfoundation.lams.tool.mc.McAppConstants"%>
 
     <% 
 		Set tabs = new LinkedHashSet();
@@ -45,14 +41,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		pageContext.setAttribute("tabsBasic", tabsBasic);
 	%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 	<html:html locale="true">
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<lams:headItems/>
 		<title><fmt:message key="activity.title" /></title>
 
 		<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
@@ -172,43 +162,49 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body onLoad="init();">
 
-	<b> <font size=2> <bean:message key="label.authoring.mc"/> </font></b>
-	
-	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
-	<html:hidden property="dispatch" value="submitQuestions"/>
-	<html:hidden property="toolContentID"/>
-	<html:hidden property="currentTab" styleId="currentTab" />
-	
-	<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
-		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-		<!-- end tab buttons -->
-		<div class="tabbody">
-		
-		<!-- tab content 1 (Basic) -->
-		<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
-		<!-- end of content (Basic) -->
-		      
-		<!-- tab content 2 (Advanced) -->
-		<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-		<!-- end of content (Advanced) -->
-		
-		<!-- tab content 3 (Instructions) -->
-		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
-		<!-- end of content (Instructions) -->
-		
-	</c:if> 			
-	
-	<c:if test="${sessionScope.activeModule == 'defineLater' }"> 			
-		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
-		<!-- end tab buttons -->
-		<div class="tabbody">
-		
-		<!-- tab content 1 (Basic) -->
-		<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
-		<!-- end of content (Basic) -->
-	</c:if> 			
+<div id="page">
+	<h1> <bean:message key="label.authoring.mc"/> </h1>
 
-	</html:form>
-	<lams:HTMLEditor/>		
+	<div id="header">	
+		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+			<lams:Tabs collection="${tabs}" useKey="true" control="true"/>		
+		</c:if> 			
+		<c:if test="${sessionScope.activeModule == 'defineLater' }"> 			
+			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
+		</c:if> 			
+	</div>		
+
+	<div id="content">	
+		<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
+		<html:hidden property="dispatch" value="submitQuestions"/>
+		<html:hidden property="toolContentID"/>
+		<html:hidden property="currentTab" styleId="currentTab" />
+		
+		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+			<!-- tab content 1 (Basic) -->
+			<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
+			<!-- end of content (Basic) -->
+			      
+			<!-- tab content 2 (Advanced) -->
+			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+			<!-- end of content (Advanced) -->
+			
+			<!-- tab content 3 (Instructions) -->
+			<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
+			<!-- end of content (Instructions) -->
+		</c:if> 			
+
+		<c:if test="${sessionScope.activeModule == 'defineLater' }"> 			
+			<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
+		</c:if> 			
+		</html:form>				
+	</div>		
+
+
+	<div id="footer"></div>
+		<lams:HTMLEditor />
+	</div>
+
+
 </body>
 </html:html>

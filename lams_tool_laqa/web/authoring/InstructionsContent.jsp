@@ -28,15 +28,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 
-			<table align=center>
+		<table class="forms">
 
           		<tr> 
-					<td NOWRAP  valign=top><font size=2> <b>
-          				<bean:message key="label.onlineInstructions.col" />
-	       				</b> </font>
-          			</td>
-					<td NOWRAP width=700> 
-						<lams:SetEditor id="onlineInstructions" text="${QaAuthoringForm.onlineInstructions}" small="true"/>								
+					<td colspan=2 NOWRAP> 
+						<lams:SetEditor id="onlineInstructions" text="${QaAuthoringForm.onlineInstructions}" small="true" key="label.onlineInstructions.col"/>								
 					</td> 
 				</tr>
 				
@@ -56,13 +52,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				</tr>
 				<tr> 
-					<td NOWRAP  valign=top><font size=2> <b>
-          				<bean:message key="label.offlineInstructions.col" />
-	          			</b>
-    	      			</font>
-          			</td>
-					<td NOWRAP width=700> 
-						<lams:SetEditor id="offlineInstructions" text="${QaAuthoringForm.offlineInstructions}" small="true"/>								
+					<td colspan=2 NOWRAP> 
+						<lams:SetEditor id="offlineInstructions" text="${QaAuthoringForm.offlineInstructions}" small="true" key="label.offlineInstructions.col"/>								
 					</td> 
 				</tr>
 
@@ -81,16 +72,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</html:submit>
 					</td> 
 
-				</tr>          		</table>	  	
-		</td></tr>
-		</table>
-		
-<table align=center>
+				</tr>          		
+			</table>	  	
+	
+	
+<table class="forms">
 <tr><td align=center>
 <logic:present name="attachmentList">
 <bean:size id="count" name="attachmentList" />
 <logic:notEqual name="count" value="0">
-	<h2><font size=2> <bean:message key="label.attachments" /> </font></h2>
+	<h2><font size=2>  </font></h2>
 		<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td>
@@ -127,23 +118,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
 						                   		<bean:message key="link.view" />
 						                    </a>
-						               	</td>
-						                <td>
-              								<font size=2> <b>
+											&nbsp&nbsp
 							            	<html:link page="<%=download%>" styleClass="button">
 							                	<bean:message key="link.download" />
 							                </html:link>
-											</b> </font>				                							                
-						                </td>
-						                <td>
-											<font size=2> <b>						                
+											&nbsp&nbsp
 							            	<html:link page="/authoring.do?dispatch=deleteFile" 
 							                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 							                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 							                         	target="_self" styleClass="button">
 							                	<bean:message key="link.delete" />
 							                </html:link> 
-											</b> </font>				                							                							                
 							            </td>
 						           	</tr>
 					            </table>

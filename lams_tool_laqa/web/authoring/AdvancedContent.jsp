@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-			<table align=center>
+			<table class="forms">
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> <b>

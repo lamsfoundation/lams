@@ -19,23 +19,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
+<%@ include file="/common/taglibs.jsp" %>
 
 	<html:hidden property="responseId"/>	 
 	
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
-				<table class="forms" align="center">
+				<table class="forms">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
 							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
@@ -47,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table class="forms">
 
 				<c:if test="${(requestLearningReport != 'true')}"> 	
 						<tr> 

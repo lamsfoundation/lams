@@ -19,17 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp" %>
 
 	<tr> 
 		<c:if test="${editResponse != 'true'}">	  	 									 			

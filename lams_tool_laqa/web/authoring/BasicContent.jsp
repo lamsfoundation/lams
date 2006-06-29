@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 		           <h2><font size=2> <b> <bean:message key="label.authoring.qa.basic"/> </b></font></h2>
-		        	<table align=center> 	  
+					<table class="forms">
 						<tr>   
 						<td NOWRAP class=error>
 							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
@@ -47,30 +47,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 
 
-					<table align=center> 
+					<table class="forms">
 						<tr> 
-					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="title" text="${activityTitle}" small="true"/>								
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="title" text="${activityTitle}" small="true" key="label.authoring.title.col"/>								
 							</td> 
 							
 					  	</tr>
 
 					  	<tr> 
-					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true"/>								
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
 							</td> 
 						</tr>
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 				 		<tr> 
-						  	<td valign="top"> 
-						 		<font size=2> <b> <bean:message key="label.question1"/>:  </b></font>
-						 	</td>
-
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="questionContent0" text="${sessionScope.defaultQuestionContent}" small="true"/>								
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="questionContent0" text="${sessionScope.defaultQuestionContent}" small="true" key="label.question.col"/>								
 							</td> 
 					  	</tr>
 		
@@ -82,11 +76,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  		<c:if test="${questionEntry.key > 1}"> 			
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
-								  	<td valign="top"> <font size=2> <b> <c:out value="Question ${queIndex}"/>:  </b></font></td>
+									<td colspan=2 NOWRAP valign=top>
 
-									<td NOWRAP valign=top>
-
-										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true"/>								
+										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true" key="label.question.col"/>								
                                 
 	                                	<c:if test="${ (sessionScope.activeModule != 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 

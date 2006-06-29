@@ -19,17 +19,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.lamsfoundation.lams.tool.vote.VoteAppConstants"%>
 
     <% 
 		Set tabs = new LinkedHashSet();
@@ -40,17 +37,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		pageContext.setAttribute("tabs", tabs);
 	%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:headItems/>
+
 	<title> <bean:message key="label.monitoring"/> </title>
+
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script type="text/javascript">
 		var imgRoot="${lams}images/";
@@ -153,29 +146,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 </head>
 <body onLoad="init();">
-	
+
 	<c:if test="${(isPortfolioExport != 'true') }"> 	
-		<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
+		<div id="page">
+			<h1> <bean:message key="label.monitoring"/> </h1>
 	</c:if> 				
-				
-    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-	<html:hidden property="method"/>
-	<html:hidden property="toolContentID"/>
-	<html:hidden property="currentTab" styleId="currentTab" />
+	<c:if test="${(isPortfolioExport == 'true') }"> 	
+		<div id="page">
+			<h1>  </h1>
+	</c:if> 				
 
-	<html:hidden property="responseId"/>	 
-	<html:hidden property="currentUid"/>
-	<html:hidden property="selectedToolSessionId"/>							
-	<input type="hidden" name="isToolSessionChanged"/>	
-
+	<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-		<div class="tabbody">
-		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
-		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
-		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
-	</html:form>
+	</div>	
+
+	<div id="content">						
+	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		<html:hidden property="method"/>
+		<html:hidden property="toolContentID"/>
+		<html:hidden property="currentTab" styleId="currentTab" />
 	
-	<lams:HTMLEditor/>		
+		<html:hidden property="responseId"/>	 
+		<html:hidden property="currentUid"/>
+		<html:hidden property="selectedToolSessionId"/>							
+		<input type="hidden" name="isToolSessionChanged"/>	
+	
+			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+			<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
+			<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
+			<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+		</html:form>
+	</div>	
+
+	<div id="footer"></div>
+		<lams:HTMLEditor />
+	</div>
+	
 </body>
 </html:html>

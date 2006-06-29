@@ -34,13 +34,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table class="forms">
 				<tr> 
-					<td NOWRAP align="right" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.onlineInstructions" /> </b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 valign=top>
-						<lams:SetEditor id="richTextOnlineInstructions" text="${sessionScope.richTextOnlineInstructions}" small="true"/>					
+					<td NOWRAP colspan=4 valign=top>
+						<lams:SetEditor id="richTextOnlineInstructions" text="${sessionScope.richTextOnlineInstructions}" small="true" key="label.onlineInstructions.col"/>					
 					</td> 
 				</tr>
 				
@@ -68,29 +63,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
           			</td>
           			
 					<td NOWRAP colspan=3 align=left valign=top width="100%">
-						<table align="left" border="1">
+						<table align="left" >
 									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
 													<font size=2> <c:out value="${file.filename}"/> </font>
-												</td>
-												<td NOWRAP valign=top>
+													&nbsp&nbsp
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 														 <font size=2>	<bean:message key="label.view"/> </font>
 													</a>
-												</td>
-												<td NOWRAP valign=top>
+													&nbsp
 													<c:set var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 														<font size=2> <bean:message key="label.download"/> </font>
 													</a>
-												</td>
-												<td NOWRAP valign=top> 
+													&nbsp
 													<font size=2> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> </font>	
 												</td>
 											</tr>
@@ -101,13 +93,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				
 				<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.offlineInstructions" />: <b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 valign=top>
-						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true"/>																			
+					<td NOWRAP colspan=4 valign=top>
+						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true" key="label.offlineInstructions.col"/>																			
 					</td> 
 				</tr>
 				
@@ -134,30 +121,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	      			</font>
           			</td>
 					<td NOWRAP colspan=3 align=left valign=top width="100%">
-						<table align="left" border="1">
+						<table align="left">
 									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
 													<font size=2> <c:out value="${file.filename}"/> </font>
-												</td>
-												<td NOWRAP valign=top>
+													&nbsp&nbsp
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 														<font size=2> <bean:message key="label.view"/> </font>
 													</a>
-												</td>
-												<td NOWRAP valign=top>
+													&nbsp
 													<c:set var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 														<font size=2> <bean:message key="label.download"/> </font>
 													</a>
-												</td>
-												<td NOWRAP valign=top> 
-													 <font size=2>	<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> </font>													
+													&nbsp
+												 <font size=2>	<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> </font>													
 												</td>
 											</tr>
 				         			</c:forEach>

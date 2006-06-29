@@ -254,13 +254,14 @@
 	   			
 	   			<fileset dir="${conf.web.dir}">
 						<include name="*"/>
-	   					<include name="author_page/**"/>
 						<include name="authoring/*"/>
-						<include name="learning/*"/>
+						<include name="common/*"/>
+						<include name="css/*"/>	   					   					   				
+						<include name="layout/*"/>
 		   				<include name="export/*"/>
-						<include name="css/*"/>	   					   				
 						<include name="includes/*"/>	   					   				
 		   				<include name="monitoring/*"/>
+						<include name="learning/*"/>	   				
 	   					<include name="images/**"/>
 		   				<include name="css/**"/>
 				</fileset>

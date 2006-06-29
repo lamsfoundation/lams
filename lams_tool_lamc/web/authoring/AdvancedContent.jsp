@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-			<table>
+			<table class="forms">
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> 
@@ -89,39 +89,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</font>
 	      			</td>
 
-				</tr>	      			
-		        
+				</tr>	      	
+			</table>
+
+			<table class="forms">						
 		         <tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-					 		<b>	<bean:message key="label.report.title"/>: </b>
-				 		</font>
-				 	</td>
 	  				<td NOWRAP valign=top>
 		  				<font size=2>
-							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true"/>							
+							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
 						</font>
 					</td> 
 			  	</tr>
 			  	
 			  	<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-					 		<b>	<bean:message key="label.report.endLearningMessage"/>: </b>
-			 			</font>
-			 		</td>
-	  				<td NOWRAP>
+	  				<td NOWRAP valign=top>
 		  				<font size=2>
-							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true"/>														
+							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true" key="label.report.endLearningMessage.col"/>														
 						</font>
 					</td> 
 			  	</tr>
-			  	
-		  		<tr>
- 				 	<td NOWRAP colspan=2 align=center valign=top>								
-						&nbsp&nbsp
-				  	</td>
-				</tr>
 
 			</table>	  	
 		

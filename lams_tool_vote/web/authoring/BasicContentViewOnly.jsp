@@ -29,16 +29,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 	
 				<tr> <td>
-						<table align=center> 
+						<table class="forms">
 							<tr> 
 						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-						 		<td NOWRAP width=700> 
+						 		<td NOWRAP> 
 	                                     <c:out value="${activityTitle}" escapeXml="false"/>
 								</td> 
 						  	</tr>
 						  	<tr> 
 						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-						 		<td NOWRAP width=700> 
+						 		<td NOWRAP> 
 	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
 								</td>
 							</tr>

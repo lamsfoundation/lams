@@ -31,10 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-			<table width="80%" cellspacing="8" align="center" class="forms">
-			<tr>
-				<td>
-				<table align="center">
+			<table class="forms">
 						<tr> 
 							<td NOWRAP align="right" valign=top>
 				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
@@ -80,9 +77,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td> 
 						</tr>
 
-				</table>
-				</td>
-			</tr>
 		</table>
 
 

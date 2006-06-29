@@ -60,9 +60,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	</td>
 					</tr>
 
-					<tr> <td colspan=4 align=center valign=top width="100%">
+					<tr> <td colspan=4 align=center valign=top width="80%">
 					
-					<table align="center" border="1">
+					<table align="center">
 					     <tr>
 							  	<td bgcolor="#A8C7DE" colspan=4 class="input" valign=top align=left>
 							  	 	<font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
@@ -177,24 +177,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 					<tr> 
-						<td NOWRAP class="formlabel" valign=top>
-							<font size=2>
-	    	      				<b> <bean:message key="label.feedback.incorrect" /> <b>
-	    	      			</font>
-	          			</td>
-						<td NOWRAP colspan=3 class="formcontrol" valign=top>
-							<lams:SetEditor id="richTextIncorrectFeedback" text="${sessionScope.richTextIncorrectFeedback}" small="true"/>																						
+						<td NOWRAP colspan=4 class="formcontrol" valign=top>
+							<lams:SetEditor id="richTextIncorrectFeedback" text="${sessionScope.richTextIncorrectFeedback}" small="true" key="label.feedback.incorrect"/>																						
 						</td> 
 					</tr>
 
 					<tr> 
-						<td NOWRAP class="formlabel" valign=top>
-							<font size=2>
-	    	      				<b> <bean:message key="label.feedback.correct" /> <b>
-	    	      			</font>
-	          			</td>
-						<td NOWRAP colspan=3 class="formcontrol" valign=top>
-							<lams:SetEditor id="richTextCorrectFeedback" text="${sessionScope.richTextCorrectFeedback}" small="true"/>																											
+						<td NOWRAP colspan=4 class="formcontrol" valign=top>
+							<lams:SetEditor id="richTextCorrectFeedback" text="${sessionScope.richTextCorrectFeedback}" small="true" key="label.feedback.correct"/>																											
 						</td> 
 					</tr>
 

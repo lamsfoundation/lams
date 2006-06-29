@@ -19,39 +19,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <html:html locale="true">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="activity.title"/> </title>
+
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
+	
+	
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";
 		var themeName="aqua";
 	</script>
-	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
-	<script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
-	
-	<!-- this is the custom CSS for hte tool -->
-	<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
-	<lams:css/>
+
 	<script language="JavaScript" type="text/JavaScript">
 
-		// general submit
-		// actionMethod: name of the method to be called in the DispatchAction
 		function submitMonitoringMethod(actionMethod) 
 		{
 			document.QaMonitoringForm.method.value=actionMethod; 
@@ -69,14 +56,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
 		MM_reloadPage(true);
-		//-->
 	</script>	
 </head>
 <body>
 
+<div id="page">
+
 <c:if test="${ requestLearningReportProgress != 'true'}"> 			
 	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-		<table width="80%" cellspacing="8" align="CENTER">
+     	<table class="forms"> 	  
 			<tr> <th scope="col">
 				 <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> 
 			 </th>
@@ -85,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if> 				    
 
 	<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
-		<table width="80%" cellspacing="8" align="CENTER">
+       	<table class="forms"> 	  
 			<tr> <th scope="col">
 				<bean:message key="label.learning.viewOnly"/>
 			 </th>
@@ -103,7 +91,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<jsp:include page="/monitoring/SummaryContent.jsp" />
 
 				<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
-					<table align=right> 	  
+			       	<table class="forms" align=right> 	  
 							<tr> <td align=right> 
 								<font size=2> <bean:message key="label.learning.forceFinish"/> </font> &nbsp&nbsp
 
@@ -116,7 +104,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if> 			
 
 				<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-					<table align=right> 	  
+			       	<table class="forms" align=right> 	  
 							<tr> <td align=right> 
 								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
 									<bean:message key="button.endLearning"/>
@@ -130,7 +118,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:if> 				    
 
 <c:if test="${ requestLearningReportProgress == 'true'}"> 			
-		<table width="80%" cellspacing="8" align="CENTER">
+       	<table class="forms"> 	  
 			<tr> <th scope="col">
 				<bean:message key="label.learner.progress"/>
 			 </th>

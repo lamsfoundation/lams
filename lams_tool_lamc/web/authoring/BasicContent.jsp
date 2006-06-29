@@ -58,16 +58,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							   (sessionScope.defineLaterInEditMode == 'true') 
 							  }"> 			
  						<tr> 
-					 		<td NOWRAP class="formlabel" valign=top> <b> <font size=2> <bean:message key="label.authoring.title"/>: </font> </b> </td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="richTextTitle" text="${sessionScope.richTextTitle}" small="true"/>								
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="richTextTitle" text="${sessionScope.richTextTitle}" small="true" key="label.authoring.title.col"/>																
 							</td> 
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td NOWRAP class="formlabel" valign=top> <b> <font size=2> <bean:message key="label.authoring.instructions"/>: </font> </b> </td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="richTextInstructions" text="${sessionScope.richTextInstructions}" small="true"/>																
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="richTextInstructions" text="${sessionScope.richTextInstructions}" small="true" key="label.authoring.instructions.col"/>																
 							</td>
 						</tr>
 					</c:if> 										
@@ -96,8 +94,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	</td>
 					</tr>
 				
-					<tr> <td NOWRAP colspan=2 align=center valign=top>
-					<table align="center" border="1" summary="layout and Content" width="55%">
+					<tr> <td NOWRAP colspan=2 align=center valign=top width="45%">
+					<table align="center">
 					     <tr>
 								  	<td NOWRAP bgcolor="#A8C7DE" colspan=5 class="input" valign=top align=left>
 									  	 <font size=2> <b> <bean:message key="label.mc.questions"/> </b> </font>
@@ -248,14 +246,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  }"> 			
 
 						<tr>
-						  	<td NOWRAP class="formlabel" valign=top><b> <font size=2> <bean:message key="radiobox.passmark"/>: </font> </b> </td>
-							<td NOWRAP class="input" valign=top> 
+						  	<td colspan=5 NOWRAP class="formlabel" valign=top><b> <font size=2> <bean:message key="radiobox.passmark"/>: </font> </b> 
 								<font size=2>
 								  <html:text property="passmark"  size="3" maxlength="3"/><bean:message key="label.percent"/>
 								 </font>
 							</td>
-							<td NOWRAP valign=top> </td> 
-							<td NOWRAP valign=top> </td>
 						</tr>
 						
 						<tr>
@@ -275,14 +270,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  }"> 			
 
 						<tr>
-						  	<td NOWRAP class="formlabel" valign=top align=left><b> <bean:message key="radiobox.passmark"/>: </b></td>
-							<td NOWRAP class="input" valign=top align=left> 
+						  	<td NOWRAP colspan=5 class="formlabel" valign=top align=left><b> <font size=2> <bean:message key="radiobox.passmark"/>: </font> </b>
 								<font size=2>
 										<c:out value="${sessionScope.passMark}"/> <bean:message key="label.percent"/>
 								</font>
 							</td>
-							<td NOWRAP valign=top> </td> 
-							<td NOWRAP valign=top> </td>
 						</tr>
 						<tr>
 		 				 	<td NOWRAP colspan=5 align=center valign=top>

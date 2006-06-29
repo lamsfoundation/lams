@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	                                     
 		           <h2><font size=2> <b> <bean:message key="label.authoring.vote.basic"/> </b></font></h2>
-		        	<table align=center> 	  
+					<table class="forms">
 						<tr>   
 						<td NOWRAP class=error>
 							<c:if test="${sbmtSuccess == 'true' }"> 			
@@ -58,36 +58,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 
 
-					<table align=center> 
+					<table class="forms">
 						<tr> 
-					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="title" text="${activityTitle}" small="true"/>								
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="title" text="${activityTitle}" small="true" key="label.authoring.title.col"/>								
 							</td> 
-							
+							<td> </td>
 					  	</tr>
 
 					  	<tr> 
-					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true"/>								
+							<td colspan=2 NOWRAP valign=top>
+								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
 							</td> 
+							<td> </td>							
 						</tr>
 				
 			 		<!--default Option content, this entry can not be deleted but can be updated -->
 				 		<tr> 
-						  	<td valign="top"> 
-						 		<font size=2> <b><bean:message key="label.nomination1"/>:  </b></font>
-						 	</td>
-
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true"/>								
+								<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true" key="label.nomination.col"/>								
 							</td> 
 							
 						  	<td NOWRAP valign=middle>			
 								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> </font>
-							</td> 								 
-							
+							</td> 								
+							<td> </td>														 
 					  	</tr>
 		
 				  	<!--end of default Option content -->
@@ -98,11 +93,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
 								  <tr>
-								  	<td valign="top"> <font size=2> <b> <c:out value="Nomination ${optIndex}"/>:  </b></font></td>
-
 									<td NOWRAP valign=top>
-
-										<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true"/>								
+										<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true" key="label.nomination.col"/>								
 	                                	<c:if test="${ activeModule != 'monitoring' }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  

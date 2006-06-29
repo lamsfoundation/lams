@@ -19,17 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp" %>
 
 		<table class="forms">
 			<tr>
@@ -66,12 +56,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		
 		
-<table align=center>
+<table class="forms"> 	  
 <tr><td align=center>
 <logic:present name="attachmentList">
 <bean:size id="count" name="attachmentList" />
 <logic:notEqual name="count" value="0">
-	<h2><font size=2> <bean:message key="label.attachments" /> </font></h2>
+	<h2><font size=2> </font></h2>
 		<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td>
@@ -108,13 +98,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
 						                   		<bean:message key="link.view" />
 						                    </a>
-						               	</td>
-						                <td>
-              								<font size=2> <b>
+						                    &nbsp&nbsp
 							            	<html:link page="<%=download%>" styleClass="button">
 							                	<bean:message key="link.download" />
 							                </html:link>
-											</b> </font>				                							                
 						                </td>
 						           	</tr>
 					            </table>

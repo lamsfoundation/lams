@@ -326,11 +326,13 @@ public class QaQueContent implements Serializable,Comparable, Nullable
         QaQueContent queContent = (QaQueContent) o;
         
         //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+        /*
         if (uid == null)
         	return 1;
 		else
 			return (int) (uid.longValue() - queContent.uid.longValue());
-        
+			*/
+       return 1;
     }
 
     

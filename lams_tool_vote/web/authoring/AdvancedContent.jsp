@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-			<table>
+				<table class="forms">
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> <b>

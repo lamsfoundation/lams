@@ -1,4 +1,3 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -20,20 +19,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp"%>
 
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.lamsfoundation.lams.tool.mc.McAppConstants"%>
 
     <% 
 		Set tabs = new LinkedHashSet();
@@ -44,15 +37,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		pageContext.setAttribute("tabs", tabs);
 	%>
 
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<lams:headItems/>
 	<title><fmt:message key="activity.title" /></title>
+
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 	
 	 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
@@ -151,19 +141,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%-- chooses which tab to highlight --%>
 
 <body onLoad="init();">
-	<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
+<div id="page">
+	<h1> <bean:message key="label.monitoring"/>  </h1>
 	
 		<c:set var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />
 		</c:set>
 
+	<div id="header">
+		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
+	</div>	
+
+
+	<div id="content">		
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>	 
 		<html:hidden property="currentTab" styleId="currentTab" />
-
-	<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-		<!-- end tab buttons -->
-		<div class="tabbody">
 		
 		<lams:TabBody id="1" titleKey="label.summary" page="Summary.jsp"/>
 
@@ -172,10 +165,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
 		
 		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+ 		</html:form>
+	</div>		
 
+	<div id="footer"></div>
+		<lams:HTMLEditor />
+	</div>
 
-	<lams:HTMLEditor/>			
-	</html:form>
 
 </body>
 </html:html>

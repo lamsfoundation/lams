@@ -235,13 +235,15 @@
 	   			
 	   			<fileset dir="${conf.web.dir}">
 						<include name="*"/>
-	   					<include name="author_page/**"/>
 						<include name="authoring/*"/>
+		   				<include name="css/**"/>	   				
+		   				<include name="export/*"/>
+	  					<include name="images/**"/>
+						<include name="common/*"/>
+						<include name="layout/*"/>
+						<include name="includes/*"/>	   				
 						<include name="learning/*"/>
 		   				<include name="monitoring/*"/>
-		   				<include name="export/*"/>
-	   					<include name="images/**"/>
-		   				<include name="css/**"/>
 				</fileset>
 				<!--
 	   			<fileset dir="${conf.includes.dir}">

@@ -19,21 +19,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp" %>
 
 		<table class="forms">
-			<tr>
-				<td>
-				<table align="center">
 						<tr> 
 							<td NOWRAP align="right" valign=top>
 				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
@@ -51,10 +39,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	 <font size=2> <c:out value="${sessionScope.countSessionComplete}"/></font>
 							</td> 
 						</tr>
-						
-				</table>
-				</td>
-			</tr>
 		</table>
 
 

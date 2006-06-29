@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-				<table align="left">
+				<table class="forms">
 				
 						<c:if test="${statsTabActive != 'true'}"> 							
 							<tr> 
