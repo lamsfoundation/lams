@@ -33,19 +33,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<!--question content goes here-->
 			<tr> <td>
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 			  		<c:if test="${questionEntry.key == sessionScope.currentQuestionIndex}"> 			
 					  <tr>
-					  	<td colspan=2 NOWRAP valign=top> <font size=2> 
+						<td colspan=2 NOWRAP> 
 					  		<b> <bean:message key="label.question"/> 
-						  	<c:out value="${questionEntry.key}" escapeXml="false"/>: </font> </b> 
+						  	<c:out value="${questionEntry.key}" escapeXml="false"/>:  </b> 
 						  	<c:out value="${questionEntry.value}" escapeXml="false"/>
+						</td>
 					  </tr>
 
 					  <tr> 
-				 		<td NOWRAP valign=top> <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
-				 		<td NOWRAP valign=top> 
+						<td NOWRAP>  <b> <bean:message key="label.answer"/> </b> </td>
+						<td NOWRAP>
 				 			<html:text property="answer" size="60" maxlength="255" value="${sessionScope.currentAnswer}"/>
 				 			<html:hidden property="currentQuestionIndex" value="${questionEntry.key}"/>
 				 		</td>
@@ -55,18 +56,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</table>
 
 	<!--question content ends here-->
-
-
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 				<tr>
 				<c:choose>  
 				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
 				  				  (sessionScope.totalQuestionCount !=1) }"> 
-					 <td NOWRAP valign=top align=right> 
+					<td NOWRAP>
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
-					 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+					 		&nbsp&nbsp
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<bean:message key="button.done"/>
 						</html:submit>	 				 		  					
@@ -88,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
-						&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+						&nbsp&nbsp
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 									<bean:message key="button.getNextQuestion"/>
 						</html:submit>	 				 		  					

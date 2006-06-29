@@ -18,22 +18,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ include file="/common/taglibs.jsp"%>
+
 <html:html locale="true">
 <head>
-	<jsp:include page="/learning/learningHeader.jsp" />
+	<title> <bean:message key="label.learning.qa"/> </title>
+
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
+
 	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
@@ -52,9 +49,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 
-			<tr><td NOWRAP valign=top>
+			<tr><td NOWRAP>
 				 <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> 
 			</td></tr>
 
@@ -64,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td></tr>
 
 			<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
-				<tr> <td>
+				<tr> <td NOWRAP>
 					<bean:message key="error.defineLater"/>
 				</td></tr>
 			</c:if> 		
@@ -72,18 +69,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			<c:if test="${sessionScope.isDefineLater == 'false'}"> 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
-					<tr> <td>
+					<tr> <td NOWRAP>
 						<bean:message key="label.learning.forceOfflineMessage"/>
 					</td></tr>
 				</c:if> 		
 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
-					<tr><td NOWRAP valign=top>
+					<tr><td NOWRAP>
 						<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/> 
 					</td></tr>
 		
-					<tr> <td>
-						 <font size=2>	<c:out value="${sessionScope.userFeedback}" escapeXml="true"/> </font>
+					<tr> <td NOWRAP>
+						 <c:out value="${sessionScope.userFeedback}" escapeXml="true"/> 
 					</td></tr>
 				
 					<c:choose> 

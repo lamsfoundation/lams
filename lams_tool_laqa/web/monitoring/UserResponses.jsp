@@ -23,12 +23,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<tr> 
 		<c:if test="${editResponse != 'true'}">	  	 									 			
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> 
+			 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+			 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
+			 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
 
 			<c:if test="${userData.visible != 'true' }"> 			
-                        <font size=2> <i><bean:message key="label.response.hidden"/> </i> </font>											                                
+                         <i><bean:message key="label.response.hidden"/> </i> 
 			</c:if> 								
 	 </td>
 	
@@ -56,12 +56,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<c:if test="${editResponse == 'true'}">	  	
 			<c:if test="${editableResponseId == responseUid}">	  	 									 			
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-				 <td NOWRAP valign=top>  <font size=2> <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> </font> 
+				 <td NOWRAP valign=top>  <c:out value="${userData.userName}"/>   </td>  
+				 <td NOWRAP valign=top>  <c:out value="${userData.attemptTime}"/>  </td>
+				 <td NOWRAP valign=top>  <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 
 
 				<c:if test="${userData.visible != 'true' }"> 			
-	                        <font size=2> <i><bean:message key="label.response.hidden"/> </i> </font>											                                
+	                         <i><bean:message key="label.response.hidden"/> </i> 
 				</c:if> 								
 				 </td>
 		
@@ -88,11 +88,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>
 		
 		<c:if test="${editableResponseId != responseUid}">	  	 									 			
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> 
+				 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+				 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+				 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
 					<c:if test="${userData.visible != 'true' }"> 			
-		                        <font size=2> <i><bean:message key="label.response.hidden"/> </i> </font>											                                
+		                         <i><bean:message key="label.response.hidden"/> </i> 
 					</c:if> 								
 				 </td>
 		

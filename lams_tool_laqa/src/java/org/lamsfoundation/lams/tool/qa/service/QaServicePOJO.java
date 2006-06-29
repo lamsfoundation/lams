@@ -952,19 +952,23 @@ public class QaServicePOJO
 	public boolean studentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException
 	{
 	    logger.debug("doing studentActivityOccurredGlobal : " + qaContent);
-        Iterator questionIterator=qaContent.getQaQueContents().iterator();
-        while (questionIterator.hasNext())
-        {
-        	QaQueContent qaQueContent=(QaQueContent)questionIterator.next(); 
-        	logger.debug("iterated question : " + qaQueContent);
-        	Iterator responsesIterator=qaQueContent.getQaUsrResps().iterator();
-        	while (responsesIterator.hasNext())
-        	{
-        		logger.debug("there is at least one response");
-        		return true;
-        	}
-        } 
-        logger.debug("there is no response for this content");
+	    
+	    if (qaContent != null)
+	    {
+	        Iterator questionIterator=qaContent.getQaQueContents().iterator();
+	        while (questionIterator.hasNext())
+	        {
+	        	QaQueContent qaQueContent=(QaQueContent)questionIterator.next(); 
+	        	logger.debug("iterated question : " + qaQueContent);
+	        	Iterator responsesIterator=qaQueContent.getQaUsrResps().iterator();
+	        	while (responsesIterator.hasNext())
+	        	{
+	        		logger.debug("there is at least one response");
+	        		return true;
+	        	}
+	        } 
+	        logger.debug("there is no response for this content");
+	    }
 		return false;
 	}
 	

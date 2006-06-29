@@ -23,20 +23,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<table class="forms">
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
+							<td NOWRAP valign=top>
+				  				<b> <bean:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	 <font size=2> <c:out value="${sessionScope.countAllUsers}"/>
+							  	  <c:out value="${sessionScope.countAllUsers}"/>
 							</td> 
 						</tr>
 						
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.finished.user" /> </font></b>
+							<td NOWRAP valign=top>
+				  				<b>  <bean:message key="count.finished.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	 <font size=2> <c:out value="${sessionScope.countSessionComplete}"/></font>
+							  	 <c:out value="${sessionScope.countSessionComplete}"/>
 							</td> 
 						</tr>
 		</table>

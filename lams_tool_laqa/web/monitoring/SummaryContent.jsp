@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+							<b> <bean:message key="error.noLearnerActivity"/> </b>
 						</td> 
 					<tr>
 				</table>
@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<c:if test="${(requestLearningReport != 'true')}"> 	
 						<tr> 
-							<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+							<td NOWRAP class="formlabel" valign=top align=center> <b> <bean:message key="label.selectGroup"/> </b>
 									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 									<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
 										<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
@@ -68,7 +68,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:forEach>		  	
 									</c:forEach>		  	
 									</select>
-								</font>
 							</td> 
 						<tr>
 					</c:if>			
@@ -79,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question"/> : </b> </font>
+							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -88,9 +87,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<td NOWRAP class="formlabel" valign=top>
 								<table align=center>
 									<tr> 
-										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.response"/> </font> 	</b></td>
+										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
 						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">

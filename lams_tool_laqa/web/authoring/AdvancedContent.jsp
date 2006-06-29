@@ -28,15 +28,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+		<td class="field-name">							
 			<table class="forms">
 				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> <b>
+					<td class="field-name">							
+		      			 <b>
 			      			<bean:message key="radiobox.synchInMonitor"/>:
-			      		</b> </font>
+			      		</b> 
 					</td>
-					<td NOWRAP valign=top>
-						<font size=2>
+					<td>							
 						<html:radio property="synchInMonitor" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -44,18 +44,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:radio property="synchInMonitor" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-						</font>						
 	      			</td>
 		         </tr>
 		         
 				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> <b>
+					<td class="field-name">							
+						 <b>
 			      			<bean:message key="radiobox.usernameVisible"/>:
-			      		</b> </font>		      			
+			      		</b> 
 					</td>
-					<td NOWRAP valign=top>
-						<font size=2>
+					<td>							
 						<html:radio property="usernameVisible" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -63,18 +61,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:radio property="usernameVisible" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-						</font>												
 	      			</td>
 		         </tr>
 		         
    				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> <b>
+					<td class="field-name">							
+		      			 <b>
 			      			<bean:message key="radiobox.questionsSequenced"/>:
-			      		</b> </font>		      			
+			      		</b> 
 					</td>
-					<td NOWRAP valign=top>
-					<font size=2>
+					<td>							
 						<html:radio property="questionsSequenced" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -82,45 +78,38 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:radio property="questionsSequenced" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-					</font>												
 	      			</td>
 		        </tr>
 		         
 		         <tr> 
-	      			<td NOWRAP class="formlabel" valign=top>
-	      			<font size=2> <b>
+					<td class="field-name">							
+					<b>
 				 		<bean:message key="label.report.title"/>: 
-		      		</b> </font>		      							 		
-				 		</td>
-					<td NOWRAP valign=top>
-						<font size=2>
+		      		</b> 
+			 		</td>
+					<td>							
 			 			<html:text property="reportTitle" size="60" maxlength="100"/>
-						</font>									 			
 			 		</td>
 			  	</tr>
 			  	
 			  	<tr> 
-	      			<td NOWRAP class="formlabel" valign=top>
-	      			<font size=2> <b>
+					<td class="field-name">							
+					 <b>
 				 		<bean:message key="label.monitoringReport.title"/>: </td>
-		      		</b> </font>		      							 					 		
-					<td NOWRAP valign=top>
-					<font size=2>
+		      		</b> 
+					<td>							
 			 			<html:text property="monitoringReportTitle" size="60" maxlength="100"/>
-					</font>									 			
 			 		</td>
 			  	</tr>
 			  	
 			  	<tr> 
-	      			<td NOWRAP class="formlabel" valign=top>
-	      			<font size=2> <b>	      			
+					<td class="field-name">							
+					 <b>	      			
 				 		<bean:message key="label.report.endLearningMessage"/>: 
-		      		</b> </font> </td>
-				 		
-					<td NOWRAP valign=top>
-					<font size=2>
+		      		</b>  
+		      		</td>
+					<td>							
 			 			<html:text property="endLearningMessage" size="60" maxlength="100"/>
-					</font>									 			
 			 		</td>
 			  	</tr>
 			</table>	  	

@@ -18,22 +18,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<jsp:include page="/learning/learningHeader.jsp" />
+	<title> <bean:message key="label.learning.qa"/> </title>
+
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
@@ -52,14 +47,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
 
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table class="forms">
 				  <tr><th scope="col">
 					  	 <bean:message key="label.learning.reportMessage"/> 
 		    	  	</th>
 				  </tr>
 
 					<tr>
-						<td NOWRAP align=right class="input" valign=top colspan=2> 
+						<td NOWRAP colspan=2>
 							<hr>
 						</td> 
 					</tr>
@@ -69,7 +64,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table align="left">
 							<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 									  <tr>
-									  	<td colspan=2 NOWRAP valign=top> <font size=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  </font> 
+										<td colspan=2 NOWRAP>
+										<b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  
 									  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 									  	 </td>
 									  </tr>
@@ -77,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  			  		<c:forEach var="answerEntry" items="${sessionScope.mapAnswers}">
 										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
 										  <tr>
-  										  	<td colspan=2 NOWRAP align=left  valign=top> <font size=2> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  </font> 
+											<td colspan=2 NOWRAP> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  
 												  <c:out value="${answerEntry.value}" escapeXml="false" />						  																	
 										  	</td>
 										  </tr>
@@ -85,7 +81,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:forEach>
 									
 									  <tr>
-									  	<td colspan=2 NOWRAP valign=top> 
+										<td colspan=2 NOWRAP >
 											&nbsp&nbsp
 									  	 </td>
 									  </tr>
@@ -95,25 +91,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td></tr>
 					
 			  	   	<tr> 
-				 		<td NOWRAP colspan=2 class="input" valign=top> 
+						<td colspan=2 NOWRAP>
 				 		&nbsp
 				 		</td>
 			  	   </tr>
 
-			  	   
-		  	   		  <tr>
-					  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
-						  	<font size=2>
-
-                                <html:submit property="viewAllResults" 
+	  	   		  <tr>
+						<td colspan=2 NOWRAP >
+			                                <html:submit property="viewAllResults" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('viewAllResults');">
                                     <bean:message key="label.allResponses"/>
                                 </html:submit>
-							</font>
 					  	 </td>
-					  </tr>
-					
+				  </tr>
+				
 				</table>
 	</html:form>
 	

@@ -28,34 +28,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-	
-				<tr> <td>
-						<table align=center> 
+						<table class="forms">
 							<tr> 
-						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-						 		<td NOWRAP width=700> 
-	 				      			<font size=2> 
+	 							<td class="field-name"> <b> <bean:message key="label.authoring.title"/>: </b> </td>
+						 		<td NOWRAP> 
 	                                     <c:out value="${activityTitle}" escapeXml="false"/>
-	    							</font>
 								</td> 
 						  	</tr>
 						  	<tr> 
-						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-						 		<td NOWRAP width=700> 
-					      			<font size=2> 
+	 							<td class="field-name"> <b> <bean:message key="label.authoring.instructions"/>:  </b></td>
+						 		<td NOWRAP> 
 	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
-	    							</font>									
 								</td>
 							</tr>
 					
 					 		<tr> 
-							  	<td valign="top"> 
-							 		<font size=2> <b> <bean:message key="label.question1"/>:  </b></font>
+	 							<td class="field-name">
+									 <b> <bean:message key="label.question1"/>:  </b>
 							 	</td>
 							  	<td>
-					      			<font size=2> 
 										<c:out value="${sessionScope.defaultQuestionContent}"  escapeXml="false"/>
-									</font>																		
 							  	</td>
 						  	</tr>
 	
@@ -65,11 +57,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  		<c:if test="${questionEntry.key > 1}"> 			
 									<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 									  <tr>
-									  	<td valign="top"> <font size=2> <b> <c:out value="Question ${queIndex}"/>:  </b></font></td>
+			 							<td class="field-name"> <b> <c:out value="Question ${queIndex}"/>:  </b></td>
 									  	<td>
-							      			<font size=2> 								  	
 												<c:out value="${questionEntry.value}" escapeXml="false"/>                         
-											</font>																													       
 	                                    </td>
 									  </tr>
 								</c:if> 			
@@ -78,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<html:hidden property="questionIndex"/>
 				
 						<tr>
-							<td colspan=2>			
+							<td colspan=2 align=right>			
 				   				<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="button">
 									<bean:message key="label.edit"/>
 								</html:submit>	 				 		  					
@@ -86,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 						</table>
-				</td></tr>			
+
 
 
 

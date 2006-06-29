@@ -23,34 +23,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<table class="forms">
 			<tr>
-				<td>
-					<table align="center">
+				<td NOWRAP valign=top>
+	  				<b>  <bean:message key="label.onlineInstructions.col" /> </b>
+	  			</td>
+				<td NOWRAP valign=top>
+					  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	
+				</td> 
+			</tr>
+		
+			<tr>
+				<td colspan=2> &nbsp </td>
+			</tr>
 
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b> <font size=2> <bean:message key="label.onlineInstructions.col" /> </font></b>
-				  			</td>
-							<td NOWRAP valign=top>
-								  <font size=2> <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	</font>					  
-							</td> 
-						</tr>
-					
-						<tr>
-							<td colspan=2> &nbsp&nbsp&nbsp </td>
-						</tr>
-
-					
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b> <font size=2> <bean:message key="label.offlineInstructions.col" /> </font> </b>
-				  			</td>
-							<td NOWRAP valign=top>
-								  <font size=2> <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	</font>					  
-							</td> 
-						</tr>
-				
-					</table>
-				</td>
+		
+			<tr> 
+				<td NOWRAP valign=top>
+	  				<b>  <bean:message key="label.offlineInstructions.col" />  </b>
+	  			</td>
+				<td NOWRAP valign=top>
+					  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	
+				</td> 
 			</tr>
 		</table>
 
@@ -61,14 +53,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <logic:present name="attachmentList">
 <bean:size id="count" name="attachmentList" />
 <logic:notEqual name="count" value="0">
-	<h2><font size=2> </font></h2>
+
 		<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td>
 					<table width="70%" align="left">
 		            <tr>
-		                <td NOWRAP  valign=top><font size=2> <b><bean:message key="label.filename" /> </b> </font> </td>
-		                <td NOWRAP  valign=top><font size=2> <b> <bean:message key="label.type" /></b> </font> </td>
+		                <td NOWRAP  valign=top> <b><bean:message key="label.filename" /> </b>  </td>
+		                <td NOWRAP  valign=top> <b> <bean:message key="label.type" /></b>  </td>
 		            	<td>&nbsp;</td>
 		            </tr>
 		            <logic:iterate name="attachmentList" id="attachment">
@@ -77,10 +69,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                         <bean:define id="uuid" name="attachment" property="uuid" />
                         
                         <tr>
-			                         	
-			            	<td><font size=2>  <bean:write name="attachment" property="fileName"/> </font> </td>
+			            	<td>  <bean:write name="attachment" property="fileName"/>  </td>
 			                <td>
-								<font size=2> 
 			                	<c:choose>
 					            	<c:when test="${attachment.fileOnline}" >
 					                	<bean:message key="instructions.type.online" />
@@ -89,7 +79,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					                	<bean:message key="instructions.type.offline" />
 					                </c:otherwise>
 				                </c:choose>
-								 </font>				                
 				            </td>
 				            <td>
 					        	<table>

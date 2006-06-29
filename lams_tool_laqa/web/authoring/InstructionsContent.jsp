@@ -37,9 +37,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 				
 				<tr> 
-						<td NOWRAP  valign=top><font size=2> <b>
+					<td class="field-name"> <b>
 	          				<bean:message key="label.onlineFiles" />
-          				</b> </font>
+          				</b> 
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
@@ -58,10 +58,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 
 				<tr> 
-					<td NOWRAP  valign=top><font size=2> <b>
+					<td class="field-name"> <b>
           				<bean:message key="label.offlineFiles" />
 	          			</b>
-    	      			</font> 
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
@@ -71,7 +70,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
-
 				</tr>          		
 			</table>	  	
 	
@@ -81,14 +79,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <logic:present name="attachmentList">
 <bean:size id="count" name="attachmentList" />
 <logic:notEqual name="count" value="0">
-	<h2><font size=2>  </font></h2>
 		<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td>
 					<table width="70%" align="left">
 		            <tr>
-		                <td NOWRAP  valign=top><font size=2> <b><bean:message key="label.filename" /> </b> </font> </td>
-		                <td NOWRAP  valign=top><font size=2> <b> <bean:message key="label.type" /></b> </font> </td>
+		                <td NOWRAP  valign=top> <b><bean:message key="label.filename" /> </b>  </td>
+		                <td NOWRAP  valign=top> <b> <bean:message key="label.type" /></b> </td>
 		            	<td>&nbsp;</td>
 		            </tr>
 		            <logic:iterate name="attachmentList" id="attachment">
@@ -98,9 +95,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                         
                         <tr>
 			                         	
-			            	<td><font size=2>  <bean:write name="attachment" property="fileName"/> </font> </td>
+			            	<td> <bean:write name="attachment" property="fileName"/>  </td>
 			                <td>
-								<font size=2> 
 			                	<c:choose>
 					            	<c:when test="${attachment.fileOnline}" >
 					                	<bean:message key="instructions.type.online" />
@@ -109,7 +105,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					                	<bean:message key="instructions.type.offline" />
 					                </c:otherwise>
 				                </c:choose>
-								 </font>				                
 				            </td>
 				            <td>
 					        	<table>

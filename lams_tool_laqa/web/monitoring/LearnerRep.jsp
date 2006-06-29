@@ -93,7 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
 			       	<table class="forms" align=right> 	  
 							<tr> <td align=right> 
-								<font size=2> <bean:message key="label.learning.forceFinish"/> </font> &nbsp&nbsp
+								 <bean:message key="label.learning.forceFinish"/> &nbsp&nbsp
 
 								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
 									<bean:message key="button.endLearning"/>

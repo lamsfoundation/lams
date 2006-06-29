@@ -32,16 +32,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 			<tr> <td>
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 						  <tr>
-						  	<td colspan=2 NOWRAP valign=top> <font size=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  </font> 
+						  	<td colspan=2 NOWRAP> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  
 						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 						  	 </td>
 						  </tr>
 						  <tr> 
-					 		<td NOWRAP valign=top > <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
-					 		<td  NOWRAP valign=top>
+					 		<td NOWRAP> <b> <bean:message key="label.answer"/> </b> </td>
+							<td NOWRAP>
 					 			<input type="text" name="answer<c:out value="${questionEntry.key}"  escapeXml="false"/>" size="60" maxlength="255" value=""/> 
 					 		</td>
 					  	  </tr>
@@ -49,9 +49,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:forEach>
 			</table>
 			
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 			<tr>
-				 <td align=right> 
+				 <td align=left> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 							<bean:message key="button.submitAllContent"/>
 						</html:submit>	 				 		  					
