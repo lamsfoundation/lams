@@ -59,7 +59,7 @@
 		<!-- Instructions Row -->
 		<tr>
 			<td colspan="2">
-				<lams:SetEditor id="Resource.onlineInstructions" text="${formBean.resource.onlineInstructions}" key="label.authoring.online.instruction" />
+				<lams:SetEditor id="Resource.onlineInstructions" small="true" text="${formBean.resource.onlineInstructions}" key="label.authoring.online.instruction" />
 			</td>
 		</tr>
 		<tr>
@@ -71,10 +71,10 @@
 			</td>
 		</tr>
 		<tr>
-			<td nowrap="nowrap">
+			<td nowrap="nowrap" class="field-name">
 				<fmt:message key="label.authoring.online.file" />:
 			</td>
-			<td class="formcontrol">
+			<td>
 				<html:file property="onlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
@@ -86,7 +86,7 @@
 		<!-- Offline Instructions -->
 		<tr>
 			<td colspan="2">
-			<lams:SetEditor id="Resource.offlineInstructions" text="${formBean.resource.offlineInstructions}" key="label.authoring.offline.instruction"/>
+			<lams:SetEditor id="Resource.offlineInstructions" small="true"  text="${formBean.resource.offlineInstructions}" key="label.authoring.offline.instruction"/>
 			</td>
 		</tr>
 		<tr>
@@ -98,7 +98,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td nowrap="nowrap" valign="top">
+			<td nowrap="nowrap" valign="top" class="field-name">
 				<fmt:message key="label.authoring.offline.file" />:
 			</td>
 			<td valign="top">
