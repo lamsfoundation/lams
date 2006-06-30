@@ -147,20 +147,17 @@ class Lesson {
 	}
 	
 	public function exitLesson():Boolean {
-		var callback:Function = Proxy.create(this,closeLesson);
-		
-		// call action
-		var lessonId:Number = lessonModel.ID;
-		
-		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(lessonId), callback, false);
+		getURL('javascript:top.window.close();');
 		
 		return true;
 	}
 	
 	public function exportLesson(){
 		// do export call
-		getURL(_root.serverURL + 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+String(lessonModel.ID), "_blank");
+		var exp_url:String = _root.serverURL + 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+String(lessonModel.ID);
+		
+		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolioLearner', 300, 400, true, true, false, false, false);
+	
 	}
 	
 	private function storeLessonData(dto:Object){
@@ -274,7 +271,8 @@ class Lesson {
 	private function popupActivity(url:Object){
 		Debugger.log('loading activity (popup window) : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
 
-		getURL(url.activityURL,"_blank");
+		JsPopup.getInstance().launchPopupWindow(url.activityURL, 'LearnerActivity', 600, 800, true, true, true, false, false);
+	
 	}
 	
 	/**
