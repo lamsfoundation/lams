@@ -32,9 +32,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-			<table>
+			<table class="forms">
 				<tr>
-	  				<td NOWRAP valign=top>
+					<td class="field-name">							
 			      			<b> <bean:message key="radiobox.sln"/>: </b>
 					</td>
 					<td NOWRAP valign=top>
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         </tr>
 		         
    				<tr>
-	  				<td NOWRAP valign=top>
+					<td class="field-name">							
 			      			<b> <bean:message key="radiobox.onepq"/>: </b>
 					</td>
 					<td NOWRAP valign=top>
@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		        </tr>
 		         
 		         <tr>
-	  				<td NOWRAP valign=top>
+					<td class="field-name">							
 			      			<b> <bean:message key="radiobox.retries"/>: </b>
 					</td>
 					<td NOWRAP valign=top>
@@ -78,18 +78,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	      			</td>
 
 				</tr>	    
-			</table>	  	  	
-			
-			<table>
 
 		         <tr> 
-	  				<td NOWRAP valign=top>
+	  				<td colspan=2 NOWRAP valign=top>
 							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
 					</td> 
 			  	</tr>
 			  	
 			  	<tr> 
-	  				<td NOWRAP valign=top>
+	  				<td colspan=2 NOWRAP valign=top>
 							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true" key="label.report.endLearningMessage.col"/>														
 					</td> 
 			  	</tr>

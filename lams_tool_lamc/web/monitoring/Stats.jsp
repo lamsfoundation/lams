@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<table class="forms">
 						<tr> 
-							<td NOWRAP valign=top>
+							<td class="field-name">							
 				  				<b>  <bean:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td class="field-name">							
 				  				<b> <bean:message key="count.finished.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 					
 						<tr> 
-						<td NOWRAP valign=top>
+							<td class="field-name">							
 				  				<b>  <bean:message key="label.topMark" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
@@ -60,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td class="field-name">							
 				  				<b> <bean:message key="label.avMark" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
@@ -69,7 +69,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td class="field-name">							
 				  				<b>  <bean:message key="label.loMark" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>

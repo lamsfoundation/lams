@@ -28,10 +28,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 
+
 		<table class="forms">
           		<tr> 
 					<td NOWRAP colspan=2 valign=top>
-						<c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" />						
+                   		<bean:message key="label.onlineInstructions.col" />	<c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" />						
 					</td> 
 				</tr>
 				
@@ -96,7 +97,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td colspan=2 NOWRAP> 
-						<c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" />												
+                   		<bean:message key="label.offlineInstructions.col" />	<c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" />												
 					</td> 
 				</tr>
 
