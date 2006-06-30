@@ -114,16 +114,14 @@ function doConfirm(arg){
 }
 
 function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
-	if(thePopUp && thePopUp.open && !thePopUp.closed){
-			thePopUp.focus();
+	// refocus code commented out as we want to replace contents due to tool's session issues. Code will be 
+	// wanted again the future.
+	//if(thePopUp && thePopUp.open && !thePopUp.closed){
+	//		thePopUp.focus();
 			
-	}else{
-		//mozilla seems to want a full url
-		
-		//var args = getHostURL()+args;
+	//}else{
 		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
-		//thePopUp = window.open(args,"learnerPop","HEIGHT=450,WIDTH=550,resizable,scrollbars");
-	}
+	//}
 }
 
 
