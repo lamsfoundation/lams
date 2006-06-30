@@ -1,6 +1,6 @@
 <global-exceptions>
   <exception
-    handler="org.apache.struts.action.ExceptionHandler"
+    handler="org.lamsfoundation.lams.admin.web.StrutsExceptionHandler"
     key="error.system"
     path=".error"
     scope="request"
