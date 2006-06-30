@@ -31,10 +31,10 @@ function createElem(name, attrs, style, text) {
     var e = document.createElement(name);
     if (attrs) {
         for (key in attrs) {
-            if (key == "class") {
+            if (key == "attrClass") {
                 e.className = attrs[key];
             } else {
-                if (key == "id") {
+                if (key == "attrId") {
                     e.id = attrs[key];
                 } else {
                     e.setAttribute(key, attrs[key]);
@@ -51,6 +51,7 @@ function createElem(name, attrs, style, text) {
         e.appendChild(document.createTextNode(text));
     }
     return e;
+
 }
 
 // Roster 
@@ -112,12 +113,13 @@ function updateSendDisplay() {
     }
 }
 function generateMessageHTML(nick, message, type) {
-	var colour = getColour(nick);
-    var fromElem = createElem("span", {class: "messageFrom"}, {color: colour}, nick)
-    var msgElem = createElem("div", {class: 'message ' + type}, {color: colour}, null);
+    var colour = getColour(nick);
+    var fromElem = createElem("span", {attrClass: "messageFrom"}, {color: colour}, nick);
+    var msgElem = createElem("div", {attrClass: "message " + type}, {color: colour}, null);
+
     msgElem.innerHTML = message;
-    msgElem.insertBefore(document.createElement("br"), msgElem.firstChild);
-	msgElem.insertBefore(fromElem, msgElem.firstChild);
+    msgElem.insertBefore(document.createElement("br"), msgElem.firstChild );
+    msgElem.insertBefore(fromElem, msgElem.firstChild);
 
     return msgElem;
 }
