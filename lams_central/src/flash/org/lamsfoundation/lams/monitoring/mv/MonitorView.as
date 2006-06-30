@@ -201,7 +201,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_learnerTabLayer_mc = _monitor_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		
-		var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}, {label:Dictionary.getValue('mtab_todo'), data:"todo"}];
+		//var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}, {label:Dictionary.getValue('mtab_todo'), data:"todo"}];
+		
+		var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}];
 		
 		monitorTabs_tb.dataProvider = tab_arr;
 		monitorTabs_tb.selectedIndex = 0;
@@ -245,18 +247,20 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
 		// Inititialsation for Todo Tab View 
-		todoTabView_mc = _todoTabLayer_mc.attachMovie("TodoTabView", "todoTabView_mc",DepthManager.kTop)
+		/*todoTabView_mc = _todoTabLayer_mc.attachMovie("TodoTabView", "todoTabView_mc",DepthManager.kTop)
 		todoTabView_mc._visible = false;
 		todoTabView = TodoTabView(todoTabView_mc);
 		todoTabView.init(mm, undefined);
 		todoTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
 		//Observers for All the Tab Views
-		
+		mm.addObserver(todoTabView);
+		*/
 		mm.addObserver(lessonTabView);
 		mm.addObserver(monitorTabView);
 		mm.addObserver(learnerTabView);
-		mm.addObserver(todoTabView);
+		
+		
 		
 	}
 
