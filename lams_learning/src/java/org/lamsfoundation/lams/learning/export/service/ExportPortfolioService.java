@@ -191,7 +191,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		    		
 		    		if ( portfolios.size() >= 0 ) {
 			    		exports = doExport(portfolios, cookies,lesson);	 
-			    		
+			    		exports.setLearnerName(learner.getFirstName()+" "+learner.getLastName()+" ("+learner.getLogin()+")");
 		    		} else {
 				        log.error("The learner has not completed or attempted any activities");
 		    		}
@@ -270,6 +270,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		portfolio.setExportTmpDir(tempDirectoryName);
 		portfolio.setLessonName(lesson.getLessonName());
 		portfolio.setLessonDescription(lesson.getLessonDescription());
+		portfolio.setLessonStartDate(lesson.getStartDateTime());
 		
 		processPortfolios(portfolios, cookies, tempDirectoryName);
 		portfolio.setActivityPortfolios((ActivityPortfolio[])portfolios.toArray(new ActivityPortfolio[portfolios.size()]));

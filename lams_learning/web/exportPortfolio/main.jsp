@@ -34,7 +34,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title><c:out value="${portfolio.lessonName}"/></title>
     <fmt:setBundle basename = "org.lamsfoundation.lams.learning.ApplicationResources" />
-	<lams:css/>
+
+	<%--  can't use the normal "lams:css localLink=true" as that points to ../default.css --%>
+	<link href="aqua.css" rel="stylesheet" type="text/css">
+	<link href="default.css" rel="stylesheet" type="text/css">
+	<!--[if IE]>
+	<style type="text/css">
+	@import url(<link href="ie-styles.css" rel="stylesheet" type="text/css">);
+	</style>
+	<![endif]-->
+
 </head>
 
 <body>
@@ -44,28 +53,49 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</h1>
 		<div id="header-no-tabs"></div>
 		<div id="content">
-
-		<p><c:out value="${portfolio.lessonDescription}"/></p>
-
-		<c:if test="${empty portfolio.activityPortfolios}">
-			<fmt:message key="export.portfolio.noneAttempted.message"/>
+		
+		<c:choose>
+			<c:when test="${not empty portfolio.learnerName}">
+				<H2><fmt:message key="export.portfolio.for.user.heading"/> <c:out value="${portfolio.learnerName}"/></H2>
+			</c:when>
+			<c:otherwise>
+				<H2><fmt:message key="export.portfolio.for.class.heading"/> <c:out value="${portfolio.learnerName}"/></H2>
+			</c:otherwise>
+		</c:choose>
+			
+		<p>&nbsp;</p>
+		
+		<c:if test="${not empty portfolio.lessonDescription}">
+			<p><c:out value="${portfolio.lessonDescription}"/></p>
 		</c:if>
 
-		<c:forEach var="actport" items="${portfolio.activityPortfolios}" varStatus="status">
-			<c:if test="${status.first}">
-				<UL>
-			</c:if>
+		<p><fmt:message key="export.portfolio.lesson.started.date.label"/> 
+			<fmt:formatDate value="${portfolio.lessonStartDate}" type="both" timeStyle="long"/></p>
 
-			<lams:ExportPortOutput actport="${actport}"/>
-			<c:if test="${status.last}">
-				</UL>
-			</c:if>
-		</c:forEach>
+		<p><fmt:message key="export.portfolio.generated.date.label"/> 
+			<fmt:formatDate value="${portfolio.portfolioCreatedDate}" type="both" timeStyle="long"/></p>
+
+		<c:if test="${empty portfolio.activityPortfolios}">
+			<p><fmt:message key="export.portfolio.noneAttempted.message"/></p>
+		</c:if>
+	
+		<div align="left" width="90">
+			<c:forEach var="actport" items="${portfolio.activityPortfolios}" varStatus="status">
+				<c:if test="${status.first}">
+					<UL>
+				</c:if>
+	
+				<lams:ExportPortOutput actport="${actport}"/>
+				<c:if test="${status.last}">
+					</UL>
+				</c:if>
+			</c:forEach>
+		</div>
 
 		</div>
 		<div id="footer"></div>
 	</div>
 
-<</body>
+</body>
 	
 </html:html>

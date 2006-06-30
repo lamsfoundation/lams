@@ -91,18 +91,18 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 						window.location.href = url;
 						break;
 					case 404: //status 404 Not Found
-						msg = "<fmt:message key='error.message.404' />";
+						msg = "<fmt:message key='error.message.404' />.";
 						alert(msg);
 						break;
 					case 500: //status 500 Internal Server Error
-						msg = "<fmt:message key='error.system.learner'><fmt:param>Status 500</fmt:param></fmt:message>";
+						msg = "<p><fmt:message key='error.system.learner'><fmt:param>Status 500</fmt:param></fmt:message></p>";
 						document.getElementById("message").innerHTML = msg;
 						break;
 				}
 				
 				
 			}else{
-				document.getElementById("message").innerHTML = "Loading ... "+updateindicator;
+				document.getElementById("message").innerHTML = "<p>Loading ...</p>"+updateindicator;
 				
 				
 			}

@@ -153,6 +153,8 @@ public class MainExportServlet extends HttpServlet {
 	
 	private void bundleStylesheetWithExportPackage(String directory, HttpServletRequest request, Cookie[] cookies) throws IOException
 	{
+		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+
 		List themeList = CSSThemeUtil.getAllUserThemes();
 		
 		Iterator i = themeList.iterator();
@@ -161,10 +163,14 @@ public class MainExportServlet extends HttpServlet {
 		{
 			String theme = (String)i.next();
 			
-			String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 			String url = basePath + "/lams/css/" + theme + ".css";
 			HttpUrlConnectionUtil.writeResponseToFile(url, directory, theme + ".css", cookies); //cookies aren't really needed here.
 		}
+		
+		// include the special IE stylesheet
+		String url = basePath + "/lams/css/ie-styles.css";
+		HttpUrlConnectionUtil.writeResponseToFile(url, directory, "ie-styles.css", cookies); //cookies aren't really needed here.
+		
 	}
 
 }

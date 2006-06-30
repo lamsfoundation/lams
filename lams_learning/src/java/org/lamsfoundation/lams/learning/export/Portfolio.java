@@ -24,6 +24,9 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export;
 
+import java.util.Date;
+
+
 
 /**
  * @author mtruong
@@ -35,12 +38,16 @@ public class Portfolio {
     private String lessonName;
     private String lessonDescription;
     private ActivityPortfolio[] activityPortfolios;
+    private String learnerName;
+    private Date lessonStartDate;
+    private Date portfolioCreatedDate;
     
     public Portfolio(String exportID)
     {
         this.exportTmpDir = null;
         this.activityPortfolios = null;
         this.exportID = exportID;
+        this.portfolioCreatedDate = new Date();
     }
 
     /**
@@ -91,5 +98,29 @@ public class Portfolio {
 
 	public void setExportID(String exportID) {
 		this.exportID = exportID;
+	}
+
+	public String getLearnerName() {
+		return learnerName;
+	}
+
+	public void setLearnerName(String learnerName) {
+		this.learnerName = learnerName;
+	}
+
+	public Date getLessonStartDate() {
+		return lessonStartDate;
+	}
+
+	public void setLessonStartDate(Date lessonStartDate) {
+		this.lessonStartDate = lessonStartDate;
+	}
+
+	public Date getPortfolioCreatedDate() {
+		return portfolioCreatedDate;
+	}
+
+	public void setPortfolioCreatedDate(Date portfolioCreatedDate) {
+		this.portfolioCreatedDate = portfolioCreatedDate;
 	}
 }
