@@ -46,7 +46,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -75,7 +74,6 @@ public class LearningAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
 		String param = mapping.getParameter();
-		request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
 		//-----------------------Resource Learner function ---------------------------
 		if(param.equals("start")){
 			return start(mapping, form, request, response);
@@ -120,7 +118,6 @@ public class LearningAction extends Action {
 			return mapping.getInputForward();
 			
 		}
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
 		// get sessionId from HttpServletRequest
 		String nextActivityUrl = null ;
 		try {
@@ -222,6 +219,8 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//save toolContentID into HTTPSession
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		
 		Long sessionId =  new Long(request.getParameter(ResourceConstants.PARAM_TOOL_SESSION_ID));
 		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID,sessionId);
 		
@@ -294,6 +293,7 @@ public class LearningAction extends Action {
 		resource.setDefineLater(false);
 		service.saveOrUpdateResource(resource);
 		
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	//*************************************************************************************

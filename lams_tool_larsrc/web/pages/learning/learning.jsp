@@ -27,7 +27,7 @@
  		    return false;
 		}
 		function viewItem(itemUid){
-			var myUrl = "<c:url value="/reviewItem.do"/>?mode=learner&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
+			var myUrl = "<c:url value="/reviewItem.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
 			launchPopup(myUrl,"LearnerView");
 		}
 		function completeItem(itemUid){

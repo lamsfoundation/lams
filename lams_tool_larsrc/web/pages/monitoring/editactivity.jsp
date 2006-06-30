@@ -26,7 +26,7 @@
 			<c:set var="isPageEditable" value="${isPageEditable}" />
 			<c:choose>
 				<c:when test='${isPageEditable == "true"}'>
-					<c:url value="/authoring/init.do" var="authoringUrl">
+					<c:url value="/definelater.do" var="authoringUrl">
 						<c:param name="toolContentID" value="${toolContentID}" />
 					</c:url>
 					<html:link href="${authoringUrl}" styleClass="button" target="_blank">

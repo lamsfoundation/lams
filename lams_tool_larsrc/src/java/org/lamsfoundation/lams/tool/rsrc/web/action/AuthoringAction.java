@@ -95,12 +95,11 @@ public class AuthoringAction extends Action {
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
 		if(param.equals("start")){
-			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
+			request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR.toString());
 			return start(mapping, form, request, response);
 		}
 		if (param.equals("definelater")) {
 			//update define later flag to true
-			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
 			Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 			IResourceService service = getResourceService();
 			Resource resource = service.getResourceByContentId(contentId);
@@ -116,16 +115,14 @@ public class AuthoringAction extends Action {
 				service.saveOrUpdateResource(resource);
 			}
 			
+			request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER.toString());
 			return start(mapping, form, request, response);
 		}		
 	  	if (param.equals("initPage")) {
        		return initPage(mapping, form, request, response);
         }
-//	  	if (param.equals("monitoringInitPage")) {
-////	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.MONITOR_MODE);
-//	  		return initPage(mapping, form, request, response);
-//	  	}
-        if (param.equals("updateContent")) {
+
+	  	if (param.equals("updateContent")) {
        		return updateContent(mapping, form, request, response);
         }
         if (param.equals("uploadOnlineFile")) {
@@ -392,7 +389,7 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		ToolAccessMode mode = getAccessMode(request);
 		if(mode.isAuthor())
 			return mapping.findForward(ResourceConstants.SUCCESS);
 		else
