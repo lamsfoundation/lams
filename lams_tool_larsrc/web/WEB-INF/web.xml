@@ -74,12 +74,6 @@
     project's merge dir.
     -->
 
- <servlet>
-	<servlet-name>context</servlet-name>
-	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-	<load-on-startup>1</load-on-startup>
-</servlet>
-
 <servlet>
 		<servlet-name>exportPortfolio</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.tool.rsrc.web.servlet.ExportServlet</servlet-class>
@@ -98,7 +92,7 @@
     </init-param>
     <init-param>
       <param-name>detail</param-name>
-      <param-value>2</param-value>
+      <param-value>1</param-value>
     </init-param>
     <init-param>
       <param-name>validate</param-name>

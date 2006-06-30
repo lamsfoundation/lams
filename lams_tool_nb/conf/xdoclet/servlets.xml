@@ -1,22 +1,3 @@
-    <!--
-	  - Loads the root application context of this web app at startup,
-	  - by default from "/WEB-INF/applicationContext.xml".
-		- Note that it is preferable to use ContextLoaderListener in a servlet container
-		- that follows the Servlet 2.4 initialization order (most Servlet 2.3 containers do).
-		-
-	  - Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
-	  - to access it anywhere in the web application, outside of the framework.
-	  -
-	  - The root context is the parent of all servlet-specific contexts.
-	  - This means that its beans are automatically available in these child contexts,
-	  - both for getBean(name) calls and (external) bean references.
-	-->
-	<servlet>
-		<servlet-name>context</servlet-name>
-		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-
 	<servlet>
 	    <servlet-name>action</servlet-name>
 	    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
@@ -36,7 +17,7 @@
 	      <param-name>validate</param-name>
 	      <param-value>true</param-value>
 	    </init-param>
-	    <load-on-startup>2</load-on-startup>
+	    <load-on-startup>1</load-on-startup>
     </servlet>
  
 <!--  The download servlet, reused from the content repository jar -->

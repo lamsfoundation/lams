@@ -70,12 +70,6 @@
 	 		org.lamsfoundation.lams.web.SessionListener
 	 	</listener-class>
 	</listener>
-
-	<servlet>
-		<servlet-name>context</servlet-name>
-		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
 	
 	<servlet>
 	    <servlet-name>action</servlet-name>
@@ -96,7 +90,7 @@
 	      <param-name>validate</param-name>
 	      <param-value>true</param-value>
 	    </init-param>
-	    <load-on-startup>2</load-on-startup>
+	    <load-on-startup>1</load-on-startup>
     </servlet>
 
 	<servlet>
