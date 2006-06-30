@@ -77,11 +77,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 	private var _dataLoadCheckCount = 0;			
 	
     private var _wizard:Wizard;
-    private var _workspace:Workspace;
-    private var _comms:Communication;
-    private var _themeManager:ThemeManager;
-    private var _dictionary:Dictionary;
-    private var _config:Config;
+    
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
     
@@ -144,10 +140,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
 		
-		
-		//Comms object - do this before any objects are created that require it for server communication
-        _comms = new Communication();
-
     	//Get the instance of config class
         _config = Config.getInstance();
         
@@ -157,9 +149,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         //Set up Key handler 
         //TODO take out after testing and uncomment same key handler in ready();
         Key.addListener(this);
-		//setupUI();
-		//setupData();
-		//checkDataLoaded();
+
     }
     
     /**
@@ -197,33 +187,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog')); 
 		
     }
-    
-    /**
-    * Called when Dictionary loaded
-	* @param evt:Object	the event object
-    */
-    private function onDictionaryLoad(evt:Object){
-        if(evt.type=='load'){
-            _dictionaryLoaded = true;
-			Debugger.log('Dictionary loaded :',Debugger.CRITICAL,'onDictionaryLoad','Application');			
-        } else {
-            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onDictionaryLoad','Application');
-        }
-    }
-    
-    /**
-    * Called when the current selected theme has been loaded
-	* @param evt:Object	the event object
-    */
-    private function onThemeLoad(evt:Object) {
-        if(evt.type=='load'){
-            _themeLoaded = true; 
-			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');		
-        } else {
-            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onThemeLoad','Application');
-        }
-		
-    }
 	 
 	/**
 	* Periodically checks if data has been loaded
@@ -243,8 +206,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 				
         
 			} else if(_dataLoadCheckCount >= DATA_LOAD_CHECK_TIMEOUT_COUNT) {
-				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkUILoaded','Application');
-				clearInterval(_UILoadCheckIntervalID);
+				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkDataLoaded','Application');
+				clearInterval(_DataLoadCheckIntervalID);
 				
         
 			}
