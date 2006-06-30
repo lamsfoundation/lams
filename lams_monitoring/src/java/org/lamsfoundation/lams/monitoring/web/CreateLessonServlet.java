@@ -30,7 +30,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -72,8 +71,19 @@ public class CreateLessonServlet  extends AbstractStoreWDDXPacketServlet {
 					FlashMessage.ERROR);
     		return flashMessage.serializeMessage();
     	}
-		IMonitoringService monitoringService = getMonitoringService();
-			return monitoringService.createLessonClassForLessonWDDX(userID,lessonPackage);
+    	
+    	if ( log.isDebugEnabled() ) {
+    		log.debug("CreateLessonServlet process received packet "+lessonPackage);
+    	}
+    	
+    	try {
+			IMonitoringService monitoringService = getMonitoringService();
+				return monitoringService.createLessonClassForLessonWDDX(userID,lessonPackage);
+    	} catch ( Exception e ) {
+    		log.error("Exception thrown while creating lesson class.",e);
+    		FlashMessage flashMessage = FlashMessage.getExceptionOccured("createLesson",e.getMessage());
+    		return flashMessage.serializeMessage();
+    	}
 	}
 
 	protected String getMessageKey(String packet, HttpServletRequest request) {
