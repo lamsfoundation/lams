@@ -46,6 +46,8 @@ import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -118,7 +120,7 @@ public class LearningAction extends LamsDispatchAction {
 			chatService.saveOrUpdateChatSession(chatSession);
 		}
 
-		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
+		request.setAttribute("XMPPDOMAIN", Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
 		request.setAttribute("USERNAME", chatUser.getUserId());
 		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());

@@ -88,6 +88,8 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -518,14 +520,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	public void createJabberRoom(ChatSession chatSession) {
 		try {
 			XMPPConnection.DEBUG_ENABLED = false;
-			XMPPConnection con = new XMPPConnection(ChatConstants.XMPPDOMAIN);
+			XMPPConnection con = new XMPPConnection(Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
 
-			con.login(ChatConstants.XMPP_ADMIN_USERNAME,
-					ChatConstants.XMPP_ADMIN_PASSWORD);
+			con.login(Configuration.get(ConfigurationKeys.XMPP_ADMIN),
+					Configuration.get(ConfigurationKeys.XMPP_PASSWORD));
 
 			// Create a MultiUserChat using an XMPPConnection for a room
 			String jabberRoom = new Long(System.currentTimeMillis()).toString()
-					+ "@" + ChatConstants.XMPPCONFERENCE;
+					+ "@" + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
 
 			MultiUserChat muc = new MultiUserChat(con, jabberRoom);
 
@@ -563,6 +565,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	}
 
 	public void processIncomingMessages(NodeList messageElems) {
+	
 		for (int i = 0; i < messageElems.getLength(); i++) {
 			// extract message attributes
 			Node message = messageElems.item(i);
@@ -892,7 +895,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	 */
 	private String createJabberId(UserDTO user) {
 		try {
-			XMPPConnection con = new XMPPConnection(ChatConstants.XMPPDOMAIN);
+			XMPPConnection con = new XMPPConnection(Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
 
 			AccountManager manager = con.getAccountManager();
 			if (manager.supportsAccountCreation()) {
@@ -905,7 +908,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			logger.error(e);
 			// TODO handle exception
 		}
-		return user.getUserID() + "@" + ChatConstants.XMPPDOMAIN;
+		return user.getUserID() + "@" + Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
 	}
 
 	private NodeKey processFile(FormFile file, String type) {

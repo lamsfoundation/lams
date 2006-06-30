@@ -27,6 +27,10 @@
 <!ELEMENT Dictionary (language, createDate)>
 <!ELEMENT language (#PCDATA)>
 <!ELEMENT createDate (#PCDATA)>
+<!ELEMENT XmppDomain (#PCDATA)>
+<!ELEMENT XmppConference (#PCDATA)>
+<!ELEMENT XmppAdmin (#PCDATA)>
+<!ELEMENT XmppPassword (#PCDATA)>
 
 
 

@@ -51,11 +51,5 @@ public interface ChatConstants {
 	// Parameter names
 	public static final String PARAM_PARENT_PAGE = "parentPage";
 	
-	// TODO this is temporary for developement.  this should not remain here.
-	static final String XMPPDOMAIN = "shaun.melcoe.mq.edu.au";
-	static final String XMPPCONFERENCE = "conference.shaun.melcoe.mq.edu.au";
-	static final String XMPP_ADMIN_USERNAME = "admin";
-	static final String XMPP_ADMIN_PASSWORD = "wildfire";
-	
 	static final String FILTER_REPLACE_TEXT = "***";
 }

@@ -27,8 +27,6 @@ package org.lamsfoundation.lams.tool.chat.web.actions;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,9 +35,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatSessionDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
-import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
@@ -50,6 +48,8 @@ import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -162,7 +162,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		// set the teachers visibility
 
-		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
+		request.setAttribute("XMPPDOMAIN", Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
 		request.setAttribute("USERNAME", chatUser.getUserId());
 		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());

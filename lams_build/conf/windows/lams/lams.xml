@@ -37,4 +37,8 @@
 			<createDate>2006-01-02</createDate>
 		</Dictionary>
 	</DictionaryDates>
+	<XmppDomain>shaun.melcoe.mq.edu.au</XmppDomain>
+	<XmppConference>conference.shaun.melcoe.mq.edu.au</XmppConference>
+	<XmppAdmin>admin</XmppAdmin>
+	<XmppPassword>wildfire</XmppPassword>
 </Lams>

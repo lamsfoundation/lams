@@ -84,6 +84,19 @@ public class ConfigurationKeys {
 	
 	public static String DICTIONARY_CREATE_DATE = "createDate";
 	
-	public static String DICTIONARY_LANGUAGE = "language";	
+	public static String DICTIONARY_LANGUAGE = "language";
+	
+	public static String XMPP_DOMAIN = "XmppDomain";
+	
+	public static String XMPP_CONFERENCE = "XmppConference";
+	
+	public static String XMPP_ADMIN = "XmppAdmin";
+	
+	public static String XMPP_PASSWORD = "XmppPassword";
+	
+	 
+	  
+	 
+	 
 	
 }
