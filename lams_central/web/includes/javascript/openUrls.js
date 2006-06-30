@@ -174,15 +174,17 @@
 		
 		function openOrgManagement(orgId)
 		{
-			var hight = 768;
-			var width = 1024;
-			if(screen){
-				height = screen.availHeight;
-				width = screen.availWidth;
+			var height = 570;
+			var width = 796;
+			var left = 0;
+			var top = 0;
+			if(self.screen){
+				top = self.screen.height/2-height/2;
+				left = self.screen.width/2-width/2;
 			}
 			if(isMac)
 			{
-				omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left=0,top=0,width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
+				omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 			}
 			else
 			{
@@ -193,7 +195,7 @@
 				}
 				else
 				{
-					omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left=0,top=0,width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					omWin.focus();
 				}
 			}
