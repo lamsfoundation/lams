@@ -138,7 +138,6 @@
 				<include name="flashxml/**"/>
 				<include name="toolcontent/**"/>
 				<include name="**/*.jsp"/>
-				<exclude name="lams_example_tool"/>
 				<exclude name="classes"/>
 			</fileset>
 		</war>
