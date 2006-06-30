@@ -36,6 +36,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<lams:generateID id="${param.lessonID}"/>
 		</c:set>
 		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+		<script language="JavaScript" type="text/JavaScript">
+		<!--
+			
+			var thePopUp = null;
+		
+			function doAlert(arg){
+				alert(unescape(arg));
+			}
+			
+			function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
+	
+				thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+			}
+		//-->
+		</script>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 	
