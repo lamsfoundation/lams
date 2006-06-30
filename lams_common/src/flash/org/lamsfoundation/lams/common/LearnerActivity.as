@@ -35,6 +35,7 @@ import mx.managers.*
 import mx.containers.*;
 import mx.events.*
 import mx.utils.*
+import mx.controls.*
 
 /**  
 * LearnerActivity - 
@@ -66,7 +67,7 @@ class LearnerActivity extends MovieClip {
 	private var todo_mc:MovieClip;
 	private var attempted_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
-	private var title_lbl:MovieClip;
+	private var title_lbl:Label;
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
 	private var sentFrom:String;
@@ -122,7 +123,8 @@ class LearnerActivity extends MovieClip {
 		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
 	
 		
-		setStyles();
+		setStyles() ;
+		
 		trace("Data for sentFrom: "+sentFrom)
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
@@ -156,7 +158,7 @@ class LearnerActivity extends MovieClip {
 	 * @return  
 	 */
 	private function draw(){
-	
+		
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
@@ -297,13 +299,18 @@ class LearnerActivity extends MovieClip {
 	 * @return  
 	 */
 	private function setStyles() {
-		var styleObj = _tm.getStyleObject('label');
+		var styleObj;
+		if(app.module == 'learner'){
+			Debugger.log('setting style - smallLabel : ' ,Debugger.CRITICAL,'setStyles','org.lamsfoundation.lams.LearnerActivity');
+			styleObj = _tm.getStyleObject('smallLabel');
+		} else {
+			styleObj = _tm.getStyleObject('label');
+		}
 		
+		Debugger.log('setting style to title: ' + styleObj ,Debugger.CRITICAL,'setStyles','org.lamsfoundation.lams.LearnerActivity');
+			
 		title_lbl.setStyle('styleName',styleObj);
 		title_lbl.setStyle('textAlign', 'center');
-		
-		//styleObj = _tm.getStyleObject('ACTPanel')
-		//act_pnl.setStyle('styleName',styleObj);
 			
     }
     
