@@ -5,6 +5,7 @@
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
+    	    <role-name>COURSE MANAGER</role-name>
     		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
@@ -20,6 +21,9 @@
    	</login-config>
 
     <!--  Security Roles -->
+    <security-role>
+		<role-name>COURSE MANAGER</role-name>
+	</security-role>
    	<security-role>
 		<role-name>COURSE ADMIN</role-name>
 	</security-role>
