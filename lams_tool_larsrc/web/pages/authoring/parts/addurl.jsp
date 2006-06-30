@@ -66,11 +66,11 @@
 								</td>
 							</tr>
 							<tr>
-								<td>
+								<td valign="top">
 									<fmt:message key="label.authoring.basic.resource.url.input" />
 								</td>
 								<td>
-									<html:text property="url" size="55" />
+									<html:text property="url" size="55" /><BR><BR>
 									<html:checkbox property="openUrlNewWindow">
 										<fmt:message key="open.in.new.window" />
 									</html:checkbox>

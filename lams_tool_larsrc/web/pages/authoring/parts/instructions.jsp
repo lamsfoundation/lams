@@ -15,7 +15,7 @@
 		<c:forEach var="item" items="${instructionList}" varStatus="status">
 			<tr id="instructionItem${status.index}">
 				<td width="3px">${status.index+1}</td>
-				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="70" value="${item}"></td>
+				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="60" value="${item}"></td>
 				
 				<td width="20px">
 					<%-- Don't display down icon if last line --%>
