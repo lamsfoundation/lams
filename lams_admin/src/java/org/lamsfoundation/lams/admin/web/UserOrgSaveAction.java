@@ -39,8 +39,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
@@ -119,9 +121,12 @@ public class UserOrgSaveAction extends Action{
 			if(!alreadyInOrg){
 				User user = (User)service.findById(User.class,userId);
 				UserOrganisation uo = new UserOrganisation(user,organisation);
-				service.save(uo);  // weird spring?/hibernate? bug where only first row is added
+				service.save(uo);
 				uos.add(uo);
 				log.debug("added: "+userId);
+				Role role = (Role)service.findByProperty(Role.class,"name",Role.LEARNER).get(0);
+		        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
+		        service.save(uor);
 			}
 		}
 		
