@@ -99,28 +99,23 @@ public class UserOrgAction extends Action {
 		}
 		Integer orgType = organisation.getOrganisationType().getOrganisationTypeId();
 		request.setAttribute("orgType",orgType);
-		
-		// check user permission
-		//String username = request.getRemoteUser();
-		
+				
 		// get list of users in org
+		User user = (User)service.getUserByLogin(request.getRemoteUser());
 		List<User> users = new ArrayList<User>();
 		if(request.isUserInRole(Role.SYSADMIN)){
 			users = service.findAll(User.class);
-		}else if(request.isUserInRole(Role.COURSE_ADMIN)){
-			if(true){  // org allows admin to add users
-				if(true){  // org allows admin to browse all users
+		}else if(service.isUserInRole(user.getUserId(),orgId,Role.COURSE_ADMIN)){
+			if(organisation.getCourseAdminCanAddNewUsers()){
+				if(organisation.getCourseAdminCanBrowseAllUsers()){
 					users = service.findAll(User.class);
 				}else if(orgType.equals(new Integer(OrganisationType.CLASS_TYPE))){
 					users = service.getUsersFromOrganisation(parentOrg.getOrganisationId());
 				}else if(orgType.equals(new Integer(OrganisationType.COURSE_TYPE))){
 					users = service.getUsersFromOrganisation(orgId);
-					/*errors.add("permission",new ActionMessage("error.need.browse.permission"));
-					saveErrors(request,errors);
-					return mapping.findForward("userorg");*/
 				}
 			}else{
-				errors.add("permission",new ActionMessage("error.need.add.permission"));
+				errors.add("authorisation",new ActionMessage("error.authorisation"));
 				saveErrors(request,errors);
 				return mapping.findForward("error");
 			}

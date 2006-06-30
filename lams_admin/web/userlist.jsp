@@ -15,10 +15,12 @@
   <fmt:message key="admin.user.manage" />
 </h2>
 <p align="right">
-<input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=1' />
-<logic:notEqual name="UserManageForm" property="orgId" value="1">
-  <input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' /></p>
-</logic:notEqual>
+  <logic:equal name="canAdd" value="true">
+    <input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+    <logic:notEqual name="UserManageForm" property="orgId" value="1">
+      <input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' /></p>
+    </logic:notEqual>
+  </logic:equal>
 <table class="alternative-color" width=100%>
 <tr>
 	<th></th>

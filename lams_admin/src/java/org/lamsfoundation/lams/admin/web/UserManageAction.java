@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -87,10 +88,7 @@ public class UserManageAction extends Action {
 			saveErrors(request,errors);
 			return mapping.findForward("error");
 		}
-		log.debug("userlist orgId: "+orgId);
-		
-		// check user permission
-		//String username = request.getRemoteUser();
+		log.debug("orgId: "+orgId);
 		
 		// get org name
 		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
@@ -100,7 +98,19 @@ public class UserManageAction extends Action {
 			return mapping.findForward("error");
 		}
 		String orgName = organisation.getName();
-		log.debug("userlist orgName: "+orgName);
+		log.debug("orgName: "+orgName);
+		
+		Integer userId = service.getUserByLogin(request.getRemoteUser()).getUserId();
+        // check permission
+		if(request.isUserInRole(Role.SYSADMIN)){
+			request.setAttribute("canAdd",true);
+		}else if(!service.isUserInRole(userId,orgId,Role.COURSE_ADMIN)){
+			errors.add("authorisation",new ActionMessage("error.authorisation"));
+			saveErrors(request,errors);
+			return mapping.findForward("error");
+		}else{
+			request.setAttribute("canAdd",organisation.getCourseAdminCanAddNewUsers());
+		}
 		
 		// get list of users in org
 		List<User> users = service.getUsersFromOrganisation(orgId);
