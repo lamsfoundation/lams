@@ -1,6 +1,6 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<table width="100%" border="0" cellspacing="3" cellpadding="3">
+<table cellpadding="0">
 	<c:if test="${empty report}">
 		<tr>
 			<td>
@@ -15,22 +15,21 @@
 		<c:set var="markList" value="${userList.value}" />
 		<c:set var="first" value="true" />
 		<c:forEach items="${markList}" var="topic">
-			<span><p>
-					<c:if test="${first}">
-						<c:set var="first" value="false" />
-						<tr>
-							<td colspan="2">
-								<c:out value="${user.firstName}" />
-								<c:out value="${user.lastName}" />
-								,
-								<c:out value="${user.loginName}" />
-								,
-								<fmt:message key="monitoring.user.post.topic" />
-							</td>
-						<tr>
-					</c:if>
+			<c:if test="${first}">
+				<c:set var="first" value="false" />
+				<tr>
+					<td colspan="5">
+						<c:out value="${user.firstName}" />
+						<c:out value="${user.lastName}" />
+						,
+						<c:out value="${user.loginName}" />
+						,
+						<fmt:message key="monitoring.user.post.topic" />
+					</td>
+				<tr>
+			</c:if>
 			<tr>
-				<td valign="MIDDLE" width="48%">
+				<td>
 					<c:set var="viewtopic">
 						<html:rewrite page="/monitoring/viewTopic.do?messageID=${topic.message.uid}&create=${topic.message.created.time}" />
 					</c:set>
@@ -38,7 +37,7 @@
 						<c:out value="${topic.message.subject}" />
 					</html:link>
 				</td>
-				<td width="2%">
+				<td>
 					<c:if test="${topic.hasAttachment}">
 						<img src="<html:rewrite page="/images/paperclip.gif"/>">
 					</c:if>
@@ -54,13 +53,13 @@
 					<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
 				</td>
 			</tr>
+
 			<tr>
-			<tr>
-				<td>
+				<td class="field-name" width="30%">
 					<fmt:message key="lable.topic.title.mark" />
 					:
 				</td>
-				<td colspan="3">
+				<td colspan="4">
 					<c:choose>
 						<c:when test="${empty topic.message.report.mark}">
 							<fmt:message key="message.not.avaliable" />
@@ -72,11 +71,11 @@
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="field-name" width="30%">
 					<fmt:message key="lable.topic.title.comment" />
 					:
 				</td>
-				<td colspan="3">
+				<td colspan="4">
 					<c:choose>
 						<c:when test="${empty topic.message.report.comment}">
 							<fmt:message key="message.not.avaliable" />
@@ -89,7 +88,7 @@
 			</tr>
 
 			<tr>
-				<td colspan="2">
+				<td colspan="5">
 					<html:form action="/monitoring/editMark" method="post">
 						<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' />>
 						<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' />>
@@ -98,7 +97,7 @@
 					</html:form>
 				</td>
 			</tr>
-			</span>
+
 		</c:forEach>
 	</c:forEach>
 </table>

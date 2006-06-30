@@ -2,11 +2,20 @@
 
 <html:form action="/monitoring/updateMark" method="post">
 	<c:set var="formBean" value="<%= session.getAttribute("markForm") %>" />
-	<b><fmt:message key="message.assign.mark" /> <c:out value="${formBean.user.loginName}" /> , <c:out value="${formBean.user.firstName}" /> <c:out value="${formBean.user.lastName}" /> </b>
-	</p>
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+	<table cellpadding="0">
 		<tr>
-			<td valign="MIDDLE" width="48%">
+			<td colspan="5">
+				<fmt:message key="message.assign.mark" />
+				<c:out value="${formBean.user.loginName}" />
+				,
+				<c:out value="${formBean.user.firstName}" />
+				<c:out value="${formBean.user.lastName}" />
+			</td>
+		</tr>
+
+		<tr>
+			<td>
 				<c:set var="viewtopic">
 					<html:rewrite page="/monitoring/viewTopic.do?messageID=${formBean.messageDto.message.uid}&create=${formBean.messageDto.message.created.time}" />
 				</c:set>
@@ -14,7 +23,7 @@
 					<c:out value="${formBean.messageDto.message.subject}" />
 				</html:link>
 			</td>
-			<td width="2%">
+			<td>
 				<c:if test="${formBean.messageDto.hasAttachment}">
 					<img src="<html:rewrite page="/images/paperclip.gif"/>">
 				</c:if>
@@ -31,46 +40,46 @@
 			</td>
 		</tr>
 	</table>
-	<table class="forms">
+	<table>
 		<input type="hidden" name="toolSessionID" value="<c:out value='${formBean.sessionId}'/>" />
 		<input type="hidden" name="messageID" value="<c:out value='${formBean.messageDto.message.uid}'/>" />
 		<input type="hidden" name="userID" value="<c:out value='${formBean.user.uid}'/>" />
 		<tr>
-			<td class="formlabel">
-				<fmt:message key="lable.topic.title.mark" />*
-				:
+			<td class="field-name" width="30%">
+				<fmt:message key="lable.topic.title.mark" />
+				* :
 			</td>
-			<td class="formcontrol">
+			<td>
 				<input type="text" name="mark" value="<c:out value='${formBean.mark}'/>" />
 			</td>
 			<td>
 				<html:errors property="report.mark" />
 			</td>
 		</tr>
+
 		<tr>
-			<td class="formlabel">
-				<fmt:message key="lable.topic.title.comment" />
-				:
+			<td colspan="3">
+				<lams:SetEditor id="comment" small="true" text="${formBean.comment}" key="lable.topic.title.comment" />
 			</td>
-			<td class="formcontrol">
-				<FCK:editor id="comment" basePath="/lams/fckeditor/" height="150" width="85%">
-					<c:out value="${formBean.comment}" escapeXml="false" />
-				</FCK:editor>
-			</td>
-			<td>
+		</tr>
+
+		<tr>
+			<td colspan="3">
 				<html:errors property="report.comment" />
 			</td>
 		</tr>
+
 		<tr>
-			<td class="formlabel" colspan="3">
+			<td class="field-name" colspan="3">
 				<html:errors property="report.globel" />
 			</td>
 		</tr>
 		<tr>
-			<td class="formcontrol" colspan="3">
+			<td colspan="3">
 				<input type="submit" value="<fmt:message key="lable.update.mark"/>" style="width:120px" class="buttonStyle" />
 			</td>
 		</tr>
-		</span>
 	</table>
 </html:form>
+
+<lams:HTMLEditor />

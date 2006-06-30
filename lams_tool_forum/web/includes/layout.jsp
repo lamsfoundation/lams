@@ -6,21 +6,27 @@
 
 <html>
 	<head>
-		<title>
-			<bean:message key="activity.title" />
-	  	</title>
-	  	<%@ include file="/common/header.jsp"%>
+		<title><bean:message key="activity.title" /></title>
+		<%@ include file="/common/header.jsp"%>
 	</head>
 	<body>
-	
-		<tiles:useAttribute name="pageTitleKey" scope="request" />
-		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-		<logic:notEmpty name="pTitleKey">
-			<h1>
-				<bean:message key="<%=pTitleKey %>" />
-			</h1>
-		</logic:notEmpty>
+		<div id="page">
+			<tiles:useAttribute name="pageTitleKey" scope="request" />
+			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
+			<logic:notEmpty name="pTitleKey">
+				<h1 class="no-tabs-below">
+					<bean:message key="<%=pTitleKey %>" />
+				</h1>
+			</logic:notEmpty>
 
-		<tiles:insert attribute="body" />
+			<div id="header"></div>
+
+			<div id="content">
+				<tiles:insert attribute="body" />
+			</div>
+
+			<div id="footer">
+			</div>
+		</div>
 	</body>
 </html>
