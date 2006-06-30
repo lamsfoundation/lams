@@ -32,9 +32,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-			<table class="forms">
+			<table>
 				<tr>
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 			      			<b> <bean:message key="radiobox.sln"/>: </b>
 					</td>
 					<td NOWRAP valign=top>
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         </tr>
 		         
    				<tr>
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 			      			<b> <bean:message key="radiobox.onepq"/>: </b>
 					</td>
 					<td NOWRAP valign=top>
@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		        </tr>
 		         
 		         <tr>
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 			      			<b> <bean:message key="radiobox.retries"/>: </b>
 					</td>
 					<td NOWRAP valign=top>

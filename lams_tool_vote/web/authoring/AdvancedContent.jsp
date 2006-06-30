@@ -31,9 +31,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-				<table class="forms">
+				<table>
 				<tr>
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 		      			 <b>
 			      			<bean:message key="label.vote.changable"/>:
 			      		</b> 
@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         </tr>
 		         
 				<tr>
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 		      			 <b>
 			      			<bean:message key="label.vote.lockedOnFinish"/>:
 			      		</b> 
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         
 
 				<tr>
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 		      			 <b>
 			      			<bean:message key="label.allowText"/>:
 			      		</b> 
@@ -86,7 +86,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 			  	<tr> 
-					<td class="field-name">							
+					<td NOWRAP valign=top>
 	      			 <b>
 				 		<bean:message key="label.maxNomCount"/>: </td>
 		      		</b> 

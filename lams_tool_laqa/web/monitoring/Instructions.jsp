@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<table class="forms">
           		<tr> 
 					<td NOWRAP colspan=2 valign=top>
-                   		<bean:message key="label.onlineInstructions.col" />	<c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" />						
+                   		<b> <bean:message key="label.onlineInstructions.col" /> </b> <c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" />						
 					</td> 
 				</tr>
 				
@@ -97,7 +97,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td colspan=2 NOWRAP> 
-                   		<bean:message key="label.offlineInstructions.col" />	<c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" />												
+                   		<b> <bean:message key="label.offlineInstructions.col" /> </b>	<c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" />												
 					</td> 
 				</tr>
 

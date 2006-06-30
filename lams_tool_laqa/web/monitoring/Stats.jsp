@@ -21,7 +21,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp" %>
 
-		<table class="forms">
+		<table>
 						<tr> 
 						<td NOWRAP valign=top>
 				  				<b> <bean:message key="count.total.user" /> </b>

@@ -35,7 +35,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
-							<bean:message key="label.onlineInstructions.col" />   <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	
+							<b> <bean:message key="label.onlineInstructions.col" />  </b>
+							<c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	
 					</td> 
 				</tr>
 				
@@ -74,7 +75,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
-						<bean:message key="label.offlineInstructions.col" />  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	
+						<b> <bean:message key="label.offlineInstructions.col" /> </b>
+					    <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	
 					</td> 
 				</tr>
 				
