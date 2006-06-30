@@ -51,6 +51,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
@@ -143,6 +145,17 @@ public class UserAction extends LamsDispatchAction {
 		}else{
 			String[] roles = new String[0];
 			userForm.set("roles",roles);
+			try{
+				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+				log.debug("defaultLocale: "+defaultLocale);
+				Map<String, Object> properties = new HashMap<String, Object>();
+				properties.put("languageIsoCode",defaultLocale.substring(0,2));
+				properties.put("countryIsoCode",defaultLocale.substring(3));
+				SupportedLocale locale = (SupportedLocale)service.findByProperties(SupportedLocale.class,properties).get(0);
+				userForm.set("localeId",locale.getLocaleId());
+			}catch(Exception e){
+                log.debug(e);				
+			}
 		}
 		
 		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
