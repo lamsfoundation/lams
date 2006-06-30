@@ -82,7 +82,7 @@
 							<tr>
 								<!--Second Row displaying the description of the File -->
 								<td class="field-name">
-									<b><fmt:message key="label.learner.fileDescription" /></b>
+									<fmt:message key="label.learner.fileDescription" />
 								</td>
 								<td>
 									<c:out value="${file.fileDescription}" escapeXml="false" />
@@ -136,44 +136,46 @@
 
 			</table>
 
-			<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" focus="filePath" onsubmit="return validateForm(this);">
-				<p>
-					<html:errors />
-				</p>
-				<table>
-					<!-- Hidden fields -->
-					<html:hidden property="toolSessionID" value="${learner.toolSessionID}" />
-
-					<!--File path row -->
-					<tr>
-						<td class="field-name">
-							<fmt:message key="label.learner.filePath" />
-						</td>
-						<td>
-							<html:file property="filePath" disabled="${learner.locked}" size="40" tabindex="1" />
-						</td>
-					</tr>
-					<!--File Description row -->
-					<tr>
-						<td class="field-name">
-							<fmt:message key="label.learner.fileDescription" />
-						</td>
-						<td>
-							<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="fileDescription" disabled="${learner.locked}" />
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" align="center">
-							<html:submit disabled="${learner.locked}" styleClass="buttonStyle">
-								<fmt:message key="label.learner.upload" />
-							</html:submit>
-							<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
-								<fmt:message key="label.learner.finished" />
-							</html:button>
-						</td>
-					</tr>
-				</table>
-			</html:form>
+			<c:if test="${mode != 'teacher'}">
+				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" focus="filePath" onsubmit="return validateForm(this);">
+					<p>
+						<html:errors />
+					</p>
+					<table>
+						<!-- Hidden fields -->
+						<html:hidden property="toolSessionID" value="${learner.toolSessionID}" />
+	
+						<!--File path row -->
+						<tr>
+							<td class="field-name">
+								<fmt:message key="label.learner.filePath" />
+							</td>
+							<td>
+								<html:file property="filePath" disabled="${learner.locked}" size="40" tabindex="1" />
+							</td>
+						</tr>
+						<!--File Description row -->
+						<tr>
+							<td class="field-name">
+								<fmt:message key="label.learner.fileDescription" />
+							</td>
+							<td>
+								<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="fileDescription" disabled="${learner.locked}" />
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" align="center">
+								<html:submit disabled="${learner.locked}" styleClass="buttonStyle">
+									<fmt:message key="label.learner.upload" />
+								</html:submit>
+								<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
+									<fmt:message key="label.learner.finished" />
+								</html:button>
+							</td>
+						</tr>
+					</table>
+				</html:form>
+			</c:if>
 		</div>
 		<div id="footer"></div>
 	</div>

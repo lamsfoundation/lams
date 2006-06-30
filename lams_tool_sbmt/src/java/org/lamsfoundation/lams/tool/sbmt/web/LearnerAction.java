@@ -97,9 +97,11 @@ public class LearnerAction extends DispatchAction {
         request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
                 
         if(mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR) ){
+        	request.setAttribute(AttributeNames.ATTR_MODE,mode);
             return listFiles(mapping, form, request, response);
         }
         else if(mode.equals(ToolAccessMode.TEACHER)){
+        	request.setAttribute(AttributeNames.ATTR_MODE,mode);
         	return listFiles(mapping, form, request, response);
         }
         logger.error("Requested mode + '" + mode.toString() + "' not supported");

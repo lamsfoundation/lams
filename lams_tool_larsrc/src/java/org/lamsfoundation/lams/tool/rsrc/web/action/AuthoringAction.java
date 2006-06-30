@@ -95,7 +95,12 @@ public class AuthoringAction extends Action {
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
 		if(param.equals("start")){
-			request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR.toString());
+			ToolAccessMode mode = getAccessMode(request);
+			//teacher mode "check for new" button enter.
+			if(mode != null)
+				request.setAttribute(AttributeNames.ATTR_MODE,mode.toString());
+			else
+				request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR.toString());
 			return start(mapping, form, request, response);
 		}
 		if (param.equals("definelater")) {
