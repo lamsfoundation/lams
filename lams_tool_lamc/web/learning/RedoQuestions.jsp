@@ -18,25 +18,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ include file="/common/taglibs.jsp"%>
+
 <html:html locale="true">
 <head>
-	<jsp:include page="/learning/learningHeader.jsp" />
+	<title> <bean:message key="label.learning"/> </title>
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 </head>
 <body>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
 
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 				<table width="80%" cellspacing="8" align="CENTER" class="forms">
@@ -49,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
-							  	<font size=3> <b>  <bean:message key="label.individual.results.withRetries"/> </b> </font>
+							  	 <b>  <bean:message key="label.individual.results.withRetries"/> </b> 
 						  	</td>
 						  </tr>
   					</c:if> 			
@@ -57,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.isRetries == 'false'}"> 							  
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
-							  	<font size=3> <b>  <bean:message key="label.individual.results.withoutRetries"/> </b> </font>
+							  	 <b>  <bean:message key="label.individual.results.withoutRetries"/> </b> 
 						  	</td>
 						  </tr>
 					</c:if> 			
@@ -65,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<font size=3>  <bean:message key="label.learner.redo"/> </font>
+						  	 <bean:message key="label.learner.redo"/> 
 					  	</td>
 					  </tr>	
 
@@ -78,10 +71,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<font size=2>  <bean:message key="label.learner.bestMark"/>
+						  	 <bean:message key="label.learner.bestMark"/>
 						  	<b>   <c:out value="${sessionScope.learnerBestMark}"/> </b> 
 						  	<bean:message key="label.outof"/> 
-						  	<b> <c:out value="${sessionScope.totalQuestionCount}"/> </b> </font>
+						  	<b> <c:out value="${sessionScope.totalQuestionCount}"/> </b> 
 					  	</td>
 					  </tr>	
 					  
@@ -93,16 +86,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 					  
 				  <tr>
-				  	<td NOWRAP colspan=2 align=center valign=top> 
-					  	<font size=2>
+				  	<td NOWRAP colspan=2 align=left valign=top> 
 				  			<html:submit property="viewAnswers" styleClass="button">
 								<bean:message key="label.view.answers"/>
 							</html:submit>	 		
-	   						&nbsp&nbsp&nbsp&nbsp&nbsp
+	   						&nbsp&nbsp
 	   						<html:submit property="redoQuestionsOk" styleClass="button">
 								<bean:message key="label.redo.questions"/>
 							</html:submit>	 				 		  					
-						</font>
 				  	 </td>
 				  </tr>
 

@@ -32,15 +32,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-			<table class="forms">
+			<table>
 				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> 
+	  				<td NOWRAP valign=top>
 			      			<b> <bean:message key="radiobox.sln"/>: </b>
-		      			</font>
 					</td>
 					<td NOWRAP valign=top>
-						<font size=2>
 							<html:radio property="sln"  value="ON">
 							 <bean:message key="option.on"/>
 							</html:radio>
@@ -48,18 +45,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<html:radio property="sln"  value="OFF">
 							 <bean:message key="option.off"/>
 							</html:radio>
-						</font>
 	      			</td>
 		         </tr>
 		         
    				<tr>
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
+	  				<td NOWRAP valign=top>
 			      			<b> <bean:message key="radiobox.onepq"/>: </b>
-		      			</font>
 					</td>
 					<td NOWRAP valign=top>
-						<font size=2>
 							<html:radio property="questionsSequenced" value="ON">
 							 <bean:message key="option.on"/>
 							</html:radio>
@@ -67,18 +60,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<html:radio property="questionsSequenced" value="OFF">
 							 <bean:message key="option.off"/>
 							</html:radio>
-						</font>
 	      			</td>
 		        </tr>
 		         
 		         <tr>
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
+	  				<td NOWRAP valign=top>
 			      			<b> <bean:message key="radiobox.retries"/>: </b>
-		      			</font>
 					</td>
 					<td NOWRAP valign=top>
-						<font size=2>
 							<html:radio property="retries" value="ON">
 							 <bean:message key="option.on"/>
 							</html:radio>
@@ -86,26 +75,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<html:radio property="retries" value="OFF">
 							 <bean:message key="option.off"/>
 							</html:radio>
-						</font>
 	      			</td>
 
-				</tr>	      	
-			</table>
+				</tr>	    
+			</table>	  	  	
+			
+			<table>
 
-			<table class="forms">						
 		         <tr> 
 	  				<td NOWRAP valign=top>
-		  				<font size=2>
 							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
-						</font>
 					</td> 
 			  	</tr>
 			  	
 			  	<tr> 
 	  				<td NOWRAP valign=top>
-		  				<font size=2>
 							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true" key="label.report.endLearningMessage.col"/>														
-						</font>
 					</td> 
 			  	</tr>
 

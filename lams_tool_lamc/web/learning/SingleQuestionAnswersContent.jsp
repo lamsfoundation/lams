@@ -18,23 +18,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
 	<!--options content goes here-->
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
 					  <tr>
-					  	<th scope="col" valigntop colspan=2> 
+					  	<th scope="col" valign=top colspan=2> 
 						  	  <bean:message key="label.assessment"/> 
 					  	</th>
 					  </tr>
@@ -56,7 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<font size=3> <b>  <bean:message key="label.withRetries"/> </b> </font>
+						  	 <b>  <bean:message key="label.withRetries"/> </b> 
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -64,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.isRetries != 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center  valign=top colspan=2> 
-						  	<font size=3> <b>  <bean:message key="label.withoutRetries"/> </b> </font>
+						  	<b>  <bean:message key="label.withoutRetries"/> </b> 
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -72,9 +59,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	<font size=2> <b>  <bean:message key="label.learner.message"/>
+						  	 <b>  <bean:message key="label.learner.message"/>
 						  		 (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
-						  	</b> </font>
+						  	</b> 
 					  	</td>
 					  </tr>
 					</c:if> 								  
@@ -87,9 +74,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 						  <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
-								  	<font size=2>
 								  		<c:out value="${questionEntry.value}"/> 
-								  	</font> 
 						  	</td>
 						  </tr>
 
@@ -112,7 +97,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  							
 																	<tr> 
 																		<td NOWRAP align=left valign=top> 
-																			<font size=2>
 																				<input type="checkbox" 
 																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
 																				onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
@@ -129,12 +113,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																					document.forms[0].checked.value=false;
 																				}
 																				document.forms[0].submit();" CHECKED> 
-																			</font>
 																		</td> 
 																		<td NOWRAP align=left valign=top> 
-																				<font size=2>
-																					<c:out value="${subEntry.value}"/> 
-																				</font>
+																				<c:out value="${subEntry.value}"/> 
 																		</td>
 																	</tr>	
 												  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
@@ -148,7 +129,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
 																	<tr> 
 																		<td NOWRAP align=left valign=top> 
-																			<font size=2>
 																				<input type="checkbox" 
 																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
 																				onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
@@ -165,12 +145,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																					document.forms[0].checked.value=false;
 																				}
 																				document.forms[0].submit();"> 
-																			</font>
 																		</td> 
 																		<td NOWRAP align=left valign=top> 
-																			<font size=2>
-																				<font> <c:out value="${subEntry.value}"/> </font>
-																			</font>
+																			 <c:out value="${subEntry.value}"/> 
 																		</td>
 																	</tr>	
   												</c:if> 			
@@ -190,7 +167,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:hidden property="optionIndex"/>
 						<html:hidden property="optionValue"/>						
 						<html:hidden property="checked"/>
-				 		<td colspan=2 class="input" valign=top> 
+				 		<td colspan=2 valign=top> 
 				 		&nbsp
 				 		</td>
 			  	   </tr>
@@ -199,11 +176,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  		<c:if test="${sessionScope.totalCountReached != 'true'  &&  sessionScope.totalQuestionCount != '1'}"> 			
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2 align=right valign=top> 
-					  	<font size=2>
 				  			<html:submit property="nextOptions" styleClass="button">
 								<bean:message key="button.nextQuestion"/>
 							</html:submit>	 				 		  					
-						</font>
 				  	 </td>
 				  </tr>
 				</c:if> 								  
@@ -211,11 +186,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 		<c:if test="${sessionScope.totalQuestionCount == '1'}"> 		
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2 align=right valign=top> 
-					  	<font size=2>
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
 							</html:submit>	 				 		  					
-						</font>
 				  	 </td>
 				  </tr>
 				</c:if> 								  
@@ -223,11 +196,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 		<c:if test="${sessionScope.totalCountReached == 'true'}"> 		
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2 align=right valign=top> 
-					  	<font size=2>
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
 							</html:submit>	 				 		  					
-						</font>
 				  	 </td>
 				  </tr>
 				</c:if> 								  

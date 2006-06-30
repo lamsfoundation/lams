@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
-					<h2><font size=2> <bean:message key="label.authoring.mc.basic"/> </font> </h2>	
+					<h2><bean:message key="label.authoring.mc.basic"/>  </h2>	
 				</c:if> 				
 				
 		    	<table align=center> 	  
@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td NOWRAP class=error>
 						<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
 							<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
-								<font size=2> <bean:message key="sbmt.successful"/> </font> 
+								<bean:message key="sbmt.successful"/> 
 							</img>
 						</c:if> 			
 					</td>
@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				
 
-			<table class="forms">
+				<table class="forms">
 					
 				<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
 							   (sessionScope.defineLaterInEditMode == 'true') 
@@ -74,15 +74,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							   (sessionScope.defineLaterInEditMode != 'true') 
 							  }"> 			
  						<tr> 
-					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <font size=2> <bean:message key="label.authoring.title"/>: </font> </b> </td>
-							<td NOWRAP class="formcontrol" valign=top align=left>
+					 		<td NOWRAP valign=top align=left> <b> <bean:message key="label.authoring.title"/>: </b> </td>
+							<td NOWRAP valign=top align=left>
 									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
 							</td> 
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <font size=2> <bean:message key="label.authoring.instructions"/>: </font> </b> </td>
-							<td NOWRAP class="formcontrol" valign=top align=left>
+					 		<td NOWRAP  valign=top align=left> <b> <bean:message key="label.authoring.instructions"/>:  </b> </td>
+							<td NOWRAP  valign=top align=left>
 									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</td>
 						</tr>
@@ -94,11 +94,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	</td>
 					</tr>
 				
-					<tr> <td NOWRAP colspan=2 align=center valign=top width="45%">
-					<table align="center">
+					<tr> <td NOWRAP colspan=2 align=center valign=top>
+					<table width="40%">
 					     <tr>
-								  	<td NOWRAP bgcolor="#A8C7DE" colspan=5 class="input" valign=top align=left>
-									  	 <font size=2> <b> <bean:message key="label.mc.questions"/> </b> </font>
+								  	<td NOWRAP bgcolor="#A8C7DE" colspan=5 valign=top align=left>
+									  	 <b> <bean:message key="label.mc.questions"/> </b> 
 								  	</td>
 						 </tr>					
 					
@@ -110,34 +110,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  }"> 			
 
 								  <tr>
-								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <bean:message key="label.question.only"/> ${queIndex} : </b>  </font> </td>
+								  	<td NOWRAP bgcolor="#EEEEEE"  valign=top>  <b> <bean:message key="label.question.only"/> ${queIndex} : </b>   </td>
 								  	
-							  		<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top width=50> 
-								  		<font size=2> <input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>" 
-								  		size="50" maxlength="255" > </font>
+							  		<td NOWRAP bgcolor="#EEEEEE"  valign=top width=50> 
+								  		 <input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>" 
+								  		size="30" maxlength="255" > 
 								  	</td>
 	
-								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
-									  	<font size=2>
+								  	<td NOWRAP bgcolor="#EEEEEE"   align=center valign=top>			
 									 		<c:if test="${sessionScope.queIndex == 1}"> 		
-				   								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> </font>
+				   								  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> 
 			   								</c:if> 			
 			   								
 							  				<c:if test="${(sessionScope.maxQuestionIndex == sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-			     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> </font>
+			     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> 
 			     							</c:if> 	    
 											
 			 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-				 				  				<font size=2>
 				   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
 				       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
-				       							</font>
 											</c:if>
-										</font>										 	           								 
 	                                </td>
 	
-	                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
-		                                    <font size=2>
+	                                    <td NOWRAP bgcolor="#EEEEEE"  align=left valign=top>										  	
 												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">       
 														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
 													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
@@ -145,14 +140,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														  		<bean:message key="label.percent"/>
 														</c:if>
 												</c:forEach>
-											</font>
 	                                    </td>
 																						
-	                                   <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
-											<font size=2>	                                   
+	                                   <td NOWRAP bgcolor="#EEEEEE"  valign=top>								
 												<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
 												<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
-											<font>											
 									  	</td>
 								  </tr>
 							</c:if> 																		  								  
@@ -162,14 +154,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  }"> 			
 
 								  <tr>
-								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <bean:message key="label.question.only"/> ${queIndex} : </b>  </font> </td>
+								  	<td NOWRAP bgcolor="#EEEEEE"  valign=top>   <b> <bean:message key="label.question.only"/> ${queIndex} : </b>   </td>
 								  	
-							  		<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top> 
-								  		<font size=2> <c:out value="${questionEntry.value}"/> </font>
+							  		<td NOWRAP bgcolor="#EEEEEE"  valign=top> 
+								  		 <c:out value="${questionEntry.value}"/> 
 								  	</td>
 	
-								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
-									  	<font size=2>
+								  	<td NOWRAP bgcolor="#EEEEEE"  align=center valign=top>			
 									 		<c:if test="${sessionScope.queIndex == 1}"> 		
 			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 			   								</c:if> 			
@@ -182,24 +173,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 											</c:if> 	           								 
-										</font>
 	                                </td>
 	
-                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
-	                                    <font size=2>
+                                    <td NOWRAP bgcolor="#EEEEEE" align=left valign=top>										  	
 											<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 													<c:if test="${questionEntry.key == weightsEntry.key}"> 			
-														<font size=2> <c:out value="${weightsEntry.value}"/><bean:message key="label.percent"/> </font>
+														 <c:out value="${weightsEntry.value}"/><bean:message key="label.percent"/> 
 													</c:if>
 											</c:forEach>
-										</font>
                                     </td>
 																					
-                                   <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
-										<font size=2>                                   
+                                   <td NOWRAP bgcolor="#EEEEEE"  valign=top>								
 											<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 											<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-										</font>
 								  	</td>
 								  </tr>
 							</c:if> 																		  								  
@@ -209,12 +195,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							   			(sessionScope.defineLaterInEditMode == 'true') 
 							  }"> 			
 							 <tr>
-								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-									  	<font size=2>
+								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5  valign=top align=right>
 											<html:submit onclick="javascript:submitMethod('addNewQuestion');" styleClass="button">
 												<bean:message key="label.add.question"/>
 											</html:submit>	 				 		  										  		
-										</font>
 								  	</td>
 							 </tr>							
 						</c:if> 							
@@ -224,12 +208,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										   (sessionScope.defineLaterInEditMode != 'true') 
 										  }"> 			
 							 <tr>
-								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-									  	<font size=2>
+								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5  valign=top align=right>
 											<html:submit styleClass="button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 												<bean:message key="label.add.question"/>
 											</html:submit>	 				 		  										  		
-										</font>
 								  	</td>
 							 </tr>													
 						</c:if> 													
@@ -246,10 +228,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  }"> 			
 
 						<tr>
-						  	<td colspan=5 NOWRAP class="formlabel" valign=top><b> <font size=2> <bean:message key="radiobox.passmark"/>: </font> </b> 
-								<font size=2>
+						  	<td colspan=5 NOWRAP valign=top><b> <bean:message key="radiobox.passmark"/>:  </b> 
 								  <html:text property="passmark"  size="3" maxlength="3"/><bean:message key="label.percent"/>
-								 </font>
 							</td>
 						</tr>
 						
@@ -270,10 +250,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  }"> 			
 
 						<tr>
-						  	<td NOWRAP colspan=5 class="formlabel" valign=top align=left><b> <font size=2> <bean:message key="radiobox.passmark"/>: </font> </b>
-								<font size=2>
+						  	<td NOWRAP colspan=5 valign=top align=left><b>  <bean:message key="radiobox.passmark"/>:  </b>
 										<c:out value="${sessionScope.passMark}"/> <bean:message key="label.percent"/>
-								</font>
 							</td>
 						</tr>
 						<tr>
@@ -288,16 +266,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						
 						 <tr>
-	 						<td NOWRAP valign=top> </td> 
-							<td NOWRAP class="input" colspan=3 align=left valign=top>								
-								<font size=2>
+							<td NOWRAP colspan=5 align=center valign=top>								
 									<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="buttonLeft">
 										<bean:message key="label.edit"/>
 									</html:submit>	 				 		  					
-								</font>
 			 			  	</td>
-							<td NOWRAP valign=top> </td> 
-							<td NOWRAP valign=top> </td>
 						</tr>
 
 						

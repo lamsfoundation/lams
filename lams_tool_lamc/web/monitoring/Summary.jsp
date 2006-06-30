@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms" align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+							<b> <bean:message key="error.noLearnerActivity"/> </b>
 						</td> 
 					<tr>
 				</table>
@@ -45,7 +45,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 						<tr> 
-							<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+						<td NOWRAP  valign=top align=center>  <b> <bean:message key="label.selectGroup"/> </b>
 									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 									<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
 										<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
@@ -73,7 +73,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:forEach>		  	
 									</c:forEach>		  	
 									</select>
-								</font>
 							</td> 
 						<tr>					
 
@@ -96,25 +95,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
-							<font size=2>
+							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
 								<c:out value="${currentDto.question}"/> &nbsp (<bean:message key="label.weight"/> 
 								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
-							</font> </td>
+							 </td>
 						</tr>	
 						<tr>					
-							<td NOWRAP valign=top align=left> <font size=2> <b> <bean:message key="label.mc.options.col"/> </font> </b> 
+							<td NOWRAP valign=top align=left>  <b> <bean:message key="label.mc.options.col"/>  </b> 
 								<table align=left>
 									<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 										<tr>			
 											<td NOWRAP valign=top align=left>
-												<font size=2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+												&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 												<c:out value="${answersData.candidateAnswer}"/> 
 												
 												<c:if test="${answersData.correct == 'true'}"> 		
 													&nbsp (<bean:message key="label.correct"/>)
 												</c:if>																		
-												</font>
 											</td>	
 										</tr>
 									</c:forEach>		  	
@@ -125,8 +122,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>		  	
 
 		  	 		<tr>
-		  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
-		  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  </font>
+		  	 			<td NOWRAP valign=top align=left> <b> 
+		  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  
 		  	 			</td>
 		  	 		</tr>
 				</table>

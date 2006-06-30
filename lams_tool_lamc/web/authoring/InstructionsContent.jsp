@@ -31,65 +31,47 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		    	<table align=center> 	  
+				<table class="forms">
 					<tr> <td>
 						<jsp:include page="/McErrorBox.jsp" />
 					</td> </tr>
 				</table>
 
 				<table class="forms">
-
 				<tr> 
 					<td NOWRAP colspan=2 valign=top>
 						<lams:SetEditor id="richTextOnlineInstructions" text="${sessionScope.richTextOnlineInstructions}" small="true" key="label.onlineInstructions.col"/>					
 					</td> 
 				</tr>
 				
-				<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.onlineFiles" /> </b>
-    	      			</font>
-          			</td>
-          			<td NOWRAP valign=top> 
-	          			<font size=2>
-							<html:file  property="theOnlineFile"></html:file>
-						 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');" styleClass="buttonLeft">
-								 <bean:message key="button.upload"/> 
-							</html:submit>
-						</font>
-					</td> 
-				</tr>
 
 				<tr>
-					<td NOWRAP align="right" valign=top>
-	          			<font size=2>
-		      				<b> <bean:message key="label.uploadedOnlineFiles" /> </b>
-	      				</font>
-          			</td>
-          			
-					<td NOWRAP align=left valign=top width="100%">
-						<table align="left" width="100%">
+					<td colspan=2 NOWRAP align=left valign=top width="50%">
+						<table width="50%" cellspacing="8" align="CENTER" class="forms">
 									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
-													<font size=2> <c:out value="${file.filename}"/> </font>
-													&nbsp&nbsp
+													 <c:out value="${file.filename}"/> 
+												</td>
+												<td NOWRAP valign=top>												
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														 <font size=2>	<bean:message key="label.view"/> </font>
+														 	<bean:message key="label.view"/> 
 													</a>
-													&nbsp
+
+												</td>
+												<td NOWRAP valign=top>													
 													<c:set var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<font size=2> <bean:message key="label.download"/> </font>
+														<bean:message key="label.download"/> 
 													</a>
-													&nbsp
-													<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> </font>	
+												</td>
+												<td NOWRAP valign=top>
+													<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> 
 												</td>
 											</tr>
 				         			</c:forEach>
@@ -97,62 +79,71 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td> 
 				</tr>
 				
+
+				<tr> 
+					<td class="field-name">
+    	      				<b> <bean:message key="label.onlineFiles" /> </b>
+          			</td>
+          			<td NOWRAP valign=top> 
+							<html:file  property="theOnlineFile"></html:file>
+						 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');" styleClass="buttonLeft">
+								 <bean:message key="button.upload"/> 
+							</html:submit>
+					</td> 
+				</tr>
+
 				
 				<tr> 
 					<td NOWRAP colspan=2 valign=top>
 						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true" key="label.offlineInstructions.col"/>																			
 					</td> 
 				</tr>
-				
-				<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-							<b> <bean:message key="label.offlineFiles" /> <b>
-						</font>
-          			</td>
-          			<td NOWRAP valign=top> 
-	          			<font size=2>
-							<html:file  property="theOfflineFile"></html:file>
-						 	<html:submit onclick="javascript:submitMethod('submitOfflineFiles');" styleClass="buttonLeft">
-								 <bean:message key="button.upload"/> 
-							</html:submit>
-						</font>
-					</td> 
 
-				</tr>
 				<tr> 
-					<td NOWRAP align="right" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.uploadedOfflineFiles" /> </b>
-    	      			</font>
-          			</td>
-					<td NOWRAP align=left valign=top width="100%">
-						<table align="left">
+					<td colspan=2 NOWRAP align=left valign=top width="50%">
+						<table width="50%" cellspacing="8" align="CENTER" class="forms">
 									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
-													<font size=2> <c:out value="${file.filename}"/> </font>
-													&nbsp&nbsp												
+													 <c:out value="${file.filename}"/> 
+												</td>
+												<td NOWRAP valign=top>												
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														<font size=2> <bean:message key="label.view"/> </font>
+														 	<bean:message key="label.view"/> 
 													</a>
-													&nbsp
+
+												</td>
+												<td NOWRAP valign=top>													
 													<c:set var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<font size=2> <bean:message key="label.download"/> </font>
+														<bean:message key="label.download"/> 
 													</a>
-													&nbsp
-									 				<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> </font>													
 												</td>
-											</tr>
+												<td NOWRAP valign=top>
+													<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> 
+												</td>
 				         			</c:forEach>
 	         			</table>
 					</td> 
+				</tr>
+
+				
+				<tr> 
+					<td class="field-name">
+							<b> <bean:message key="label.offlineFiles" /> <b>
+          			</td>
+          			<td NOWRAP valign=top> 
+							<html:file  property="theOfflineFile"></html:file>
+						 	<html:submit onclick="javascript:submitMethod('submitOfflineFiles');" styleClass="buttonLeft">
+								 <bean:message key="button.upload"/> 
+							</html:submit>
+					</td> 
+
 				</tr>
 
 				<html:hidden property="fileItem"/>

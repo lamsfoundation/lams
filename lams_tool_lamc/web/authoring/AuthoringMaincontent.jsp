@@ -45,6 +45,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<head>
 		<title><fmt:message key="activity.title" /></title>
 
+		<%@ include file="/common/header.jsp"%>
+		<%@ include file="/common/fckeditorheader.jsp"%>
+		
 		<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
 			<script language="JavaScript" type="text/JavaScript">
 		        function init(){
@@ -200,11 +203,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</html:form>				
 	</div>		
 
-
 	<div id="footer"></div>
-		<lams:HTMLEditor />
-	</div>
+<lams:HTMLEditor />
 
+</div>
 
 </body>
 </html:html>

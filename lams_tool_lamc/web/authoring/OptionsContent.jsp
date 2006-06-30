@@ -38,19 +38,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 
 
-				<table class="forms" align=center>
+				<table class="forms">
 					<tr>
-	 				 	<td class="formlabel" align=right valign=top> 
-		 				 	<font size=2>
+	 				 	<td NOWRAP valign=top> 
 								<b> <bean:message key="label.question"/>: </b>
-							</font>
 						</td>
 						
 						<td colspan=3 valign=top>
-							<font size=2>
 				  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
 						  			size="50" maxlength="255"> 
-					  		</font>
 					  	</td>
 					</tr>
 					
@@ -64,8 +60,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					<table align="center">
 					     <tr>
-							  	<td bgcolor="#A8C7DE" colspan=4 class="input" valign=top align=left>
-							  	 	<font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
+							  	<td bgcolor="#A8C7DE" colspan=4 valign=top align=left>
+							  	 	 <b> <bean:message key="label.mc.options"/> </b> 
 							  	</td>
 						 </tr>					
 					
@@ -75,81 +71,69 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
 								  
-									  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <bean:message key="label.candidateAnswer"/> ${optionIndex} :  </b>  </font>
+									  	<td bgcolor="#EEEEEE" valign=top>   <b> <bean:message key="label.candidateAnswer"/> ${optionIndex} :  </b>  
 
-										<font size=2>
-								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
-									  		size="50" maxlength="255">
-									  	</font>
+							  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
+								  		size="50" maxlength="255">
+
 							
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
-				  							<font size=2>								  	
 												  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
 							  					
 														  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-																<option value="Incorrect" > <font size=2> <bean:message key='option.incorrect'/> </font> </option>
-																<option value="Correct" SELECTED>  <font size=2> <bean:message key='option.correct'/> </font></option>
+																<option value="Incorrect" >  <bean:message key='option.incorrect'/>  </option>
+																<option value="Correct" SELECTED>  <bean:message key='option.correct'/> </option>
 															</select>
 												
 							  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
 							 					</c:if> 			
-							 				</font>
 										</c:forEach>
 										
 									  <c:if test="${selectedOptionFound == 0}"> 			
-										  <font size=2>								  	
 													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-															<option value="Incorrect" SELECTED> <font size=2> <bean:message key='option.incorrect'/> </font> </option>
-															<option value="Correct">   <font size=2> <bean:message key='option.correct'/>  </font> </option>
+															<option value="Incorrect" SELECTED>  <bean:message key='option.incorrect'/>  </option>
+															<option value="Correct">   <bean:message key='option.correct'/>  </option>
 														</select>
-											</font>													
 					 					</c:if> 			
 										</td>
 	
-										<td bgcolor="#EEEEEE" class="input" valign=top>
-											<font size=2>								  	
+										<td bgcolor="#EEEEEE"  valign=top>
 		       								    <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:deleteOption(1,'removeOption');">
-		       								 </font>
 									  	</td>
 							 </tr>
 							</c:if> 			
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <bean:message key="label.candidateAnswer"/> ${optionIndex} : </b></font>
+								  	<td bgcolor="#EEEEEE" valign=top> <b> <bean:message key="label.candidateAnswer"/> ${optionIndex} : </b>
 
-									<font size=2>								  	
 							  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"
 								  		size="50" maxlength="255">
-							  		</font>
 
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
-				  							<font size=2>								  	
+
 											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
 													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-															<option value="Incorrect" > <font size=2> <bean:message key='option.incorrect'/> </font> </option>
-															<option value="Correct" SELECTED> <font size=2>	  <bean:message key='option.correct'/>   </font> </option>
+															<option value="Incorrect" >  <bean:message key='option.incorrect'/>  </option>
+															<option value="Correct" SELECTED>  <bean:message key='option.correct'/>   </option>
 														</select>
 						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
 							 					</c:if> 			
-							 				</font>
 										</c:forEach>
 										
 									  <c:if test="${selectedOptionFound == 0}"> 			
 
 												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-														<option value="Incorrect" SELECTED> <font size=2> <bean:message key='option.incorrect'/>  </font> </option>
-														<option value="Correct">   <font size=2> <bean:message key='option.correct'/> </font>   </option>
+														<option value="Incorrect" SELECTED> <bean:message key='option.incorrect'/>  </option>
+														<option value="Correct">   <bean:message key='option.correct'/>  </option>
 													</select>
 					 					</c:if> 			
 										</td>
 	
-										<td bgcolor="#EEEEEE" class="input" valign=top>
-											<font size=2>
+										<td bgcolor="#EEEEEE" valign=top>
 		       								    <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:deleteOption(<c:out value="${optionIndex}"/>,'removeOption');">
-	       								    </font>
     								  	</td>
 								  </tr>
 							</c:if> 			
@@ -157,12 +141,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:forEach>
 						
 						 <tr>
-							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
-				  					<font size=2>
+							  	<td bgcolor="#EEEEEE" colspan=4 valign=top align=right>
 										<html:submit onclick="javascript:submitMethod('addOption');" styleClass="button">
 												<bean:message key="label.add.option"/>
 										</html:submit>	 				 		  										  		
-									</font>									
 							  	</td>
 						 </tr>							
 					</table> </td> </tr>	
@@ -177,25 +159,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 					<tr> 
-						<td NOWRAP colspan=4 class="formcontrol" valign=top>
+						<td NOWRAP colspan=4 valign=top>
 							<lams:SetEditor id="richTextIncorrectFeedback" text="${sessionScope.richTextIncorrectFeedback}" small="true" key="label.feedback.incorrect"/>																						
 						</td> 
 					</tr>
 
 					<tr> 
-						<td NOWRAP colspan=4 class="formcontrol" valign=top>
+						<td NOWRAP colspan=4 valign=top>
 							<lams:SetEditor id="richTextCorrectFeedback" text="${sessionScope.richTextCorrectFeedback}" small="true" key="label.feedback.correct"/>																											
 						</td> 
 					</tr>
 
 	 				 <tr>
 	 				 <td valign=top> </td>
-	 				 <td class="input" align=left colspan=3 valign=top>
-						<font size=2>
+	 				 <td align=left colspan=3 valign=top>
 							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="button">
 									<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
-						</font>							
 	 			  	</td>
 	 				</tr>
 				</table> 	 

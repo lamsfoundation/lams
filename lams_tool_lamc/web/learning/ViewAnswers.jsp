@@ -18,31 +18,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<jsp:include page="/learning/learningHeader.jsp" />
-	
-		<script language="JavaScript" type="text/JavaScript">
-		function submitLearnerProgressMethod(actionMethod) 
-		{
-			document.McLearningForm.doneLearnerProgress.value=1; 
-			document.McLearningForm.submit();
-		}
-		</script>
+	<title> <bean:message key="label.learning"/> </title>
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 </head>
 <body>
 
@@ -66,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<font size=3> <b>  <bean:message key="label.viewAnswers"/> </b> </font>
+						  	<b>  <bean:message key="label.viewAnswers"/> </b> 
 					  	</td>
 					  </tr>
 					</c:if> 								  
@@ -74,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.learnerProgress == 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<font size=3> <b>  <bean:message key="label.learner.viewAnswers"/> </b> </font>
+						  	 <b>  <bean:message key="label.learner.viewAnswers"/> </b> 
 					  	</td>
 					  </tr>
 					</c:if> 								  
@@ -90,9 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
 						  <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
-								  	<font size=2>
 								  		<c:out value="${questionEntry.value}"/> 
-							  	</font> 
 						  	</td>
 						  </tr>
 
@@ -107,19 +90,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
 													<td NOWRAP align=left valign=top> 
-														<font size=2>
 						   								    <img src="<c:out value="${tool}"/>images/dot.jpg" align=left> &nbsp
-															<font size=2>	<c:out value="${subEntry.value}"/> </font>					   								    
-														</font>
+															<c:out value="${subEntry.value}"/> 
 													</td> 
 												</tr>	
 											</c:forEach>
 
 												<tr>												
 												<td NOWRAP colspan=2 align=left valign=top> 
-													<font size=2>
 					   								    <b> <bean:message key="label.attempts"/> </b>
-					   								 </font>
 												</td> 
 												</tr>
 												
@@ -135,9 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																				<c:if test="${distinctAttemptEntry.key == i}"> 	
 																					<tr>
 																						<td NOWRAP align=left valign=top> 
-																							<font size=2>
 																								<b> <bean:message key="label.attempt"/> <c:out value="${sessionScope.aIndex}"/>: </b>
-																							</font>
 																						</td>
 																						<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
 								 														<td align=left valign=top> 																					
@@ -145,9 +122,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
 																									<tr>
 																										<td NOWRAP align=left valign=top>
-																											<font size=2>
 													 															<c:out value="${singleAttemptEntry.value}"/> 
-													 														</font>
 												 														</td>
 																									</tr>	
 																								</c:forEach>
@@ -181,7 +156,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 			  	   		  <tr>
 						  	<td NOWRAP colspan=2 align=center valign=top> 
-							  	<font size=2>
 						  			<html:submit property="redoQuestions" styleClass="button">
 										<bean:message key="label.redo.questions"/>
 									</html:submit>	 		
@@ -195,7 +169,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			   						<html:submit property="viewSummary" styleClass="button">
 										<bean:message key="label.view.summary"/>
 									</html:submit>	 				 		  					
-								</font>
 						  	 </td>
 						  </tr>
 						</c:if> 																		
@@ -203,7 +176,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 			  	   		  <tr>
 			  	   		    <td colspan=2 align=right  valign=top>
-				  	   		    <font size=2>
 							  	   <html:submit property="learnerFinished" styleClass="button">
 												<bean:message key="label.finished"/>
 								   </html:submit>
@@ -211,7 +183,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			   						<html:submit property="viewSummary" styleClass="button">
 										<bean:message key="label.view.summary"/>
 									</html:submit>	 				 		  					
-								</font>
 						  	 </td>
 						  </tr>
 						</c:if> 																		

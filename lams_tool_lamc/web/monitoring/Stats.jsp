@@ -31,49 +31,49 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-			<table class="forms">
+					<table class="forms">
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
+							<td NOWRAP valign=top>
+				  				<b>  <bean:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	 <font size=2> <c:out value="${sessionScope.countAllUsers}"/>
+							  	 <c:out value="${sessionScope.countAllUsers}"/>
 							</td> 
 						</tr>
 						
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.finished.user" /> </font></b>
+							<td NOWRAP valign=top>
+				  				<b> <bean:message key="count.finished.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	 <font size=2> <c:out value="${sessionScope.countSessionComplete}"/></font>
+							  	  <c:out value="${sessionScope.countSessionComplete}"/>
 							</td> 
 						</tr>
 					
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="label.topMark" /> </font></b>
+						<td NOWRAP valign=top>
+				  				<b>  <bean:message key="label.topMark" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	<font size=2> <c:out value="${sessionScope.topMark}"/></font>
+							  	 <c:out value="${sessionScope.topMark}"/>
 							</td> 
 						</tr>
 						
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2><bean:message key="label.avMark" /> </font></b>
+							<td NOWRAP valign=top>
+				  				<b> <bean:message key="label.avMark" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	<font size=2> <c:out value="${sessionScope.averageMark}"/></font>
+							  	<c:out value="${sessionScope.averageMark}"/>
 							</td> 
 						</tr>
 						
 						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="label.loMark" /> </font></b>
+							<td NOWRAP valign=top>
+				  				<b>  <bean:message key="label.loMark" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	<font size=2> <c:out value="${sessionScope.lowestMark}"/></font>
+							  	<c:out value="${sessionScope.lowestMark}"/>
 							</td> 
 						</tr>
 

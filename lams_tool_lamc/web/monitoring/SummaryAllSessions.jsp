@@ -30,31 +30,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-			<table width="80%" cellspacing="8" align="center" class="forms">
+				<table class="forms">
 		  	 		
 					<c:forEach var="sessionMarksDto" items="${sessionScope.listMonitoredMarksContainerDto}">
 			  	 		<c:set var="currentSessionId" scope="request" value="${sessionMarksDto.sessionId}"/>
 			  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
 
 						<tr>
-					 		<td NOWRAP colspan=2 > <b> <font size=2> <bean:message key="label.groupName"/> </b>
+					 		<td NOWRAP colspan=2 > <b> <bean:message key="label.groupName"/> </b>
 					 		<c:out value="${sessionMarksDto.sessionName}"/>  </td>
 						</tr>
 
 
 			  	 		<tr>
-							 <td NOWRAP valign=top align=left> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
+							 <td NOWRAP valign=top align=left> <b> <bean:message key="label.user"/> </b> </td>  
 				  	 		<c:set var="queIndex" scope="request" value="0"/>
 							<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
 							<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-								<td NOWRAP valign=top align=left> <b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
+								<td NOWRAP valign=top align=left> <b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
 									 &nbsp (<bean:message key="label.weight"/> 
 									<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
-								</font> 
 								</td>
 							</c:forEach>		  	
 							 
-							 <td NOWRAP valign=top align=left> <b> <font size=2> <bean:message key="label.total"/> </font> </b> </td>  
+							 <td NOWRAP valign=top align=left> <b> <bean:message key="label.total"/>  </b> </td>  
 			  	 		</tr>						 
 
 									<c:forEach var="markData" items="${mapUserMarksDto}">						
@@ -64,20 +63,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
 										<c:if test="${currentUserSessionId == currentSessionId}"> 	
 											<tr>									  	 		
-							  	 				<td NOWRAP valign=top align=left> <font size=2>
+							  	 				<td NOWRAP valign=top align=left> 
 														<c:out value="${data.userName}"/> 
-													</font>
 												</td>	
 			
 												<c:forEach var="mark" items="${data.marks}">
-													<td NOWRAP valign=top align=left> <font size=2>
+													<td NOWRAP valign=top align=left> 
 															<c:out value="${mark}"/> 								
 													</td>
 												</c:forEach>		  										
 			
-												<td NOWRAP valign=top align=left> <font size=2>
+												<td NOWRAP valign=top align=left> 
 															<c:out value="${data.totalMark}"/> 																
-													</font>
 												</td>							
 											</tr>													
 										</c:if>																
@@ -92,20 +89,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<c:if test="${sessionScope.currentMonitoredToolSession == currentUserSessionId}"> 										
 											<c:if test="${currentUserSessionId == currentSessionId}"> 									
 											<tr>			
-												<td NOWRAP valign=top align=left> <font size=2>
+												<td NOWRAP valign=top align=left> 
 														<c:out value="${data.userName}"/> 
-													</font>
 												</td>	
 			
 												<c:forEach var="mark" items="${data.marks}">
-													<td NOWRAP valign=top align=left> <font size=2>
+													<td NOWRAP valign=top align=left> 
 															<c:out value="${mark}"/> 								
 													</td>
 												</c:forEach>		  										
 			
-												<td NOWRAP valign=top align=left> <font size=2>
+												<td NOWRAP valign=top align=left> 
 															<c:out value="${data.totalMark}"/> 																
-													</font>
 												</td>							
 											</tr>														
 											</c:if>																
