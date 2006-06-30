@@ -39,7 +39,7 @@
 <table>
 	<tr>
 		<td><fmt:message key="admin.organisation.name"/>:</td>
-		<td><html-el:text property="name" size="20" /> *</td>
+		<td><html-el:text property="name" size="40" /> *</td>
 	</tr>
 	<tr>
 	<td><fmt:message key="admin.organisation.code"/>:</td>
