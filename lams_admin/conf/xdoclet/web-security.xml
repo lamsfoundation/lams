@@ -5,7 +5,7 @@
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
-    		<role-name>ADMIN</role-name>
+    		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
