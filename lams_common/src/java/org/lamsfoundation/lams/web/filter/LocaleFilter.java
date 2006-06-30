@@ -35,6 +35,8 @@ import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -89,17 +91,15 @@ public class LocaleFilter extends OncePerRequestFilter {
 				}
 			}
     	}
-//		if(preferredLocale == null){
-//        	//if request does not have, set it default then.
-//        	preferredLocale = new Locale(DEFAULT_LANGUAGE,DEFUALT_COUNTRY);
-//		}
+		if(preferredLocale == null){
+        	//if request does not have, set it default then.
+        	preferredLocale = new Locale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
+		}
 
     	HttpSession session = request.getSession(false);
         //set locale for STURTS and JSTL
         if (session != null) {
-            if (preferredLocale == null) {
-                preferredLocale = (Locale) session.getAttribute(PREFERRED_LOCALE_KEY);
-            } else {
+            if (preferredLocale != null) {
                 session.setAttribute(PREFERRED_LOCALE_KEY, preferredLocale);
                 Config.set(session, Config.FMT_LOCALE, preferredLocale);
             }
