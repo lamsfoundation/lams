@@ -62,7 +62,8 @@
 			</td>
 		</tr>
 	</table>
-	<br>
+	<div id="header-no-tabs"></div>
+	
 	<div id="content">
 	<BR>
 	<%@ include file="/common/messages.jsp"%>
