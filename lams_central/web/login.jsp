@@ -85,13 +85,13 @@ LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" ta
 						</p>
 					</c:if>	
 				 <p class="first"><fmt:message key="label.username"/>: 
-				   <input name="j_username" type="text" size="16" />
+				   <input name="j_username" type="text" size="16" tabindex="1"/>
 				  </p>
 				 <p><fmt:message key="label.password"/>: 
-				   <input name="j_password" type="password" size="16" autocomplete="off"/>
+				   <input name="j_password" type="password" size="16" autocomplete="off" tabindex="2"/>
 				  </p>
 					
-					 <p><a href="javascript:submitForm()" class="button"><fmt:message key="button.login"/></a></p>
+					 <p><input type="submit" class="button" value="<fmt:message key="button.login"/>" onClick="javascript:submitForm()" tabindex="3"/></p>
 				</form>	 
 				</div><!--closes right col-->
 	 
