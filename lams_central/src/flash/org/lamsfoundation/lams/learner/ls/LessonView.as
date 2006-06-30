@@ -30,6 +30,8 @@ import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.common.dict.*;
 
 import org.lamsfoundation.lams.authoring.Activity;
 
@@ -44,6 +46,8 @@ import mx.events.*
 class LessonView extends AbstractView {
 	
 	private static var ACTIVITY_OFFSET = 65;
+	private static var LESSON_NAME_LIMIT = 15;
+	
 	private var _className = "LessonView";
 	private var _depth:Number;
 	
@@ -51,10 +55,11 @@ class LessonView extends AbstractView {
 	private var _lesson_mc:MovieClip;
 	
 	private var bkg_pnl:MovieClip;
-	private var _lessonName:Label;
-	private var export_btn:Button;
 	private var progress_scp:MovieClip;
 	private var _activityList:Array;
+	
+	private var _tm:ThemeManager;
+	private var _dictionary:Dictionary;
 	
 	private var ACT_X:Number = -20;
 	private var ACT_Y:Number = 32.5;
@@ -71,6 +76,8 @@ class LessonView extends AbstractView {
 	public function LessonView(){
 		_activityList = new Array();
 		
+		_tm = ThemeManager.getInstance();
+		
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);     
 	}
@@ -84,23 +91,22 @@ class LessonView extends AbstractView {
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		
-		MovieClipUtils.doLater(Proxy.create(this,createLesson));		
+		this.onEnterFrame = createLesson;	
 	}
 	
 	/**
 	* Sets up the lesson (clip)
 	*/
 	public function createLesson() {
+		//Delete the enterframe dispatcher
+        delete this.onEnterFrame;
+		
 		trace('creating new Lesson ...');
         setStyles();
 		
         _lesson_mc = this;
 		_depth = this.getNextHighestDepth();
-		
-		//Add the button handlers, essentially this is handing on clicked event to controller.
-        var controller = getController();
-		export_btn.addEventListener("click", controller);
-		
+
         //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
 	   
@@ -140,7 +146,7 @@ class LessonView extends AbstractView {
 				break;
 			case 'LESSON' :
 				trace('setting lesson name');
-				_lessonName.text = lm.name;
+				setLessonName(lm.name);
 				break;
 			case 'DESIGNMODEL' :
 				trace('updating design model for lesson..');
@@ -162,6 +168,12 @@ class LessonView extends AbstractView {
         }
 	}
     
+	private function setLessonName(lessonName:String){
+		if (lessonName.length > 15){
+			lessonName = lessonName.substr(0, LESSON_NAME_LIMIT)+"..."
+		}
+		Application.getInstance().getHeader().setLessonName(lessonName);
+	}
 	
 	/**
 	 * Remove the activityies from screen on selection of new lesson
@@ -226,12 +238,16 @@ class LessonView extends AbstractView {
 		
 		
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			_activityList.push(newActivity_mc);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
-		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+		} else if(a.isGateActivity()){
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
+			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
+			_activityList.push(newActivity_mc);
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is parellel (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
@@ -247,6 +263,8 @@ class LessonView extends AbstractView {
 		if (actItems < lm.getActivityKeys().length){
 			lm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
+		
+		progress_scp.redraw(true);
 		
 		return true;
 	}
@@ -298,7 +316,11 @@ class LessonView extends AbstractView {
     * Set the styles for the Lesson
     */
     private function setStyles() {
-		// no styles to set 
+		var styleObj = _tm.getStyleObject('BGPanel');
+		bkg_pnl.setStyle('styleName', styleObj);
+		
+		styleObj = _tm.getStyleObject('scrollpane');
+		progress_scp.setStyle('styleName', styleObj);
 	}
 	
 	/**
