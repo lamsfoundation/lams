@@ -90,7 +90,7 @@
 					<img src="images/loading.gif" /> <font color="gray" size="4"><fmt:message key="msg.loading"/></font>
 			</div>
 			<p><img src="images/launch_page_graphic.jpg"/></p>
-			<p><A HREF="copyright.jsp" target='copyright' onClick="window.open('copyright.jsp','copyright','resizable,width=750,height=388,scrollbars');return false;">
+			<p><A HREF="copyright.jsp" target='copyright' onClick="window.open('copyright.jsp','copyright','resizable,left='+(self.screen.width/2-750/2)+',top='+(self.screen.height/2-33/2)+',width=750,height=388,scrollbars');return false;">
 						&copy; <fmt:message key="msg.LAMS.copyright.short"/></a></p>
 		</div>
 	</div>
