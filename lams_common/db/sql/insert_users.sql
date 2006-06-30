@@ -74,11 +74,11 @@ INSERT INTO lams_organisation (organisation_id, name, code, description, parent_
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
 	VALUES (3, 'Everybody', null, 'All People In Course',2,3,NOW(),null,'en','AU',1);
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (4, 'Mathematics 1', 'MATH111', 'Mathematics 1',1,2,NOW(),3,'zh','',1);
+	VALUES (4, 'Mathematics 1', 'MATH111', 'Mathematics 1',1,2,NOW(),3,'zh','null',1);
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (5, 'Tutorial Group A', 'TUTA', 'Tutorial Group A',4,3,NOW(),null,'zh','',1);
+	VALUES (5, 'Tutorial Group A', 'TUTA', 'Tutorial Group A',4,3,NOW(),null,'zh','null',1);
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),null,'zh','',1);
+	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),null,'zh','null',1);
 
 -- users
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
