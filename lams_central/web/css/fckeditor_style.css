@@ -14,7 +14,7 @@
 
 .smallPreviewPanel {
 	width: 665px;
-	height: 120px;
+	height: 80px;
 	border-style: none;
 	border-width: 1px;
 	padding: 5px;
@@ -22,7 +22,7 @@
 
 .smallTextareaPanel {
 	width: 665px;
-	height: 120px;
+	height: 80px;
 }
 
 
