@@ -1,11 +1,6 @@
-<%@ include file="/includes/taglibs.jsp" %>
+<%@ include file="/includes/taglibs.jsp"%>
 
 <html:errors property="error" />
-<div align="center">
 <html:form action="/learning/createTopic.do" method="post" focus="message.subject" enctype="multipart/form-data">
-
-<fieldset>
-<%@ include file="/jsps/learning/message/topicform.jsp" %>
- </fieldset>
- </html:form>
-</div>
+	<%@ include file="/jsps/learning/message/topicform.jsp"%>
+</html:form>

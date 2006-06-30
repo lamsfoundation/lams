@@ -1,12 +1,17 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <c:set var="mode" value="${sessionScope.mode}" />
-<h1><c:out value="${title}" escapeXml="false"/></h1>
-<h2><c:out value="${instruction}" escapeXml="false"/></h2>
-<BR>
-<div align="center">
-	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
 
-	<br>
+<h1>
+	<c:out value="${title}" escapeXml="false" />
+</h1>
+<p>
+	<c:out value="${instruction}" escapeXml="false" />
+</p>
+
+
+<%@ include file="/jsps/learning/message/topiclist.jsp"%>
+
+<p>
 	<c:set var="newtopic">
 		<html:rewrite page="/learning/newTopic.do" />
 	</c:set>
@@ -30,4 +35,4 @@
 		</html:button>
 	</c:if>
 
-</div>
+</p>

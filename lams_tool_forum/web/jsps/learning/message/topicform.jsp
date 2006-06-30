@@ -1,35 +1,37 @@
-
 <c_rt:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-<table width="90%" cellspacing="8" border="0" align="CENTER">
+
+<table cellpadding="0">
 	<tr>
-		<td valign="MIDDLE">
-			<b><bean:message key="message.label.subject" /><b class="required">*</b></b>
+		<td class="field-name">
+			<bean:message key="message.label.subject" />
+			*
 		</td>
-		<td valign="MIDDLE" align="left">
+		<td>
 			<html:text size="30" tabindex="1" property="message.subject" />
 			<br>
 			<html:errors property="message.subject" />
 		</td>
 	</tr>
 	<tr>
-		<td valign="MIDDLE">
-			<b><bean:message key="message.label.body" /> <b class="required">*</b></b>
+		<td class="field-name">
+			<bean:message key="message.label.body" />
+			*
 		</td>
-		<td valign="TOP" align="left">
+		<td>
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
 	<tr>
-		<td valign="MIDDLE">
-			<b><bean:message key="message.label.attachment" /></b>
+		<td class="field-name">
+			<bean:message key="message.label.attachment" />
 		</td>
-		<td valign="MIDDLE" align="left">
+		<td>
 			<html:file tabindex="3" property="attachmentFile" />
 			<html:errors property="message.attachment" />
 		</td>
 	</tr>
 	<tr>
-		<td></td>
+		<td>&nbsp;</td>
 		<td align="left">
 			<BR>
 			<html:submit styleClass="buttonStyle" style="width:120px">

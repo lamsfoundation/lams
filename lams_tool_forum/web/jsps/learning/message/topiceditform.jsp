@@ -1,26 +1,27 @@
-<table width="90%" cellspacing="8" align="CENTER">
+<table cellpadding="0">
 	<tr>
-		<td valign="MIDDLE">
-			<b><bean:message key="message.label.subject" /><b class="required">*</b></b>
+		<td class="field-name">
+			<bean:message key="message.label.subject" />*
 		</td>
-		<td valign="MIDDLE" align="left">
-			<html:text size="30" tabindex="1" property="message.subject" /><br>
+		<td>
+			<html:text size="30" tabindex="1" property="message.subject" />
 			<html:errors property="message.subject" />
 		</td>
 	</tr>
 	<tr>
-		<td valign="MIDDLE">
-			<b><bean:message key="message.label.body" /></b><b class="required">*</b>
+		<td class="field-name">
+			<bean:message key="message.label.body" />*
 		</td>
-		<td valign="MIDDLE" align="left">
+		<td>
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
+	
 	<tr>
-		<td>
-			<b><bean:message key="message.label.attachment" /></b>
+		<td class="field-name">
+			<bean:message key="message.label.attachment" />
 		</td>
-		<td valign="MIDDLE" align="left">
+		<td>
 			<c:if test="${topic.hasAttachment}">
 				<c:forEach var="file" items="${topic.message.attachments}">
 					<c:set var="downloadURL">
@@ -42,8 +43,7 @@
 	</tr>
 	<tr>
 		<td></td>
-		<td align="left">
-			<BR>
+		<td>
 			<html:submit styleClass="buttonStyle" style="width:120px">
 				<bean:message key="button.submit" />
 			</html:submit>
