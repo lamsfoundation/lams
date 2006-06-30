@@ -18,3 +18,12 @@
     		<form-login-page>/login.jsp</form-login-page>
    		</form-login-config>
    	</login-config>
+
+    <!--  Security Roles -->
+   	<security-role>
+		<role-name>COURSE ADMIN</role-name>
+	</security-role>
+	<security-role>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+	
