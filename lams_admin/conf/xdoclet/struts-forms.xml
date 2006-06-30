@@ -8,6 +8,9 @@
 	<form-property name="localeId" type="java.lang.Byte" initial="1"/>
 	<form-property name="typeId" type="java.lang.Integer" />
 	<form-property name="stateId" type="java.lang.Integer" />
+	<form-property name="courseAdminCanAddNewUsers" type="java.lang.Boolean" initial="false"/>
+	<form-property name="courseAdminCanBrowseAllUsers" type="java.lang.Boolean" initial="false"/>
+	<form-property name="courseAdminCanChangeStatusOfCourse" type="java.lang.Boolean" initial="false"/>
 </form-bean>
 
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
