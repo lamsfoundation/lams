@@ -95,11 +95,6 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		ActionMessages errors = new ActionMessages();
-		if(!request.isUserInRole(Role.SYSADMIN) || !request.isUserInRole(Role.COURSE_ADMIN)){
-			errors.add("permission",new ActionMessage("errors.insufficient.permissions"));
-		    saveErrors(request,errors);
-			return mapping.findForward("error");
-		}
 		
 		// retain orgId to return to userlist
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
