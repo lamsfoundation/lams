@@ -19,34 +19,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
-	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-	
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="label.learning.report"/> </title>
 	
-	 <lams:css/>
-	
-	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
-
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 	
 	
 	<script language="JavaScript" type="text/JavaScript">
@@ -69,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body>
 
-		<table width="80%" cellspacing="8" align="CENTER" class="forms">
+		<table  class="forms">
 				<tr>
 			 		<th NOWRAP>  <bean:message key="label.learner.progress"/>   </th>
 				</tr>
@@ -82,9 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>	 
 
-			<div class="tabbody content_b" >
-			
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table  class="forms">
 					<tr>
 						<td NOWRAP valign=top align=left>
 			 			<table align=left>
@@ -95,17 +76,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td> &nbsp&nbsp</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
+								<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
 									<c:out value="${currentDto.question}" escapeXml="false"/>
-								</font> </td>
+								 </td>
 							</tr>	
 							
 							<tr> 
-								<td NOWRAP class="formlabel" valign=top>
+								<td NOWRAP valign=top>
 									<table align=center>
 										<tr> 
-											 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-					  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
+											 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
+					  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
 							  			</tr>				 
 			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											<c:forEach var="sData" items="${questionAttemptData.value}">
@@ -137,17 +118,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td> &nbsp&nbsp</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
+								<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
 									<c:out value="${currentDto.question}" escapeXml="false"/>
-								</font> </td>
+								 </td>
 							</tr>	
 							
 							<tr> 
-								<td NOWRAP class="formlabel" valign=top>
+								<td NOWRAP  valign=top>
 									<table align=center>
 										<tr> 
-											 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-					  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
+											 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
+					  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
 							  			</tr>				 
 	
 			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
@@ -164,7 +145,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		</td>
 				</tr>
 			</table>
-		</div>		         
 	</html:form>
 
 </body>

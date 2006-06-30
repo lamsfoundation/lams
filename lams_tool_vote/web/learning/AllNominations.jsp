@@ -18,22 +18,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp"%>
 
 <html:html locale="true">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<jsp:include page="/learning/learningHeader.jsp" />
+	<title> <bean:message key="label.learning"/> </title>
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
+
+	<script language="JavaScript" type="text/JavaScript">
+		function submitMethod(actionMethod) 
+		{
+			document.VoteLearningForm.dispatch.value=actionMethod; 
+			document.VoteLearningForm.submit();
+		}
+	</script>
+	
 </head>
 <body>
 
@@ -41,27 +44,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table  class="forms">
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-						  	<font size=2> <b>  <bean:message key="label.progressiveResults"/> </b> </font>
+					  	<td NOWRAP align=center  valign=top colspan=2> 
+						  	 <b>  <bean:message key="label.progressiveResults"/> </b> 
 					  	</td>
 					  </tr>
 					  
  					<c:if test="${VoteLearningForm.nominationsSubmited == 'true'}"> 			
 						<tr> <td class="error" align=center>
 								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
-								<font size=2> <bean:message key="sbmt.learner.nominations.successful"/> </font> </img>
+								 <bean:message key="sbmt.learner.nominations.successful"/>  </img>
 						</td></tr>
 					</c:if> 		
 					  
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center valign=top colspan=2> 
 							<c:set var="viewURL">
 								<html:rewrite page="/chartGenerator?type=pie"/>
 							</c:set>
 							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								 <font size=2>	<bean:message key="label.view.piechart"/>  </font>
+								 	<bean:message key="label.view.piechart"/>  
 							</a>
 								
 					  	</td>
@@ -69,12 +72,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 					  
 			  			<tr> 
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center  valign=top colspan=2> 
 								<c:set var="viewURL">
 									<html:rewrite page="/chartGenerator?type=bar"/>
 								</c:set>
 								<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									 <font size=2>	<bean:message key="label.view.barchart"/>  </font>
+									 	<bean:message key="label.view.barchart"/>  
 								</a>
 							</td>
 						</tr>
@@ -82,14 +85,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center  valign=top colspan=2> 
 								&nbsp&nbsp&nbsp&nbsp								
 					  	</td>
 					  </tr>	
 
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-						  	<font size=2> <b>  <bean:message key="label.learner.nominations"/> </b> </font>
+					  	<td NOWRAP align=center  valign=top colspan=2> 
+						  	 <b>  <bean:message key="label.learner.nominations"/> </b> 
 					  	</td>
 					  </tr>
 
@@ -102,16 +105,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 
 						<tr> 
-							<td NOWRAP align=center class="input" valign=top colspan=2> 
+							<td NOWRAP align=center  valign=top colspan=2> 
 						 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
 					 		</td>
 					  	</tr>
 
 
 				  <tr>
-				  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
-					  	<font size=2>
-					  	
+				  	<td NOWRAP colspan=2 align=center valign=top> 
 								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 				   						
 			                                <html:submit property="redoQuestionsOk" 
 			                                             styleClass="linkbutton" 
@@ -133,7 +134,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                              onclick="submitMethod('learnerFinished');">
                                     <bean:message key="label.finished"/>
                                 </html:submit>
-						</font>
 				  	 </td>
 				  </tr>
 

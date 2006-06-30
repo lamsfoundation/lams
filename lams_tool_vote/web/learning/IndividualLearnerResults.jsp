@@ -1,19 +1,23 @@
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/taglibs.jsp"%>
 
 <html:html locale="true">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<jsp:include page="/learning/learningHeader.jsp" />
+	<title> <bean:message key="label.learning"/> </title>
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
+
+	<script language="JavaScript" type="text/JavaScript">
+		function submitMethod(actionMethod) 
+		{
+			document.VoteLearningForm.dispatch.value=actionMethod; 
+			document.VoteLearningForm.submit();
+		}
+	</script>
+
+	
 </head>
 <body>
 
@@ -21,17 +25,17 @@
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 				
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top  colspan=2> 
-						  	<font size=2> <b>  <bean:message key="label.learning.reportMessage"/> </b> </font>
+					  	<td NOWRAP align=left  valign=top  colspan=2> 
+						  	 <b>  <bean:message key="label.learning.reportMessage"/> </b> 
 					  	</td>
 					  </tr>
 				
 
 					<tr>
-						<td NOWRAP align=right class="input" valign=top colspan=2> 
+						<td NOWRAP align=right  valign=top colspan=2> 
 							<hr>
 						</td> 
 					</tr>
@@ -51,15 +55,14 @@
 					  	</tr>
 
 			  	   	<tr> 
-				 		<td NOWRAP colspan=2 class="input" valign=top> 
+				 		<td NOWRAP colspan=2  valign=top> 
 				 		&nbsp
 				 		</td>
 			  	   </tr>
 
 			  	   
 		  	   		  <tr>
-					  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
-						  	<font size=2>
+					  	<td NOWRAP colspan=2 align=center  valign=top> 
                                 <html:submit property="redoQuestions" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('redoQuestions');">
@@ -72,7 +75,6 @@
                                              onclick="submitMethod('viewAllResults');">
                                     <bean:message key="label.overAllResults"/>
                                 </html:submit>
-							</font>
 					  	 </td>
 					  </tr>
 					

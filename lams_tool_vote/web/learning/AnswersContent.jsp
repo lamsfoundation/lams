@@ -18,22 +18,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
+<%@ include file="/common/taglibs.jsp"%>
 
 <html:html locale="true">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<jsp:include page="/learning/learningHeader.jsp" />
+	<title> <bean:message key="label.learning"/> </title>
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -83,6 +79,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		alert(msg);
 	}
 	</script>
+	
+	<script language="JavaScript" type="text/JavaScript">
+		function submitMethod(actionMethod) 
+		{
+			document.VoteLearningForm.dispatch.value=actionMethod; 
+			document.VoteLearningForm.submit();
+		}
+	</script>
+	
 
 </head>
 <body>
@@ -91,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table class="forms">
 					<c:if test="${VoteLearningForm.activityRunOffline == 'true'}"> 			
 						<tr> <td class="error">
 							<bean:message key="label.learning.forceOfflineMessage"/>
@@ -136,24 +141,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:if test="${VoteLearningForm.allowTextEntry == 'true'}"> 			
 									<tr> 
 										<td NOWRAP align=left valign=top colspan=2> 
-							      			<font size=2> <b>
+							      			 <b>
 										 		<bean:message key="label.other"/>: 
 									      		</b> 
 									 			<html:text property="userEntry" size="30" maxlength="100"/>
-											</font>									 			
 								 		</td>
 								  	</tr>
 							</c:if> 									  	
 				  	   
 				  	<html:hidden property="donePreview"/>						   
 		  	   		  <tr>
-					  	<td NOWRAP align=right class="input" valign=top> 
-						  	<font size=2>
+					  	<td NOWRAP align=left valign=top> 
 		                            <html:submit property="continueOptionsCombined" 
 		                                         styleClass="linkbutton">
 										<bean:message key="label.submit.vote"/>
 		                            </html:submit>
-							</font>
 					  	 </td>
 					  </tr>
 					

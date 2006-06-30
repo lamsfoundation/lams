@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+							<b>  <bean:message key="error.noLearnerActivity"/> </b>
 						</td> 
 					<tr>
 				</table>

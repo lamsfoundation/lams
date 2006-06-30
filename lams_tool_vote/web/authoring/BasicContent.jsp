@@ -33,24 +33,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	                                     
-		           <h2><font size=2> <b> <bean:message key="label.authoring.vote.basic"/> </b></font></h2>
+		           <h2>  <bean:message key="label.authoring.vote.basic"/> </h2>
 					<table class="forms">
 						<tr>   
 						<td NOWRAP class=error>
 							<c:if test="${sbmtSuccess == 'true' }"> 			
-								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="sbmt.successful"/> </font> </img>
+								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <bean:message key="sbmt.successful"/>  </img>
 							</c:if> 			
 
 							<c:if test="${userExceptionMaxNominationInvalid == 'true'}"> 										
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.maxNominationCount.invalid"/> </font> </img>
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <bean:message key="error.maxNominationCount.invalid"/>  </img>
 							</c:if> 			
 
 							<c:if test="${validationError == 'true'}"> 			
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.fields.mandatory"/> </font> </img>
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <bean:message key="error.fields.mandatory"/>  </img>
 							</c:if> 			
 							
 							<c:if test="${userExceptionOptionsDuplicate == 'true'}"> 			
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.duplicate.nomination"/> </font> </img>
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>   <bean:message key="error.duplicate.nomination"/>  </img>
 							</c:if> 			
 							
 						</td>
@@ -80,7 +80,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td> 
 							
 						  	<td NOWRAP valign=middle>			
-								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> </font>
+								  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
 							</td> 								
 							<td> </td>														 
 					  	</tr>
@@ -113,14 +113,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                     </td>
 	      						  	<td NOWRAP valign=middle>			
 						  				<c:if test="${maxOptionIndex == optIndex}"> 			
-		     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> </font>
+		     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
 		     							</c:if> 	    
 										
 		 				  				<c:if test="${maxOptionIndex != optIndex }"> 			
-			 				  				<font size=2>
 			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
 			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
-			       							</font>
 										</c:if> 	           								 
 		                         	</td>
 								  </tr>

@@ -441,8 +441,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     
     	
     	logger.debug("created user attempt in the db");
-    	voteLearningForm.resetCommands();
-
+    	
     	// Put the map in the request ready for the next screen
     	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
@@ -453,6 +452,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	MonitoringUtil.prepareChartData(request, voteService, null, toolContentId, toolSessionUid);
     	
     	logger.debug("fwding to INDIVIDUAL_REPORT: " + INDIVIDUAL_REPORT);
+    	voteLearningForm.resetCommands();
     	return (mapping.findForward(INDIVIDUAL_REPORT));
     }
 
@@ -492,6 +492,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
 	    logger.debug("previewOnly : " + previewOnly);
 	    logger.debug("fwd'ing to LOAD_LEARNER : " + LOAD_LEARNER);
+	    voteLearningForm.resetCommands();
 	    return (mapping.findForward(LOAD_LEARNER));
    }
 

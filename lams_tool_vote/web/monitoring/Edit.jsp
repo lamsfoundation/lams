@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${isMonitoredContentInUse == 'true'}"> 			
 					<table border="0" cellspacing="2" cellpadding="2">									
 						<tr> <td NOWRAP valign=top>
-								<font size=2> <bean:message key="error.content.inUse"/> </font>
+								 <bean:message key="error.content.inUse"/> 
 						</td> </tr>
 					</table>
 		</c:if> 																									

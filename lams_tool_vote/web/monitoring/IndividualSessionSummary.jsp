@@ -56,20 +56,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 						<tr>
-					 		<td NOWRAP colspan=2 > <b> <font size=2> <bean:message key="label.groupName"/> </b><c:out value="${groupName}"/>  </td>
+					 		<td NOWRAP colspan=2 > <b>  <bean:message key="label.groupName"/> </b><c:out value="${groupName}"/>  </td>
 						</tr>
 
 
 	  					<tr>
-					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.students"/> </b> </td>
-					 		<td> <font size=2> <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </font></td>
+					 		<td NOWRAP> <b>  <bean:message key="label.total.students"/> </b> </td>
+					 		<td>  <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </td>
 						</tr>
 
 	  					<tr>
-					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
-					 		<td NOWRAP> <font size=2> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> 
+					 		<td NOWRAP> <b>  <bean:message key="label.total.completed.students"/> </b> </td> 
+					 		<td NOWRAP>  <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> 
 						 		&nbsp(<c:out value="${VoteMonitoringForm.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
-					 		</font></td>
+					 		</td>
 						</tr>
 
 						<tr>
@@ -100,7 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:rewrite page="/chartGenerator?type=pie"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-											 <font size=2>	<bean:message key="label.view.piechart"/>  </font>
+											 	<bean:message key="label.view.piechart"/>  
 										</a>
 									</td>
 								</tr>
@@ -111,15 +111,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:rewrite page="/chartGenerator?type=bar"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-											 <font size=2>	<bean:message key="label.view.barchart"/>  </font>
+											 <bean:message key="label.view.barchart"/>  
 										</a>
 									</td>
 								</tr>
 							</c:if> 								
 							
 									<tr>
-								 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
-										<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
+								 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
+										<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
 									</tr>
 									
 									<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
@@ -152,11 +152,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																					</c:set>
 																  																					
 																					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-																						<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+																						 <c:out value="${currentUserCount.value}"/>  
 																					</a>
 																				</c:if> 	    
 																  				<c:if test="${currentNomination.value == 'Open Vote'}"> 				
-																						<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+																						 <c:out value="${currentUserCount.value}"/>  
 																				</c:if> 	    
 																		</c:if> 	    
 																	</c:forEach>		  
@@ -165,7 +165,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 															</c:forEach>		  
 														</c:if> 	    								
 										  				<c:if test="${currentUserCount.value == '0' }"> 		  				
-																<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+																<c:out value="${currentUserCount.value}"/>  
 														</c:if> 	
 														    																								
 													</c:if> 	    
@@ -174,7 +174,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
 										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-																<font size=2> &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
+																 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
 													</c:if> 	    
 												</c:forEach>		  
 											</td>								
@@ -207,11 +207,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</tr>
 	
 												<tr> 
-													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
-													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
-							  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
+													 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.vote"/>  </b> </td>  														 
+													 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.user"/>  </b> </td>  
+							  						 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.attemptTime"/> </b></td>
 							 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
-								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
+								  						 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.visible"/>  </b></td>								  						 
 													 </c:if> 																					  						 
 									  			</tr>				 
 											
@@ -224,12 +224,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<td NOWRAP valign=top align=left> 
 																	<c:out value="${currentDto.question}" escapeXml="false"/> 
 																	<c:if test="${userData.visible != 'true' }"> 			
-												                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
+												                                 <i><bean:message key="label.hidden"/> </i> 
 																	</c:if> 								
 																</td>
 																 
-																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+																 <td NOWRAP valign=top align=left>    <c:out value="${userData.userName}"/>   </td>  
+																 <td NOWRAP valign=top align=left>    <c:out value="${userData.attemptTime}"/>  </td>
 																 
 										 						<c:if test="${statsTabActive != 'true'}"> 							
 																	 <td NOWRAP valign=top align=left>

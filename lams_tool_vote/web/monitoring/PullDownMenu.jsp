@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:if test="${(isPortfolioExport != 'true') }"> 	
 									<table align=right>			
 										<tr> 
-											<td NOWRAP  valign=top align=right><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+											<td NOWRAP  valign=top align=right> <b> <bean:message key="label.selectGroup"/> </b>
 													<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 													<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
 														<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
@@ -64,7 +64,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														</c:forEach>		  	
 													</c:forEach>		  	
 													</select>
-												</font>
 												</td> 
 											<tr>
 										</table>

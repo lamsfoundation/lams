@@ -20,32 +20,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="java.util.Set" %>
+<%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-
-<html:html locale="true">
+	<html:html locale="true">
 	<head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:headItems/>
 	<title> <bean:message key="label.learnersVoted"/> </title>
+	
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
+	
 </head>
 <body>
 
-    <table width='80%' cellspacing='8' align='CENTER' class='forms'>
+    <table class='forms'>
 	    <tr> <th NOWRAP colspan=2>  <bean:message key="label.learnersVoted"/> </th> </tr>
 	
 		<tr> 
@@ -55,8 +45,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    
 		<c:forEach var="userData" items="${mapStudentsVoted}">
 			<tr>		 
-					 <td NOWRAP valign=top align=center>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-					 <td NOWRAP valign=top align=center>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+					 <td NOWRAP valign=top align=center>    <c:out value="${userData.userName}"/>   </td>  
+					 <td NOWRAP valign=top align=center>    <c:out value="${userData.attemptTime}"/>  </td>
 			</tr>				 
 		</c:forEach>		  	
     </table>

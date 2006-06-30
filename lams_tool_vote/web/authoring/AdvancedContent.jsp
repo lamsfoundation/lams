@@ -33,13 +33,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table class="forms">
 				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> <b>
+					<td class="field-name">							
+		      			 <b>
 			      			<bean:message key="label.vote.changable"/>:
-			      		</b> </font>		      			
+			      		</b> 
 					</td>
-					<td NOWRAP valign=top>
-						<font size=2>
+	  				<td NOWRAP valign=top>
 						<html:radio property="voteChangable" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -47,18 +46,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:radio property="voteChangable" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-						</font>												
 	      			</td>
 		         </tr>
 		         
 				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> <b>
+					<td class="field-name">							
+		      			 <b>
 			      			<bean:message key="label.vote.lockedOnFinish"/>:
-			      		</b> </font>		      			
+			      		</b> 
 					</td>
 					<td NOWRAP valign=top>
-						<font size=2>
 						<html:radio property="lockOnFinish" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -66,19 +63,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:radio property="lockOnFinish" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-						</font>												
 	      			</td>
 		         </tr>
 		         
 
 				<tr>
-	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> <b>
+					<td class="field-name">							
+		      			 <b>
 			      			<bean:message key="label.allowText"/>:
-			      		</b> </font>		      			
+			      		</b> 
 					</td>
 					<td NOWRAP valign=top>
-						<font size=2>
 						<html:radio property="allowText" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -86,20 +81,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:radio property="allowText" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-						</font>												
 	      			</td>
 		         </tr>
 
 
 			  	<tr> 
-	      			<td NOWRAP class="formlabel" valign=top>
-	      			<font size=2> <b>
+					<td class="field-name">							
+	      			 <b>
 				 		<bean:message key="label.maxNomCount"/>: </td>
-		      		</b> </font>		      							 					 		
+		      		</b> 
 					<td NOWRAP valign=top>
-					<font size=2>
 			 			<html:text property="maxNominationCount" size="3" maxlength="3"/>
-					</font>									 			
 			 		</td>
 			  	</tr>
 				

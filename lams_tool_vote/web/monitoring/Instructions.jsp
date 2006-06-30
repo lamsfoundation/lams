@@ -34,45 +34,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 				<table class="forms">
 				<tr> 
-					<td NOWRAP align="right" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.onlineInstructions.col" /> </b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 valign=top>
-							   <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	
+					<td NOWRAP colspan=4 valign=top>
+							<bean:message key="label.onlineInstructions.col" />   <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	
 					</td> 
 				</tr>
 				
 
 				<tr>
-					<td NOWRAP align="right" valign=top>
-	          			<font size=2>
-		      				<b> <bean:message key="label.uploadedOnlineFiles" /> </b>
-	      				</font>
-          			</td>
-          			
-					<td NOWRAP colspan=3 align=left valign=top width="100%">
+					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left">
 									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
-													<font size=2> <c:out value="${file.filename}"/> </font>
-													&nbsp&nbsp
+													 <c:out value="${file.filename}"/> 
+													</td>
+													<td NOWRAP valign=top>												
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														 <font size=2>	<bean:message key="label.view"/> </font>
+														 	<bean:message key="label.view"/> 
 													</a>
-													&nbsp
+													</td>
+													<td NOWRAP valign=top>													
+
 													<c:set var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<font size=2> <bean:message key="label.download"/> </font>
+														 <bean:message key="label.download"/> 
 													</a>
-												</td>
+													</td>
 											</tr>
 				         			</c:forEach>
 	         			</table>
@@ -81,43 +73,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				
 				<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.offlineInstructions.col" /> <b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 valign=top>
-						   <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	
+					<td NOWRAP colspan=4 valign=top>
+						<bean:message key="label.offlineInstructions.col" />  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	
 					</td> 
 				</tr>
 				
 				<tr> 
-					<td NOWRAP align="right" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.uploadedOfflineFiles" /> </b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 align=left valign=top width="100%">
+					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left">
 									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
-													<font size=2> <c:out value="${file.filename}"/> </font>
-													&nbsp&nbsp
+													 <c:out value="${file.filename}"/> 
+													</td>
+													<td NOWRAP valign=top>												
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														<font size=2> <bean:message key="label.view"/> </font>
+														 	<bean:message key="label.view"/> 
 													</a>
-													&nbsp
+													</td>
+													<td NOWRAP valign=top>													
+
 													<c:set var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<font size=2> <bean:message key="label.download"/> </font>
+														 <bean:message key="label.download"/> 
 													</a>
-												</td>
+													</td>
 											</tr>
 				         			</c:forEach>
 	         			</table>

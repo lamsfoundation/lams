@@ -32,8 +32,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	<tr> 
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+			 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+			 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
 	</tr>		
 	
 
