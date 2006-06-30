@@ -26,19 +26,31 @@ import mx.utils.*
 import mx.managers.*
 import mx.events.*
 
-import org.lamsfoundation.lams.learner.*;
-import org.lamsfoundation.lams.common.Sequence;
+import org.lamsfoundation.lams.learner.*
+import org.lamsfoundation.lams.common.Sequence
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.style.*
 
 class Header extends MovieClip {
+	
 	private var _header_mc:MovieClip;
 	private var _container:MovieClip;		// Holding Container
 	private var lams:MovieClip; 			// LAMS logo
-	private var resume_btn:Button;         //Resume and Exit buttons
-    private var exit_btn:Button;
+	private var resume_btn:MovieClip;         //Resume and Exit buttons
+    private var exit_btn:MovieClip;
+	private var resume_lbl:TextField;
+	private var exit_lbl:TextField;
+	
+	private var export_btn:Button;
+	private var export_lbl:TextField;
+	
+	private var _lessonName:Label;
+	
 	private var panel:MovieClip;       //The underlaying panel base
     
+	private var _tm:ThemeManager;
+	private var _dictionary:Dictionary;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -52,7 +64,11 @@ class Header extends MovieClip {
 	public function Header() {
 		//Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
-		trace('[new Header]');
+		
+		_tm = ThemeManager.getInstance();
+		_dictionary = Dictionary.getInstance();
+		_dictionary.addEventListener('init',Proxy.create(this,setLabels));
+		
 		//Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
 	}
@@ -62,22 +78,20 @@ class Header extends MovieClip {
     */
     public function init(){
 		trace('initialing header..');
+		
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
-		_header_mc = this;
 		
-		//Set the text for buttons
-        //resume_btn.label = Dictionary.getValue('learner_resume_btn');
-        //exit_btn.label = Dictionary.getValue('learner_exit_btn');
-        
+		_header_mc = this;
+		setStyles();
+		setLabels();
+		resize(Stage.width);
+		
 		//get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
-        
 		//fm = _container.getFocusManager();
         //fm.enabled = true;
 		
         //Add event listeners for resume and exit buttons
-	    //_header_mc.resume_btn.addEventListener("release", this);
-        //_header_mc.exit_btn.addEventListener("release",this);
 		
 		resume_btn.onRelease = function(){
 			trace('on releasing resuming button..');
@@ -91,8 +105,34 @@ class Header extends MovieClip {
 			app.getLesson().exitLesson();
 		}
 		
+		export_btn.onRelease = function(){
+			var app:Application = Application.getInstance();
+			app.getLesson().exportLesson();
+		}
+		
         dispatchEvent({type:'load',target:this});
         
+	}
+	
+	private function setStyles(){
+		var styleObj = _tm.getStyleObject('smallLabel');
+		_lessonName.setStyle('styleName', styleObj);
+	}
+	
+	private function setLabels(){
+		//Set the text for buttons
+        resume_lbl.text = Dictionary.getValue('hd_resume_lbl');
+        exit_lbl.text = Dictionary.getValue('hd_exit_lbl');
+		export_lbl.text = Dictionary.getValue('ln_export_btn');
+	}
+	
+	public function setLessonName(lessonName:String){
+		_lessonName.text = lessonName;
+	}
+	
+	public function resize(width:Number){
+		panel._width = width;
+		
 	}
 	
 	function get className():String { 

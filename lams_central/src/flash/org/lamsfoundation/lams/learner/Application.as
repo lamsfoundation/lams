@@ -21,7 +21,9 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.comms.*       //communications
+import org.lamsfoundation.lams.common.comms.*;      //communications
+import org.lamsfoundation.lams.common.dict.*;		// dictionary
+import org.lamsfoundation.lams.common.style.*;		// styles/themes
 import org.lamsfoundation.lams.common.util.*;		// utilities
 import org.lamsfoundation.lams.common.ui.*;		// ui
 import org.lamsfoundation.lams.common.*;
@@ -39,19 +41,16 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	//private var _comms:Communication;
 	private var _lesson:Lesson;
 	private var _header_mc:MovieClip;
-	
-	
+
 	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "learner";
 	
     private static var QUESTION_MARK_KEY:Number = 191;
 	
-	//private var _appRoot_mc:MovieClip;                 //Application root clip
-    
-	private static var HEADER_X:Number = -1;
+	private static var HEADER_X:Number = -10;
 	private static var HEADER_Y:Number = -13.5;
 	private static var LESSON_X:Number = 0;
-	private static var LESSON_Y:Number = 40;
+	private static var LESSON_Y:Number = 82;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
@@ -61,11 +60,23 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
+	private static var DATA_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
+	private var _dataLoadCheckCount = 0;			
+	
 	private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
-    private var _UILoaded:Boolean;                     //UI Loading status
-    private var _lessonLoaded:Boolean;                  //Lesson loaded flag
+    private var _DataLoadCheckIntervalID:Number;
+	
+	private var _dictionaryLoaded:Boolean;             //Dictionary loaded flag
+    private var _dictionaryEventDispatched:Boolean     //Event status flag
+    private var _themeLoaded:Boolean;                  //Theme loaded flag
+    private var _themeEventDispatched:Boolean          //Dictionary loaded flag
+	
+	private var _UILoaded:Boolean;                     //UI Loading status
+    
+	private var _lessonLoaded:Boolean;                  //Lesson loaded flag
   	private var _headerLoaded:Boolean;
 
     
@@ -75,24 +86,19 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	private var _container_mc:MovieClip;               //Main container
 	
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
-    
-	
-	
-	
+
+
 	/**
     * Application - Constructor
     */
     private function Application(){
 		super(this);
 		
-		trace('Begin Application...');
         _lessonLoaded = false;
-        //_seqLibEventDispatched = false;
 		_headerLoaded = false;
+		
 		_module = Application.MODULE;
-		//_headerEventDispatched = false;
-        
-        
+ 
     }
     
 	/**
@@ -115,31 +121,91 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
-		
-		//Comms object - do this before any objects are created that require it for server communication
-        //_comms = new Communication();
-		
+
+    	//Get the instance of config class
+        _config = Config.getInstance();
+        
+        //Assign the config load event to
+        _config.addEventListener('load',Delegate.create(this,configLoaded));
+        
 		
 		Key.addListener(this);
-		
-		setupUI();
-		checkUILoaded();
+
     }
+	
+	/**
+    * Called when the config class has loaded
+    */
+	private function configLoaded(){
+		//Now that the config class is ready setup the UI and data, call to setupData() first in 
+		//case UI element constructors use objects instantiated with setupData()
+        
+		setupData();
+		checkDataLoaded();
+		
+	}
+	
+	/**
+    * Loads and sets up event listeners for Theme, Dictionary etc.  
+    */
+    private function setupData() {
+		
+        //Get the language, create+load dictionary and setup load handler.
+		var language:String = String(_config.getItem('language'));
+        _dictionary = Dictionary.getInstance();
+        _dictionary.addEventListener('load',Delegate.create(this,onDictionaryLoad));
+		_dictionary.load(language);
+        
+		
+		
+        //Set reference to StyleManager and load Themes and setup load handler.
+        var theme:String = String(_config.getItem('theme'));
+        _themeManager = ThemeManager.getInstance();
+        _themeManager.addEventListener('load',Delegate.create(this,onThemeLoad));
+        _themeManager.loadTheme(theme);
+		Debugger.getInstance().crashDumpSeverityLevel = Number(_config.getItem('crashDumpSeverityLevelLog'));
+		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog')); 
+		
+    }
+	
+		/**
+	* Periodically checks if data has been loaded
+	*/
+	private function checkDataLoaded() {
+		// first time through set interval for method polling
+		if(!_DataLoadCheckIntervalID) {
+			_DataLoadCheckIntervalID = setInterval(Proxy.create(this, checkDataLoaded), DATA_LOAD_CHECK_INTERVAL);
+		} else {
+			_dataLoadCheckCount++;
+			// if dictionary and theme data loaded setup UI
+			if(_dictionaryLoaded && _themeLoaded) {
+				clearInterval(_DataLoadCheckIntervalID);
+				
+				setupUI();
+				checkUILoaded();
+				
+        
+			} else if(_dataLoadCheckCount >= DATA_LOAD_CHECK_TIMEOUT_COUNT) {
+				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkDataLoaded','Application');
+				clearInterval(_DataLoadCheckIntervalID);
+				
+        
+			}
+		}
+	}
+    
 	
 	private function setupUI():Void {
 		trace('Setting up UI...');
 		
 		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
-        trace('_appRoot_mc: ' + _appRoot_mc);
-		//var depth:Number = _appRoot_mc.getNextHighestDepth();
-		
+        
         _header_mc = _container_mc.attachMovie('LHeader','_header_mc',HEADER_DEPTH, {_x:HEADER_X,_y:HEADER_Y});
 	    _header_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
         _lesson.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		//_seqLib.addEventListener('init', Proxy.create(this,reload));
 		
 	}
 	
@@ -156,10 +222,8 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
             
 			//If UI loaded check which events can be broadcast
 			if(_UILoaded){
-				//if(_seqLibLoaded && _headerLoaded){
-					clearInterval(_UILoadCheckIntervalID);
-					start();
-				//}
+				clearInterval(_UILoadCheckIntervalID);
+				start();
 				
 				if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
 					//if we havent loaded the library by the timeout count then give up
@@ -232,7 +296,8 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 			_lesson.setSize(w,h);
 		}
 		
-		_lesson.setSize(w,h);
+		Header(_header_mc).resize(w);
+		_lesson.setSize(w,h-LESSON_Y);
 		
 	}
 	
@@ -249,6 +314,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		Debugger.log('completed: ' + completed,Debugger.CRITICAL,'refreshProgress','Application');
 		Debugger.log('current: ' + current,Debugger.CRITICAL,'refreshProgress','Application');
         Debugger.log('_root lesson ID: ' + _root.lessonID + ' passed in lesson ID: ' + lessonID,Debugger.CRITICAL,'refreshProgress','Application');
+        //Debugger.log('_root unique ID: ' + _root.uniqueID + ' passed in unique ID: ' + uniqueID,Debugger.CRITICAL,'refreshProgress','Application');
         
 		if(_root.lessonID == lessonID){
 			var attemptedArray:Array = attempted.split("_");
@@ -282,6 +348,10 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		return _lesson;
 	}
 	
+	public function getHeader():Header{
+		return Header(_header_mc);
+	}
+	
 	public function showDebugger():Void{
 		_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
 	}
@@ -307,12 +377,5 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
             }               
         }
 	}
-	
-	/**
-    * returns the the Comms instance
-    *
-    *public function getComms():Communication{
-    *    return _comms;
-    *}
-	*/
+
 }
