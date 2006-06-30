@@ -75,6 +75,24 @@
 		</td>
 	</tr>
 	<tr>
+		<td colspan=2>
+			<html-el:checkbox property="courseAdminCanAddNewUsers" />
+			<fmt:message key="admin.can.add.user"/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox property="courseAdminCanBrowseAllUsers" />
+			<fmt:message key="admin.can.browse.user"/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox property="courseAdminCanChangeStatusOfCourse" />
+			<fmt:message key="admin.can.change.status"/>
+		</td>
+	</tr>
+	<tr>
 		<td colspan=2 align="right">
 			<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
 			<html-el:reset><fmt:message key="admin.reset"/></html-el:reset>
