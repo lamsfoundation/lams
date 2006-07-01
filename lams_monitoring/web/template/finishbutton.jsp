@@ -19,22 +19,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-
-	<h1 class="no-tabs-below"><fmt:message key="label.synch.gate.title"/></h1>
-	<div id="login-header">
-	</div id="login-header">
-
-	<div id="login-content">
-
-		<p>&nbsp;</p> 
-		<%@ include file="gateInfo.jsp" %>
-		<%@ include file="gateStatus.jsp" %>
-
-	</div>  <!--closes content-->
-
-
+<div class="right-buttons"><a href="javascript:window.close();" class="button"><fmt:message key="button.finished"/></a></div>

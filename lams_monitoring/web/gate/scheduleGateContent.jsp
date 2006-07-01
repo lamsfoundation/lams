@@ -25,13 +25,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<H1><fmt:message key="label.schedule.gate.title"/></H1>
-	<p>&nbsp;</p> 
-	<%@ include file="gateInfo.jsp" %>
-	<p><fmt:message key="label.schedule.gate.open.message"/> <fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
+	<h1 class="no-tabs-below"><fmt:message key="label.schedule.gate.title"/></h1>
+	<div id="login-header">
+	</div id="login-header">
 
-	<c:if test="${GateForm.map.endingTime!=null}">
-		<p><fmt:message key="label.schedule.gate.close.message"/> <fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
-	</c:if>
+	<div id="login-content">
 
-	<%@ include file="gateStatus.jsp" %>
+		<p>&nbsp;</p> 
+		<%@ include file="gateInfo.jsp" %>
+		<p><fmt:message key="label.schedule.gate.open.message"/> <fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
+
+		<c:if test="${GateForm.map.endingTime!=null}">
+			<p><fmt:message key="label.schedule.gate.close.message"/> <fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
+		</c:if>
+
+		<%@ include file="gateStatus.jsp" %>
+
+	</div>  <!--closes content-->
+

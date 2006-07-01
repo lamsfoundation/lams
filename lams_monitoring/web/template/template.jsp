@@ -35,22 +35,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	  <script language="JavaScript" type="text/JavaScript">
-	        <!--
-	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
-	            obj.className=new_style;
-	        }
-	        //-->
-	  </script>
-	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
     </head>
     
     <body>
-		<div id="page">	
-			<div id="content">
-				<tiles:insert attribute="content" />
- 			</div>
-			<div id="footer"></div>
-		</div>
+		<div id="login-page">	
+	
+		<tiles:insert attribute="content" />
+
+		<div id="footer">
+		</div><!--closes footer-->
+
+		</div><!--closes page-->
+
     </body>
 </html:html>

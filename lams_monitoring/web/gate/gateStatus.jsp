@@ -27,3 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<img height="43" src="../images/synch_not_active.gif" width="37"><br><span class="bodyBold"><fmt:message key="label.gate.gate.open"/></span>
 		</c:if>
 </p>
+
+<c:if test="${not GateForm.map.readOnly}"> 
+	<%@ include file="../template/finishbutton.jsp" %>
+</c:if>

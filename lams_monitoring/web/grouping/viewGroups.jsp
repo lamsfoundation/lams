@@ -26,40 +26,47 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<tr>
-	<td>
-	<!-- Page Content table--> 
-		<h1><c:out value="${title}"/></h1>
-	
-		<p><c:out value="${description}"/></p>
+<h1 class="no-tabs-below"><c:out value="${title}"/></h1>
+<div id="login-header">
+</div id="login-header">
 
-		<c:choose>
-		<c:when test="${empty groups}">
-			<p><fmt:message key="label.grouping.no.groups.created"/></p>
-		</c:when>
-		<c:otherwise>
-			<table width="100%" border="0" cellpadding="3" cellspacing="4" class="body" summary="This table is being used for layout purposes">
-				<c:forEach items="${groups}" var="group">
-				<tr>
-					<td align="right" class="bodyBold" style="{border-right: solid #CCCCCC 1px; border-bottom: solid #CCCCCC 1px; }">
-						<c:out value="${group.groupName}"/>
-					</td>
-					<td width="85%" align="left" class="body"  style="{border-bottom: solid #CCCCCC 1px; }">
-						<table width="100%" border="0" cellpadding="0" cellspacing="0">
-							<c:forEach items="${group.users}" var="user">
-							<tr>
-								<td class="bodyBold">
-									<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
-								</td>
-							</tr>
-							</c:forEach>
-						</table>		
-					</td>
-				</tr>
-				</c:forEach>
-			</table>
-		</c:otherwise>
-		</c:choose>
-	<!-- end of Page Content table--> 
-	</td>
-</tr>
+<div id="login-content">
+
+	<c:if test="${not empty description}">
+		<p>&nbsp;</p>
+		<p><c:out value="${description}"/></p>
+	</c:if>
+
+	<c:choose>
+	<c:when test="${empty groups}">
+		<p><fmt:message key="label.grouping.no.groups.created"/></p>
+	</c:when>
+	<c:otherwise>
+		<table width="100%" border="0" cellpadding="3" cellspacing="4" class="body" summary="This table is being used for layout purposes">
+			<c:forEach items="${groups}" var="group">
+			<tr>
+				<td align="right" class="bodyBold" style="{border-right: solid #CCCCCC 1px; border-bottom: solid #CCCCCC 1px; }">
+					<c:out value="${group.groupName}"/>
+				</td>
+				<td width="85%" align="left" class="body"  style="{border-bottom: solid #CCCCCC 1px; }">
+					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+						<c:forEach items="${group.users}" var="user">
+						<tr>
+							<td class="bodyBold">
+								<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
+							</td>
+						</tr>
+						</c:forEach>
+					</table>		
+				</td>
+			</tr>
+			</c:forEach>
+		</table>
+	</c:otherwise>
+	</c:choose>
+		
+	<%@ include file="../template/finishbutton.jsp" %>
+
+</div>  <!--closes content-->
+
+

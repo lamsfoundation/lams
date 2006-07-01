@@ -25,21 +25,28 @@
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<H1><fmt:message key="label.permission.gate.title"/></H1>
-	<p>&nbsp;</p> 
+	<h1 class="no-tabs-below"><fmt:message key="label.permission.gate.title"/></h1>
+	<div id="login-header">
+	</div id="login-header">
 
-	<%@ include file="gateInfo.jsp" %>
-	<p><fmt:message key="label.gate.you.open.message"/>
+	<div id="login-content">
 
-	<%-- set to read only if in export portfolio --%>
-	<c:if test="${not GateForm.map.readOnly}"> 
-		<c:if test="${not GateForm.map.gate.gateOpen}" >
-			<html:form action="/gate?method=openGate" target="_self">
-				<p><html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit></p>
-			</html:form>
+		<p>&nbsp;</p> 
+		<%@ include file="gateInfo.jsp" %>
+		<p><fmt:message key="label.gate.you.open.message"/>
+
+		<%-- set to read only if in export portfolio --%>
+		<c:if test="${not GateForm.map.readOnly}"> 
+			<c:if test="${not GateForm.map.gate.gateOpen}" >
+				<html:form action="/gate?method=openGate" target="_self">
+					<p><html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit></p>
+				</html:form>
+			</c:if>
 		</c:if>
-	</c:if>
 
-	</p>
+		</p>
 
-	<%@ include file="gateStatus.jsp" %>
+		<%@ include file="gateStatus.jsp" %>
+
+	</div>  <!--closes content-->
+
