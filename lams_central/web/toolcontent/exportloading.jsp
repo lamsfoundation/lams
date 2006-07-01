@@ -27,18 +27,26 @@
 	</head>
 
 	<BODY onload="download()">
-		<div id="page">	
-			<h1 class="no-tabs-below">
-				<fmt:message key="title.export.loading" />
-			</h1>
-			<div id="header-no-tabs"></div>
-			<div id="content">
-				<p><fmt:message key="msg.export.loading" /></p>
-				<p>
-					<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
-				</p>
-			</div>
-			<div id="footer"></div>
-		</div>
+
+	<div id="page-learner"><!--main box 'page'-->
+
+		<h1 class="no-tabs-below">
+			<fmt:message key="title.export.loading" />
+		</h1>
+		<div id="header-no-tabs-learner">
+		</div><!--closes header-->
+		
+		 <div id="content-learner">
+	  
+				<H2><fmt:message key="msg.export.loading" /></H2>
+				<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
+		
+		</div>  <!--closes content-->
+			
+		<div id="footer-learner">
+		</div><!--closes footer-->
+			
+	</div><!--closes page-->
+
 	</BODY>
 </HTML>

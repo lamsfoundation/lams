@@ -15,15 +15,16 @@
 
 <body>
 
-	<div id="page">	
-
+	<div id="page-learner"><!--main box 'page'-->
+	
 		<h1 class="no-tabs-below">
 			Test WDDX Packet
 		</h1>
-	
-		<div id="header-no-tabs"></div>
-		<div id="content">
 
+		<div id="header-no-tabs-learner">
+		</div><!--closes header-->
+
+		<div id="content-learner">
 			<html:form action="/WDDXPost.do" target="_self" method="POST" enctype="multipart/form-data">
 			
 			  <p>Test posting file to form - this should be WDDX XML to a URL expecting 
@@ -37,14 +38,15 @@
 				<html:file property="wddxFile" size="40" styleClass="button" />
 			</p>
 			  <p>
-				<html:submit>Send</html:submit>
+				<html:submit styleClass="button">Send</html:submit>
 			  </p>
 			</html:form>
 	
 		</div>
-		
-		<div id="footer"></div>
-		
-	</div>
+	   
+		<div id="footer-learner">
+		</div><!--closes footer-->
+
+	</div><!--closes page-->
 </body>
 </html>

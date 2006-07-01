@@ -16,14 +16,15 @@
 	</head>
 
 	<BODY>
-		<div id="page">	
+
+	<div id="page-learner"><!--main box 'page'-->
+
+	<h1 class="no-tabs-below"><fmt:message key="msg.export.success" /></h1>
+	<div id="header-no-tabs-learner">
+	</div><!--closes header-->
 	
-		<h1 class="no-tabs-below">
-			<fmt:message key="msg.export.success" />
-		</h1>
-		<div id="header-no-tabs"></div>
-		<div id="content">
-	
+	<div id="content-learner">
+
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
 				<c:choose>
@@ -46,11 +47,16 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<p>&nbsp;</p>
-		<P><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></p>
-		</div>
-		<div id="footer"></div>
-		</div>
+	<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
+	</div>  <!--closes content-->
 
+	<div id="footer-learner">
+	</div><!--closes footer-->
+		
+	</div><!--closes page-->
+		
 	</BODY>
 </HTML>
+
+	  
+

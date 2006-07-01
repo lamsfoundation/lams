@@ -11,12 +11,19 @@
 </HEAD>
 
 <BODY>
-	<div id="page">	
-		<div id="content">
+	<div id="page-learner"><!--main box 'page'-->
+	
+		<div id="header-no-tabs-learner">
+		</div><!--closes header-->
+
+		<div id="content-learner">
 			<p><fmt:message key="msg.loading.system.admin.window"/></p>
 		</div>
-		<div id="footer"></div>
-	</div>
+	   
+		<div id="footer-learner">
+		</div><!--closes footer-->
+
+	</div><!--closes page-->
 </BODY>
 	
 </HTML>
