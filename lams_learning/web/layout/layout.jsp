@@ -29,37 +29,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
+	<tiles:useAttribute name="title" ignore="false" />
+
 	<%-- includeBodyTag, this variable is used to stop the default behaviour of
 	displaying body tags (for use with a frameset) --%>
 	<tiles:useAttribute name="includeBodyTag" ignore="true" />
 
+	
 	<head>
 		<title>LAMS</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
-		<link href="css/learner.css" rel="stylesheet" type="text/css">
 		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
-	</head>
+	  	<script language="JavaScript" type="text/JavaScript">
+	        <!--
+	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
+	            obj.className=new_style;
+	        }
+	        //-->
+	  </script>	
+	  
+	  </head>
 
 	<c:choose>
 			<c:when test="${includeBodyTag}">
 				<body>
-					<div id="page">	
-					<div id="content">
+					<div id="page-learner"><!--main box 'page'-->
 						<tiles:insert attribute="body" />
-					</div>
 					</div>
 				</body>
 				
 			</c:when>
 			<c:otherwise>
-				<div id="page">	
-				<div id="content">
-					<tiles:insert attribute="body" />
-				</div>
-				</div>
+					<div id="page-learner"><!--main box 'page'-->
+						<tiles:insert attribute="body" />
+					</div>
 			</c:otherwise>
 
 	</c:choose>
-	
+
 </html:html>

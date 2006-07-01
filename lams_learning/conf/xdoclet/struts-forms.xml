@@ -1,4 +1,5 @@
 <form-bean name="GroupingForm"  type="org.apache.struts.validator.DynaValidatorForm">
+	<form-property name="title" type="java.lang.String" />
 	<form-property name="previewLesson" type="java.lang.Boolean" />
 </form-bean>
 

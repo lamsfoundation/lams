@@ -25,9 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<H1><fmt:message key="label.synch.gate.title"/></H1>
 <p><fmt:message key="label.synch.gate.message"/></p> 
-<p>&nbsp;</p> 
 <p><fmt:message key="label.gate.waiting.learners">  
 		<fmt:param value="${GateForm.map.waitingLearners}"/>
 		<fmt:param value="${GateForm.map.totalLearners}"/>

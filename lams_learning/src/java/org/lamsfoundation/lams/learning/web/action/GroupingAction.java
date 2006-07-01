@@ -95,6 +95,7 @@ public class GroupingAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	public static final String GROUPS = "groups";
 	public static final String FINISHED_BUTTON = "finishedButton";
+	public static final String TITLE = "title";
 	
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
@@ -102,6 +103,7 @@ public class GroupingAction extends LamsDispatchAction
 	public static final String VIEW_GROUP = "viewGroup";
 	public static final String WAIT_GROUP = "waitGroup";
 	public static final String SHOW_GROUP = "showGroup";
+	
     
     //---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -141,6 +143,7 @@ public class GroupingAction extends LamsDispatchAction
         
         DynaActionForm groupForm = (DynaActionForm)form;
         groupForm.set("previewLesson",learnerProgress.getLesson().isPreviewLesson());
+        groupForm.set("title", learnerProgress.getNextActivity().getTitle());
         
         if ( groupingDone ) {
         	request.setAttribute(FINISHED_BUTTON, Boolean.TRUE);
@@ -172,6 +175,7 @@ public class GroupingAction extends LamsDispatchAction
         SortedSet groups = new TreeSet(new GroupComparator());
 
         Activity activity = LearningWebUtil.getActivityFromRequest(request,learnerService);
+
         Grouping grouping = ((GroupingActivity)activity).getCreateGrouping();
         if ( grouping != null)
         	groups.addAll(grouping.getGroups());
@@ -179,6 +183,7 @@ public class GroupingAction extends LamsDispatchAction
         request.setAttribute(GROUPS,groups);
         request.setAttribute(FINISHED_BUTTON,Boolean.TRUE);
         request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
+        request.setAttribute(TITLE,activity.getTitle());
         
         return mapping.findForward(SHOW_GROUP);
     }
@@ -216,6 +221,7 @@ public class GroupingAction extends LamsDispatchAction
         request.setAttribute(GROUPS,groups);
         request.setAttribute(FINISHED_BUTTON,Boolean.FALSE);
         request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
+        request.setAttribute(TITLE,activity.getTitle());
         
         return mapping.findForward(SHOW_GROUP);
     }

@@ -41,13 +41,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  </head>
 
 	<body>
-		<div id="page">	
-			<div id="content">
+		<div id="page-learner"><!--main box 'page'-->
+
+			<h1 class="no-tabs-below"><c:out value="${GateForm.map.gate.title}"/></h1>
+			<div id="header-no-tabs-learner">
+
+			</div><!--closes header-->
+
+			<div id="content-learner">
+
+				<p>&nbsp;</p>
 				<tiles:insert attribute="body" />
 				<%@ include file="../gate/gateNext.jsp" %>			  
-			</div>
-			<div id="footer"></div>
-		</div>
+
+			</div>  <!--closes content-->
+
+
+			<div id="footer-learner">
+			</div><!--closes footer-->
+
+		</div><!--closes page-->
 
 	</body>
 

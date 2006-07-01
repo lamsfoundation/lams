@@ -11,7 +11,7 @@
 
 <html:form action="${formAction}" target="_self">
 <p align="right">
-	<html:submit><fmt:message key="label.next.button"/></html:submit>
+	<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
 </p>
 </html:form>
 	

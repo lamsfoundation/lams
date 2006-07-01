@@ -38,13 +38,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
 		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${activity.activityId}">
+		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	  </head>
 
 	<body>
-		<div id="page">	
-		<div id="content">
+		<div id="page-learner"><!--main box 'page'-->
 	      <tiles:insert attribute="body" />
-		</div>
 		</div>
 	</body>
 

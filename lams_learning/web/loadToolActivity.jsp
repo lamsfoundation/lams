@@ -38,8 +38,15 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 
 %>
 
-	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
-	
+<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
+
+<h1 class="no-tabs-below">&nbsp;</h1>
+<div id="header-no-tabs-learner">
+
+</div><!--closes header-->
+
+<div id="content-learner">
+
 	<c:if test="${!empty activityForm.activityURLs}">
 		
 		<script language="JavaScript" type="text/JavaScript"><!--
@@ -62,7 +69,18 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 			//-->
 		</script>
 		
-	<H1><fmt:message key="message.activity.loading" /></H1>
-	<!-- Tool summary is <c:out value="${activityForm.progressSummary}" escapeXml="false" /> -->
-			
+		<p>&nbsp;</p>
+		<p><fmt:message key="message.activity.loading"/></p>
+
+	<!-- <p>Tool summary is <c:out value="${activityForm.progressSummary}" escapeXml="false" /></p> -->
+
 	</c:if>
+
+</div>  <!--closes content-->
+
+
+<div id="footer-learner">
+</div><!--closes footer-->
+
+
+			

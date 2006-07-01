@@ -25,16 +25,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<div id="page">	
-	<div id="content">
+	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
 
-		<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
+	<h1 class="no-tabs-below"><c:out value="${title}"/></h1>
+	<div id="header-no-tabs-learner">
+	</div><!--closes header-->
 
-		<h1><fmt:message key="label.view.groups.title"/></h1>
+	<div id="content-learner">
+
 		<table class="alternative-color">
+			<tr>
+				<th width="25%" class="first">
+					<fmt:message key="label.view.groups.title"/>
+				</th>
+				<th>
+				</th>
+			</tr>
 			<logic:iterate id="group" name="groups"> 
 			<tr>
-				<td width="25%">
+				<td width="25%" class="first">
 					<c:out value="${group.groupName}"/>
 				</td>
 				<td>
@@ -46,13 +55,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</logic:iterate>
 		</table>
 
-		<c:if test="${finishedButton}">
-			<p align="right">
-				<html:submit styleClass="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"><fmt:message key="label.finish.button"/></html:submit>
-			</p>
-		</c:if>
+	<c:if test="${finishedButton}">
+			<table><tr><td><div id="right" class="right-buttons">
+					<html:submit styleClass="button"><fmt:message key="label.finish.button"/></html:submit>
+			</div></td></tr></table>
+	</c:if>
+
+	</div>  <!--closes content-->
+
+	<div id="footer-learner">
+	</div><!--closes footer-->
 
 	</html:form>
 
-	</div>
 </div>

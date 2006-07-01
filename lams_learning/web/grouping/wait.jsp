@@ -26,19 +26,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="formAction">/grouping.do?method=performGrouping&activityID=${activity.activityId}</c:set>
-
-	<h1><fmt:message key="label.view.groups.title"/></h1>
-	<p>&nbsp;</p>
-	<p><fmt:message key="label.view.view.groups.wait.message"/></p>
-	
+	<c:set var="formAction">/grouping.do?method=performGrouping&activityID=${activity.activityId}</c:set>
 	<c:if test="${GroupingForm.map.previewLesson == true}">
 		<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
-		<p><em><fmt:message key="label.grouping.preview.message"/></em></p>
 	</c:if>
 
 	<html:form action="${formAction}" target="_self">
-		<p align="right"><html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit></p>
-	</html:form>
 
-</div>
+		<h1 class="no-tabs-below"><c:out value="${GroupingForm.map.title}"/></h1>
+		<div id="header-no-tabs-learner">
+		</div><!--closes header-->
+
+		<div id="content-learner">
+		
+			<p>&nbsp;</p>
+
+			<p><fmt:message key="label.view.view.groups.wait.message"/></p>
+
+			<c:if test="${GroupingForm.map.previewLesson == true}">
+				<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
+				<p><em><fmt:message key="label.grouping.preview.message"/></em></p>
+			</c:if>
+
+			<table><tr><td><div class="right-buttons">
+					<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
+			</div></td></tr></table>
+
+		</div>  <!--closes content-->
+
+		<div id="footer-learner">
+		</div><!--closes footer-->
+
+	</html:form>

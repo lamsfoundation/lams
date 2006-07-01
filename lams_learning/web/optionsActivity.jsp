@@ -55,17 +55,23 @@
 		//-->
 	</script>
 	
-	<div id="page">	
-		<div id="content">
+	<html:form action="/ChooseActivity" method="POST">
+	<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
+		
+	<h1 class="no-tabs-below"><c:out value="${optionsActivityForm.title}"/></h1>
+	<div id="header-no-tabs-learner">
+
+	</div><!--closes header-->
+
+	<div id="content-learner">
 
 		<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
-	
-		<html:form action="/ChooseActivity" method="POST">
-		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		
-		<H1><c:out value="${optionsActivityForm.title}"/></H1>
 		<p>&nbsp;</p>
-		<p><c:out value="${optionsActivityForm.description}"/></p>
+
+		<c:if test="${not empty optionsActivityForm.description}">
+			<p><c:out value="${optionsActivityForm.description}"/></p>
+		</c:if>
 		<p><fmt:message key="message.activity.options.activityCount">
 				<fmt:param value="${optionsActivityForm.minimum}" />
 				<fmt:param value="${optionsActivityForm.maximum}" />
@@ -97,12 +103,14 @@
 		<p><font size="1"><fmt:message key="message.activity.options.note" /></font></p>
 		<p>&nbsp;</p>
 
-		<p align="right">
-			<input name="chooseBtn" type="button" class="button" id="chooseBtn" onClick="submitChoose()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.activity.options.choose" />">
-			<c:if test="${optionsActivityForm.finished}">
-				<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.finish.button" />">
-			</c:if>
-		</p>
+		<div class="left-buttons">
+			<a href="#" class="button" id="chooseBtn" onClick="submitChoose()"><fmt:message key="label.activity.options.choose" /></a>
+		</div>
+		<c:if test="${optionsActivityForm.finished}">
+			<div class="right-buttons">
+				<a href="#" class="button" id="finishBtn" onClick="submitFinish()"><fmt:message key="label.finish.button" /></a>
+			</div>
+		</c:if>
 
 	</html:form>
 
@@ -110,6 +118,11 @@
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityID}" />" />
 	</html:form>
-</div>
-</div>
+
+	</div>  <!--closes content-->
+
+
+	<div id="footer-learner">
+	</div><!--closes footer-->
+
 

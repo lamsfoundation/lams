@@ -34,9 +34,25 @@ if(cprotocol.startsWith("HTTPS")){
 String pathToShare = cprotocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/..";
 %>
 
-<logic:messagesPresent> 
-	<p><img src="<%=pathToShare%>/images/error.jpg" alt='<fmt:message key="error.title"/>'/></p>
-	 <html:messages id="error" message="false"> 
-		 <P class="warning"><c:out value="${error}" escapeXml="false"/></p>
-	 </html:messages> 
-</logic:messagesPresent>
+
+	<h1 class="no-tabs-below">&nbsp;</h1>
+	<div id="header-no-tabs-learner">
+
+	</div><!--closes header-->
+
+	<div id="content-learner">
+
+		<logic:messagesPresent> 
+			<p><img src="<%=pathToShare%>/images/error.jpg" alt='<fmt:message key="error.title"/>'/></p>
+			 <html:messages id="error" message="false"> 
+				 <P class="warning"><c:out value="${error}" escapeXml="false"/></p>
+			 </html:messages> 
+		</logic:messagesPresent>
+
+	</div>  <!--closes content-->
+
+
+	<div id="footer-learner">
+	</div><!--closes footer-->
+
+

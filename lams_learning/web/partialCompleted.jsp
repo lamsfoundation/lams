@@ -25,6 +25,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<H1>
-	<fmt:message key="message.activity.parallel.partialComplete" />
-</H1>
+
+	<h1 class="no-tabs-below">&nbsp;</h1>
+	<div id="header-no-tabs-learner">
+
+	</div><!--closes header-->
+
+	<div id="content-learner">
+
+		<p>&nbsp;</p>
+		<p><fmt:message key="message.activity.parallel.partialComplete" /></p>
+
+	</div>  <!--closes content-->
+
+
+	<div id="footer-learner">
+	</div><!--closes footer-->
+
+

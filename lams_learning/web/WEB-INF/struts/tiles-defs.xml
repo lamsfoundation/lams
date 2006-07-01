@@ -24,19 +24,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!-- Standard layout with css. -->
 	<definition name=".layout" path="/layout/layout.jsp">
+		<put name="pageTitle" value="LAMS"/>
 		<put name="title" value="LAMS"/>
 		<put name="body" value=""/>
 		<put name="includeBodyTag" value="true"/>
 	</definition>
 
-	<!-- Standard layout for message or tool. This probably needs to be done using
-	included header and footer though because tools need this. -->
-	<definition name=".activityLayout" path="/layout/activityLayout.jsp">
-		<put name="pageTitle" value="LAMS"/>
-		<put name="title" value="LAMS"/>
-		<put name="body" value=""/>
-	</definition>
-	
 	<!-- Standard layout for a gate page. -->
 	<definition name=".gateLayout" path="/layout/gateLayout.jsp">
 		<put name="pageTitle" value="LAMS"/>
@@ -51,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value=""/>
 	</definition>
 
-	<definition name=".systemError" extends=".activityLayout" >
+	<definition name=".systemError" extends=".layout" >
 		<put name="title" value="System Error Page"/>
 		<put name="body" value="/error.jsp" />	
 	</definition>
@@ -68,20 +61,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/parallelActivity.jsp"/>
 		<put name="includeBodyTag" value="false"/>
 	</definition>
-	<definition name=".optionsActivity" extends=".activityLayout">
+	<definition name=".optionsActivity" extends=".layout">
 		<put name="title" value="Optional Activity"/>
 		<put name="body" value="/optionsActivity.jsp"/>
 	</definition>
 	<definition name=".requestDisplay" path="/requestURL.jsp" />
-	<definition name=".parallelWait" extends=".activityLayout">
+	<definition name=".parallelWait" extends=".layout">
 		<put name="title" value="Wait..."/>
 		<put name="body" value="/partialCompleted.jsp"/>
 	</definition>
-	<definition name=".lessonComplete" extends=".activityLayout">
+	<definition name=".lessonComplete" extends=".layout">
 		<put name="title" value="Lesson Complete"/>
 		<put name="body" value="/lessonComplete.jsp"/>
 	</definition>
-	<definition name=".welcome" extends=".activityLayout">
+	<definition name=".welcome" extends=".layout">
 		<put name="title" value="Welcome"/>
 		<put name="body" value="/welcome.jsp"/>
 	</definition>
@@ -90,20 +83,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/previewDefineLater.jsp"/>
 		<put name="includeBodyTag" value="false"/>
 	</definition>
-	<definition name=".exit" extends=".activityLayout">
-		<put name="title" value="Exited"/>
-		<put name="body" value="/exit.jsp"/>
-	</definition>
 	
 	<!-- Journal definitions -->
 	
-	<definition name=".journalDetail" extends=".activityLayout">
+	<definition name=".journalDetail" extends=".layout">
 		<put name="pageTitle" value="Journal - Detail" />
 		<put name="title" value="Journal" />
 		<put name="body" value="/notebook/detail.jsp"/>
 	</definition>
 	<!-- Grouping definitions -->
-	<definition name=".showgroup" extends=".activityLayout">
+	<definition name=".showgroup" extends=".layout">
 		<put name="pageTitle" value="Grouping" />
 		<put name="title" value="Grouping" />
 		<put name="body" value="/grouping/show.jsp"/>

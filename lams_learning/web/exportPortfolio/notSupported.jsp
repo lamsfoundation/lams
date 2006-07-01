@@ -41,18 +41,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 
 	<body>
-	<div id="page">	
-		<div id="content">
+	<div id="page-learner"><!--main box 'page'-->
 
-		<H1><c:out value="${pageTitle}"/></H1>
-		
+	<h1 class="no-tabs-below"><c:out value="${pageTitle}"/></h1>
+	<div id="header-no-tabs-learner">
+
+	</div><!--closes header-->
+
+	<div id="content-learner">
+
 		<p>	<fmt:message key="${error.export.portfolio.not.supported}">
 				<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
 			</fmt:message>
 		</p>
 		
-		</div>
-	</div>
+	</div>  <!--closes content-->
 
 	</body>
 	
