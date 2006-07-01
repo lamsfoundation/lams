@@ -124,8 +124,9 @@ public interface VoteAppConstants {
     public static final String MAP_GENERAL_SELECTED_OPTIONS_CONTENT		="mapGeneralSelectedOptionsContent";
     public static final String MAP_STARTUP_GENERAL_OPTIONS_CONTENT		="mapStartupGeneralOptionsContent";
     public static final String MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT	="mapStartupGeneralSelectedOptionsContent";
-    public static final String MAP_STARTUP_GENERAL_OPTIONS_QUEID		="mapStartupGeneralOptionsQueId";
+    public static final String LIST_GENERAL_CHECKED_OPTIONS_CONTENT		="listGeneralCheckedOptionsContent";
     public static final String MAP_STUDENTS_VOTED						="mapStudentsVoted";
+    
     public static final String QUESTIONS_WITHNO_OPTIONS					="questionsWithNoOptions";
     
     public static final String MAP_GENERAL_CHECKED_OPTIONS_CONTENT		="mapGeneralCheckedOptionsContent";

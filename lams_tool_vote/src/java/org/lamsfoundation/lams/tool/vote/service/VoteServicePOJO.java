@@ -330,6 +330,21 @@ public class VoteServicePOJO implements
         }        
     }
     
+    public Set getAttemptsForUserAndSession(final Long queUsrUid,  final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsForUserAndSession(queUsrUid, voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting  user entries: "
+                                                         + e.getMessage(),
+														   e);
+        }
+        
+    }
+    
     
     public Set getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException
     {

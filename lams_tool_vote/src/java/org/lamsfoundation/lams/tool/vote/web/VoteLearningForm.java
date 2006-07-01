@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.vote.web;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -85,7 +86,10 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String maxNominationCountReached;
 	protected int 	 castVoteCount;
 	
-	/** The check boxes selected on the first voting screen */
+	protected Map mapGeneralCheckedOptionsContent;
+	
+
+/** The check boxes selected on the first voting screen */
 	protected String[] checkedVotes;
 	
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
@@ -640,5 +644,19 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	public void setCheckedVotes(String[] checkedVotes) {
 		this.checkedVotes = checkedVotes;
 	}
+	
 
+    /**
+     * @return Returns the mapGeneralCheckedOptionsContent.
+     */
+    public Map getMapGeneralCheckedOptionsContent() {
+        return mapGeneralCheckedOptionsContent;
+    }
+    /**
+     * @param mapGeneralCheckedOptionsContent The mapGeneralCheckedOptionsContent to set.
+     */
+    public void setMapGeneralCheckedOptionsContent(
+            Map mapGeneralCheckedOptionsContent) {
+        this.mapGeneralCheckedOptionsContent = mapGeneralCheckedOptionsContent;
+    }
 }

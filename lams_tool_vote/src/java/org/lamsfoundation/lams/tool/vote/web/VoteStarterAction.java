@@ -278,6 +278,9 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		}
 		    
 		voteAuthoringForm.resetUserAction();
+
+		if (voteAuthoringForm != null)
+		    voteAuthoringForm.setCurrentTab("1");
 		
 		logger.debug("will return to jsp with: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);

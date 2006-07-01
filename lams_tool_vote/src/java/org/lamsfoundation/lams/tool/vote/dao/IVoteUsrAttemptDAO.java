@@ -97,6 +97,8 @@ public interface IVoteUsrAttemptDAO
 	public void removeVoteUsrAttemptByUID(Long uid);
 	
 	public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
+	
+	public Set getAttemptsForUserAndSession(final Long queUsrId,  final Long voteSessionId)
 }
 
 

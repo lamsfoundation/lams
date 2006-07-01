@@ -289,6 +289,8 @@ public interface IVoteService
     public List getOfflineFilesMetaData(Long voteContentId) throws VoteApplicationException;
     
     public List getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
+    
+    public Set getAttemptsForUserAndSession(final Long queUsrId,  final Long voteSessionId) throws VoteApplicationException;
 
 }
 

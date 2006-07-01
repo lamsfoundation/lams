@@ -135,21 +135,28 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 		setContentInUse(request);
 		IVoteService voteService =VoteUtils.getToolService(request);
-	 	
-		Collection<String> voteDisplayOrderIds = voteLearningForm.votesAsCollection();
-		logger.debug("Checkbox votes "+voteDisplayOrderIds);
-		
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
+
+    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("toolSessionId: " + toolSessionId);
     	
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
-    	logger.debug("voteContent:" + voteContent);
+    	VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
+        logger.debug("retrieving voteSession: " + voteSession);
+        
+        Long toolSessionUid=voteSession.getUid();
+        logger.debug("toolSessionUid: " + toolSessionUid);
+        
+    	String userID=(String)request.getSession().getAttribute(USER_ID);
+    	logger.debug("userID: " + userID);
+    	VoteQueUsr existingVoteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
+    	logger.debug("existingVoteQueUsr: " + existingVoteQueUsr);
 
-		Map mapGeneralCheckedOptionsContent = LearningUtil.buildQuestionContentMap(request, voteContent, voteDisplayOrderIds);
-		logger.debug("mapGeneralCheckedOptionsContent: "+ mapGeneralCheckedOptionsContent);
-		request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 
+		List userAttempts=voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
+		logger.debug("userAttempts: "+ userAttempts);
+		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+		
     	voteLearningForm.resetCommands();
+    	logger.debug("fwding to ALL_NOMINATIONS: "+ ALL_NOMINATIONS);
 	    return (mapping.findForward(ALL_NOMINATIONS));
     }
     
@@ -445,6 +452,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	// Put the map in the request ready for the next screen
     	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    	voteLearningForm.setMapGeneralCheckedOptionsContent(mapGeneralCheckedOptionsContent);
     	
     	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
     	
