@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 	
 <!-- ============= Noticeboard Learner Page Definitions ====================== -->	
-	<definition name=".learnerContent" extends=".baseDef" >
+	<definition name=".learnerContent"  path="/template/learnerTemplate.jsp" >
 		<put name="title" value="Noticeboard"/>
 		<put name="pageHeader" value = "Noticeboard"/>
 		<put name="content" value="/learnerContent.jsp" />	
