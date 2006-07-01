@@ -361,6 +361,9 @@ public class McStarterAction extends Action implements McAppConstants {
 
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+
+		if (mcAuthoringForm != null)
+		        mcAuthoringForm.setCurrentTab("1");
 		
 		logger.debug("will return to jsp with: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter);
