@@ -326,6 +326,8 @@ input.button {
 	padding-top: 25px;
 	padding-bottom: 25px;
 	text-decoration: none;
+	font-size: 11px;
+	font-family: verdana, arial, helvetica, sans-serif;
 }
 
 input:hover.button {
@@ -337,6 +339,8 @@ input:hover.button {
 	padding-top: 25px;
 	padding-bottom: 25px;
 	text-decoration: none;
+	font-size: 11px;
+	font-family: verdana, arial, helvetica, sans-serif;
 }
 .box {
 	display: none;
@@ -423,8 +427,38 @@ table.forum td.first, table.forum th.first {
 	padding-left:20px;
 }
 
+/* Used for chosen grouping */
+table.chosengrouping { 
+	 width:98%;
+	 margin-left:0px; 
+	 text-align:center; 
+	 }
 
+table.chosengrouping tr { 
+	valign:top
+}
 
+table.chosengrouping th { 
+	padding:0px; 
+	font-size:11px;
+	align:center;
+}
+
+table.chosengrouping td { 
+	padding:0px; 
+	font-size:11px;
+	align:center;
+}
+
+table.chosengrouping td p{ 
+	padding:0px; 
+	font-size:11px; 
+	line-height:11px;
+}
+
+table.chosengrouping td select { 
+	font-size:11px; 
+}
 /*layout of the table with form elements */
 
 table { 
@@ -449,6 +483,7 @@ td p.button{
 	margin:0px; 
 	padding:10px 10px 10px 0px; 
 	font-size:11px;
+	font-family: verdana, arial, helvetica, sans-serif;
 }
 
 
