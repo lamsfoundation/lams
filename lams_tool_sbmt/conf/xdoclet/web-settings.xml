@@ -5,7 +5,6 @@
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
-		classpath:/org/lamsfoundation/lams/commonContext.xml
 		classpath:/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml	
