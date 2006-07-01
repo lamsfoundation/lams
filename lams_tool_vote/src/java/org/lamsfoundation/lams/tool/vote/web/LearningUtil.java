@@ -144,7 +144,8 @@ public class LearningUtil implements VoteAppConstants {
      * @param singleUserEntry
      * @param voteSession
      */
-    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  boolean singleUserEntry, VoteSession voteSession)
+    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  
+            boolean singleUserEntry, VoteSession voteSession)
 	{
         logger.debug("doing voteSession: " + voteSession);
         logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
@@ -158,39 +159,56 @@ public class LearningUtil implements VoteAppConstants {
 		
 		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
 		logger.debug("toolContentUID: " + toolContentUID);
-		 	
-		if (toolContentUID != null)
+		
+		
+		if ((mapGeneralCheckedOptionsContent.size() == 0))
 		{
-			Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
-	        while (itCheckedMap.hasNext()) 
-	        {
-	        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-	            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
-	            
-	            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
-	            
-	            VoteQueContent voteQueContent=voteService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
-	            logger.debug("voteQueContent: " + voteQueContent);
-	            if (voteQueContent != null)
-	            {
-	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
-	            }
-	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
-	            {
-	                logger.debug("creating user entry record, 101");
-	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
-	                logger.debug("localVoteQueContent: " + localVoteQueContent);
-	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, true, voteSession);    
-	            }
-	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("102")))
-	            {
-	                logger.debug("creating user entry record, 102");
-	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
-	                logger.debug("localVoteQueContent: " + localVoteQueContent);
-	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
-	            }
-	        }			
+            logger.debug("mapGeneralCheckedOptionsContent is empty");
+            VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
+            logger.debug("localVoteQueContent: " + localVoteQueContent);
+            createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, singleUserEntry, voteSession);
+		    
 		}
+		else
+		{
+		    logger.debug("mapGeneralCheckedOptionsContent is not empty");
+			if (toolContentUID != null)
+			{
+				Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
+				logger.debug("iterating mapGeneralCheckedOptionsContent");
+		        while (itCheckedMap.hasNext()) 
+		        {
+		        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
+		            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
+		            
+		            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
+		            
+		            VoteQueContent voteQueContent=voteService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
+		            logger.debug("voteQueContent: " + voteQueContent);
+		            if (voteQueContent != null)
+		            {
+		                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
+		            }
+		            /*
+		            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
+		            {
+		                logger.debug("creating user entry record, 101");
+		                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
+		                logger.debug("localVoteQueContent: " + localVoteQueContent);
+		                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, true, voteSession);    
+		            }
+		            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("102")))
+		            {
+		                logger.debug("creating user entry record, 102");
+		                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
+		                logger.debug("localVoteQueContent: " + localVoteQueContent);
+		                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
+		            }
+		            */
+		        }			
+			}		    
+		}
+
 	 }
 
     

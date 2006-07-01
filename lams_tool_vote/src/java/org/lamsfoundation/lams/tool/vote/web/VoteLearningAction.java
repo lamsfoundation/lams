@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -151,7 +152,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("existingVoteQueUsr: " + existingVoteQueUsr);
 
 
-		List userAttempts=voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
+		Set userAttempts=voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
 		logger.debug("userAttempts: "+ userAttempts);
 		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 		
@@ -415,7 +416,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	
     	if (mapGeneralCheckedOptionsContent.size() > 0)
     	{
-    	    LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, false, voteSession);    
+    	    LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, false, voteSession);
     	}
     	
     	
@@ -423,7 +424,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	{
     		logger.debug("mapGeneralCheckedOptionsContent size is 0");
     		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
-    		mapLeanerCheckedOptionsContent.put("101", userEntry);
+    		//mapLeanerCheckedOptionsContent.put("101", userEntry);
 
 			logger.debug("after mapsize check  mapLeanerCheckedOptionsContent " + mapLeanerCheckedOptionsContent);
 			if (userEntry.length() > 0)
@@ -432,11 +433,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, true, voteSession);    
 			}
     	}
+    	
     	if ((mapGeneralCheckedOptionsContent.size() > 0) && (userEntryAvailable == true))
     	{
     		logger.debug("mapGeneralCheckedOptionsContent size is > 0" + userEntry);
     		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
-    		mapLeanerCheckedOptionsContent.put("102", userEntry);
+    		//mapLeanerCheckedOptionsContent.put("102", userEntry);
 
 			logger.debug("after mapsize check  mapLeanerCheckedOptionsContent " + mapLeanerCheckedOptionsContent);
 			if (userEntry.length() > 0)
