@@ -5,7 +5,7 @@
 	<table cellspacing="0">
 		<tr>
 			<th colspan="2">
-				<c:out value="${session.sessionName}" />
+				${session.sessionName}
 			</th>
 		</tr>
 
@@ -14,7 +14,7 @@
 				<fmt:message>heading.totalLearners</fmt:message>
 			</td>
 			<td>
-				??99
+				${session.numberOfLearners}
 			</td>
 		</tr>
 
@@ -23,7 +23,7 @@
 				<fmt:message>heading.totalMessages</fmt:message>
 			</td>
 			<td>
-				<c:out value="${session.postCount}" />
+				${session.numberOfPosts}
 			</td>
 		</tr>
 
@@ -46,8 +46,7 @@
 
 							<c:forEach var="message" items="${session.messageDTOs}">
 								<div>
-									<span style="font-weight: bold"> <c:out value="${message.from}" /></span>
-									<c:out value="${message.body}" />
+									<span style="font-weight: bold"> ${message.from}</span> ${message.body}
 									<br />
 								</div>
 							</c:forEach>
@@ -63,7 +62,7 @@
 				<html:form action="/monitoring" method="post" target="_blank" style="float:left; margin-right: 4px">
 					<html:hidden property="dispatch" value="openChatHistory" />
 					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:submit>
+					<html:submit styleClass="button">
 						<fmt:message>summary.editMessages</fmt:message>
 					</html:submit>
 				</html:form>
@@ -71,12 +70,12 @@
 				<html:form action="/monitoring" method="post" target="_blank">
 					<html:hidden property="dispatch" value="openChatClient" />
 					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:submit>
+					<html:submit styleClass="button">
 						<fmt:message>summary.openChat</fmt:message>
 					</html:submit>
-					<html:checkbox property="teacherVisible">
-						<fmt:message>Visible</fmt:message>
-					</html:checkbox>
+					<!--					<html:checkbox property="teacherVisible">-->
+					<!--						<fmt:message>Visible</fmt:message>-->
+					<!--					</html:checkbox>-->
 				</html:form>
 
 			</td>

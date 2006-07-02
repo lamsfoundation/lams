@@ -6,7 +6,7 @@
 		<tbody>
 			<tr>
 				<th colspan="2">
-					<c:out value="${session.sessionName}" />
+					${session.sessionName}
 				</th>
 			</tr>
 
@@ -15,7 +15,7 @@
 					<fmt:message>heading.totalLearners</fmt:message>
 				</td>
 				<td>
-					TODO.
+					${session.numberOfLearners}
 				</td>
 			</tr>
 
@@ -24,7 +24,7 @@
 					<fmt:message>heading.totalMessages</fmt:message>
 				</td>
 				<td>
-					<c:out value="${session.postCount}" />
+					${session.numberOfPosts}
 				</td>
 			</tr>
 
@@ -40,10 +40,10 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						<c:out value="${user.jabberNickname}" />
+						${user.jabberNickname}
 					</td>
 					<td>
-						<c:out value="${user.postCount}" />
+						${user.postCount}
 					</td>
 				</tr>
 			</c:forEach>

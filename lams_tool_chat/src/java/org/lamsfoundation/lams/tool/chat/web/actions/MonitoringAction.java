@@ -106,18 +106,21 @@ public class MonitoringAction extends LamsDispatchAction {
 			if (count == null) {
 				count = 0;
 			}
-			sessionDTO.setPostCount(count);
+			sessionDTO.setNumberOfPosts(count);
 
 			// constructing userDTOs
 			Map<Long, Integer> userCountMap = chatService
 					.getMessageCountByFromUser(session.getUid());
+			
+			sessionDTO.setNumberOfLearners(userCountMap.size());
+			
 			for (Iterator userIter = session.getChatUsers().iterator(); userIter
 					.hasNext();) {
 				ChatUser user = (ChatUser) userIter.next();
 				ChatUserDTO userDTO = new ChatUserDTO(user);
 				count = userCountMap.get(user.getUid());
 				if (count == null) {
-					count = 98;
+					count = 0;
 				}
 				userDTO.setPostCount(count);
 				sessionDTO.getUserDTOs().add(userDTO);
