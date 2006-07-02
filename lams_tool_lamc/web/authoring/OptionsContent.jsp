@@ -171,8 +171,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</tr>
 
 	 				 <tr>
-	 				 <td valign=top> </td>
-	 				 <td align=left colspan=3 valign=top>
+	 				 <td align=right colspan=4 valign=top>
 							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="button">
 									<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		

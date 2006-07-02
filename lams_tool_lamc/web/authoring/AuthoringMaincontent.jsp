@@ -204,9 +204,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>		
 
 	<div id="footer"></div>
-<lams:HTMLEditor />
-
-</div>
+		<lams:HTMLEditor />
+	</div>
 
 </body>
 </html:html>

@@ -31,66 +31,73 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-
-			<table>
-				<tr>
-					<td NOWRAP valign=top>
-			      			<b> <bean:message key="radiobox.sln"/>: </b>
-					</td>
-					<td NOWRAP valign=top>
-							<html:radio property="sln"  value="ON">
-							 <bean:message key="option.on"/>
-							</html:radio>
-	
-							<html:radio property="sln"  value="OFF">
-							 <bean:message key="option.off"/>
-							</html:radio>
-	      			</td>
-		         </tr>
-		         
-   				<tr>
-					<td NOWRAP valign=top>
-			      			<b> <bean:message key="radiobox.onepq"/>: </b>
-					</td>
-					<td NOWRAP valign=top>
-							<html:radio property="questionsSequenced" value="ON">
-							 <bean:message key="option.on"/>
-							</html:radio>
-	
-							<html:radio property="questionsSequenced" value="OFF">
-							 <bean:message key="option.off"/>
-							</html:radio>
-	      			</td>
-		        </tr>
-		         
-		         <tr>
-					<td NOWRAP valign=top>
-			      			<b> <bean:message key="radiobox.retries"/>: </b>
-					</td>
-					<td NOWRAP valign=top>
-							<html:radio property="retries" value="ON">
-							 <bean:message key="option.on"/>
-							</html:radio>
-	
-							<html:radio property="retries" value="OFF">
-							 <bean:message key="option.off"/>
-							</html:radio>
-	      			</td>
-
-				</tr>	    
-
-		         <tr> 
-	  				<td colspan=2 NOWRAP valign=top>
-							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
-					</td> 
-			  	</tr>
-			  	
-			  	<tr> 
-	  				<td colspan=2 NOWRAP valign=top>
-							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true" key="label.report.endLearningMessage.col"/>														
-					</td> 
-			  	</tr>
-
-			</table>	  	
-		
 			
+			<table class="forms">
+					<tr>
+						<td class="field-name">							
+				      			 <bean:message key="radiobox.sln"/>: 
+						</td>
+						<td>							
+								<html:radio property="sln"  value="ON">
+								 <bean:message key="option.on"/>
+								</html:radio>
+		
+								<html:radio property="sln"  value="OFF">
+								 <bean:message key="option.off"/>
+								</html:radio>
+		      			</td>
+			         </tr>
+			         
+					<tr>
+						<td class="field-name">							
+				      			 <bean:message key="radiobox.onepq"/>: 
+						</td>
+						<td>							
+								<html:radio property="questionsSequenced" value="ON">
+								 <bean:message key="option.on"/>
+								</html:radio>
+		
+								<html:radio property="questionsSequenced" value="OFF">
+								 <bean:message key="option.off"/>
+								</html:radio>
+		      			</td>
+			         </tr>
+			         
+	   				<tr>
+						<td class="field-name">							
+				      			 <bean:message key="radiobox.retries"/>:
+						</td>
+						<td>							
+								<html:radio property="retries" value="ON">
+								 <bean:message key="option.on"/>
+								</html:radio>
+		
+								<html:radio property="retries" value="OFF">
+								 <bean:message key="option.off"/>
+								</html:radio>
+		      			</td>
+			        </tr>
+
+			         <tr> 
+						<td colspan=2>							
+								<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
+				 		</td>
+				  	</tr>
+				  	
+				  	<tr> 
+						<td colspan=2>							
+								<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true" key="label.report.endLearningMessage.col"/>														
+				 		</td>
+				  	</tr>
+		</table>
+
+
+
+
+
+
+		
+		
+		
+
+					

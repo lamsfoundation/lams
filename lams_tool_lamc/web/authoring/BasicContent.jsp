@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<h2><bean:message key="label.authoring.mc.basic"/>  </h2>	
 				</c:if> 				
 				
-		    	<table align=center> 	  
+				<table class="forms">
 					<tr>   
 					<td NOWRAP class=error>
 						<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
