@@ -30,20 +30,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<table class="forms">
 							<tr> 
-	 							<td class="field-name"> <b> <bean:message key="label.authoring.title"/>: </b> </td>
+	 							<td> <b>  <bean:message key="label.authoring.title"/>: </b> </td>
 						 		<td NOWRAP> 
 	                                     <c:out value="${activityTitle}" escapeXml="false"/>
 								</td> 
 						  	</tr>
 						  	<tr> 
-	 							<td class="field-name"> <b> <bean:message key="label.authoring.instructions"/>:  </b></td>
+	 							<td> <b> <bean:message key="label.authoring.instructions"/>:  </b></td>
 						 		<td NOWRAP> 
 	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
 								</td>
 							</tr>
 					
 					 		<tr> 
-	 							<td class="field-name">
+	 							<td>
 									 <b> <bean:message key="label.question1"/>:  </b>
 							 	</td>
 							  	<td>

@@ -259,6 +259,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         {
     		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
         }
+        
+		if (qaAuthoringForm != null)
+		{
+		    if ((qaAuthoringForm.getOnlineInstructions() == null) || (qaAuthoringForm.getOnlineInstructions().length() == 0)) 
+		        qaAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
+		    if ((qaAuthoringForm.getOfflineInstructions() == null) || (qaAuthoringForm.getOfflineInstructions().length() == 0))
+		        qaAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
+		}
+        
 
         authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
 
@@ -481,6 +490,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         throws IOException, ServletException {
     	
     	logger.debug("dispathcing addNewQuestion");
+    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         AuthoringUtil authoringUtil= new AuthoringUtil();
@@ -501,6 +511,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
     		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
         }
         
+		if (qaAuthoringForm != null)
+		{
+		    if ((qaAuthoringForm.getOnlineInstructions() == null) || (qaAuthoringForm.getOnlineInstructions().length() == 0)) 
+		        qaAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
+		    if ((qaAuthoringForm.getOfflineInstructions() == null) || (qaAuthoringForm.getOfflineInstructions().length() == 0))
+		        qaAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
+		}
+
         request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  //FIXME: ??
         authoringUtil.reconstructQuestionContentMapForAdd(mapQuestionContent, request);
         
@@ -526,6 +544,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         throws IOException, ServletException {
     	logger.debug("doing removeQuestion ");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	
 		String richTextTitle = request.getParameter("title");
         String richTextInstructions = request.getParameter("instructions");
@@ -543,8 +562,17 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         }
         
 		AuthoringUtil authoringUtil= new AuthoringUtil();
-        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+        
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+        
+		if (qaAuthoringForm != null)
+		{
+		    if ((qaAuthoringForm.getOnlineInstructions() == null) || (qaAuthoringForm.getOnlineInstructions().length() == 0)) 
+		        qaAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
+		    if ((qaAuthoringForm.getOfflineInstructions() == null) || (qaAuthoringForm.getOfflineInstructions().length() == 0))
+		        qaAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
+		}
+    	
         
         request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  //FIXME: ??
         authoringUtil.reconstructQuestionContentMapForRemove(mapQuestionContent, request, qaAuthoringForm);
@@ -571,6 +599,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
         
+		if (qaAuthoringForm != null)
+		{
+		    if ((qaAuthoringForm.getOnlineInstructions() == null) || (qaAuthoringForm.getOnlineInstructions().length() == 0)) 
+		        qaAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
+		    if ((qaAuthoringForm.getOfflineInstructions() == null) || (qaAuthoringForm.getOfflineInstructions().length() == 0))
+		        qaAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
+		}
+
         addFileToContentRepository(request, qaAuthoringForm);
         qaAuthoringForm.resetUserAction();
         return (mapping.findForward(LOAD_QUESTIONS));

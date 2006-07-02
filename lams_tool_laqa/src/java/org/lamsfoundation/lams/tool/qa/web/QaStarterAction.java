@@ -361,6 +361,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
             retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue(),false);
         }
 		
+		if (qaAuthoringForm != null)
+		{
+		    if ((qaAuthoringForm.getOnlineInstructions() == null) || (qaAuthoringForm.getOnlineInstructions().length() == 0)) 
+		        qaAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
+		    if ((qaAuthoringForm.getOfflineInstructions() == null) || (qaAuthoringForm.getOfflineInstructions().length() == 0))
+		        qaAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
+		}
+		
 		logger.debug("will return to jsp with: " + sourceMcStarter);
 		String destination=QaUtils.getDestination(sourceMcStarter, requestedModule);
 		logger.debug("destination: " + destination);

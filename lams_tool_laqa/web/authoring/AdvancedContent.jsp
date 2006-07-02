@@ -31,9 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<table class="forms">
 				<tr>
 					<td class="field-name">							
-		      			 <b>
 			      			<bean:message key="radiobox.synchInMonitor"/>:
-			      		</b> 
 					</td>
 					<td>							
 						<html:radio property="synchInMonitor" value="ON">
@@ -48,9 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         
 				<tr>
 					<td class="field-name">							
-						 <b>
 			      			<bean:message key="radiobox.usernameVisible"/>:
-			      		</b> 
 					</td>
 					<td>							
 						<html:radio property="usernameVisible" value="ON">
@@ -65,9 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         
    				<tr>
 					<td class="field-name">							
-		      			 <b>
 			      			<bean:message key="radiobox.questionsSequenced"/>:
-			      		</b> 
 					</td>
 					<td>							
 						<html:radio property="questionsSequenced" value="ON">
@@ -82,9 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         
 		         <tr> 
 					<td class="field-name">							
-					<b>
 				 		<bean:message key="label.report.title"/>: 
-		      		</b> 
 			 		</td>
 					<td>							
 			 			<html:text property="reportTitle" size="60" maxlength="100"/>
@@ -93,9 +85,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	
 			  	<tr> 
 					<td class="field-name">							
-					 <b>
 				 		<bean:message key="label.monitoringReport.title"/>: </td>
-		      		</b> 
 					<td>							
 			 			<html:text property="monitoringReportTitle" size="60" maxlength="100"/>
 			 		</td>
@@ -103,9 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	
 			  	<tr> 
 					<td class="field-name">							
-					 <b>	      			
 				 		<bean:message key="label.report.endLearningMessage"/>: 
-		      		</b>  
 		      		</td>
 					<td>							
 			 			<html:text property="endLearningMessage" size="60" maxlength="100"/>

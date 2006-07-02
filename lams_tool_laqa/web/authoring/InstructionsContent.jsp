@@ -87,9 +87,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				
 				<tr> 
-					<td class="field-name"> <b>
+					<td class="field-name"> 
 	          				<bean:message key="label.onlineFiles" />
-          				</b> 
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
@@ -168,9 +167,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 				<tr> 
-					<td class="field-name"> <b>
+					<td class="field-name"> 
           				<bean:message key="label.offlineFiles" />
-	          			</b>
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
