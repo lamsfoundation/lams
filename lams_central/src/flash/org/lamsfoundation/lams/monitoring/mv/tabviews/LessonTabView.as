@@ -538,7 +538,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				//requiredTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
 				requiredTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contribute Type is: "+o.taskURL);
-					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);
+					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
 					
 					//getURL(String(o.taskURL), "_blank");
 					//getURL("http://localhost:8080/lams/monitoring/monitoring.do?method=getAllContributeActivities&lessonID=4", "_blank");
