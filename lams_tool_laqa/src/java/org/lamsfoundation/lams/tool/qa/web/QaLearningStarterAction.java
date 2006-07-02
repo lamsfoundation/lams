@@ -194,6 +194,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    /*mark the http session as a learning activity  */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
 	    
+	    
 	    QaUtils.persistTimeZone(request);
 	    
 	    /*validate learning mode parameters*/
@@ -257,6 +258,24 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	persistError(request,"error.toolContent.notAvailable");
 	    	return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
+	    
+	    
+		if (qaContent.getTitle() == null)
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Q&A Title");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Q&A Instructions");
+		}
+		else if (qaContent.getTitle().equals(""))
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Q&A Title");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Q&A Instructions");
+		}
+		else
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());			
+		}
+
 
 	    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, qaContent.getQaContentId());
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
@@ -266,11 +285,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * And the passed tool session id refers to it.
 	     */
 	    
-	    logger.debug("ACTIVITY_TITLE: " + qaContent.getTitle());
-	    request.getSession().setAttribute(ACTIVITY_TITLE,qaContent.getTitle());
-	    
-	    logger.debug("ACTIVITY_INSTRUCTIONS: " + qaContent.getInstructions());
-	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS,qaContent.getInstructions());
 	    
 		logger.debug("REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
 	    request.getSession().setAttribute(REPORT_TITLE_LEARNER,qaContent.getReportTitle());
