@@ -31,14 +31,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-				<table>
+		
+			<table class="forms">
 				<tr>
-					<td NOWRAP valign=top>
-		      			 <b>
+					<td class="field-name">							
 			      			<bean:message key="label.vote.changable"/>:
-			      		</b> 
 					</td>
-	  				<td NOWRAP valign=top>
+					<td>							
 						<html:radio property="voteChangable" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -50,12 +49,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         </tr>
 		         
 				<tr>
-					<td NOWRAP valign=top>
-		      			 <b>
+					<td class="field-name">							
 			      			<bean:message key="label.vote.lockedOnFinish"/>:
-			      		</b> 
 					</td>
-					<td NOWRAP valign=top>
+					<td>							
 						<html:radio property="lockOnFinish" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -66,14 +63,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	      			</td>
 		         </tr>
 		         
-
-				<tr>
-					<td NOWRAP valign=top>
-		      			 <b>
+   				<tr>
+					<td class="field-name">							
 			      			<bean:message key="label.allowText"/>:
-			      		</b> 
 					</td>
-					<td NOWRAP valign=top>
+					<td>							
 						<html:radio property="allowText" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -82,19 +76,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						 <bean:message key="option.off"/>
 						</html:radio>
 	      			</td>
-		         </tr>
+		        </tr>
+		         
+		         <tr> 
+					<td class="field-name">							
+					 		<bean:message key="label.maxNomCount"/>: 
+					</td>
 
-
-			  	<tr> 
-					<td NOWRAP valign=top>
-	      			 <b>
-				 		<bean:message key="label.maxNomCount"/>: </td>
-		      		</b> 
-					<td NOWRAP valign=top>
-			 			<html:text property="maxNominationCount" size="3" maxlength="3"/>
+					<td>							
+			 			<html:text property="maxNominationCount" size="60" maxlength="3"/>
 			 		</td>
 			  	</tr>
-				
-
+			  	
 			</table>	  	
+
 		

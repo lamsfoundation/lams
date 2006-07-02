@@ -60,94 +60,104 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<table class="forms">
 						<tr> 
-							<td colspan=2 NOWRAP valign=top>
+							<td NOWRAP valign=top>
 								<lams:SetEditor id="title" text="${activityTitle}" small="true" key="label.authoring.title.col"/>								
 							</td> 
-							<td> </td>
 					  	</tr>
 
 					  	<tr> 
-							<td colspan=2 NOWRAP valign=top>
+							<td NOWRAP valign=top>
 								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
 							</td> 
-							<td> </td>							
 						</tr>
 				
-			 		<!--default Option content, this entry can not be deleted but can be updated -->
-				 		<tr> 
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true" key="label.nomination.col"/>								
-							</td> 
-							
-						  	<td NOWRAP valign=middle>			
-								  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
-							</td> 								
-							<td> </td>														 
-					  	</tr>
-		
-				  	<!--end of default Option content -->
-				  	
-			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="optIndex" scope="session" value="1"/>
-						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
-					  		<c:if test="${optionEntry.key > 1}"> 			
-								<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
-								  <tr>
+				
+					<tr> <td NOWRAP valign=top>
+						<table width="40%">
+
+					 		<!--default Option content, this entry can not be deleted but can be updated -->
+						 		<tr> 
 									<td NOWRAP valign=top>
-										<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true" key="label.nomination.col"/>								
-	                                	<c:if test="${ activeModule != 'monitoring' }"> 			
-			 		 						<html:submit property="removeContent" 
-	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeNomination(${optIndex});">
-												<bean:message key="button.delete"/>
-											</html:submit>
-										</c:if> 			
-										
-	                                	<c:if test="${ activeModule == 'monitoring' }"> 			
-			 		 						<html:submit property="removeContent" 
-	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeMonitoringNomination(${optIndex});">
-												<bean:message key="button.delete"/>
-											</html:submit>
-										</c:if> 													
-                                    </td>
-	      						  	<td NOWRAP valign=middle>			
-						  				<c:if test="${maxOptionIndex == optIndex}"> 			
-		     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
-		     							</c:if> 	    
-										
-		 				  				<c:if test="${maxOptionIndex != optIndex }"> 			
-			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
-			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
-										</c:if> 	           								 
-		                         	</td>
-								  </tr>
-							</c:if> 			
-						</c:forEach>
-						<html:hidden property="toolContentId" value="${VoteAuthoringForm.toolContentId}"/>
-						<html:hidden property="optIndex"/>
-                        
-                        <tr>
-                            <td></td>
-                            <td align="right">
-                                <html:submit property="addContent" 
-                                             styleClass="linkbutton" 
-                                             onclick="submitMethod('addNewNomination');">
-                                    <bean:message key="button.add"/>
-                                </html:submit>
-                            </td>
-                        </tr>
-					
+										<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true" key="label.nomination.col"/>								
+									</td> 
+									
+									
+								  	<td NOWRAP valign=top>			
+										  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
+									</td> 								
+							  	</tr>
+				
+						  	<!--end of default Option content -->
+						  	
+					  		<!-- if there is more than just the default content start presenting them -->
+					  	 		<c:set var="optIndex" scope="session" value="1"/>
+								<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
+							  		<c:if test="${optionEntry.key > 1}"> 			
+										<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+										  <tr>
+											<td NOWRAP valign=top>
+												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true" key="label.nomination.col"/>								
+			                                	<c:if test="${ activeModule != 'monitoring' }"> 			
+					 		 						<html:submit property="removeContent" 
+			                                                     styleClass="linkbutton"  
+			                                                     onclick="removeNomination(${optIndex});">
+														<bean:message key="button.delete"/>
+													</html:submit>
+												</c:if> 			
+												
+			                                	<c:if test="${ activeModule == 'monitoring' }"> 			
+					 		 						<html:submit property="removeContent" 
+			                                                     styleClass="linkbutton"  
+			                                                     onclick="removeMonitoringNomination(${optIndex});">
+														<bean:message key="button.delete"/>
+													</html:submit>
+												</c:if> 													
+		                                    </td>
+		                                    
+			      						  	<td NOWRAP valign=top>			
+								  				<c:if test="${maxOptionIndex == optIndex}"> 			
+				     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
+				     							</c:if> 	    
+												
+				 				  				<c:if test="${maxOptionIndex != optIndex }"> 			
+					   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
+					       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
+												</c:if> 	           								 
+				                         	</td>
+										  </tr>
+									</c:if> 			
+								</c:forEach>
+								<html:hidden property="toolContentId" value="${VoteAuthoringForm.toolContentId}"/>
+								<html:hidden property="optIndex"/>
+		                        
+		                        <tr>
+		                            <td colspan=2 valign=top align="right">
+		                                <html:submit property="addContent" 
+		                                             styleClass="linkbutton" 
+		                                             onclick="submitMethod('addNewNomination');">
+		                                    <bean:message key="button.add"/>
+		                                </html:submit>
+		                            </td>
+		                        </tr>
+						
+						</table>
+						</td>
+					</tr>
+				
 					</table>
 
       	<c:if test="${ activeModule != 'authoring' }"> 					
-			<HR>
 			<p align="right">
 		        <a href="javascript:submitMethod('submitAllContent')" class="button">
 		        	<bean:message key="label.save"/></a>
 			</p>
-		</c:if> 					
-
+		</c:if> 				
+		
+      	<c:if test="${activeModule == 'authoring'}"> 					
+			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
+			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />		
+		</c:if> 							
 
 <SCRIPT language="JavaScript"> 
 
