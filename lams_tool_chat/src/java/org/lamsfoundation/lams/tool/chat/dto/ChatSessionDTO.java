@@ -124,4 +124,26 @@ public class ChatSessionDTO implements Comparable {
 	public void setPostCount(int postCount) {
 		this.postCount = postCount;
 	}
+	
+	/** Added just to stop the build crashing */
+	public Integer numberOfPosts;
+	public Integer numberOfLearners;
+
+	public Integer getNumberOfLearners() {
+		return numberOfLearners;
+	}
+
+	public void setNumberOfLearners(Integer numberOfLearners) {
+		this.numberOfLearners = numberOfLearners;
+	}
+
+	public Integer getNumberOfPosts() {
+		return numberOfPosts;
+	}
+
+	public void setNumberOfPosts(Integer numberOfPosts) {
+		this.numberOfPosts = numberOfPosts;
+	}
+	
+
 }
