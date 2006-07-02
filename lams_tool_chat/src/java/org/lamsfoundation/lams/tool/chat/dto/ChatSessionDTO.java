@@ -44,7 +44,9 @@ public class ChatSessionDTO implements Comparable {
 	
 	Set<ChatUserDTO> userDTOs;
 	
-	int postCount;
+	int numberOfPosts;
+	
+	int numberOfLearners;
 	
 	public ChatSessionDTO(ChatSession session) {
 		this.sessionID = session.getSessionId();
@@ -117,33 +119,19 @@ public class ChatSessionDTO implements Comparable {
 		this.userDTOs = chatUsers;
 	}
 
-	public int getPostCount() {
-		return postCount;
-	}
-
-	public void setPostCount(int postCount) {
-		this.postCount = postCount;
-	}
-	
-	/** Added just to stop the build crashing */
-	public Integer numberOfPosts;
-	public Integer numberOfLearners;
-
-	public Integer getNumberOfLearners() {
+	public int getNumberOfLearners() {
 		return numberOfLearners;
 	}
 
-	public void setNumberOfLearners(Integer numberOfLearners) {
+	public void setNumberOfLearners(int numberOfLearners) {
 		this.numberOfLearners = numberOfLearners;
 	}
 
-	public Integer getNumberOfPosts() {
+	public int getNumberOfPosts() {
 		return numberOfPosts;
 	}
 
-	public void setNumberOfPosts(Integer numberOfPosts) {
+	public void setNumberOfPosts(int numberOfPosts) {
 		this.numberOfPosts = numberOfPosts;
 	}
-	
-
 }
