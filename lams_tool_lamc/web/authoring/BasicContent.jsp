@@ -266,7 +266,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						
 						 <tr>
-							<td NOWRAP colspan=5 align=center valign=top>								
+							<td NOWRAP colspan=5 align=right valign=top>								
 									<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="buttonLeft">
 										<bean:message key="label.edit"/>
 									</html:submit>	 				 		  					

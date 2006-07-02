@@ -49,34 +49,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	  <c:out value="${sessionScope.countSessionComplete}"/>
 							</td> 
 						</tr>
-					
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b>  <bean:message key="label.topMark" /> </b>
-				  			</td>
-							<td NOWRAP valign=top>
-							  	 <c:out value="${sessionScope.topMark}"/>
-							</td> 
-						</tr>
-						
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b> <bean:message key="label.avMark" /> </b>
-				  			</td>
-							<td NOWRAP valign=top>
-							  	<c:out value="${sessionScope.averageMark}"/>
-							</td> 
-						</tr>
-						
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b>  <bean:message key="label.loMark" /> </b>
-				  			</td>
-							<td NOWRAP valign=top>
-							  	<c:out value="${sessionScope.lowestMark}"/>
-							</td> 
-						</tr>
-
 		</table>
 
 

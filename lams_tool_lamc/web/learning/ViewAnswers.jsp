@@ -158,6 +158,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 
 
+
+				<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
 				 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 			  	   		  <tr>
 						  	<td NOWRAP valign=top> 
@@ -196,6 +198,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	 
 						  </tr>
 						</c:if> 																		
+					</c:if> 																								
 					
 				  	<html:hidden property="doneLearnerProgress"/>						   
 				</table>

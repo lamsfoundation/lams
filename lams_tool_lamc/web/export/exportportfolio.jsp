@@ -28,6 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:html locale="true">
 	<head>
 	<title> <bean:message key="label.exportPortfolio"/> </title>
+	<lams:csss localLink="true"/>
 	</head>
 
 	<body>
