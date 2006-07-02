@@ -16,24 +16,29 @@
 </head>
 
 <body>
-	<div id="page">
+	<div id="page-learner">
 
 		<h1 class="no-tabs-below">
 			<fmt:message key="activity.title"></fmt:message>
 		</h1>
 
-		<div id="header-no-tabs"></div>
+		<div id="header-no-tabs-learner"></div>
 
-		<div id="content">
-			<h1>
-				<fmt:message key="label.authoring.heading" />
-			</h1>
-			<p>
-				<fmt:message key="define.later.message" />
-				<a href="javascript:location.reload(true);" class="button"><fmt:message key="button.try.again" /></a>
-			</p>
+		<div id="content-learner">
+			<table>
+				<tr>
+					<td>
+						<p>
+							<fmt:message key="define.later.message" />
+						</p>
+						<div class="right-buttons">
+							<a href="javascript:location.reload(true);" class="button"><fmt:message key="button.try.again" /></a>
+						</div>
+					</td>
+				</tr>
+			</table>
 		</div>
-		<div id="footer"></div>
+		<div id="footer-learner"></div>
 	</div>
 </body>
 </html:html>

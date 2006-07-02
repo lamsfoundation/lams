@@ -16,25 +16,32 @@
 </head>
 
 <body>
-	<div id="page">
+	<div id="page-learner">
 
 		<h1 class="no-tabs-below">
 			<fmt:message key="activity.title"></fmt:message>
 		</h1>
 
-		<div id="header-no-tabs"></div>
+		<div id="header-no-tabs-learner"></div>
 
-		<div id="content">
-			<h1>
-				<fmt:message key="run.offline.message" />
-			</h1>
-			<p>
-				<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
-					<fmt:message key="button.finish" />
-				</html:button>
-			</p>
+		<div id="content-learner">
+			<table>
+				<tr>
+					<td>
+						<p>
+							<fmt:message key="run.offline.message" />
+						</p>
+					</td>
+				</tr>
+			</table>
+			
+									<div class="right-buttons">
+							<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
+								<fmt:message key="button.finish" />
+							</html:button>
+						</div>
 		</div>
-		<div id="footer"></div>
+		<div id="footer-learner"></div>
 	</div>
 </body>
 </html:html>
