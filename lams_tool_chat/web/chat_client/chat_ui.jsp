@@ -20,6 +20,7 @@
 	var RESOURCE = "lams_chatclient";
 	var MODE = "${MODE}";
 	var USER_UID = "${USER_UID}";	
+	var SESSION_ID = "${SESSION_ID}";
 	var LEARNER_FINISHED = "${LEARNER_FINISHED}";
 	var LOCK_ON_FINISHED = "${LOCK_ON_FINISHED}";	
 </script>
@@ -75,6 +76,7 @@
 			<div>
 				<input type="hidden" name="dispatch" value="finishActivity" />
 				<input type="hidden" name="chatUserUID" value="${USER_UID}" />
+				<input type="hidden" name="toolSessionID" value="${SESSION_ID}" />				
 				<input type="submit" value='<fmt:message>button.finish</fmt:message>' />
 			</div>
 		</form>

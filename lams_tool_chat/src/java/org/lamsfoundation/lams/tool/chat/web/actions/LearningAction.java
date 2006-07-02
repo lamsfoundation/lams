@@ -127,6 +127,7 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("NICK", chatUser.getJabberNickname());
 		request.setAttribute("MODE", "learner");
 		request.setAttribute("USER_UID", chatUser.getUid());
+		request.setAttribute("SESSION_ID", toolSessionID);
 		request
 				.setAttribute("LEARNER_FINISHED", chatUser
 						.getFinishedActivity());
@@ -165,6 +166,7 @@ public class LearningAction extends LamsDispatchAction {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		Long chatUserUID = WebUtil.readLongParam(request, "chatUserUID");
+		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
 		// set the finished flag
 		ChatUser chatUser = chatService.getUserByUID(chatUserUID);
@@ -188,7 +190,7 @@ public class LearningAction extends LamsDispatchAction {
 
 		String nextActivityUrl;
 		try {
-			nextActivityUrl = sessionMgrService.leaveToolSession(new Long(1),
+			nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID,
 					userID);
 			response.sendRedirect(nextActivityUrl);
 		} catch (DataMissingException e) {
