@@ -29,23 +29,19 @@
 </head>
 
 <body>
-
-	<div id="page">
+	<div id="page-learner">
 		<h1 class="no-tabs-below">
-			<fmt:message key="activity.title"></fmt:message>
+			<c:out value="${learner.contentTitle}" escapeXml="false" />
 		</h1>
 
-		<div id="header-no-tabs">
+		<div id="header-no-tabs-learner">
 
 		</div>
 
-		<div id="content">
+		<div id="content-learner">
 			<table cellpadding="0">
 				<tr>
 					<td colspan="2">
-						<h1>
-							<c:out value="${learner.contentTitle}" escapeXml="false" />
-						</h1>
 						<p>
 							<c:out value="${learner.contentInstruction}" escapeXml="false" />
 						</p>
@@ -54,14 +50,14 @@
 
 				<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 				<c:choose>
-				
+
 					<c:when test="${empty learner.filesUploaded}">
 						<tr>
-							</td>
-								<fmt:message key="label.learner.noUpload" />
-								<p>
-									<fmt:message key="label.learner.uploadMessage" />
-								</p>
+							<td>
+							<fmt:message key="label.learner.noUpload" />
+							<p>
+								<fmt:message key="label.learner.uploadMessage" />
+							</p>
 							</center>
 							</td>
 						</tr>
@@ -144,7 +140,7 @@
 					<table>
 						<!-- Hidden fields -->
 						<html:hidden property="toolSessionID" value="${learner.toolSessionID}" />
-	
+
 						<!--File path row -->
 						<tr>
 							<td class="field-name">
@@ -177,7 +173,7 @@
 				</html:form>
 			</c:if>
 		</div>
-		<div id="footer"></div>
+		<div id="footer-learner"></div>
 	</div>
 </body>
 </html:html>
