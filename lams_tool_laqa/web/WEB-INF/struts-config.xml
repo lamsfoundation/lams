@@ -199,6 +199,11 @@
 		    redirect="false"
 	      />
 
+	      <forward
+	        name="individualLearnerRep"
+	        path="/learning/LearnerRep.jsp"
+		    redirect="false"
+	      />
 
 	  	<forward
 			name="loadMonitoring"
@@ -274,6 +279,13 @@
 	        path="/learningIndex.jsp"
 		    redirect="false"
 	      />
+      
+	      <forward
+	        name="individualLearnerRep"
+	        path="/learning/LearnerRep.jsp"
+		    redirect="false"
+	      />
+
       
 	     <forward
 	        name="learnerRep"

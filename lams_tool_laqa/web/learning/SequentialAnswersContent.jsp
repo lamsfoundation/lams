@@ -65,7 +65,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
-					 		&nbsp&nbsp
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<bean:message key="button.done"/>
 						</html:submit>	 				 		  					
@@ -74,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
 				  				  (sessionScope.totalQuestionCount == 1) }"> 
-					 <td NOWRAP valign=top align=right> 
+					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<bean:message key="button.done"/>
 						</html:submit>	 				 		  					
@@ -83,11 +82,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  
 				  
  				  <c:when test="${sessionScope.currentQuestionIndex != sessionScope.totalQuestionCount && sessionScope.currentQuestionIndex > 1}"> 
-					 <td NOWRAP valign=top align=right> 
+					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
-						&nbsp&nbsp
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 									<bean:message key="button.getNextQuestion"/>
 						</html:submit>	 				 		  					
@@ -95,7 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   				  </c:when> 
   				  
 				  <c:otherwise>
-					 <td NOWRAP valign=top align=right> 
+					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 									<bean:message key="button.getNextQuestion"/>
 						</html:submit>	 				 		  					

@@ -263,8 +263,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(false).toString());
-		logger.debug("fwd'ing to: " + LEARNER_REPORT);
-		return (mapping.findForward(LEARNER_REPORT));
+		logger.debug("fwd'ing to: " + INDIVIDUAL_LEARNER_REPORT);
+		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 	}
 
     
