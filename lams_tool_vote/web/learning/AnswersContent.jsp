@@ -19,17 +19,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:html locale="true">
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
+<html:html>
 <head>
-	<title> <bean:message key="label.learning"/> </title>
-	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<html:base />
+	<lams:headItems />
+	<title><bean:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -87,12 +93,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteLearningForm.submit();
 		}
 	</script>
-	
-
 </head>
-<body>
 
-<html:form  onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
+<body>
+	<div id="page-learner">
+
+<h1 class="no-tabs-below">
+	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+</h1>
+
+<div id="header-no-tabs-learner"></div>
+
+<div id="content-learner">
+	<html:form  onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 
@@ -106,19 +119,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${VoteLearningForm.maxNominationCountReached == 'true'}"> 			
 						<tr> <td class="error">
 							<bean:message key="error.maxNominationCount.reached"/> 
-							<c:out value="${VoteLearningForm.maxNominationCount}"/>	
+								<c:out value="${VoteLearningForm.maxNominationCount}"/>	
 							<bean:message key="label.nominations"/>
 						</td></tr>
 					</c:if> 		
 					
 	
 					<c:if test="${VoteLearningForm.activityRunOffline != 'true'}"> 			
-	  					  <tr>
-						  	<td NOWRAP align=center valign=top colspan=2> 
-								  <c:out value="${VoteLearningForm.activityTitle}" escapeXml="false" />						  								
-						  	</td>
-						  </tr>
-						  
 						  <tr>
 						  	<td  NOWRAP align=left valign=top colspan=2> 
 								  <c:out value="${VoteLearningForm.activityInstructions}" escapeXml="false" />						  																
@@ -141,19 +148,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:if test="${VoteLearningForm.allowTextEntry == 'true'}"> 			
 									<tr> 
 										<td NOWRAP align=left valign=top colspan=2> 
-							      			 <b>
-										 		<bean:message key="label.other"/>: 
-									      		</b> 
-									 			<html:text property="userEntry" size="30" maxlength="100"/>
+											<table align=left> 
+												<tr> <td>
+								      			 <b>
+											 		<bean:message key="label.other"/>: 
+										      		</b> 
+										 			<html:text property="userEntry" size="30" maxlength="100"/>
+											 	</td> </tr>
+											</table>									 			
 								 		</td>
 								  	</tr>
 							</c:if> 									  	
 				  	   
 				  	<html:hidden property="donePreview"/>						   
+		  	   		
 		  	   		  <tr>
-					  	<td NOWRAP align=left valign=top> 
+					  	<td NOWRAP valign=top colspan=2> 
 		                            <html:submit property="continueOptionsCombined" 
-		                                         styleClass="linkbutton">
+		                                         styleClass="button">
 										<bean:message key="label.submit.vote"/>
 		                            </html:submit>
 					  	 </td>
@@ -161,8 +173,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					</c:if> 		
 				</table>
-</html:form>
+	</html:form>
+</div>
 
+<div id="footer-learner"></div>
+
+</div>
 </body>
 </html:html>
 

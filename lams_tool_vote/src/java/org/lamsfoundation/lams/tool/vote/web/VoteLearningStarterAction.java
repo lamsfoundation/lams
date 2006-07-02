@@ -187,7 +187,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      * And the passed tool session id already refers to it.
      */
     setupAttributes(request, voteContent, voteLearningForm);
-
+    
     request.getSession().setAttribute(TOOL_CONTENT_ID, voteContent.getVoteContentId());
     logger.debug("using TOOL_CONTENT_ID: " + voteContent.getVoteContentId());
     
@@ -455,6 +455,12 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    logger.debug("allow text entry is: " + voteLearningForm.getAllowTextEntry());
 	    voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	    voteLearningForm.setVoteChangable(new Boolean(voteContent.isVoteChangable()).toString());
+	    
+	    logger.debug("ACTIVITY_TITLE: " + voteContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_TITLE,voteContent.getTitle());
+	    
+	    logger.debug("ACTIVITY_INSTRUCTIONS: " + voteContent.getInstructions());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS,voteContent.getInstructions());
 	}
 	
 	

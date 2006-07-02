@@ -185,7 +185,7 @@ public interface VoteAppConstants {
     public static final Integer MAX_TOOL_SESSION_COUNT					=new Integer(500);
     public static final String IS_TOOL_SESSION_CHANGED					="isToolSessionChanged";
     public static final String OPTION_OFF								="false";
-    public static final String ACTIVITY_TITLE 							= "activityTitle";
+    public static final String ACTIVITY_TITLE 							="activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS					= "activityInstructions";
     public static final String MONITORING								="monitoring";
     public static final String REMOVABLE_QUESTION_INDEX					="removableQuestionIndex";

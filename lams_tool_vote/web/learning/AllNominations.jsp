@@ -18,17 +18,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:html locale="true">
-<head>
-	<title> <bean:message key="label.learning"/> </title>
-	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
+<html:html>
+<head>
+	<html:base />
+	<lams:headItems />
+	<title><bean:message key="activity.title" /></title>
+	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
@@ -36,10 +44,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteLearningForm.submit();
 		}
 	</script>
-	
 </head>
-<body>
 
+<body>
+	<div id="page-learner">
+
+<h1 class="no-tabs-below">
+	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+</h1>
+
+<div id="header-no-tabs-learner"></div>
+
+<div id="content-learner">
 <html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
@@ -85,8 +101,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 
 					  <tr>
-					  	<td NOWRAP align=center  valign=top colspan=2> 
-								&nbsp&nbsp&nbsp&nbsp								
+					  	<td NOWRAP valign=top colspan=2> 
+								&nbsp
 					  	</td>
 					  </tr>	
 
@@ -112,10 +128,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 				  <tr>
-				  	<td NOWRAP colspan=2 align=center valign=top> 
+				  	<td NOWRAP valign=top> 
 								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 				   						
 			                                <html:submit property="redoQuestionsOk" 
-			                                             styleClass="linkbutton" 
+			                                             styleClass="button" 
 			                                             onclick="submitMethod('redoQuestionsOk');">
 			                                    <bean:message key="label.retake"/>
 			                                </html:submit>
@@ -123,25 +139,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish == 'true' && VoteLearningForm.revisitingUser == 'false' }"> 				   						
 				                                <html:submit property="redoQuestionsOk" 
-				                                             styleClass="linkbutton" 
+				                                             styleClass="button" 
 				                                             onclick="submitMethod('redoQuestionsOk');">
 				                                    <bean:message key="label.retake"/>
 				                                </html:submit>
 								</c:if> 		          								                      
-
+					<td>					
+					<td NOWRAP valign=top> 			
+						<div class="right-buttons">
                                 <html:submit property="learnerFinished" 
-                                             styleClass="linkbutton" 
+                                             styleClass="button" 
                                              onclick="submitMethod('learnerFinished');">
                                     <bean:message key="label.finished"/>
                                 </html:submit>
+                         </div>
 				  	 </td>
 				  </tr>
 
-					  
-</html:form>
+	</html:form>
+</div>
 
+<div id="footer-learner"></div>
+
+</div>
 </body>
 </html:html>
-
-
 

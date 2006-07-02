@@ -287,6 +287,8 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("destination: " + destination);
 		
 		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		
+		logger.debug("final ACTIVITY_TITLE is: " + request.getSession().getAttribute(ACTIVITY_TITLE));
 		return (mapping.findForward(destination));
 	} 
 	
@@ -433,8 +435,8 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		
 		if (voteContent.getTitle() == null)
 		{
-			request.getSession().setAttribute(ACTIVITY_TITLE, "Questions and Answers");
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Please answer the questions.");
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Voting Title");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Voting Instructions");
 		}
 		else
 		{
