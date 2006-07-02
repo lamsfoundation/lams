@@ -19,18 +19,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 	<!--options content goes here-->
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
 						  	  <bean:message key="label.assessment"/> 
 					  	</th>
-					  </tr>
-					  
-					  
-					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	<c:out value="${activityTitle}" escapeXml="false" /> 
-					  	</td>
 					  </tr>
 					  
 					  <tr>
@@ -43,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.withRetries"/> </b> 
+						  	 <b> <bean:message key="label.withRetries"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -51,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.isRetries != 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center  valign=top colspan=2> 
-						  	<b>  <bean:message key="label.withoutRetries"/> </b> 
+						  	<b> <bean:message key="label.withoutRetries"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -59,9 +52,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.message"/>
+						  	  <bean:message key="label.learner.message"/>
 						  		 (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
-						  	</b> 
 					  	</td>
 					  </tr>
 					</c:if> 								  
@@ -175,7 +167,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		  		<c:if test="${sessionScope.totalCountReached != 'true'  &&  sessionScope.totalQuestionCount != '1'}"> 			
 	  	   		  <tr>
-				  	<td NOWRAP colspan=2 align=right valign=top> 
+				  	<td NOWRAP colspan=2 valign=top> 
 				  			<html:submit property="nextOptions" styleClass="button">
 								<bean:message key="button.nextQuestion"/>
 							</html:submit>	 				 		  					
@@ -185,7 +177,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		 		<c:if test="${sessionScope.totalQuestionCount == '1'}"> 		
 	  	   		  <tr>
-				  	<td NOWRAP colspan=2 align=right valign=top> 
+				  	<td NOWRAP colspan=2 valign=top> 
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
 							</html:submit>	 				 		  					
@@ -195,7 +187,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 		 		<c:if test="${sessionScope.totalCountReached == 'true'}"> 		
 	  	   		  <tr>
-				  	<td NOWRAP colspan=2 align=right valign=top> 
+				  	<td NOWRAP colspan=2 valign=top> 
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
 							</html:submit>	 				 		  					

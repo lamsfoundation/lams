@@ -18,21 +18,38 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:html locale="true">
-<head>
-	<title> <bean:message key="label.learning"/> </title>
-	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
-</head>
-<body>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
+<html:html>
+<head>
+	<html:base />
+	<lams:headItems />
+	<title><bean:message key="activity.title" /></title>
+</head>
+
+<body>
+	<div id="page-learner">
+	
+	<h1 class="no-tabs-below">
+		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	</h1>
+
+<div id="header-no-tabs-learner"></div>
+
+<div id="content-learner">
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table class="forms">
 					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
@@ -51,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<b>  <bean:message key="label.viewAnswers"/> </b> 
+						  	<b>  <bean:message key="label.viewAnswers"/>  </b>
 					  	</td>
 					  </tr>
 					</c:if> 								  
@@ -59,16 +76,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.learnerProgress == 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.viewAnswers"/> </b> 
+						  	 <b> <bean:message key="label.learner.viewAnswers"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 								  
 
-					<tr>
-						<td NOWRAP align=right valign=top colspan=2> 
-							<hr>
-						</td> 
-					</tr>
 					
   		  	 		<c:set var="mainQueIndex" scope="session" value="0"/>
 					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
@@ -98,7 +110,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 												<tr>												
 												<td NOWRAP colspan=2 align=left valign=top> 
-					   								    <b> <bean:message key="label.attempts"/> </b>
+					   								   <b>  <bean:message key="label.attempts"/> </b>
 												</td> 
 												</tr>
 												
@@ -114,7 +126,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																				<c:if test="${distinctAttemptEntry.key == i}"> 	
 																					<tr>
 																						<td NOWRAP align=left valign=top> 
-																								<b> <bean:message key="label.attempt"/> <c:out value="${sessionScope.aIndex}"/>: </b>
+																								<b> <bean:message key="label.attempt"/> <c:out value="${sessionScope.aIndex}"/>:  </b>
 																						</td>
 																						<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
 								 														<td align=left valign=top> 																					
@@ -145,45 +157,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 					</c:forEach>
 
-			  	   	<tr> 
-				 		<td NOWRAP colspan=2 valign=top> 
-				 		&nbsp
-				 		</td>
-			  	   </tr>
-
-
 
 				 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 			  	   		  <tr>
-						  	<td NOWRAP colspan=2 align=center valign=top> 
+						  	<td NOWRAP valign=top> 
 						  			<html:submit property="redoQuestions" styleClass="button">
 										<bean:message key="label.redo.questions"/>
 									</html:submit>	 		
 				       
-									<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+			   						<html:submit property="viewSummary" styleClass="button">
+										<bean:message key="label.view.summary"/>
+									</html:submit>	 				 		  					
+
+								<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
 								  	   <html:submit property="learnerFinished" styleClass="button">
 											<bean:message key="label.finished"/>
 									   </html:submit>
 							  	   </c:if>
-		
-			   						<html:submit property="viewSummary" styleClass="button">
-										<bean:message key="label.view.summary"/>
-									</html:submit>	 				 		  					
 						  	 </td>
 						  </tr>
 						</c:if> 																		
 	
 						<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 			  	   		  <tr>
-			  	   		    <td colspan=2 align=right  valign=top>
-							  	   <html:submit property="learnerFinished" styleClass="button">
-												<bean:message key="label.finished"/>
-								   </html:submit>
-		
-			   						<html:submit property="viewSummary" styleClass="button">
-										<bean:message key="label.view.summary"/>
-									</html:submit>	 				 		  					
+			  	   		    <td  valign=top>
+				   						<html:submit property="viewSummary" styleClass="button">
+											<bean:message key="label.view.summary"/>
+										</html:submit>	 				 		  					
 						  	 </td>
+						  	 
+ 			  	   		    <td  valign=top>
+	    	  						<div class="right-buttons">
+								  	   <html:submit property="learnerFinished" styleClass="button">
+													<bean:message key="label.finished"/>
+									   </html:submit>
+									</div>
+						  	 </td>
+						  	 
 						  </tr>
 						</c:if> 																		
 					
@@ -191,8 +201,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 	</html:form>
 
+</div>
+
+<div id="footer-learner"></div>
+
+</div>
 </body>
 </html:html>
 
 
 
+
+
+
+
+
+
+	
+	

@@ -31,16 +31,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	<!--options content goes here-->
-				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
 						  	 <bean:message key="label.assessment"/> 
-					  	</td>
-					  </tr>
-					  
-  					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	<c:out value="${activityTitle}" escapeXml="false" /> 
 					  	</td>
 					  </tr>
 					  
@@ -54,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.withRetries"/> </b> 
+						  	  <b> <bean:message key="label.withRetries"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -62,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${sessionScope.isRetries == 'false'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<b>  <bean:message key="label.withoutRetries"/> </b> 
+						    <b> <bean:message key="label.withoutRetries"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -70,8 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
-						  	</b> 
+						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> )  </b>
 					  	</td>
 					  </tr>
 					</c:if> 								  

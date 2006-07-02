@@ -18,21 +18,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:html locale="true">
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
+<html:html>
 <head>
-	<title> <bean:message key="label.learning"/> </title>
-	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<html:base />
+	<lams:headItems />
+	<title><bean:message key="activity.title" /></title>
 </head>
+
 <body>
+	<div id="page-learner">
+	
+	<h1 class="no-tabs-below">
+		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	</h1>
 
+<div id="header-no-tabs-learner"></div>
 
-<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
+<div id="content-learner">
+	<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 		<c:choose> 
 		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
 				<jsp:include page="/learning/SingleQuestionAnswersContent.jsp" /> 
@@ -41,9 +57,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
 		  </c:otherwise>
 		</c:choose> 
-</html:form>
+	</html:form>
+</div>
 
+<div id="footer-learner"></div>
+
+</div>
 </body>
 </html:html>
 
 
+
+
+
+
+
+
+
+	
+	
