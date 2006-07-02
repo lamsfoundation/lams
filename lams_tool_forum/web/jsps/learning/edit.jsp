@@ -1,8 +1,26 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<html:errors property="error" />
+<h1 class="no-tabs-below">
+	<fmt:message key="activity.title" />
+</h1>
 
-<html:form action="/learning/updateTopic.do" focus="message.subject" onsubmit="return validateMessageForm(this);" enctype="multipart/form-data">
-	<%@ include file="/jsps/learning/message/topiceditform.jsp"%>
-</html:form>
+<div id="header-no-tabs-learner"></div>
+
+<div id="content-learner">
+
+	<h2>
+		<fmt:message key="title.message.edit" />
+	</h2>
+	
+	<html:errors property="error" />
+
+	<html:form action="/learning/updateTopic.do" focus="message.subject" onsubmit="return validateMessageForm(this);" enctype="multipart/form-data">
+		<%@ include file="/jsps/learning/message/topiceditform.jsp"%>
+	</html:form>
+
+</div>
+
+<div id="footer-learner"></div>
+
+
 

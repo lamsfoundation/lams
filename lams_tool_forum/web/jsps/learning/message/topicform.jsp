@@ -30,19 +30,18 @@
 			<html:errors property="message.attachment" />
 		</td>
 	</tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td align="left">
-			<BR>
-			<html:submit styleClass="buttonStyle" style="width:120px">
-				<bean:message key="button.submit" />
-			</html:submit>
-			<c:set var="backToForum">
-				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionScope.toolSessionID}" />
-			</c:set>
-			<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="buttonStyle" style="width:120px">
-				<bean:message key="button.cancel" />
-			</html:button>
-		</td>
-	</tr>
 </table>
+
+<div class="right-buttons">
+	<html:submit styleClass="button">
+		<bean:message key="button.submit" />
+	</html:submit>
+	<c:set var="backToForum">
+		<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionScope.toolSessionID}" />
+	</c:set>
+	<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="button">
+		<bean:message key="button.cancel" />
+	</html:button>
+</div>
+
+<div class="space-bottom"></div>

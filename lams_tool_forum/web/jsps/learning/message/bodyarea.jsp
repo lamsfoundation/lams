@@ -10,7 +10,7 @@
 		
 	</c:when>
 	<c:otherwise>
-		<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body" styleId="messageBody" />
+		<lams:STRUTS-textarea rows="10" cols="40" tabindex="2" property="message.body" styleId="messageBody" />
 		<BR>
 		<fmt:message key="lable.char.left" />:  
 		<span id="charleftDiv"></span>

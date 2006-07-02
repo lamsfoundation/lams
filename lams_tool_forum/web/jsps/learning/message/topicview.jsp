@@ -52,54 +52,55 @@
 			</c:if>
 
 			<tr>
-				<td align="right">
-					<br />
-					<!--  Hide/Unhide Button -->
-					<c:if test='${mode == "teacher"}'>
-						<!--  call the hide action -->
-						<c:choose>
-							<c:when test="${hidden}">
-								<!--  display a show link  -->
-								<c:set var="hidetopic">
-									<html:rewrite page="/learning/updateMessageHideFlag.do?msgId=${msgDto.message.uid}&hideFlag=false" />
-								</c:set>
-								<html:link href="${hidetopic}" styleClass="button">
-									<b> <fmt:message key="label.show" /> </b>
-								</html:link>
-							</c:when>
-							<c:otherwise>
-								<!--  display a hide link -->
-								<c:set var="hidetopic">
-									<html:rewrite page="/learning/updateMessageHideFlag.do?msgId=${msgDto.message.uid}&hideFlag=true" />
-								</c:set>
-								<html:link href="${hidetopic}" styleClass="button">
-									<b> <fmt:message key="label.hide" /> </b>
-								</html:link>
-							</c:otherwise>
-						</c:choose>
-					</c:if>
+				<td>
+					<div class="right-buttons">
+						<!--  Hide/Unhide Button -->
+						<c:if test='${mode == "teacher"}'>
+							<!--  call the hide action -->
+							<c:choose>
+								<c:when test="${hidden}">
+									<!--  display a show link  -->
+									<c:set var="hidetopic">
+										<html:rewrite page="/learning/updateMessageHideFlag.do?msgId=${msgDto.message.uid}&hideFlag=false" />
+									</c:set>
+									<html:link href="${hidetopic}" styleClass="button">
+										<b> <fmt:message key="label.show" /> </b>
+									</html:link>
+								</c:when>
+								<c:otherwise>
+									<!--  display a hide link -->
+									<c:set var="hidetopic">
+										<html:rewrite page="/learning/updateMessageHideFlag.do?msgId=${msgDto.message.uid}&hideFlag=true" />
+									</c:set>
+									<html:link href="${hidetopic}" styleClass="button">
+										<b> <fmt:message key="label.hide" /> </b>
+									</html:link>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
 
-					<!--  Edit Button -->
-					<c:if test="${not hidden}">
-						<c:if test='${(mode == "teacher") || (msgDto.isAuthor && not finishedLock && sessionScope.allowEdit)}'>
-							<c:set var="edittopic">
-								<html:rewrite page="/learning/editTopic.do?topicId=${msgDto.message.uid}&rootUid=${rootUid}&create=${msgDto.message.created.time}" />
+						<!--  Edit Button -->
+						<c:if test="${not hidden}">
+							<c:if test='${(mode == "teacher") || (msgDto.isAuthor && not finishedLock && sessionScope.allowEdit)}'>
+								<c:set var="edittopic">
+									<html:rewrite page="/learning/editTopic.do?topicId=${msgDto.message.uid}&rootUid=${rootUid}&create=${msgDto.message.created.time}" />
+								</c:set>
+								<html:link href="${edittopic}" styleClass="button">
+									<fmt:message key="label.edit" />
+								</html:link>
+							</c:if>
+						</c:if>
+
+						<!--  Reply Button -->
+						<c:if test="${not finishedLock}">
+							<c:set var="replytopic">
+								<html:rewrite page="/learning/newReplyTopic.do?parentId=${msgDto.message.uid}&rootUid=${rootUid}" />
 							</c:set>
-							<html:link href="${edittopic}" styleClass="button">
-								<fmt:message key="label.edit" />
+							<html:link href="${replytopic}" styleClass="button">
+								<fmt:message key="label.reply" />
 							</html:link>
 						</c:if>
-					</c:if>
-
-					<!--  Reply Button -->
-					<c:if test="${not finishedLock}">
-						<c:set var="replytopic">
-							<html:rewrite page="/learning/newReplyTopic.do?parentId=${msgDto.message.uid}&rootUid=${rootUid}" />
-						</c:set>
-						<html:link href="${replytopic}" styleClass="button">
-							<fmt:message key="label.reply" />
-						</html:link>
-					</c:if>
+					</div>
 				</td>
 			</tr>
 		</table>

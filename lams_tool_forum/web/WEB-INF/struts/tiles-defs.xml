@@ -35,6 +35,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	<put name="body" value=""/>
     	<put name="header" value=""/>
 	</definition>
+	
+	<definition name="tiles:learner:layout" path="/includes/learnerLayout.jsp">
+    	<put name="body" value=""/>
+	</definition>
 
 	<!-- B: Generic -->
 	<definition name="tiles:/error" extends="tiles:layout">
@@ -57,32 +61,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<!-- B: Learning -->
 	<!-- MAIN PAGE for learner -->	
-	<definition name="tiles:/learning/forum/viewForum" extends="tiles:layout">
+	<definition name="tiles:/learning/forum/viewForum" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/viewforum.jsp"/>
 	</definition>
-	<definition name="tiles:/learning/forum/runOffline" extends="tiles:layout">
+	<definition name="tiles:/learning/forum/runOffline" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/runoffline.jsp"/>
 	</definition>
-	<definition name="tiles:/learning/forum/defineLater" extends="tiles:layout">
+	<definition name="tiles:/learning/forum/defineLater" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/definelater.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/learning/forum/viewTopic" extends="tiles:layout">
+	<definition name="tiles:/learning/forum/viewTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.view.topic"/>
     	<put name="body" value="/jsps/learning/viewtopic.jsp"/>
 	</definition>
 	
-    <definition name="tiles:/learning/forum/newTopic" extends="tiles:layout">
+    <definition name="tiles:/learning/forum/newTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.add"/>
     	<put name="body" value="/jsps/learning/create.jsp"/>
 	</definition>
 
-    <definition name="tiles:/learning/forum/replyTopic" extends="tiles:layout">
+    <definition name="tiles:/learning/forum/replyTopic" extends="tiles:learner:layout">
           <put name="pageTitleKey" value="title.message.reply"/>
           <put name="body" value="/jsps/learning/reply.jsp"/>
     </definition>
     
-    <definition name="tiles:/learning/forum/editTopic" extends="tiles:layout">
+    <definition name="tiles:/learning/forum/editTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.edit"/>
     	<put name="body" value="/jsps/learning/edit.jsp"/>
 	</definition>

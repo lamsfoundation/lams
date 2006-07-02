@@ -1,38 +1,62 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <c:set var="mode" value="${sessionScope.mode}" />
 
-<h1>
+<h1 class="no-tabs-below">
 	<c:out value="${title}" escapeXml="false" />
 </h1>
-<p>
-	<c:out value="${instruction}" escapeXml="false" />
-</p>
+
+<div id="header-no-tabs-learner"></div>
 
 
-<%@ include file="/jsps/learning/message/topiclist.jsp"%>
+<div id="content-learner">
 
-<p>
-	<c:set var="newtopic">
-		<html:rewrite page="/learning/newTopic.do" />
-	</c:set>
-	<c:set var="refresh">
-		<html:rewrite page="/learning/viewForum.do?toolSessionID=${param.toolSessionID}" />
-	</c:set>
-	<c:set var="finish">
-		<html:rewrite page="/learning/finish.do?toolSessionID=${param.toolSessionID}" />
-	</c:set>
-	<c:if test='${mode != "teacher"}'>
-		<html:button property="newtopic" onclick="javascript:location.href='${newtopic}';" disabled="${finishedLock}" style="width:120px" styleClass="buttonStyle">
-			<fmt:message key="label.newtopic" />
-		</html:button>
-	</c:if>
-	<html:button property="refresh" onclick="javascript:location.href='${refresh}';" disabled="${finishedLock}" style="width:120px" styleClass="buttonStyle">
-		<fmt:message key="label.refresh" />
-	</html:button>
-	<c:if test='${mode != "teacher"}'>
-		<html:button property="finish" onclick="javascript:location.href='${finish}';" disabled="${finishedLock}" style="width:120px" styleClass="buttonStyle">
-			<fmt:message key="label.finish" />
-		</html:button>
-	</c:if>
+	<table>
+		<tr>
+			<td>
+				<c:out value="${instruction}" escapeXml="false" />
+			</td>
+		</tr>
+	</table>
 
-</p>
+	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
+
+	<table>
+		<tr>
+			<td>
+
+
+				<c:set var="newtopic">
+					<html:rewrite page="/learning/newTopic.do" />
+				</c:set>
+				<c:set var="refresh">
+					<html:rewrite page="/learning/viewForum.do?toolSessionID=${param.toolSessionID}" />
+				</c:set>
+				<c:set var="finish">
+					<html:rewrite page="/learning/finish.do?toolSessionID=${param.toolSessionID}" />
+				</c:set>
+
+				<div class="left-buttons">
+					<c:if test='${mode != "teacher"}'>
+						<html:button property="newtopic" onclick="javascript:location.href='${newtopic}';" disabled="${finishedLock}" styleClass="button">
+							<fmt:message key="label.newtopic" />
+						</html:button>
+					</c:if>
+					<html:button property="refresh" onclick="javascript:location.href='${refresh}';" disabled="${finishedLock}" styleClass="button">
+						<fmt:message key="label.refresh" />
+					</html:button>
+				</div>
+
+				<div class="right-buttons">
+
+					<c:if test='${mode != "teacher"}'>
+						<html:button property="finish" onclick="javascript:location.href='${finish}';" disabled="${finishedLock}" styleClass="button">
+							<fmt:message key="label.finish" />
+						</html:button>
+					</c:if>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<div id="footer-learner"></div>

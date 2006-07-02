@@ -1,6 +1,22 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<html:errors property="error" />
-<html:form action="/learning/replyTopic.do" focus="message.subject" onsubmit="return validateMessageForm(this);" enctype="multipart/form-data">
-	<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
-</html:form>
+<h1 class="no-tabs-below">
+	<fmt:message key="activity.title" />
+</h1>
+
+<div id="header-no-tabs-learner"></div>
+
+<div id="content-learner">
+
+	<h2>
+		<fmt:message key="title.message.reply" />
+	</h2>
+
+	<html:errors property="error" />
+	<html:form action="/learning/replyTopic.do" focus="message.subject" onsubmit="return validateMessageForm(this);" enctype="multipart/form-data">
+		<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
+	</html:form>
+
+</div>
+
+<div id="footer-learner"></div>
