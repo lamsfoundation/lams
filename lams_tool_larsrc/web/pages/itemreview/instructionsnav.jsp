@@ -9,7 +9,8 @@
 		<script language="JavaScript" type="text/JavaScript">
 		<!--
 				function finishIns(){
-					if(${param.mode == "learner"}){
+				//learner and author(preview mode) will mark the finish
+					if(${param.mode == "learner"} || ${param.mode == "author"}){
 					   var reqIDVar = new Date();
 					   //if auto run mode, the opener will be null
 					   if(window.parent.opener != null) 

@@ -81,5 +81,6 @@ public class ResourceConstants {
 	
 	
 	public static final String PAGE_EDITABLE = "isPageEditable";
+	public static final String MODE_AUTHOR_SESSION = "author_session";
 
 }

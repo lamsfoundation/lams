@@ -194,12 +194,12 @@ public class ViewItemAction extends Action {
 	 */
 	private ResourceItem getResourceItem(HttpServletRequest request, String mode) {
 		ResourceItem item = null;		
-		if(ToolAccessMode.AUTHOR.toString().equals(mode)){
+		if(ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)){
 			int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),0);
 			//authoring: does not save item yet, so only has ItemList from session and identity by Index
 			List<ResourceItem> resourceList = getResourceItemList(request);
 			item = resourceList.get(itemIdx);
-		}else if(ToolAccessMode.LEARNER.toString().equals(mode) || ToolAccessMode.TEACHER.toString().equals(mode)){
+		}else{
 			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 //			get back the resource and item list and display them on page
 			IResourceService service = getResourceService();			
