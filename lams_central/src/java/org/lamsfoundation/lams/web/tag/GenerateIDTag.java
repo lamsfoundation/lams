@@ -92,7 +92,7 @@ public class GenerateIDTag extends TagSupport {
 				
 				if((uniqueID = (String)ss.getAttribute(AttributeNames.UID)) != null){
 					if(getId() != null)
-						writer.print(uniqueID + "%" + getId());
+						writer.print(uniqueID + "_" + getId());
 					else
 						writer.print(uniqueID);
 				} else {
@@ -106,7 +106,7 @@ public class GenerateIDTag extends TagSupport {
 						if (number != -1) {
 					        ss.setAttribute(AttributeNames.UID, Integer.toString(pos));
 					        if(getId() != null)
-					        	writer.print(ss.getAttribute(AttributeNames.UID) + "%" + getId());
+					        	writer.print(ss.getAttribute(AttributeNames.UID) + "_" + getId());
 					        else
 					        	writer.print(ss.getAttribute(AttributeNames.UID));
 					    } else {
