@@ -98,7 +98,7 @@
 			<html:file property="offlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
-			<html:button onclick="javascript:doSubmit('uploadOffline');" property="uploadOfflineButt" styleClass="buttonStyle">
+			<html:button onclick="javascript:doSubmit('uploadOffline');" property="uploadOfflineButt" styleClass="button">
 				<fmt:message key="label.authoring.upload.offline.button" />
 			</html:button>
 		</td>
