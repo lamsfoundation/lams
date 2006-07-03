@@ -94,17 +94,17 @@ FCKConfig.ToolbarSets["Default_original"] = [
 ] ;
 
 FCKConfig.ToolbarSets["Default"] = [
-	['Source','DocProps','-','Preview'],
-	['PasteWord'],
+	['Source','DocProps','-','Preview','PasteWord'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
-	['OrderedList','UnorderedList','-','Outdent','Indent'],
+	['OrderedList','UnorderedList','-','Outdent','Indent'], 	
+	['About'], 
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
 	['Image','Table','Rule','Smiley','SpecialChar','UniversalKey'],
 	['FontFormat','FontName','FontSize'],
 	['TextColor','BGColor'],
-	['About']
 ] ;
+
 
 FCKConfig.ToolbarSets["Basic"] = [
 	['Bold','Italic','-','OrderedList','UnorderedList','-','Link','Unlink','-','About']
