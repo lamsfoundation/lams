@@ -93,6 +93,7 @@ public class LearningAction extends Action {
 	
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 		String runOffline = request.getParameter(ResourceConstants.PARAM_RUN_OFFLINE);
 		if(resourceItemUid != null){
@@ -126,12 +127,15 @@ public class LearningAction extends Action {
 		} catch (ResourceApplicationException e) {
 			log.error("Failed get next activity url:" + e.getMessage());
 		}
+		
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return mapping.findForward("finish");
 	}
 
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		doComplete(request);
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
@@ -147,6 +151,7 @@ public class LearningAction extends Action {
 	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		ResourceItemForm itemForm = (ResourceItemForm)form;
 		ActionErrors errors = validateResourceItem(itemForm);
 		
@@ -208,6 +213,7 @@ public class LearningAction extends Action {
 		
 		//URL or file upload
 		request.setAttribute("addType",new Short(type));
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**

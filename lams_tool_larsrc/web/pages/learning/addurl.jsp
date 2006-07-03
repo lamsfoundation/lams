@@ -47,6 +47,7 @@
 					<%@ include file="/common/messages.jsp"%>
 					<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm">
 						<input type="hidden" name="itemType" id="itemType" value="1"/>
+						<input type="hidden" name="mode" value="${param.mode}"/>
 						<table class="innerforms">
 							<tr>
 								<td valign="top">

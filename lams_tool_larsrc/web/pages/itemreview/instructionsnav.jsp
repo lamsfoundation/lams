@@ -6,18 +6,23 @@
 		<title>${instructions.title}</title>
 
 		<%@ include file="/common/header.jsp"%>
+		
+		<%-- param has higher level for request attribute --%>
+		<c:if test="${not empty param.mode}">
+			<c:set var="mode" value="${param.mode}"/>
+		</c:if>		
 		<script language="JavaScript" type="text/JavaScript">
 		<!--
 				function finishIns(){
 				//learner and author(preview mode) will mark the finish
-					if(${param.mode == "learner"} || ${param.mode == "author"}){
+					if(${mode == "learner"} || ${mode == "author"}){
 					   var reqIDVar = new Date();
 					   //if auto run mode, the opener will be null
 					   if(window.parent.opener != null) 
-						    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
+						    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
 					   else{
 					  		//set complete flag and finish this activity as well.
-					        window.parent.location.href='<c:url value="/learning/finish.do?toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
+					        window.parent.location.href='<c:url value="/learning/finish.do?mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
 					   }
 					}
 				   if(window.parent.opener != null) {
@@ -26,7 +31,7 @@
 					}
 				}
 				function nextIns(currIns){
-					document.location.href="<c:url value='/nextInstruction.do'/>?insIdx=" + currIns + "&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}&mode=${param.mode}";
+					document.location.href="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
 				}
 		//-->
 		</script>

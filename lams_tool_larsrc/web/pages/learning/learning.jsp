@@ -7,35 +7,40 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
+	<%-- param has higher level for request attribute --%>
+	<c:if test="${not empty param.mode}">
+		<c:set var="mode" value="${param.mode}"/>
+	</c:if>
+	
 	<script type="text/javascript">
 	<!--
 		function gotoURL(){
  		    var reqIDVar = new Date();
-			var gurl = "<c:url value="/pages/learning/addurl.jsp"/>?&reqID="+reqIDVar.getTime();
+			var gurl = "<c:url value="/pages/learning/addurl.jsp"/>?mode=${mode}&reqID="+reqIDVar.getTime();
 	      	showMessage(gurl);
 	      	return false;
 		}
 		function gotoFile(){
  		    var reqIDVar = new Date();
- 		    var gurl = "<c:url value="/pages/learning/addfile.jsp"/>?&reqID="+reqIDVar.getTime();
+ 		    var gurl = "<c:url value="/pages/learning/addfile.jsp"/>?mode=${mode}&reqID="+reqIDVar.getTime();
 	      	showMessage(gurl);
 	      	return false;
 		}
 		function checkNew(){
  		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?mode=${param.mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
  		    return false;
 		}
 		function viewItem(itemUid){
-			var myUrl = "<c:url value="/reviewItem.do"/>?mode=${param.mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
+			var myUrl = "<c:url value="/reviewItem.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
 			launchPopup(myUrl,"LearnerView");
 		}
 		function completeItem(itemUid){
-			document.location.href = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
+			document.location.href = "<c:url value="/learning/completeItem.do"/>?mode=${mode}&itemUid=" + itemUid;
 			return false;
 		}
 		function finishSession(){
-			document.location.href ='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}"/>';
+			document.location.href ='<c:url value="/learning/finish.do?mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 		function showMessage(url) {
@@ -94,7 +99,7 @@
 				</td>
 				
 				<td>
-					<c:if test="${param.mode != 'teacher'}">
+					<c:if test="${mode != 'teacher'}">
 						<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
 					</c:if>	
 					<a href="javascript:;" class="button" onclick="viewItem(${item.uid})" ><fmt:message key="label.view" /></a>
@@ -105,7 +110,7 @@
 			<td colspan="3" align="right">
 				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
 				&nbsp;
-				<c:if test="${param.mode != 'teacher'}">
+				<c:if test="${mode != 'teacher'}">
 					<a href="#" class="button" onclick="return finishSession()">
 						<fmt:message key="label.finished" />
 					</a>
@@ -120,7 +125,7 @@
 			</tr>
 		</c:if>
 	</table>
-	<c:if test="${param.mode != 'teacher'}">
+	<c:if test="${mode != 'teacher'}">
 		<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
 			<table border="0" align="center" width="100%">
 				<tr>
@@ -153,21 +158,21 @@
 			<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
 				<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addurl.jsp'/>");
+						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?mode=${mode}");
 					-->
 				</script>
 			</c:when>
 			<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
 				<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addfile.jsp'/>");
+						showMessage("<c:url value='/pages/learning/addfile.jsp'/>?mode=${mode}");
 					-->
 				</script>
 			</c:when>
 			<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
 				<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addurl.jsp'/>");
+						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?mode=${mode}");
 					-->
 				</script>
 			</c:when>
