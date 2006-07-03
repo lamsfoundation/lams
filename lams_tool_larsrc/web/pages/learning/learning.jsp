@@ -9,9 +9,9 @@
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.mode}">
-		<c:set var="mode" value="${param.mode}"/>
+		<c:set var="mode" value="${param.mode}" />
 	</c:if>
-	
+
 	<script type="text/javascript">
 	<!--
 		function gotoURL(){
@@ -54,134 +54,136 @@
     </script>
 </head>
 <body>
-<div id="page">
-	<table border="0" align="center" width="95%">
-		<tr>
-			<td>
-				<h1>
-					${resource.title}
-				</h1>
-				<h2>
-					${resource.instructions}
-				</h2>
-			</td>
-		</tr>
-	</table>
-	<div id="header-no-tabs"></div>
-	
-	<div id="content">
-	<BR>
-	<%@ include file="/common/messages.jsp"%>
-	<table border="0" align="center" width="95%">
-		<tr>
-			<th width="400px" align="center">
-				<fmt:message key="label.resoruce.to.review" />
-			</th>
-			<th width="50px">
-				<fmt:message key="label.completed" />
-			</th>
-			<th align="center">
-			
-			</th>
-		</tr>
-		<c:forEach var="item" items="${resourceList}">
-			<tr>
-				<td  align="center">${item.title}
-					<c:if test="${!item.createByAuthor}">
+	<div id="page-learner">
+		<h1 class="no-tabs-below">
+			${resource.title}
+		</h1>
+		<div id="header-no-tabs-learner">
+		</div>
+		<!--closes header-->
+
+		<div id="content-learner">
+			<p>
+				${resource.instructions}
+			</p>
+
+			<%@ include file="/common/messages.jsp"%>
+			<table cellpadding="0" cellspacing="0" class="alternative-color">
+				<tr>
+					<th width="255px">
+						<fmt:message key="label.resoruce.to.review" />
+					</th>
+					<th width="75px">
+						<fmt:message key="label.completed" />
+					</th>
+					<th align="center">
+
+					</th>
+				</tr>
+				<c:forEach var="item" items="${resourceList}">
+					<tr>
+						<td align="center">
+							${item.title}
+							<c:if test="${!item.createByAuthor}">
 						[${item.createBy.loginName}]
 					</c:if>
-				</td>
-				<td align="center">
-					<c:if test="${item.complete}">
-						<img src="<html:rewrite page='/includes/images/tick.gif'/>" border="0">
-					</c:if>
-				
-				</td>
-				
-				<td>
-					<c:if test="${mode != 'teacher'}">
-						<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
-					</c:if>	
-					<a href="javascript:;" class="button" onclick="viewItem(${item.uid})" ><fmt:message key="label.view" /></a>
-				</td>
-			</tr>
-		</c:forEach>
-		<tr>
-			<td colspan="3" align="right">
-				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
-				&nbsp;
-				<c:if test="${mode != 'teacher'}">
-					<a href="#" class="button" onclick="return finishSession()">
-						<fmt:message key="label.finished" />
-					</a>
+						</td>
+						<td align="center">
+							<c:if test="${item.complete}">
+								<img src="<html:rewrite page='/includes/images/tick.gif'/>" border="0">
+							</c:if>
+
+						</td>
+
+						<td>
+							<c:if test="${mode != 'teacher'}">
+								<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
+							</c:if>
+							<a href="javascript:;" class="button" onclick="viewItem(${item.uid})"><fmt:message key="label.view" /></a>
+						</td>
+					</tr>
+				</c:forEach>
+				<c:if test="${resource.miniViewResourceNumber > 0}">
+					<tr>
+						<td colspan="3" align="left">
+							<b>${resource.miniViewNumberStr}</b>
+						</td>
+					</tr>
 				</c:if>
-			</td>
-		</tr>
-		<c:if test="${resource.miniViewResourceNumber > 0}">
-			<tr>
-				<td colspan="3" align="left">
-					<b>${resource.miniViewNumberStr}</b>
-				</td>
-			</tr>
-		</c:if>
-	</table>
-	<c:if test="${mode != 'teacher'}">
-		<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
-			<table border="0" align="center" width="100%">
-				<tr>
-					<td style="align:left" >
-						<fmt:message key="label.suggest.new"/> 
-						<c:choose>
-							<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-								<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()"><fmt:message key="label.authoring.basic.resource.url.input"/> |
-								<input type="radio" name="suggest" value="file"  onclick="gotoFile()"><fmt:message key="label.authoring.basic.resource.file.input"/> 
-							</c:when>
-							<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-								<input type="radio" name="suggest" value="file"  checked="true" onclick="gotoFile()"><fmt:message key="label.authoring.basic.resource.file.input"/> 
-							</c:when>
-							<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-								<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()"><fmt:message key="label.authoring.basic.resource.url.input"/>
-							</c:when>
-						</c:choose>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" 
-							id="reourceInputArea" name="reourceInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
-						</iframe>
-					</td>
-				</tr>			
 			</table>
-		</c:if>
-		<c:choose>
-			<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-				<script type="text/javascript">
+			<div class="left-buttons">
+				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
+			</div>
+			<c:if test="${mode != 'teacher'}">
+				<div class="right-buttons">
+					<a href="#" class="button space-left" onclick="return finishSession()"> <fmt:message key="label.finished" /> </a>
+				</div>
+			</c:if>
+			<P>&nbsp;</P>
+			<c:if test="${mode != 'teacher'}">
+				<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
+					<table border="0" align="center" width="100%">
+						<tr>
+							<td style="align:left">
+								<fmt:message key="label.suggest.new" />
+								<c:choose>
+									<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
+										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()">
+										<fmt:message key="label.authoring.basic.resource.url.input" /> |
+								<input type="radio" name="suggest" value="file" onclick="gotoFile()">
+										<fmt:message key="label.authoring.basic.resource.file.input" />
+									</c:when>
+									<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
+										<input type="radio" name="suggest" value="file" checked="true" onclick="gotoFile()">
+										<fmt:message key="label.authoring.basic.resource.file.input" />
+									</c:when>
+									<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
+										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()">
+										<fmt:message key="label.authoring.basic.resource.url.input" />
+									</c:when>
+								</c:choose>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" id="reourceInputArea" name="reourceInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
+								</iframe>
+							</td>
+						</tr>
+					</table>
+				</c:if>
+				<c:choose>
+					<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
+						<script type="text/javascript">
 					<!--
 						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?mode=${mode}");
 					-->
 				</script>
-			</c:when>
-			<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-				<script type="text/javascript">
+					</c:when>
+					<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
+						<script type="text/javascript">
 					<!--
 						showMessage("<c:url value='/pages/learning/addfile.jsp'/>?mode=${mode}");
 					-->
 				</script>
-			</c:when>
-			<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-				<script type="text/javascript">
+					</c:when>
+					<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
+						<script type="text/javascript">
 					<!--
 						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?mode=${mode}");
 					-->
 				</script>
-			</c:when>
-		</c:choose>		
-	<%-- end mode != teacher --%>
-	</c:if>
-	</div>
-	<div id="footer"></div>
-</div>
+					</c:when>
+				</c:choose>
+				<%-- end mode != teacher --%>
+			</c:if>
+		</div>  <!--closes content-->
+		
+		<div id="footer-learner">
+		</div>
+		<!--closes footer-->
+
+	</div><!--closes page-->
 </body>
 </html:html>
 
