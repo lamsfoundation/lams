@@ -472,6 +472,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	}
 	
 	
+	private function isLoopingLD(fromAct, toAct):Boolean{
+		trace("fromAct is: "+fromAct+" and toAct is: "+toAct)
+		var toTransitions = _cv.ddm.getTransitionsForActivityUIID(toAct)
+		trace("toTransitions.out"+toTransitions.out)
+		if (toTransitions.out != null){
+			var nextAct = toTransitions.out.toUIID;
+			trace("next activity is: "+nextAct)
+			if (nextAct == fromAct){
+				return true;
+			}else {
+				return isLoopingLD(fromAct, nextAct)
+			}
+		}else {
+			return false;
+		}
+		
+	}
+	
+	
 	/**
 	 * Adds another Canvas Activity to the transition.  
 	 * Only 2 may be added, adding the 2nd one triggers the creation of the transition.
@@ -492,43 +511,56 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			//TODO: show an error
 			return new LFError("Too many activities in the Transition","addActivityToTransition",this);
 		}
+		
 		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
 		_transitionActivities.push(activity);
-		
+		var fromAct = _transitionActivities[0].activityUIID
+		var toAct = _transitionActivities[1].activityUIID
 		if(_transitionActivities.length == 2){
 			//check we have 2 valid acts to create the transition.
-			if(_transitionActivities[0].activityUIID == _transitionActivities[1].activityUIID){
+			if(fromAct == toAct){
 				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
-			if(!_cv.ddm.activities.containsKey(_transitionActivities[0].activityUIID)){
+			if(!_cv.ddm.activities.containsKey(fromAct)){
 				return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
 			}
-			if(!_cv.ddm.activities.containsKey(_transitionActivities[1].activityUIID)){
+			if(!_cv.ddm.activities.containsKey(toAct)){
 				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
 			}
 			//check there is not already a transition to or from this activity:
 			var transitionsArray:Array = _cv.ddm.transitions.values();
+			
 			/**/
 			for(var i=0;i<transitionsArray.length;i++){
-				//if (transitionsArray[i].fromUIID != null && transitionsArray[i].toUIID == null){
-				//	trace("first activtiy in design is "+transitionsArray[i].fromUIID)
-				//}
 				
-				if(transitionsArray[i].toUIID == _transitionActivities[1].activityUIID){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_toactivtiy',[_transitionActivities[1].title]));
+				if(transitionsArray[i].toUIID == toAct){
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity',[_transitionActivities[1].title]));
 				}
-				if(transitionsArray[i].fromUIID == _transitionActivities[0].activityUIID){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_fromactivtiy',[_transitionActivities[0].title]));
+				if(transitionsArray[i].fromUIID == fromAct){
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity',[_transitionActivities[0].title]));
 				}
+				
+				if ((transitionsArray[i].toUIID == toAct && transitionsArray[i].fromUIID == fromAct) || (transitionsArray[i].toUIID == fromAct && transitionsArray[i].fromUIID == toAct)){
+					return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
+				}
+				
+				
+			}
+			
+			if (isLoopingLD(fromAct, toAct)){
+				return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
 			}
 			
 			Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
 			//lets make the transition
 			var t:Transition = createTransition(_transitionActivities);
 			//add it to the DDM
+			
 			var success:Object = _cv.ddm.addTransition(t);
 			//flag the model as dirty and trigger a refresh
+			
 			setDirty();
+			
 			setSelectedItem(_transitionsDisplayed.get(t.transitionUIID));
 			_cv.stopTransitionTool();
 			
