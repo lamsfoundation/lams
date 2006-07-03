@@ -201,7 +201,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         
-        _header_mc = _container_mc.attachMovie('LHeader','_header_mc',HEADER_DEPTH, {_x:HEADER_X,_y:HEADER_Y});
+        _header_mc = _appRoot_mc.createChildAtDepth('LHeader', DepthManager.kTop, {_x:HEADER_X,_y:HEADER_Y});
 	    _header_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);

@@ -69,8 +69,9 @@ class Header extends MovieClip {
 		_dictionary = Dictionary.getInstance();
 		_dictionary.addEventListener('init',Proxy.create(this,setLabels));
 		
-		//Create a clip that will wait a frame before dispatching init to give components time to setup
-        this.onEnterFrame = init;
+		//let it wait one frame to set up the components.
+		MovieClipUtils.doLater(Proxy.create(this,init));
+		
 	}
 	
 	/**
@@ -83,7 +84,7 @@ class Header extends MovieClip {
         delete this.onEnterFrame;
 		
 		_header_mc = this;
-		setStyles();
+		
 		setLabels();
 		resize(Stage.width);
 		
@@ -110,13 +111,14 @@ class Header extends MovieClip {
 			app.getLesson().exportLesson();
 		}
 		
-        dispatchEvent({type:'load',target:this});
-        
+		this.onEnterFrame = setLabels;
+		
 	}
 	
 	private function setStyles(){
 		var styleObj = _tm.getStyleObject('smallLabel');
 		_lessonName.setStyle('styleName', styleObj);
+		
 	}
 	
 	private function setLabels(){
@@ -124,6 +126,13 @@ class Header extends MovieClip {
         resume_lbl.text = Dictionary.getValue('hd_resume_lbl');
         exit_lbl.text = Dictionary.getValue('hd_exit_lbl');
 		export_lbl.text = Dictionary.getValue('ln_export_btn');
+		
+		setStyles();
+		
+		delete this.onEnterFrame; 
+		
+		dispatchEvent({type:'load',target:this});
+        
 	}
 	
 	public function setLessonName(lessonName:String){
