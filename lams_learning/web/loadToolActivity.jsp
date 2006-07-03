@@ -52,7 +52,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 		<script language="JavaScript" type="text/JavaScript"><!--
 			// onload method call commented out as the Flash passon movie calls doRedirect
 			function redirectPage() {
-				setTimeout("doRedirect()", 500);
+				setTimeout("doRedirect()", 1000);
 			}
 			function doRedirect() {
 				var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";

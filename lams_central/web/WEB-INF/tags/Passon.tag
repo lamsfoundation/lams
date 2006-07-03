@@ -40,14 +40,13 @@
 		<c:set var="randomID">
 			<lams:generateID id="${id}"/>
 		</c:set>
-			<c:set var="passonurl_params" value="?${progress}&lessonID=${id}&uniqueID=${randomID}"/>
+			<c:set var="passonurl_params" value="${progress}&lessonID=${id}&uniqueID=${randomID}"/>
 			<c:if test="${redirect}">
-				<c:set var="passonurl_params" value="${passonurl_params}&redirect=true"/>
+				<c:set var="passonurl_params" value="redirect=true&${passonurl_params}"/>
 			</c:if>
 			
-			<c:set var="passonurl_nojs" value="passon.swf${passonurl_params}"/>
-			<c:set var="passonurl_js" value="passon${passonurl_params}"/>
-			
+			<c:set var="passonurl_nojs" value="passon.swf?${passonurl_params}"/>
+			<c:set var="passonurl_js" value="passon?${passonurl_params}"/>
 			<script type="text/javascript">
 				AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','1','height','1','align','left','src','<c:out value="${passonurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#FFFFFF','name','passon', 'id', 'passon', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie','<c:out value="${passonurl_js}" escapeXml="false"/>' );
 			</script>
