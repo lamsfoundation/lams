@@ -5,28 +5,28 @@
 <table class="forms">
 	<!-- Instructions Row -->
 	<tr>
-		<td colspan="2" class="formcontrol">
+		<td colspan="2">
 			<html:checkbox property="forum.lockWhenFinished">
 				<fmt:message key="label.authoring.advance.lock.on.finished" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="formcontrol">
+		<td colspan="2"">
 			<html:checkbox property="forum.allowEdit">
 				<fmt:message key="label.authoring.advance.allow.edit" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="formcontrol">
+		<td colspan="2">
 			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
 				<fmt:message key="label.authoring.advance.use.richeditor" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="formcontrol">
+		<td colspan="2">
 			<html:checkbox property="forum.limitedInput" styleId="limitedInput">
 				<fmt:message key="label.authoring.advance.limited.input" />
 			</html:checkbox>
