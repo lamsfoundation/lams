@@ -2,7 +2,7 @@
 
 <!--   Advance Tab Content    -->
 
-<table class="forms">
+<table>
 	<!-- Instructions Row -->
 	<tr>
 		<td colspan="2">

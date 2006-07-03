@@ -8,7 +8,7 @@
 		<%@ include file="/common/header.jsp"%>
 	</head>
 	<body class="tabpart">
-		<table class="forms">
+		<table>
 			<!-- Basic Info Form-->
 			<tr>
 				<td>
