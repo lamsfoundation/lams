@@ -293,7 +293,7 @@ class Sequence {
 	}
 	
 	public function get isStarted():Boolean{
-		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null){
+		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null || _seqStartDate.getFullYear() == 1970){
 			return false;
 		}
 		
