@@ -170,7 +170,7 @@ class LessonView extends AbstractView {
     
 	private function setLessonName(lessonName:String){
 		if (lessonName.length > 15){
-			lessonName = lessonName.substr(0, LESSON_NAME_LIMIT)+"..."
+			lessonName = lessonName.substr(0, LESSON_NAME_LIMIT)+".."
 		}
 		Application.getInstance().getHeader().setLessonName(lessonName);
 	}
@@ -230,7 +230,6 @@ class LessonView extends AbstractView {
 		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
 		
 		var _activityLayer_mc = progress_scp.content;
-		
 		var s:Boolean = false;
 		var newActivity_mc:MovieClip;
 		var lv:LessonView = LessonView(this);
@@ -239,12 +238,12 @@ class LessonView extends AbstractView {
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			_activityList.push(newActivity_mc);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		} else if(a.isGateActivity()){
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			_activityList.push(newActivity_mc);
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
