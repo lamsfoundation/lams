@@ -35,6 +35,8 @@ public class ConfigurationKeys {
 	public static String SERVER_URL="ServerURL";
 	public static String LAMS_HOME="LamsHome";
 	public static String LAMS_TEMP_DIR="TempDir";
+	/** Directory in which lams.ear is deployed. Usually {JBOSS}/server/default/deploy/lams.ear */
+	public static String LAMS_EAR_DIR="EARDir";
 	public static String SMTP_SERVER="SMTPServer";
 	public static String LAMS_ADMIN_EMAIL="LamsSupportEmail";
 
