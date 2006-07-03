@@ -36,24 +36,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     <fmt:setBundle basename = "org.lamsfoundation.lams.learning.ApplicationResources" />
 
 	<%--  can't use the normal "lams:css localLink=true" as that points to ../default.css --%>
-	<link href="aqua.css" rel="stylesheet" type="text/css">
-	<link href="default.css" rel="stylesheet" type="text/css">
+	<link href="css/aqua.css" rel="stylesheet" type="text/css">
+	<link href="css/default.css" rel="stylesheet" type="text/css">
 	<!--[if IE]>
 	<style type="text/css">
-	@import url(<link href="ie-styles.css" rel="stylesheet" type="text/css">);
+	@import url(<link href="css/ie-styles.css" rel="stylesheet" type="text/css">);
 	</style>
 	<![endif]-->
 
 </head>
 
 <body>
+
 	<div id="page">	
 		<h1 class="no-tabs-below">
 			<c:out value="${portfolio.lessonName}"/>
 		</h1>
-		<div id="header-no-tabs"></div>
+		<div id="header-no-tabs">
+		</div>
 		<div id="content">
 		
+		<p>&nbsp;</p>
+
 		<c:choose>
 			<c:when test="${not empty portfolio.learnerName}">
 				<H2><fmt:message key="export.portfolio.for.user.heading"/> <c:out value="${portfolio.learnerName}"/></H2>

@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.learning.export.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -43,9 +41,7 @@ import org.lamsfoundation.lams.learning.export.service.ExportPortfolioServicePro
 import org.lamsfoundation.lams.learning.export.service.IExportPortfolioService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -68,6 +64,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class MainExportServlet extends HttpServlet {
 	
+ 
 	private static final long serialVersionUID = 7788509831929373666L;
 	private String exportTmpDir;
 	
@@ -100,7 +97,7 @@ public class MainExportServlet extends HttpServlet {
 		
 	    /** Get the cookies that were sent along with this request, then pass it onto export service */
 		Cookie[] cookies = request.getCookies();	
-	
+
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this.getServletContext());
 		// ILearnerService learnerService = LearnerServiceProxy.getLearnerService(this.getServletContext());
 		
@@ -128,7 +125,8 @@ public class MainExportServlet extends HttpServlet {
 			exportService.generateMainPage(request, portfolios, cookies);	
 			
 			//bundle the stylesheet with the package
-			bundleStylesheetWithExportPackage(exportTmpDir, request, cookies);
+			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir);
+			bundler.bundleStylesheet();
 			
 			//zip up the contents of the temp export folder
 			String zipFilename = exportService.zipPortfolio(ExportPortfolioConstants.ZIP_FILENAME, exportTmpDir);
@@ -151,26 +149,5 @@ public class MainExportServlet extends HttpServlet {
 	    return absolutePath.substring(tempSysDirName.length()+1, absolutePath.length());
 	}
 	
-	private void bundleStylesheetWithExportPackage(String directory, HttpServletRequest request, Cookie[] cookies) throws IOException
-	{
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
-
-		List themeList = CSSThemeUtil.getAllUserThemes();
-		
-		Iterator i = themeList.iterator();
-		
-		while (i.hasNext())
-		{
-			String theme = (String)i.next();
-			
-			String url = basePath + "/lams/css/" + theme + ".css";
-			HttpUrlConnectionUtil.writeResponseToFile(url, directory, theme + ".css", cookies); //cookies aren't really needed here.
-		}
-		
-		// include the special IE stylesheet
-		String url = basePath + "/lams/css/ie-styles.css";
-		HttpUrlConnectionUtil.writeResponseToFile(url, directory, "ie-styles.css", cookies); //cookies aren't really needed here.
-		
-	}
 
 }
