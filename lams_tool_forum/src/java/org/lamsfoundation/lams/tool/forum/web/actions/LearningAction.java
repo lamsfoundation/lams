@@ -223,6 +223,13 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward newTopic(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
+		Long sessionId = (Long) request.getSession().getAttribute(
+				AttributeNames.PARAM_TOOL_SESSION_ID);
+		forumService = getForumManager();
+		ForumToolSession session = forumService
+				.getSessionBySessionId(sessionId);
+		
+		request.setAttribute(ForumConstants.FORUM_TITLE,session.getForum().getTitle());
 		return mapping.findForward("success");
 	}
 
@@ -242,10 +249,12 @@ public class LearningAction extends Action {
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		ToolAccessMode mode = (ToolAccessMode) request.getSession()
 				.getAttribute(AttributeNames.ATTR_MODE);
+		
+		ForumToolSession session = null;
 		if (mode == ToolAccessMode.LEARNER || mode==ToolAccessMode.AUTHOR) {
 			// get sessionId from HttpServletRequest
 			forumService = getForumManager();
-			ForumToolSession session = forumService
+			session = forumService
 					.getSessionBySessionId(sessionId);
 			session.setStatus(ForumConstants.SESSION_STATUS_FINISHED);
 			forumService.updateSession(session);
@@ -277,7 +286,9 @@ public class LearningAction extends Action {
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
-
+		if(session != null)
+			request.setAttribute(ForumConstants.FORUM_TITLE,session.getForum().getTitle());
+		
 		return mapping.findForward("success");
 	}
 
@@ -301,15 +312,20 @@ public class LearningAction extends Action {
 
 		forumService = getForumManager();
 		// get root topic list
-		List msgDtoList = forumService.getTopicThread(topicId);
+		List<MessageDTO> msgDtoList = forumService.getTopicThread(topicId);
 
 		setAuthorMark(msgDtoList);
 
+		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
+		String title = getForumTitle(msgDtoList);
+		request.setAttribute(ForumConstants.FORUM_TITLE,title);
 		request.getSession().setAttribute(ForumConstants.ROOT_TOPIC_UID,topicId);
 		return mapping.findForward("success");
 
 	}
+
+
 
 	/**
 	 * Create a new root topic.
@@ -354,6 +370,7 @@ public class LearningAction extends Action {
 	
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+		
 		return mapping.findForward("success");
 	}
 
@@ -384,8 +401,12 @@ public class LearningAction extends Action {
 		// cache this parentId in order to create reply
 		request.getSession().setAttribute("parentId", parentId);
 		
+		String title = getForumTitle(topic);
+		request.setAttribute(ForumConstants.FORUM_TITLE,title);
+		
 		return mapping.findForward("success");
 	}
+
 
 	/**
 	 * Create a replayed topic for a parent topic.
@@ -425,6 +446,9 @@ public class LearningAction extends Action {
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		
+		String title = getForumTitle(msgDtoList);
+		request.setAttribute(ForumConstants.FORUM_TITLE,title);
+		
 		return mapping.findForward("success");
 	}
 
@@ -453,6 +477,9 @@ public class LearningAction extends Action {
 
 		// cache this topicId in order to create reply
 		request.getSession().setAttribute("topicId", topicId);
+		
+		String title = getForumTitle(topic);
+		request.setAttribute(ForumConstants.FORUM_TITLE,title);		
 		return mapping.findForward("success");
 	}
 
@@ -556,6 +583,8 @@ public class LearningAction extends Action {
 		setAuthorMark(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		
+		String title = getForumTitle(msgDtoList);
+		request.setAttribute(ForumConstants.FORUM_TITLE,title);		
 		return mapping.findForward("success");
 	}
 
@@ -602,8 +631,11 @@ public class LearningAction extends Action {
 		// save message into database
 		forumService.updateTopic(messagePO);
 
+		String title = getForumTitle(messagePO);
+		request.setAttribute(ForumConstants.FORUM_TITLE,title);		
 		return mapping.findForward("success");
 	}
+
 
 	// ==========================================================================================
 	// Utility methods
@@ -710,4 +742,37 @@ public class LearningAction extends Action {
 			message.setAttachments(attSet);
 		}
 	}
+	
+	/**
+	 * @param msgDtoList
+	 */
+	private String getForumTitle(List<MessageDTO> msgDtoList) {
+		String title = "";
+		for(MessageDTO msgDto : msgDtoList){
+			title = getForumTitle(msgDto);
+			break;
+		}
+		
+		return title;
+	}
+	private String getForumTitle(MessageDTO msgDto) {
+		Message msg = msgDto.getMessage();
+		return getForumTitle(msg);
+	}
+
+
+	private String getForumTitle(Message msg) {
+		String title = "";
+		ForumToolSession session  = msg.getToolSession();
+		Forum forum;
+		if(session == null){
+			forum = msg.getForum();
+		}else
+			forum = session.getForum();
+		
+		if(forum != null)
+			title = forum.getTitle();
+		return title;
+	}
+	
 }
