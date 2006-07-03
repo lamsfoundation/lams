@@ -14,19 +14,14 @@
 	<html:hidden property="mode" value="teacher" />
 
 	<div id="header">
-	<!-- start tabs -->
-	<lams:Tabs collection="${tabs}" useKey="true" control="true" />
-	<!-- end tab buttons -->
+		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
 	</div>
 	
 	<div id="content">
-		<!-- tab content 1 (Basic) -->
 		<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
-		<!-- end of content (Basic) -->
 
 		<!-- Button Row -->
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" accessMode="teacher" defineLater="yes"/>
-
 		<lams:HTMLEditor />
 	</div>
 </html:form>
