@@ -32,10 +32,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css/>
 		<title><fmt:message key="learner.title"/></title>
+		<script language="JavaScript" type="text/JavaScript">
+		<!--
+			function doAlert(arg){
+				alert(arg);
+			}
+		//-->
+		</script>
 	</head>
 
-	<frameset rows="*" cols="178,*">
-		<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/>" name="controlFrame" scrolling="YES">
+	<frameset rows="*" cols="160,*">
+		<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/>" name="controlFrame" scrolling="NO">
 		<frame src="content.do" name="contentFrame" scrolling="YES">
 	</frameset>
 	
