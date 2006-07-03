@@ -26,7 +26,7 @@
 		<c:choose>
 			<c:when test='${isPageEditable == "true"}'>
 				<td colspan="2">
-					<c:url value="/authoring.do" var="authoringUrl">
+					<c:url value="/definelater.do" var="authoringUrl">
 						<c:param name="mode" value="teacher" />
 						<c:param name="toolContentID" value="${sessionScope.toolContentID}" />
 					</c:url>

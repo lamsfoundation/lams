@@ -1,3 +1,6 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
 <%@include file="/common/taglibs.jsp"%>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
 
@@ -16,7 +19,6 @@
 			pageContext.setAttribute("tabs", tabs);
 
 			%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
 	<lams:headItems />
@@ -54,21 +56,17 @@
 
 </head>
 <body onLoad="init()">
-
-	<html:form action="definelater" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
-		<html:hidden property="mode" value="teacher" />
-		<html:hidden property="toolContentID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch" value="updateContent" />
+	<div id="page">
 
 		<h1>
 			<fmt:message key="label.authoring.heading" />
 		</h1>
-
-		<!-- start tabs -->
-		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
-		<!-- end tab buttons -->
-		<div class="tabbody">
+		<div id="header">
+			<!-- start tabs -->
+			<lams:Tabs collection="${tabs}" useKey="true" control="true" />
+			<!-- end tab buttons -->
+		</div>
+		<div id="content">
 			<table align=center>
 				<tr>
 					<td NOWRAP>
@@ -76,17 +74,22 @@
 					</td>
 				</tr>
 			</table>
+			<html:form action="definelater" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+				<html:hidden property="mode" value="teacher" />
+				<html:hidden property="toolContentID" />
+				<html:hidden property="currentTab" styleId="currentTab" />
+				<html:hidden property="dispatch" value="updateContent" />
 
-			<!-- tab content 1 (Basic) -->
-			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+				<!-- tab content 1 (Basic) -->
+				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher"
-					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" defineLater="true" />
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" defineLater="true" />
 
+				<lams:HTMLEditor />
+
+			</html:form>
 		</div>
-		<lams:HTMLEditor />
-
-
-	</html:form>
+		<div id="footer"></div>
+	</div>
 </body>
 </html:html>
