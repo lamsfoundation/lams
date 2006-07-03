@@ -8,28 +8,12 @@
 		<!-- ==========  Online Instructions ========== -->
 		<tr>
 			<td>
-				<lams:SetEditor id="OnlineInstruction" text="${authForm.onlineInstruction}" key="instructions.onlineInstructions" />
+				<lams:SetEditor id="OnlineInstruction" text="${authForm.onlineInstruction}" key="instructions.onlineInstructions" small="true" />
 			</td>
 		</tr>
 
 
-		<!-- ==========  Online Attachments Upload========== -->
-		<tr>
-			<td class="field-name">
-				<fmt:message key="instructions.uploadOnlineInstr" />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<html:file property="onlineFile">
-					<!--<fmt:message key="label.authoring.choosefile.button" />  -->
-					choose
-				</html:file>
-				<html:link href="javascript:doSubmit('uploadOnline');" property="submit">
-					<fmt:message key="button.upload" />
-				</html:link>
-			</td>
-		</tr>
+
 
 		<!-- ==========  Online Attachments ========== -->
 		<c:if test="${not empty requestScope.sessionMap.onlineFiles or not empty requestScope.sessionMap.unsavedOnlineFiles}">
@@ -79,6 +63,26 @@
 				</td>
 			</tr>
 		</c:if>
+
+		<!-- ==========  Online Attachments Upload========== -->
+		<tr>
+			<td>
+				<div class="field-name left-buttons">
+					<fmt:message key="instructions.uploadOnlineInstr" />
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="space-left">
+					<html:file property="onlineFile">
+					</html:file>
+					<html:link href="javascript:doSubmit('uploadOnline');" property="submit" styleClass="button">
+						<fmt:message key="button.upload" />
+					</html:link>
+				</div>
+			</td>
+		</tr>
 	</tbody>
 </table>
 
@@ -89,28 +93,11 @@
 		<!-- ==========  Offline Instructions ========== -->
 		<tr>
 			<td>
-				<lams:SetEditor id="OfflineInstruction" text="${authForm.offlineInstruction}" key="instructions.offlineInstructions" alt="true" />
+				<lams:SetEditor id="OfflineInstruction" text="${authForm.offlineInstruction}" key="instructions.offlineInstructions" alt="true" small="true" />
 			</td>
 		</tr>
 
-		<!-- ==========  Offline Attachments Upload ========== -->
 
-		<tr>
-			<td class="field-name-alternative-color">
-				<fmt:message key="instructions.uploadOfflineInstr" />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<html:file property="offlineFile">
-					<!--<fmt:message key="label.authoring.choosefile.button" />  -->
-					choose
-				</html:file>
-				<html:link href="javascript:doSubmit('uploadOffline');" property="submit">
-					<fmt:message key="button.upload" />
-				</html:link>
-			</td>
-		</tr>
 
 		<!-- ==========  Offline Attachments ========== -->
 		<c:if test="${not empty requestScope.sessionMap.offlineFiles or not empty requestScope.sessionMap.unsavedOfflineFiles}">
@@ -161,5 +148,26 @@
 				</td>
 			</tr>
 		</c:if>
+
+		<!-- ==========  Offline Attachments Upload ========== -->
+
+		<tr>
+			<td>
+				<div class="field-name-alternative-color left-buttons">
+					<fmt:message key="instructions.uploadOfflineInstr" />
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="space-left">
+					<html:file property="offlineFile">
+					</html:file>
+					<html:link href="javascript:doSubmit('uploadOffline');" property="submit" styleClass="button">
+						<fmt:message key="button.upload" />
+					</html:link>
+				</div>
+			</td>
+		</tr>
 	</tbody>
 </table>
