@@ -33,6 +33,7 @@
 <%@ tag body-content="empty" %>
 <%@ attribute name="progress" required="true" rtexprvalue="true" type="java.lang.String" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
+<%@ attribute name="redirect" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <c:if test="${!empty progress}">
@@ -40,6 +41,10 @@
 			<lams:generateID id="${id}"/>
 		</c:set>
 			<c:set var="passonurl_params" value="?${progress}&lessonID=${id}&uniqueID=${randomID}"/>
+			<c:if test="${redirect}">
+				<c:set var="passonurl_params" value="${passonurl_params}&redirect=true"/>
+			</c:if>
+			
 			<c:set var="passonurl_nojs" value="passon.swf${passonurl_params}"/>
 			<c:set var="passonurl_js" value="passon${passonurl_params}"/>
 			

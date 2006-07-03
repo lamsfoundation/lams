@@ -38,7 +38,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 
 %>
 
-<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
+<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" redirect="true"/>
 
 <h1 class="no-tabs-below">&nbsp;</h1>
 <div id="header-no-tabs-learner">
@@ -51,7 +51,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 		
 		<script language="JavaScript" type="text/JavaScript"><!--
 			function redirectPage() {
-				setTimeout("doRedirect()", 1000);
+				//setTimeout("doRedirect()", 500);
 			}
 			function doRedirect() {
 				var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
@@ -65,7 +65,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 				window.location.href = url;
 			}
 			
-				window.onload = redirectPage;
+				//window.onload = redirectPage;
 			//-->
 		</script>
 		
