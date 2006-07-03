@@ -1,34 +1,42 @@
 .previewPanel {
-	width: 665px;
+	width: 625px;
 	height: 220px;
 	border-style: none;
 	border-width: 1px;
 	padding: 5px;
 	overflow: auto;
+	margin-left: 20px;
+	margin-top: 12px;
 }
 
 .textareaPanel {
-	width: 665px;
+	width: 625px;
 	height: 220px;
+	margin-left: 20px;
+		margin-top: 12px;
 }
 
 .smallPreviewPanel {
-	width: 665px;
+	width: 625px;
 	height: 80px;
 	border-style: none;
 	border-width: 1px;
 	padding: 5px;
+	margin-left: 20px;
+	margin-top: 12px;
 }
 
 .smallTextareaPanel {
-	width: 665px;
+	width: 625px;
 	height: 80px;
+	margin-left: 20px;
+		margin-top: 12px;
 }
 
 
 #wyswygEditorScreen {
 	position: absolute;
-	width: 665px;
+	width: 625px;
 	height: 220px;
 	padding: 0px;
 	margin: 0px;
