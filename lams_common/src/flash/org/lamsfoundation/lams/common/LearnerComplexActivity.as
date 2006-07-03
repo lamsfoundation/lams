@@ -43,6 +43,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var CHILD_OFFSET_Y : Number = 57;
 	private var CHILD_INCRE : Number = 60;
 	
+	private var LABEL_W:Number = 130;
+	private var LABEL_H:Number = 22;
+	
 	//this is set by the init object
 	private var _controller:AbstractController;
 	private var _view:AbstractView;
@@ -54,8 +57,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	//refs to screen items:
 	private var container_pnl : Panel;
-	private var title_lbl : Label;
-	
+	private var title_lbl:MovieClip;
+	private var labelHolder_mc:MovieClip;
 	//locals
 	private var actStatus:String;
 	private var childActivities_mc : MovieClip;
@@ -99,7 +102,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	public function init () : Void
 	{
+		var styleObj = _tm.getStyleObject('smallLabel');
+		title_lbl = labelHolder_mc.attachMovie("Label", "actTitle", this.getNextHighestDepth(), {_width:LABEL_W, _height:LABEL_H, autoSize:"center", styleName:styleObj});
 		
+
 		children_mc = new Array();
 		var childrenArray:Array;
 		
@@ -126,7 +132,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		{
 			var progStatus:String = Progress.compareProgressData(learner, childrenArray[i].activityID);
 			
-			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:childrenArray[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus});
+			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:childrenArray[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true});
 			Debugger.log('attaching child movieL ' + children_mc[i],Debugger.CRITICAL,'init','LearnerComplexActivity');
         
 			//set the positioning co-ords
@@ -180,6 +186,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	private function draw (){
+		
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
@@ -201,8 +208,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		var numOfChildren = _children.length;
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
-		setStyles();
-		
+
 		//write text
 		if(_activity.title != undefined){
 			title_lbl.text = _activity.title;
@@ -229,7 +235,6 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 
 	private function localOnPress():Void{
 		this.swapDepths(this._parent.getNextHighestDepth());
-		
 		// check double-click
 		var now : Number = new Date ().getTime ();
 		if ((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY)	{
@@ -348,8 +353,5 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	public function get panelHeight():Number {
 		return _panelHeight;
 	}
-	private function setStyles():Void {
-		var styleObj = _tm.getStyleObject ('label');
-		title_lbl.setStyle (styleObj);
-	}
+
 }

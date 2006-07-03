@@ -23,12 +23,12 @@
 
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.common.util.ui.*;
+import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.authoring.Activity;
-import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.style.*;
 
 import com.polymercode.Draw;
 import mx.managers.*
@@ -46,6 +46,12 @@ class LearnerActivity extends MovieClip {
 	public static var GATE_ACTIVITY_WIDTH:Number = 50;
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	
+	public static var LABEL_X:Number = 0;
+	public static var LABEL_Y:Number = 10;
+	public static var LABEL_W:Number = 130;
+	public static var LABEL_H:Number = 22;
+	
 	private var xPos:Number;
 	private var yPos:Number;
 	
@@ -67,7 +73,7 @@ class LearnerActivity extends MovieClip {
 	private var todo_mc:MovieClip;
 	private var attempted_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
-	private var title_lbl:Label;
+	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
 	private var sentFrom:String;
@@ -78,7 +84,7 @@ class LearnerActivity extends MovieClip {
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
 	
-	
+	private var _complex:Boolean;
 	
 	function LearnerActivity(){
 		Debugger.log("_activity:"+_activity.title,4,'Constructor','Activity');
@@ -105,6 +111,8 @@ class LearnerActivity extends MovieClip {
 	}
 	
 	public function init(initObj):Void{
+		var styleObj = _tm.getStyleObject('smallLabel');
+		var _autosize:String;
 		
 		if(initObj){
 			
@@ -114,6 +122,18 @@ class LearnerActivity extends MovieClip {
 				learner = initObj.learner;
 		}
 		
+		if(_complex){
+			_autosize = "left";
+			LABEL_X = 18;
+			LABEL_Y = 2;
+		} else {
+			LABEL_X = 0
+			LABEL_Y = 10
+			_autosize = "center";
+		}
+		
+		title_lbl = this.attachMovie("Label", "Label"+_activity.activityID, this.getNextHighestDepth(), {_x:LABEL_X , _y:LABEL_Y, _width:LABEL_W, _height:LABEL_H, autoSize:_autosize, styleName:styleObj});
+		
 		showAssets(false);
 		
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){
@@ -121,9 +141,6 @@ class LearnerActivity extends MovieClip {
 		}
 		
 		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
-	
-		
-		setStyles() ;
 		
 		trace("Data for sentFrom: "+sentFrom)
 		MovieClipUtils.doLater(Proxy.create(this,draw));
@@ -159,11 +176,12 @@ class LearnerActivity extends MovieClip {
 	 */
 	private function draw(){
 		
+		
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
 		
-		title_lbl._visible = true;
+		//title_lbl._visible = true;
 		Debugger.log('activity status : ' + actStatus ,Debugger.CRITICAL,'draw','org.lamsfoundation.lams.LearnerActivity');
 	
 		//clickTarget_mc._visible = true;
@@ -297,7 +315,7 @@ class LearnerActivity extends MovieClip {
 	 * directly to the instanced
 	 * @usage   
 	 * @return  
-	 */
+	 
 	private function setStyles() {
 		var styleObj;
 		if(app.module == 'learner'){
@@ -313,6 +331,5 @@ class LearnerActivity extends MovieClip {
 		title_lbl.setStyle('textAlign', 'center');
 			
     }
-    
-
+	*/
 }
