@@ -36,10 +36,12 @@
 	<div id="chat_content">
 
 		<div id="login_pane">
+			<div id="loading_message">
+				<p>
+					<fmt:message>message.loading</fmt:message>
+				</p>
+			</div>
 			<div id="login_err"></div>
-			<p>
-				<fmt:message>message.loading</fmt:message>
-			</p>
 		</div>
 
 		<div id="chat_pane" style="display:none;">
@@ -71,17 +73,17 @@
 					<input id="clearButton" class="button" type="button" onclick="resetInputs();" value='<fmt:message>button.clear</fmt:message>' />
 				</div>
 			</form>
+		</div>
 
-			<div id="finishButton_pane" class="space-bottom" style="display:none;">
-				<form name="finishActivity" action="${tool}learning.do" method="post">
-					<div class="right-buttons">
-						<input type="hidden" name="dispatch" value="finishActivity" />
-						<input type="hidden" name="chatUserUID" value="${USER_UID}" />
-						<input type="hidden" name="toolSessionID" value="${SESSION_ID}" />
-						<input type="submit" class="button" value='<fmt:message>button.finish</fmt:message>' />
-					</div>
-				</form>
-			</div>
+		<div id="finishButton_pane" class="space-bottom" style="display:none;">
+			<form name="finishActivity" action="${tool}learning.do" method="post">
+				<div class="right-buttons">
+					<input type="hidden" name="dispatch" value="finishActivity" />
+					<input type="hidden" name="chatUserUID" value="${USER_UID}" />
+					<input type="hidden" name="toolSessionID" value="${SESSION_ID}" />
+					<input type="submit" class="button" value='<fmt:message>button.finish</fmt:message>' />
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

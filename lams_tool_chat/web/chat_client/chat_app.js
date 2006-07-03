@@ -1,7 +1,7 @@
 // Constants
 var GROUPCHAT_MSG = "groupchat_message";
 var PRIVATE_MSG = "private_message";
-var colours = ["#0000FF", "#006699", "#0066FF", "#6633FF", "#00CCFF", "#009900", "#00CC33", "#339900", "#008080", "#66FF66", "#CC6600", "#FF6600", "#FF9900", "#CC6633", "#FF9933", "#990000", "#A50021", "#990033", "#CC3300", "#FF6666", "#330033", "#663399", "#6633CC", "#660099", "#FF00FF", "#999900", "#808000", "#FFFF00", "#666633", "#CCFF00", "#292929", "#666666"];
+var colours = ["#0000FF", "#006699", "#0066FF", "#6633FF", "#00CCFF", "#009900", "#00CC33", "#339900", "#008080", "#66FF66", "#CC6600", "#FF6600", "#FF9900", "#CC6633", "#FF9933", "#990000", "#A50021", "#990033", "#CC3300", "#FF6666", "#330033", "#663399", "#6633CC", "#660099", "#FF00FF", "#999900", "#808000", "#FFFF00", "#666633", "#292929", "#666666"];
 
 // Variables
 var roster = new Roster();
@@ -219,7 +219,9 @@ function handleConnected() {
     roster = new Roster();
 }
 function handleError(e) {
+    document.getElementById("loading_message").style.display = "none";
     document.getElementById("login_err").innerHTML = "Couldn't connect. Please try again...<br />" + htmlEnc("Code: " + e.getAttribute("code") + "\nType: " + e.getAttribute("type") + "\nCondition: " + e.firstChild.nodeName);
+    document.getElementById("finishButton_pane").style.display = "";
 }
 function doLogin() {
     try {
@@ -248,6 +250,7 @@ function doLogin() {
     }
     catch (e) {
         document.getElementById("login_err").innerHTML = e.toString();
+        document.getElementById("finishButton_pane").style.display = "";
     }
     finally {
         return false;
