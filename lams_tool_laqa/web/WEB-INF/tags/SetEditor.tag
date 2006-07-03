@@ -34,7 +34,8 @@
 <%@ attribute name="text" required="true" rtexprvalue="true"%>
 <%@ attribute name="small" required="false" rtexprvalue="true"%>
 <%@ attribute name="key" required="false" rtexprvalue="true"%>
-<%@ attribute name="alt" required="false" rtexprvalue="true"%> <!--  default true -->
+<%@ attribute name="alt" required="false" rtexprvalue="true"%>
+<!--  default true -->
 
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-core" prefix="c"%>
@@ -60,31 +61,36 @@
 
 <c:set var="fieldName" value="field-name" />
 <c:if test="${alt}">
-<c:set var="fieldName" value="field-name-alternative-color" />
+	<c:set var="fieldName" value="field-name-alternative-color" />
 </c:if>
 
 <div id="preview${id}" style="visibility: hidden; display: none;">
 	<div>
-		<p class="button">
+		<div class="${fieldName} left-buttons">
 			<c:if test="${key != null}">
-				<span class="${fieldName}"><fmt:message key="${key}" /></span>
+				<fmt:message key="${key}" />
 			</c:if>
+		</div>
+		<div class="button right-buttons">
 			<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)" class="button-html-editor">HTML Editor</a>
-		</p>
+		</div>
 	</div>
+	<br>
 	<div class="${previewClassName}" id="preview${id}.text"></div>
 </div>
 
 
 <div id="tx${id}">
 	<div>
-
-		<p class="button">
+		<div class="${fieldName} left-buttons">
 			<c:if test="${key != null}">
-				<span class="${fieldName}"><fmt:message key="${key}" /></span>
+				<fmt:message key="${key}" />
 			</c:if>
+		</div>
+		<div class="button right-buttons">
 			<a href="javascript:doTextToHTML('${id}');doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)" class="button-html-editor">HTML Editor</a>
-		</p>
+		</div>
 	</div>
+	<br>
 	<textarea class="${txtClassName}" name="${fn:toLowerCase(id_a)}${id_b}" id="tx${id}.textarea"><c:out value="${text}" escapeXml="false" /></textarea>
 </div>
