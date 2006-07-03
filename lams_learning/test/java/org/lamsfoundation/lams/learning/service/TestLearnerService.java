@@ -72,7 +72,8 @@ public class TestLearnerService extends AbstractLamsTestCase
     //---------------------------------------------------------------------
     // Testing Data - Constants
     //---------------------------------------------------------------------
-    private final Integer TEST_USER_ID = new Integer(2);
+    private final Integer TEST_USER_ID = new Integer(4);
+    private final String TEST_USER_LOGIN = "mmm";
     private final Long Test_Lesson_ID = new Long(2);
     private final long TEST_TOOL_SESSION_ID = 1;
     //---------------------------------------------------------------------
@@ -121,7 +122,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         toolSessionDao = (ToolSessionDAO)this.context.getBean("toolSessionDAO");
         activityDao = (IActivityDAO)this.context.getBean("activityDAO");
         
-        testUser = usermanageService.getUserById(TEST_USER_ID);
+        testUser = usermanageService.getUserByLogin(TEST_USER_LOGIN);
         testLesson = lessonDao.getLesson(Test_Lesson_ID);
     }
 
@@ -344,7 +345,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     
     public void testKnockSynchGateOpen()
     {
-        User testUser2= usermanageService.getUserById(new Integer(1));
+        User testUser2= usermanageService.getUserByLogin(TEST_USER_LOGIN);
         
         //get sync gate
         GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));

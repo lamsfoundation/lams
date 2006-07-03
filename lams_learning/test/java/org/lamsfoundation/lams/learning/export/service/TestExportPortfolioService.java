@@ -118,11 +118,12 @@ public class TestExportPortfolioService extends AbstractLamsTestCase  {
         toolSessionDao = (ToolSessionDAO)this.context.getBean("toolSessionDAO");
         transitionDao = (TransitionDAO)this.context.getBean("transitionDAO");
         exportService = (IExportPortfolioService) this.context.getBean("exportService");
-        testUser = usermanageService.getUserById(TEST_USER_ID);
+ /*      Commented out as usermanageService.getUserById has been removed 
+  * 	 testUser = usermanageService.getUserById(TEST_USER_ID);
         testLesson = lessonDao.getLesson(TEST_LESSON_ID);
         
         testLesson_fromCommon = lessonDao.getLesson(TEST_LESSON_ID_fromCommon);
-        testUser_fromCommon = usermanageService.getUserById(TEST_USER_ID_fromCommon);
+        testUser_fromCommon = usermanageService.getUserById(TEST_USER_ID_fromCommon); */
    }
 
     /*
