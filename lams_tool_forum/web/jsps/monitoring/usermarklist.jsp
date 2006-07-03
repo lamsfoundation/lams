@@ -86,7 +86,7 @@
 					<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' />>
 					<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' />>
 					<input type="hidden" name="userID" value=<c:out value='${user.uid}' />>
-					<input type="submit" value="<fmt:message key="lable.update.mark"/>" style="width:120px" class="buttonStyle" />
+					<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
 				</html:form>
 			</td>
 		</tr>

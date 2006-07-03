@@ -49,7 +49,7 @@
 				<html:form action="/learning/viewForum.do" target="_blank">
 					<html:hidden property="mode" value="${toolAccessMode}" />
 					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-					<html:submit property="viewForum" style="width:120px" styleClass="buttonStyle">
+					<html:submit property="viewForum" styleClass="button">
 						<fmt:message key="label.monitoring.summary.view.forum" />
 					</html:submit>
 				</html:form>
@@ -58,7 +58,7 @@
 			<td align="center">
 				<html:form action="/monitoring/viewAllMarks" target="_blank">
 					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-					<html:submit property="Mark" style="width:120px" styleClass="buttonStyle">
+					<html:submit property="Mark" styleClass="button">
 						<fmt:message key="lable.topic.title.mark" />
 					</html:submit>
 				</html:form>
@@ -66,7 +66,7 @@
 			<td align="left">
 				<html:form action="/monitoring/downloadMarks">
 					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-					<html:submit property="downloadMarks" style="width:120px" styleClass="buttonStyle">
+					<html:submit property="downloadMarks" styleClass="button">
 						<fmt:message key="message.download.marks" />
 					</html:submit>
 				</html:form>

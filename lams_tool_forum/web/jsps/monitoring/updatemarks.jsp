@@ -76,7 +76,7 @@
 		</tr>
 		<tr>
 			<td colspan="3">
-				<input type="submit" value="<fmt:message key="lable.update.mark"/>" style="width:120px" class="buttonStyle" />
+				<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
 			</td>
 		</tr>
 	</table>

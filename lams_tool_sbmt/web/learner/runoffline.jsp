@@ -36,7 +36,7 @@
 			</table>
 			
 									<div class="right-buttons">
-							<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
+							<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="button">
 								<fmt:message key="button.finish" />
 							</html:button>
 						</div>

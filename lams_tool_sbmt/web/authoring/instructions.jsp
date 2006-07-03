@@ -44,7 +44,7 @@
 			<html:file property="onlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
-			<html:button onclick="javascript:doSubmit('uploadOnline');" property="uploadOnlineButt" styleClass="buttonStyle">
+			<html:button onclick="javascript:doSubmit('uploadOnline');" property="uploadOnlineButt" styleClass="button">
 				<fmt:message key="label.authoring.upload.online.button" />
 			</html:button>
 		</td>

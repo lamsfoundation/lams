@@ -161,7 +161,7 @@
 						</tr>
 						<tr>
 							<td colspan="2" align="center">
-								<html:submit disabled="${learner.locked}" styleClass="buttonStyle">
+								<html:submit disabled="${learner.locked}" styleClass="button">
 									<fmt:message key="label.learner.upload" />
 								</html:submit>
 								<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
