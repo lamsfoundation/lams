@@ -55,7 +55,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".loadToolActivity" extends=".layout">
 		<put name="title" value="Loading..."/>
 		<put name="body" value="/loadToolActivity.jsp"/>
-		<put name="includeBodyTag" value="false"/>
 	</definition>
 	<definition name=".parallelActivity" extends=".layout">
 		<put name="body" value="/parallelActivity.jsp"/>
@@ -81,7 +80,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".previewDefineLater" extends=".layout">
 		<put name="title" value="Define Later"/>
 		<put name="body" value="/previewDefineLater.jsp"/>
-		<put name="includeBodyTag" value="false"/>
 	</definition>
 	
 	<!-- Journal definitions -->
