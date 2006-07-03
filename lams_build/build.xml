@@ -35,8 +35,11 @@
 
 	<!-- clean dirs for this script only -->
 	<target name="clean" description="cleans assembly">
-		<delete dir="${assembly}"
-			includes="**/*" />
+		<delete includeemptydirs="true">
+			<fileset dir="${assembly}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- clean all projects -->
@@ -164,6 +167,9 @@
 <!--		<delete dir="${assembly}/temp" includeEmptyDirs="true" /> -->
 		<!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
 		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
+		<move file="${assembly.lams.ear}/lams-central.war" tofile="${assembly.lams.ear}/temp.war"/>
+		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-central.war"/>
+		<delete file="${assembly.lams.ear}/temp.war"/>
 		<!-- delete temp.ear -->
 		<delete file="${assembly.temp.ear}" />
 	</target>
@@ -175,7 +181,7 @@
 	<target name="deploy-ear" 
 		description="Deploys previously assembled ear to jboss">
 		<copy todir="${jboss.ear.deploy}" overwrite="true"
-			failonerror="true" verbose="true">
+			failonerror="true">
 			<fileset dir="${assembly}">
 				<include name="${lams.ear}/**/*.*" />
 			</fileset>

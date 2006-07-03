@@ -5,6 +5,7 @@
 	<LamsHome>/var/opt/lams</LamsHome>
 	<TempDir>/var/opt/lams/temp</TempDir>
 	<DumpDir>/var/opt/lams/dump</DumpDir>
+	<EARDir>/usr/local/jboss-4.0.2/server/default/deploy/lams.ear</EARDir>
 	<SMTPServer>mail.lib.mq.edu.au</SMTPServer>
 	<LamsSupportEmail>lams_support@melcoe.mq.edu.au</LamsSupportEmail>
 	<ContentRepositoryPath>/var/opt/lams/repository</ContentRepositoryPath>
