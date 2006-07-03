@@ -636,15 +636,28 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var ts:Array = _transitions.values();
 		var transObj = new Object();
 		var myTransitions:Array = new Array();
+		var into = null;
+		var out = null;
 		var hasTrans:Boolean = false;
 		for(var i=0; i<ts.length;i++){
 			if(ts[i].toUIID == UIID || ts[i].fromUIID == UIID){
 				myTransitions.push(ts[i]);
 				hasTrans = true;
 			}
-			
+			if(into != null && out != null){
+					break;
+			}else{
+				if(ts[i].fromUIID == UIID){
+					out = ts[i];
+				}
+				if(ts[i].toUIID == UIID){
+					into = ts[i];
+				}
+			}
 		}
 		transObj.myTransitions = myTransitions;
+		transObj.out = out;
+		transObj.into = into;
 		transObj.hasTrans = hasTrans;
 		return transObj;
 	}
