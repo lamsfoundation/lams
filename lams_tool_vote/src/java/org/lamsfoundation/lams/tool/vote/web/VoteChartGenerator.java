@@ -41,6 +41,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
@@ -83,7 +84,10 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
         		logger.debug("existing voteContent:" + voteContent);
 
-                MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), new Long(currentSessionId));
+        		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentSessionId));
+        		logger.debug("voteSession uid:" + voteSession.getUid());
+        		
+                MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), voteSession.getUid());
                 logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);
 
                 logger.debug("post prepareChartData : MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));

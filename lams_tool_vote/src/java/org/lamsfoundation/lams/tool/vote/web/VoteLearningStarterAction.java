@@ -240,8 +240,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(true).toString());
-		logger.debug("fwd'ing to for learner progress" + LEARNER_REPORT);
-		return (mapping.findForward(LEARNER_REPORT));		
+		logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
+		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		
 
 	}
 	

@@ -217,6 +217,7 @@ public interface VoteAppConstants {
     public static final String FROM_TOOL_CONTENT_ID						="fromToolContentId";
     public static final String TO_TOOL_CONTENT_ID						="toToolContentId";
     public static final String LEARNER_REPORT							="learnerReport";
+    public static final String INDIVIDUAL_LEARNER_REPORT				="individualLearnerReport";
     public static final String MAP_USER_RESPONSES						="mapUserResponses";
     public static final String MAP_MAIN_REPORT							="mapMainReport";
     public static final String MAP_STATS								="mapStats";

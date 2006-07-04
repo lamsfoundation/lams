@@ -34,9 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 </head>
 <body>
+<div id="page">
 
     <table class='forms'>
-	    <tr> <th NOWRAP colspan=2>  <bean:message key="label.learnersVoted"/> </th> </tr>
+	    <tr> <th NOWRAP colspan=2 align=center>  <bean:message key="label.learnersVoted"/> </th> </tr>
 	
 		<tr> 
 	       <td NOWRAP align=center valign=top><b> <bean:message key="label.user"/> </b></td>
@@ -51,5 +52,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:forEach>		  	
     </table>
 
+</div>
 </body>
 </html:html>

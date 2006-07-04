@@ -125,6 +125,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(false).toString());
 		voteMonitoringForm.setShowOpenVotesSection(new Boolean(false).toString());
 		
+		logger.debug("calling submitSession:" + toolContentId);
 		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 

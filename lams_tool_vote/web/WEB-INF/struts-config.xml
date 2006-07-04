@@ -223,6 +223,13 @@
 	        path="/monitoring/LearnerRep.jsp"
 		    redirect="false"
 	      />
+
+	    <forward
+	        name="individualLearnerReport"
+	        path="/learning/LearnerRep.jsp"
+		    redirect="false"
+	      />
+
 	  	
 	  	<forward
 		    name="viewAnswers"
