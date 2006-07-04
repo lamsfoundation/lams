@@ -99,6 +99,79 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 					  
 					  
+					  
+				  		<!--present  a mini summary table here -->
+			  			<tr> 
+						  	<td NOWRAP align=center  valign=top colspan=2> <table>
+					  
+					  				<tr>
+								 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
+										<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
+									</tr>
+									
+									<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
+							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
+							  	 		 <tr>
+				  	 						<td NOWRAP valign=top align=left>
+												<c:out value="${currentNomination.value}" escapeXml="false"/>
+											 </td>
+			
+			
+			
+											<td NOWRAP valign=top align=left>				  	 		
+									  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
+									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+									  				
+									  					<c:if test="${currentUserCount.value != '0' }"> 	
+												  	 		<c:forEach var="currentQuestionUid" items="${mapStandardQuestionUid}">
+													  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
+												  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
+
+
+														  	 		<c:forEach var="currentSessionUid" items="${mapStandardToolSessionUid}">
+															  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
+														  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
+		
+																  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
+																					<c:set var="viewURL">
+																						<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
+																					</c:set>
+																  																					
+																					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																						 <c:out value="${currentUserCount.value}"/>  
+																					</a>
+																				</c:if> 	    
+																  				<c:if test="${currentNomination.value == 'Open Vote'}"> 				
+																						 <c:out value="${currentUserCount.value}"/>  
+																				</c:if> 	    
+																		</c:if> 	    
+																	</c:forEach>		  
+
+																</c:if> 	    
+															</c:forEach>		  
+														</c:if> 	    								
+										  				<c:if test="${currentUserCount.value == '0' }"> 		  				
+																<c:out value="${currentUserCount.value}"/>  
+														</c:if> 	
+														    																								
+													</c:if> 	    
+												</c:forEach>		  
+			
+									  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+																 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
+													</c:if> 	    
+												</c:forEach>		  
+											</td>								
+										</tr>	
+									</c:forEach>	
+					  
+					  			</table>
+								</td> </tr>					  
+
+					  
 
 					  <tr>
 					  	<td NOWRAP valign=top colspan=2> 

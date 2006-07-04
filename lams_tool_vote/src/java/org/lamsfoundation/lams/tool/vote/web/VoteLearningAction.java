@@ -143,6 +143,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
         logger.debug("retrieving voteSession: " + voteSession);
         
+        VoteContent voteContent=voteSession.getVoteContent();
+        logger.debug("retrieving voteContent: " + voteContent);
+        
         Long toolSessionUid=voteSession.getUid();
         logger.debug("toolSessionUid: " + toolSessionUid);
         
@@ -155,6 +158,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		Set userAttempts=voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
 		logger.debug("userAttempts: "+ userAttempts);
 		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+		
+	    logger.debug("voteSession uid:" + voteSession.getUid());
+	    logger.debug("calling prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
+	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), voteSession.getUid());
+	    logger.debug("end of  prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
+		
 		
     	voteLearningForm.resetCommands();
     	logger.debug("fwding to ALL_NOMINATIONS: "+ ALL_NOMINATIONS);
