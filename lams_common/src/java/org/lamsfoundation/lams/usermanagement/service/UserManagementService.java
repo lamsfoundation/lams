@@ -93,8 +93,8 @@ public class UserManagementService implements IUserManagementService {
 		try{
 			if(object instanceof User){
 				User user = (User)object;
+				user.setPassword(HashUtil.sha1(user.getPassword()));
 				if(user.getUserId()==null){
-					user.setPassword(HashUtil.sha1(user.getPassword()));
 					baseDAO.insertOrUpdate(user);  // creating a workspace needs a userId
 					object = createWorkspaceForUser(user);
 				}
