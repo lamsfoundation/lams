@@ -135,6 +135,8 @@
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
             </props>
         </property>
     </bean>
