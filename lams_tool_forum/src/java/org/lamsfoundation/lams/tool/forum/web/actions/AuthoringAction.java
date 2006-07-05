@@ -520,6 +520,12 @@ public class AuthoringAction extends Action {
 		}
 		StringBuffer sb = new StringBuffer();
 		iter = leftAttachments.iterator();
+		
+		boolean hasAtts = iter.hasNext();
+		
+		if (hasAtts) {
+			sb.append("<ul>");
+		}		
 		while(iter.hasNext()){
 			Attachment file = (Attachment) iter.next();
 			sb.append("<li>").append(file.getFileName()).append("\r\n");
@@ -550,6 +556,9 @@ public class AuthoringAction extends Action {
 				sb.append(this.getResources(request).getMessage("label.authoring.online.delete"));
 			sb.append("</a></li>\r\n");
 		}
+		if (hasAtts) {
+			sb.append("<ul>");
+		}		
 		try {
 			PrintWriter out = response.getWriter();
 			out.print(sb.toString());
