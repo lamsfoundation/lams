@@ -70,7 +70,7 @@ FCKConfig.ForceSimpleAmpersand	= false ;
 FCKConfig.TabSpaces		= 0 ;
 FCKConfig.ShowBorders	= true ;
 FCKConfig.UseBROnCarriageReturn	= false ;	// IE only.
-FCKConfig.ToolbarStartExpanded	= false ;
+FCKConfig.ToolbarStartExpanded	= true ;
 FCKConfig.ToolbarCanCollapse	= true ;
 FCKConfig.IEForceVScroll = false ;
 FCKConfig.IgnoreEmptyParagraphValue = true ;
@@ -96,6 +96,7 @@ FCKConfig.ToolbarSets["Default_original"] = [
 FCKConfig.ToolbarSets["Default"] = [
 	['Source','DocProps','-','Preview','PasteWord'],
 	['Undo','Redo'],
+	['Link'], 
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['OrderedList','UnorderedList','-','Outdent','Indent'], 	
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
