@@ -2,31 +2,31 @@
 
 <!--   Advance Tab Content    -->
 
-<table>
+<table cellpadding="0">
 	<!-- Instructions Row -->
 	<tr>
-		<td colspan="2">
+		<td>
 			<html:checkbox property="forum.lockWhenFinished">
 				<fmt:message key="label.authoring.advance.lock.on.finished" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2"">
+		<td>
 			<html:checkbox property="forum.allowEdit">
 				<fmt:message key="label.authoring.advance.allow.edit" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2">
+		<td>
 			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
 				<fmt:message key="label.authoring.advance.use.richeditor" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2">
+		<td>
 			<html:checkbox property="forum.limitedInput" styleId="limitedInput">
 				<fmt:message key="label.authoring.advance.limited.input" />
 			</html:checkbox>
@@ -34,13 +34,13 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2">
+		<td>
 			<html:errors />
 		</td>
 	</tr>
 </table>
 
-	<script type="text/javascript">
+<script type="text/javascript">
 			var limit = document.getElementById("limitedInput");
 			var rich = document.getElementById("richEditor");
 			var limitChar = document.getElementById("limitedChar");
@@ -76,6 +76,6 @@
 					alert('<fmt:message key="js.error.title"/>\n'+errors);
 				
 			}
-	</script>
+</script>
 
 
