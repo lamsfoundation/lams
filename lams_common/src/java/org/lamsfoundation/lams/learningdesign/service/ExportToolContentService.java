@@ -42,6 +42,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -142,6 +143,21 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private IGroupingDAO groupingDAO;
 	private ITransitionDAO  transitionDAO;
 	private ILearningDesignDAO learningDesignDAO;
+	
+	/**
+	 * Class to sort activity DTO according to the rule: Paretns is before their children.
+	 */
+	private class ActDTOParentComparator implements Comparator<AuthoringActivityDTO>{
+
+		public int compare(AuthoringActivityDTO a1, AuthoringActivityDTO a2) {
+			//if a1 is a2's parent, then a1 is before a2.
+			if(a1.getActivityID().equals(a2.getParentActivityID()))  
+				return -1;
+			else 
+				return 1;
+		}
+		
+	}
 	/**
 	 * Class of tool attachment file handler class and relative fields information container.
 	 */
@@ -213,17 +229,19 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			Object result;
 			try {
-		    	
+		    	//for export : marshal object to xml  
 			    if(StringUtils.equals(method.getName(),"marshal")){
 			    	for(NameInfo name:fileHandleClassList){
 				    	if(args[0] != null && name.className.equals((args[0].getClass().getName()))){
 							Long uuid = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.uuidFieldName));
-							//version id is optional
-							Long version = null;
-							if(name.versionFieldName != null)
-								version = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.versionFieldName));
-							log.debug("XStream get file node ["+uuid +"," + version +"].");
-							fileNodes.add(ExportToolContentService.this.new ValueInfo(uuid,version));
+							if(uuid != null){
+								//version id is optional
+								Long version = null;
+								if(name.versionFieldName != null)
+									version = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.versionFieldName));
+								log.debug("XStream get file node ["+uuid +"," + version +"].");
+								fileNodes.add(ExportToolContentService.this.new ValueInfo(uuid,version));
+							}
 				    	}
 			    	}
 			    }
@@ -242,6 +260,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    
 			    result = method.invoke(obj, args);
 			    
+//			  for import : unmarshal xml to object
 			    if(StringUtils.equals(method.getName(),"unmarshal") && result != null){
 			    	//During deserialize XML file into object, it will save file node into fileNodes
 			    	for(NameInfo name:fileHandleClassList){
@@ -326,6 +345,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}catch (Exception e) {
 					String msg = activity.getToolDisplayName() + " export tool content failed:" + e.toString();
 					log.error(msg);
+					//Try to delete tool.xml. This makes export_failed and tool.xml does not exist simultaneously.
+					String toolPath = FileUtil.getFullPath(contentDir,activity.getToolContentID().toString());
+					String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FILE_NAME);
+					File toolFile = new File(toolFileName);
+					if(toolFile.exists())
+						toolFile.delete();
 					writeErrorToToolFile(contentDir,activity.getToolContentID(),msg);
 					toolsErrorMsgs.add(msg);
 				} 
@@ -372,9 +397,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				Converter  myc = (Converter) Proxy.newProxyInstance(c.getClass().getClassLoader(),new Class[]{Converter.class},handler);
 				toolXml.registerConverter(myc);
 			}
-			
 			//XML to Object
 			toolXml.toXML(toolContentObj,toolFile);
+			toolFile.flush();
+			toolFile.close();
 			
 			//get out the fileNodes
 			if(handler != null){
@@ -489,6 +515,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 	}
+	/**
+	 * Import tool content 
+	 */
 	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
 		Object toolPOJO = null;
 //		change xml to Tool POJO 
@@ -517,6 +546,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				for(ValueInfo fileNode:valueList){
 					
 					Long uuid = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.uuidFieldName));
+					//For instance, item class in share resource tool may be url or single file. If it is URL, then the 
+					//file uuid will be null. Ignore it!
+					if(uuid == null)
+						continue;
+					
 					Long version = null;
 					//optional
 					try{
@@ -658,7 +692,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		//================== Start handle activities ======================
 		//activity object list
-		List<AuthoringActivityDTO> actDtoList = dto.getActivities();
+		Set<AuthoringActivityDTO> actDtoList = new TreeSet<AuthoringActivityDTO>(new ActDTOParentComparator());
+		//sort them to ensure parent before its children.
+		actDtoList.addAll(dto.getActivities());
+		
 		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		for(AuthoringActivityDTO actDto: actDtoList){
@@ -671,6 +708,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		//rescan the activity list and refresh their parent activity.
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = activityMapper.get(actDto.getActivityID());
+			
 			if(actDto.getParentActivityID() != null){
 				Activity parent = activityMapper.get(actDto.getParentActivityID());
 				act.setParentActivity(parent);
