@@ -85,10 +85,10 @@ public class ExportToolContentAction extends LamsAction {
 		Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
 		IExportToolContentService service = getExportService();
 		List<String> ldErrorMsgs = new ArrayList<String>();
+		List<String> toolsErrorMsgs = new ArrayList<String>();
 		try {
-			List<String> toolsErrorMsgs = new ArrayList<String>();
 			String zipFilename = service.exportLearningDesign(learningDesignId,toolsErrorMsgs);
-			request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
+			
 			//write zip file as response stream. 
 			response.setContentType("application/zip");
 			response.setHeader("Content-Disposition","attachment;filename="+FileUtil.getFileName(zipFilename));
@@ -125,6 +125,7 @@ public class ExportToolContentAction extends LamsAction {
 		} catch (Exception e1) {
 			log.error("Unable to export tool content: " + e1.toString());
 			request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
+			request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
 		}
 		//display initial page for upload
 		return mapping.findForward("result");

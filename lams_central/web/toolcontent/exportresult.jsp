@@ -29,10 +29,10 @@
 			<c:when test="${empty ldErrorMessages}">
 				<c:choose>
 					<c:when test="${empty toolsErrorMessages}">
-						<h2><fmt:message key="msg.export.success" /></h2>
+						<h2><fmt:message key="msg.export.failed" /></h2>
 					</c:when>
 					<c:otherwise>
-						<h2><fmt:message key="msg.export.ld.success" /></h2>
+						<h2><fmt:message key="msg.export.failed" /></h2>
 						<h2><fmt:message key="msg.export.tool.error.prefix" /></h2>
 						<c:forEach var="toolError" items="${toolsErrorMessages}">
 							<p class="warning">${toolError}</p>

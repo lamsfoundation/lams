@@ -17,36 +17,46 @@
 	</head>
 
 	<BODY>
-		<div id="page-learner"><!--main box 'page'-->
-	
-		<h1 class="no-tabs-below">
-			<fmt:message key="title.import" />
-		</h1>
+		<div id="page-learner">
+			<!--main box 'page'-->
 
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
-	
-		<div id="content-learner">
-			<h2>
-				<fmt:message key="title.import.instruction" />
-			</h2>
-			<p>&nbsp;</p>
-			<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
-				<p><fmt:message key="label.ld.zip.file" />
-				:
-				<input type="file" name="UPLOAD_FILE" class="button"/>
-				<input type="submit" name="import" value="<fmt:message key="button.import" />" class="button"/></p>
-			</form>
+			<h1 class="no-tabs-below">
+				<fmt:message key="title.import" />
+			</h1>
 
-	    </div>  <!--closes content-->
-	   
-		
-		<div id="footer-learner">
-		</div><!--closes footer-->
-		
-	</div><!--closes page-->
+			<div id="header-no-tabs-learner">
+			</div>
+			<!--closes header-->
 
-		
-			
+			<div id="content-learner">
+				<h2>
+					<fmt:message key="title.import.instruction" />
+				</h2>
+				<p>
+					&nbsp;
+				</p>
+				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
+					<p>
+						<fmt:message key="label.ld.zip.file" />
+						<input type="file" name="UPLOAD_FILE" />
+					</p>
+					<p>
+						<input type="submit" name="import" value="<fmt:message key="button.import" />" class="button" />
+					</p>
+				</form>
+
+			</div>
+			<!--closes content-->
+
+
+			<div id="footer-learner">
+			</div>
+			<!--closes footer-->
+
+		</div>
+		<!--closes page-->
+
+
+
 	</BODY>
 </HTML>
