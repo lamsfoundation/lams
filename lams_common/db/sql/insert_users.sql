@@ -106,7 +106,7 @@ locale_language, locale_country, flash_theme_id, html_theme_id)
 VALUES(3, 'lamskh01',SHA1('dummy'),'Mr','Jacky','Fang',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'jfang@melcoe.mq.edu.au',
 0,NOW(),2,null,
-'en','nz',1,3);
+'en','au',1,3);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
