@@ -250,7 +250,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			onActivityLearnerArray = new Array();
 			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
-							
+			var learner_X = _activity.xCoord + learnerOffset_X;
+			var learner_Y = _activity.yCoord + learnerOffset_Y;
 			// get the length of learners from the Monitor Model and run a for loop.
 			for (var j=0; j<mm.allLearnersProgress.length; j++){
 				var learner:Object = new Object();
@@ -262,19 +263,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				if (isLearnerCurrentAct){
 					//onActivityLearnerArray.push(learner)
 					
-					if (learnerOffset_X > 112){
-						learnerOffset_X = 4 
-						learnerOffset_Y = 27 
+					if (learner_X > (_activity.xCoord + 112)){
+						learner_X = _activity.xCoord + learnerOffset_X 
+						learner_Y = 27 
 					}
 					
 					trace(_activity.title+": is the learner's current Activity.")
-					 
-					this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learnerOffset_X, _y:learnerOffset_Y});
+					trace("this._parent is "+this._parent)
+					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
 					//var learnerIcon = this["learnerIcon"+learner.getUserName()]
 					//learnerIcon.click_mc.onRollOver = function (){
 					//	trace("I am: "+onActivityLearnerArray[learner.getUserName()])
 					//}
-					learnerOffset_X = learnerOffset_X+10
+					learner_X = learner_X+10
+					//learnerOffset_X = _activity.xCoord;
 					
 					
 					
