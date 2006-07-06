@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
@@ -272,4 +273,12 @@ public interface IUserManagementService {
      * @return 	 
      */ 	 
     public Organisation saveOrganisation( Organisation organisation, Integer userID );
+    
+    /**
+     * 
+     * @param language
+     * @param country
+     * @return SupportedLocale
+     */
+    public SupportedLocale  getSupportedLocale(String language, String country);
 }

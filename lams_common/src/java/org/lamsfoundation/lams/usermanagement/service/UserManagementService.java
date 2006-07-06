@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
@@ -439,5 +440,13 @@ public class UserManagementService implements IUserManagementService {
             return organisation; 	 
     } 	 
 
-	
+	public SupportedLocale getSupportedLocale(String language, String country) {
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("languageIsoCode",language);
+		if(country!=null){
+			properties.put("countryIsoCode",country);
+		}
+		List results = findByProperties(SupportedLocale.class,properties);
+		return results.isEmpty() ? null : (SupportedLocale)results.get(0);
+	}
 }
