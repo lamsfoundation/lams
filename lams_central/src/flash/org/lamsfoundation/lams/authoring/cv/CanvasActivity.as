@@ -80,6 +80,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _visibleHeight:Number;
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
+	private var bgNegative:Boolean = false;
 	
 	
 	
@@ -156,8 +157,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @usage   
 	 * @return  
 	 */
-	public function refresh():Void{
+	public function refresh(setNegative:Boolean):Void{
+		bgNegative = setNegative;
 		trace("called from PI")
+		setStyles();
 		draw();
 		setSelected(_isSelected);
 	}
@@ -496,8 +499,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		title_lbl.setStyle('styleName',styleObj);
 		title_lbl.setStyle('textAlign', 'center');
+		if (bgNegative){
+			styleObj = _tm.getStyleObject('ACTPanelNegative')
+		}else {
+			styleObj = _tm.getStyleObject('ACTPanel')
+		}
 		
-		styleObj = _tm.getStyleObject('ACTPanel')
 		act_pnl.setStyle('styleName',styleObj);
 			
     }
