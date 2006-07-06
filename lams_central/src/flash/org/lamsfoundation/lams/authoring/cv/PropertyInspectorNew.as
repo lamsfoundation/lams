@@ -997,6 +997,7 @@ class PropertyInspectorNew extends MovieClip{
 			
 			_canvasModel.selectedItem.activity.runOffline = runOffline_chk.selected;
 			Debugger.log('_canvasModel.selectedItem.activity.runOffline:'+_canvasModel.selectedItem.activity.runOffline,Debugger.GEN,'click','PropertyInspector');
+			_canvasModel.selectedItem.refresh(_canvasModel.selectedItem.activity.runOffline)
 		}
 	}
 	
