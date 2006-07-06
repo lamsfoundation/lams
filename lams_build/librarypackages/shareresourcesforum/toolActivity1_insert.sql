@@ -13,4 +13,4 @@ null,null,now(),0,
 null,null,${tool_id},null,
 null,null,null,'tool/larsrc11/images/icon_rsrc.swf',
 2,0,4,
-'org.lamsfoundation.lams.tool.rsrc.web.ApplicationResources');
+'org.lamsfoundation.lams.tool.rsrc.ApplicationResources');

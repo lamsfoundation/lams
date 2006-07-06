@@ -70,7 +70,7 @@ NULL,
 'tool/lavote11/exportPortfolio?mode=teacher',
 'tool/lavote11/monitoringStarter.do',
 'tool/lavote11/monitoringStarter.do',
-'org.lamsfoundation.lams.tool.vote.VoteResources',
+'org.lamsfoundation.lams.tool.vote.ApplicationResources',
 NOW()
 )
 

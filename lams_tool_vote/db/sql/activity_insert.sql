@@ -97,5 +97,5 @@ NULL
 , NULL
 , NULL
 , NULL
-,'org.lamsfoundation.lams.tool.vote.VoteResources'
+,'org.lamsfoundation.lams.tool.vote.ApplicationResources'
 )
