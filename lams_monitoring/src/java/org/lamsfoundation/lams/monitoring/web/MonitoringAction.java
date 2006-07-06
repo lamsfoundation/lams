@@ -543,6 +543,9 @@ public class MonitoringAction extends LamsDispatchAction
         	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
         	Integer learnerId = new Integer(WebUtil.readIntParam(request,MonitoringConstants.PARAM_LEARNER_ID));
     		String message = monitoringService.forceCompleteLessonByUser(learnerId,lessonId,activityId);
+    		if ( log.isDebugEnabled() ) {
+    			log.debug("Force complete for learner "+learnerId+" lesson "+lessonId+". "+message);
+    		}
     		flashMessage = new FlashMessage("forceComplete",message);
 		} catch (Exception e) {
 			flashMessage = handleException(e, "forceComplete", monitoringService);

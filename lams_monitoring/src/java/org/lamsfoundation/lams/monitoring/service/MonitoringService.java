@@ -140,6 +140,16 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private MessageService messageService;
     private ILearningDesignService learningDesignService;
     
+    
+    /** Message keys */
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_ACTIVITY_DONE = "force.complete.stop.message.activity.done";
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_GROUPING_ERROR = "force.complete.stop.message.grouping.error";
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_GROUPING = "force.complete.stop.message.grouping"; 
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_GATE = "force.complete.stop.message.gate";         
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY = "force.complete.stop.message.completed.to.activity";
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_END = "force.complete.stop.message.completed.to.end";
+    private static final String FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY = "force.complete.stop.message.stopped.unexpectedly";
+
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -775,90 +785,142 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
 
     	User learner = (User)baseDAO.find(User.class,learnerId);
-        Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
-        Set activities = newLesson.getLearningDesign().getActivities();
-        /*
-         Gate -- LearnerService.knockGate(GateActivity gate, User knocker, List lessonLearners)
-         Y - continue
-         N - Stop
-         Group --  getGroup -> exist? 
-         Y - continue 
-         N - PermissionGroup - Stop
-         	 RandomGroup - create group, then complete it and continue.
-         */
-        String stopReason = "Success to complete to the end of lesson";
-        for (Iterator i = activities.iterator(); i.hasNext();)
-        {
-            Activity actProxy = (Activity) i.next();
-            //reload activity to get real object instead of CGLIB proxy
-            Activity activity = activityDAO.getActivityByActivityId(actProxy.getActivityId());
-            
-            if (activity.isGroupingActivity()){
-            	GroupingActivity groupActivity = (GroupingActivity) activity;
-            	Grouping grouping = groupActivity.getCreateGrouping();
-            	Group myGroup = grouping.getGroupBy(learner);
-            	if(myGroup == null && myGroup.isNull()){
-            		//group does not exist
-            		if(grouping.isRandomGrouping()){
-            			//for random grouping, create then complete it. Continue 
-            			try {
-							lessonService.performGrouping(lessonId, groupActivity,learner);
-						} catch (LessonServiceException e) {
-		            		stopReason = "Force complete stop at non-grouped grouping activity [" + groupActivity + "] due to exception "+e.getMessage();
-						}
-            			learnerService.completeActivity(learner.getUserId(),activity);
-            			log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
-            		}else{
-	            		//except random grouping, stop here
-	            		stopReason = "Force complete stop at non-grouped grouping activity [" + groupActivity + "]";
-	            		break;
-            		}
-            	}else{
-            		//if group already exist
-            		learnerService.completeActivity(learner.getUserId(),activity);
-            		log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
-            	}
-            }else if ( activity.isGateActivity() ) {
-            	GateActivity gate = (GateActivity) activity;
-            	if(learnerService.knockGate(gate,learner,false)){
-            		//the gate is opened, continue to next activity to complete
-            		learnerService.completeActivity(learner.getUserId(),activity);
-            		log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
-            	}else{
-            		//the gate is closed, stop here
-            		stopReason = "Force complete stop at gate activity [" + gate + "]";
-            		break;
-            	}
-            }else{
-            	//left: toolActivity and complexActivity
-            	if(activity.isToolActivity()){
-            		ToolActivity toolActivity = (ToolActivity) activity;
-            		try {
-						ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
-						learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learnerId.longValue()));
-						log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
-					} catch (LamsToolServiceException e) {
-						throw new MonitoringServiceException(e);
+        
+       	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
+       	
+       	// check if activity is already complete
+       	if ( activityId != null ) {
+       		Activity stopActivity = activityDAO.getActivityByActivityId(activityId);
+       		if ( stopActivity == null ) {
+       			throw new MonitoringServiceException("Activity missing. Activity id"+activityId);
+       		}
+       		if ( learnerProgress != null && learnerProgress.getCompletedActivities().contains(stopActivity) ) {
+       			return messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_ACTIVITY_DONE,new Object[]{stopActivity.getTitle()});
+       			
+       		}
+       	}
+       	
+       	Activity currentActivity = learnerProgress.getCurrentActivity();
+       	String stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, activityId, new ArrayList<Long>());
+       	return stopReason != null ? stopReason : messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
+       	
+		
+    }
+    
+    /**
+     * Recursive method to step through a design and do the force complete.
+     * 
+     * Special Cases:
+     * Gate -- LearnerService.knockGate(GateActivity gate, User knocker, List lessonLearners)
+     * Y - continue
+     * N - Stop
+     * Group --  getGroup -> exist? 
+     * Y - continue 
+     * N - PermissionGroup - Stop
+     * RandomGroup - create group, then complete it and continue.
+     * 
+     * As we process an activity, we stick it in touchedActivityIds. Then we check this list before forwarding to an activity - this will
+     * stop us going into loops on the parallel activities and other complex activities that return to the parent activity after the child.
+    */
+    private String forceCompleteActivity(User learner, Long lessonId, LearnerProgress progress, Activity activity, Long stopActivityId, ArrayList<Long> touchedActivityIds) {
+    	
+    	// TODO check performance - does it load the learner progress every time or do it load it from the cache.
+       	String stopReason = null;
+
+       	// activity likely to be a cglib so get the real activity
+   		activity = activityDAO.getActivityByActivityId(activity.getActivityId());
+   		touchedActivityIds.add(activity.getActivityId());
+   		
+        if (activity.isGroupingActivity()){
+        	GroupingActivity groupActivity = (GroupingActivity) activity;
+        	Grouping grouping = groupActivity.getCreateGrouping();
+        	Group myGroup = grouping.getGroupBy(learner);
+        	if(myGroup == null || myGroup.isNull()){
+        		//group does not exist
+        		if(grouping.isRandomGrouping()){
+        			//for random grouping, create then complete it. Continue 
+        			try {
+						lessonService.performGrouping(lessonId, groupActivity,learner);
+					} catch (LessonServiceException e) {
+						log.error("Force complete failed. Learner "+learner+" lessonId "+lessonId+" processing activity "+activity,e);
+	            		stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_GROUPING_ERROR,new Object[]{activity.getTitle()});
 					}
-            	}else if(activity.isComplexActivity()){
-            		//for complex activities:SEQUENCE ACTIVITY,PARALLEL ACTIVITY,OPTIONS ACTIVITY
-            		ComplexActivity complexActivity = (ComplexActivity) activity;
-            		Set allActivities = complexActivity.getActivities();
-            		Iterator iter = allActivities.iterator();
-            		while(iter.hasNext()){
-            			Activity act = (Activity) iter.next();
-            			forceCompleteLessonByUser(learnerId,lessonId,act.getActivityId());
-            		}
-            		log.debug("Complex activity [" + activity.getActivityId() + "] is completed.");
-            	}
-            	
-            }
-            //complete to the given activity ID, then stop. To be sure, the given activity is forced to complete as well.
-            if(activityId != null && activities.equals(activity.getActivityId())){
-            	//stop here
-            	stopReason = "success complete to the given activity [" + activityId + "]";
-            	break;
-            }
+        			learnerService.completeActivity(learner.getUserId(),activity);
+        			if ( log.isDebugEnabled()) {
+        				log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
+        			}
+        		}else{
+            		//except random grouping, stop here
+            		stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_GROUPING,new Object[]{activity.getTitle()});
+        		}
+        	}else{
+        		//if group already exist
+        		learnerService.completeActivity(learner.getUserId(),activity);
+       			if ( log.isDebugEnabled()) {
+       				log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
+       			}
+        	}
+        	
+        }else if ( activity.isGateActivity() ) {
+        	GateActivity gate = (GateActivity) activity;
+        	if(learnerService.knockGate(gate,learner,false)){
+        		//the gate is opened, continue to next activity to complete
+        		learnerService.completeActivity(learner.getUserId(),activity);
+       			if ( log.isDebugEnabled()) {
+       				log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
+       			}
+        	}else{
+        		//the gate is closed, stop here
+        		stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_GATE,new Object[]{activity.getTitle()});
+        	}
+        	
+        }else if(activity.isToolActivity()){
+        		ToolActivity toolActivity = (ToolActivity) activity;
+        		try {
+					ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
+					learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learner.getUserId().longValue()));
+	       			if ( log.isDebugEnabled()) {
+	       				log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
+	       			}
+				} catch (LamsToolServiceException e) {
+					throw new MonitoringServiceException(e);
+				}
+				
+       	}else if(activity.isComplexActivity()){
+        		//for complex activities:SEQUENCE ACTIVITY,PARALLEL ACTIVITY,OPTIONS ACTIVITY
+        		ComplexActivity complexActivity = (ComplexActivity) activity;
+        		Set allActivities = complexActivity.getActivities();
+        		Iterator iter = allActivities.iterator();
+        		while(stopReason==null && iter.hasNext()){
+        			Activity act = (Activity) iter.next();
+        			stopReason = forceCompleteActivity(learner, lessonId, progress, act, stopActivityId, touchedActivityIds);
+        		}
+        		log.debug("Complex activity [" + activity.getActivityId() + "] is completed.");
+       	}
+        
+        // complete to the given activity ID, then stop. To be sure, the given activity is forced to complete as well.
+        // if we had stopped due to a subactivity, the stop reason will already be set.
+        if ( stopReason == null ) {
+	        if(stopActivityId!= null && stopActivityId.equals(activity.getActivityId())){
+	        	//stop here
+	        	stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY,new Object[]{activity.getTitle()});
+	        } else {
+	           	LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
+	           	Activity nextActivity = learnerProgress.getCurrentActivity();
+	           	
+	           	// now where?
+	           	if ( nextActivity == null || nextActivity.getActivityId().equals(activity.getActivityId()) ) {
+		           	// looks like we have reached the end of the sequence?
+	           		stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_END);
+	           	} else if ( touchedActivityIds.contains(nextActivity.getActivityId()) ) {
+		           	// processed this one before. Better cut at this point or we will end up in a loop.
+	           		// it's probably the parent activity
+	           		stopReason = null; // i.e. do nothing 
+	           	} else {
+	           		// no where else to go - keep on pressing on down the sequence then.
+	           		stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, nextActivity, stopActivityId, touchedActivityIds);
+	           	} 
+	        }
         }
         
         return stopReason;
