@@ -24,7 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,11 +38,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.usermanagement.Country;
-import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -83,8 +78,6 @@ public class UserAction extends LamsDispatchAction {
 					.getServletContext());
 	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
-    //private static List countries = service.findAll(Country.class);
-	//private static List languages = service.findAll(Language.class);
 	private static List allRoles = service.findAll(Role.class);
 	private static List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
 	static {
@@ -96,8 +89,6 @@ public class UserAction extends LamsDispatchAction {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-		ActionMessages errors = new ActionMessages();
-		
 		// retain orgId to return to userlist
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		if(orgId != null) {
@@ -134,12 +125,7 @@ public class UserAction extends LamsDispatchAction {
 			        break;
 			    }
 			}
-			Map<String, Object> properties = new HashMap<String, Object>();
-			properties.put("languageIsoCode",user.getLocaleLanguage());
-			if(user.getLocaleCountry()!=null){
-				properties.put("countryIsoCode",user.getLocaleCountry());
-			}
-			SupportedLocale locale = (SupportedLocale)service.findByProperties(SupportedLocale.class,properties).get(0);
+			SupportedLocale locale = service.getSupportedLocale(user.getLocaleLanguage(),user.getLocaleCountry());
 			userForm.set("localeId",locale.getLocaleId());
 			
 		}else{
@@ -148,10 +134,7 @@ public class UserAction extends LamsDispatchAction {
 			try{
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 				log.debug("defaultLocale: "+defaultLocale);
-				Map<String, Object> properties = new HashMap<String, Object>();
-				properties.put("languageIsoCode",defaultLocale.substring(0,2));
-				properties.put("countryIsoCode",defaultLocale.substring(3));
-				SupportedLocale locale = (SupportedLocale)service.findByProperties(SupportedLocale.class,properties).get(0);
+				SupportedLocale locale = service.getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
 				userForm.set("localeId",locale.getLocaleId());
 			}catch(Exception e){
                 log.debug(e);				
@@ -167,8 +150,6 @@ public class UserAction extends LamsDispatchAction {
 		request.setAttribute("orgId",orgId);
 		request.setAttribute("orgName",org.getName());
 		request.setAttribute("orgType",org.getOrganisationType().getOrganisationTypeId());
-		//request.setAttribute("countries",countries);
-		//request.setAttribute("languages",languages);
 		return mapping.findForward("user");
 	}
 	
