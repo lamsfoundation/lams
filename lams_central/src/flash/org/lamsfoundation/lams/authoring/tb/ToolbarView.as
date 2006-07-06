@@ -36,7 +36,8 @@ class ToolbarView extends AbstractView {
 	//Toolbar clip
 	private var _toolbar_mc:MovieClip;
 	private var _tm:ThemeManager;
-    
+    private var btnOffset_X:Number = 4;
+	private var btnOffset_Y:Number = 6;
 	private var new_btn:Button;
 	private var open_btn:Button;
 	private var save_btn:Button;
@@ -49,6 +50,8 @@ class ToolbarView extends AbstractView {
 	private var branch_btn:Button;
 	private var group_btn:Button;
 	private var preview_btn:Button;
+	private var _toolbarMenu:Array;
+	//private var btn_text:TextField;
 	private var bkg_pnl:Panel;
 	private var flow_bkg_pnl:Panel;
 	private var _dictionary:Dictionary;
@@ -70,7 +73,8 @@ class ToolbarView extends AbstractView {
         mx.events.EventDispatcher.initialize(this);  
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
-		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
+		//_dictionary.addEventListener('init',Proxy.create(this,setupButtons));
+		//_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
     
     /**
@@ -84,11 +88,19 @@ class ToolbarView extends AbstractView {
     }
 	
 	public function showHideAssets(v:Boolean){
-		trace("Method Called")
+		
 		_toolbar_mc.branch_btn.enabled = false;
 		_toolbar_mc.gate_btn.visible = v;
 		_toolbar_mc.branch_btn.visible = v;
 		_toolbar_mc.flow_bkg_pnl.visible = v;
+		var flowW:Number = _toolbar_mc.flow_btn.width
+		var gateW:Number = _toolbar_mc.gate_btn.width
+		var branchW:Number = _toolbar_mc.branch_btn.width
+		var maxWidth:Number = Math.max(flowW, gateW, maxWidth)
+		trace("flow  width: "+flowW+" gate width: "+gateW+" branch width: "+branchW+" and max button width: "+maxWidth)
+		_toolbar_mc.flow_bkg_pnl.setSize(maxWidth+6, 95)
+		_toolbar_mc.flow_bkg_pnl._x = _toolbar_mc.branch_btn._x-3;
+		
 		
 	}
     
@@ -124,6 +136,7 @@ class ToolbarView extends AbstractView {
         //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
 	}
+	
 	public function setupLabels(){
 		
 		_toolbar_mc.new_btn.label = Dictionary.getValue('new_btn');
@@ -139,6 +152,40 @@ class ToolbarView extends AbstractView {
 		_toolbar_mc.group_btn.label = Dictionary.getValue('group_btn');
 		_toolbar_mc.preview_btn.label = Dictionary.getValue('preview_btn');
 			}
+	
+	public function setupButtons(tm:ToolbarModel, menuList:Array){
+		trace("setupButtons Called")
+		_toolbarMenu = new Array();
+		this.createTextField("btn_text", this.getNextHighestDepth(), btnOffset_X, -100, 10, 18); 
+		for (var i=0; i<menuList.length; i++){
+			trace("button label is: "+Dictionary.getValue(menuList[i][0]))
+			var btnLabel:String = Dictionary.getValue(menuList[i][0])
+			var btn_text = this["btn_text"]
+			btn_text.autoSize = true;
+			btn_text.html = true;
+			btn_text.htmlText = btnLabel
+			
+			var btnWidth:Number = btn_text.textWidth+37
+			trace("textwidth for button "+menuList[i][0]+" is: "+btnWidth)
+			_toolbarMenu[i] = this.attachMovie("Button", menuList[i][0], this.getNextHighestDepth(), {label:btnLabel, icon:menuList[i][1] })
+			_toolbarMenu[i].setSize(btnWidth, 25)
+			if (i == 0){
+				_toolbarMenu[i]._x  = btnOffset_X
+			}else {
+				_toolbarMenu[i]._x = (_toolbarMenu[i-1]._x+_toolbarMenu[i-1].width)+btnOffset_X
+			}
+			_toolbarMenu[i]._y = btnOffset_Y;
+			
+			if (i >= menuList.length-2){
+				_toolbarMenu[i]._x = this.flow_btn._x;
+				_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y
+			}
+			if (i == menuList.length){
+				btn_text.removeTextField();
+			}
+		}
+		
+	}
 	/*
 	* Updates state of the Toolbar, called by Toolbar Model
 	*
@@ -160,6 +207,9 @@ class ToolbarView extends AbstractView {
 			case 'BUTTON' :
                 setState(tm, infoObj);
                 break;
+			case 'SETMENU' :
+				setupButtons(tm, infoObj.data);
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.ToolbarView');
         }
