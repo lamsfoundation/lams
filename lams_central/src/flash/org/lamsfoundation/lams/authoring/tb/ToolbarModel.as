@@ -62,6 +62,33 @@ class ToolbarModel extends Observable {
 		notifyObservers(infoObj);
     }
     
+	
+	public function toolbarButtons(){
+		var buttonArr:Array = new Array();
+		
+		buttonArr[0] 	= ["new_btn", "icon_newDesign"];
+		buttonArr[1] 	= ["open_btn", "icon_openDesign"];
+		buttonArr[2] 	= ["save_btn", "icon_saveDesign"];
+		buttonArr[3] 	= ["copy_btn", "icon_copy"];
+		buttonArr[4] 	= ["paste_btn", "icon_paste"];
+		buttonArr[5] 	= ["trans_btn", "icon_pen"];
+		buttonArr[6] 	= ["optional_btn", "icon_optional"];
+		buttonArr[7] 	= ["flow_btn", "icon_flow"];
+		buttonArr[8] 	= ["group_btn", "icon_group"];
+		buttonArr[9] 	= ["preview_btn", "icon_preview"];
+		buttonArr[10] 	= ["gate_btn", "icon_gate"];
+		buttonArr[11] 	= ["branch_btn", "icon_branch"];
+		
+		
+		setChanged();
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "SETMENU";
+		infoObj.data = buttonArr;
+		notifyObservers(infoObj);
+		
+		
+	}
 	/**
 	* set the button state to enabled/disabled and set a changed flag and notify view and controller.
     */
