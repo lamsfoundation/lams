@@ -119,7 +119,11 @@ class ToolkitView extends AbstractView {
 	}
 	public function setupLabels(){
 		
-		title_lbl.text = "<b>"+Dictionary.getValue('tk_title')+"</b>:";
+		var tkTitle = Dictionary.getValue('tk_title')
+		if (tkTitle.length > 25){
+			tkTitle = tkTitle.substr(0, 24)+"..."
+		} 
+		title_lbl.text = "<b>"+tkTitle+"</b>";
 		
 
 	}
@@ -222,6 +226,7 @@ class ToolkitView extends AbstractView {
 		var myLibs:Hashtable = tkm.getToolkitLibraries();	
 		//loop through the libraries
 		var keys:Array = myLibs.keys();
+		//keys.sortOn("title", Array.CASEINSENSITIVE);
 		for(var i=0; i<keys.length; i++){
 			//NOTE: Each library element contains an array of templateActivities.  
 			
