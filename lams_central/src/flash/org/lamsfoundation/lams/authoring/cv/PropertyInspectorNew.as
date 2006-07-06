@@ -334,7 +334,7 @@ class PropertyInspectorNew extends MovieClip{
 			
 			}else{
 				//its a tool activity
-				delimitLine._visible = false;	
+				delimitLine._visible = true;	
 				showOptionalControls(false);
 				showGeneralControls(true);
 				showGroupingControls(false);
