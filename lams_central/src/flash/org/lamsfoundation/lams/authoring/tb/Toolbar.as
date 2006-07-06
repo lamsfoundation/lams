@@ -63,6 +63,7 @@ class Toolbar {
 
         //Set the position by setting the model which will call update on the view
         toolbarModel.setPosition(x,y);
+		toolbarModel.toolbarButtons();
 		
 	}
     
