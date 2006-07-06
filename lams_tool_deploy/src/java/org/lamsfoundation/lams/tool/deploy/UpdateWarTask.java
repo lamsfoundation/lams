@@ -75,6 +75,8 @@ public abstract class UpdateWarTask implements Task {
     protected String lamsEarPath;
     
     protected List<String> archivesToUpdate;
+    
+    protected Map<File,File> filesToRename; 
 
     /**
      * The value of the tool application context file, including the path
@@ -169,6 +171,7 @@ public abstract class UpdateWarTask implements Task {
      */
     public void execute() throws DeployException
     {
+   
 		if ( applicationContextPath == null ) { 
 			throw new DeployException("UpdateWebXmTask: Unable to update web.xml as the application content path is missing (applicationContextPath).");
 		}
@@ -176,60 +179,135 @@ public abstract class UpdateWarTask implements Task {
 		if ( archivesToUpdate != null ) {
 			
 			// map the old File to the new File e.g. lams_learning.war is the key, lams_learning.war.new is the value  
-			Map<File,File> filesToRename = new HashMap<File,File>(archivesToUpdate.size());
+			filesToRename = new HashMap<File,File>(archivesToUpdate.size());
 			
 			for ( String warFileName: archivesToUpdate ) {
 				
 		    	File warFile = new File(lamsEarPath+File.separator+warFileName);
-				if ( ! warFile.canRead() || warFile.isDirectory() ) {
-					throw new DeployException("Unable to access war file "+warFile.getAbsolutePath()+". May be missing, a directory or not readable");
+				if ( ! warFile.canRead() ) {
+					throw new DeployException("Unable to access war file "+warFile.getAbsolutePath()+". May be missing or not readable");
 				}
-				String newFilename = lamsEarPath+File.separator+warFileName+".new";
-				File outputFile = new File(newFilename);
-				JarOutputStream newWarOutputStream = null;
-				ZipInputStream warInputStream = null;
-				try {
-					
-					newWarOutputStream = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
-					newWarOutputStream.setMethod(JarOutputStream.DEFLATED);
-					newWarOutputStream.setLevel(Deflater.DEFAULT_COMPRESSION);
-					//newWarOutputStream.setMethod(JarOutputStream.STORED);
-
-					warInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(warFile)));
-					ZipEntry entry = null; 
-					
-			 		// work through each entry, copying across to the output stream. 
-					// when we hit the web.xml, we have to modify it.
-			        while( ( entry = warInputStream.getNextEntry() ) != null ) {
-			    		if ( WEBXML_PATH.equals(entry.getName()) ) {
-			    			updateWebXML(newWarOutputStream, warInputStream, entry);
-			    		} else if ( MANIFEST_PATH.equals(entry.getName()) ) {
-			    			updateManifest(newWarOutputStream, warInputStream, entry);
-			    		} else {
-			    			copyEntryToWar(newWarOutputStream, warInputStream, entry);
-			    		}
-			        }
-			        
-					warInputStream.close();
-					newWarOutputStream.close();
-					
-				} catch (IOException e) {
-					throw new DeployException("Unable to process war file "+warFileName,e);
-				} finally {
-					try { 
-						if ( warInputStream != null )
-							warInputStream.close();
-						if ( newWarOutputStream != null )
-							newWarOutputStream.close();
-					} catch ( IOException e2 ) {}
+				if ( warFile.isDirectory() ) {
+					updateExpandedWar(warFileName, warFile);
+				} else {
+					updateZippedWar(warFileName, warFile);
 				}
-				
-				filesToRename.put(warFile, outputFile);
 		    }
 			
-			copyNewFilesToOldNames(filesToRename);
+			copyNewFilesToOldNames();
 		}		
     }
+
+	/**
+	 * 
+	 * Update the war file which is assumed to be in expanded format (ie a directory)
+	 * 
+	 * @param warFileName
+	 * @param warFile
+	 */
+	protected void updateExpandedWar(String warFileName, File warFileDirectory) {
+		
+		System.out.println("Updating expanded war "+warFileName);
+
+		String webXMLFilename = lamsEarPath+File.separator+warFileName+File.separator+WEBXML_PATH;
+		File webXMLFile = new File(webXMLFilename);
+		File newWebXMLFile = new File(webXMLFilename+".new");
+		String manifestFilename = lamsEarPath+File.separator+warFileName+File.separator+MANIFEST_PATH;
+		File manifestFile = new File(manifestFilename);
+		File newManifestFilename = new File(manifestFilename+".new");
+		
+		FileInputStream webXMLFileis = null;
+		FileOutputStream webXMLFileos = null;
+		FileInputStream manifestFileis = null;
+		FileOutputStream manifestFileos = null;
+		
+		
+		try {
+			webXMLFileis = new FileInputStream(webXMLFile);
+			webXMLFileos = new FileOutputStream(newWebXMLFile);
+			manifestFileis = new FileInputStream(manifestFile);
+			manifestFileos = new FileOutputStream(newManifestFilename);
+
+			Document doc = parseWebXml(webXMLFileis);
+		    updateWebXml(doc);
+		    writeWebXml(doc, webXMLFileos);
+
+		    Manifest manifest = new Manifest(manifestFileis);
+			updateClasspath(manifest);
+			manifest.write(manifestFileos);
+				
+		} catch (IOException e) {
+			throw new DeployException("Unable to process war file "+warFileName,e);
+		} finally {
+			try { 
+				if ( webXMLFileis != null )
+					webXMLFileis.close();
+				if ( webXMLFileos != null )
+					webXMLFileos.close();
+				if ( manifestFileis != null )
+					manifestFileis.close();
+				if ( manifestFileos != null )
+					manifestFileos.close();
+			} catch ( IOException e2 ) {}
+		}
+		
+		filesToRename.put(webXMLFile, newWebXMLFile);
+		filesToRename.put(manifestFile, newManifestFilename);
+	}
+	/**
+	 * 
+	 * Update the war file, which is assumed to be in zip file format. 
+	 * 
+	 * @param warFileName
+	 * @param warFile
+	 * @return new zipped war file
+	 */
+	protected void updateZippedWar(String warFileName, File warFile) {
+
+		System.out.println("Updating zipped war "+warFileName);
+
+		String newFilename = lamsEarPath+File.separator+warFileName+".new";
+		File outputFile = new File(newFilename);
+		JarOutputStream newWarOutputStream = null;
+		ZipInputStream warInputStream = null;
+		try {
+			
+			newWarOutputStream = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
+			newWarOutputStream.setMethod(JarOutputStream.DEFLATED);
+			newWarOutputStream.setLevel(Deflater.DEFAULT_COMPRESSION);
+			//newWarOutputStream.setMethod(JarOutputStream.STORED);
+
+			warInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(warFile)));
+			ZipEntry entry = null; 
+			
+			// work through each entry, copying across to the output stream. 
+			// when we hit the web.xml, we have to modify it.
+		    while( ( entry = warInputStream.getNextEntry() ) != null ) {
+				if ( WEBXML_PATH.equals(entry.getName()) ) {
+					updateWebXML(newWarOutputStream, warInputStream, entry);
+				} else if ( MANIFEST_PATH.equals(entry.getName()) ) {
+					updateManifest(newWarOutputStream, warInputStream, entry);
+				} else {
+					copyEntryToWar(newWarOutputStream, warInputStream, entry);
+				}
+		    }
+		    
+			warInputStream.close();
+			newWarOutputStream.close();
+			
+		} catch (IOException e) {
+			throw new DeployException("Unable to process war file "+warFileName,e);
+		} finally {
+			try { 
+				if ( warInputStream != null )
+					warInputStream.close();
+				if ( newWarOutputStream != null )
+					newWarOutputStream.close();
+			} catch ( IOException e2 ) {}
+		}
+		
+		filesToRename.put(warFile, outputFile);
+	}
 
     /* ********* Manage the archive updates, copy files, etc *********/
 
@@ -254,7 +332,7 @@ public abstract class UpdateWarTask implements Task {
 	 * Everything worked okay so rename the files
 	 * @param filesToRename
 	 */
-    protected void copyNewFilesToOldNames(Map<File, File> filesToRename) throws DeployException {
+    protected void copyNewFilesToOldNames() throws DeployException {
 		// clean up any old backup files first.
 		for ( Map.Entry<File,File> mapEntry : filesToRename.entrySet() ) {
 			File origFile = mapEntry.getKey();
@@ -282,7 +360,7 @@ public abstract class UpdateWarTask implements Task {
 			} 
 			
 			if ( successful ) {
-				System.out.println("Updated web.xml in war file "+origFile.getName());
+				System.out.println("Updated file "+origFile.getName());
 				
 			} else {
 				// something has gone wrong so restore the backup files
@@ -291,7 +369,7 @@ public abstract class UpdateWarTask implements Task {
 					File backupFile = renamedMapEntry.getValue();
 					backupFile.renameTo(updatedFile);
 				}
-				String message = "Error occured renaming the war files. Tried to go back to old files but may or may not have succeeded. Check files:";
+				String message = "Error occured renaming the war/web.xml/manifest files. Tried to go back to old files but may or may not have succeeded. Check files:";
 				for ( String warFileName: archivesToUpdate ) {
 					message += " " + warFileName;
 				}
