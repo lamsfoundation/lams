@@ -96,7 +96,7 @@ class ToolbarView extends AbstractView {
 		var flowW:Number = _toolbar_mc.flow_btn.width
 		var gateW:Number = _toolbar_mc.gate_btn.width
 		var branchW:Number = _toolbar_mc.branch_btn.width
-		var maxWidth:Number = Math.max(flowW, gateW, maxWidth)
+		var maxWidth:Number = Math.max(flowW, gateW, branchW)
 		trace("flow  width: "+flowW+" gate width: "+gateW+" branch width: "+branchW+" and max button width: "+maxWidth)
 		_toolbar_mc.flow_bkg_pnl.setSize(maxWidth+6, 95)
 		_toolbar_mc.flow_bkg_pnl._x = _toolbar_mc.branch_btn._x-3;
