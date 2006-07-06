@@ -23,8 +23,6 @@
 <head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
-	<!-- this is the custom CSS for the tool -->
-	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
 
 	<script>
     

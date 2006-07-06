@@ -14,14 +14,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
 
  	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
-	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
 	<lams:css />
-	<!--[if IE]>
-	<style type="text/css">
-	@import url(${lams}/css/ie-styles.css);
-	</style>
-	<![endif]-->
 
 
  	<!-- ********************  javascript ********************** -->

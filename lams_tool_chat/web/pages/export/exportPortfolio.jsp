@@ -5,43 +5,55 @@
 
 <html>
 	<head>
-		<title><fmt:message key="titleHeading.exportPortfolio" /></title>
-		<lams:headItems />
+		<title><c:out value="${chatDTO.title} escapeXml="false" /></title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<lams:css localLinkPath="../"/>
 	</head>
 
 	<body>
-		<h1>
-			${chatDTO.title}
-		</h1>
-
-		<p>
-			${chatDTO.instructions}
-		</p>
-
-		<c:if test='${mode == "teacher"}'>
-			<div id="sessionContents">
-				<ul>
-					<c:forEach var="session" items="${chatDTO.sessionDTOs}">
-						<li>
-							<a href="#sid-${session.sessionID}">${session.sessionName}</a>
-						</li>
-					</c:forEach>
-				</ul>
-			</div>
-		</c:if>
-
-		<c:forEach var="session" items="${chatDTO.sessionDTOs}">
-			<div id="sid-${session.sessionID}">
-				<h2>
-					${session.sessionName}
-				</h2>
-				<c:forEach var="message" items="${session.messageDTOs}">
-					<div>
-						${message.from} : ${message.body}
+	<div id="page-learner"><!--main box 'page'-->
+	
+		<h1 class="no-tabs-below"><c:out value="${chatDTO.title} escapeXml="false" /></h1>
+		<div id="header-no-tabs-learner">
+	
+		</div><!--closes header-->
+	
+		<div id="content-learner">
+	
+			<p><c:out value="${chatDTO.instructions} escapeXml="false" /></p>
+	
+				<c:if test='${mode == "teacher"}'>
+					<div id="sessionContents">
+						<ul>
+							<c:forEach var="session" items="${chatDTO.sessionDTOs}">
+								<li>
+									<a href="#sid-${session.sessionID}">${session.sessionName}</a>
+								</li>
+							</c:forEach>
+						</ul>
+					</div>
+				</c:if>
+		
+				<c:forEach var="session" items="${chatDTO.sessionDTOs}">
+					<div id="sid-${session.sessionID}">
+						<h2>
+							${session.sessionName}
+						</h2>
+						<c:forEach var="message" items="${session.messageDTOs}">
+							<div>
+								${message.from} : ${message.body}
+							</div>
+						</c:forEach>
 					</div>
 				</c:forEach>
-			</div>
-		</c:forEach>
+		
+		</div>  <!--closes content-->
+	
+	
+		<div id="footer-learner">
+		</div><!--closes footer-->
+	
+	</div><!--closes page-->
 	</body>
 </html>
 

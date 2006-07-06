@@ -7,31 +7,30 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   	<head>    
-	    <title>Noticeboard Export</title>
+	    <title><c:out value="${NbExportForm.title}"/></title>
 	  	
-		<lams:css localLink="true" />
+		<lams:css localLinkPath="../"/>
 	</head>  
   	<body>
-   		<h1>Export Portfolio</h1>
-		<h2>Noticeboard</h2>
-		<br>
-		<div id="datatablecontainer">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td align="center">
-					<c:out value="${NbExportForm.title}" escapeXml="false"/>
-					</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td align="left">
-						<c:out value="${NbExportForm.content}" escapeXml="false"/>
-					</td>
-				</tr>
-			</table>
+		<div id="page-learner"/>
+
+			<h1 class="no-tabs-below">
+				<c:out value="${NbExportForm.title}" escapeXml="false" />
+			</h1>
+
+			<div id="header-no-tabs-learner">
+			</div>
+
+			<div id="content-learner">
+
+				<p>
+					<c:out value="${NbExportForm.content}" escapeXml="false" />
+				</p>
+			</div>
+
+			<div id="footer-learner">
+			</div>
+
 		</div>
 
 	</body>

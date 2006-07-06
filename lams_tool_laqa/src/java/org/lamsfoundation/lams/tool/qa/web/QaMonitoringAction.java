@@ -665,7 +665,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         QaContent qaContent=qaService.loadQa(toolContentId.longValue());
     	logger.debug("existing qaContent:" + qaContent);
     	
-        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, true, false, null, null);
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService, true, false, null, null);
         request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
         logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
     }
@@ -852,7 +852,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    
 	    
 	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
-	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, 
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService, 
 	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));

@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:html locale="true">
 	<head>
 	<title> <bean:message key="label.export"/> </title>
-		<lams:css localLink="true"/>
+		<lams:css localLinkPath="../"/>
 	</head>
 	<body>
 	
@@ -35,7 +35,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="method"/>
 	<html:hidden property="toolContentID"/>
 
+	<div id="page-learner"><!--main box 'page'-->
 
+		<h1 class="no-tabs-below">
+		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+			<c:if test="${(portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
+			<c:if test="${(portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
+		</c:if>
+        </h1>
+		<div id="header-no-tabs-learner">
+	
+		</div><!--closes header-->
+	
+		<div id="content-learner">
+	
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
 				<table align="center">
 					<tr> 
@@ -48,28 +61,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-		
-			<table align="center">
-				<c:if test="${(portfolioExportMode == 'learner')}">
-					<tr> 
-						<td NOWRAP valign=top align=center> 
-							<h1> <bean:message key="label.export.learner"/>  </h1>
-						</td> 
-					<tr>
-				</c:if>			
-				<c:if test="${(portfolioExportMode != 'learner')}">
-					<tr> 
-						<td NOWRAP valign=top align=center> 
-							<h1> <bean:message key="label.export.teacher"/>  </h1>
-						</td> 
-					<tr>
-				</c:if>			
-			</table>
-		
 			<jsp:include page="/export/ExportContent.jsp" />
 		</c:if>						
+		
+		</div>  <!--closes content-->
+	
+	
+		<div id="footer-learner">
+		</div><!--closes footer-->
+	
+	</div><!--closes page-->
 
-	</html:form>
+		</html:form>
 </body>
 </html:html>
 

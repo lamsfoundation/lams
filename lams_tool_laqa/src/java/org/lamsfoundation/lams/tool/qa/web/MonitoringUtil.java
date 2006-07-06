@@ -201,14 +201,12 @@ public class MonitoringUtil implements QaAppConstants{
 	 * @param mcContent
 	 * @return List
 	 */
-	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent, 
+	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
 	{
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		logger.debug("userId: " + userId);
-		
-		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
     	
 		logger.debug("will be building groups question data  for content:..." + qaContent);
@@ -230,7 +228,7 @@ public class MonitoringUtil implements QaAppConstants{
 	    		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
 	    		
 	    		logger.debug("using allUsersData to retrieve users data: " + isUserNamesVisible);
-				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaQueContent, qaQueContent.getUid().toString(), 
+				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaService, qaQueContent, qaQueContent.getUid().toString(), 
 						isUserNamesVisible,isLearnerRequest, currentSessionId, userId);
 				logger.debug("questionAttemptData:..." + questionAttemptData);
 				qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
@@ -243,7 +241,7 @@ public class MonitoringUtil implements QaAppConstants{
 	}
 	
 
-	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, QaQueContent qaQueContent, String questionUid, 
+	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, IQaService qaService, QaQueContent qaQueContent, String questionUid, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
 	{
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
@@ -252,7 +250,6 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("userId: " + userId);
 		
 		logger.debug("doing buildGroupsAttemptData...");
-		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	logger.debug("qaService: " + qaService);
 
     	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new QaStringComparator());
@@ -281,7 +278,7 @@ public class MonitoringUtil implements QaAppConstants{
                 	{
                 		List listUsers=qaService.getUserBySessionOnly(qaSession);	
                 		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
-                		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, 
+                		Map sessionUsersAttempts=populateSessionUsersAttempts(request, qaService, qaSession.getQaSessionId(), listUsers, questionUid, 
                 				isUserNamesVisible, isLearnerRequest, userId);
                 		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
                 	}
@@ -310,7 +307,7 @@ public class MonitoringUtil implements QaAppConstants{
                     	{
                     		List listUsers=qaService.getUserBySessionOnly(qaSession);	
                     		logger.debug("listQaUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
-                    		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, 
+                    		Map sessionUsersAttempts=populateSessionUsersAttempts(request, qaService, qaSession.getQaSessionId(), listUsers, questionUid, 
                     				isUserNamesVisible, isLearnerRequest, userId);
                     		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
                     	}
@@ -334,7 +331,7 @@ public class MonitoringUtil implements QaAppConstants{
 	 * @param listUsers
 	 * @return List
 	 */
-	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listUsers, String questionUid, 
+	public static Map populateSessionUsersAttempts(HttpServletRequest request,IQaService qaService, Long sessionId, List listUsers, String questionUid, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String userId)
 	{
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
@@ -342,7 +339,6 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("userId: " + userId);
 		
 		logger.debug("doing populateSessionUsersAttempts...");
-		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	logger.debug("qaService: " + qaService);
 		
 		Map mapMonitoredUserContainerDTO= new TreeMap(new QaStringComparator());

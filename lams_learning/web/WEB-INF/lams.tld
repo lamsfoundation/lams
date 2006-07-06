@@ -85,7 +85,7 @@
 
       <attribute>
          <description>Output stylesheet based on the user preferences.</description>
-         <name>localLink</name>
+         <name>localLinkPath</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -308,6 +308,7 @@
    	</tag-file>  
 	<tag-file>
 	    <name>ExportPortOutput</name>
-	       <path>/WEB-INF/tags/ExportPortOutput.tag</path>
+		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
+
 </taglib>

@@ -45,12 +45,6 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
 <lams:css />
-<!--[if IE]>
-<style type="text/css">
-@import url(${lams}/css/ie-styles.css);
-</style>
-<![endif]-->
-
 <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

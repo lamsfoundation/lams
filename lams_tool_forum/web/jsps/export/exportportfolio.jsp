@@ -1,10 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
+<%-- flag indicated to header.jsp to use the local path option for the css --%>
+<c:set scope="page" var="localLinkPath" value="../"/>
 <head>
 	<%@ include file="/common/header.jsp"%>
+	
 </head>
 <body>
+<div id="page-learner"><!--main box 'page'-->
+
+	<h1 class="no-tabs-below">  </h1>
+	<div id="header-no-tabs-learner">
+
+	</div><!--closes header-->
+
+	<div id="content-learner">
+
 	<c:if test="${empty report}">
 		<div align="center"><b><fmt:message key="message.not.avaliable"/></b></div>
 	</c:if>
@@ -111,5 +123,14 @@
 			</tr>
 		</table>
 	</c:forEach>
+	
+	</div>  <!--closes content-->
+
+
+	<div id="footer-learner">
+	</div><!--closes footer-->
+
+</div><!--closes page-->
+
 </body>
 </html:html>

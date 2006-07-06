@@ -22,34 +22,31 @@
 			 */
 
 			/**
-			 * Standard Head Items
-			 *	Author: Fiona Malikoff
-			 *	Description: Includes all the standard head items e.g. the 
-			 * lams css files, sets the content type, standard javascript files.
+			 * TabBody.tag
+			 *	Author: Mitchell Seaton
+			 *	Description: Creates the body container for a tab element
+			 * Wiki: 
 			 */
 
 		%>
-<%@ tag body-content="empty"%>
-
+<%@ tag body-content="scriptless"%>
+<%@ attribute name="id" required="true" rtexprvalue="true"%>
+<%@ attribute name="tabTitle" required="false" rtexprvalue="true"%>
+<%@ attribute name="titleKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="page" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
 
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
+<!-- begin tab content -->
+<div class="box" id="tabbody${id}">
+	<c:choose>
+		<c:when test="${page != null}">
+			<jsp:include page="${page}" />
+		</c:when>
+		<c:otherwise>
+			<jsp:doBody />
+		</c:otherwise>
+	</c:choose>
 
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
-<lams:css />
-<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
-
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-<script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
-
+</div>
+<!-- end tab content -->

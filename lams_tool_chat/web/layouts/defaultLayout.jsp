@@ -7,7 +7,7 @@
 	<tiles:insert attribute="header" />
 	<body>
 		<div id="page">	
-			<tiles:useAttribute name="pageTitleKey" />
+			<tiles:useAttribute name="pageTitleKey" ignore="true"/>
 			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
 			<h1 class="no-tabs-below">
 				<bean:message key="${pTitleKey}" />

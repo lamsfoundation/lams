@@ -53,7 +53,7 @@ public class CssTag extends TagSupport {
 
 	private static final Logger log = Logger.getLogger(CssTag.class);
 	private static final String IE_STYLESHEET_NAME = "ie-styles";
-	private boolean generateLocalLink = false; 
+	private String localLinkPath = null; 
 	
 	/**
 	 * 
@@ -80,7 +80,7 @@ public class CssTag extends TagSupport {
 				{
 					String theme = (String)i.next();
 					if ( theme != null) {
-						if (generateLocalLink)
+						if (localLinkPath != null)
 							customStylesheetLink = generateLocalLink(theme,serverURL);
 						else	
 							customStylesheetLink = generateLink(theme,serverURL);
@@ -96,7 +96,7 @@ public class CssTag extends TagSupport {
 			}
 			
 			// Special IE stylesheet for all those IE related formatting issues
-			String ieLink = generateLocalLink ? generateLocalLink(IE_STYLESHEET_NAME,serverURL) : generateLink(IE_STYLESHEET_NAME,serverURL);
+			String ieLink = localLinkPath != null ? generateLocalLink(IE_STYLESHEET_NAME,serverURL) : generateLink(IE_STYLESHEET_NAME,serverURL);
 			writer.println("<!--[if IE]>");
 			writer.println("<style type=\"text/css\">");
 			writer.println("@import url("+ieLink+");");
@@ -111,7 +111,7 @@ public class CssTag extends TagSupport {
 	}
 
 	private String generateLocalLink(String stylesheetName, String serverURL) {
-		return "<link href=\"../" + stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
+		return "<link href=\""+localLinkPath+"css/"+stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
 	}
 	
 	private String generateLink(String stylesheetName, String serverURL)
@@ -128,21 +128,20 @@ public class CssTag extends TagSupport {
 	}
 	
 	/**
-	 * @jsp.attribute required="false" rtexprvalue="true" description="Should the css link be a local file link? Useful for export portfolio. Valid values true or false."
+	 * @jsp.attribute required="false" rtexprvalue="true" 
+	 * description="Should the css link be a local file link? If so, what is the path back to the 'root'. For tools' export portfolio pages, this should be set to \"../\""
 	 * 
 	 * @return Returns the property.
 	 */
-	public String getLocalLink()
+	public String getLocalLinkPath()
 	{
-		return generateLocalLink ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+		return localLinkPath;
 	}
 
-	public void setLocalLink(String localLink)
+	public void setLocalLinkPath(String localLinkPath)
 	{
-		if (Boolean.parseBoolean(localLink))
-			this.generateLocalLink = true;
-		else
-			this.generateLocalLink = false;
+		this.localLinkPath = localLinkPath;
 	}
-	
+
+
 }

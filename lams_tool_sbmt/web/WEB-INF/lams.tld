@@ -24,6 +24,26 @@
    </tag>
    <tag>
 
+      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+      <display-name>generate unique ID</display-name>
+      <icon>    
+      </icon>
+      <name>generateID</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+         <name>id</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Output details from the shared session UserDTO object</description>
       <display-name>user details</display-name>
       <icon>    
@@ -65,7 +85,7 @@
 
       <attribute>
          <description>Output stylesheet based on the user preferences.</description>
-         <name>localLink</name>
+         <name>localLinkPath</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -282,4 +302,13 @@
        <name>headItems</name>
        <path>/WEB-INF/tags/headItems.tag</path>
    	</tag-file>   	
+   	<tag-file>
+       <name>Passon</name>
+       <path>/WEB-INF/tags/Passon.tag</path>
+   	</tag-file>  
+	<tag-file>
+	    <name>ExportPortOutput</name>
+		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
+   	</tag-file>  
+
 </taglib>

@@ -32,9 +32,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     
     <title>System logon required</title>
 
-    <!--
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    -->
   </head>
   
   <body>

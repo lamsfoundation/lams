@@ -7,15 +7,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<title>Submission Export</title>
-	<lams:css localLink="true" />
+	<title><fmt:message key="activity.title" /></title>
+	<lams:css localLinkPath="../"/>
 </head>
 <body>
-	<h2>
-		<fmt:message key="activity.title" />
-	</h2>
-	<br>
-	<div id="datatablecontainer">
+
+<div id="page-learner"><!--main box 'page'-->
+
+	<h1 class="no-tabs-below"><fmt:message key="activity.title" /></h1>
+	<div id="header-no-tabs-learner">
+
+	</div><!--closes header-->
+
+	<div id="content-learner">
+
 		<c:choose>
 			<c:when test="${empty report}">
 				<h3>
@@ -24,7 +29,7 @@
 				</h3>
 			</c:when>
 			<c:otherwise>
-				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<table>
 					<c:forEach items="${report}" var="mapElement">
 						<c:set var="user" value="${mapElement.key}" />
 						<c:set var="submissionList" value="${mapElement.value}" />
@@ -118,7 +123,13 @@
 			</c:otherwise>
 		</c:choose>
 
-	</div>
+	</div>  <!--closes content-->
+
+
+	<div id="footer-learner">
+	</div><!--closes footer-->
+
+</div><!--closes page-->
 </body>
 </html:html>
 

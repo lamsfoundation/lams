@@ -45,8 +45,13 @@
       validate="true"
     >
       <forward
-        name="success"
+        name="chat_client"
         path="tiles:/learning/main"
+        redirect="false"
+      />
+      <forward
+        name="message_page"
+        path="tiles:/generic/message"
         redirect="false"
       />
     </action>
@@ -94,6 +99,11 @@
       <forward
         name="success"
         path="tiles:/authoring/main"
+        redirect="false"
+      />
+      <forward
+        name="message_page"
+        path="tiles:/generic/message"
         redirect="false"
       />
     </action>

@@ -131,6 +131,7 @@
 				<include name="**/*.tld"/>
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
+				<include name="tags/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<fileset dir="${conf.web.dir}">

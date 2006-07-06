@@ -35,14 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><c:out value="${portfolio.lessonName}"/></title>
     <fmt:setBundle basename = "org.lamsfoundation.lams.learning.ApplicationResources" />
 
-	<%--  can't use the normal "lams:css localLink=true" as that points to ../default.css --%>
-	<link href="css/aqua.css" rel="stylesheet" type="text/css">
-	<link href="css/default.css" rel="stylesheet" type="text/css">
-	<!--[if IE]>
-	<style type="text/css">
-	@import url(<link href="css/ie-styles.css" rel="stylesheet" type="text/css">);
-	</style>
-	<![endif]-->
+	<lams:css localLinkPath="./"/>
 
 </head>
 

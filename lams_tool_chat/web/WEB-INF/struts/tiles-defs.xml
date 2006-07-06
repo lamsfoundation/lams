@@ -80,6 +80,7 @@
 
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:learning">
+		<put name="pageTitleKey" value="pageTitle.learning" />
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="/chat_client/chat_ui.jsp" />
 	</definition>

@@ -82,6 +82,18 @@
       />
     </action>
     <action
+      path="/profile"
+      type="org.lamsfoundation.lams.web.ProfileAction"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="profile"
+        path="/profile.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/home"
       type="org.lamsfoundation.lams.web.HomeAction"
       parameter="method"
