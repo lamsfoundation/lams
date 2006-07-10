@@ -26,7 +26,7 @@
 </script>
 
 <!--  Chat Client -->
-<script src="${tool}chat_client/chat_app.js" type="text/javascript"></script>
+<script src="${tool}pages/learning/chat_app.js" type="text/javascript"></script>
 
 <h1 class="no-tabs-below">
 	<c:out value="${chatTitle}" escapeXml="false" />
@@ -76,14 +76,16 @@
 		</div>
 
 		<div id="finishButton_pane" class="space-bottom" style="display:none;">
-			<form name="finishActivity" action="${tool}learning.do" method="post">
+			<html:form action="/learning" method="post">
 				<div class="right-buttons">
-					<input type="hidden" name="dispatch" value="finishActivity" />
-					<input type="hidden" name="chatUserUID" value="${USER_UID}" />
-					<input type="hidden" name="toolSessionID" value="${SESSION_ID}" />
-					<input type="submit" class="button" value='<fmt:message>button.finish</fmt:message>' />
+					<html:hidden property="dispatch" value="finishActivity" />
+					<html:hidden property="chatUserUID" value="${USER_UID}" />
+					<html:hidden property="toolSessionID" value="${SESSION_ID}" />
+					<html:submit styleClass="button space-bottom">
+						<fmt:message>button.finish</fmt:message>
+					</html:submit>
 				</div>
-			</form>
+			</html:form>
 		</div>
 	</div>
 </div>

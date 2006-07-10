@@ -67,15 +67,12 @@
 					</html:submit>
 				</html:form>
 
-				<html:form action="/monitoring" method="post" target="_blank">
-					<html:hidden property="dispatch" value="openChatClient" />
+				<html:form action="/learning" method="post" target="_blank">
 					<html:hidden property="toolSessionID" value="${session.sessionID}" />
+					<html:hidden property="mode" value="teacher" />
 					<html:submit styleClass="button">
 						<fmt:message>summary.openChat</fmt:message>
 					</html:submit>
-					<!--					<html:checkbox property="teacherVisible">-->
-					<!--						<fmt:message>Visible</fmt:message>-->
-					<!--					</html:checkbox>-->
 				</html:form>
 
 			</td>

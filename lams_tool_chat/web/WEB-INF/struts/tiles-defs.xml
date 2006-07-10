@@ -31,11 +31,11 @@
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="" />
 	</definition>
-	
+
 	<definition name="tiles:/layout:learning" path="/layouts/learningLayout.jsp">
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="" />
-	</definition>	
+	</definition>
 
 	<!--  End: Layouts -->
 
@@ -59,6 +59,7 @@
 		</definition>
 	-->
 	<definition name="tiles:/generic/message" extends="tiles:/layout:default">
+		<put name="pageTitleKey" value="pageTitle.authoring" />
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="/common/message.jsp"></put>
 	</definition>
@@ -80,9 +81,18 @@
 
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:learning">
-		<put name="pageTitleKey" value="pageTitle.learning" />
 		<put name="header" value="tiles:/header:default" />
-		<put name="body" value="/chat_client/chat_ui.jsp" />
+		<put name="body" value="/pages/learning/chat_ui.jsp" />
+	</definition>
+
+	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:learning">
+		<put name="header" value="tiles:/header:default" />
+		<put name="body" value="/pages/learning/runOffline.jsp" />
+	</definition>
+	
+	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:learning">
+		<put name="header" value="tiles:/header:default" />
+		<put name="body" value="/pages/learning/defineLater.jsp" />
 	</definition>
 	<!-- End: Learning -->
 
@@ -97,7 +107,7 @@
 	<definition name="tiles:/monitoring/chat_client" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
 		<put name="header" value="tiles:/header:default" />
-		<put name="body" value="/chat_client/chat_ui.jsp" />
+		<put name="body" value="/pages/learning/chat_ui.jsp" />
 	</definition>
 
 	<definition name="tiles:/monitoring/chat_history" extends="tiles:/layout:default">

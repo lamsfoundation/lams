@@ -57,9 +57,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch"
+ * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="chat_client" path="tiles:/learning/main"
- * @struts.action-forward name="message_page" path="tiles:/generic/message"
+ * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
+ * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -76,7 +77,7 @@ public class LearningAction extends LamsDispatchAction {
 		// TODO need to catch exceptions and handle errors.
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
 				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
-
+		
 		Long toolSessionID = WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -97,22 +98,21 @@ public class LearningAction extends LamsDispatchAction {
 
 		Chat chat = chatSession.getChat();
 
+		// Retrieve the current user
+		ChatUser chatUser = getCurrentUser(toolSessionID);
+		
 		// check defineLater
 		if (chat.getDefineLater()) {
-			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(request).getMessage(
-					"message.defineLaterSet"));
-			return mapping.findForward("message_page");
+			return mapping.findForward("defineLater");
 		}
 
 		// check runOffline
 		if (chat.getRunOffline()) {
-			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(request).getMessage(
-					"message.runOfflineSet"));
-			return mapping.findForward("message_page");
+			request.setAttribute("MODE", mode.toString());
+			request.setAttribute("USER_UID", chatUser.getUid());
+			request.setAttribute("SESSION_ID", toolSessionID);
+			return mapping.findForward("runOffline");
 		}
-
-		// Retrieve the current user
-		ChatUser chatUser = getCurrentUser(toolSessionID);
 
 		// Create the room if it doesnt exist
 		if (chatSession.getJabberRoom() == null) {
@@ -125,7 +125,7 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getJabberNickname());
-		request.setAttribute("MODE", "learner");
+		request.setAttribute("MODE", mode.toString());
 		request.setAttribute("USER_UID", chatUser.getUid());
 		request.setAttribute("SESSION_ID", toolSessionID);
 		request

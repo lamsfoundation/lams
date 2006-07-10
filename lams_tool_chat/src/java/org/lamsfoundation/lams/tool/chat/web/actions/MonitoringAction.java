@@ -132,53 +132,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		return mapping.findForward("success");
 	}
 
-	public ActionForward openChatClient(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-
-		// TODO this method is almost a copy of LearningAction.unspecified.
-		Long toolSessionID = WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID);
-
-		// set up chatService
-		if (chatService == null) {
-			chatService = ChatServiceProxy.getChatService(this.getServlet()
-					.getServletContext());
-		}
-
-		// Retreive the session
-		ChatSession chatSession = chatService
-				.getSessionBySessionId(toolSessionID);
-		if (chatSession == null) {
-			throw new ChatException(
-					"Cannot retrieve session with toolSessionId"
-							+ toolSessionID);
-		}
-
-		// Retrieve the current user
-		ChatUser chatUser = getCurrentUser(toolSessionID);
-
-		// Create the room if it doesnt exist
-		if (chatSession.getJabberRoom() == null) {
-			chatService.createJabberRoom(chatSession);
-			chatService.saveOrUpdateChatSession(chatSession);
-		}
-
-		// set the teachers visibility
-
-		request.setAttribute("XMPPDOMAIN", Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
-		request.setAttribute("USERNAME", chatUser.getUserId());
-		request.setAttribute("PASSWORD", chatUser.getUserId());
-		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
-		request.setAttribute("NICK", chatUser.getJabberNickname());
-		request.setAttribute("MODE", "teacher");
-
-		request.setAttribute("chatTitle", chatSession.getChat().getTitle());
-		request.setAttribute("chatInstructions", chatSession.getChat()
-				.getInstructions());
-
-		return mapping.findForward("chat_client");
-	}
-
 	public ActionForward openChatHistory(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
