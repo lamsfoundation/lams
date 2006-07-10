@@ -29,8 +29,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -406,22 +408,19 @@ public class LearningDesignDTO extends BaseDTO{
 	}
 
 	public ArrayList populateActivities(LearningDesign design) {
-		ArrayList<AuthoringActivityDTO> activities = new ArrayList<AuthoringActivityDTO>();		
 		//ArrayList childActivities = null;
+		//To use sorted set again: in getAuthoringActivityDTOSet() it will already be sorted, here is just double warranty
+		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
 		Iterator parentIterator = design.getParentActivities().iterator();
 		while(parentIterator.hasNext()){
 			Activity object = (Activity) parentIterator.next();
-			if (object.isComplexActivity())
-			{
-				Set<AuthoringActivityDTO> dtoSet = object.getAuthoringActivityDTOSet();
-				activities.addAll(dtoSet);
-			}
-			else
-			{
-				activities.addAll(object.getAuthoringActivityDTOSet());
-			}
+			//getAuthoringActivityDTOSet() method will:
+			//for complex activity: It already populate its children activities.
+			//for other activity: only get itself DTO object.
+			dtoSet.addAll(object.getAuthoringActivityDTOSet());
 		}
-		return activities;
+		
+		return new ArrayList<AuthoringActivityDTO>(dtoSet);
 	}	
 	public ArrayList populateTransitions(LearningDesign design){
 		ArrayList<TransitionDTO> transitions = new ArrayList<TransitionDTO>();

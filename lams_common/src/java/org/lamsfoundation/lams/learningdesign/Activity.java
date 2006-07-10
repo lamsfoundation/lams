@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -798,7 +797,7 @@ public abstract class Activity implements Serializable,Nullable {
 	 */
 	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet()
 	{
-		HashSet<AuthoringActivityDTO> dtoSet = new HashSet<AuthoringActivityDTO>();
+		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
 		dtoSet.add(new AuthoringActivityDTO(this));
 		return dtoSet;
 	}
