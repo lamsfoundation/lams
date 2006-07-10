@@ -24,13 +24,14 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.Date;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,8 +46,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
-import org.lamsfoundation.lams.usermanagement.Country;
-import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -55,6 +54,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -94,6 +94,7 @@ public class UserSaveAction extends Action {
             HttpServletResponse response) throws Exception {
 		DynaActionForm userForm = (DynaActionForm)form;
 		Boolean edit = false;
+		Boolean passwordChanged = true;
 		Integer orgId = (Integer)userForm.get("orgId");
 		
 		if(isCancelled(request)){
@@ -101,29 +102,36 @@ public class UserSaveAction extends Action {
 			return mapping.findForward("userlist");
 		}
 		
+		Integer userId = (Integer)userForm.get("userId");
+		log.debug("got userId: "+userId);
+		if(userId!=0) edit = true;
+		
 		ActionMessages errors = new ActionMessages();
 		if((userForm.get("login")==null)||(((String)userForm.getString("login").trim()).length()==0)){
 			errors.add("login",new ActionMessage("error.login.required"));
 		}
-		if((userForm.get("password")==null)||(((String)userForm.getString("password").trim()).length()==0)){
-			errors.add("password",new ActionMessage("error.password.required"));
-		}
 		if(!userForm.get("password").equals(userForm.get("password2"))){
 			errors.add("password",new ActionMessage("error.newpassword.mismatch"));
+		}
+		if((userForm.get("password")==null)||(((String)userForm.getString("password").trim()).length()==0)){
+			passwordChanged = false;
+			if(!edit) errors.add("password",new ActionMessage("error.password.required"));
 		}
 		
 		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)userForm.get("localeId"));
 		log.debug("locale: "+locale);
 		
 		if(errors.isEmpty()){
-			Integer userId = (Integer)userForm.get("userId");
 			User user;
-			log.debug("got userId: "+userId);
 			String[] roles = (String[])userForm.get("roles");
-			if(userId!=0){    // edit user
-				edit = true;
+			if(edit){    // edit user
 				log.debug("editing userId: "+userId);
 				user = (User)service.findById(User.class,userId);
+				if(passwordChanged) {
+					userForm.set("password",HashUtil.sha1((String)userForm.get("password")));
+				}else{
+					userForm.set("password",user.getPassword());
+				}
 				BeanUtils.copyProperties(user,userForm);
 				log.debug("country: "+user.getLocaleCountry());
 				log.debug("language: "+user.getLocaleLanguage());
@@ -131,7 +139,6 @@ public class UserSaveAction extends Action {
 				user.setLocaleLanguage(locale.getLanguageIsoCode());
 				log.debug("country: "+user.getLocaleCountry());
 				log.debug("language: "+user.getLocaleLanguage());
-				//service.save(user);
 				
 				List rolesList = Arrays.asList(roles);
 				log.debug("rolesList.size: "+rolesList.size());
@@ -182,6 +189,7 @@ public class UserSaveAction extends Action {
 			}else{    // create user
 				log.debug("creating user...");
 				user = new User();
+				userForm.set("password",HashUtil.sha1((String)userForm.get("password")));
 				BeanUtils.copyProperties(user,userForm);
 				log.debug("new login: "+user.getLogin());
 				if(service.getUserByLogin(user.getLogin())!=null){
@@ -236,15 +244,19 @@ public class UserSaveAction extends Action {
 			}
 		    saveErrors(request,errors);
 		    Organisation org = (Organisation)service.findById(Organisation.class,orgId);
-			Organisation pOrg = org.getParentOrganisation();
-			if(pOrg!=null){
-				request.setAttribute("pOrgId",pOrg.getOrganisationId());
-				request.setAttribute("pOrgName",pOrg.getName());
+			Organisation parentOrg = org.getParentOrganisation();
+			if(parentOrg!=null){
+				request.setAttribute("pOrgId",parentOrg.getOrganisationId());
+				request.setAttribute("pOrgName",parentOrg.getName());
 			}
 			request.setAttribute("orgId",orgId);
 			request.setAttribute("orgName",org.getName());
-		    request.setAttribute("countries",service.findAll(Country.class));
-		    request.setAttribute("languages",service.findAll(Language.class));
+			List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
+			Collections.sort(locales);
+			request.setAttribute("locales",locales);
+			List allRoles = service.findAll(Role.class);
+			Collections.sort(allRoles);
+			request.setAttribute("rolelist",allRoles);
 		    return mapping.findForward("user");
 		}
 	}

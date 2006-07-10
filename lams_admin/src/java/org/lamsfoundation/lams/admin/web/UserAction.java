@@ -25,10 +25,8 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -105,7 +103,7 @@ public class UserAction extends LamsDispatchAction {
 			log.debug("got userid to edit: "+userId);
 			User user = (User)service.findById(User.class,userId);
 			BeanUtils.copyProperties(userForm, user);
-			BeanUtils.setProperty(userForm,"password2",user.getPassword());
+			userForm.set("password",null);
 			
 			// get user's roles
 			Iterator iter = user.getUserOrganisations().iterator();
@@ -142,10 +140,10 @@ public class UserAction extends LamsDispatchAction {
 		}
 		
 		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
-		Organisation pOrg = org.getParentOrganisation();
-		if(pOrg!=null){
-			request.setAttribute("pOrgId",pOrg.getOrganisationId());
-			request.setAttribute("pOrgName",pOrg.getName());
+		Organisation parentOrg = org.getParentOrganisation();
+		if(parentOrg!=null){
+			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
+			request.setAttribute("pOrgName",parentOrg.getName());
 		}
 		request.setAttribute("orgId",orgId);
 		request.setAttribute("orgName",org.getName());
