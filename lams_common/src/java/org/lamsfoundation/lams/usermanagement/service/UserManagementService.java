@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -94,7 +93,6 @@ public class UserManagementService implements IUserManagementService {
 		try{
 			if(object instanceof User){
 				User user = (User)object;
-				user.setPassword(HashUtil.sha1(user.getPassword()));
 				if(user.getUserId()==null){
 					baseDAO.insertOrUpdate(user);  // creating a workspace needs a userId
 					object = createWorkspaceForUser(user);
@@ -365,7 +363,7 @@ public class UserManagementService implements IUserManagementService {
 	public void updatePassword(String login, String password) {
 		try{
 			User user = getUserByLogin(login);
-			user.setPassword(HashUtil.sha1(password));
+			//user.setPassword(HashUtil.sha1(password));
 			baseDAO.update(user);
 		}catch(Exception e){
 			log.debug(e);
