@@ -1,8 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
-<%-- flag indicated to header.jsp to use the local path option for the css --%>
-<c:set scope="page" var="localLinkPath" value="../"/>
 <head>
 	<title><fmt:message key="export.title" /></title>
 	<c:set var="lams">
@@ -18,6 +16,7 @@
 			wd.window.focus();
 		}
 	</script>
+	<lams:css localLinkPath="../"/>
 </head>
 <body>
 

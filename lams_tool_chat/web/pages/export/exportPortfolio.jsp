@@ -5,7 +5,7 @@
 
 <html>
 	<head>
-		<title><c:out value="${chatDTO.title} escapeXml="false" /></title>
+		<title><c:out value="${chatDTO.title}" escapeXml="false" /></title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css localLinkPath="../"/>
 	</head>
@@ -13,14 +13,14 @@
 	<body>
 	<div id="page-learner"><!--main box 'page'-->
 	
-		<h1 class="no-tabs-below"><c:out value="${chatDTO.title} escapeXml="false" /></h1>
+		<h1 class="no-tabs-below"><c:out value="${chatDTO.title}" escapeXml="false" /></h1>
 		<div id="header-no-tabs-learner">
 	
 		</div><!--closes header-->
 	
 		<div id="content-learner">
 	
-			<p><c:out value="${chatDTO.instructions} escapeXml="false" /></p>
+			<p><c:out value="${chatDTO.instructions}" escapeXml="false" /></p>
 	
 				<c:if test='${mode == "teacher"}'>
 					<div id="sessionContents">
@@ -39,11 +39,11 @@
 						<h2>
 							${session.sessionName}
 						</h2>
+						<p>
 						<c:forEach var="message" items="${session.messageDTOs}">
-							<div>
-								${message.from} : ${message.body}
-							</div>
+								${message.from} : ${message.body}<BR>
 						</c:forEach>
+						</p>
 					</div>
 				</c:forEach>
 		

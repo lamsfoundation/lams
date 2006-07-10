@@ -15,14 +15,7 @@
 
  	<!-- ********************  CSS ********************** -->
 	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
-	<c:choose>
-		<c:when test="${not empty localLinkPath}">
-			<lams:css localLinkPath="${localLinkPath}"/>
-		</c:when>
-		<c:otherwise>
-			<lams:css />
-		</c:otherwise>
-	</c:choose>
+	<lams:css />
 
 
  	<!-- ********************  javascript ********************** -->
