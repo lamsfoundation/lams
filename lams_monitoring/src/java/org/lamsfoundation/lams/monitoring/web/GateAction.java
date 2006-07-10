@@ -105,6 +105,7 @@ public class GateAction extends LamsDispatchAction
 	private static final String ACTIVITY_FORM_FIELD = "activityId";
 	private static final String TOTAL_LEARNERS_FORM_FIELD = "totalLearners";
 	public static final String READ_ONLY= "readOnly";
+	public static final String LOCAL_FILES= "localFiles";
 
     //---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -164,6 +165,7 @@ public class GateAction extends LamsDispatchAction
         int totalLearners = learnerService.getActiveLearnersByLesson(lessonId).size();
         gateForm.set(TOTAL_LEARNERS_FORM_FIELD,new Integer(totalLearners));
         gateForm.set(ACTIVITY_FORM_FIELD,gateIdLong);        
+    	gateForm.set(LOCAL_FILES, Boolean.FALSE);
         
         return findViewByGateType(mapping, gateForm, gate);
     }
@@ -209,6 +211,7 @@ public class GateAction extends LamsDispatchAction
     	DynaActionForm gateForm = (DynaActionForm)form;
     	ActionForward forward = viewGate(mapping, form, request, response);
     	gateForm.set(READ_ONLY, Boolean.TRUE);
+    	gateForm.set(LOCAL_FILES, Boolean.TRUE);
     	return forward;
     }
     

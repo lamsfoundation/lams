@@ -30,8 +30,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale = "true">
     <head>
        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-       <html:base/>
-	   <lams:css/>
+       
+		<%-- if localFiles == true then wanted for export portfolio and must run offline --%>
+		<c:choose>
+		<c:when test="${not empty GateForm and GateForm.map.localFiles == true}">
+			<lams:css localLinkPath="../"/>
+		</c:when>
+		<c:otherwise>
+			<lams:css/>
+		</c:otherwise>
+		</c:choose>
+       
+       
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
@@ -39,7 +49,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     
     <body>
 		<div id="login-page">	
-	
 		<tiles:insert attribute="content" />
 
 		<div id="footer">

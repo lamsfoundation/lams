@@ -6,5 +6,6 @@
 	<form-property name="startingTime" type="java.util.Date" />
 	<form-property name="endingTime" type="java.util.Date" />
 	<form-property name="readOnly" type="java.lang.Boolean" />
+	<form-property name="localFiles" type="java.lang.Boolean" />
 </form-bean>
 
