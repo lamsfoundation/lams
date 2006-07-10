@@ -103,7 +103,7 @@ FCKConfig.ToolbarSets["Default"] = [
 	['About'], 
 	['Image','Table','Rule','Smiley','SpecialChar','UniversalKey'],
 	['FontFormat','FontName','FontSize'],
-	['TextColor','BGColor'],
+	['TextColor','BGColor']
 ] ;
 
 
