@@ -52,13 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div id="content-learner">
 		
 				<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
-						<table align="center">
-							<tr> 
-								<td NOWRAP valign=top align=center> 
-									<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
-								</td> 
-							<tr>
-						</table>
+						<h2> <bean:message key="error.noLearnerActivity"/> </h2>
 				</c:if>			
 		
 		
