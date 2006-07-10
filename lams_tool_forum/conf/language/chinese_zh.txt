@@ -2,12 +2,12 @@
 # Language strings for the Forum tool.
 
 # ========== Values for tool and library activity. Sent to Flash as part of the learning design toolkit.  ======
-activity.title=Forum
-activity.description=Online threaded discussion tool (asynchronous).
-activity.helptext=Discussion tool useful for long running collaborations and situations where learners are not all on line at the same time.
+activity.title=论坛
+activity.description=讨论工具
+activity.helptext=在学生没有全部在线的情况下，为长期的讨论提供的有效工具
 
-tool.display.name=Forum Tool
-tool.description=Tool for forums, also known as message boards.
+tool.display.name=论坛
+tool.description=论坛工具，也是消息板
 
 #=========================labels===========================#
 #-------------------------Authoring Labels-----------------#
@@ -39,7 +39,7 @@ label.authoring.advance.limited.input=限制输入字符
 
 lable.topic.title.subject=主题
 lable.topic.title.body=内容
-lable.topic.title.update=前一个消息
+lable.topic.title.update=前一个帖子
 lable.topic.title.author=作者
 lable.topic.title.startedby=首贴于
 lable.topic.title.replies=回复
@@ -49,10 +49,10 @@ label.back.to.forum=返回论坛
 label.monitoring.edit.activity.cancel=取消
 label.monitoring.edit.activity.update=更新
 label.monitoring.edit.activity.edit=编辑
-lable.topic.title.message.number=消息# 
+lable.topic.title.message.number=帖子# 
 lable.topic.title.average.mark= 平均分
-label.monitoring.statistic.average.mark= 消息平均分
-lable.monitoring.statistic.total.message= 总消息 # 
+label.monitoring.statistic.average.mark= 帖子平均分
+lable.monitoring.statistic.total.message= 总帖子 # 
 authoring.exception= 在编辑页发生问题,原因是{0}
 #-------------------------END Authoring Labels END-----------------#
 page.title.monitoring.content.userlist=监控用户列表
@@ -82,19 +82,19 @@ message.msg.maxFileSize = 最大 250K
 ##Message
 title.messageTopic.open = 更多
 
-title.message.add = 发消息
-title.message.open = 查看消息
-title.message.reply = 回复消息
-title.message.edit = 编辑消息
+title.message.add = 发帖子
+title.message.open = 查看帖子
+title.message.reply = 回复帖子
+title.message.edit = 编辑帖子
 title.message.view=消息板
-title.message.view.topic=查看消息
-title.message.delete=删除消息
+title.message.view.topic=查看帖子
+title.message.delete=删除帖子
 
 message.label.subject = 主题
 message.label.body = 内容
 message.label.attachment = 附件
 message.label.postedOn = 发布:
-message.label.threadReplies  = 消息树
+message.label.threadReplies  = 帖子树
 message.link.reply = 回复
 
 ##Labels
@@ -130,7 +130,7 @@ monitoring.tab.summary=总计
 monitoring.tab.instructions=指导
 monitoring.tab.edit.activity=编辑活动
 monitoring.tab.edit.statistics=统计
-monitoring.user.post.topic=发布下列消息:
+monitoring.user.post.topic=发表下列帖子:
 lable.topic.title.comment=评论
 message.not.avaliable=不可用
 lable.update.mark=更新分数
@@ -140,3 +140,26 @@ message.monitoring.summary.no.users=没有可用用户
 message.view.all.marks=查看全部分数
 message.download.marks=下载分数
 label.monitoring.summary.view.forum=查看论坛
+
+message.monitoring.summary.no.session  =没有可用的会话
+topic.message.subject.hidden  =帖子主题隐藏
+topic.message.body.hidden  =帖子内容隐藏
+label.show  =显示
+label.hide  =隐藏
+page.title.monitoring.init  =论坛监控
+monitoring.tab.statistics  =统计
+label.save  =保存
+label.cancel  =取消
+authoring.tab.basic  =基本
+authoring.tab.advanced  =高级
+authoring.tab.instructions  =指导
+page.title.authoring.init  =论坛编辑
+
+
+#======= End labels: Exported 130 labels for en AU =====
+#======= New labels: after 12/05/2006 =============
+authoring.msg.cancel.save=你想不保存就关闭窗口吗？
+#======= New labels: after 08/06/2006 =============
+define.later.message=请等待教师定义这部分内容。
+run.offline.message=这个活动不能在计算机上完成，更多细节请询问你的指导老师。
+button.try.again=重新再试
