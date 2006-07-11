@@ -133,7 +133,7 @@ public class ActivityMapping implements Serializable
         else
         {
 
-            if (! progress.getCurrentActivity().isParallelActivity() && progress.isParallelWaiting())
+            if (progress.getCurrentActivity()!=null && ! progress.getCurrentActivity().isParallelActivity() && progress.isParallelWaiting())
             {
                 // progress is waiting, goto waiting page
                 String strutsAction = this.getActivityMappingStrategy()

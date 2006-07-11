@@ -42,6 +42,7 @@ public class LearnerProgressDTO
     private Long currentActivityId;
     private Long [] attemptedActivities;
     private Long [] completedActivities;
+    private Boolean lessonComplete;
     
     /**
      * Full constructor 
@@ -54,7 +55,8 @@ public class LearnerProgressDTO
                               Integer learnerId,
                               Long currentActivityId,
                               Long[] attemptedActivities,
-                              Long[] completedActivities)
+                              Long[] completedActivities,
+                              Boolean lessonComplete)
     {
         this.lessonId = lessonId;
         this.lessonName = lessonName;
@@ -65,6 +67,7 @@ public class LearnerProgressDTO
         this.currentActivityId = currentActivityId;
         this.attemptedActivities = attemptedActivities;
         this.completedActivities = completedActivities;
+        this.lessonComplete = lessonComplete;
     }
 
     /**
@@ -123,16 +126,12 @@ public class LearnerProgressDTO
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
 	public String getLastName() {
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public Boolean getLessonComplete() {
+		return lessonComplete;
 	}    
     
 }

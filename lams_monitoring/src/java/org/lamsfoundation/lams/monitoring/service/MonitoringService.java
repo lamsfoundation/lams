@@ -802,7 +802,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
        	}
        	
        	Activity currentActivity = learnerProgress.getCurrentActivity();
-       	String stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, stopActivity, new ArrayList<Long>());
+		String stopReason = null;
+		if (currentActivity != null ) {
+	       	stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, stopActivity, new ArrayList<Long>());
+		}
        	return stopReason != null ? stopReason : messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
        	
 		

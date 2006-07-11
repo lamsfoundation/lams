@@ -435,9 +435,10 @@ public class LearnerProgress implements Serializable
                                       this.user.getLastName(),
                                       this.user.getFirstName(),
                                       this.user.getUserId(),
-                                      this.currentActivity.getActivityId(),
+                                      this.currentActivity != null ? this.currentActivity.getActivityId() : null,
                                       this.createIdArrayFrom(this.attemptedActivities),
-                                      this.createIdArrayFrom(this.completedActivities));
+                                      this.createIdArrayFrom(this.completedActivities),
+                                      this.lessonComplete);
     }
     
     //---------------------------------------------------------------------

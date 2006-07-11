@@ -245,8 +245,10 @@ public class ProgressEngine
                 calculateProgress(learner, parent, learnerProgress);
         }
         //lesson is meant to be completed if there is no transition and no parent.
-        else
+        else {
+        	learnerProgress.setCurrentActivity(null);
             learnerProgress.setLessonComplete(true);
+        }
 
         return learnerProgress;
     }
