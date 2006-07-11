@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
 	@Override
-	public void clearSession(HttpSession session, ToolAccessMode mode) {
+	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
 			session.removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
 			session.removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
