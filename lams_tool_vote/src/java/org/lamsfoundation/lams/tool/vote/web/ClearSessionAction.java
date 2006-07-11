@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 public class ClearSessionAction extends LamsAuthoringFinishAction implements VoteAppConstants {
 
 
-	public void clearSession(HttpSession session, ToolAccessMode mode) {
+	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 	    session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 		if(mode.isAuthor()){
 		    session.removeAttribute(TOOL_SERVICE);

@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
-	public void clearSession(HttpSession session, ToolAccessMode mode) {
+	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 		//only this tool save LAMS_AUTHORING_SUCCESS_FLAG into session, remove it!!!
 		session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 		if(mode.isAuthor()){

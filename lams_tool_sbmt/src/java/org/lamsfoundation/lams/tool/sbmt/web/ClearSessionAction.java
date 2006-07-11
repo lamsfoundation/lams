@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
 	@Override
-	public void clearSession(HttpSession session, ToolAccessMode mode) {
+	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
 			session.removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 			session.removeAttribute(SbmtConstants.ATTACHMENT_LIST);

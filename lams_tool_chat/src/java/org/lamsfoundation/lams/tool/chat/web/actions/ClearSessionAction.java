@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
 	@Override
-	public void clearSession(HttpSession session, ToolAccessMode mode) {
+	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
 //			session.removeAttribute(QaAction.SUBMIT_SUCCESS);
 		}

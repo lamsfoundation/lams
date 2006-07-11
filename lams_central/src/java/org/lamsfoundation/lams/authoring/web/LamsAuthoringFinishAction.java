@@ -62,6 +62,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	 
 	private static final String ACTION_NAME = "action";
 	private static final String ACTION_MODE = "mode";
+	private static final String CUSTOMISE_SESSION_ID = "customiseSessionID";
 	private static final String TOOL_SIGNATURE = "signature";
 	
 	private static final String CONFIRM_ACTION = "confirm";
@@ -78,12 +79,13 @@ public abstract class LamsAuthoringFinishAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String action = request.getParameter(ACTION_NAME);
 		String modeStr = request.getParameter(ACTION_MODE);
+		String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
 		if(StringUtils.equals(ToolAccessMode.AUTHOR.toString(),modeStr))
-			clearSession(request.getSession(),ToolAccessMode.AUTHOR);
+			clearSession(cSessionID,request.getSession(),ToolAccessMode.AUTHOR);
 		if(StringUtils.equals(ToolAccessMode.LEARNER.toString(),modeStr))
-			clearSession(request.getSession(),ToolAccessMode.LEARNER);
+			clearSession(cSessionID,request.getSession(),ToolAccessMode.LEARNER);
 		if(StringUtils.equals(ToolAccessMode.TEACHER.toString(),modeStr))
-			clearSession(request.getSession(),ToolAccessMode.TEACHER);
+			clearSession(cSessionID,request.getSession(),ToolAccessMode.TEACHER);
 		if(StringUtils.equals(action,CONFIRM_ACTION)){
 			String nextUrl = getLamsUrl() + "authoringConfirm.jsp";
 			String signature = request.getParameter(TOOL_SIGNATURE);
@@ -116,10 +118,11 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	 * All subclass will implements this method and execute clear <code>HttpSession</code> action to 
 	 * remove obsolete session values.
 	 * 
+	 * @param customiseSessionID customised session ID.
 	 * @param session
 	 * @param mode ToolAccessMode to decide which role's session will be clear.
 	 */
-	abstract public void clearSession(HttpSession session, ToolAccessMode mode);
+	abstract public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode);
 	
 	private String getLamsUrl(){
 		String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
