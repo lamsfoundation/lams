@@ -231,6 +231,10 @@ public class HomeAction extends DispatchAction {
 			HttpServletRequest req, HttpServletResponse res)
 			throws IOException, ServletException {
 		req.getSession().invalidate();
+		
+		//clear system shared session.
+		SessionManager.getSession().invalidate();
+		
 		return mapping.findForward("index");
 	}
 }
