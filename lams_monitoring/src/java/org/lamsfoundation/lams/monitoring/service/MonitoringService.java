@@ -787,21 +787,22 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	User learner = (User)baseDAO.find(User.class,learnerId);
         
        	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
+       	Activity stopActivity = null;
        	
-       	// check if activity is already complete
        	if ( activityId != null ) {
-       		Activity stopActivity = activityDAO.getActivityByActivityId(activityId);
+       		stopActivity = activityDAO.getActivityByActivityId(activityId);
        		if ( stopActivity == null ) {
        			throw new MonitoringServiceException("Activity missing. Activity id"+activityId);
        		}
+       		
+           	// check if activity is already complete
        		if ( learnerProgress != null && learnerProgress.getCompletedActivities().contains(stopActivity) ) {
        			return messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_ACTIVITY_DONE,new Object[]{stopActivity.getTitle()});
-       			
        		}
        	}
        	
        	Activity currentActivity = learnerProgress.getCurrentActivity();
-       	String stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, activityId, new ArrayList<Long>());
+       	String stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, stopActivity, new ArrayList<Long>());
        	return stopReason != null ? stopReason : messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
        	
 		
@@ -822,7 +823,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * As we process an activity, we stick it in touchedActivityIds. Then we check this list before forwarding to an activity - this will
      * stop us going into loops on the parallel activities and other complex activities that return to the parent activity after the child.
     */
-    private String forceCompleteActivity(User learner, Long lessonId, LearnerProgress progress, Activity activity, Long stopActivityId, ArrayList<Long> touchedActivityIds) {
+    private String forceCompleteActivity(User learner, Long lessonId, LearnerProgress progress, Activity activity, Activity stopActivity, ArrayList<Long> touchedActivityIds) {
     	
     	// TODO check performance - does it load the learner progress every time or do it load it from the cache.
        	String stopReason = null;
@@ -893,7 +894,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		Iterator iter = allActivities.iterator();
         		while(stopReason==null && iter.hasNext()){
         			Activity act = (Activity) iter.next();
-        			stopReason = forceCompleteActivity(learner, lessonId, progress, act, stopActivityId, touchedActivityIds);
+        			stopReason = forceCompleteActivity(learner, lessonId, progress, act, stopActivity, touchedActivityIds);
         		}
         		log.debug("Complex activity [" + activity.getActivityId() + "] is completed.");
        	}
@@ -901,12 +902,16 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         // complete to the given activity ID, then stop. To be sure, the given activity is forced to complete as well.
         // if we had stopped due to a subactivity, the stop reason will already be set.
         if ( stopReason == null ) {
-	        if(stopActivityId!= null && stopActivityId.equals(activity.getActivityId())){
-	        	//stop here
+           	LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
+        	if ( learnerProgress.getCompletedActivities().contains(stopActivity) ) {
+	        	// we have reached the stop activity. It may have been the activity we just processed 
+        		// or it may have been a parent activity (e.g. an optional activity) and completing its last 
+        		// child has triggered the parent activity to be completed. Hence we have to check the actual
+        		// completed activities list rather than just checking the id of the activity.
 	        	stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY,new Object[]{activity.getTitle()});
-	        } else {
-	           	LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
-	           	Activity nextActivity = learnerProgress.getCurrentActivity();
+
+        	} else {
+	           	Activity nextActivity = learnerProgress.getNextActivity();
 	           	
 	           	// now where?
 	           	if ( nextActivity == null || nextActivity.getActivityId().equals(activity.getActivityId()) ) {
@@ -918,7 +923,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	           		stopReason = null; // i.e. do nothing 
 	           	} else {
 	           		// no where else to go - keep on pressing on down the sequence then.
-	           		stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, nextActivity, stopActivityId, touchedActivityIds);
+	           		stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, nextActivity, stopActivity, touchedActivityIds);
 	           	} 
 	        }
         }
