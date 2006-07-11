@@ -92,7 +92,14 @@ public class UserAction extends LamsDispatchAction {
 		if(orgId != null) {
 		    request.setAttribute("org",orgId);
 		}
-				
+		
+		// remove sysadmin from role list for non-sysadmin users
+		User requestor = (User)service.getUserByLogin(request.getRemoteUser());
+		if(!service.isUserInRole(requestor.getUserId(),service.getRootOrganisation().getOrganisationId(),Role.SYSADMIN)){
+			Role sysadmin = new Role();
+			sysadmin.setRoleId(Role.ROLE_SYSADMIN);
+			allRoles.remove(sysadmin);
+		}
 		request.setAttribute("rolelist",allRoles);
 		request.setAttribute("locales",locales);
 		
