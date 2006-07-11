@@ -39,16 +39,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<head>
 		<title>LAMS</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<lams:css/>
-		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
-	  	<script language="JavaScript" type="text/JavaScript">
-	        <!--
-	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
-	            obj.className=new_style;
-	        }
-	        //-->
-	  </script>	
-	  
+		
+		<%-- if localFiles == true then wanted for export portfolio and must run offline --%>
+		<c:choose>
+		<c:when test="${localFiles == true}">
+			<lams:css localLinkPath="../"/>
+		</c:when>
+		<c:otherwise>
+			<lams:css/>
+			<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+		</c:otherwise>
+		</c:choose>
 	  </head>
 
 	<c:choose>

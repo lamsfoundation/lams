@@ -95,6 +95,7 @@ public class GroupingAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	public static final String GROUPS = "groups";
 	public static final String FINISHED_BUTTON = "finishedButton";
+	public static final String LOCAL_FILES= "localFiles";
 	public static final String TITLE = "title";
 	
     //---------------------------------------------------------------------
@@ -182,6 +183,7 @@ public class GroupingAction extends LamsDispatchAction
         
         request.setAttribute(GROUPS,groups);
         request.setAttribute(FINISHED_BUTTON,Boolean.TRUE);
+        request.setAttribute(LOCAL_FILES,Boolean.FALSE);
         request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
         request.setAttribute(TITLE,activity.getTitle());
         
@@ -220,6 +222,7 @@ public class GroupingAction extends LamsDispatchAction
         
         request.setAttribute(GROUPS,groups);
         request.setAttribute(FINISHED_BUTTON,Boolean.FALSE);
+        request.setAttribute(LOCAL_FILES,Boolean.TRUE);
         request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
         request.setAttribute(TITLE,activity.getTitle());
         
