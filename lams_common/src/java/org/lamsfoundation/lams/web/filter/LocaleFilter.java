@@ -53,7 +53,7 @@ public class LocaleFilter extends OncePerRequestFilter {
 	
 	//	private static final String DEFAULT_LANGUAGE = "en";
 //	private static final String DEFUALT_COUNTRY = "AU";
-	private static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
+	public static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
 	/**
 	 * Set the encoding to use for requests. This encoding will be
 	 * passed into a ServletRequest.setCharacterEncoding call.

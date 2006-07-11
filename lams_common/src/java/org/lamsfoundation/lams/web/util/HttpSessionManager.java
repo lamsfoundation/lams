@@ -25,17 +25,20 @@ package org.lamsfoundation.lams.web.util;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 
 /**
@@ -153,6 +156,16 @@ public class HttpSessionManager
 		HttpSession session= se.getSession();
 		session.setMaxInactiveInterval(timeout);
 		context = session.getServletContext();
+		
+        //set server default locale for STURTS and JSTL. This value should be overwrite 
+		//LocaleFilter class. But this part code can cope with login.jsp Locale.
+        if (session != null) {
+        	Locale preferredLocale = new Locale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
+            if (preferredLocale != null) {
+                session.setAttribute(LocaleFilter.PREFERRED_LOCALE_KEY, preferredLocale);
+                Config.set(session, Config.FMT_LOCALE, preferredLocale);
+            }
+        }		
 	}
 }
 
