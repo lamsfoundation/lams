@@ -13,7 +13,7 @@
 		</tr>
 	</table>
 
-	<c:if test="${MODE == 'learner'}">
+	<c:if test="${MODE == 'learner' || MODE == 'author'}">
 		<html:form action="/learning" method="post">
 			<div class="right-buttons">
 				<html:hidden property="dispatch" value="finishActivity" />

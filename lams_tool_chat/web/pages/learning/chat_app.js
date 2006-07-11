@@ -203,6 +203,9 @@ function handleConnected() {
         } else {
             document.getElementById("finishButton_pane").style.display = "";
         }
+    } 
+    if (MODE == "author") {
+    	document.getElementById("finishButton_pane").style.display = "";
     }
 
 	// send presence
