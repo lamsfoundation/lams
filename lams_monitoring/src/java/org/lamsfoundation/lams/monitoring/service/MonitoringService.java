@@ -465,6 +465,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    	
 	   		flashMessage = new FlashMessage("createLesson",Boolean.TRUE);
 		} catch (Exception e) {
+			log.error("Exception occured trying to create a lesson class ",e);
 			flashMessage = new FlashMessage("createLesson",
 					e.getMessage(),
 					FlashMessage.ERROR);
@@ -479,6 +480,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		
         return message;
     }
+    
     /**
      * <p>Pre-condition: This method must be called under the condition of the
      * 					 existance of new lesson (without lesson class).</p>
@@ -499,7 +501,18 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to create class for lesson.");
         }
        	checkOwnerOrStaffMember(userId, newLesson, "create lesson class");
-        
+
+       	// make sure lesson isn't started
+       	if ( newLesson.isLessonStarted() ) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" has been started. Unable to create/change class for lesson.");
+       	}
+       	
+        if ( newLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to create class for lesson.");
+        }
+
+       	LessonClass oldLessonClass = newLesson.getLessonClass();
+       	
         LessonClass newLessonClass = this.createLessonClass(organisation,
         													learnerGroupName,
                                                             organizationUsers,
@@ -511,6 +524,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         newLesson.setOrganisation(organisation);
         
         lessonDAO.updateLesson(newLesson);
+        
+        if ( oldLessonClass != null ) {
+        	lessonClassDAO.deleteLessonClass(oldLessonClass);
+        }
         
         return newLesson;
     }
