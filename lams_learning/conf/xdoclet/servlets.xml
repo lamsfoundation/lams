@@ -34,13 +34,7 @@
 		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
 	</servlet>
 	
-	<servlet>
-		<description>Tool does not support portfolio exports</description>
-		<display-name>Export Portfolio Unavailable</display-name>
-		<servlet-name>exportNotSupported</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportNotSupportedServlet</servlet-class>
-	</servlet>
-	
+
 
 	
 	
