@@ -477,4 +477,15 @@ public class Lesson implements Serializable {
     	return ( copyTypeID != null && LearningDesign.COPY_TYPE_PREVIEW == copyTypeID.intValue() );
     }
     
+    /** Has this lesson ever been started? Considered started if it is started, finished, archived or removed
+     * or if the previousLessonStateId is one of these states (to pick up suspended started)*/
+    public boolean isLessonStarted() {
+    	return  isStarted(lessonStateId) || isStarted(previousLessonStateId) ;
+    }
+
+    private boolean isStarted(Integer stateId) {
+    	return ( stateId != null && 
+    		( stateId.equals(STARTED_STATE) || stateId.equals(FINISHED_STATE) 
+    			|| stateId.equals(ARCHIVED_STATE) || stateId.equals(REMOVED_STATE) ) ) ;
+    }
 }
