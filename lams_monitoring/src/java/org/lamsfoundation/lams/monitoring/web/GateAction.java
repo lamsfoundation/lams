@@ -34,7 +34,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
@@ -93,7 +93,7 @@ public class GateAction extends LamsDispatchAction
 	// private static Logger log = Logger.getLogger(GateAction.class);
 	
 	private IMonitoringService monitoringService;
-	private ILearnerService learnerService;
+	private ICoreLearnerService learnerService;
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------

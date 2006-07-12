@@ -76,8 +76,6 @@ public class TestMonitoringAction extends AbstractLamsStrutsTestCase
         super.setUp();
         setConfigFile("/WEB-INF/struts/struts-config.xml");
         setRequestPathInfo("/monitoring.do");
-        
-        //learnerService =  (ILearnerService)this.wac.getBean("learnerService");
     }
 
     /*

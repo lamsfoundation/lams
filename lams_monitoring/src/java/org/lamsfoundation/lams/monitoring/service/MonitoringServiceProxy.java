@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import javax.servlet.ServletContext;
 
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -63,9 +63,9 @@ public class MonitoringServiceProxy
      * @param servletContext the servletContext for current application
      * @return learner service object.
      */
-    public static final ILearnerService getLearnerService(ServletContext servletContext)
+    public static final ICoreLearnerService getLearnerService(ServletContext servletContext)
     {
-        return (ILearnerService)getDomainService(servletContext,"learnerService");
+        return (ICoreLearnerService)getDomainService(servletContext,"learnerService");
     }
     /**
      * Retrieve the proper Spring bean from bean factory. 

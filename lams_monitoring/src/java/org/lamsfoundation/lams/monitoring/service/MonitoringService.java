@@ -42,7 +42,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -131,7 +131,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private ILearningDesignDAO learningDesignDAO;
     private IGroupingDAO groupingDAO;
     private IAuthoringService authoringService;
-    private ILearnerService learnerService;
+    private ICoreLearnerService learnerService;
     private ILessonService lessonService;
     private ILamsCoreToolService lamsCoreToolService;
     private IUserManagementService userManagementService;
@@ -186,7 +186,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * 
 	 * @param learnerService
 	 */
-	public void setLearnerService(ILearnerService learnerService) {
+	public void setLearnerService(ICoreLearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
 	/**
@@ -882,6 +882,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		ToolActivity toolActivity = (ToolActivity) activity;
         		try {
 					ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
+					if ( toolSession == null ) {
+						// grouped tool's tool session isn't created until the first user in the group reaches that 
+						// point the tool session creation is normally triggered by LoadTooLActivityAction, so we need 
+						// to do it here. Won't happen very often - normally another member of the group will have 
+						// triggered the creation of the tool session.
+						learnerService.createToolSessionsIfNecessary(toolActivity,progress);
+						toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
+					}
 					learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learner.getUserId().longValue()));
 	       			if ( log.isDebugEnabled()) {
 	       				log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
