@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -106,7 +106,7 @@ public class LearnerAction extends LamsDispatchAction
 	 * @param learnerService
 	 * @return
 	 */
-	protected FlashMessage handleException(Exception e, String methodKey, ILearnerService learnerService) {
+	protected FlashMessage handleException(Exception e, String methodKey, ICoreLearnerService learnerService) {
 		log.error("Exception thrown "+methodKey,e);
 		String[] msg = new String[1];
 		msg[0] = e.getMessage();
@@ -139,7 +139,7 @@ public class LearnerAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         FlashMessage message = null;
     	try {
@@ -204,7 +204,7 @@ public class LearnerAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         FlashMessage message = null;
     	try {
@@ -242,7 +242,7 @@ public class LearnerAction extends LamsDispatchAction
     {
 
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         FlashMessage message = null;
     	try {
@@ -311,7 +311,7 @@ public class LearnerAction extends LamsDispatchAction
 	        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
     		
 	        Integer learnerId = LearningWebUtil.getUserId();
-	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	        
 		    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID );
 		    LearnerProgressDTO learnerProgress = learnerService.getProgressDTOByLessonId(lessonId, learnerId);
@@ -367,7 +367,7 @@ public class LearnerAction extends LamsDispatchAction
 	        
 	        //initialize service object
 	        ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
-	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	
 	        //getting requested object according to coming parameters
 	        Integer learnerId = LearningWebUtil.getUserId();

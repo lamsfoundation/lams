@@ -24,12 +24,8 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export.service;
 
-import java.util.Iterator;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -57,7 +53,7 @@ public class TestExportPortfolioService extends AbstractLamsTestCase  {
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(TestExportPortfolioService.class);
 	
-    private ILearnerService learnerService;
+    private ICoreLearnerService learnerService;
     private IUserManagementService usermanageService;
     private ILessonDAO lessonDao; 
     private ILearnerProgressDAO learnerProgressDao;
@@ -111,7 +107,7 @@ public class TestExportPortfolioService extends AbstractLamsTestCase  {
 	protected void setUp() throws Exception
     {
         super.setUp();
-        learnerService = (ILearnerService)this.context.getBean("learnerService");
+        learnerService = (ICoreLearnerService)this.context.getBean("learnerService");
         usermanageService = (IUserManagementService)this.context.getBean("userManagementService");
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
         learnerProgressDao = (LearnerProgressDAO)this.context.getBean("learnerProgressDAO");

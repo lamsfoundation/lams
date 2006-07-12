@@ -50,9 +50,9 @@ public class LearnerServiceProxy
      * @param servletContext the servletContext for current application
      * @return learner service object.
      */
-    public static final ILearnerService getLearnerService(ServletContext servletContext)
+    public static final ICoreLearnerService getLearnerService(ServletContext servletContext)
     {
-        return (ILearnerService)getDomainService(servletContext,"learnerService");
+        return (ICoreLearnerService)getDomainService(servletContext,"learnerService");
     }
     
     /**

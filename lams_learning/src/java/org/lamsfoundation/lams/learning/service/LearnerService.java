@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * This class is a facade over the Learning middle tier.
  * @author chris, Jacky Fang
  */
-public class LearnerService implements ILearnerService
+public class LearnerService implements ICoreLearnerService
 {
     //---------------------------------------------------------------------
     // Instance variables
@@ -177,7 +177,7 @@ public class LearnerService implements ILearnerService
     //---------------------------------------------------------------------
     /**
      * Delegate to lesson dao to load up the lessons.
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
      */
     public LessonDTO[] getActiveLessonsFor(Integer learnerId)
     {
@@ -253,12 +253,44 @@ public class LearnerService implements ILearnerService
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
         }
         
-        createToolSessionsIfNecessary(learnerProgress);
         lessonService.cacheLessonUser(lesson, learner);
         return learnerProgress;
     }
     
-
+    /**
+     * This method navigate through all the tool activities for the given
+     * activity. For each tool activity, we look up the database
+     * to check up the existance of correspondent tool session. If the tool 
+     * session doesn't exist, we create a new tool session instance.
+     * 
+     * @param learnerProgress the learner progress we are processing.
+     * @throws LamsToolServiceException
+     */
+    public void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress) 
+    {
+        if(activity!=null) {
+        
+	        try
+	        {
+	            for(Iterator i = activity.getAllToolActivities().iterator();i.hasNext();)
+	            {
+	            	ToolActivity toolActivity =  (ToolActivity)i.next();
+	           		createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
+	            }
+	        }
+	        catch (LamsToolServiceException e)
+	        {
+	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+	    		throw new LearnerServiceException(e.getMessage());
+	        }
+	        catch (ToolException e)
+	        {
+	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+	    		throw new LearnerServiceException(e.getMessage());
+	        }
+        }
+    }
+    
 
     /**
      * Returns the current progress data of the User. 
@@ -273,7 +305,7 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getProgressById(java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getProgressById(java.lang.Long)
      */
     public LearnerProgress getProgressById(Long progressId)
     {
@@ -281,7 +313,7 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getProgressDTOByLessonId(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getProgressDTOByLessonId(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
     public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId)
     {
@@ -289,7 +321,7 @@ public class LearnerService implements ILearnerService
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity)
      */
     public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity) 
     {
@@ -320,8 +352,6 @@ public class LearnerService implements ILearnerService
         {
             learnerProgress = progressEngine.calculateProgress(learnerProgress.getUser(), completedActivity,learnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
-            
-            createToolSessionsIfNecessary(learnerProgress);
         }
         catch (ProgressException e)
         {
@@ -336,18 +366,19 @@ public class LearnerService implements ILearnerService
      */
     public String completeToolSession(Long toolSessionId, Long learnerId) 
     {
-        //update tool session state in lams
-        ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
+    	// this method is called by tools, so it mustn't do anything that relies on all the tools' Spring beans
+    	// being available in the context. Hence it is defined in the ILearnerService interface, not the IFullLearnerService
+    	// interface. If it calls any other methods then it mustn't use anything on the ICoreLearnerService interface.
     	
+        ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
         toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
-        
         lamsCoreToolService.updateToolSession(toolSession);
         
         return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, java.lang.Long)
      */
     public String completeActivity(Integer learnerId,Long activityId) {
     	Activity activity = getActivity(activityId);
@@ -355,7 +386,7 @@ public class LearnerService implements ILearnerService
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
      */
     public String completeActivity(Integer learnerId,Activity activity)
     {
@@ -373,7 +404,7 @@ public class LearnerService implements ILearnerService
     
     /**
      * Exit a lesson.
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
      */
     public void exitLesson(Long progressId)
     {
@@ -390,7 +421,7 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActivity(java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActivity(java.lang.Long)
      */
     public Activity getActivity(Long activityId)
     {
@@ -399,7 +430,7 @@ public class LearnerService implements ILearnerService
     
     /**
      * @throws LearnerServiceException 
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(java.lang.Long, java.lang.Long, java.lang.Integer)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#performGrouping(java.lang.Long, java.lang.Long, java.lang.Integer)
      */
     public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping) throws LearnerServiceException
     {
@@ -445,7 +476,7 @@ public class LearnerService implements ILearnerService
     	
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
     public boolean knockGate(Long gateActivityId, User knocker, boolean forceGate) {
     	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateActivityId, GateActivity.class);
@@ -458,7 +489,7 @@ public class LearnerService implements ILearnerService
 		throw new LearnerServiceException(error);
     }
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#knockGate(org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User)
      */
     public boolean knockGate(GateActivity gate, User knocker, boolean forceGate)
     {
@@ -489,7 +520,7 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getLearnerActivityURL(java.lang.Integer, java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getLearnerActivityURL(java.lang.Integer, java.lang.Long)
      */
    public String getLearnerActivityURL(Integer learnerId, Long activityId) {    
     	User learner = (User)userManagementService.findById(User.class,learnerId);
@@ -499,7 +530,7 @@ public class LearnerService implements ILearnerService
     }
     
    /**
-    * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLearnersByLesson(long)
+    * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActiveLearnersByLesson(long)
     */
    public List getActiveLearnersByLesson(long lessonId)
    {
@@ -507,7 +538,7 @@ public class LearnerService implements ILearnerService
    }
    
    /**
-    * @see org.lamsfoundation.lams.learning.service.ILearnerService#getCountActiveLessonLearners(long)
+    * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getCountActiveLessonLearners(long)
     */
    public Integer getCountActiveLearnersByLesson(long lessonId)
    {
@@ -528,43 +559,7 @@ public class LearnerService implements ILearnerService
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
-    /**
-     * This method navigate through all the tool activities included inside
-     * the next activity. For each tool activity, we look up the database
-     * to check up the existance of correspondent tool session. If the tool 
-     * session doesn't exist, we create a new tool session instance.
-     * 
-     * @param learnerProgress the learner progress we are processing.
-     * @throws LamsToolServiceException
-     */
-    private void createToolSessionsIfNecessary(LearnerProgress learnerProgress) 
-    {
-    	// getNextActivity will be null if we have finished the top part of a parallel activity.
-    	
-        if(learnerProgress.getNextActivity()!=null) {
-        
-	        Activity nextActivity = learnerProgress.getNextActivity();
-	        try
-	        {
-	            for(Iterator i = nextActivity.getAllToolActivities().iterator();i.hasNext();)
-	            {
-	            	ToolActivity toolActivity =  (ToolActivity)i.next();
-	           		createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
-	            }
-	        }
-	        catch (LamsToolServiceException e)
-	        {
-	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
-	    		throw new LearnerServiceException(e.getMessage());
-	        }
-	        catch (ToolException e)
-	        {
-	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
-	    		throw new LearnerServiceException(e.getMessage());
-	        }
-        }
-    }
-    
+
     /**
      * <p>Create a lams tool session for learner against a tool activity. This will
      * have concurrency issues interms of grouped tool session because it might 
@@ -582,9 +577,8 @@ public class LearnerService implements ILearnerService
      */
     private void createToolSessionFor(ToolActivity toolActivity,User learner,Lesson lesson) throws LamsToolServiceException, ToolException
     {
+        // if the tool session already exists, createToolSession() will return null
         ToolSession toolSession = lamsCoreToolService.createToolSession(learner,toolActivity,lesson);
-        
-        // if the tool session already exists, will return null
         if ( toolSession !=null ) {
 	        toolActivity.getToolSessions().add(toolSession);
 	        lamsCoreToolService.notifyToolsToCreateSession(toolSession, toolActivity);

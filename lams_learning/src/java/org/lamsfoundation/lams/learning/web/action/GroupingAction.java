@@ -37,7 +37,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -132,7 +132,7 @@ public class GroupingAction extends LamsDispatchAction
         boolean forceGroup = WebUtil.readBooleanParam(request,PARAM_FORCE_GROUPING,false);
 
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
         validateLearnerProgress(learnerProgress);
         
@@ -171,7 +171,7 @@ public class GroupingAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
      
         SortedSet groups = new TreeSet(new GroupComparator());
 
@@ -209,7 +209,7 @@ public class GroupingAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
      
         SortedSet groups = new TreeSet(new GroupComparator());
 
@@ -248,7 +248,7 @@ public class GroupingAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
 

@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -72,7 +72,7 @@ public class LearningWebUtil
      * Helper method to retrieve the user data. Gets the id from the user details
      * in the shared session then retrieves the real user object.
      */
-    public static User getUser(ILearnerService learnerService)
+    public static User getUser(ICoreLearnerService learnerService)
     {
         HttpSession ss = SessionManager.getSession();
         UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -100,7 +100,7 @@ public class LearningWebUtil
 	 * If the learner progress id isn't available, then we have to look it up using activity 
 	 * based on the activity / activity id in the request. 
 	 */
-	public static LearnerProgress getLearnerProgress(HttpServletRequest request, ILearnerService learnerService) {
+	public static LearnerProgress getLearnerProgress(HttpServletRequest request, ICoreLearnerService learnerService) {
 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		if ( learnerProgress != null ) {
 			if ( log.isDebugEnabled() ) {
@@ -148,7 +148,7 @@ public class LearningWebUtil
      * @return
      */
     public static Activity getActivityFromRequest(HttpServletRequest request,
-                                                  ILearnerService learnerService)
+                                                  ICoreLearnerService learnerService)
     {
         Activity activity = (Activity)request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
         
@@ -170,7 +170,7 @@ public class LearningWebUtil
      * @param activity
      */
     public static void putActivityInRequest(HttpServletRequest request, Activity activity,
-                                                  ILearnerService learnerService)
+                                                  ICoreLearnerService learnerService)
     {
         Activity realActivity = learnerService.getActivity(activity.getActivityId());
         request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);

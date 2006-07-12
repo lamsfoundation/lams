@@ -99,7 +99,6 @@ public class MainExportServlet extends HttpServlet {
 		Cookie[] cookies = request.getCookies();	
 
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this.getServletContext());
-		// ILearnerService learnerService = LearnerServiceProxy.getLearnerService(this.getServletContext());
 		
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		

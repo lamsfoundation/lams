@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.learning.export.ActivityPortfolio;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.Portfolio;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -81,7 +81,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     
 	private ILamsCoreToolService lamsCoreToolService;
 	private IActivityDAO activityDAO;
-    private ILearnerService learnerService;
+    private ICoreLearnerService learnerService;
     private IBaseDAO baseDAO;
     private ILessonDAO lessonDAO;
     protected MessageService messageService;
@@ -90,7 +90,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	/**
 	 * @param learnerService The learnerService to set.
 	 */
-	public void setLearnerService(ILearnerService learnerService) {
+	public void setLearnerService(ICoreLearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
 	

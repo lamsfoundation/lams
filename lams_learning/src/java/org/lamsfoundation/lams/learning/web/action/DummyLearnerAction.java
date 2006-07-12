@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -103,7 +103,7 @@ public class DummyLearnerAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get learner.
         Integer learner = LearningWebUtil.getUserId();
@@ -141,7 +141,7 @@ public class DummyLearnerAction extends LamsDispatchAction
                                                                           ServletException
     {
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get user and lesson based on request.
         Integer learner = LearningWebUtil.getUserId();

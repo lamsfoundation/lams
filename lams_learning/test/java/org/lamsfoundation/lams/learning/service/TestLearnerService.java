@@ -63,7 +63,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(TestLearnerService.class);
 	
-    private ILearnerService learnerService;
+    private ICoreLearnerService learnerService;
     private IUserManagementService usermanageService;
     private ILessonDAO lessonDao; 
     private ILearnerProgressDAO learnerProgressDao;
@@ -115,7 +115,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        learnerService = (ILearnerService)this.context.getBean("learnerService");
+        learnerService = (ICoreLearnerService)this.context.getBean("learnerService");
         usermanageService = (IUserManagementService)this.context.getBean("userManagementService");
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
         learnerProgressDao = (LearnerProgressDAO)this.context.getBean("learnerProgressDAO");

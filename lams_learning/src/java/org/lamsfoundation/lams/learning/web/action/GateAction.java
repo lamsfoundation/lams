@@ -34,7 +34,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -125,7 +125,7 @@ public class GateAction extends LamsDispatchAction
         Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
         
         //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         Activity activity = learnerService.getActivity(activityId);
         Lesson lesson = learnerService.getLessonByActivity(activity);
         User learner = LearningWebUtil.getUser(learnerService);

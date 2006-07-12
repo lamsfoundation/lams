@@ -25,10 +25,8 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -50,7 +48,7 @@ public class TestGateAction extends AbstractTestAction
     private static final String TEST_LEARNER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
     
-    private ILearnerService learnerService;
+    private ICoreLearnerService learnerService;
 
     private static final String TEST_GATE_ACTIVITY_ID = "31";
     /**
@@ -70,7 +68,7 @@ public class TestGateAction extends AbstractTestAction
         setConfigFile("/WEB-INF/struts/struts-config.xml");
         setRequestPathInfo("/gate.do");
         
-        learnerService =  (ILearnerService)this.wac.getBean("learnerService");
+        learnerService =  (ICoreLearnerService)this.wac.getBean("learnerService");
     }
 
     /*

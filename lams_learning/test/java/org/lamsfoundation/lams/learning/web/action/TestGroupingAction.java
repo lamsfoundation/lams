@@ -26,11 +26,10 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -49,7 +48,7 @@ public class TestGroupingAction extends AbstractTestAction
     private static final String TEST_LEARNER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
     private static Activity groupingActivity;
-    private ILearnerService learnerService;
+    private ICoreLearnerService learnerService;
     /**
      * @param arg0
      * @param arg1
@@ -68,7 +67,7 @@ public class TestGroupingAction extends AbstractTestAction
         setConfigFile("/WEB-INF/struts/struts-config.xml");
         setRequestPathInfo("/grouping.do");
         
-        learnerService =  (ILearnerService)this.wac.getBean("learnerService");
+        learnerService =  (ICoreLearnerService)this.wac.getBean("learnerService");
     }
 
     /*
