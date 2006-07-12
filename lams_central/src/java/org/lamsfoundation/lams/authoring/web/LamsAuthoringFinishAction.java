@@ -80,12 +80,15 @@ public abstract class LamsAuthoringFinishAction extends Action {
 		String action = request.getParameter(ACTION_NAME);
 		String modeStr = request.getParameter(ACTION_MODE);
 		String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
-		if(StringUtils.equals(ToolAccessMode.AUTHOR.toString(),modeStr))
-			clearSession(cSessionID,request.getSession(),ToolAccessMode.AUTHOR);
+
+		//clear session according to the ToolAccessMode.
 		if(StringUtils.equals(ToolAccessMode.LEARNER.toString(),modeStr))
 			clearSession(cSessionID,request.getSession(),ToolAccessMode.LEARNER);
-		if(StringUtils.equals(ToolAccessMode.TEACHER.toString(),modeStr))
+		else if(StringUtils.equals(ToolAccessMode.TEACHER.toString(),modeStr))
 			clearSession(cSessionID,request.getSession(),ToolAccessMode.TEACHER);
+		else //if(StringUtils.equals(ToolAccessMode.AUTHOR.toString(),modeStr)) : default value
+			clearSession(cSessionID,request.getSession(),ToolAccessMode.AUTHOR);
+		
 		if(StringUtils.equals(action,CONFIRM_ACTION)){
 			String nextUrl = getLamsUrl() + "authoringConfirm.jsp";
 			String signature = request.getParameter(TOOL_SIGNATURE);
