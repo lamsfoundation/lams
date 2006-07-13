@@ -33,7 +33,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.tool.chat.util.SessionMap;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * @struts.form name="authoringForm"
