@@ -71,6 +71,7 @@ public class IndexAction extends Action {
 
 	private static IUserManagementService service;
 	
+	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.debug("User:"+request.getRemoteUser());
 		List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
@@ -120,6 +121,7 @@ public class IndexAction extends Action {
 		return mapping.findForward("index");
 	}
 
+	@SuppressWarnings({"unchecked","static-access"})
 	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin) {
 		log.debug("creating orgBean for org:"+org.getName());
 		User user = (User)getService().findByProperty(User.class, "login",username).get(0);
