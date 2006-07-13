@@ -23,12 +23,19 @@
 
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import mx.utils.*
+import mx.controls.*
+import mx.behaviors.*
+import mx.core.*
+import mx.events.*
+import mx.effects.*
 
 /**
 * Controller for the sequence library
@@ -49,18 +56,113 @@ class MonitorController extends AbstractController {
 		_monitorModel = MonitorModel(model);
 		_monitorController = this;
 		_isBusy = false;
-		//get a view if ther is not one
-		//if(!_lessonTabView){
-		//	_lessonTabView =  LessonTabView(getView());
-		//}
+		
 	}
 	
-	public function activityClick(ca:Object):Void{
+	public function activityClick(act:Object, forObj:String):Void{
 		//if (ca.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
-			
-			Debugger.log('activityClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityClick','MonitorController');
-		//}
+		if (forObj == "LearnerIcon"){
+			_monitorModel.isDragging = true;
+			act.startDrag(false);
+			//Cursor.showCursor(Application.C_WHITEARROW);
+			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
+		}
    }
+   
+	public function activityRelease(act:Object, forObj:String):Void{
+		Debugger.log('activityRelease CanvasActivity:'+act.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
+		if (forObj == "LearnerIcon"){
+			var hasHit:Boolean = false;
+			var actUIIDToCompare = act.activity.activityUIID;
+			if (act.activity.parentUIID != null){
+				var parentAct:Activity = _monitorModel.getMonitor().ddm.getActivityByUIID(act.activity.parentUIID)
+				actUIIDToCompare = parentAct.activityUIID;
+				
+			}
+			var indexArray:Array = _monitorModel.activitiesOnCanvas()	//setDesignOrder();
+			var currentActOrder:Number = checkLearnerCurrentActivity(indexArray, actUIIDToCompare)
+			if(_monitorModel.isDragging){
+				act.stopDrag();
+			}
+			trace("current activity order: "+currentActOrder)
+			//run a loop to check which activity has been hitted by the learner.
+			for (var i=0; i<indexArray.length; i++){ 
+				trace("acitity "+i+" in loop is: "+indexArray[i].activity.title)
+				if (act.hitTest(indexArray[i])){
+					var actHitOrder:Number = checkLearnerCurrentActivity(indexArray, indexArray[i].activity.activityUIID)
+					//if learner is on the next activity - get new progress data.
+					if (actHitOrder > currentActOrder){
+						
+						var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+act.Learner.getLearnerId()+"&activityID="+indexArray[i-1].activity.activityID
+						var ref = this;
+						var fnOk:Function = Proxy.create(ref,reloadProgress, ref, URLToSend);
+						var fnCancel:Function = Proxy.create(ref,activitySnapBack, act);
+						LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[act.Learner.getFullName(), indexArray[i].activity.title]), fnOk,fnCancel);
+						
+					}else if (actHitOrder == currentActOrder || actHitOrder < currentActOrder){
+						activitySnapBack(act)
+						var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[act.Learner.getFullName(), indexArray[i].activity.title]) ;
+						LFMessage.showMessageAlert(msg);
+					}
+				hasHit = true;
+				break;
+				}
+				
+			}
+			if (act.hitTest(_monitorModel.endGate)){
+				_monitorModel.endGate.doorClosed._visible = false;
+				_monitorModel.endGate.doorOpen._visible = true;
+				var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+act.Learner.getLearnerId()+"&activityID=null";
+				var ref = this;
+				var fnOk:Function = Proxy.create(ref,reloadProgress, ref, URLToSend);
+				var fnCancel:Function = Proxy.create(ref,activitySnapBack, act);
+				LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_tofinish',[act.Learner.getFullName(), indexArray[i].activity.title]), fnOk,fnCancel);
+				hasHit = true;
+			}
+			if (!hasHit){
+				activitySnapBack(act)
+				var msg:String = Dictionary.getValue('al_error_forcecomplete_notarget',[act.Learner.getFullName()]) ;
+				LFMessage.showMessageAlert(msg);
+			}
+		}
+		
+	}
+	
+	private function reloadProgress(ref, URLToSend){
+		var callback:Function = Proxy.create(ref, getProgressData);
+		Application.getInstance().getComms().getRequest(URLToSend,callback, false);
+						
+		
+	}
+	private function activitySnapBack(act:Object){
+		act._x = act.xCoord;
+		act._y = act.yCoord;
+		_monitorModel.endGate.doorClosed._visible = true;
+		_monitorModel.endGate.doorOpen._visible = false;
+	}
+	
+	private function getProgressData(r){
+		trace('force complete ok');
+		if(r instanceof LFError) {
+			r.showErrorAlert();
+		} else if(r) {
+			LFMessage.showMessageAlert(r);
+			_monitorModel.broadcastViewUpdate("RELOADPROGRESS", null, _monitorModel.getSelectedTab())
+		}
+	}
+	
+	private function checkLearnerCurrentActivity(arr:Array, actUIID:Number):Number{
+		for (var i=0; i<arr.length; i++){
+			//trace("activity "+ i +" is "+arr[i].activity.title)
+			if (arr[i].activity.activityUIID == actUIID){
+				return i
+			}
+		}
+	}
+	
+	public function activityReleaseOutside(ca:Object):Void{
+	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
+	}
    
 	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number):Void{
 		var _learnerID:Number;
@@ -90,22 +192,11 @@ class MonitorController extends AbstractController {
 		//Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','MonitorModel');
 		
 		JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
-			
-		//}else{
-			//TODO: Show the property inspector if its a parralel activity or whatever
-		//}
-	  
+
 	   clearBusy()
 	}
    
-   public function activityRelease(ca:Object):Void{
-	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
-	    
-	}
-	
-   public function activityReleaseOutside(ca:Object):Void{
-	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
-   }
+   
 	// add control methods
 	
 	/**
@@ -223,30 +314,7 @@ class MonitorController extends AbstractController {
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeClose','org.lamsfoundation.lams.MonitorController');
 		var treeview = evt.target;
     }
-	/**
-	public function onTreeNodeChange (evt:Object){
-		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeChange','org.lamsfoundation.lams.MonitorController');
-		var treeview = evt.target;
-		if(!_isBusy){
-			setBusy();
-			_monitorModel.setSelectedTreeNode(treeview.selectedNode);
-		} else {
-			treeview.selectedNode = _monitorModel.getSelectedTreeNode();
-		}
-	}
-	*/
-	
-	/**
-	public function selectTreeNode(node:XMLNode){
-		if(node!=null){
-			if(!_isBusy){
-			//	setBusy();
-			//	_monitorModel.setSelectedTreeNode(node);
-			}
-		}
-	}
-	*/
-	
+		
 	/**
 	 * Save Lesson Class after Lesson is initialized
 	 *  
