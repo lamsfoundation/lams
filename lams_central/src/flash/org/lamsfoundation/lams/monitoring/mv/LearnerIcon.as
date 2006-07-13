@@ -57,8 +57,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private var app:Application;
 	//locals
 	private var toolTip:MovieClip;
-	private var learnerOffset_X:Number = 4
-	private var learnerOffset_Y:Number = 3
+	private var learnerOffset_X:Number
+	private var learnerOffset_Y:Number
 	private var click_mc:MovieClip;
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -85,20 +85,25 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	public function init(initObj):Void{
-		click_mc.onRollOver = Proxy.create (this, localOnRollOver);
-		click_mc.onRollOut = Proxy.create (this, localOnRollOut);
-		click_mc.onPress = Proxy.create (this, localOnPress);
-		click_mc.onRelease = Proxy.create (this, localOnRelease);
-		click_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
-		
 		if(initObj){
 			_monitorView = initObj._monitorView;
 			_monitorController = initObj._monitorController;
 			_activity = initObj.activity;
 			learner = initObj.learner;
+			learnerOffset_X = initObj._x
+			learnerOffset_Y = initObj._y
 		}
-		
+		learnerOffset_X = _x
+		learnerOffset_Y = _y
 		showAssets(false);
+		//Click, Rollover and rollout Events for Learner Icon;
+		click_mc.onRollOver = Proxy.create (this, localOnRollOver);
+		click_mc.onRollOut = Proxy.create (this, localOnRollOut);
+		if (_activity != undefined){
+			click_mc.onPress = Proxy.create (this, localOnPress);
+			click_mc.onRelease = Proxy.create (this, localOnRelease);
+			click_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		}
 		
 		setStyles();
 		MovieClipUtils.doLater(Proxy.create(this,draw));
@@ -122,16 +127,10 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private function draw(){
 		
 		//Code for Drawing learner on the activty. 
-		
-		//trace("value of _Module in Canvas Activity: "+_module)
-		//trace("Monitor Model is: "+_monitorController.getModel())
-		
+				
 		Debugger.log('Learner is in Activity: '+_activity.title,4,'draw','LearnerIcon');
 		setStyles();
-		//position
-		//_x = xCoord;
-		//_y = yCoord;
-		toolTip.text = learner.getUserName();
+		toolTip.text = learner.getFullName();
 
 		
 		//Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
@@ -152,7 +151,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 				//Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.GEN,'onPress','CanvasActivity For Monitoring');
 				var _learnerID:Number = learner.getLearnerId()
 				_monitorController.activityDoubleClick(_activity, "MonitorTabViewLearner", _learnerID);
-				
+						
 			}
 			
 			
@@ -160,7 +159,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			
 			_doubleClicking = false;
 			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
-			//_monitorController.activityClick(this);
+			_monitorController.activityClick(this, "LearnerIcon");
+			
 		}
 		
 		_dcStartTime = now;
@@ -181,8 +181,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private function localOnRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
-			//	trace("Activity ID is: "+this.activity.activityUIID)	
-				_monitorController.activityRelease(this);
+			//	trace("Activity ID is: "+this.activity.activityUIID);
+				_monitorController.activityRelease(this, "LearnerIcon");
 		}
 	}
 	
@@ -192,6 +192,48 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	
+	public function get xCoord():Number{
+		return learnerOffset_X;
+	}
+	
+	public function get yCoord():Number{
+		return learnerOffset_Y;
+	}
+	public function get Learner():Progress{
+		return getLearner();
+	}
+	
+	public function set Learner(a:Progress){
+		setLearner(a);
+	}
+	
+	
+	public function getLearner():Progress{
+		return learner;
+
+	}
+	
+	public function setLearner(a:Progress){
+		learner = a;
+	}
+	
+	public function get activity():Activity{
+		return getActivity();
+	}
+	
+	public function set activity(a:Activity){
+		setActivity(a);
+	}
+	
+	
+	public function getActivity():Activity{
+		return _activity;
+
+	}
+	
+	public function setActivity(a:Activity){
+		_activity = a;
+	}
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and applies them
 	 * directly to the instanced
