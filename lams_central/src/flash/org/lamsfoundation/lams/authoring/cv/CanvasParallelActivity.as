@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
+import org.lamsfoundation.lams.common.style.*;
 import mx.controls.*;
 import mx.managers.*
 
@@ -62,7 +63,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var padlockClosed_mc:MovieClip;
 	private var padlockOpen_mc:MovieClip;
 	
-	
+	private var learnerOffset_X:Number = 4
+	private var learnerOffset_Y:Number = 3
 	private var _ddm:DesignDataModel;
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -123,8 +125,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			child2.yCoord = CHILD2_OFFSET_Y;
 		//so now it is placed on in the IDE and we just call init
 		if (fromModuleTab == "monitorMonitorTab"){
-			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorTabView});
-			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorTabView});
+			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring"});
+			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring"});
 				
 		}else {
 			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
@@ -175,7 +177,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		if(fromModuleTab == "monitorMonitorTab"){
 			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 		trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
-		
+			var learner_X = _activity.xCoord + learnerOffset_X;
+			var learner_Y = _activity.yCoord + learnerOffset_Y;
 		// get the length of learners from the Monitor Model and run a for loop.
 			for (var j=0; j<mm.allLearnersProgress.length; j++){
 				var learner:Object = new Object();
@@ -185,8 +188,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 				
 				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
 				if (isLearnerCurrentAct){
+					if (learner_X > (_activity.xCoord + 112)){
+						learner_X = _activity.xCoord + learnerOffset_X 
+						learner_Y = 27
+					}
+					
+					trace("this._parent is "+this._parent)
 					trace(_activity.title+": is the learner's current Activity.")
-					this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{name_lbl:learner.getUserName()});
+					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
+					learner_X = learner_X+10
 				}else {
 					trace(_activity.title+": is not the learner's current Activity.")
 				}
