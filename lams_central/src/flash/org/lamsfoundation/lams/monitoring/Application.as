@@ -167,6 +167,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
+		//Cursor.addCursor(C_WHITEARROW);
 		//Cursor.addCursor(C_OPTIONAL);
 		//Cursor.addCursor(C_TRANSITION);
 		//Cursor.addCursor(C_GATE);
@@ -498,42 +499,19 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         var w:Number = Stage.width;
         var h:Number = Stage.height;
 		
-		//var someListener:Object = new Object();
-		//someListener.onMouseUp = function () {
+		var someListener:Object = new Object();
+		someListener.onMouseUp = function () {
 			
 		//Menu - only need to worry about width
         _menu_mc.setSize(w,_menu_mc.height);
-
-        //MONITOR
-        //_monitor.setSize(w-_lessons.width,h-MONITOR_Y);
-        //_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
-
-        //Toolbar
-        //_toolbar.setSize(null,_toolbar.height);
-		//Property Inspector
-		//var pi = _canvas.getPropertyInspector();
-		//pi._y = h;//- pi._height;
-		//pi._y = h - 210;
-		
-		//}
-		//Mouse.addListener(someListener);
-       
-       //Canvas
-	   //_lessons.setSize(_lessons.width,h-LESSONS_Y);
-        _monitor.setSize(w-MONITOR_X,h-MONITOR_Y);
+		//MONITOR
+		_monitor.setSize(w-15,h-_menu_mc._height);
         
-
-        //Toolbar
-        //_toolbar.setSize(w,_toolbar.height);
-		//Property Inspector
-		//var pi = _canvas.getPropertyInspector();
-		//pi._y = h;//- pi._height;
-		//pi._y = h - 210;
-		
-		
-		
-		
-		
+		}
+       _menu_mc.setSize(w,_menu_mc.height);
+       //MONITOR
+       _monitor.setSize(w,h-MONITOR_Y);
+	   trace("Stage Width "+w+" and height "+h)
     }
 	
 	/**
@@ -542,9 +520,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	
 	public function transition_keyPressed(){
 		_controlKeyPressed = "transition";
-		//if(_canvas.model.activeTool != "TRANSITION"){
-		//	_canvas.toggleTransitionTool();
-		//}
+		
 	}
 	public function showDebugger():Void{
 		_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
@@ -707,11 +683,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     * Handles KEY presses for Application
     */
     private function onKeyDown(){
-		
-		//var mouseListener:Object = new Object();
-        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
-        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
-		//the debug window:
         if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
             if (!_debugDialog.content){
                 showDebugger();
