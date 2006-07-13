@@ -41,7 +41,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
 	private var CHILD_INCRE : Number = 60;
-	
+	private var learnerOffset_X:Number = 4
+	private var learnerOffset_Y:Number = 3
 	//this is set by the init object
 	private var _canvasController : CanvasController;
 	private var _canvasView : CanvasView;
@@ -191,14 +192,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 
 		if(fromModuleTab == "monitorMonitorTab"){
 			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
-			// get the length of learners from the Monitor Model and run a for loop.
+		trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
+			var learner_X = _activity.xCoord + learnerOffset_X;
+			var learner_Y = _activity.yCoord + learnerOffset_Y;
+		// get the length of learners from the Monitor Model and run a for loop.
 			for (var j=0; j<mm.allLearnersProgress.length; j++){
 				var learner:Object = new Object();
 				learner = mm.allLearnersProgress[j]
+				
 				//Gets a true if learner's currect activityID matches this activityID else false.
+				
 				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
 				if (isLearnerCurrentAct){
-					//this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{name_lbl:learner.getUserName()});
+					if (learner_X > (_activity.xCoord + 112)){
+						learner_X = _activity.xCoord + learnerOffset_X 
+						learner_Y = 27
+					}
+					
+					trace("this._parent is "+this._parent)
+					trace(_activity.title+": is the learner's current Activity.")
+					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
+					learner_X = learner_X+10
 				}else {
 					trace(_activity.title+": is not the learner's current Activity.")
 				}
