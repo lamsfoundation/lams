@@ -69,8 +69,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var listCount:Number = 0; 
 	private var requiredTaskList:Array = new Array();
 	private var _monitorReqTask_mc:MovieClip;
+	private var monitorLesson_scp:MovieClip;
 	private var reqTasks_scp:MovieClip;
 	private var monitorTabs_tb:MovieClip;
+	private var _monitorLesson_mc:MovieClip;
 	private var _lessonStateArr:Array;
 	private var bkg_pnl:MovieClip;
 	
@@ -127,17 +129,20 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	* Constructor
 	*/
 	function LessonTabView(){
+		trace("loaded lesson tab view")
 		_lessonTabView = this;
 		this._visible = false;
 		_tm = ThemeManager.getInstance();
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
+		MovieClipUtils.doLater(Proxy.create(this,init));
 	}
 	
 	/**
 	* Called to initialise Canvas  . CAlled by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller){
+		trace("called Lesson Tab Init")
 		super (m, c);
 		btnLabel = Dictionary.getValue('td_goContribute_btn');
 		MovieClipUtils.doLater(Proxy.create(this,setupTab));
@@ -276,6 +281,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		this.onEnterFrame = setupLabels;
 		
 		//get the content path for the sp
+		//_monitorLesson_mc = monitorLesson_scp.contentPath = this;
 		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
 		
@@ -732,7 +738,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
-		bkg_pnl.setSize(s.w-20,s.h);
+		//bkg_pnl.setSize(s.w-20,s.h);
 		lessonManager.setSize(s.w-20,lessonManager._height);
 		taskManager.setSize(s.w-20,lessonManager._height);
 		//qTasks_scp.setSize(s.w._width,reqTasks_scp._height);
