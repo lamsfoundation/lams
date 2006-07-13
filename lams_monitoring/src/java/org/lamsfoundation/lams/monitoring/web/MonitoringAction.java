@@ -46,9 +46,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -75,7 +72,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class MonitoringAction extends LamsDispatchAction
 {
-	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 	
 	//---------------------------------------------------------------------
     // Instance variables
