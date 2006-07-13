@@ -40,10 +40,10 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -122,6 +122,7 @@ public class IndexAction extends Action {
 
 	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin) {
 		log.debug("creating orgBean for org:"+org.getName());
+		User user = (User)getService().findByProperty(User.class, "login",username).get(0);
 		IndexOrgBean orgBean = new IndexOrgBean(org.getName(), org.getOrganisationType().getOrganisationTypeId());
 		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
 		if(isSysAdmin){
@@ -145,22 +146,24 @@ public class IndexAction extends Action {
 		List<IndexLessonBean> lessonBeans = new ArrayList<IndexLessonBean>();
 		Set<Lesson> lessons = org.getLessons();
 		for(Lesson lesson:lessons) {
-			if(!lesson.isPreviewLesson()){
-				List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
-				if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
-					if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
-						lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
+			if(isInLesson(user,lesson)){
+				if(!lesson.isPreviewLesson()){
+					List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
+					if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
+						if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
+							lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
+						}
 					}
-				}
-				if(contains(roles,Role.ROLE_LEARNER)){
-					log.debug("Lesson State:"+lesson.getLessonStateId());
-					if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
-						lessonLinks.add(new IndexLinkBean("index.participate","javascript:openLearner("+lesson.getLessonId()+")"));
+					if(contains(roles,Role.ROLE_LEARNER)){
+						log.debug("Lesson State:"+lesson.getLessonStateId());
+						if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
+							lessonLinks.add(new IndexLinkBean("index.participate","javascript:openLearner("+lesson.getLessonId()+")"));
+						}
 					}
-				}
-				if(lessonLinks.size()>0){
-					IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
-					lessonBeans.add(lessonBean);
+					if(lessonLinks.size()>0){
+						IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
+						lessonBeans.add(lessonBean);
+					}
 				}
 			}
 		}
@@ -183,6 +186,10 @@ public class IndexAction extends Action {
 			orgBean.setChildIndexOrgBeans(childOrgBeans);
 		}
 		return orgBean;
+	}
+
+	private boolean isInLesson(User user, Lesson lesson) {
+		return lesson.getLessonClass().isStaffMember(user)||lesson.getLessonClass().getLearners().contains(user);
 	}
 
 	private boolean contains(List<Integer> roles, Integer roleId) {
