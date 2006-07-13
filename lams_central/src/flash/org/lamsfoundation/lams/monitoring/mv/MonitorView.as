@@ -106,10 +106,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		_monitorView = this;
 		_tm = ThemeManager.getInstance();
 		
-		//_dictionary = Dictionary.getInstance();
-		//_dictionary.addEventListener('init',Proxy.create(this,setLabels));
-		
-        //Init for event delegation
+		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
 	
@@ -144,16 +141,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	 */
 	public function update (o:Observable,infoObj:Object):Void{
 		
-       var mm:MonitorModel = MonitorModel(o);
-	   _monitorController = getController();
+		var mm:MonitorModel = MonitorModel(o);
+		_monitorController = getController();
 
-	   switch (infoObj.updateType){
-		   case 'SEQUENCE' :
-				trace("TabID for Selected tab is: "+infoObj.tabID)
-				//showData(mm);
-				//removeActivity(infoObj.removeData, mm)
-                break;
-            case 'POSITION' :
+		switch (infoObj.updateType){
+			case 'POSITION' :
 				setPosition(mm);
                 break;
             case 'SIZE' :
@@ -188,20 +180,20 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
-		
+		trace("Height of learnerMenuBar: "+learnerMenuBar._height)
 		var mcontroller = getController();
 		
-		//get the content path for the sp
+		//get the content path for Tabs
 		_monitor_mc = monitor_scp.content;
 		
-		trace("Height of learnerMenuBar: "+learnerMenuBar._height)
-		
 		_lessonTabLayer_mc = _monitor_mc.createEmptyMovieClip("_lessonTabLayer_mc", _monitor_mc.getNextHighestDepth());
-		_monitorTabLayer_mc = _monitor_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitor_mc.getNextHighestDepth());
-		_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
-		_learnerTabLayer_mc = _monitor_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		
-		//var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}, {label:Dictionary.getValue('mtab_todo'), data:"todo"}];
+		
+		_monitorTabLayer_mc = _monitor_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitor_mc.getNextHighestDepth());
+		
+		_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
+		
+		_learnerTabLayer_mc = _monitor_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		
 		var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}];
 		
@@ -269,7 +261,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	 * directly to the instance  
 	 */
 	private function setStyles():Void{
-		var styleObj = _tm.getStyleObject('CanvasPanel');
+		var styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('scrollpane');
 		monitor_scp.setStyle('styleName',styleObj);
@@ -294,6 +286,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
 		bkg_pnl.setSize(s.w,s.h);
+		trace("Monitor View Stage Width "+s.w+" and Monitor View Stage height "+s.h)
+		trace("Monitor View bg panel Width "+bkg_pnl.width+" and Monitor View bg panel height "+bkg_pnl.height)
 		monitor_scp.setSize(s.w-monitor_scp._x,s.h-monitor_scp._y);
 		exportPortfolio_btn._x = s.w - 260;
 		refresh_btn._x = s.w - 160
