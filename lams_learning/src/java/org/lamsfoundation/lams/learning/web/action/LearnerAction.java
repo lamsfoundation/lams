@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -77,10 +78,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
- * @struts:action-forward name="welcome" path=".welcome"
- * @struts:action-forward name="exit" path="/exit.do"
- * 
+ * @struts:action-forward name="displayActivity" path="/DisplayActivity.do" 
  * ----------------XDoclet Tags--------------------
  * 
  */
@@ -95,10 +93,18 @@ public class LearnerAction extends LamsDispatchAction
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
     private static final String DISPLAY_ACTIVITY = "displayActivity";
-    private static final String WELCOME = "welcome";
-    private static final String EXIT = "exit";
     
-	/** Handle an exception - either thrown by the service or by the web layer. Allows the exception
+	private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url) throws IOException, ServletException {
+		if ( url != null ) {
+			  String fullURL = WebUtil.convertToFullURL(url);
+			  response.sendRedirect(response.encodeRedirectURL(fullURL));
+		} else {
+			  throw new ServletException("Tried to redirect to url but url is null");
+		}
+		return null;
+	 }
+
+	  /** Handle an exception - either thrown by the service or by the web layer. Allows the exception
 	 * to be logged properly and ensure that an actual message goes back to Flash.
 	 * 
 	 * @param e
@@ -216,8 +222,8 @@ public class LearnerAction extends LamsDispatchAction
 	        
 	        learnerService.exitLesson(learnerProgress.getLearnerProgressId());
 	        
-	        //send acknowledgment to flash as it is triggerred by flash
-	        message = new FlashMessage("exitLesson",mapping.findForward(EXIT).getPath());
+	        //send acknowledgment to flash as it is triggered by flash
+	        message = new FlashMessage("exitLesson",true);
 
     	} catch (Exception e ) {
     		message = handleException(e, "exitLesson", learnerService);
@@ -361,25 +367,13 @@ public class LearnerAction extends LamsDispatchAction
 
         FlashMessage message = null;
     	try {
-	
-	        //get parameter
-	        long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
-	        
-	        //initialize service object
-	        ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
-	        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-	
-	        //getting requested object according to coming parameters
-	        Integer learnerId = LearningWebUtil.getUserId();
-	        User learner = (User)LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(User.class,learnerId);
 
-	        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
+    		// get the activity id and calculate the url for this activity.
+	        long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
+	        String url = getLearnerActivityURL(request, activityId); 
 	        
-	        //preparing tranfer object for flash
-	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
-	        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),
-	                 activityMapping.calculateActivityURLForProgressView(learnerProgress.getLesson(),learner,requestedActivity));
 	        //send data back to flash.
+	        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),url);
 	        message = new FlashMessage("getLearnerActivityURL",activityDTO);
 
     	} catch (Exception e ) {
@@ -392,5 +386,54 @@ public class LearnerAction extends LamsDispatchAction
         
         response.getWriter().print(wddxPacket);
         return null;
+    }
+
+	/**
+	 * @param request
+	 * @param activityId
+	 * @return
+	 */
+	private String getLearnerActivityURL(HttpServletRequest request, long activityId) {
+		//initialize service object
+		ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+		//getting requested object according to coming parameters
+		Integer learnerId = LearningWebUtil.getUserId();
+		User learner = (User)LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(User.class,learnerId);
+
+		Activity requestedActivity = learnerService.getActivity(new Long(activityId));
+		Lesson lesson = learnerService.getLessonByActivity(requestedActivity);
+		String url = activityMapping.calculateActivityURLForProgressView(lesson,learner,requestedActivity);
+		return url;
+	}
+    
+    /**
+     * Gets the same url as getLearnerActivityURL() but forwards directly to the url, rather than 
+     * returning the url in a Flash packet.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward forwardToLearnerActivityURL(ActionMapping mapping,
+                                               ActionForm form,
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) throws IOException,
+                                                                          	ServletException
+    {
+        long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
+        if(log.isDebugEnabled())
+            log.debug("Forwarding to the url for learner activity..."+activityId);
+        
+        String url = getLearnerActivityURL(request, activityId);
+       	return redirectToURL(mapping, response, url);
     }
 }
