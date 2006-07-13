@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
@@ -39,7 +40,7 @@ import mx.managers.*
 import mx.containers.*;
 import mx.events.*
 import mx.utils.*
-import mx.controls.TabBar;
+import mx.controls.*;
 
 
 /**
@@ -55,6 +56,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private var GRID_WIDTH:Number;
 	private var H_GAP:Number;
 	private var V_GAP:Number;
+	private var endGateOffset:Number = 60;
+	private var learner_X:Number = 22;
+	private var learner_Y:Number = 19;
 	private var drawDesignCalled:String;
 	
 	private var _tm:ThemeManager;
@@ -63,6 +67,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	
 	//Canvas clip
 	//private var _monitor_mc:MovieClip;
+	private var lessonEnd_lbl:Label;
+	private var finishedLearnersList:Array;
+	private var bg_pnl:MovieClip;
+	private var doorClosed:MovieClip;
+	private var doorOpen:MovieClip;
+	private var bar_pnl:MovieClip;
 	private var learnerMenuBar:MovieClip;
 	private var monitorTabs_tb:MovieClip;
 	private var _monitorTabViewContainer_mc:MovieClip;
@@ -71,6 +81,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private var _transitionLayer_mc:MovieClip;
 	private var _activityLayerComplex_mc:MovieClip;
 	private var _activityLayer_mc:MovieClip;
+	private var endGate_mc:MovieClip;
 	
 	//private var _transitionPropertiesOK:Function;
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
@@ -125,6 +136,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 				case 'TABCHANGE' :
 					trace("isChanged value in monitorModel is: "+mm.getIsProgressChanged())
 					if (infoObj.tabID == _tabID){
+						setStyles();
 						this._visible = true;
 						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
@@ -152,7 +164,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 				case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID){
 						trace("called Reload progress")
-						reloadProgress()
+						reloadProgress(true)
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
@@ -186,8 +198,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 				
 				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID){
+						setStyles();
+						setSize(mm);
 						drawDesignCalled = "called";
 						trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
+						showEndGateData(mm);
 						mm.drawDesign(infoObj.tabID);
 						//mm.setIsProgressChanged(false);
 					}
@@ -216,10 +231,37 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);	
 		trace("Loaded MonitorTabView Data"+ this)
 		//setSize (mm)
+		 var s:Object = mm.getSize();
+		endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
+		mm.endGate(endGate_mc);
+		mm.endGate = endGate_mc;
 		
+		//_activityLayer_mc.endgate
 		setStyles();
 		
 		dispatchEvent({type:'load',target:this});
+	}
+	
+	private function showEndGateData(mm:MonitorModel):Void{
+		endGate_mc.doorClosed._visible = true
+		var mc = getController();
+		var finishedLearners:Number = 0; 
+		finishedLearnersList = new Array();
+		var totalLearners:Number = mm.allLearnersProgress.length;
+		for (var i=0; i<mm.allLearnersProgress.length; i++){
+			if (mm.allLearnersProgress[i].isLessonComplete()){
+				var learner:Object = new Object();
+				learner = mm.allLearnersProgress[i]
+				trace("Learner passed is: "+learner.getFullName())
+				var temp_mc = _activityLayer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _activityLayer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y)});
+				finishedLearnersList.push(temp_mc);
+				var learnerIcon_mc = _activityLayer_mc["learnerIcon"+learner.getUserName()]
+				learnerIcon_mc.init();
+				finishedLearners++;
+			}
+		}
+		endGate_mc.lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
+		//setSize(mm);
 	}
 	
 	
@@ -235,7 +277,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	 * @return  nothing
 	 */
 	private function reloadProgress(isChanged:Boolean){
-		
+			var s:Object = mm.getSize();
 			trace("reloading Progress data for Learners")
 			drawDesignCalled = undefined
 			
@@ -243,11 +285,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 			
 			_transitionLayer_mc.removeMovieClip();
 			_activityLayer_mc.removeMovieClip();
-			
+			endGate_mc.removeMovieClip();
 			//Recreate both Transition holder and Activity holder Movieclips
 			_transitionLayer_mc = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 			_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			
+			endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 			
 			if (isChanged == false){
 				mm.setIsProgressChanged(false);
@@ -298,7 +341,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity,mm:MonitorModel):Boolean{
-		Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
+		Debugger.log('The activity:'+a.title+','+a.activityID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		var s:Boolean = false;
 		
 		var mtv = MonitorTabView(this);
@@ -330,7 +373,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
 		s = true;
-		//mm.getMonitor().getMV().getMonitorScp().redraw(true); 
+		
 		return s;
 	}
 	
@@ -367,6 +410,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private function setStyles():Void{
 		var styleObj = _tm.getStyleObject('CanvasPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('WZPanel');
+		endGate_mc.bg_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('BGPanel');
+		endGate_mc.bar_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('EndGatelabel');
+		endGate_mc.lessonEnd_lbl.setStyle('styleName',styleObj);
 	}
 	
 	/**
@@ -376,10 +425,16 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
         var s:Object = mm.getSize();
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		//monitor_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(s.w,s.h);
-		//learnerMenuBar.help_btn._x = s.w - 80;
+		bkg_pnl.setSize(s.w-17,s.h-17);
+		endGate_mc._y = s.h-endGateOffset;
+		endGate_mc.bg_pnl.setSize(s.w-17,endGate_mc.bg_pnl.height);
+		endGate_mc.bar_pnl.setSize(s.w-37,endGate_mc.bar_pnl.height);
+		for (var i=0; i<finishedLearnersList.length; i++){
+			finishedLearnersList[i]._y = endGate_mc._y+learner_Y
+		}
+		mm.getMonitor().getMV().getMonitorScp().redraw(true); 
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
+		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-17),Math.round(s.h-17),V_GAP,H_GAP);
 				
 	}
 	
@@ -392,6 +447,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
         this._x = p.x;
         this._y = p.y;
+		
 	}
 	
 	
@@ -405,14 +461,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		return MonitorController(c);
 	}
 	
-	public function getMonitorTab():MovieClip{
-		return monitorTabs_tb;
-	}
-	 /*
+	/*
     * Returns the default controller for this view.
     */
     public function defaultController (model:Observable):Controller {
         return new MonitorController(model);
     }
+	
+	public function getEndGate():MovieClip{
+		return endGate_mc;
+	}
 	
 }
