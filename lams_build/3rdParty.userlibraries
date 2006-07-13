@@ -98,5 +98,7 @@
 <archive path="/lams_build/lib/jfreechart/jfreechart-1.0.1.jar"/>
 <archive path="/lams_build/lib/jfreechart/gnujaxp.jar"/>
 <archive path="/lams_build/lib/jfreechart/jcommon-1.0.0.jar"/>
+<archive path="/lams_build/lib/smack/smack.jar"/>
+<archive path="/lams_build/lib/smack/smackx.jar"/>
 </library>
 </eclipse-userlibraries>
