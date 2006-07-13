@@ -140,11 +140,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
 
-		// add the sessionMap to the HttpServletRequest
-		// TODO workaround until we can figure out how to get request
-		// attributes using dynamic attributes in jsps.
-		request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
-
 		return mapping.findForward("success");
 	}
 
@@ -192,6 +187,9 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,
 				Boolean.TRUE);
+		
+		// add the sessionMapID to form
+		authForm.setSessionMapID(map.getSessionID());
 
 		return mapping.findForward("success");
 	}

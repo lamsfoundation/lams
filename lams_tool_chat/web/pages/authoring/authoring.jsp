@@ -31,17 +31,16 @@
 		<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
 		<lams:TabBody id="3" titleKey="button.instructions" page="instructions.jsp" />
 
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}"/>	
+
 		<c:set var="defineLater" value="no" />
-		<c:if test="${requestScope.sessionMap.mode == 'teacher'}">
+		<c:if test="${sessionMap.mode == 'teacher'}">
 			<c:set var="defineLater" value="yes" />
 		</c:if>
-
-		<%-- Form Controls --%>
-		<!-- Button Row -->
-
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lachat11" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" toolContentID="${formBean.toolContentID}"
-			accessMode="${requestScope.sessionMap.mode}" defineLater="${defineLater}" />
+			accessMode="${sessionMap.mode}" defineLater="${defineLater}" customiseSessionID="${sessionMap.sessionID}"/>
 
 	</html:form>
 </div>
