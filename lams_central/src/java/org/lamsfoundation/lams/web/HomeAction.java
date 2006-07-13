@@ -37,13 +37,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -68,9 +68,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class HomeAction extends DispatchAction {
 	
 	private static Logger log = Logger.getLogger(HomeAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-	private static UserManagementService service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
 	
+	private static IUserManagementService service;
+	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
+	}
+
 	private UserDTO getUser() {
 		HttpSession ss = SessionManager.getSession();
 		return (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -92,7 +100,7 @@ public class HomeAction extends DispatchAction {
 			if ( user == null ) {
 				log.error("admin: User missing from session. ");
 				return mapping.findForward("error");
-			} else if ( service.isUserInRole(user.getUserID(),orgId,Role.SYSADMIN)) {
+			} else if ( getService().isUserInRole(user.getUserID(),orgId,Role.SYSADMIN)) {
 				log.debug("user is sysadmin");
 				return mapping.findForward("sysadmin");
 			} else {
@@ -208,7 +216,7 @@ public class HomeAction extends DispatchAction {
 				return mapping.findForward("error");
 			} else { 
 				Integer orgId = classId != null ? classId : courseId;
-				if (service.isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
+				if (getService().isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
 					log.debug("user is staff");
 					String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 					req.setAttribute("serverUrl", serverUrl);

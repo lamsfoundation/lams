@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.cache.CacheManager;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -59,18 +58,7 @@ public class CacheAction extends LamsDispatchAction {
 	public static final String NODE_KEY = "node";
 	
 	private static Logger log = Logger.getLogger(CacheAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-	private static CacheManager manager = (CacheManager) ctx.getBean("cacheManager");
-	//private static UserManagementService service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
-	
-	/*
-	private boolean isUserInRole(String login,int orgId, String roleName)
-	{
-		if (service.getUserOrganisationRole(login, new Integer(orgId),roleName)==null)
-			return false;
-		return true;
-	} */
-	
+	private static CacheManager manager;
     /**
 	 * request for sysadmin environment
 	 */
@@ -100,7 +88,7 @@ public class CacheAction extends LamsDispatchAction {
 				return mapping.findForward("error");
 			} */
 			
-			Map items = manager.getCachedItems();
+			Map items = getManager().getCachedItems();
 			req.setAttribute(CACHE_ENTRIES, items);
 			return mapping.findForward("cache");
 			
@@ -140,9 +128,9 @@ public class CacheAction extends LamsDispatchAction {
 			} */
 
 			String node = WebUtil.readStrParam(req, NODE_KEY, false);
-			manager.clearCache(node);
+			getManager().clearCache(node);
 			
-			Map items = manager.getCachedItems();
+			Map items = getManager().getCachedItems();
 			req.setAttribute(CACHE_ENTRIES, items);
 			return mapping.findForward("cache");
 			
@@ -151,4 +139,13 @@ public class CacheAction extends LamsDispatchAction {
 			return mapping.findForward("error");
 		}
 	}
+	
+	private CacheManager getManager(){
+		if(manager==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			manager = (CacheManager) ctx.getBean("cacheManager");
+		}
+		return manager;
+	}
+
 }

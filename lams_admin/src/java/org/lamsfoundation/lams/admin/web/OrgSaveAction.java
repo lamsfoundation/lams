@@ -22,8 +22,6 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -41,13 +39,11 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
-import org.lamsfoundation.lams.usermanagement.Workspace;
-import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -81,13 +77,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class OrgSaveAction extends Action {
 	
 	private static Logger log = Logger.getLogger(OrgSaveAction.class);
-	
-	private static WebApplicationContext ctx = WebApplicationContextUtils
-	.getWebApplicationContext(HttpSessionManager.getInstance()
-			.getServletContext());
 
-	private static IUserManagementService service = (IUserManagementService) ctx
-	.getBean("userManagementServiceTarget");
+	private static IUserManagementService service;
 
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -110,10 +101,10 @@ public class OrgSaveAction extends Action {
 
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
+			SupportedLocale locale = (SupportedLocale)getService().findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
 
 			if(orgId!=0){
-				org = (Organisation)service.findById(Organisation.class,orgId);
+				org = (Organisation)getService().findById(Organisation.class,orgId);
 				BeanUtils.copyProperties(org,orgForm);
 				org.setLocaleCountry(locale.getCountryIsoCode());
 				org.setLocaleLanguage(locale.getLanguageIsoCode());
@@ -122,13 +113,13 @@ public class OrgSaveAction extends Action {
 				BeanUtils.copyProperties(org,orgForm);
 				org.setLocaleCountry(locale.getCountryIsoCode());
 				org.setLocaleLanguage(locale.getLanguageIsoCode());
-				org.setParentOrganisation((Organisation)service.findById(Organisation.class,(Integer)orgForm.get("parentId")));
-				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
+				org.setParentOrganisation((Organisation)getService().findById(Organisation.class,(Integer)orgForm.get("parentId")));
+				org.setOrganisationType((OrganisationType)getService().findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 			}
 			
 			log.debug("orgId:"+org.getOrganisationId()+" language:"+org.getLocaleLanguage()+" Country:"+org.getLocaleCountry()+" create date:"+org.getCreateDate());
-			org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
-			org = service.saveOrganisation(org, user.getUserID());
+			org.setOrganisationState((OrganisationState)getService().findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
+			org = getService().saveOrganisation(org, user.getUserID());
 			
 			request.setAttribute("org",orgForm.get("parentId"));
 			return mapping.findForward("orglist");
@@ -137,4 +128,13 @@ public class OrgSaveAction extends Action {
 			return mapping.findForward("organisation");
 		}
 	}
+	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
+	}
+	
 }

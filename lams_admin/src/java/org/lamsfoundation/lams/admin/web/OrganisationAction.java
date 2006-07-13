@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -63,27 +62,14 @@ public class OrganisationAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(OrganisationAction.class);
 
-	private static WebApplicationContext ctx = WebApplicationContextUtils
-			.getWebApplicationContext(HttpSessionManager.getInstance()
-					.getServletContext());
-
-	private static IUserManagementService service = (IUserManagementService) ctx
-			.getBean("userManagementServiceTarget");
-
-	//private static List countries = service.findAll(Country.class);
+	private static IUserManagementService service;
+	private static List<SupportedLocale> locales; 
+	private static List status;
 	
-	private static List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
-	
-	private static List status = service.findAll(OrganisationState.class);
-	
-	static{
-		Collections.sort(locales);
-	}
-
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		if(orgId != null){//editing existing organisation
-			Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+			Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 			DynaActionForm orgForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(orgForm,org);
 			log.debug("Struts Pupulated orgId:"+(Integer)orgForm.get("orgId"));
@@ -96,7 +82,7 @@ public class OrganisationAction extends LamsDispatchAction {
 			if(org.getLocaleCountry()!=null){
 				properties.put("countryIsoCode",org.getLocaleCountry());
 			}
-			SupportedLocale locale = (SupportedLocale)service.findByProperties(SupportedLocale.class,properties).get(0);
+			SupportedLocale locale = (SupportedLocale)getService().findByProperties(SupportedLocale.class,properties).get(0);
 			orgForm.set("localeId",locale.getLocaleId());
 		}
 		//request.getSession().setAttribute("countries",countries);
@@ -107,10 +93,21 @@ public class OrganisationAction extends LamsDispatchAction {
 
 	public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		service.deleteById(Organisation.class,orgId);
+		getService().deleteById(Organisation.class,orgId);
 		Integer parentId = WebUtil.readIntParam(request,"parentId");
 		request.setAttribute("org",parentId);
 		return mapping.findForward("orglist");
+	}
+
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			locales = service.findAll(SupportedLocale.class);
+			status = service.findAll(OrganisationState.class);
+			Collections.sort(locales);
+		}
+		return service;
 	}
 
 } // end Action

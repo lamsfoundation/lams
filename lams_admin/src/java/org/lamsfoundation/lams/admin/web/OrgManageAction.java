@@ -38,14 +38,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -73,8 +72,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class OrgManageAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(OrgManageAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-	private static IUserManagementService service = (IUserManagementService)ctx.getBean("userManagementServiceTarget");
+	
+	private static IUserManagementService service;
+
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -93,7 +93,7 @@ public class OrgManageAction extends Action {
 		}
 		String username = request.getRemoteUser();
 		OrgListDTO orgManageForm = new OrgListDTO();
-		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 		log.debug("orgId:"+orgId);
 		if(org==null){
 			errors.add("org",new ActionMessage("error.org.invalid"));
@@ -109,7 +109,7 @@ public class OrgManageAction extends Action {
 		orgManageForm.setType(org.getOrganisationType().getOrganisationTypeId());
 		log.debug("orgType:"+orgManageForm.getType());
 		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
-		//if(service.isUserSysAdmin(username)){
+		//if(getService().isUserSysAdmin(username)){
 		if(request.isUserInRole(Role.SYSADMIN)){
 			Integer type;
 			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){
@@ -117,7 +117,7 @@ public class OrgManageAction extends Action {
 			}else{
 				type = OrganisationType.CLASS_TYPE;
 			}
-			List organisations = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",type);
+			List organisations = getService().findByProperty(Organisation.class,"organisationType.organisationTypeId",type);
 			log.debug("user is sysadmin");
 			log.debug("Got "+organisations.size()+" organsiations");
 			log.debug("organisationType is "+type);
@@ -134,7 +134,7 @@ public class OrgManageAction extends Action {
 				orgManageBeans.add(orgManageBean);
 			}
 		}else{
-			Set userOrganisations = service.getUserByLogin(username).getUserOrganisations();
+			Set userOrganisations = getService().getUserByLogin(username).getUserOrganisations();
 			if(userOrganisations!=null){
 				Iterator iter = userOrganisations.iterator();
 				while(iter.hasNext()){
@@ -163,6 +163,14 @@ public class OrgManageAction extends Action {
 		orgManageForm.setOrgManageBeans(orgManageBeans);
 		request.setAttribute("OrgManageForm",orgManageForm);
 		return mapping.findForward("orglist");
+	}
+
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
 	}
 
 }

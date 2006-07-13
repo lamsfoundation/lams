@@ -42,8 +42,8 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -66,12 +66,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name="index" path="/indexContent.jsp"
  */
 public class IndexAction extends Action {
+
 	private static Logger log = Logger.getLogger(IndexAction.class);
 
-	private static WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-
-	private static UserManagementService service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
-
+	private static IUserManagementService service;
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.debug("User:"+request.getRemoteUser());
 		List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
@@ -80,7 +79,7 @@ public class IndexAction extends Action {
 		if (request.isUserInRole(Role.SYSADMIN)) {
 			log.debug("user is sysadmin");
 			headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
-			headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + service.getRootOrganisation().getOrganisationId()+")"));
+			headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+")"));
 		}
 		if (request.isUserInRole(Role.AUTHOR)) {
 			log.debug("user is author");
@@ -92,18 +91,18 @@ public class IndexAction extends Action {
 		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
 		if (request.isUserInRole(Role.SYSADMIN)) {
 			List<Integer> roles = new ArrayList<Integer>();
-			List<Organisation> organisations = service.getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
+			List<Organisation> organisations = getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
 			log.debug("we got "+organisations.size()+" organisations whose type is "+OrganisationType.COURSE_DESCRIPTION+" and whose state is "+OrganisationState.ACTIVE);
 			roles.add(Role.ROLE_SYSADMIN);
 			for (Organisation org:organisations) {
-				List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
+				List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
 				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
 					roles.add(userOrganisationRole.getRole().getRoleId());
 				}
 				orgBeans.add(createOrgBean(org, roles, request.getRemoteUser(),true));
 			}
 		} else {
-			List<UserOrganisation> userOrganisations = service.getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE);
+			List<UserOrganisation> userOrganisations = getService().getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE);
 			log.debug("we got "+userOrganisations.size()+" organisations whose type is "+OrganisationType.COURSE_DESCRIPTION+" and whose state is "+OrganisationState.ACTIVE);
 			for (UserOrganisation userOrganisation: userOrganisations) {
 				List<Integer> roles = new ArrayList<Integer>();
@@ -174,7 +173,7 @@ public class IndexAction extends Action {
 			for(Organisation organisation:children){
 				if(organisation.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ACTIVE)){
 					List<Integer> classRoles = new ArrayList<Integer>();
-					List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(organisation.getOrganisationId(),username);
+					List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(organisation.getOrganisationId(),username);
 					for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
 						classRoles.add(userOrganisationRole.getRole().getRoleId());
 					}
@@ -196,4 +195,11 @@ public class IndexAction extends Action {
 		return false;
 	}
 	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
+	}
 }
