@@ -310,4 +310,16 @@
 				todir="${jboss.deploy}"/>
 	</target>
 
+	<!-- ================================= -->
+	<!--  target: synchronize-jsp          -->            
+	<!--  ================================= -->
+	<target name="synchronize-deploy" description="copy non-java file into deploy folder - war must be expanded. Do not overwrite the web.xml">
+		<copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.*" />
+				<exclude name="WEB-INF/web.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
 </project>
