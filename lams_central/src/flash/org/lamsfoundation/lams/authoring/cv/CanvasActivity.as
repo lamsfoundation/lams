@@ -63,7 +63,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	//locals
 	private var learnerOffset_X:Number = 4
 	private var learnerOffset_Y:Number = 3
-	private var onActivityLearnerArray:Array;
 	private var _module:String;
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
@@ -80,7 +79,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _visibleHeight:Number;
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
-	private var bgNegative:Boolean = false;
+	private var bgNegative:String = "original";
 	
 	
 	
@@ -117,7 +116,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
 		if(initObj){
-			
+			_module = initObj._module;
 			if (_module == "monitoring"){
 				_monitorView = initObj._monitorView;
 				_monitorController = initObj._monitorController;
@@ -158,7 +157,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @return  
 	 */
 	public function refresh(setNegative:Boolean):Void{
-		bgNegative = setNegative;
+		bgNegative = String(setNegative);
 		trace("called from PI")
 		setStyles();
 		draw();
@@ -250,11 +249,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		trace("value of _Module in Canvas Activity: "+_module)
 		trace("Monitor Model is: "+_monitorController.getModel())
 		if (_module == "monitoring"){
-			onActivityLearnerArray = new Array();
+			var ref = this._parent;
 			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
 			var learner_X = _activity.xCoord + learnerOffset_X;
 			var learner_Y = _activity.yCoord + learnerOffset_Y;
+			var parentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(_activity.parentUIID)
 			// get the length of learners from the Monitor Model and run a for loop.
 			for (var j=0; j<mm.allLearnersProgress.length; j++){
 				var learner:Object = new Object();
@@ -264,25 +264,26 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				
 				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
 				if (isLearnerCurrentAct){
-					//onActivityLearnerArray.push(learner)
 					
 					if (learner_X > (_activity.xCoord + 112)){
 						learner_X = _activity.xCoord + learnerOffset_X 
-						learner_Y = 27 
+						learner_Y = 27
 					}
 					
 					trace(_activity.title+": is the learner's current Activity.")
 					trace("this._parent is "+this._parent)
-					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
-					//var learnerIcon = this["learnerIcon"+learner.getUserName()]
-					//learnerIcon.click_mc.onRollOver = function (){
-					//	trace("I am: "+onActivityLearnerArray[learner.getUserName()])
-					//}
+					
+					if (_activity.parentUIID != null && parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
+						ref = this._parent._parent;
+						learner_X = learner_X + this._parent._x
+						learner_Y = learner_Y + this._parent._y
+					}else if (_activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+						ref = this._parent._parent;
+						
+					}
+					
+					ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
 					learner_X = learner_X+10
-					//learnerOffset_X = _activity.xCoord;
-					
-					
-					
 				}else {
 					trace(_activity.title+": is not the learner's current Activity.")
 				}
@@ -495,17 +496,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @return  
 	 */
 	private function setStyles() {
-		var styleObj = _tm.getStyleObject('label');
-		
-		title_lbl.setStyle('styleName',styleObj);
+		var my_color:Color = new Color(this);
+		var transNegative = {ra:-100, ga:-100, ba:-100, rb:255, gb:255, bb:255};
+		var transPositive = {ra:100, ga:100, ba:100, rb:0, gb:0, bb:0};
 		title_lbl.setStyle('textAlign', 'center');
-		if (bgNegative){
-			styleObj = _tm.getStyleObject('ACTPanelNegative')
-		}else {
+		if (bgNegative == "true"){
+			my_color.setTransform(transNegative);
+		}else if(bgNegative == "false"){
+			my_color.setTransform(transPositive);
+		}else if(bgNegative == "original"){
+			var styleObj = _tm.getStyleObject('label');
+			title_lbl.setStyle('styleName',styleObj);
 			styleObj = _tm.getStyleObject('ACTPanel')
+			act_pnl.setStyle('styleName',styleObj);
 		}
 		
-		act_pnl.setStyle('styleName',styleObj);
+		
 			
     }
     
