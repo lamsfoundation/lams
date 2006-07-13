@@ -59,6 +59,7 @@ class MonitorModel extends Observable{
 	private var _learnersLoaded:Boolean;
 	private var _isProgressChanged:Boolean;
 	private var _isSequenceSet:Boolean = false;
+	private var _isDragging:Boolean;
 	
 	private var _monitor:Monitor;
 	
@@ -70,7 +71,7 @@ class MonitorModel extends Observable{
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
 	// state data
 	private var _showLearners:Boolean;
-	
+	private var _endGate:MovieClip;
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
@@ -297,6 +298,19 @@ class MonitorModel extends Observable{
 		return _showLearners;
 	}
 
+
+	public function activitiesOnCanvas():Array{
+		//_activitiesDisplayed
+		//var _ddm.getActivityByUIID(Activity.OPTIONAL_ACTIVITY_TYPE)
+		var actAll:Array = new Array();
+		var k:Array = _activitiesDisplayed.values();
+		//trace("findOptionalActivities Called "+k.length )
+		for (var i=0; i<k.length; i++){
+			actAll.push(k[i]);
+				trace("find the activity with id:"+k[i].activity.activityUIID )			
+		}
+		return actAll
+	}
 	/**
 	 * Compares the design in the CanvasModel (what is displayed on the screen) 
 	 * against the design in the DesignDataModel and updates the Canvas Model accordingly.
@@ -369,7 +383,7 @@ class MonitorModel extends Observable{
 		
 	}
 	
-	private function setDesignOrder(){
+	public function setDesignOrder():Array{
 		trace("set Design order called")
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
 		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
@@ -426,7 +440,7 @@ class MonitorModel extends Observable{
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
 			trace("Activity type ID: "+ddm_activity.activityTypeID)
 			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-				trace("Activity is an optional activity "+ddm_activity.activityUIID)
+				trace("Activity is an optional activity "+ddm_activity.activityID)
 			}
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				trace("this is Child")
@@ -816,6 +830,14 @@ class MonitorModel extends Observable{
 	public function set resultDTO(a:Object){
 		_resultDTO = a;
 	}
+	
+	public function set endGate(a:MovieClip){
+		_endGate = a;
+	}
+	
+	public function get endGate():MovieClip{
+		return _endGate;
+	}
 
 	/**
 	 * Returns a reference to the Activity Movieclip for the UIID passed in.  Gets from _activitiesDisplayed Hashable
@@ -853,5 +875,24 @@ class MonitorModel extends Observable{
 	public function getMonitor():Monitor{
 		return _monitor;
 	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get isDragging ():Boolean {
+		return _isDragging;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function set isDragging (newisDragging:Boolean):Void{
+		_isDragging = newisDragging;
+	}
+	
 	
 }
