@@ -39,7 +39,7 @@ import mx.managers.*
 import mx.containers.*;
 import mx.events.*
 import mx.utils.*
-import mx.controls.TabBar;
+import mx.controls.*;
 
 
 /**
@@ -60,6 +60,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var xOffSet:Number = 10;
 	private var actWidth:Number = 120;
 	private var actLenght:Number = 0;
+	private var count:Number = 0;
 	private var activeLearner:Number;
 	private var prevLearner:Number;
 	private var learnersDrawn:Number;
@@ -73,7 +74,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	//Canvas clip
 	
 	private var _learnerTabViewContainer_mc:MovieClip
-	private var bkg_pnl:MovieClip;
+	
 	private var learnerMenuBar:MovieClip;
 	//private var _helpLayer_mc:MovieClip;
 	private var _gridLayer_mc:MovieClip;
@@ -205,16 +206,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function draw(){
 		//activityArr = new Array;
-		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
+		//bkg_pnl = this.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
 
 		//set up the Movie Clips to load relevant  
 
-		//_helpLayer_mc = this.attachMovie("RefreshBar", "RefreshBar", _helpLayer_mc.getNextHighestDepth()) 
-		//learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth())
-		//learnerMenuBar = eval(learnerMenuBar)
-		//_helpLayer_mc.createEmptyMovieClip("_helpLayer_mc", this.getNextHighestDepth());
-		
-		//refresh_btn.addEventListener("click", Delegate.create(this, reloadProgress));
 		_learnersLayer_mc = this.createEmptyMovieClip("_learnersLayer_mc", this.getNextHighestDepth());
 		_gridLayer_mc = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
 		
@@ -236,9 +231,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
 	}
 	
-	//private function initEventListeners(){
-		//refresh_btn.addEventListener("click", Delegate.create(this, reloadProgress));
-	//}
 	/**
 	* Sets last selected Sequence
 	*/
@@ -303,46 +295,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			ACT_X = 0;
 			ACT_Y = (j*80)+35;
 			mm.drawDesign(tabID, mm.allLearnersProgress[j]);
-			
-			//ACT_Y = Math.floor(_activityLayer_mc._y + _activityLayer_mc._height);
-			//Math.floor(ACT_Y);
 		}
 	}
 	
-	/*public function compareProgressData(learner, activityID):String{
-		trace ("activity ID passed is: "+activityID)
-		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
-		
-		var arrLearnerProgComp = learner.getCompletedActivities()
-		for (var i=0; i<arrLearnerProgComp.length; i++){
-			if (activityID == arrLearnerProgComp[i]){
-				var clipName:String = "completed_mc";
-				return clipName;
-			}
-		
-		}
-		
-		var arrLearnerProgAttempt = learner.getAttemptedActivities()
-		trace("Attempted activities are: "+arrLearnerProgAttempt.length)
-		for (var j=0; j<arrLearnerProgAttempt.length; j++){
-			trace("Activity Id Passed is "+activityID+" and attempted ID is "+arrLearnerProgAttempt[j])
-			if (activityID == arrLearnerProgAttempt[j]){
-				if (activityID == learner.getCurrentActivityId()){
-					var clipName:String = "current_mc";
-					return clipName;
-				}else {
-					var clipName:String = "attempted_mc";
-					return clipName;
-				}
-			}
-			
-		}
-		//arrLearnerProg = learner.getCurrentActivityId()
-		if (activityID == learner.getCurrentActivityId()){
-			var clipName:String = "current_mc";
-			return clipName;
-		}
-	}*/
 	/**
 	 * Remove the activityies from screen on selection of new lesson
 	 * 
@@ -360,6 +315,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	private function printLearner(a:Activity,mm:MonitorModel, learner:Object){
+		
 		var z:Object = mm.getSize();
 		var styleObj = _tm.getStyleObject('button');
 		var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn')
@@ -375,12 +331,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerExp_btn.setSize(90, 17);
 		learnerExp_btn.setStyle('styleName',styleObj);
 		learnerExp_btn.onRelease = function (){
-					//trace("Contribute Type is: "+o.taskURL);
-					JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 300, 400, true, true, false, false, false);
-					
-					//getURL(String(o.taskURL), "_blank");
-					//getURL("http://localhost:8080/lams/monitoring/monitoring.do?method=getAllContributeActivities&lessonID=4", "_blank");
-				}
+			//trace("Contribute Type is: "+o.taskURL);
+			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 300, 400, true, true, false, false, false);
+		}
 			
 		nameTextFormat.bold = true;
 		nameTextFormat.font = "Verdana";
@@ -392,6 +345,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerName_txt.setNewTextFormat(nameTextFormat);
 		learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
 		trace("Ypos for name field is: "+ACT_Y)
+		
+		learnerListArr[count][0] = learnerName_txt
+		learnerListArr[count][1] = learnerExp_btn
+		
+		count++
 	}
 
 	
@@ -407,22 +365,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
 		if (ACT_X == 0){
 			printLearner(a, mm, learner)
-			 /*var z:Object = mm.getSize();
-		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
-			_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y, z.w-20, 20);
-			var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
-			trace("Learnermername field is: "+learnerName_txt)
-			var nameTextFormat = new TextFormat();
-			nameTextFormat.bold = true;
-			nameTextFormat.font = "Verdana";
-			nameTextFormat.size = 11;
-			learnerName_txt.border = true;
-			learnerName_txt.selectable = false;
-			learnerName_txt.background = true;
-			learnerName_txt.backgroundColor = 0xCCCCCC;
-			learnerName_txt.setNewTextFormat(nameTextFormat);
-			learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
-			trace("Ypos for name field is: "+ACT_Y)*/
 		}
 		var s:Boolean = false;
 		
@@ -455,7 +397,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 		s = true;
 		//actLenght++;
-		//mm.getMonitor().getMV().getMonitorScp().redraw(true);
+		mm.getMonitor().getMV().getMonitorScp().redraw(true);
+		if (count == mm.getActivityKeys().length-1){
+			setSize(mm);
+		} 
 		return s;
 	}
 
@@ -465,7 +410,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 */
 	private function setStyles():Void{
 		var styleObj = _tm.getStyleObject('BGPanel');
-		bkg_pnl.setStyle('styleName',styleObj);
+		//bkg_pnl.setStyle('styleName',styleObj);
 	}
 
 	private function gateTitle(a:Activity):String{
@@ -493,12 +438,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
-		//monitor_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(s.w,s.h);
-		//learnerMenuBar.help_btn._x = s.w - 80
-		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		//var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
-				
+		for (var i=0; i<learnerListArr.length; i++){
+			learnerListArr[i][0]._width = _activityLayer_mc._width;
+			learnerListArr[i][1]._x = _activityLayer_mc._width-110;
+		}
 	}
 	
 	 /**
