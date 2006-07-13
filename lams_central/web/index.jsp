@@ -22,7 +22,7 @@
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/prototype.js"></script>
 	<script type="text/javascript" language="javascript">
-		var i=0;
+		var i = Math.round(1000*Math.random());
 		function getContent(){
 			i++;
 			var url = "index.do?unique="+i;
