@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.Portfolio;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class MainExportServlet extends HttpServlet {
 	
+    private static Logger log = Logger.getLogger(MainExportServlet.class);
  
 	private static final long serialVersionUID = 7788509831929373666L;
 	private String exportTmpDir;
@@ -127,9 +129,22 @@ public class MainExportServlet extends HttpServlet {
 			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir);
 			bundler.bundleStylesheet();
 			
-			//zip up the contents of the temp export folder
+			// zip up the contents of the temp export folder 
 			String zipFilename = exportService.zipPortfolio(ExportPortfolioConstants.ZIP_FILENAME, exportTmpDir);
 			
+/*			-- Used for testing timeout  change the export url in exportWaitingPage to  
+			-- String exportUrl = learning_root + "portfolioExport?" + request.getQueryString()+"&sleep=1800000";
+			-- to pause for 30 mins. 
+			Integer sleeptime = WebUtil.checkInteger("sleep", request.getParameter("sleep"), true);
+			if ( sleeptime != null ) {
+				log.debug("Testing timeouts. Sleeping for "+sleeptime/1000+" seconds");
+				try {
+					Thread.sleep(sleeptime);
+				} catch (InterruptedException e) {
+					log.error("Sleep interrupted",e);
+				}
+			}
+*/			
 			//return the relative filelocation of the zip file so that it can be picked up in exportWaitingPage.jsp
 			PrintWriter out = response.getWriter();
 			out.println(returnRelativeExportTmpDir(zipFilename)); 

@@ -25,6 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 
 <%
@@ -43,8 +44,9 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <title>Generating Export</title>
+    <title><fmt:message key='export.portfolio.window.title'/></title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
     <script type ="text/javascript">
     	var READY_STATE_UNINITIALIZED=0;
 		var READY_STATE_LOADING=1;
@@ -53,6 +55,23 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 		var READY_STATE_COMPLETE=4;
 		var req;
 		var updateindicator="";
+		var downloadStarted=new Boolean(false);
+
+		function startTimer() {
+			setTimeout('wakeup()', 10000 );						
+		}
+
+		function wakeup() {
+			if ( downloadStarted != true ) {
+				displayGeneratingMessage();
+				startTimer();
+			}
+		}
+
+		function displayGeneratingMessage() {
+			updateindicator = updateindicator+"... ";
+			document.getElementById("message").innerHTML = "<p><fmt:message key='export.portfolio.generating.message'/>"+updateindicator+"</p>";
+		}
 
 		function sendRequest(url,HttpMethod)
 		{
@@ -72,13 +91,12 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 				req.open(HttpMethod,url,true);
 				req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 				req.send(null); //sends any parameters along with the request for that url
+				startTimer();
 			}
 		}
 		
 		function exportCallback(){
 			
-			updateindicator = updateindicator+"... ";
-		
 			var ready=req.readyState;
 			var msg;
 		
@@ -88,6 +106,12 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 				{
 					case 200: // status 200 OK
 						var url = "<%=downloadServlet%>"+req.responseText;
+
+						downloadStarted = new Boolean(true);
+						msg = "<p><fmt:message key='export.portfolio.generation.complete.message'/></p>\n"
+						document.getElementById("button").style.visibility = "visible";
+						document.getElementById("message").innerHTML = msg;
+						
 						window.location.href = url;
 						break;
 					case 404: //status 404 Not Found
@@ -102,9 +126,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 				
 				
 			}else{
-				document.getElementById("message").innerHTML = "<p>Loading ...</p>"+updateindicator;
-				
-				
+				displayGeneratingMessage();
 			}
 		
 		}
@@ -122,20 +144,26 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
   
   <body>
 
-	<h1 class="no-tabs-below">&nbsp;</h1>
-	<div id="header-no-tabs-learner">
+	<div id="page-learner">
+		<h1 class="no-tabs-below"><fmt:message key='export.portfolio.window.title'/></h1>
+		<div id="header-no-tabs-learner">
 
-	</div><!--closes header-->
+		</div><!--closes header-->
 
-	<div id="content-learner">
+		<div id="content-learner">
 
-	    <div id="message"></div>
+			<p>&nbsp;</p>
+			<div id="message"></div>
+			<div id="button" style="visibility:hidden">
+				<p><a href='#' onclick='javascript:window.close()' class='button'><fmt:message key='label.finish.button'/></a></p>
+			</div>
+			
+		</div>  <!--closes content-->
 
-	</div>  <!--closes content-->
 
-
-	<div id="footer-learner">
-	</div><!--closes footer-->
+		<div id="footer-learner">
+		</div><!--closes footer-->
+	</div>
 
   </body>
 </html>
