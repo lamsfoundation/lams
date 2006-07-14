@@ -301,7 +301,6 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_CONTENT_IN_USE			="userExceptionContentInUse";
     public static final String USER_EXCEPTION_CONTENT_BEING_MODIFIED	="userExceptionContentBeingModified";
     public static final String USER_EXCEPTION_CONTENT_RUNOFFLINE		="userExceptionContentRunOffline";
-    public static final String USER_EXCEPTION_CONTENT_DEFINE_LATER		="userExceptionContentDefineLater";
     public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";
     public static final String USER_EXCEPTION_QUESTION_EMPTY			="userExceptionQuestionEmpty";
     public static final String USER_EXCEPTION_ANSWER_EMPTY				="userExceptionAnswerEmpty";

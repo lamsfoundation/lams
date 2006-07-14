@@ -5,17 +5,7 @@
 </h1>
 <div id="header-no-tabs-learner"></div>
 <div id="content-learner">
-	<table>
-		<tr>
-			<td>
-				<fmt:message>message.defineLaterSet</fmt:message>
-			</td>
-		</tr>
-	</table>
-
-	<div class="right-buttons">
-		<a href="javascript:location.reload(true);" class="button"><fmt:message key="button.try.again" /></a>
-	</div>
+	<lams:DefineLater defineLaterMessageKey="message.defineLaterSet"/>
 </div>
 
 <div id="footer-learner"></div>

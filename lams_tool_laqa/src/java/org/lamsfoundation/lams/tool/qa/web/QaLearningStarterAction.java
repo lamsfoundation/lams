@@ -153,6 +153,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 	        redirect="true"
 	      />
 	      
+	  	<forward
+		    name="defineLater"
+	        path="/learning/defineLater.jsp"
+		    redirect="false"
+	  	/>
+	      
 		<forward
 		    name="errorListLearner"
 		    path="/QaErrorBox.jsp"
@@ -299,11 +305,15 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(qaContent.isUsernameVisible()));
+	    
 	    /*
 	     * Is the tool activity been checked as Define Later in the property inspector?
 	     */
 	    logger.debug("IS_DEFINE_LATER: " + qaContent.isDefineLater());
-	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
+	    if ( qaContent.isDefineLater() ) {
+            QaUtils.cleanUpSessionAbsolute(request);
+	    	return (mapping.findForward(DEFINE_LATER));
+	    }
 	    
 	    /*
 	     * Learning mode requires this setting for jsp to generate the user's report 
@@ -464,20 +474,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	logger.debug("userId is null, it should not be, report this.");
 	    }
 	    
-        /*
-         * if the content is not ready yet, don't even proceed.
-         * check the define later status
-         */
-        Boolean defineLater=(Boolean)request.getSession().getAttribute(IS_DEFINE_LATER);
-        logger.debug("learning-defineLater: " + defineLater);
-        if (defineLater.booleanValue() == true)
-        {
-            QaUtils.cleanUpSessionAbsolute(request);
-			persistError(request,"error.defineLater");
-			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
-			return (mapping.findForward(ERROR_LIST_LEARNER));
-        }
-        
     	/*
     	 * present user with the questions.
     	 */

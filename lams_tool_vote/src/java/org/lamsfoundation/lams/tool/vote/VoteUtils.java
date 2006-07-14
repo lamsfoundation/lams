@@ -517,7 +517,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_BEING_MODIFIED);
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER);
     	request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
     	request.getSession().removeAttribute(USER_EXCEPTION_QUESTION_EMPTY);
     	request.getSession().removeAttribute(USER_EXCEPTION_ANSWER_EMPTY);

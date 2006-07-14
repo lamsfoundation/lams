@@ -554,7 +554,6 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
 		request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
 		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
-		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER);
 		request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
 		request.getSession().removeAttribute(USER_EXCEPTION_RUN_OFFLINE);
 		request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);

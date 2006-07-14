@@ -21,6 +21,10 @@
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm"
     />
+    <form-bean
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.chat.web.forms.LearningForm"
+    />
 
   </form-beans>
 
@@ -40,6 +44,8 @@
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.chat.web.actions.LearningAction"
+      name="learningForm"
+      scope="request"
       parameter="dispatch"
       unknown="false"
       validate="true"
@@ -50,8 +56,13 @@
         redirect="false"
       />
       <forward
-        name="message_page"
-        path="tiles:/generic/message"
+        name="runOffline"
+        path="tiles:/learning/runOffline"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path="tiles:/learning/defineLater"
         redirect="false"
       />
     </action>

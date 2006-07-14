@@ -24,8 +24,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <tiles-definitions>
 <!-- ============= template Definitions ====================== -->
 	<definition name=".baseDef" path="/template/template.jsp">
-		<put name="title" value="Base Template Page"/>
-		<put name="pageHeader" value = "Base Template"/>
 		<put name="header" value="/header.jsp"/>
 		<put name="content" value="/template/baseContent.jsp" />	
 		<put name="footer" value="/footer.jsp"/>	
@@ -33,30 +31,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 <!-- ============= Exception Page Definitions ====================== -->	
 	<definition name=".error" extends=".baseDef" >
-		<put name="title" value="System Error Page"/>
-		<put name="pageHeader" value = "System Exception"/>
 		<put name="content" value="/errorbox.jsp" />	
 	</definition>
 
 <!-- ============= Exception Page Definitions ====================== -->	
 	<definition name=".message" extends=".baseDef" >
-		<put name="title" value="Alert"/>
-		<put name="pageHeader" value = "Noticeboard Alert"/>
 		<put name="content" value="/message.jsp" />	
 	</definition>
 	
 <!-- ============= Noticeboard Learner Page Definitions ====================== -->	
 	<definition name=".learnerContent"  path="/template/learnerTemplate.jsp" >
-		<put name="title" value="Noticeboard"/>
-		<put name="pageHeader" value = "Noticeboard"/>
 		<put name="content" value="/learnerContent.jsp" />	
+	</definition>
+	<definition name=".defineLater"  path="/template/learnerTemplate.jsp" >
+		<put name="content" value="/defineLater.jsp" />	
 	</definition>
 	
 <!-- ============= Noticeboard Export Page Definitions ====================== -->	
 
 <definition name=".exportPortfolio" extends=".baseDef" >
-		<put name="title" value="Noticeboard"/>
-		<put name="pageHeader" value = "Noticeboard"/>
 		<put name="content" value="/exportPortfolio.jsp" />	
 	</definition>
 </tiles-definitions>

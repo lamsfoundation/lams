@@ -5,7 +5,9 @@
 <div id="header-no-tabs-learner"></div>
 
 <div id="content-learner">
-	<lams:DefineLater/>
+
+	<lams:DefineLater defineLaterMessageKey="message.defineLaterSet"/>
+
 </div>
 
 <div id="footer-learner"></div>

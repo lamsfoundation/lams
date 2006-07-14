@@ -75,6 +75,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * @struts:action-forward name="displayMessage" path=".message"
+ * @struts:action-forward name="defineLater" path=".defineLater"
  * ----------------XDoclet Tags--------------------
  */
 
@@ -142,8 +143,12 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 
 	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
 	    
+	    if ( isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER) ) {
+            return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
+	    }
+
 	    /*
-         * Checks to see if the defineLater or runOffline flag is set.
+         * Checks to see if the runOffline flag is set.
          * If the particular flag is set, control is forwarded to jsp page
          * displaying to the user the message according to what flag is set.
          */

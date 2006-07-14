@@ -12,14 +12,14 @@
 
 <html:html>
 <head>
-	<html:base />
-	<lams:headItems />
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title"/></title>
 </head>
 
 <body>
-	<div id="page-learner">
-		<tiles:insert attribute="content" />
-	</div>
+<div id="page-learner"><!--main box 'page'-->
+
+	<tiles:insert attribute="content" />
+	
 </body>
 </html:html>

@@ -7,23 +7,23 @@
 </head>
 
 <body>
-	<table border="0" align="center" class="forms" width="95%">
-		<tr>
-			<td>
-				<h1>
-					${resource.title}
-				</h1>
-				<h2>
-					${resource.instructions}
-				</h2>
-			</td>
-		</tr>
-	</table>
 
-	<div align="center">
-		<b> <fmt:message key="define.later.message" /> </b>
-		<P>
-			<a href="javascript:location.reload(true);" class="button"><b><fmt:message key="button.try.again" /></b></a>
+	<div id="page-learner">
+		<h1 class="no-tabs-below">
+			${resource.title}
+		</h1>
+		<div id="header-no-tabs-learner">
+		</div>
+		<!--closes header-->
+
+		<div id="content-learner">
+			<lams:DefineLater/>
+		</div>
+		
+		<div id="footer-learner">
+		</div>
+		<!--closes footer-->
+
 	</div>
 
 </body>

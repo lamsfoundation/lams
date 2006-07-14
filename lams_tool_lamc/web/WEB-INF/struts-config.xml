@@ -250,6 +250,12 @@
 	  	/>
 	  	
 	  	<forward
+		    name="defineLater"
+	        path="/learning/defineLater.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
 		    redirect="false"

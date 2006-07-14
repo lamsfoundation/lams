@@ -12,28 +12,25 @@
 
 <html:html>
 <head>
-	<html:base />
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
 </head>
 
 <body>
-	<div id="page">
-		<c:set var="pageheader" scope="session">
-			<tiles:getAsString name="pageHeader" />
-		</c:set>
+	<div id="page-learner">
 
 		<h1 class="no-tabs-below">
-			<c:out value="${sessionScope.pageheader}" />
+			<fmt:message key="activity.title" />
 		</h1>
 
-		<div id="header-no-tabs"></div>
+		<div id="header-no-tabs-learner">
+		</div>
 
 		<div id="content">
 			<tiles:insert attribute="content" />
 		</div>
 
-		<div id="footer">
+		<div id="footer-learner">
 		</div>
 	</div>
 </body>

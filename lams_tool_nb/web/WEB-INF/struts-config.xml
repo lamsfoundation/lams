@@ -76,6 +76,11 @@
         path=".message"
         redirect="false"
       />
+      <forward
+        name="defineLater"
+        path=".defineLater"
+        redirect="false"
+      />
     </action>
     <action
       path="/clearsession"

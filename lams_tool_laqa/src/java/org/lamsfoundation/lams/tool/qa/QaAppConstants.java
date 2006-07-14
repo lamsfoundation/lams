@@ -145,7 +145,6 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
     public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
     public static final String USER_EXCEPTION_CONTENT_IN_USE			="userExceptionContentInUse";
-    public static final String USER_EXCEPTION_CONTENT_DEFINE_LATER		="userExceptionContentDefineLater";
     public static final String USER_EXCEPTION_RUN_OFFLINE				="userExceptionRunOffline";    
     public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";    
     public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";

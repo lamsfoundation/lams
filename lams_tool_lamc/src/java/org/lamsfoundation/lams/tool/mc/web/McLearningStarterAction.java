@@ -143,6 +143,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 	  	/>
 	  	
 	  	<forward
+		    name="defineLater"
+	        path="/learning/defineLater.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
 		    redirect="true"
@@ -356,10 +362,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if (isDefineLater == true)
 	    {
 	    	McUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
-	    	logger.debug("warning to learner: the activity is defineLater, we interpret that the content is being modified.");
-	    	persistError(request,"error.defineLater");
-	    	return (mapping.findForward(ERROR_LIST));
+	    	return (mapping.findForward(DEFINE_LATER));
 	    }
 
 	    /*

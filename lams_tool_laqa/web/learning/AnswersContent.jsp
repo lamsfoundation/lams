@@ -70,40 +70,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<html:errors/>
 			</td></tr>
 
-			<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
+			<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
 				<tr> <td NOWRAP>
-					<bean:message key="error.defineLater"/>
+					<bean:message key="label.learning.forceOfflineMessage"/>
 				</td></tr>
 			</c:if> 		
-
-			
-			<c:if test="${sessionScope.isDefineLater == 'false'}"> 			
-				<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
-					<tr> <td NOWRAP>
-						<bean:message key="label.learning.forceOfflineMessage"/>
-					</td></tr>
-				</c:if> 		
-			
-				<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
-					<tr><td NOWRAP>
-						<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/> 
-					</td></tr>
 		
-					<tr> <td NOWRAP>
-						 <c:out value="${sessionScope.userFeedback}" escapeXml="true"/> 
-					</td></tr>
-				
-					<c:choose> 
-					  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
-							<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
+			<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
+				<tr><td NOWRAP>
+					<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/> 
+				</td></tr>
+	
+				<tr> <td NOWRAP>
+					 <c:out value="${sessionScope.userFeedback}" escapeXml="true"/> 
+				</td></tr>
+			
+				<c:choose> 
+				  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
+						<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
 					  </c:when> 
 
 					  <c:otherwise>
 						  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
-					  </c:otherwise>
-					</c:choose> 
-				</c:if> 		
-		  	</c:if> 		
+				  </c:otherwise>
+				</c:choose> 
+			</c:if> 		
 	 	</table>
 	</html:form>
 </div>

@@ -270,6 +270,12 @@
 	      
 
 	  	<forward
+		    name="defineLater"
+	        path="/learning/defineLater.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 	        path="/VoteErrorBox.jsp"
 		    redirect="false"

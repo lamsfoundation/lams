@@ -20,12 +20,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 	<table>
-		<c:if test="${userExceptionContentDefineLater == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<bean:message key="error.defineLater"/> 
-			</td> </tr>
-		</c:if> 				    
-
 		<c:if test="${userExceptionContentDoesNotExist == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						 <bean:message key="error.content.doesNotExist"/> 

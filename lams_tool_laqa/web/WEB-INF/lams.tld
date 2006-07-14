@@ -310,5 +310,8 @@
 	    <name>ExportPortOutput</name>
 		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
-
+	<tag-file>
+	    <name>DefineLater</name>
+		<path>/WEB-INF/tags/DefineLater.tag</path>
+   	</tag-file>  
 </taglib>

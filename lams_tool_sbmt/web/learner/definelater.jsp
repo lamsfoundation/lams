@@ -25,18 +25,7 @@
 		<div id="header-no-tabs-learner"></div>
 
 		<div id="content-learner">
-			<table>
-				<tr>
-					<td>
-						<p>
-							<fmt:message key="define.later.message" />
-						</p>
-						<div class="right-buttons">
-							<a href="javascript:location.reload(true);" class="button"><fmt:message key="button.try.again" /></a>
-						</div>
-					</td>
-				</tr>
-			</table>
+			<lams:DefineLater/>
 		</div>
 		<div id="footer-learner"></div>
 	</div>

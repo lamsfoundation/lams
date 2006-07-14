@@ -266,10 +266,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     if (isDefineLater == true)
     {
     	VoteUtils.cleanUpSessionAbsolute(request);
-    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
-    	logger.debug("warning to learner: the activity is defineLater, we interpret that the content is being modified.");
-    	persistInRequestError(request,"error.defineLater");
-    	return (mapping.findForward(ERROR_LIST));
+	    return (mapping.findForward(DEFINE_LATER));
     }
 
     /*
