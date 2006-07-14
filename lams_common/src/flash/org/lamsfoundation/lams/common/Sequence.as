@@ -283,7 +283,7 @@ class Sequence {
 			//dateFormated = "Not Started"
 			return null;
 		}else{
-			var dateFormated:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()+1))+" "+_seqStartDate.getFullYear());;
+			var dateFormated:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()))+" "+_seqStartDate.getFullYear());;
 		}
 		return dateFormated;
 	}
