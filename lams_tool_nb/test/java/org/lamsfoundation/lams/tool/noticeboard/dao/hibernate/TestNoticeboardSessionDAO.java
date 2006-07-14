@@ -101,6 +101,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         Long newSessionId = new Long(2222);
         Date newDateCreated = new Date(System.currentTimeMillis());
         NoticeboardSession newSessionObject = new NoticeboardSession(newSessionId,
+        															"Session "+newSessionId,
                 													nbContentToReference,
                 													newDateCreated,
                 													NoticeboardSession.NOT_ATTEMPTED);

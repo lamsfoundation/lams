@@ -194,6 +194,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    nbService.saveNoticeboard(nbContent);
 	    
 	   NoticeboardSession nbSession = new NoticeboardSession(testSessionId,
+			   													"Session "+testSessionId,
 	            												nbContent,
 	            												created,
 	            												NoticeboardSession.NOT_ATTEMPTED); 
@@ -390,9 +391,9 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    userId1 = new Long(567); userId2 = new Long(568); userId3 = new Long(569);
 	    userId4 = new Long(570); userId5 = new Long(571); userId6 = new Long(572);
 	    
-	    session1 = new NoticeboardSession(sessionId1, nbContent);
-	    session2 = new NoticeboardSession(sessionId2, nbContent);
-	    session3 = new NoticeboardSession(sessionId3, nbContent);
+	    session1 = new NoticeboardSession(sessionId1, "Session "+sessionId1, nbContent);
+	    session2 = new NoticeboardSession(sessionId2, "Session "+sessionId1, nbContent);
+	    session3 = new NoticeboardSession(sessionId3, "Session "+sessionId1, nbContent);
 	    
 	    nbContent.getNbSessions().add(session1);
 	    nbContent.getNbSessions().add(session2);

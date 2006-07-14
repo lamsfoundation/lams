@@ -145,7 +145,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 	
 	 	NoticeboardContent content = noticeboardDAO.findNbContentById(TEST_NB_ID);
 	 	
-	 	NoticeboardSession newSession = new NoticeboardSession(newSessionId, content);
+	 	NoticeboardSession newSession = new NoticeboardSession(newSessionId, "Session "+newSessionId, content);
 	 	content.getNbSessions().add(newSession);
 	 	noticeboardDAO.updateNbContent(content);
 	 	nbSessionDAO.saveNbSession(newSession);

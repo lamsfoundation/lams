@@ -77,6 +77,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final Long TEST_CREATOR_USER_ID = new Long(1300);
 	
 	protected final Long TEST_SESSION_ID = new Long(1400);
+	protected final String TEST_SESSION_NAME = "Session 1400";
 	protected final Date TEST_SESSION_START_DATE = new Date(System.currentTimeMillis());
 	protected final Date TEST_SESSION_END_DATE = new Date(System.currentTimeMillis() + ONE_DAY);
 	protected final String TEST_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
@@ -187,11 +188,11 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     	NoticeboardContent nb = noticeboardDAO.findNbContentById(TEST_NB_ID);
     	
     	nbSession = new NoticeboardSession(TEST_SESSION_ID,
+    									   TEST_SESSION_NAME,
     									   nb,
 										   TEST_SESSION_START_DATE,
 										   TEST_SESSION_END_DATE,
 										   TEST_SESSION_STATUS);
-    		
     	nbSessionDAO.saveNbSession(nbSession);
     	
     	//associate the session with the content
