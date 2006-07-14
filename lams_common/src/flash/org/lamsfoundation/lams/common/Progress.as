@@ -38,6 +38,7 @@ class Progress {
 	private var _learnerLName:String;
 	private var _learnerFName:String;
 	private var _learnerId:Number;
+	private var _lessonComplete:Boolean;
 	private var _currentActivityId:Number;
 	private var _attemptedActivities:Array;
 	private var _completedActivities:Array;
@@ -71,6 +72,7 @@ class Progress {
 		_learnerId = dto.learnerId;
 		_learnerFName = dto.firstName;
 		_learnerLName = dto.lastName;
+		_lessonComplete = dto.lessonComplete;
 		_currentActivityId = dto.currentActivityId;
 		_attemptedActivities = dto.attemptedActivities;
 		_completedActivities = dto.completedActivities;
@@ -109,6 +111,11 @@ class Progress {
 			var clipName:String = "current_mc";
 			return clipName;
 		}
+		
+		if (learner.getCurrentActivityId() == null && learner.isLessonComplete){
+			var clipName:String = "completed_mc";
+			return clipName;
+		}
 	}
 	
 	public static function isLearnerCurrentActivity(learner:Object, activityID:Number):Boolean{
@@ -142,6 +149,10 @@ class Progress {
 		return _learnerLName;
 	}
 	
+	public function isLessonComplete():Boolean{
+		return _lessonComplete;
+	}
+	
 	public function getCurrentActivityId():Number{
 		return _currentActivityId;
 	}
@@ -164,6 +175,11 @@ class Progress {
 	
 	public function set completedActivities(a:Array){
 		_completedActivities = convertStringArrayToNumberArray(a);
+	}
+	
+	public function getFullName ():String{
+		var fullName:String = _learnerFName +" "+ _learnerLName;
+		return fullName;
 	}
 	
 	private function convertStringArrayToNumberArray(strArray:Array){
