@@ -34,6 +34,8 @@
 
 	<div id="content-learner">
 
+		<p>&nbsp;</p>
+
 		<p><fmt:message key="label.preview.definelater.message">
 				<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
 			</fmt:message>
