@@ -332,7 +332,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerExp_btn.setStyle('styleName',styleObj);
 		learnerExp_btn.onRelease = function (){
 			//trace("Contribute Type is: "+o.taskURL);
-			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 300, 400, true, true, false, false, false);
+			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 		}
 			
 		nameTextFormat.bold = true;
