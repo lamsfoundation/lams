@@ -156,7 +156,7 @@ class Lesson {
 		// do export call
 		var exp_url:String = _root.serverURL + 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+String(lessonModel.ID);
 		
-		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolioLearner', 300, 400, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolioLearner', 410, 640, true, true, false, false, false);
 	
 	}
 	
