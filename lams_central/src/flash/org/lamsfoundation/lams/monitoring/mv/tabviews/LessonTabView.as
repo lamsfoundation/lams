@@ -269,7 +269,8 @@ public function update (o:Observable,infoObj:Object):Void{
 			}else {
 				mm.setIsProgressChanged(true);
 			}
-			mm.getMonitor().getProgressData(mm.getSequence());
+			//mm.getMonitor().getProgressData(mm.getSequence());
+			mm.getMonitor().reloadLessonToMonitor();
 	}
 	
 	/**
