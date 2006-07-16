@@ -222,7 +222,7 @@ class MonitorController extends AbstractController {
 	private function exportClassPortfolio():Void{
 		var exp_url:String = _root.serverURL+"learning/exportWaitingPage.jsp?mode=teacher&lessonID="+_root.lessonID;
 		
-		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 300, 400, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 	}
 
 	public function click(evt):Void{
