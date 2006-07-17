@@ -25,7 +25,8 @@
 
 <div align="center"><html-el:errors/></div>
 <table>
-    <col align="right" /><col align="left" />
+  <col align="right" /><col align="left" />
+  <logic:equal name="canEdit" value="true">
 	<tr>
 		<td><fmt:message key="admin.user.login"/> *:</td>
 		<td><html-el:text property="login" size="20" maxlength="20" /></td>
@@ -109,6 +110,35 @@
 			</html-el:select>
 		</td>
 	</tr>
+  </logic:equal>
+  <logic:notEqual name="canEdit" value="true">
+    <tr>
+		<td><fmt:message key="admin.user.login"/>:</td>
+		<td><bean:write name="UserForm" property="login" /></td>
+	</tr>
+	<tr>
+	<td>Name:</td>
+		<td><bean:write name="UserForm" property="title" /> <bean:write name="UserForm" property="firstName" /> <bean:write name="UserForm" property="lastName" /></td>
+	</tr>
+	<html-el:hidden property="login" />
+	<html-el:hidden property="password" />
+	<html-el:hidden property="password2" />
+	<html-el:hidden property="title" />
+	<html-el:hidden property="firstName" />
+	<html-el:hidden property="lastName" />
+	<html-el:hidden property="addressLine1" />
+	<html-el:hidden property="addressLine2" />
+	<html-el:hidden property="addressLine3" />
+	<html-el:hidden property="city" />
+	<html-el:hidden property="state" />
+	<html-el:hidden property="country" />
+	<html-el:hidden property="dayPhone" />
+	<html-el:hidden property="eveningPhone" />
+	<html-el:hidden property="mobilePhone" />
+	<html-el:hidden property="fax" />
+	<html-el:hidden property="email" />
+	<html-el:hidden property="localeId" />
+  </logic:notEqual>
 	<tr>
 	    <td><fmt:message key="admin.user.roles"/>:</td>
 	    <td>
