@@ -39,7 +39,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Base servlet for handling WDDX packets sent by Flash.
@@ -66,6 +69,8 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
 public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 
 	private static Logger log = Logger.getLogger(AbstractStoreWDDXPacketServlet.class);
+	private static IAuditService auditService;
+
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest, HttpServletResponse)
 	 */
@@ -82,7 +87,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws IOException
 	{
-
+		auditService = getAuditService();
 		PrintWriter writer = null;
 		String packet = null;
 		String replyPacket = null;
@@ -115,6 +120,8 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(getMessageKey(packet,request),
 					e.getMessage()!=null?e.getMessage():e.getClass().getName());
 			writer.write(flashMessage.serializeMessage());
+			
+			auditService.log(AbstractStoreWDDXPacketServlet.class.getName(),"URL:"+uri+" triggered exception"+e.toString());
 			return;
 		}
 		
@@ -214,4 +221,16 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
   	 * @return messageKey
   	 */
   	abstract protected String getMessageKey(String packet, HttpServletRequest request);
+  	
+	/**
+	 * Get AuditService bean.
+	 * @return
+	 */
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
+	}
 }
