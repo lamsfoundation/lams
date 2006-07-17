@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
@@ -58,6 +59,7 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(PerformChosenGroupingServlet.class);
 	private static final long serialVersionUID = -3423985351915607659L;
+	private static IAuditService auditService;
 	
 	public IMonitoringService getMonitoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
@@ -92,6 +94,7 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
 			flashMessage = new FlashMessage("performChosenGrouping",map);
 		} catch (Exception e) {
 			log.error(e);
+    		getAuditService().log(PerformChosenGroupingServlet.class.getName(), e.getMessage());
 			flashMessage = new FlashMessage("performChosenGrouping","Perfrom chosen grouping occurs error:" 
 					+ e.getMessage(),FlashMessage.ERROR);
 		}
@@ -109,5 +112,16 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
 	protected String getMessageKey(String packet, HttpServletRequest request) {
 		return MonitoringConstants.PERFORM_CHOSEN_GROUPING_KEY;
 	}
-
+	
+	/**
+	 * Get AuditService bean.
+	 * @return
+	 */
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
+	}
 }

@@ -42,10 +42,14 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -85,6 +89,9 @@ public class MonitoringAction extends LamsDispatchAction
 	
 	/** See deleteOldPreviewLessons */
 	public static final String NUM_DELETED = "numDeleted";
+	public static final String MONITORING_MODULE_NAME = "MonitoringAction";
+	
+	private static IAuditService auditService;
 
 	private Integer getUserId(HttpServletRequest request) {
 		return new Integer(WebUtil.readIntParam(request,"userID"));
@@ -96,6 +103,9 @@ public class MonitoringAction extends LamsDispatchAction
 	
  	  private FlashMessage handleException(Exception e, String methodKey, IMonitoringService monitoringService) {
 			log.error("Exception thrown "+methodKey,e);
+			auditService = getAuditService();
+			auditService.log(MONITORING_MODULE_NAME+":"+methodKey, e.toString());
+			
 			if ( e instanceof UserAccessDeniedException ) {
 				return new FlashMessage(methodKey,
 					monitoringService.getMessageService().getMessage("error.user.noprivilege"),
@@ -112,6 +122,9 @@ public class MonitoringAction extends LamsDispatchAction
 	  private FlashMessage handleCriticalError(String methodKey, String messageKey, IMonitoringService monitoringService) {
 		  String message = monitoringService.getMessageService().getMessage(messageKey); 
 			log.error("Error occured "+methodKey+" error ");
+			auditService = getAuditService();
+			auditService.log(MONITORING_MODULE_NAME+":"+methodKey, message);
+			
 			return new FlashMessage(methodKey,
 					message,
 					FlashMessage.CRITICAL_ERROR);
@@ -558,9 +571,15 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
+    	 
+    	String wddxPacket;
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getLessonDetails(lessonID);
+    	try{
+	    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	wddxPacket = monitoringService.getLessonDetails(lessonID);
+     	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getLessonDetails", monitoringService).serializeMessage();
+    	}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -570,9 +589,14 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
+    	String wddxPacket;
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getLessonLearners(lessonID);
+    	try{
+	    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	wddxPacket = monitoringService.getLessonLearners(lessonID);
+    	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getLessonLearners", monitoringService).serializeMessage();
+    	}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -582,9 +606,14 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
+    	String wddxPacket;
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getLessonStaff(lessonID);
+    	try{
+    		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+    		wddxPacket = monitoringService.getLessonStaff(lessonID);
+    	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getLessonStaff", monitoringService).serializeMessage();
+    	}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -594,9 +623,14 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
+    	String wddxPacket;
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getLearningDesignDetails(lessonID);
+    	try{
+    		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+    		wddxPacket = monitoringService.getLearningDesignDetails(lessonID);
+     	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getLearningDesignDetails", monitoringService).serializeMessage();
+    	}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -605,9 +639,15 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
+    	String wddxPacket;
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getAllLearnersProgress(lessonID);
+    	try{
+    		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+    		wddxPacket = monitoringService.getAllLearnersProgress(lessonID);
+     	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
+    	}
+    		
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -674,10 +714,16 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-    	Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request,"folderID"));
-    	String wddxPacket = monitoringService.moveLesson(lessonID,targetWorkspaceFolderID,userID);
+    	String wddxPacket = null;
+    	try {
+    		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+	    	Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request,"folderID"));
+	    	wddxPacket = monitoringService.moveLesson(lessonID,targetWorkspaceFolderID,userID);
+    	} catch (Exception e) {
+			FlashMessage flashMessage = handleException(e, "moveLesson", monitoringService);
+			wddxPacket = flashMessage.serializeMessage();
+		}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -687,10 +733,16 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-    	String name = WebUtil.readStrParam(request,"name"); 
-    	String wddxPacket = monitoringService.renameLesson(lessonID,name,userID);
+    	String wddxPacket = null;
+    	try {
+    		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+	    	String name = WebUtil.readStrParam(request,"name"); 
+	    	wddxPacket = monitoringService.renameLesson(lessonID,name,userID);
+    	} catch (Exception e) {
+			FlashMessage flashMessage = handleException(e, "renameLesson", monitoringService);
+			wddxPacket = flashMessage.serializeMessage();
+		}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -701,10 +753,16 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         
-        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
-        Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-        String wddxPacket = monitoringService.checkGateStatus(activityID, lessonID);
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	String wddxPacket = null;
+    	try {
+    		Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
+    		Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+    		wddxPacket = monitoringService.checkGateStatus(activityID, lessonID);
+    	} catch (Exception e) {
+			FlashMessage flashMessage = handleException(e, "checkGateStatus", monitoringService);
+			wddxPacket = flashMessage.serializeMessage();
+		}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -715,9 +773,15 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
-        String wddxPacket = monitoringService.releaseGate(activityID);
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	String wddxPacket = null;
+    	try {
+    		Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
+    		wddxPacket = monitoringService.releaseGate(activityID);
+    	} catch (Exception e) {
+			FlashMessage flashMessage = handleException(e, "releaseGate", monitoringService);
+			wddxPacket = flashMessage.serializeMessage();
+		}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -774,6 +838,16 @@ public class MonitoringAction extends LamsDispatchAction
 		return mapping.findForward(PREVIEW_DELETED_REPORT_SCREEN);
 	}
 	
-
+	/**
+	 * Get AuditService bean.
+	 * @return
+	 */
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
+	}
     
 }

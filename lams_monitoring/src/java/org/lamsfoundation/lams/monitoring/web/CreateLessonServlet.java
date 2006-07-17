@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -53,13 +54,10 @@ public class CreateLessonServlet  extends AbstractStoreWDDXPacketServlet {
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(CreateLessonServlet.class);
 	private static final long serialVersionUID = 6474150792777819606L;
+	private static IAuditService auditService;
 
-	public IMonitoringService getMonitoringService(){
-		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		return (IMonitoringService) webContext.getBean(MonitoringConstants.MONITORING_SERVICE_BEAN_NAME);		
-	}
-	
 	protected String process(String lessonPackage, HttpServletRequest request) throws Exception {
+		auditService = getAuditService();
 		//get User infomation from shared session.
 		HttpSession ss = SessionManager.getSession();
     	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -78,16 +76,35 @@ public class CreateLessonServlet  extends AbstractStoreWDDXPacketServlet {
     	
     	try {
 			IMonitoringService monitoringService = getMonitoringService();
-				return monitoringService.createLessonClassForLessonWDDX(userID,lessonPackage);
+			return monitoringService.createLessonClassForLessonWDDX(userID,lessonPackage);
     	} catch ( Exception e ) {
     		log.error("Exception thrown while creating lesson class.",e);
     		FlashMessage flashMessage = FlashMessage.getExceptionOccured("createLesson",e.getMessage());
+    		auditService.log(CreateLessonServlet.class.getName(), e.getMessage());
     		return flashMessage.serializeMessage();
     	}
 	}
 
 	protected String getMessageKey(String packet, HttpServletRequest request) {
 		return MonitoringConstants.CREATE_LESSON_MESSAGE_KEY;
+	}
+	
+
+	public IMonitoringService getMonitoringService(){
+		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		return (IMonitoringService) webContext.getBean(MonitoringConstants.MONITORING_SERVICE_BEAN_NAME);		
+	}
+	
+	/**
+	 * Get AuditService bean.
+	 * @return
+	 */
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
 	}
 
 }
