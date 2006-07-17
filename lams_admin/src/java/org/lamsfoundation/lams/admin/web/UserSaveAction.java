@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -82,11 +81,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class UserSaveAction extends Action {
 
 	private static Logger log = Logger.getLogger(UserSaveAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils
-			.getWebApplicationContext(HttpSessionManager.getInstance()
-					.getServletContext());
-	private static IUserManagementService service = (IUserManagementService) ctx
-			.getBean("userManagementServiceTarget");
+	private static IUserManagementService service;
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -118,7 +113,7 @@ public class UserSaveAction extends Action {
 			if(!edit) errors.add("password",new ActionMessage("error.password.required"));
 		}
 		
-		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)userForm.get("localeId"));
+		SupportedLocale locale = (SupportedLocale)getService().findById(SupportedLocale.class,(Byte)userForm.get("localeId"));
 		log.debug("locale: "+locale);
 		
 		if(errors.isEmpty()){
@@ -126,7 +121,7 @@ public class UserSaveAction extends Action {
 			String[] roles = (String[])userForm.get("roles");
 			if(edit){    // edit user
 				log.debug("editing userId: "+userId);
-				user = (User)service.findById(User.class,userId);
+				user = (User)getService().findById(User.class,userId);
 				if(passwordChanged) {
 					userForm.set("password",HashUtil.sha1((String)userForm.get("password")));
 				}else{
@@ -160,10 +155,10 @@ public class UserSaveAction extends Action {
 				        		}
 				        	}
 				        	if(!alreadyHasRole){    // add new role
-				        		Role currentRole = (Role)service.findById(Role.class,roleId);
+				        		Role currentRole = (Role)getService().findById(Role.class,roleId);
 					            log.debug("setting role: "+currentRole);
 					            UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
-					            service.save(newUor);
+					            getService().save(newUor);
 				        	}
 				        }
 				        Iterator iter3 = uors.iterator();
@@ -184,7 +179,7 @@ public class UserSaveAction extends Action {
 				        break;  // already found uo that matches this org
 				    }
 				}
-				service.save(user);
+				getService().save(user);
 
 			}else{    // create user
 				log.debug("creating user...");
@@ -192,44 +187,44 @@ public class UserSaveAction extends Action {
 				userForm.set("password",HashUtil.sha1((String)userForm.get("password")));
 				BeanUtils.copyProperties(user,userForm);
 				log.debug("new login: "+user.getLogin());
-				if(service.getUserByLogin(user.getLogin())!=null){
+				if(getService().getUserByLogin(user.getLogin())!=null){
 					errors.add("loginUnique",new ActionMessage("error.login.unique"));
 				}
 				if(errors.isEmpty()){
 					user.setDisabledFlag(false);
 					user.setCreateDate(new Date());
-					user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,"authenticationMethodName","LAMS-Database").get(0));
+					user.setAuthenticationMethod((AuthenticationMethod)getService().findByProperty(AuthenticationMethod.class,"authenticationMethodName","LAMS-Database").get(0));
 					user.setUserId(null);
 					user.setLocaleCountry(locale.getCountryIsoCode());
 					user.setLocaleLanguage(locale.getLanguageIsoCode());
-					service.save(user);
+					getService().save(user);
 					log.debug("user: "+user.toString());
 					HashSet uos = new HashSet();
 					ArrayList<Integer> orgs = new ArrayList<Integer>();
 					orgs.add(orgId);
 					log.debug("organisation: "+orgId);
                     // if user is to be added to a class, make user a member of parent course also
-					Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+					Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 					if(org.getOrganisationType().getOrganisationTypeId().equals(new Integer(OrganisationType.CLASS_TYPE))){
 						Integer courseOrgId = org.getParentOrganisation().getOrganisationId();
 						orgs.add(courseOrgId);
 						log.debug("organisation: "+courseOrgId);
 					}
 					for(Integer id:orgs){
-						UserOrganisation uo = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,id));
+						UserOrganisation uo = new UserOrganisation(user, (Organisation)getService().findById(Organisation.class,id));
 						uos.add(uo);
-						service.save(uo);
+						getService().save(uo);
 						log.debug("userOrganisation: "+uo);
 						for(int i=0; i<roles.length; i++){    // add new roles set by user
 				        	Integer roleId = Integer.valueOf(roles[i]);
-				            Role role = (Role)service.findById(Role.class,roleId);
+				            Role role = (Role)getService().findById(Role.class,roleId);
 					        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
-					        service.save(uor);
+					        getService().save(uor);
 					        log.debug("role: "+role);
 				        }
 					}
 					user.setUserOrganisations(uos);
-					//service.save(user);
+					//getService().save(user);
 				}
 			}
 		}
@@ -243,7 +238,7 @@ public class UserSaveAction extends Action {
 			    userForm.set("userId",null);
 			}
 		    saveErrors(request,errors);
-		    Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+		    Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 			Organisation parentOrg = org.getParentOrganisation();
 			if(parentOrg!=null){
 				request.setAttribute("pOrgId",parentOrg.getOrganisationId());
@@ -251,13 +246,21 @@ public class UserSaveAction extends Action {
 			}
 			request.setAttribute("orgId",orgId);
 			request.setAttribute("orgName",org.getName());
-			List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
+			List<SupportedLocale> locales = getService().findAll(SupportedLocale.class);
 			Collections.sort(locales);
 			request.setAttribute("locales",locales);
-			List allRoles = service.findAll(Role.class);
+			List allRoles = getService().findAll(Role.class);
 			Collections.sort(allRoles);
 			request.setAttribute("rolelist",allRoles);
 		    return mapping.findForward("user");
 		}
+	}
+	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
 	}
 }

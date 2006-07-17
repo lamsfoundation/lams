@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -71,17 +70,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class UserAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(UserAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils
-			.getWebApplicationContext(HttpSessionManager.getInstance()
-					.getServletContext());
-	private static IUserManagementService service = (IUserManagementService) ctx
-			.getBean("userManagementServiceTarget");
-	private static List allRoles = service.findAll(Role.class);
-	private static List<SupportedLocale> locales = service.findAll(SupportedLocale.class);
-	static {
-		Collections.sort(allRoles);
-		Collections.sort(locales);
-	}
+	private static IUserManagementService service;
+	private static List allRoles;
+	private static List<SupportedLocale> locales;
 	
 	public ActionForward edit(ActionMapping mapping,
             ActionForm form,
@@ -94,8 +85,8 @@ public class UserAction extends LamsDispatchAction {
 		}
 		
 		// remove sysadmin from role list for non-sysadmin users
-		User requestor = (User)service.getUserByLogin(request.getRemoteUser());
-		if(!service.isUserInRole(requestor.getUserId(),service.getRootOrganisation().getOrganisationId(),Role.SYSADMIN)){
+		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
+		if(!getService().isUserInRole(requestor.getUserId(),getService().getRootOrganisation().getOrganisationId(),Role.SYSADMIN)){
 			Role sysadmin = new Role();
 			sysadmin.setRoleId(Role.ROLE_SYSADMIN);
 			allRoles.remove(sysadmin);
@@ -108,7 +99,7 @@ public class UserAction extends LamsDispatchAction {
 		DynaActionForm userForm = (DynaActionForm)form;
 		if(userId != null) {
 			log.debug("got userid to edit: "+userId);
-			User user = (User)service.findById(User.class,userId);
+			User user = (User)getService().findById(User.class,userId);
 			BeanUtils.copyProperties(userForm, user);
 			userForm.set("password",null);
 			
@@ -130,7 +121,7 @@ public class UserAction extends LamsDispatchAction {
 			        break;
 			    }
 			}
-			SupportedLocale locale = service.getSupportedLocale(user.getLocaleLanguage(),user.getLocaleCountry());
+			SupportedLocale locale = getService().getSupportedLocale(user.getLocaleLanguage(),user.getLocaleCountry());
 			userForm.set("localeId",locale.getLocaleId());
 			
 		}else{
@@ -139,14 +130,14 @@ public class UserAction extends LamsDispatchAction {
 			try{
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 				log.debug("defaultLocale: "+defaultLocale);
-				SupportedLocale locale = service.getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
+				SupportedLocale locale = getService().getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
 				userForm.set("localeId",locale.getLocaleId());
 			}catch(Exception e){
                 log.debug(e);				
 			}
 		}
 		
-		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 		Organisation parentOrg = org.getParentOrganisation();
 		if(parentOrg!=null){
 			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
@@ -164,9 +155,21 @@ public class UserAction extends LamsDispatchAction {
             HttpServletResponse response) throws Exception {
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		log.debug("removing userid: "+userId);
-		service.deleteById(User.class,userId);
+		getService().deleteById(User.class,userId);
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
+	}
+	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			allRoles = getService().findAll(Role.class);
+			locales = getService().findAll(SupportedLocale.class);
+			Collections.sort(allRoles);
+			Collections.sort(locales);
+		}
+		return service;
 	}
 }

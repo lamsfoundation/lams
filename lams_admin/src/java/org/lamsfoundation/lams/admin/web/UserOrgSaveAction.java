@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -69,11 +68,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class UserOrgSaveAction extends Action{
 
 	private static Logger log = Logger.getLogger(UserOrgSaveAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils
-			.getWebApplicationContext(HttpSessionManager.getInstance()
-					.getServletContext());
-	private static IUserManagementService service = (IUserManagementService) ctx
-			.getBean("userManagementServiceTarget");
+	private static IUserManagementService service;
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -89,7 +84,7 @@ public class UserOrgSaveAction extends Action{
 			return mapping.findForward("userlist");
 		}
 		
-		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
+		Organisation organisation = (Organisation)getService().findById(Organisation.class, orgId);
 		Set uos = organisation.getUserOrganisations();
 		
 		String[] userIds = (String[])userOrgForm.get("userIds");
@@ -119,20 +114,28 @@ public class UserOrgSaveAction extends Action{
 				}
 			}
 			if(!alreadyInOrg){
-				User user = (User)service.findById(User.class,userId);
+				User user = (User)getService().findById(User.class,userId);
 				UserOrganisation uo = new UserOrganisation(user,organisation);
-				service.save(uo);
+				getService().save(uo);
 				uos.add(uo);
 				log.debug("added: "+userId);
-				Role role = (Role)service.findByProperty(Role.class,"name",Role.LEARNER).get(0);
+				Role role = (Role)getService().findByProperty(Role.class,"name",Role.LEARNER).get(0);
 		        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
-		        service.save(uor);
+		        getService().save(uor);
 			}
 		}
 		
 		organisation.setUserOrganisations(uos);
-		service.save(organisation);
+		getService().save(organisation);
 		
 		return mapping.findForward("userlist");
+	}
+	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
 	}
 }

@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -67,11 +66,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class UserOrgAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(UserOrgAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils
-	    .getWebApplicationContext(HttpSessionManager.getInstance()
-	    		.getServletContext());
-	private static IUserManagementService service = (IUserManagementService)ctx
-	    .getBean("userManagementServiceTarget");
+	private static IUserManagementService service;
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -82,7 +77,7 @@ public class UserOrgAction extends Action {
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		log.debug("orgId: "+orgId);
         // get org name
-		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
+		Organisation organisation = (Organisation)getService().findById(Organisation.class,orgId);
 
 		if((orgId==null)||(orgId<=0)||organisation==null){
 			errors.add("orgId",new ActionMessage("error.org.invalid"));
@@ -101,18 +96,18 @@ public class UserOrgAction extends Action {
 		request.setAttribute("orgType",orgType);
 				
 		// get list of users in org
-		User user = (User)service.getUserByLogin(request.getRemoteUser());
+		User user = (User)getService().getUserByLogin(request.getRemoteUser());
 		List<User> users = new ArrayList<User>();
 		if(request.isUserInRole(Role.SYSADMIN)){
-			users = service.findAll(User.class);
-		}else if(service.isUserInRole(user.getUserId(),orgId,Role.COURSE_ADMIN)){
+			users = getService().findAll(User.class);
+		}else if(getService().isUserInRole(user.getUserId(),orgId,Role.COURSE_ADMIN)){
 			if(organisation.getCourseAdminCanAddNewUsers()){
 				if(organisation.getCourseAdminCanBrowseAllUsers()){
-					users = service.findAll(User.class);
+					users = getService().findAll(User.class);
 				}else if(orgType.equals(new Integer(OrganisationType.CLASS_TYPE))){
-					users = service.getUsersFromOrganisation(parentOrg.getOrganisationId());
+					users = getService().getUsersFromOrganisation(parentOrg.getOrganisationId());
 				}else if(orgType.equals(new Integer(OrganisationType.COURSE_TYPE))){
-					users = service.getUsersFromOrganisation(orgId);
+					users = getService().getUsersFromOrganisation(orgId);
 				}
 			}else{
 				errors.add("authorisation",new ActionMessage("error.authorisation"));
@@ -128,7 +123,7 @@ public class UserOrgAction extends Action {
 		userOrgForm.set("orgName",orgName);
 				
 		// create list of userids, members of this org
-		List<User> memberUsers = service.getUsersFromOrganisation(orgId);
+		List<User> memberUsers = getService().getUsersFromOrganisation(orgId);
 		String[] userIds = new String[memberUsers.size()];
 		for(int i=0; i<userIds.length; i++){
 			userIds[i] = memberUsers.get(i).getUserId().toString();
@@ -136,6 +131,14 @@ public class UserOrgAction extends Action {
 		userOrgForm.set("userIds",userIds);
 
 		return mapping.findForward("userorg");
+	}
+	
+	private IUserManagementService getService(){
+		if(service==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
 	}
 	
 }
