@@ -447,4 +447,21 @@ public class UserManagementService implements IUserManagementService {
 		List results = findByProperties(SupportedLocale.class,properties);
 		return results.isEmpty() ? null : (SupportedLocale)results.get(0);
 	}
+	
+	public List getRolesForOrgType(OrganisationType orgType, Boolean sysadmin) {
+		List allRoles = findAll(Role.class);
+		Role role = new Role();
+		if(!sysadmin) {
+			role.setRoleId(Role.ROLE_SYSADMIN);
+			allRoles.remove(role);
+		}
+		if(orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+			role = new Role();
+			role.setRoleId(Role.ROLE_COURSE_ADMIN);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_COURSE_MANAGER);
+			allRoles.remove(role);
+		}
+		return allRoles;
+	}
 }

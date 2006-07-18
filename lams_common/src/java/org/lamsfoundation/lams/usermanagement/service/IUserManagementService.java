@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -281,4 +282,12 @@ public interface IUserManagementService {
      * @return SupportedLocale
      */
     public SupportedLocale  getSupportedLocale(String language, String country);
+    
+    /**
+     * 
+     * @param orgType
+     * @param sysadmin
+     * @return a list of roles according to the organisation type and whether you want sysadmin or not
+     */
+    public List getRolesForOrgType(OrganisationType orgType, Boolean sysadmin);
 }
