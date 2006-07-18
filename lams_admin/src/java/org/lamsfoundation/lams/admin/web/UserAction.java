@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -71,7 +72,7 @@ public class UserAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(UserAction.class);
 	private static IUserManagementService service;
-	private static List allRoles;
+	private List rolelist;
 	private static List<SupportedLocale> locales;
 	
 	public ActionForward edit(ActionMapping mapping,
@@ -83,18 +84,16 @@ public class UserAction extends LamsDispatchAction {
 		if(orgId != null) {
 		    request.setAttribute("org",orgId);
 		}
+		OrganisationType orgType = ((Organisation)getService().findById(Organisation.class,orgId)).getOrganisationType();
 		
-		request.setAttribute("canEdit",true);
 		// remove sysadmin from role list for non-sysadmin users
 		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		if(!getService().isUserInRole(requestor.getUserId(),getService().getRootOrganisation().getOrganisationId(),Role.SYSADMIN)){
-			Role sysadmin = new Role();
-			sysadmin.setRoleId(Role.ROLE_SYSADMIN);
-			allRoles.remove(sysadmin);
-			// set canEdit flag for non-sysadmin users
-			request.setAttribute("canEdit",false);
-		}
-		request.setAttribute("rolelist",allRoles);
+		Boolean isSysadmin = getService().isUserInRole(requestor.getUserId(),getService().getRootOrganisation().getOrganisationId(),Role.SYSADMIN);
+		rolelist = getService().getRolesForOrgType(orgType,isSysadmin);
+		Collections.sort(rolelist);
+		request.setAttribute("rolelist",rolelist);
+		// set canEdit for whether user should be able to edit anything other than roles
+		request.setAttribute("canEdit",isSysadmin);
 		request.setAttribute("locales",locales);
 		
 		// editing a user
@@ -168,9 +167,7 @@ public class UserAction extends LamsDispatchAction {
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-			allRoles = getService().findAll(Role.class);
 			locales = getService().findAll(SupportedLocale.class);
-			Collections.sort(allRoles);
 			Collections.sort(locales);
 		}
 		return service;
