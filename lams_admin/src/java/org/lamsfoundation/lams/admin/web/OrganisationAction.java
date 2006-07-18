@@ -67,6 +67,7 @@ public class OrganisationAction extends LamsDispatchAction {
 	private static List status;
 	
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
+		initLocalesAndStatus();
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		if(orgId != null){//editing existing organisation
 			Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
@@ -85,7 +86,6 @@ public class OrganisationAction extends LamsDispatchAction {
 			SupportedLocale locale = (SupportedLocale)getService().findByProperties(SupportedLocale.class,properties).get(0);
 			orgForm.set("localeId",locale.getLocaleId());
 		}
-		//request.getSession().setAttribute("countries",countries);
 		request.getSession().setAttribute("locales",locales);
 		request.getSession().setAttribute("status",status);
 		return mapping.findForward("organisation");
@@ -103,11 +103,18 @@ public class OrganisationAction extends LamsDispatchAction {
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		}
+		return service;
+	}
+	
+	private void initLocalesAndStatus(){
+		if((locales==null)||(status==null)){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
 			locales = service.findAll(SupportedLocale.class);
 			status = service.findAll(OrganisationState.class);
 			Collections.sort(locales);
 		}
-		return service;
 	}
 
 } // end Action
