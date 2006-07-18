@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Manpreet Minhas 
@@ -183,4 +184,8 @@ public interface IAuthoringService {
 	 * that is done by the LamsCoreToolService */
 	public void deleteLearningDesign(LearningDesign design);
 
+
+	/** Get the message service, which gives access to the I18N text */
+	public MessageService getMessageService();
+	
 }

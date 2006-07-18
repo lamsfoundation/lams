@@ -46,10 +46,13 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /** 
@@ -93,7 +96,9 @@ public class LearnerAction extends LamsDispatchAction
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
     private static final String DISPLAY_ACTIVITY = "displayActivity";
-    
+	
+	private static IAuditService auditService;
+	
 	private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url) throws IOException, ServletException {
 		if ( url != null ) {
 			  String fullURL = WebUtil.convertToFullURL(url);
@@ -116,6 +121,9 @@ public class LearnerAction extends LamsDispatchAction
 		log.error("Exception thrown "+methodKey,e);
 		String[] msg = new String[1];
 		msg[0] = e.getMessage();
+		
+		getAuditService().log(LearnerAction.class.getName()+":"+methodKey, e.toString());		
+		
 		return new FlashMessage(methodKey,
 				learnerService.getMessageService().getMessage("error.system.learner", msg),
 				FlashMessage.CRITICAL_ERROR);
@@ -436,4 +444,17 @@ public class LearnerAction extends LamsDispatchAction
         String url = getLearnerActivityURL(request, activityId);
        	return redirectToURL(mapping, response, url);
     }
+	
+	/**
+	 * Get AuditService bean.
+	 * @return
+	 */
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
+	}
+    
 }

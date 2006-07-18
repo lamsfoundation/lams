@@ -651,5 +651,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		learningDesignDAO.delete(design);
 	}
 
+	public MessageService getMessageService() {
+		return messageService;
+	}
+
 
 }

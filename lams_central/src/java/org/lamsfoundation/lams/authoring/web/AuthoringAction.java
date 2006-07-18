@@ -35,14 +35,11 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
-import org.lamsfoundation.lams.usermanagement.exception.UserException;
-import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -65,7 +62,9 @@ public class AuthoringAction extends LamsDispatchAction{
      * If you want it returned as a stream (ie for Flash), do not define this parameter
      */  
 	public static String USE_JSP_OUTPUT = "jspoutput";
-		
+	
+	private static IAuditService auditService;
+	
 	public IAuthoringService getAuthoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);		
@@ -99,10 +98,15 @@ public class AuthoringAction extends LamsDispatchAction{
 	public ActionForward getLearningDesignDetails(ActionMapping mapping,
 								   ActionForm form,
 								   HttpServletRequest request,
-								   HttpServletResponse response)throws ServletException, IOException{		
-		Long learningDesignID = new Long(WebUtil.readLongParam(request,"learningDesignID"));
+								   HttpServletResponse response)throws ServletException, IOException{
+		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
-		String wddxPacket = authoringService.getLearningDesignDetails(learningDesignID);
+		try {
+			Long learningDesignID = new Long(WebUtil.readLongParam(request,"learningDesignID"));
+			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID);
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService).serializeMessage();
+		}
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	
@@ -110,17 +114,27 @@ public class AuthoringAction extends LamsDispatchAction{
 											ActionForm form,
 											HttpServletRequest request,
 											HttpServletResponse response)throws ServletException, IOException{
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
-		String wddxPacket = authoringService.getLearningDesignsForUser(userID);
+		try {
+			Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+			wddxPacket = authoringService.getLearningDesignsForUser(userID);
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getLearningDesignsForUser", authoringService).serializeMessage();
+		}
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	public ActionForward getAllLearningDesignDetails(ActionMapping mapping,
 											ActionForm form,
 											HttpServletRequest request,
 											HttpServletResponse response)throws ServletException, IOException{
+		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
-		String wddxPacket = authoringService.getAllLearningDesignDetails();
+		try {		
+			wddxPacket = authoringService.getAllLearningDesignDetails();
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getAllLearningDesignDetails", authoringService).serializeMessage();
+		}
 		log.debug("getAllLearningDesignDetails: returning "+wddxPacket);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
@@ -129,8 +143,13 @@ public class AuthoringAction extends LamsDispatchAction{
 													  ActionForm form,
 													  HttpServletRequest request,
 													  HttpServletResponse response)throws ServletException, IOException{
+		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
-		String wddxPacket = authoringService.getAllLearningLibraryDetails();
+		try {
+			wddxPacket = authoringService.getAllLearningLibraryDetails();
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService).serializeMessage();
+		}
 		log.debug("getAllLearningLibraryDetails: returning "+wddxPacket);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
@@ -140,10 +159,15 @@ public class AuthoringAction extends LamsDispatchAction{
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 	 
-	    Long toolID = new Long(WebUtil.readLongParam(request,"toolID"));
-	    IAuthoringService authoringService = getAuthoringService();
-	    String message = authoringService.getToolContentID(toolID);
-	    return outputPacket(mapping, request, response, message, "details");   
+		String wddxPacket;
+		IAuthoringService authoringService = getAuthoringService();
+		try {
+		    Long toolID = new Long(WebUtil.readLongParam(request,"toolID"));
+		    wddxPacket = authoringService.getToolContentID(toolID);
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService).serializeMessage();
+		}
+	    return outputPacket(mapping, request, response, wddxPacket, "details");   
 	    
 	}
 	
@@ -175,6 +199,8 @@ public class AuthoringAction extends LamsDispatchAction{
 			flashMessage = new FlashMessage("getAvailableLicenses",
 					"License details unavailable due to system error :" + e.getMessage(),
 					FlashMessage.ERROR);
+			
+			getAuditService().log(AuthoringAction.class.getName(), e.toString());
 		}
 		
         PrintWriter writer = response.getWriter();
@@ -182,5 +208,33 @@ public class AuthoringAction extends LamsDispatchAction{
         return null;
 	}	
 	
+	/**
+	 * Handle flash error.
+	 * @param e
+	 * @param methodKey
+	 * @param monitoringService
+	 * @return
+	 */
+	  private FlashMessage handleException(Exception e, String methodKey, IAuthoringService authoringService) {
+		log.error("Exception thrown "+methodKey,e);
+		getAuditService().log(AuthoringAction.class.getName()+":"+methodKey, e.toString());
+
+		String[] msg = new String[1];
+		msg[0] = e.getMessage();
+		return new FlashMessage(methodKey,
+			authoringService.getMessageService().getMessage("error.system.error", msg),
+			FlashMessage.CRITICAL_ERROR);
+    }
+	/**
+	 * Get AuditService bean.
+	 * @return
+	 */
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
+	}
 
 }
