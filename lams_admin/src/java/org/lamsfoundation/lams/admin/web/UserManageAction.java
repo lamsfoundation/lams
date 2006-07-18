@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -95,11 +96,21 @@ public class UserManageAction extends Action {
 		String orgName = organisation.getName();
 		log.debug("orgName: "+orgName);
 		
+		Organisation pOrg = organisation.getParentOrganisation();
+		if(pOrg!=null){
+			request.setAttribute("pOrgId",pOrg.getOrganisationId());
+			request.setAttribute("pOrgName",pOrg.getName());
+		}
+		OrganisationType orgType = organisation.getOrganisationType();
+		request.setAttribute("orgType",orgType.getOrganisationTypeId());
+		
+		
 		Integer userId = getService().getUserByLogin(request.getRemoteUser()).getUserId();
+		Integer orgIdOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg.getOrganisationId() : orgId;
         // check permission
 		if(request.isUserInRole(Role.SYSADMIN)){
 			request.setAttribute("canAdd",true);
-		}else if(!getService().isUserInRole(userId,orgId,Role.COURSE_ADMIN)){
+		}else if(!getService().isUserInRole(userId,orgIdOfCourseAdmin,Role.COURSE_ADMIN)){
 			errors.add("authorisation",new ActionMessage("error.authorisation"));
 			saveErrors(request,errors);
 			return mapping.findForward("error");
@@ -140,13 +151,6 @@ public class UserManageAction extends Action {
 		
 		userManageForm.setUserManageBeans(userManageBeans);
 		request.setAttribute("UserManageForm", userManageForm);
-		
-		Organisation pOrg = organisation.getParentOrganisation();
-		if(pOrg!=null){
-			request.setAttribute("pOrgId",pOrg.getOrganisationId());
-			request.setAttribute("pOrgName",pOrg.getName());
-		}
-		request.setAttribute("orgType",organisation.getOrganisationType().getOrganisationTypeId());
 		
 		return mapping.findForward("userlist");
 	}
