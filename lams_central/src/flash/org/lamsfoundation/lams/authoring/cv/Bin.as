@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
@@ -37,8 +38,9 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
-		
+	private var _tip:ToolTip;	
 	//locals
+	private var tooltipXoffset:Number = 100;
 	private var up_mc:MovieClip;
 	private var over_mc:MovieClip;
 	
@@ -56,9 +58,10 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	
 	public function init():Void{
 		//set up handlers
+		_tip = new ToolTip();
 		up_mc.addEventListener("onRollOver",this);
-		over_mc.addEventListener("onRollOut",this);
-		over_mc.addEventListener("onRelease",this);
+		up_mc.addEventListener("onRollOut",this);
+		up_mc.addEventListener("onRelease",this);
 		draw();
 	}
 	
@@ -67,66 +70,21 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 		up_mc._visible = true;
 	}
 	
-		
-	
-	
 	private function onRelease():Void{
 		Debugger.log('onRelease:'+this,Debugger.GEN,'onRelease','Bin');
-		//see if we have an activity
-		
+		_tip.CloseToolTip();
 	}
 	
 	private function onRollOver():Void{
-		//over_mc._visible = true;
-		//up_mc._visible = false;
+		var Xpos = (Application.CANVAS_X+ this._x)-tooltipXoffset;
+		var Ypos = (Application.CANVAS_Y+ this._y)-up_mc._height;
+		var ttHolder = Application.tooltip;
+		//var ttMessage = btnObj.label;
+		var ttMessage = Dictionary.getValue("bin_tooltip");
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 	}
 	
 	private function onRollOut():Void{
-		//over_mc._visible = false;
-		//sup_mc._visible = true;
-		
+		_tip.CloseToolTip();
 	}
-
-/*
-	
-	private function onPress():Void{
-		
-			
-			// check double-click
-			var now:Number = new Date().getTime();
-			
-			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				Debugger.log('DoubleClicking:'+this,Debugger.GEN,'onPress','CanvasActivity');
-				_doubleClicking = true;
-				_canvasController.activityDoubleClick(this);
-				
-				
-
-			}else{
-				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
-				_doubleClicking = false;
-				
-				Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
-				_canvasController.activityClick(this);
-				
-			
-			}
-			
-			_dcStartTime = now;
-	
-	}
-		
-	private function onReleaseOutside():Void{
-		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
-		_canvasController.activityReleaseOutside(this);
-	}
-	
-	*/
-	
-	
-	
-	
-
-
-
 }
