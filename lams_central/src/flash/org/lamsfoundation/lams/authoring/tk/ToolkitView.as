@@ -41,6 +41,7 @@ class ToolkitView extends AbstractView {
 		private var toolkitLibraries_sp:MovieClip;
 	private var libraryActivityDesc_txa:TextArea;
 	private var title_lbl:Label;
+	private var title_btn:Button;
 	private var toolTip:MovieClip;	private var _className = "ToolkitView";
 	private var _depth:Number;
 	
@@ -50,6 +51,7 @@ class ToolkitView extends AbstractView {
 	private var dragIconListener:Object;
 	private var _dictionary:Dictionary;
 	private var _tm:ThemeManager;
+	private var _tip:ToolTip;
 	
 	//sorry mvc guru but i disagree - little state var here
 	private var _dragging:Boolean;
@@ -68,6 +70,7 @@ class ToolkitView extends AbstractView {
         EventDispatcher.initialize(this);     
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
+		_tip = new ToolTip();
 		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));		//Debugger.log('Running',4,'Constructor','ToolkitView');
 	}
 		/**
@@ -84,7 +87,9 @@ class ToolkitView extends AbstractView {
 		dragIconListener.cRef = this;
 		dragIcon_mcl = new MovieClipLoader();
 		dragIcon_mcl.addListener(dragIconListener);
-        
+		title_btn.useHandCursor = false;
+        title_btn.onRollOver = Proxy.create(this,this['showToolTip'], undefined, null, null, title_btn);
+		title_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		/**  
 		* Called by the MovieClip loader that loaded the drag icon.
 		* 
@@ -238,7 +243,7 @@ class ToolkitView extends AbstractView {
 			//NOW we pass in the whole array, as complex activities are supprted in this way
 			var activities:Array = learningLib.classInstanceRefs;
 			//Debugger.log('toolActivity '+ta.title+'('+ta.activityID+')',4,'updateLibraries','ToolkitView');
-			var templateActivity_mc = toolkitLibraries_sp.content.attachMovie("TemplateActivity","ta_"+learningLib.learningLibraryID,_depth++,{_activities:activities,_toolkitView:tkv});
+			var templateActivity_mc = toolkitLibraries_sp.content.attachMovie("TemplateActivity","ta_"+learningLib.learningLibraryID,_depth++,{_activities:activities,_toolkitView:tkv, yPos:yPos});
 			
 			//position it
 			templateActivity_mc._y = yPos;
@@ -249,17 +254,26 @@ class ToolkitView extends AbstractView {
 		
 	}
 	
-	public function showToolTip(toolName:String):Void{
-		//trace("ToolName is: "+toolName)
-		//toolTip = this.createEmptyMovieClip ("toolTip", DepthManager.kTop)
-		//toolTip.attachMovie("wizard-wand", "toolTip_mc", this.getNextHighestDepth(), {_x:_xmouse+5 ,_y:_ymouse-10});
-		Application.tooltip.attachMovie("toolTip_mc", "toolTip_mc", Application.root.getNextHighestDepth(), {_x:_xmouse+5 ,_y:_ymouse-30, toolTipName:"Hello worl how are you doing?"});
-		//Application.tooltip.toolTip_mc.toolTipName = "Hello world how are you?"
-		//toolTip.toolTip_cmp.text = "test"
+	public function showToolTip(ttMsg:String, xpos:Number, ypos:Number, btnObj):Void{
+		var ttHolder = Application.tooltip;
+		var ttMessage:String;
+		var Xpos:Number;
+		var Ypos:Number;
+		if (btnObj != undefined){
+			Xpos = Application.TOOLKIT_X+ libraryActivityDesc_txa._x;
+			Ypos = Application.TOOLKIT_Y+ libraryActivityDesc_txa._y;
+			ttMessage = title_lbl.text;
+		}else {
+			Xpos = Application.TOOLKIT_X+toolkitLibraries_sp._x + xpos
+			Ypos = Application.TOOLKIT_Y+toolkitLibraries_sp._y + ypos
+			ttMessage = ttMsg;
+		}
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
+		
 	}
 	
 	public function hideToolTip():Void{
-		toolTip.removeMovieClip();
+		_tip.CloseToolTip();
 	}	/**
 	*The currently selected Template Activity
 	* 
