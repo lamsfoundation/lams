@@ -195,7 +195,7 @@ public class GateAction extends LamsDispatchAction
         DynaActionForm gateForm = (DynaActionForm)form;
         
         GateActivity gate = monitoringService.openGate((Long)gateForm.get(ACTIVITY_FORM_FIELD));
-            
+
         return findViewByGateType(mapping, gateForm, gate);
     }
     
@@ -247,8 +247,7 @@ public class GateAction extends LamsDispatchAction
 	            		"gate id ["+gate.getActivityId()+"] - the type ["+
 	            		gate.getActivityTypeId()+"] is not a gate type");
     	} else {
-    		throw new MonitoringServiceException("Gate activity missing. " +
-        		"gate id ["+gate.getActivityId()+"]");
+    		throw new MonitoringServiceException("Gate activity missing. ");
     	}
     }
 
