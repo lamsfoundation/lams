@@ -2,13 +2,13 @@
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<c:choose>
-		<c:when test='${requestScope.isPageEditable == "true"}'>
+		<c:when test='${formBean.contentEditable == "true"}'>
 			<tr>
 				<td class="field-name">
 					<fmt:message key="basic.title" />
 				</td>
 				<td>
-					<c:out value="${sessionScope.title}" escapeXml="false" />
+					<c:out value="${formBean.title}" escapeXml="false" />
 				</td>
 			</tr>
 
@@ -17,7 +17,7 @@
 					<fmt:message key="basic.content" />
 				</td>
 				<td>
-					<c:out value="${sessionScope.content}" escapeXml="false" />
+					<c:out value="${formBean.content}" escapeXml="false" />
 				</td>
 			</tr>
 		</c:when>
@@ -33,7 +33,7 @@
 	</c:choose>
 </table>
 
-<c:if test='${requestScope.isPageEditable == "true"}'>
+<c:if test='${formBean.contentEditable == "true"}'>
 	<p align="right">
 		<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">
 			<fmt:message key="button.edit" />

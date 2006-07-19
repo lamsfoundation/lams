@@ -1,37 +1,19 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<table cellpadding="0">
-	<c:set var="groupCounter" scope="request" value="0" />
-	<c:forEach var="group" items="${requestScope.groupStatsMap}">
-		<c:set var="groupCounter" scope="request" value="${groupCounter+1}" />
-		<tr>
-			<td width="30%">
-				<fmt:message key="heading.group">
-					<fmt:param value="${groupCounter}" />
-				</fmt:message>
-			</td>
+<table>
+	<tr><td colspan="2"><h2><fmt:message key="heading.totalLearnersInGroup" /></h2></td></tr>
 
-			<td>
-				&nbsp;
-			</td>
-		</tr>
-
-		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="heading.totalLearners" />
-			</td>
-			<td>
-				<c:out value="${group.value}" />
-			</td>
-		</tr>
-	</c:forEach>
-
-	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="heading.totalLearnersInGroup" />
-		</td>
-		<td>
-			<c:out value="${requestScope.totalLearners}" />
-		</td>
+<c:forEach var="group" items="${formBean.groupStatsMap}">
+	<tr><td width="50%"><c:out value="${group.key}" /></td>
+		<td><c:out value="${group.value}" /></td>
 	</tr>
+</c:forEach>
+</table>
+
+<table>
+	<tr><td width="50%"><h2><fmt:message key="heading.totalLearners" /></h2></td>
+		<td><c:out value="${formBean.totalLearners}" /></td>
+	</tr>
+</table>
+
 </table>

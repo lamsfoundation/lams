@@ -67,7 +67,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/starter/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
+ * @struts:action path="/starter/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
  *               validate="false" parameter="mode"
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
@@ -112,7 +112,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 
         NoticeboardContent nbContent = null;
         NoticeboardUser nbUser = null;
-        NbWebUtil.cleanLearnerSession(request);
         saveMessages(request, null);
         
         NbLearnerForm learnerForm = (NbLearnerForm)form;
@@ -158,18 +157,21 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
         }
         
+        boolean readOnly = false;
         ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
         if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR )
         {
-            /* Set the ContentInUse flag to true, and defineLater flag to false */
-            nbContent.setContentInUse(true);
-          //  nbContent.setDefineLater(false); /* defineLater should be false anyway */
-            nbService.saveNoticeboard(nbContent);
-                     
+        	if ( ! nbContent.isContentInUse() ) {
+	            /* Set the ContentInUse flag to true, and defineLater flag to false */
+	            nbContent.setContentInUse(true);
+	            nbService.saveNoticeboard(nbContent);
+        	}
+        	
             if (nbUser != null)
 	        {
-            	if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED))
-	                   request.getSession().setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");	           
+            	if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED)) {
+            		readOnly = true;
+            	}
 	        }
             else
             {
@@ -177,10 +179,11 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             	NoticeboardUser newUser = new NoticeboardUser(userID);
             	nbService.addUser(toolSessionID, newUser);
             }
-            
-            
-        } 
-        learnerForm.copyValuesIntoForm(nbContent);
+        } else {
+    		readOnly = true;
+        }
+        
+        learnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
         return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
     
     }
@@ -261,28 +264,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         else
             return false;
 	}
-	
-	private boolean displayMessageToAuthor(NoticeboardContent content, ActionMessages message)
-	{
-	    boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
-        boolean isRunOfflineSet = isFlagSet(content, NoticeboardConstants.FLAG_RUN_OFFLINE);
-        if(isDefineLaterSet || isRunOfflineSet)
-        {
-            if (isDefineLaterSet)
-            {
-                message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.author.defineLaterSet1"));
-                message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.author.defineLaterSet2"));
-            }
-            if (isRunOfflineSet)
-            {
-                message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.runOfflineSet"));
-            }
-            return true;
-        }
-        else
-            return false;
-	}
-	
 	
 	
  }

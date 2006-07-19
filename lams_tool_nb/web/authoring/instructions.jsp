@@ -2,7 +2,7 @@
 
 <c:set var="onlineExist" value="false" />
 <c:set var="offlineExist" value="false" />
-<c:forEach var="att" items="${attachmentList}">
+<c:forEach var="att" items="${requestScope.sessionMap.attachmentList}">
 	<c:if test="${att.onlineFile}">
 		<c:set var="onlineExist" value="true" />
 	</c:if>
@@ -23,9 +23,9 @@
 	<c:if test="${onlineExist == 'true'}">
 		<tr>
 			<td>
-				<c:if test="${not empty attachmentList}">
+				<c:if test="${not empty requestScope.sessionMap.attachmentList}">
 					<ul>
-						<c:forEach var="attachment" items="${attachmentList}">
+						<c:forEach var="attachment" items="${requestScope.sessionMap.attachmentList}">
 							<c:if test="${attachment.onlineFile}">
 								<li>
 									${attachment.filename}
@@ -72,16 +72,16 @@
 <table>
 	<tr>
 		<td>
-			<lams:SetEditor id="offlineInstructions" text="${NbAuthoringForm.onlineInstructions}" key="instructions.onlineInstructions" alt="true" small="true" />
+			<lams:SetEditor id="offlineInstructions" text="${NbAuthoringForm.offlineInstructions}" key="instructions.offlineInstructions" alt="true" small="true" />
 		</td>
-	</tr>
+	</tr>  
 
 	<c:if test="${offlineExist == 'true'}">
 		<tr>
 			<td>
-				<c:if test="${not empty attachmentList}">
+				<c:if test="${not empty requestScope.sessionMap.attachmentList}">
 					<ul>
-						<c:forEach var="attachment" items="${attachmentList}">
+						<c:forEach var="attachment" items="${requestScope.sessionMap.attachmentList}">
 							<c:if test="${not attachment.onlineFile}">
 								<li>
 									${attachment.filename}

@@ -82,6 +82,9 @@ public class NbAuthoringForm extends ActionForm {
 	private FormFile offlineFile;
 
 	private String currentTab;
+	private String sessionMapID;
+	
+
 	/**
      * @return Returns the offlineFile.
      */
@@ -275,6 +278,12 @@ public class NbAuthoringForm extends ActionForm {
 	}
 	public void setCurrentTab(String currentTab) {
 		this.currentTab = currentTab;
+	}
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
 	}
 	
   

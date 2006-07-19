@@ -71,7 +71,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
+ * @struts:action path="/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
  *                input=".learnerContent" validate="false" parameter="method"
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
@@ -163,7 +163,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  
 		  
 	  }
-	  request.getSession().setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
+	  request.setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
 	  
 	  return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
 	  

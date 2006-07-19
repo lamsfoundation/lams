@@ -53,55 +53,51 @@
 
 	<div id="page">
 		<html:form action="/authoring" styleId="authoringForm" target="_self" enctype="multipart/form-data">
+			<html:hidden property="toolContentID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
+			<html:hidden property="sessionMapID" />
 
-			<%// in define later mode we only show the basic content, so no point showing the tabs. %>
-			<c:choose>
-				<c:when test="${requestScope.showBasicContent != 'true'}">
-					<h1>
-						<fmt:message key="activity.title" />
-					</h1>
-					<div id="header">
-						<!-- start tabs -->
-						<lams:Tabs control="true">
-							<lams:Tab id="1" key="label.authoring.heading.basic" />
-							<lams:Tab id="2" key="label.authoring.heading.advanced" inactive="true" />
-							<lams:Tab id="3" key="label.authoring.heading.instructions" />
-						</lams:Tabs>
-						<!-- end tab buttons -->
-					</div>
-				</c:when>
-				<c:otherwise>
-					<h1 class="no-tabs-below">
-						<fmt:message key="activity.title" />
-					</h1>
-					<div id="header-no-tabs"></div>
-				</c:otherwise>
-			</c:choose>
+			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+			<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" scope="request"/>	
+
+			<%-- in define later mode we edit only the basic content. But if we don't have the instructions tab, then the instructions are lost when saving. --%>
+			<h1>
+				<fmt:message key="activity.title" />
+			</h1>
+			<div id="header">
+				<!-- start tabs -->
+				<lams:Tabs control="true">
+					<lams:Tab id="1" key="label.authoring.heading.basic" />
+					<lams:Tab id="2" key="label.authoring.heading.advanced" inactive="true" />
+					<c:choose>
+					<c:when test="${formBean.defineLater != 'true'}">
+						<lams:Tab id="3" key="label.authoring.heading.instructions" />
+					</c:when>
+					<c:otherwise>
+						<lams:Tab id="3" key="label.authoring.heading.instructions" inactive="true" />
+					</c:otherwise>
+				</c:choose>
+				</lams:Tabs>
+				<!-- end tab buttons -->
+			</div>
 
 			<div id="content">
 				<!-- show any error messages here -->
 				<%@ include file="../errorbox.jsp"%>
 
-				<c:choose>
-					<c:when test="${requestScope.showBasicContent != 'true'}">
-						<!--  Set up tabs  -->
-						<lams:TabBody id="1" titleKey="label.authoring.heading.basic" page="basic.jsp" />
-						<lams:TabBody id="2" titleKey="label.authoring.heading.advanced" page="advance.jsp" />
-						<lams:TabBody id="3" titleKey="label.authoring.heading.instructions" page="instructions.jsp" />
-					</c:when>
-					<c:otherwise>
-						<!-- just include the basic page -->
-						<%@ include file="basic.jsp"%>
-					</c:otherwise>
-				</c:choose>
+				<!--  Set up tabs  -->
+				<lams:TabBody id="1" titleKey="label.authoring.heading.basic" page="basic.jsp" />
+				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced" page="advance.jsp" />
+				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions" page="instructions.jsp" />
 
 				<!-- Button Row -->
-				<c:set var="dispactchMethodName">
+				<c:set var="dispatchMethodName">
 					<fmt:message key="button.save" />
 				</c:set>
-				<html:hidden property="method" value="${dispactchMethodName}" />
-				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lanb11" toolContentID="${toolContentID}" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" />
+				<html:hidden property="method" value="${dispatchMethodName}" />
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lanb11" 
+					toolContentID="${formBean.toolContentID}" cancelButtonLabelKey="button.cancel" 
+					saveButtonLabelKey="button.save" customiseSessionID="${sessionMap.sessionID}"/>
 			</div>
 			<div id="footer" />
 				<lams:HTMLEditor />

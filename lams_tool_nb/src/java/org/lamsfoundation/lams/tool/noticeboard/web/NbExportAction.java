@@ -54,7 +54,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /**
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/exportPortfolio" name="NbExportForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportAction"
+ * @struts:action path="/exportPortfolio" name="NbExportForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportAction"
  *                validate="false" parameter="mode"
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"

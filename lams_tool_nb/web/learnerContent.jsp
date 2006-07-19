@@ -17,14 +17,16 @@
 			</td>
 		</tr>
 
-		<c:if test="${sessionScope.readOnlyMode != 'true'}">
+		<c:if test="${!NbLearnerForm.readOnly}">
 			<tr>
 				<td>
 					<div class="right-buttons">
 						<html:form action="/learner" target="_self">
-							<html:submit property="method" styleClass="button">
-								<fmt:message key="button.finish" />
-							</html:submit>
+								<html:hidden property="toolSessionID" />
+								<html:hidden property="mode" />
+								<html:submit property="method" styleClass="button">
+									<fmt:message key="button.finish" />
+								</html:submit>
 						</html:form>
 					</div>
 				</td>

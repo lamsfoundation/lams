@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,6 +65,16 @@ public class NbMonitoringForm extends ActionForm {
     private Map parametersToAppend;
     
 	private String currentTab;
+
+	/* Only valid when form just set up by Java. Values are not returned from jsp page */
+	private String title;
+	private String content;
+	private String onlineInstructions;
+	private String offlineInstructions;
+	private String contentEditable;
+	private List attachmentsList;
+	private Integer totalLearners;
+	private Map groupStatsMap;
 
 	/**
      * @return Returns the parametersToAppend.
@@ -115,4 +126,56 @@ public class NbMonitoringForm extends ActionForm {
 		this.currentTab = currentTab;
 	}
  
+	public String getContent() {
+		return content;
+	}
+
+	public String getOfflineInstructions() {
+		return offlineInstructions;
+	}
+
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public String getContentEditable() {
+		return contentEditable;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public void setContentEditable(String contentEditable) {
+		this.contentEditable = contentEditable;
+	}
+	public void setOfflineInstructions(String offlineInstructions) {
+		this.offlineInstructions = offlineInstructions;
+	}
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public List getAttachmentsList() {
+		return attachmentsList;
+	}
+	public void setAttachmentsList(List attachmentsList) {
+		this.attachmentsList = attachmentsList;
+	}
+	public Map getGroupStatsMap() {
+		return groupStatsMap;
+	}
+	public void setGroupStatsMap(Map groupStatsMap) {
+		this.groupStatsMap = groupStatsMap;
+	}
+	public Integer getTotalLearners() {
+		return totalLearners;
+	}
+	public void setTotalLearners(Integer totalLearners) {
+		this.totalLearners = totalLearners;
+	}
 }

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.util;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * This Web Utility class contains helper methods used in the Action Servlets
@@ -58,34 +60,6 @@ public class NbWebUtil {
 	 		
 	 	}
 	 	
-	 	public static void cleanAuthoringSession(HttpServletRequest request)
-	 	{
-	 	    request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
-	 	    request.getSession().removeAttribute(NoticeboardConstants.MODE);
-	 	    request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
-	 	    request.getSession().removeAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
-	 	}
-	 	
-	 	public static void cleanLearnerSession(HttpServletRequest request)
-	 	{
-	 	       request.getSession().removeAttribute(NoticeboardConstants.READ_ONLY_MODE);
-	 	      //  request.getSession().removeAttribute(NoticeboardConstants.IS_TOOL_COMPLETED);
-	 	}
-	 	
-	 	 public static void cleanMonitoringSession(HttpServletRequest request)
-	     {
-	         //request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-	         request.getSession().removeAttribute(NoticeboardConstants.TITLE);
-	         request.getSession().removeAttribute(NoticeboardConstants.CONTENT);
-	         request.getSession().removeAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS);
-	         request.getSession().removeAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS);
-	         request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
-	         // deleted attachments probably isn't used in monitoring, but included 
-	         // here to keep it consistent with authoring.
-	 	     request.getSession().removeAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
-	      
-	     }
-	     
 	     /**
 	      * <p> This method checks the two tool content flags, defineLater and contentInUse
 	      * to determine whether the tool content is modifiable or not. Returns true if the content is
@@ -113,23 +87,8 @@ public class NbWebUtil {
 	         else //  (content.isContentInUse()==true && content.isDefineLater() == false)
 	             return false;
 	     }
-	    
-	    /**
-	     * Used in the monitoring environment. 
-	     * Copies the values of the pojo/bean properties title, content, onlineInstructions and offlineInstructions
-	     * into the session scope variables title, content, onlineInstructions and offlineInstructions respectively.
-	     * @param request the HttpServletRequest which is used to obtain the HttpSession, in which is used to store the session variables for the 4 properties.
-	     * @param content the bean in which to copy the 4 properties from
-	     */ 
-	    public static void copyValuesIntoSession(HttpServletRequest request, NoticeboardContent content)
-	    {
-	         request.getSession().setAttribute(NoticeboardConstants.TITLE, content.getTitle());
-	         request.getSession().setAttribute(NoticeboardConstants.CONTENT, content.getContent());
-	         request.getSession().setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
-	         request.getSession().setAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS, content.getOfflineInstructions());
-	    }
-	    
-	    /**
+	     
+	     /**
 	     * <p>This method is used in authoring and monitoring to display the list of files that have been uploaded.
 	     * Contents of the collections are NoticeboardAttachments. The current files are included in the attachmentList, 
 	     * files that the user has nominated to delete are in the deletedAttachementList.</p>
@@ -141,19 +100,14 @@ public class NbWebUtil {
 	     * @param attachmentList
 	     * @param deletedAttachmentList
 	     */
-	    public static void addUploadsToSession(HttpServletRequest request, List attachmentList, List deletedAttachmentList)
+	    public static SessionMap addUploadsToSession(SessionMap sessionMap, HttpServletRequest request, List attachmentList, List deletedAttachmentList)
 	    {
-	    	if ( attachmentList != null ) {
-		        request.getSession().setAttribute(NoticeboardConstants.ATTACHMENT_LIST, attachmentList);
-	    	}
-	        
-	        // deleted will be empty most of the time
-	        if ( deletedAttachmentList != null ) {
-	        	request.getSession().setAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST, deletedAttachmentList);
-	        }
-
+	    	SessionMap map = sessionMap != null ? sessionMap : new SessionMap();
+			map.put(NoticeboardConstants.ATTACHMENT_LIST, attachmentList != null ? attachmentList : new ArrayList());
+			map.put(NoticeboardConstants.DELETED_ATTACHMENT_LIST, deletedAttachmentList != null ? deletedAttachmentList : new ArrayList());
+			request.getSession().setAttribute(map.getSessionID(), map);
+			return map;
 	    }
-	    
 	    
 		/** Setup the map containing the files that have been uploaded for this particular tool content id.
 		 * If NoticeboardContent content does not exist, set nb=null and an empty list will be created.

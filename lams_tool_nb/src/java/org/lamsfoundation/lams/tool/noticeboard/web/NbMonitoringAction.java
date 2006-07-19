@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
@@ -58,7 +59,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *  
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/monitoring" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
+ * @struts:action path="/monitoring" name="NbMonitoringForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
  *                input=".monitoringContent" validate="false" parameter="method"
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
@@ -82,182 +83,62 @@ public class NbMonitoringAction extends LamsDispatchAction {
     public static final String EDITACTIVITY_TABID = "3";
     public static final String STATISTICS_TABID = "4";
    
-    /**
-     * If no method parameter, or an unknown key, it will 
-	 * Setup the monitoring environment, and places values in the
-	 * formbean in session scope and then go to the summary tab.
-	 */
     public ActionForward unspecified(
     		ActionMapping mapping,
     		ActionForm form,
     		HttpServletRequest request,
     		HttpServletResponse response) throws NbApplicationException
     {
-    	 NbMonitoringForm monitorForm = new NbMonitoringForm();
-         NbWebUtil.cleanMonitoringSession(request);
-         Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
-         
-         if (toolContentId == null)
+    	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+        if (toolContentId == null)
  		{
  		    String error = "Unable to continue. Tool content id missing";
  		    logger.error(error);
  			throw new NbApplicationException(error);
  		}
-         monitorForm.setToolContentID(toolContentId.toString());
-         request.getSession().setAttribute(FORM, monitorForm);
-         return summary(mapping, form, request, response);
+         
+        NbMonitoringForm monitorForm = new NbMonitoringForm();
 
-    }
-  
-    /**
-     * Will forward to the jsp
-	 * and will display the edit activity page, which shows the content of the noticeboard
-	 * and will show an edit button which allows an author to modify the noticeboard content.
-	 * When this edit button is clicked, it appends defineLater=true to the authoring URL.
-	 * However, if the contents is not editable (ie. the contents are in use which means a learner 
-	 * already reached the activity) it will display a message saying so.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;                
-      
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-		NbWebUtil.copyValuesIntoSession(request, content);
-		if (NbWebUtil.isContentEditable(content))
-		{
-		  //  request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "false"); //used in jsp page to allow the edit button to show, so that author can edit page
-		    // request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "true");
-		    request.setAttribute(NoticeboardConstants.PAGE_EDITABLE, "true");
-		    
+
+		monitorForm.setToolContentID(toolContentId.toString());
+    	monitorForm.setTitle(content.getTitle());
+    	monitorForm.setContent(content.getContent());
+    	monitorForm.setOnlineInstructions(content.getOnlineInstructions());
+    	monitorForm.setOfflineInstructions(content.getOfflineInstructions());
+		monitorForm.setAttachmentsList(NbWebUtil.setupAttachmentList(nbService, content));
+
+		if ( NbWebUtil.isContentEditable(content) ) {
+			monitorForm.setContentEditable("true");
 		    //set up the request parameters to append to the URL
 		    Map<String,Object> map = new HashMap<String,Object>();
-		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, monitorForm.getToolContentID());
+		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId.toString());
 		    map.put(NoticeboardConstants.DEFINE_LATER, "true");
-		    
 		    monitorForm.setParametersToAppend(map);
-		    
-		  
+		} else {
+			monitorForm.setContentEditable("false");
 		}
-		else
-		{
-		   request.setAttribute(NoticeboardConstants.PAGE_EDITABLE, "false");
-		}
-				
- 		// send it to the third tab.
-   		monitorForm.setCurrentTab(EDITACTIVITY_TABID);
-		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
 		
-    }
-    
-    /**
-     * Will forward to the jsp
-	 * and will display the instructions page, which will just show the online and 
-	 * offline instructions and also the files that have been uploaded (view only mode).
-	 * The attachment map is setup again in case there were changes made from the 
-	 * first time the monitoring url was called.
-	 * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-     
-        //Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-       // Long toolContentId = getToolContentId(request);
-        
-        INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
-		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-		NbWebUtil.copyValuesIntoSession(request, content);
-		
-		request.setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
-		
-		List attachmentList = NbWebUtil.setupAttachmentList(nbService, content);
-		NbWebUtil.addUploadsToSession(request, attachmentList, null);
-		
- 		// send it to the second tab.
-   		monitorForm.setCurrentTab(INSTRUCTIONS_TABID);
-		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
-    }
-    
-    /**
-	 * Will forward to the jsp
-	 * and will display the summary page, which will show the contents of 
-	 * noticeboard.
-	 * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
-    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
-   		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-   		NbWebUtil.copyValuesIntoSession(request, content);
-   		
- 		// send it to the first tab.
-   		monitorForm.setCurrentTab(SUMMARY_TABID);
-   		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
-    }
-    
-    /**
-     * Will forward to the jsp
-	 * and will display the statistics page which shows the number of users that
-	 * have viewed this noticeboard. If grouping is applied, then the number of learners
-	 * will also be sorted into groups.
-	 * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward statistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        
-        INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        Map map = new HashMap();
-       // Long toolContentId = getToolContentId(request);
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
-        
-        NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-        
         //Get the total number of learners that have participated in this tool activity
-        int totalNumberOfUsers = nbService.calculateTotalNumberOfUsers(toolContentId);
-        request.setAttribute(NoticeboardConstants.TOTAL_LEARNERS, new Integer(totalNumberOfUsers));    
+        monitorForm.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));
         
-        //Now get the number of learners for each individual group (if any)
-        List listOfSessionIds = nbService.getSessionIdsFromContent(content);
-        Iterator i = listOfSessionIds.iterator();
-        int groupNum = 1;
+        Set sessions = content.getNbSessions();
+        Iterator i = sessions.iterator();
+        Map map = new HashMap();
         while (i.hasNext())
         {
-           
-            Long sessionId = (Long)i.next();
-            int numUsersInSession = nbService.getNumberOfUsersInSession(nbService.retrieveNoticeboardSession(sessionId));
-            map.put(new Integer(groupNum), new Integer(numUsersInSession));
-            groupNum++;
+        	NoticeboardSession session = (NoticeboardSession) i.next();
+            int numUsersInSession = nbService.getNumberOfUsersInSession(session);
+            map.put(session.getNbSessionName(), new Integer(numUsersInSession));
         }
-        request.setAttribute(NoticeboardConstants.GROUP_STATS_MAP, map);
+        monitorForm.setGroupStatsMap(map);
         
- 		// send it to the fourth tab.
-   		monitorForm.setCurrentTab(STATISTICS_TABID);
-        return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
+   		monitorForm.setCurrentTab(SUMMARY_TABID);
+        request.setAttribute(FORM, monitorForm);
+   		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
-    
+	    
    
    
 }

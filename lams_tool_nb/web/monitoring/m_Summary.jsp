@@ -1,22 +1,8 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
-<table cellpadding="0">
-	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="basic.title" />
-		</td>
-		<td>
-			<c:out value="${sessionScope.title}" escapeXml="false" />
-		</td>
-	</tr>
+	<H1><c:out value="${formBean.title}" escapeXml="false" /></H2>
+	<p><c:out value="${formBean.content}" escapeXml="false" /></p>
 
-	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="basic.content" />
-		</td>
-		<td>
-			<c:out value="${sessionScope.content}" escapeXml="false" />
-		</td>
-	</tr>
-</table>
+	<H1><fmt:message key="titleHeading.statistics"/></H2>
+	<%@ include file="m_Statistics.jsp"%>

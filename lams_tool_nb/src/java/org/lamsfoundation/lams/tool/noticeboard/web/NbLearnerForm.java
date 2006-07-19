@@ -54,6 +54,7 @@ public class NbLearnerForm extends ActionForm{
     
     private String mode;
     
+    private Boolean readOnly;
     
     /**
      * @return Returns the toolSessionID.
@@ -115,10 +116,12 @@ public class NbLearnerForm extends ActionForm{
 			
 	}
     
-    public void copyValuesIntoForm(NoticeboardContent content)
+    public void copyValuesIntoForm(NoticeboardContent content, boolean readOnly, String mode)
     {
         setTitle(content.getTitle());
         setContent(content.getContent());
+        setMode(mode);
+        setReadOnly(new Boolean(readOnly));
     }
     
     /**
@@ -133,4 +136,10 @@ public class NbLearnerForm extends ActionForm{
     public void setMode(String mode) {
         this.mode = mode;
     }
+	public Boolean getReadOnly() {
+		return readOnly;
+	}
+	public void setReadOnly(Boolean readOnly) {
+		this.readOnly = readOnly;
+	}
 }

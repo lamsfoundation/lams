@@ -28,7 +28,6 @@ import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
@@ -44,11 +43,7 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	@Override
 	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
-			session.removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
-			session.removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
-			session.removeAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
-			session.removeAttribute(NoticeboardConstants.MODE);
-			session.removeAttribute(NbAuthoringAction.FORM);
+			session.removeAttribute(customiseSessionID);
 		}
 	}
 
