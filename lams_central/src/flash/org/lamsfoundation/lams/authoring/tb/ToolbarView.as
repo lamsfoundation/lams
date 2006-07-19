@@ -20,9 +20,10 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
+import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.authoring.Application
 import org.lamsfoundation.lams.authoring.tb.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.style.*
@@ -36,6 +37,7 @@ class ToolbarView extends AbstractView {
 	//Toolbar clip
 	private var _toolbar_mc:MovieClip;
 	private var _tm:ThemeManager;
+	private var _tip:ToolTip;
     private var btnOffset_X:Number = 4;
 	private var btnOffset_Y:Number = 6;
 	private var new_btn:Button;
@@ -73,6 +75,7 @@ class ToolbarView extends AbstractView {
         mx.events.EventDispatcher.initialize(this);  
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
+		_tip = new ToolTip();
 		//_dictionary.addEventListener('init',Proxy.create(this,setupButtons));
 		//_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
@@ -89,19 +92,19 @@ class ToolbarView extends AbstractView {
 	
 	public function showHideAssets(v:Boolean){
 		
-		_toolbar_mc.branch_btn.enabled = false;
-		_toolbar_mc.gate_btn.visible = v;
-		_toolbar_mc.branch_btn.visible = v;
-		_toolbar_mc.flow_bkg_pnl.visible = v;
-		var flowW:Number = _toolbar_mc.flow_btn.width
-		var gateW:Number = _toolbar_mc.gate_btn.width
-		var branchW:Number = _toolbar_mc.branch_btn.width
+		branch_btn.enabled = false;
+		gate_btn.visible = v;
+		branch_btn.visible = v;
+		flow_bkg_pnl.visible = v;
+		var flowW:Number = flow_btn.width
+		var gateW:Number = gate_btn.width
+		var branchW:Number = branch_btn.width
 		var widthSet1:Number = Math.max(flowW, gateW)
 		var widthSet2:Number = Math.max(flowW, branchW)
 		var maxWidth:Number = Math.max(widthSet1, widthSet2)
 		trace("flow  width: "+flowW+" gate width: "+gateW+" branch width: "+branchW+" and max button width: "+maxWidth)
-		_toolbar_mc.flow_bkg_pnl.setSize(maxWidth+6, 95)
-		_toolbar_mc.flow_bkg_pnl._x = _toolbar_mc.branch_btn._x-3;
+		flow_bkg_pnl.setSize(maxWidth+6, 95)
+		flow_bkg_pnl._x = branch_btn._x-3;
 		
 		
 	}
@@ -121,17 +124,52 @@ class ToolbarView extends AbstractView {
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
 		
-		_toolbar_mc.new_btn.addEventListener("click",controller);
-		_toolbar_mc.open_btn.addEventListener("click",controller);
-		_toolbar_mc.save_btn.addEventListener("click",controller);
-		_toolbar_mc.copy_btn.addEventListener("click",controller);
-		_toolbar_mc.paste_btn.addEventListener("click",controller);
-		_toolbar_mc.trans_btn.addEventListener("click",controller);
-		_toolbar_mc.optional_btn.addEventListener("click",controller);
-		_toolbar_mc.flow_btn.addEventListener("click",controller);
-		_toolbar_mc.gate_btn.addEventListener("click",controller);
-		_toolbar_mc.group_btn.addEventListener("click",controller);
-		_toolbar_mc.preview_btn.addEventListener("click",controller);
+		new_btn.addEventListener("click",controller);
+		open_btn.addEventListener("click",controller);
+		save_btn.addEventListener("click",controller);
+		copy_btn.addEventListener("click",controller);
+		paste_btn.addEventListener("click",controller);
+		trans_btn.addEventListener("click",controller);
+		optional_btn.addEventListener("click",controller);
+		flow_btn.addEventListener("click",controller);
+		gate_btn.addEventListener("click",controller);
+		group_btn.addEventListener("click",controller);
+		preview_btn.addEventListener("click",controller);
+		
+		// Button handler for rollover and rollout.
+		
+		new_btn.onRollOver = Proxy.create(this,this['showToolTip'], new_btn, "new_btn_tooltip");
+		new_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		open_btn.onRollOver = Proxy.create(this,this['showToolTip'], open_btn, "open_btn_tooltip");
+		open_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		save_btn.onRollOver = Proxy.create(this,this['showToolTip'], save_btn, "save_btn_tooltip");
+		save_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		copy_btn.onRollOver = Proxy.create(this,this['showToolTip'], copy_btn, "copy_btn_tooltip");
+		copy_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		paste_btn.onRollOver = Proxy.create(this,this['showToolTip'], paste_btn, "paste_btn_tooltip");
+		paste_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		trans_btn.onRollOver = Proxy.create(this,this['showToolTip'], trans_btn, "trans_btn_tooltip");
+		trans_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		optional_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_btn, "optional_btn_tooltip");
+		optional_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		flow_btn.onRollOver = Proxy.create(this,this['showToolTip'], flow_btn, "flow_btn_tooltip");
+		flow_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		gate_btn.onRollOver = Proxy.create(this,this['showToolTip'], gate_btn, "gate_btn_tooltip");
+		gate_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		group_btn.onRollOver = Proxy.create(this,this['showToolTip'], group_btn, "group_btn_tooltip");
+		group_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		preview_btn.onRollOver = Proxy.create(this,this['showToolTip'], preview_btn, "preview_btn_tooltip");
+		preview_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		showHideAssets(false);
 		Debugger.log('dispatch it',Debugger.GEN,'createToolbar','ToolbarView');
@@ -141,18 +179,18 @@ class ToolbarView extends AbstractView {
 	
 	public function setupLabels(){
 		
-		_toolbar_mc.new_btn.label = Dictionary.getValue('new_btn');
-		_toolbar_mc.open_btn.label = Dictionary.getValue('open_btn');
-		_toolbar_mc.save_btn.label = Dictionary.getValue('save_btn');
-		_toolbar_mc.copy_btn.label = Dictionary.getValue('copy_btn');
-		_toolbar_mc.paste_btn.label = Dictionary.getValue('paste_btn');
-		_toolbar_mc.trans_btn.label = Dictionary.getValue('trans_btn');
-		_toolbar_mc.optional_btn.label = Dictionary.getValue('optional_btn');
-		_toolbar_mc.gate_btn.label = Dictionary.getValue('gate_btn');
-		_toolbar_mc.branch_btn.gate_btn.label = Dictionary.getValue('branch_btn');
-		_toolbar_mc.flow_btn.gate_btn.label = Dictionary.getValue('flow_btn');
-		_toolbar_mc.group_btn.label = Dictionary.getValue('group_btn');
-		_toolbar_mc.preview_btn.label = Dictionary.getValue('preview_btn');
+		new_btn.label = Dictionary.getValue('new_btn');
+		open_btn.label = Dictionary.getValue('open_btn');
+		save_btn.label = Dictionary.getValue('save_btn');
+		copy_btn.label = Dictionary.getValue('copy_btn');
+		paste_btn.label = Dictionary.getValue('paste_btn');
+		trans_btn.label = Dictionary.getValue('trans_btn');
+		optional_btn.label = Dictionary.getValue('optional_btn');
+		gate_btn.label = Dictionary.getValue('gate_btn');
+		branch_btn.label = Dictionary.getValue('branch_btn');
+		flow_btn.label = Dictionary.getValue('flow_btn');
+		group_btn.label = Dictionary.getValue('group_btn');
+		preview_btn.label = Dictionary.getValue('preview_btn');
 			}
 	
 	public function setupButtons(tm:ToolbarModel, menuList:Array){
@@ -185,6 +223,10 @@ class ToolbarView extends AbstractView {
 			if (i == menuList.length){
 				btn_text.removeTextField();
 			}
+			//_toolbarMenu[i].onRollOver = function(){
+				
+			//}
+			//_toolbarMenu[i].onRollOut = Proxy.create (this, localOnRollOut); 
 		}
 		
 	}
@@ -226,6 +268,20 @@ class ToolbarView extends AbstractView {
 			
 			this.preview_btn.enabled = infoObj.buttonstate;
 		}
+	}
+	
+	public function showToolTip(btnObj, btnTT:String):Void{
+		var Xpos = Application.TOOLBAR_X+ btnObj._x;
+		var Ypos = (Application.TOOLBAR_Y+ btnObj._y+btnObj.height)+5;
+		var ttHolder = Application.tooltip;
+		//var ttMessage = btnObj.label;
+		var ttMessage = Dictionary.getValue(btnTT);
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
 	}
 	
     /**
