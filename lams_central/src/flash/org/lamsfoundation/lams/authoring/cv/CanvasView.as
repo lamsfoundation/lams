@@ -101,13 +101,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 		trace("Value for this: "+this)
 		var myCopy:Array = new Array();
 		var menuArr:Array = new Array();
-		menuArr[0] =["Copy Activity", getCopy];
-		menuArr[1] = ["Paste Activity",getPaste];
+		menuArr[0] = ["Open/Edit Activity Content", getOpenEditActivtiyContent];
+		menuArr[1] =["Copy Activity", getCopy];
+		menuArr[2] = ["Paste Activity",getPaste];
 		
 		for (var i=0; i<menuArr.length; i++){
 			var myObj:Object = new Object();
 			myObj.cmlabel = menuArr[i][0];
 			myObj.handler = menuArr[i][1]; 
+			if (menuArr[i][0] == "Copy Activity"){
+				menuArr[i].separatorBefore = true;
+			}
 			myCopy[i]= myObj;
 			
 		} 
@@ -115,6 +119,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 		_root.menu = this_cm; 
 	}
 	
+	public function getOpenEditActivtiyContent(){
+		Application.getInstance().openEditActivtiyContent();
+	}
 	public function getCopy(){
 		Application.getInstance().copy();
 	}
@@ -232,7 +239,7 @@ public function viewUpdate(event:Object):Void{
 		var cvv = CanvasView(this);
 		
 		var cvc = getController();
-		Debugger.log('I am in drawActivity and Activity typeID :'+a+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
+		//Debugger.log('I am in drawActivity and Activity typeID :'+a+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
