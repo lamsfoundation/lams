@@ -46,31 +46,31 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	private static var MODULE:String = "authoring";
 
 	private static var _controlKeyPressed:String;
-	private static var TOOLBAR_X:Number = 0;
-    private static var TOOLBAR_Y:Number = 21;
-	private static var TOOLBAR_HEIGHT:Number = 35;
+	public static var TOOLBAR_X:Number = 0;
+    public static var TOOLBAR_Y:Number = 21;
+	public static var TOOLBAR_HEIGHT:Number = 35;
 
-    private static var TOOLKIT_X:Number = 0;
-    private static var TOOLKIT_Y:Number = 55;
+    public static var TOOLKIT_X:Number = 0;
+    public static var TOOLKIT_Y:Number = 55;
     
-    private static var CANVAS_X:Number = 180;
-    private static var CANVAS_Y:Number = 55;
-    private static var CANVAS_W:Number = 1000;
-    private static var CANVAS_H:Number = 200;
+    public static var CANVAS_X:Number = 180;
+    public static var CANVAS_Y:Number = 55;
+    public static var CANVAS_W:Number = 1000;
+    public static var CANVAS_H:Number = 200;
     
-	private static var PI_X:Number = 180;
-	private static var PI_Y:Number = 551;
-	private static var PI_W:Number = 616;
+	public static var PI_X:Number = 180;
+	public static var PI_Y:Number = 551;
+	public static var PI_W:Number = 616;
 	
-    private static var WORKSPACE_X:Number = 200;
-    private static var WORKSPACE_Y:Number = 200;
-    private static var WORKSPACE_W:Number = 300;
-    private static var WORKSPACE_H:Number = 200;
+    public static var WORKSPACE_X:Number = 200;
+    public static var WORKSPACE_Y:Number = 200;
+    public static var WORKSPACE_W:Number = 300;
+    public static var WORKSPACE_H:Number = 200;
     
 	private static var LOADING_ROOT_DEPTH:Number = 1000;	//depth of the loading movie
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
-    private static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
-    private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
+    private static var DIALOGUE_DEPTH:Number = 20;	//depth of the dialogue box
+    private static var TOOLTIP_DEPTH:Number = 60;	//depth of the tooltip
     private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
     private static var MENU_DEPTH:Number = 25;   //depth of the menu
 	private static var PI_DEPTH:Number = 35;   //depth of the menu
@@ -350,6 +350,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		for (var i=0; i<cmItems.length; i++){
 			trace("CM Item length: "+cmItems[i].handler)
 			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler);
+			if (i == 1){
+				menuItem_cmi.separatorBefore = true;
+			}
 			root_cm.customItems.push(menuItem_cmi);
 		}
 		
@@ -382,8 +385,10 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		// Change this to false to remove
 		 var myCopy:Array = new Array();
 		var menuArr:Array = new Array();
-		menuArr[0] =["Copy", copy];
-		menuArr[1] = ["Paste", paste];
+		menuArr[0] = ["Open/Edit Activity Content", openEditActivtiyContent];
+		menuArr[1] =["Copy", copy];
+		menuArr[2] = ["Paste", paste];
+		
 		
 		for (var i=0; i<menuArr.length; i++){
 			var myObj:Object = new Object();
@@ -398,11 +403,12 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
-        _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
+        
  		_cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);			
 		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
 		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);
 		
+		_tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
 
         //MENU
         _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {_x:0,_y:0});
@@ -632,13 +638,18 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		setClipboardData(_canvas.model.selectedItem, COPY_TYPE);
 	}
 	
+	public function openEditActivtiyContent():Void{
+		trace("testing openEditActivtiyContent");
+		_canvas.view.getController().activityDoubleClick(_canvas.model.selectedItem);
+	}
+	
 	public function paste():Void{
 		trace("testing paste");
 		_clipboardData.count++;
 		_canvas.setPastedItem(getClipboardData());
 	}
 	
-
+	
     
 	/**
 	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
