@@ -24,7 +24,7 @@
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.style.*;
-import org.lamsfoundation.lams.common.util.ui.*;
+import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.tk.*;
 import mx.controls.*;
@@ -39,20 +39,22 @@ import mx.events.*;
 class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{  
      
 	private var _tm:ThemeManager;
-	 
+	//private var Tip:ToolTip;
+	//private var ttHolder:MovieClip;
 	 //Declarations  
-	 private var bkg_pnl:MovieClip;
-	 private var title_lbl:Label;
-	 private var select_btn:Button;	 private var icon_mc:MovieClip;		 private var _instance:TemplateActivity;	 private var icon_mcl:MovieClipLoader;
-	 private var _taPanelStyle:Object;
-	 //this is set by the init object
-	 //contains refs to the classInstances of the activities in this TemplateActivity
-	 private var _activities:Array;
-	 private var _mainActivity:Activity;
-	 private var _childActivities:Array;
-
+	private var bkg_pnl:MovieClip;
+	private var title_lbl:Label;
+	private var select_btn:Button;
+	private var icon_mc:MovieClip;	private var _instance:TemplateActivity;	private var icon_mcl:MovieClipLoader;
+	private var _taPanelStyle:Object;
+	//this is set by the init object
+	//contains refs to the classInstances of the activities in this TemplateActivity
+	private var _activities:Array;
+	private var _mainActivity:Activity;
+	private var _childActivities:Array;
+	private var yPos:Number;
 	 
-	 private var _toolkitView:ToolkitView;
+	private var _toolkitView:ToolkitView;
 	 
     /**  
     * Constructor - creates an onEnterFrame doLater call to init
@@ -60,7 +62,8 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
     function TemplateActivity() {          
 		_tm = ThemeManager.getInstance();
 		_childActivities = new Array();
-		
+		//Tip = new ToolTip();
+		//ttHolder = Application.tooltip;
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
     }  
@@ -71,7 +74,6 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	function init():Void{		
 		_instance = this;
 				var tkv = ToolkitView(_toolkitView);
-		
 		setStyles();
 		
 		//Set up this class to use the Flash event delegation model  
@@ -109,8 +111,16 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		select_btn.onRollOut = Proxy.create(this,this['rollOut']);
 		//create an mc to hold th icon		icon_mc = this.createEmptyMovieClip("icon_mc",getNextHighestDepth());
 		loadIcon();
+		
+		
 	}
-
+	
+	/*private function initTT(){
+		
+		trace("ttHolder to pass: "+ttHolder)
+		var ttMessage:String = "<b>"+_mainActivity.title+"</b></br></br>"+_mainActivity.description;
+		Tip = new ToolTip(ttHolder, ttMessage);
+	}*/
 	/**
 	 * Populates the _childActivities array if this is a complex activity
 	 * @usage   
@@ -185,6 +195,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		if (toolTitle.length > 15){
 			toolTitle = toolTitle.substr(0, 15)+"..."
 		}
+		
 		title_lbl.text= toolTitle;
 		//attach the icon now...
 		var ICON_OFFSETX = 3;
@@ -192,6 +203,8 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		icon_mc._height = 20;
 		icon_mc._x = ICON_OFFSETX;
 		icon_mc._y = ICON_OFFSETY;
+		
+		//initTT()
 		//toolTip.text = _mainActivity.title;
 		//Debugger.log('icon_mc._width:'+icon_mc._width,4,'draw','TemplateActivity');
 		//Debugger.log('icon_mc._height:'+icon_mc._height,4,'draw','TemplateActivity');
@@ -210,7 +223,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	/**  
 	* Gets this TemplateActivity's data
 	*/
-	function get toolActivity():Object{
+	public function get toolActivity():Object{
 		/*
 		//if we only have one element then return that cos it must be a single toolActiivity
 		if(_activities.length ==1){
@@ -224,7 +237,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		
 	}
 	
-	function get mainActivity():Activity{
+	public function get mainActivity():Activity{
 		return _mainActivity;
 	}
 	
@@ -248,7 +261,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 
 	
 
-	function setState(selected:Boolean):Void{
+	public function setState(selected:Boolean):Void{
 		if(selected){
 			
 			bkg_pnl.setStyle("backgroundColor",0x1B6BA7);
@@ -261,6 +274,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	private function select():Void{
 		//Debugger.log('btn: '+this,4,'select','TemplateActivity');
 		//Debugger.log('_toolkitView:'+_toolkitView.className(),4,'select','TemplateActivity');
+		_toolkitView.hideToolTip();
 		var toolkitController = _toolkitView.getController();
 		toolkitController.selectTemplateActivity(this);			
 	}
@@ -268,15 +282,20 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	private function rollOver():Void{
 		bkg_pnl.setStyle("backgroundColor",0xFFFFFF);
 		bkg_pnl.setStyle("borderStyle","outset");
-		_toolkitView.showToolTip("test");
+		var ttMessage:String = "<b>"+_mainActivity.title+"</b> \n"+_mainActivity.description;
+		//var ttHolder = Application.tooltip;
+		//Tip.DisplayToolTip(ttHolder, ttMessage);
+		var ttypos = yPos + select_btn._height
+		var ttxpos = 2
+		_toolkitView.showToolTip(ttMessage, ttxpos, ttypos);
+		
+		
 		
 	}
 	
 	private function rollOut():Void{
 		bkg_pnl.setStyle("styleName",_taPanelStyle);
 		_toolkitView.hideToolTip();
-		//toolTip._visible = false;
-		//removeMovieClip(toolTip);
 	}
 	
 	
