@@ -71,16 +71,16 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * An implementation of the INotebookToolService interface.
+ * An implementation of the INotebookService interface.
  * 
  * As a requirement, all LAMS tool's service bean must implement
  * ToolContentManager and ToolSessionManager.
  */
 
-public class NotebookToolService implements ToolSessionManager, ToolContentManager,
-		INotebookToolService {
+public class NotebookService implements ToolSessionManager, ToolContentManager,
+		INotebookService {
 
-	static Logger logger = Logger.getLogger(NotebookToolService.class.getName());
+	static Logger logger = Logger.getLogger(NotebookService.class.getName());
 
 	private INotebookDAO notebookDAO = null;
 
@@ -104,7 +104,7 @@ public class NotebookToolService implements ToolSessionManager, ToolContentManag
 	
 	private IJournalService journalService;
 
-	public NotebookToolService() {
+	public NotebookService() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -272,7 +272,7 @@ public class NotebookToolService implements ToolSessionManager, ToolContentManag
 		}
 	}
 
-	/* ********** INotebookToolService Methods ************************************** */
+	/* ********** INotebookService Methods ************************************** */
 	public Long getDefaultContentIdBySignature(String toolSignature) {
 		Long toolContentId = null;
 		toolContentId = new Long(toolService

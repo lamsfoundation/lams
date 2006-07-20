@@ -42,8 +42,8 @@ import org.lamsfoundation.lams.tool.notebook.dto.NotebookDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
-import org.lamsfoundation.lams.tool.notebook.service.INotebookToolService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookToolServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -67,7 +67,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	private static final boolean MODE_OPTIONAL = false;
 
-	private INotebookToolService notebookToolService;
+	private INotebookService notebookService;
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -82,14 +82,14 @@ public class LearningAction extends LamsDispatchAction {
 		Long toolSessionID = WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 
-		// set up notebookToolService
-		if (notebookToolService == null) {
-			notebookToolService = NotebookToolServiceProxy.getNotebookToolService(this.getServlet()
+		// set up notebookService
+		if (notebookService == null) {
+			notebookService = NotebookServiceProxy.getNotebookService(this.getServlet()
 					.getServletContext());
 		}
 
 		// Retrieve the session and content.
-		NotebookSession notebookSession = notebookToolService
+		NotebookSession notebookSession = notebookService
 				.getSessionBySessionId(toolSessionID);
 		if (notebookSession == null) {
 			throw new NotebookException(
@@ -126,7 +126,7 @@ public class LearningAction extends LamsDispatchAction {
 		// Ensure that the content is use flag is set.
 		if (!notebook.getContentInUse()) {
 			notebook.setContentInUse(new Boolean(true));
-			notebookToolService.saveOrUpdateNotebook(notebook);
+			notebookService.saveOrUpdateNotebook(notebook);
 		}
 		
 		return mapping.findForward("notebook_client");
@@ -137,13 +137,13 @@ public class LearningAction extends LamsDispatchAction {
 				AttributeNames.USER);
 
 		// attempt to retrieve user using userId and toolSessionId
-		NotebookUser notebookUser = notebookToolService.getUserByUserIdAndSessionId(new Long(
+		NotebookUser notebookUser = notebookService.getUserByUserIdAndSessionId(new Long(
 				user.getUserID().intValue()), toolSessionId);
 
 		if (notebookUser == null) {
-			NotebookSession notebookSession = notebookToolService
+			NotebookSession notebookSession = notebookService
 					.getSessionBySessionId(toolSessionId);
-			notebookUser = notebookToolService.createNotebookUser(user, notebookSession);
+			notebookUser = notebookService.createNotebookUser(user, notebookSession);
 		}
 
 		return notebookUser;
@@ -156,16 +156,16 @@ public class LearningAction extends LamsDispatchAction {
 		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
 		// set the finished flag
-		NotebookUser notebookUser = notebookToolService.getUserByUID(notebookUserUID);
+		NotebookUser notebookUser = notebookService.getUserByUID(notebookUserUID);
 		if (notebookUser != null) {
 			notebookUser.setFinishedActivity(true);
-			notebookToolService.saveOrUpdateNotebookUser(notebookUser);
+			notebookService.saveOrUpdateNotebookUser(notebookUser);
 		} else {
 			log.error("finishActivity(): couldn't find NotebookUser with uid: "
 					+ notebookUserUID);
 		}
 
-		ToolSessionManager sessionMgrService = NotebookToolServiceProxy
+		ToolSessionManager sessionMgrService = NotebookServiceProxy
 				.getNotebookSessionManager(getServlet().getServletContext());
 
 		// get back login user DTO

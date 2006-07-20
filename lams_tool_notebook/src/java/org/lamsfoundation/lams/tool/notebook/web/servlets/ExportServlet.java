@@ -41,8 +41,8 @@ import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookToolServiceProxy;
-import org.lamsfoundation.lams.tool.notebook.service.INotebookToolService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -57,14 +57,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private final String FILENAME = "notebook_main.html";
 
-	private INotebookToolService notebookToolService;
+	private INotebookService notebookService;
 
 	protected String doExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
-		if (notebookToolService == null) {
-			notebookToolService = NotebookToolServiceProxy
-					.getNotebookToolService(getServletContext());
+		if (notebookService == null) {
+			notebookService = NotebookServiceProxy
+					.getNotebookService(getServletContext());
 		}
 
 		try {
@@ -103,7 +103,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new NotebookException(error);
 		}
 
-		NotebookSession notebookSession = notebookToolService
+		NotebookSession notebookSession = notebookService
 				.getSessionBySessionId(toolSessionID);
 
 		// get all messages for current user and filter.
@@ -111,7 +111,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				AttributeNames.USER);
 
 		// get the notebook user
-		NotebookUser notebookUser = notebookToolService.getUserByUserIdAndSessionId(
+		NotebookUser notebookUser = notebookService.getUserByUserIdAndSessionId(
 				new Long(user.getUserID()), toolSessionID);
 
 		NotebookDTO notebookDTO = new NotebookDTO(notebookSession.getNotebook());
@@ -132,7 +132,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new NotebookException(error);
 		}
 
-		Notebook notebook = notebookToolService.getNotebookByContentId(toolContentID);
+		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
 
 		NotebookDTO notebookDTO = new NotebookDTO(notebook);
 

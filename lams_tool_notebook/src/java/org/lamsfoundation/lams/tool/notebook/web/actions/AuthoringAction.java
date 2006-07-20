@@ -45,8 +45,8 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookToolServiceProxy;
-import org.lamsfoundation.lams.tool.notebook.service.INotebookToolService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -69,7 +69,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	private static Logger logger = Logger.getLogger(AuthoringAction.class);
 
-	public INotebookToolService notebookToolService;
+	public INotebookService notebookService;
 
 	// Authoring SessionMap key names
 	private static final String KEY_MODE = "mode";
@@ -97,18 +97,18 @@ public class AuthoringAction extends LamsDispatchAction {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
 
-		// set up notebookToolService
-		if (notebookToolService == null) {
-			notebookToolService = NotebookToolServiceProxy.getNotebookToolService(this.getServlet()
+		// set up notebookService
+		if (notebookService == null) {
+			notebookService = NotebookServiceProxy.getNotebookService(this.getServlet()
 					.getServletContext());
 		}
 
 		// retrieving Notebook with given toolContentID
-		Notebook notebook = notebookToolService.getNotebookByContentId(toolContentID);
+		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
 		if (notebook == null) {
-			notebook = notebookToolService.copyDefaultContent(toolContentID);
+			notebook = notebookService.copyDefaultContent(toolContentID);
 			notebook.setCreateDate(new Date());
-			notebookToolService.saveOrUpdateNotebook(notebook);
+			notebookService.saveOrUpdateNotebook(notebook);
 			// TODO NOTE: this causes DB orphans when LD not saved.
 		}
 
@@ -123,7 +123,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		// Set the defineLater flag so that learners cannot use content while we
 		// are editing. This flag is released when updateContent is called.
 		notebook.setDefineLater(true);
-		notebookToolService.saveOrUpdateNotebook(notebook);
+		notebookService.saveOrUpdateNotebook(notebook);
 
 		// Set up sessionMap
 		SessionMap map = new SessionMap();
@@ -152,7 +152,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		SessionMap map = getSessionMap(request, authForm);
 
 		// get notebook content.
-		Notebook notebook = notebookToolService.getNotebookByContentId(authForm.getToolContentID());
+		Notebook notebook = notebookService.getNotebookByContentId(authForm.getToolContentID());
 
 		// update notebook content using form inputs.
 		updateNotebook(notebook, authForm);
@@ -165,7 +165,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		for (NotebookAttachment att : getAttList(KEY_DELETED_FILES, map)) {
 			// remove from repository and db
-			notebookToolService.deleteFromRepository(att.getFileUuid(), att
+			notebookService.deleteFromRepository(att.getFileUuid(), att
 					.getFileVersionId());
 			attachments.remove(att);
 		}
@@ -183,7 +183,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		// releasing defineLater flag so that learner can start using the tool.
 		notebook.setDefineLater(false);
 
-		notebookToolService.saveOrUpdateNotebook(notebook);
+		notebookService.saveOrUpdateNotebook(notebook);
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,
 				Boolean.TRUE);
@@ -254,7 +254,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// upload file to repository
-		NotebookAttachment newAtt = notebookToolService.uploadFileToContent(authForm
+		NotebookAttachment newAtt = notebookService.uploadFileToContent(authForm
 				.getToolContentID(), file, type);
 
 		// Add attachment to unsavedFiles
@@ -328,7 +328,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 			if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
 				// delete from repository and list
-				notebookToolService.deleteFromRepository(att.getFileUuid(), att
+				notebookService.deleteFromRepository(att.getFileUuid(), att
 						.getFileVersionId());
 				iter.remove();
 				break;

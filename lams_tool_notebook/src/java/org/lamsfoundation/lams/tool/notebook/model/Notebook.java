@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookToolService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookService;
 
 /**
  * @hibernate.class table="tl_lantbk11_notebook"
@@ -47,7 +47,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = 579733009969321015L;
 
-	static Logger log = Logger.getLogger(NotebookToolService.class.getName());
+	static Logger log = Logger.getLogger(NotebookService.class.getName());
 
 	// Fields
 	/**

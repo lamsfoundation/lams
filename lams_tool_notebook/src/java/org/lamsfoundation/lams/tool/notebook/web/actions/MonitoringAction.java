@@ -41,8 +41,8 @@ import org.lamsfoundation.lams.tool.notebook.dto.NotebookUserDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
-import org.lamsfoundation.lams.tool.notebook.service.INotebookToolService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookToolServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -66,7 +66,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(MonitoringAction.class);
 
-	public INotebookToolService notebookToolService;
+	public INotebookService notebookService;
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -75,13 +75,13 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
-		// set up notebookToolService
-		if (notebookToolService == null) {
-			notebookToolService = NotebookToolServiceProxy.getNotebookToolService(this.getServlet()
+		// set up notebookService
+		if (notebookService == null) {
+			notebookService = NotebookServiceProxy.getNotebookService(this.getServlet()
 					.getServletContext());
 		}
 		
-		Notebook notebook = notebookToolService.getNotebookByContentId(toolContentID);
+		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
 		// TODO check for null
 		
 		NotebookDTO notebookDT0 = new NotebookDTO(notebook);

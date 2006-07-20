@@ -29,7 +29,7 @@ create_date_time
 VALUES
 (
 'lantbk11',
-'notebookToolService',
+'notebookService',
 'Notebook',
 'Notebook',
 'notebook',

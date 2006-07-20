@@ -40,17 +40,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * implementation.</p>
  */
 
-public class NotebookToolServiceProxy {
+public class NotebookServiceProxy {
 
-	public static final INotebookToolService getNotebookToolService(ServletContext servletContext)
+	public static final INotebookService getNotebookService(ServletContext servletContext)
     {
-        return (INotebookToolService)getNotebookDomainService(servletContext);
+        return (INotebookService)getNotebookDomainService(servletContext);
     }
 	
 	private static Object getNotebookDomainService(ServletContext servletContext)
 	{
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	    return wac.getBean("notebookToolService");
+	    return wac.getBean("notebookService");
 	}
 	
 	 /*

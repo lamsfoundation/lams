@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
  * Defines the services available to the web layer from the Notebook Service
  */
-public interface INotebookToolService {
+public interface INotebookService {
 	/**
 	 * Makes a copy of the default content and assigns it a newContentID
 	 * 
