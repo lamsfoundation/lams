@@ -71,6 +71,9 @@
 				<value>org/lamsfoundation/lams/themes/CSSProperty.hbm.xml</value>
 				<value>org/lamsfoundation/lams/themes/CSSStyle.hbm.xml</value>
 				<value>org/lamsfoundation/lams/themes/CSSThemeVisualElement.hbm.xml</value>
+				
+				<!-- Journal Service related mapping files -->
+				<value>org/lamsfoundation/lams/journal/model/JournalEntry.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -178,7 +181,12 @@
     <!--  Each message service created by loadedMessageService is a ResourceBundleMessageSource -->
 	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource"  singleton="false">
 	</bean>
-		
+			
+	<!--  journal service -->
+	<bean id="journalService" class="org.lamsfoundation.lams.journal.service.JournalService" singleton="true">
+		<property name="journalEntryDAO"><ref bean="journalEntryDAO" /></property>
+	</bean>
+	
 	<!-- auditing service -->
 	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService"  singleton="true">
 		<property name="messageService"><ref bean="commonMessageService"/></property>
@@ -218,6 +226,11 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
+	<!-- Journal related beans -->
+	<bean id="journalEntryDAO" class="org.lamsfoundation.lams.journal.dao.hibernate.JournalEntryDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	
 	<!--  System Session bean -->
 	<bean id="SystemSession"
 	    class="org.lamsfoundation.lams.web.session.SessionManager"
@@ -231,7 +244,5 @@
 	<bean id="cacheManager" class="org.lamsfoundation.lams.cache.CacheManager">
 		<property name="cacheObjectName"><value>jboss.cache:service=TreeCache</value></property>
 	</bean>
-	
-	<!--  -->
 	
 </beans>

@@ -276,6 +276,8 @@ Ant build file.
 			<transaction src="${db.scripts}/insert_users.sql"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
+			<!-- Create tables for Journal Service -->
+			<transaction src="${db.scripts}/create_journal_tables.sql"/>
 			<!-- Test the scripts for shaun 
             <transaction src="${db.scripts}/shaun/lams_user_swedish.sql"/>
             <transaction src="${db.scripts}/shaun/lams_user_french.sql"/>
@@ -350,7 +352,56 @@ Ant build file.
 			</fileset>
 			<report todir="${build.report}/html"/> 
 		</junitreport>
-	</target>	
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Generate Journal hibernate xml files                             	 -->
+	<!-- =================================================================== -->
+	<target name="generate-journal-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
+
+		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
+
+		<echo message="Building hbm.xml files using XDoclet" />
+
+		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
+			<fileset dir="${src.java.dir}">
+				<include name="**/JournalEntry.java" />
+			</fileset>
+			<hibernate version="3.0" />
+		</hibernatedoclet>
+	</target>
+	
+	
+	<!-- =================================================================== -->
+	<!-- Journal Schema export				                             	 -->
+	<!-- =================================================================== -->
+	<path id="schemaexport.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${build.classes.java}"/>
+	</path>
+	
+	<!-- exports all the hbm mappings to the specified database -->
+	<target name="journal-schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
+		depends="generate-journal-hbm-files">
+	    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
+		<taskdef
+			name="schemaexport"
+			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
+			classpathref="schemaexport.classpath"
+			>
+		</taskdef>
+		<schemaexport
+			properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+			quiet="no"
+			text="no"
+			drop="no"
+			delimiter=";"
+			output="${db.scripts}/journal_table-schema.sql">
+			<fileset dir="${conf.hibernate.mapping.dir}">
+				<include name="**/JournalEntry.hbm.xml"/>
+			</fileset>
+		</schemaexport>	
+	</target>
 	
 </project>
 
