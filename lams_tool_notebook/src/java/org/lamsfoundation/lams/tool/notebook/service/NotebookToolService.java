@@ -27,16 +27,11 @@ package org.lamsfoundation.lams.tool.notebook.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.jivesoftware.smack.AccountManager;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -49,6 +44,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.journal.service.IJournalService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -72,11 +68,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * An implementation of the INotebookToolService interface.
@@ -109,6 +101,8 @@ public class NotebookToolService implements ToolSessionManager, ToolContentManag
 	private IAuditService auditService = null;
 
 	private IExportToolContentService exportContentService;
+	
+	private IJournalService journalService;
 
 	public NotebookToolService() {
 		super();
@@ -540,5 +534,13 @@ public class NotebookToolService implements ToolSessionManager, ToolContentManag
 	public void setExportContentService(
 			IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
+	}
+
+	public IJournalService getJournalService() {
+		return journalService;
+	}
+
+	public void setJournalService(IJournalService journalService) {
+		this.journalService = journalService;
 	}
 }
