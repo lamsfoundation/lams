@@ -208,6 +208,9 @@ public interface McAppConstants {
     
     /* learner mode contants */
     public static final String MAP_QUESTION_CONTENT_LEARNER				="mapQuestionContentLearner";
+    public static final String LIST_QUESTION_CANDIDATEANSWERS_DTO		="listQuestionCandidateAnswersDto";
+    public static final String MC_GENERAL_LEARNER_FLOW_DTO				="mcGeneralLearnerFlowDTO";
+    public static final String LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO	="listSelectedQuestionCandidateAnswersDto";
     public static final String CURRENT_QUESTION_INDEX					="currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
     public static final String HR_COLUMN_COUNT							="hrColumnCount";
@@ -221,7 +224,7 @@ public interface McAppConstants {
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String TOTAL_COUNT_REACHED						="totalCountReached";
     
-    
+    public static final String MC_LEARNER_STARTER_DTO					="mcLearnerStarterDTO";
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
     public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
     public static final String IS_CONTENT_IN_USE						="isContentInUse";

@@ -1010,7 +1010,41 @@ public class AuthoringUtil implements McAppConstants {
 		logger.debug("refreshed Map:" + mapQuestionsContent);
     	return mapQuestionsContent;
     }
- 
+
+    
+    public static Map rebuildQuestionUidMap(IMcService mcService, Long toolContentId, Long mcQueContentUid)
+    {
+        logger.debug("starting rebuildQuestionUidMap");
+        
+        logger.debug("mcQueContentUid:" + mcQueContentUid);
+    	Map mapQuestionsContent= new TreeMap(new McComparator());
+    	
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+		if (mcContent != null)
+		{
+			List list=mcService.refreshQuestionContent(mcContent.getUid());
+			logger.debug("refreshed list:" + list);
+			
+			Iterator listIterator=list.iterator();
+	    	Long mapIndex=new Long(1);
+	    	while (listIterator.hasNext())
+	    	{
+	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+	    		logger.debug("mcQueContent:" + mcQueContent);
+	    		if (mcQueContent.getUid().toString().equals(mcQueContentUid.toString()))
+	    		{
+		    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getUid());
+		    		mapIndex=new Long(mapIndex.longValue()+1);
+	    		}
+	    	}
+		}
+		
+		logger.debug("refreshed Map:" + mapQuestionsContent);
+    	return mapQuestionsContent;
+    }
+
     
     /**
      * returns all the options for all the questions for a content

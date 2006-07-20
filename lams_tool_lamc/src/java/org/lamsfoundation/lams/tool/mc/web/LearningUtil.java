@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.web;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,6 +35,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
+import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -190,6 +194,7 @@ public class LearningUtil implements McAppConstants {
     {
     	String optionCheckBoxSelected=request.getParameter("optionCheckBoxSelected");
     	logger.debug("parameter optionCheckBoxSelected: " + optionCheckBoxSelected);
+
     	if ((optionCheckBoxSelected != null) && optionCheckBoxSelected.equals("1"))
     	{
     		logger.debug("parameter optionCheckBoxSelected is selected " + optionCheckBoxSelected);
@@ -266,7 +271,7 @@ public class LearningUtil implements McAppConstants {
 		return mapLeanerAssessmentResults;
 		
     }
-    
+
    
     /**
      * calculateWeights(Map mapLeanerAssessmentResults, Map mapQuestionWeights)
@@ -502,6 +507,25 @@ public class LearningUtil implements McAppConstants {
     	return mapCorrectOptions;
 	}
     
+
+    public static Map buildMapCorrectOptionUids(List correctOptions)
+	{
+    	Map mapCorrectOptionUids= new TreeMap(new McComparator());
+    	Iterator correctOptionsIterator=correctOptions.iterator();
+    	Long mapIndex=new Long(1);
+    	while (correctOptionsIterator.hasNext())
+    	{
+    		McOptsContent mcOptsContent=(McOptsContent)correctOptionsIterator.next();
+    		if (mcOptsContent != null)
+    		{
+    		    mapCorrectOptionUids.put(mapIndex.toString(),mcOptsContent.getUid().toString());
+        		mapIndex=new Long(mapIndex.longValue()+1);
+    		}
+    	}
+    	logger.debug("mapCorrectOptionUids : " + mapCorrectOptionUids);
+    	return mapCorrectOptionUids;
+	}
+
     
     public static Map compare(Map mapGeneralCorrectOptions,Map mapGeneralCheckedOptionsContent)
     {
@@ -529,8 +553,8 @@ public class LearningUtil implements McAppConstants {
                     Map mapCorrectOptions=(Map) pairs.getValue();
                     Map mapCheckedOptions=(Map) checkedPairs.getValue();
                     
-                    boolean isEqual=compareMaps(mapCorrectOptions, mapCheckedOptions);
-                    boolean isEqualCross=compareMapsCross(mapCorrectOptions, mapCheckedOptions);
+                    boolean isEqual=compareMapItems(mapCorrectOptions, mapCheckedOptions);
+                    boolean isEqualCross=compareMapsItemsCross(mapCorrectOptions, mapCheckedOptions);
                     
                     compareResult= isEqual && isEqualCross; 
                     mapLeanerAssessmentResults.put(pairs.getKey(), new Boolean(compareResult).toString());
@@ -542,8 +566,9 @@ public class LearningUtil implements McAppConstants {
     }
     
     
-    public static boolean compareMaps(Map mapCorrectOptions, Map mapCheckedOptions)
+    public static boolean compareMapItems(Map mapCorrectOptions, Map mapCheckedOptions)
 	{
+       logger.debug("performing compareMaps");
 	   logger.debug("mapCorrectOptions: " +  mapCorrectOptions);
        logger.debug("mapCheckedOptions: " +  mapCheckedOptions);
        
@@ -552,7 +577,9 @@ public class LearningUtil implements McAppConstants {
        while (itMap.hasNext()) 
        {
        		Map.Entry pairs = (Map.Entry)itMap.next();
+       		logger.debug("pairs.getValue(): " +  pairs.getValue());
 			boolean optionExists=optionExists(pairs.getValue().toString(), mapCheckedOptions);
+			logger.debug("optionExists: " + optionExists);
 			
 			if (optionExists == false)
 			{
@@ -569,8 +596,9 @@ public class LearningUtil implements McAppConstants {
      * @param mapCheckedOptions
      * @return boolean
      */
-    public static boolean compareMapsCross(Map mapCorrectOptions, Map mapCheckedOptions)
+    public static boolean compareMapsItemsCross(Map mapCorrectOptions, Map mapCheckedOptions)
 	{
+       logger.debug("performing compareMapsCross");
 	   logger.debug("mapCorrectOptions: " +  mapCorrectOptions);
        logger.debug("mapCheckedOptions: " +  mapCheckedOptions);
        
@@ -579,7 +607,9 @@ public class LearningUtil implements McAppConstants {
        while (itMap.hasNext()) 
        {
        		Map.Entry pairs = (Map.Entry)itMap.next();
-			boolean optionExists=optionExists(pairs.getValue().toString(), mapCorrectOptions);
+       		logger.debug("pairs.getValue(): " + pairs.getValue());
+       		boolean optionExists=optionExists(pairs.getValue().toString(), mapCorrectOptions);
+       		logger.debug("optionExists: " + optionExists);
 			
 			if (optionExists == false)
 			{
@@ -599,11 +629,16 @@ public class LearningUtil implements McAppConstants {
      */
     public static boolean optionExists(String optionValue, Map generalMap)
     {
+        logger.debug("performing optionExists: " + optionValue);
+        logger.debug("generalMap: " + generalMap);
+        
     	Iterator itMap = generalMap.entrySet().iterator();
     	while (itMap.hasNext()) 
     	{
        		Map.Entry pairsChecked = (Map.Entry)itMap.next();
-       		if (pairsChecked.getValue().equals(optionValue))
+       		logger.debug("pairsChecked: " + pairsChecked);
+       		
+       		if (pairsChecked.getValue().toString().equals(optionValue.toString()))
 				return true;
     	}	
     	return false;
@@ -631,13 +666,13 @@ public class LearningUtil implements McAppConstants {
      * 
      * @param request
      */
-    public static McQueUsr createUser(HttpServletRequest request)
+    public static McQueUsr createUser(HttpServletRequest request, IMcService mcService, Long toolSessionId)
 	{
-		IMcService mcService =McUtils.getToolService(request);
-	    Long queUsrId=McUtils.getUserId();
+        logger.debug("createUser: using toolSessionId: " + toolSessionId);
+		Long queUsrId=McUtils.getUserId();
 		String username=McUtils.getUserName();
 		String fullname=McUtils.getUserFullName();
-		Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+		//Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
 		
 		McSession mcSession=mcService.retrieveMcSession(toolSessionId);
 		McQueUsr mcQueUsr= new McQueUsr(queUsrId, 
@@ -787,6 +822,91 @@ public class LearningUtil implements McAppConstants {
     	return mapQuestionsContent;
     }
     
+    
+    public static McGeneralLearnerFlowDTO buildMcGeneralLearnerFlowDTO(McContent mcContent)
+    {
+        logger.debug("starting buildMcGeneralLearnerFlowDTO: " + mcContent);
+        McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO =new McGeneralLearnerFlowDTO();
+        mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
+        mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
+        mcGeneralLearnerFlowDTO.setActivityInstructions(mcContent.getInstructions());
+        mcGeneralLearnerFlowDTO.setPassMark(mcContent.getPassMark().toString());
+        mcGeneralLearnerFlowDTO.setReportTitleLearner(mcContent.getReportTitle());
+        
+        logger.debug("continue buildMcGeneralLearnerFlowDTO: " + mcContent);
+        mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(mcContent.getMcQueContents().size()).toString());
+        logger.debug("final mcGeneralLearnerFlowDTO: " + mcGeneralLearnerFlowDTO);
+        return mcGeneralLearnerFlowDTO;
+    }
+    
+    
+    public static List buildQuestionAndCandidateAnswersDTO(HttpServletRequest request, McContent mcContent, IMcService mcService)
+    {
+        logger.debug("starting buildQuestionAndCandidateAnswersDTO");
+    	List questionAndCandidateAnswersList= new LinkedList();
+    	logger.debug("mcContent uid : " + mcContent.getUid());
+    	
+    	List listQuestionEntries=mcService.getAllQuestionEntries(mcContent.getUid());
+    	logger.debug("listQuestionEntries : " + listQuestionEntries);
+    	
+        Iterator listQuestionEntriesIterator=listQuestionEntries.iterator();
+    	while (listQuestionEntriesIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listQuestionEntriesIterator.next();
+    		logger.debug("mcQueContent : " + mcQueContent);
+    		
+    		McLearnerAnswersDTO mcLearnerAnswersDTO= new McLearnerAnswersDTO();
+    		logger.debug("mcQueContent uid: " + mcQueContent.getUid());
+    		
+    		List listCandidateAnswers=mcService.findMcOptionNamesByQueId(mcQueContent.getUid());
+    		logger.debug("listCandidateAnswers: " + listCandidateAnswers);
+    		Map mapCandidateAnswers=convertToStringMap(listCandidateAnswers);
+    		logger.debug("mapCandidateAnswers: " + mapCandidateAnswers);
+
+    		
+    		List listCandidateAnswerUids=mcService.findMcOptionUidsByQueId(mcQueContent.getUid());
+    		logger.debug("listCandidateAnswerUids: " + listCandidateAnswerUids);
+    		Map mapCandidateAnswerUids=convertToStringMap(listCandidateAnswerUids);
+    		logger.debug("mapCandidateAnswerUids: " + mapCandidateAnswerUids);
+    		
+    		mcLearnerAnswersDTO.setQuestion(mcQueContent.getQuestion());
+    		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
+    		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
+    		
+    		mcLearnerAnswersDTO.setWeight(mcQueContent.getWeight().toString());
+    		mcLearnerAnswersDTO.setCandidateAnswerUids(mapCandidateAnswerUids);
+    		
+    		mcLearnerAnswersDTO.setCandidateAnswers(mapCandidateAnswers);
+    		logger.debug("current mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+    		
+    		logger.debug("current mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+
+    		questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
+    	}
+    	
+    	logger.debug("final questionAndCandidateAnswersList: " + questionAndCandidateAnswersList);
+    	return questionAndCandidateAnswersList;
+    }
+    
+    
+	public static Map convertToStringMap(List list)
+	{
+		logger.debug("using convertToStringMap: " + list);
+		Map map= new TreeMap(new McStringComparator());
+		
+		Iterator listIterator=list.iterator();
+    	Long mapIndex=new Long(1);
+    	
+    	while (listIterator.hasNext())
+    	{
+    		String data=(String)listIterator.next();
+   			map.put(mapIndex.toString(), data);
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return map;
+	}
+
+    
 
     public static int getLearnerMarkAtLeast(Integer passMark, Map mapQuestionWeights)
     {
@@ -903,7 +1023,7 @@ public class LearningUtil implements McAppConstants {
      */
     public static void cleanUpLearningSession(HttpServletRequest request)
     {
-    	request.getSession().removeAttribute(USER_ID);
+    	//request.getSession().removeAttribute(USER_ID);
     	request.getSession().removeAttribute(TOOL_CONTENT_ID);
     	request.getSession().removeAttribute(TOOL_SESSION_ID);
     	request.getSession().removeAttribute(QUESTION_LISTING_MODE);

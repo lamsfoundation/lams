@@ -48,6 +48,14 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String donePreview;
 	protected String doneLearnerProgress;
 	
+	
+	protected String[] checkedCa;
+	protected String toolContentId;
+	protected String toolContentUID;
+	protected String toolSessionId;
+	protected String learningMode;
+	protected String currentQuestionIndex;
+	
 	protected String userOverPassMark;
 	protected String passMarkApplicable;
 	
@@ -281,4 +289,81 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     public void setPassMarkApplicable(String passMarkApplicable) {
         this.passMarkApplicable = passMarkApplicable;
     }
+    /**
+     * @return Returns the checkedCa.
+     */
+    public String[] getCheckedCa() {
+        return checkedCa;
+    }
+    /**
+     * @param checkedCa The checkedCa to set.
+     */
+    public void setCheckedCa(String[] checkedCa) {
+        this.checkedCa = checkedCa;
+    }
+
+    /**
+     * @return Returns the toolContentId.
+     */
+    public String getToolContentId() {
+        return toolContentId;
+    }
+    /**
+     * @param toolContentId The toolContentId to set.
+     */
+    public void setToolContentId(String toolContentId) {
+        this.toolContentId = toolContentId;
+    }
+    /**
+     * @return Returns the toolSessionId.
+     */
+    public String getToolSessionId() {
+        return toolSessionId;
+    }
+    /**
+     * @param toolSessionId The toolSessionId to set.
+     */
+    public void setToolSessionId(String toolSessionId) {
+        this.toolSessionId = toolSessionId;
+    }
+
+    /**
+     * @return Returns the learningMode.
+     */
+    public String getLearningMode() {
+        return learningMode;
+    }
+    /**
+     * @param learningMode The learningMode to set.
+     */
+    public void setLearningMode(String learningMode) {
+        this.learningMode = learningMode;
+    }
+    
+    /**
+     * @return Returns the toolContentUID.
+     */
+    public String getToolContentUID() {
+        return toolContentUID;
+    }
+    /**
+     * @param toolContentUID The toolContentUID to set.
+     */
+    public void setToolContentUID(String toolContentUID) {
+        this.toolContentUID = toolContentUID;
+    }
+
+    /**
+     * @return Returns the currentQuestionIndex.
+     */
+    public String getCurrentQuestionIndex() {
+        return currentQuestionIndex;
+    }
+    /**
+     * @param currentQuestionIndex The currentQuestionIndex to set.
+     */
+    public void setCurrentQuestionIndex(String currentQuestionIndex) {
+        this.currentQuestionIndex = currentQuestionIndex;
+    }
+    
 }

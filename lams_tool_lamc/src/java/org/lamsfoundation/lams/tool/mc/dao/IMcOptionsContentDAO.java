@@ -42,6 +42,9 @@ public interface IMcOptionsContentDAO
 	 */
 	public McOptsContent getMcOptionsContentByUID(Long uid);
 
+	public List findMcOptionUidsByQueId(Long mcQueContentId);
+	
+	public McOptsContent findMcOptionsContentByUid(Long uid);
 	
 	/**
 	 *  <p>Return a list of a McOptsContents  

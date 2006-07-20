@@ -40,12 +40,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	<c:out value="${activityInstructions}" escapeXml="false" /> 
+						  	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" /> 
 					  	</td>
 					  </tr>
 					  
 			
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
+			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	  <b> <bean:message key="label.withRetries"/> </b>
@@ -53,7 +53,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 					</c:if> 			
 				
-					<c:if test="${sessionScope.isRetries == 'false'}"> 		
+					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
 						    <b> <bean:message key="label.withoutRetries"/> </b>
@@ -61,106 +61,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 					</c:if> 			
 
-			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
+			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> )  </b>
+						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${mcGeneralLearnerFlowDTO.passMark}"/><bean:message key="label.percent"/> )  </b>
 					  	</td>
 					  </tr>
-					</c:if> 								  
-				
-  		  	 		<c:set var="mainQueIndex" scope="session" value="0"/>
-					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
-					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
-						  <tr>
-						  	<td NOWRAP align=left valign=top colspan=2> 
-								  		<c:out value="${questionEntry.value}"/> 
-						  	</td>
-						  </tr>
+					</c:if>
 
-								  								  
-						  <tr>						 
-							<td NOWRAP align=left>
-							<table align=left>
-			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-								<c:forEach var="mainEntry" items="${sessionScope.mapGeneralOptionsContent}">
-									<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
-									  		<c:forEach var="subEntry" items="${mainEntry.value}">
-									  		
-
-							  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
-												<!-- traverse the selected option from here --> 									  		
-	  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-														<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
-													  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
-
-																<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
-									  							
-																	<tr> 
-																		<td NOWRAP align=left  valign=top> 
-																				<input type="checkbox" 
-																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																				onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																				document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																				document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
-																				document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
-																				
-																				if (this.checked == 1)
-																				{
-																					document.forms[0].checked.value=true;
-																				}
-																				else
-																				{
-																					document.forms[0].checked.value=false;
-																				}
-																				document.forms[0].submit();" CHECKED> 
-			
-																				&nbsp
-																				 	<c:out value="${subEntry.value}"/> 																			
-																		</td>
-																	</tr>	
-												  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
-				  												</c:if> 			
-
-														</c:forEach>																						
-	  												</c:if> 			
-												</c:forEach>									
-												<!-- till  here --> 									  					
-
-												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
-																	<tr> 
-																		<td NOWRAP align=left valign=top> 
-																				<input type="checkbox" 
-																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																				onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																				document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																				document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
-																				document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
-	
-																				if (this.checked == 1)
-																				{
-																					document.forms[0].checked.value=true;
-																				}
-																				else
-																				{
-																					document.forms[0].checked.value=false;
-																				}
-																				document.forms[0].submit();"> 
-																				
-																				&nbsp
-																				<c:out value="${subEntry.value}"/> 
-																		</td>
-																	</tr>	
-  												</c:if> 			
-
+				  <tr>						 
+					  	<td NOWRAP align=left valign=top colspan=2> 
+						<table align=left>
+								<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+										  		<c:out value="${dto.question}"/> &nbsp[ <b> <bean:message key="label.weight"/> : </b>
+										  		<c:out value="${dto.weight}"/> ]
+									  	</td>
+									  </tr>
+									
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+											<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
+												<input type="checkbox" name="checkedCa" value="${dto.questionUid}-${ca.value}"> 
+													
+													<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
+														<c:if test="${ca.key == caText.key}"> 		
+																<c:out value="${caText.value}" escapeXml="false"/><BR>
+														</c:if>															
+													</c:forEach>
 											</c:forEach>
-										</c:if> 			
-								</c:forEach>
-							</table>
-							</td>
-						</tr>
-					</c:forEach>
+									  	</td>
+									  </tr>
+								</c:forEach>								
+						</table>
+						</td>
+					</tr>
+
 
 			  	   	<tr> 
 				  	   	<html:hidden property="optionCheckBoxSelected"/>

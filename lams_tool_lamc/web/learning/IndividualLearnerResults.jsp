@@ -41,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -58,12 +58,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<c:out value="${reportTitleLearner}" escapeXml="false" />
+						  	<c:out value="${mcGeneralLearnerFlowDTO.reportTitleLearner}" escapeXml="false" />
 					  	</td>
 					  </tr>
 
 				
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
+			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
 							  	<b> <bean:message key="label.individual.results.withRetries"/> </b>
@@ -71,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  </tr>
   					</c:if> 			
 
-					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
 								  <b>  <bean:message key="label.individual.results.withoutRetries"/> </b>
@@ -82,136 +82,71 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=right valign=top colspan=2> 
-						  	  <bean:message key="label.mark"/>  
-						  	<c:out value="${sessionScope.learnerMark}"/>  &nbsp
+						  	<bean:message key="label.mark"/>  
+						  	<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}"/>  &nbsp
 							<bean:message key="label.outof"/> &nbsp
-						  	<c:out value="${sessionScope.totalQuestionCount}"/>
+						  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/>
 					  	</td>
 					  </tr>	
 
 					
-					<c:if test="${sessionScope.userPassed != 'true'}">
+					<c:if test="${mcGeneralLearnerFlowDTO.userPassed != 'true'}">
 						 <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
 							  	 <bean:message key="label.mustGet"/> &nbsp
-							  	<c:out value="${sessionScope.learnerMarkAtLeast}"/>  &nbsp
+							  	<c:out value="${mcGeneralLearnerFlowDTO.learnerMarkAtLeast}"/>  &nbsp
 								<bean:message key="label.outof"/> &nbsp
-							  	<c:out value="${sessionScope.totalQuestionCount}"/>
+							  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/>
 								<bean:message key="label.toFinish"/>						  	
 						  	</td>
 						  </tr>	
   					</c:if> 			
 					
-					
-  		  	 		<c:set var="mainQueIndex" scope="session" value="0"/>
-					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
-					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
-						  <tr>
-						  	<td NOWRAP align=left valign=top colspan=2> 
-								  		<c:out value="${questionEntry.value}"/> 
-						  	</td>
-						  </tr>
 
-								  								  
-						  <tr>						 
-							<td NOWRAP align=left>
-							<table align=left>
-			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-								<c:forEach var="mainEntry" items="${sessionScope.mapGeneralOptionsContent}">
-									<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
-									  		<c:forEach var="subEntry" items="${mainEntry.value}">
-				  								<tr> 
-													<td NOWRAP align=left valign=top> 
-					   								    <img src="<c:out value="${tool}"/>images/dot.jpg" align=left> &nbsp
-														<c:out value="${subEntry.value}"/> 
-													</td> 
-												</tr>	
+				  <tr>						 
+					  	<td NOWRAP align=left valign=top colspan=2> 
+							<b>	<bean:message key="label.yourAnswers"/> </b>
+						</td>
+					</tr>
+					  	
+				  <tr>						 
+					  	<td NOWRAP align=left valign=top colspan=2> 
+						<table align=left>
+								<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+										  		<c:out value="${dto.question}"/> &nbsp[ <b> <bean:message key="label.weight"/> : </b>
+										  		<c:out value="${dto.weight}"/> ]
+									  	</td>
+									  </tr>
+									
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+											<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
+													<c:out value="${caText.value}" escapeXml="false"/><BR>											
 											</c:forEach>
+									  	</td>
+									  </tr>
 
-												<tr>												
-												<td NOWRAP colspan=2 align=left valign=top> 
-					   								    <bean:message key="label.you.answered"/>
-												</td> 
-												</tr>
-												
-												<tr>
-													<td NOWRAP align=left valign=top> 											
-														<table align=left>
-													  		<c:forEach var="subEntry" items="${mainEntry.value}">
-						  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-																				<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
-																			  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
-																						<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
-																								<tr> 
-																									<td NOWRAP align=left valign=top> 
-																											<c:out value="${subEntry.value}"/> 
-																									</td> 
-																								</tr>
-										  												</c:if> 			
-																					</c:forEach>																						
-							  													</c:if> 			
-																	</c:forEach>		
-																</tr>																			
-												  			</c:forEach>											
-														</table>
-													</td>
 
-													<td NOWRAP align=right valign=top> 											
-															<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
-																	<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
-																		<c:if test="${mainEntry.value == 'true'}"> 		
-																			<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
-																				<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																					    <img src="<c:out value="${tool}"/>images/tick.gif" align=right width=20 height=20>
-																				</c:if> 																																				
-																			</c:forEach>											
-																		</c:if> 														
-																		
-																		<c:if test="${mainEntry.value == 'false'}"> 		
-																			<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
-																				<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																					    <img src="<c:out value="${tool}"/>images/cross.gif" align=right width=20 height=20>
-																				</c:if> 																																				
-																			</c:forEach>											
-																		</c:if> 														
-																	</c:if> 																		
-															</c:forEach>		
-													</td>
-												</tr>
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+											<c:if test="${dto.attemptCorrect == 'true'}"> 											  
+													<c:out value="${dto.feedbackCorrect}" escapeXml="false"/><BR>											
+											</c:if>																
+											<c:if test="${dto.attemptCorrect != 'true'}"> 											  
+													<c:out value="${dto.feedbackIncorrect}" escapeXml="false"/><BR>											
+											</c:if>																
+									  	</td>
+									  </tr>
+									  
+								</c:forEach>								
+						</table>
+						</td>
+					</tr>
 
-												<tr>
-												<td NOWRAP colspan=2 align=left valign=top> 											
-														<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
-																<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
-																	<c:if test="${mainEntry.value == 'true'}"> 		
-																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
-																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																				<c:out value="${feedbackEntry.value}" escapeXml="false" />
-																			</c:if> 																																				
-																		</c:forEach>											
-																	</c:if> 														
-																	
-																	<c:if test="${mainEntry.value != 'true'}"> 		
-																		<c:forEach var="feedbackEntryIncorrect" items="${sessionScope.mapLeanerFeedbackIncorrect}">
-																			<c:if test="${feedbackEntryIncorrect.key == sessionScope.queIndex}"> 		
-																				<c:out value="${feedbackEntryIncorrect.value}" escapeXml="false" />
-																			</c:if> 																																				
-																		</c:forEach>											
-																	</c:if> 														
-																</c:if> 																		
-														</c:forEach>											
-												</td>
-												</tr>
-											
-										</c:if> 			
-								</c:forEach>
-							</table>
-							</td>
-						</tr>
-					</c:forEach>
-
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
+					
+			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
 		  	   		  <tr>
 					  	<td NOWRAP colspan=2 valign=top> 
 					  			<html:submit property="redoQuestions" styleClass="button">
@@ -222,7 +157,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<bean:message key="label.view.summary"/>
 								</html:submit>	 				 		  					
 
-								<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+								<c:if test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
 							  	   <html:submit property="learnerFinished" styleClass="button">
 										<bean:message key="label.finished"/>
 								   </html:submit>
@@ -231,7 +166,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 					</c:if> 																		
 
-					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
 		  	   		  <tr>
 		  	   		    <td NOWRAP valign=top>
 		   						<html:submit property="viewSummary" styleClass="button">
@@ -259,13 +194,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </body>
 </html:html>
 
-
-
-
-
-
-
-
-
-	
-	

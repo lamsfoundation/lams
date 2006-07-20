@@ -1,0 +1,88 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+/* $$Id$$ */
+package org.lamsfoundation.lams.tool.mc;
+
+
+
+/**
+ * <p> DTO that holds properties for initial screen presentation
+ * </p>
+ * 
+ * @author Ozgur Demirtas
+ */
+public class McLearnerStarterDTO implements Comparable
+{
+    
+    protected String questionListingMode;
+    
+    protected String activityTitle;
+    
+    protected String toolActivityOffline;
+    
+    /**
+     * @return Returns the toolActivityOffline.
+     */
+    public String getToolActivityOffline() {
+        return toolActivityOffline;
+    }
+    /**
+     * @param toolActivityOffline The toolActivityOffline to set.
+     */
+    public void setToolActivityOffline(String toolActivityOffline) {
+        this.toolActivityOffline = toolActivityOffline;
+    }
+    /**
+     * @return Returns the activityTitle.
+     */
+    public String getActivityTitle() {
+        return activityTitle;
+    }
+    /**
+     * @param activityTitle The activityTitle to set.
+     */
+    public void setActivityTitle(String activityTitle) {
+        this.activityTitle = activityTitle;
+    }
+    /**
+     * @return Returns the questionListingMode.
+     */
+    public String getQuestionListingMode() {
+        return questionListingMode;
+    }
+    /**
+     * @param questionListingMode The questionListingMode to set.
+     */
+    public void setQuestionListingMode(String questionListingMode) {
+        this.questionListingMode = questionListingMode;
+    }
+	public int compareTo(Object o)
+    {
+	    McLearnerStarterDTO mcLearnerStarterDTO = (McLearnerStarterDTO) o;
+     
+        if (mcLearnerStarterDTO == null)
+        	return 1;
+		else
+			return 0;
+    }
+	
+}

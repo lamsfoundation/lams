@@ -175,4 +175,6 @@ public interface IMcQueContentDAO
 	 */	
 	public List getNextAvailableDisplayOrder(final long mcContentId);
 	
+	public McQueContent findMcQuestionContentByUid(Long uid);
+	
 }

@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -45,6 +46,8 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	
+	 	private static final String FIND_QUESTION_CONTENT_BY_UID = "from mcQueContent in class McQueContent where mcQueContent.uid=:uid";
+	 	
 	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	
 	 	private static final String REFRESH_QUESTION_CONTENT 			= "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId order by mcQueContent.displayOrder";
@@ -55,6 +58,24 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String GET_NEXT_AVAILABLE_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 		 	
+	 	
+	 	public McQueContent findMcQuestionContentByUid(Long uid)
+	    {
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( uid != null) {
+				List list = getSession().createQuery(FIND_QUESTION_CONTENT_BY_UID)
+					.setLong("uid",uid.longValue())
+					.list();
+				
+				if(list != null && list.size() > 0){
+				    McQueContent mcq = (McQueContent) list.get(0);
+					return mcq;
+				}
+			}
+			return null;
+	    }
+
+	 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
 		{

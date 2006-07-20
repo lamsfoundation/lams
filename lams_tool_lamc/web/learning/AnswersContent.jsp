@@ -42,15 +42,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+		<c:out value="${mcLearnerStarterDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
 <div id="header-no-tabs-learner"></div>
 
 <div id="content-learner">
 	<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
+		<html:hidden property="toolContentId"/>						
+		<html:hidden property="toolSessionId"/>								
 		<c:choose> 
-		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
+		  <c:when test="${mcLearnerStarterDTO.questionListingMode == 'questionListingModeSequential'}" > 
 				<jsp:include page="/learning/SingleQuestionAnswersContent.jsp" /> 
 		  </c:when> 
 		  <c:otherwise>

@@ -1026,7 +1026,7 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static void cleanupMonitoringSession(HttpServletRequest request)
 	{
-		request.getSession().removeAttribute(USER_ID);
+		//request.getSession().removeAttribute(USER_ID);
 		request.getSession().removeAttribute(TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ACTIVE_MODULE);
 		request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
