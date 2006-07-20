@@ -106,16 +106,16 @@ public class UserManageAction extends Action {
 		
 		
 		Integer userId = getService().getUserByLogin(request.getRemoteUser()).getUserId();
-		Integer orgIdOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg.getOrganisationId() : orgId;
+		Organisation orgOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg : organisation;
         // check permission
 		if(request.isUserInRole(Role.SYSADMIN)){
 			request.setAttribute("canAdd",true);
-		}else if(!getService().isUserInRole(userId,orgIdOfCourseAdmin,Role.COURSE_ADMIN)){
+		}else if(!getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)){
 			errors.add("authorisation",new ActionMessage("error.authorisation"));
 			saveErrors(request,errors);
 			return mapping.findForward("error");
 		}else{
-			request.setAttribute("canAdd",organisation.getCourseAdminCanAddNewUsers());
+			request.setAttribute("canAdd",orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 		}
 		
 		// get list of users in org

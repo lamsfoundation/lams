@@ -98,11 +98,12 @@ public class UserOrgAction extends Action {
 		// get list of users in org
 		User user = (User)getService().getUserByLogin(request.getRemoteUser());
 		List<User> users = new ArrayList<User>();
+		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
 		if(request.isUserInRole(Role.SYSADMIN)){
 			users = getService().findAll(User.class);
-		}else if(getService().isUserInRole(user.getUserId(),orgId,Role.COURSE_ADMIN)){
-			if(organisation.getCourseAdminCanAddNewUsers()){
-				if(organisation.getCourseAdminCanBrowseAllUsers()){
+		}else if(getService().isUserInRole(user.getUserId(),orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)){
+			if(orgOfCourseAdmin.getCourseAdminCanAddNewUsers()){
+				if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
 					users = getService().findAll(User.class);
 				}else if(orgType.equals(new Integer(OrganisationType.CLASS_TYPE))){
 					users = getService().getUsersFromOrganisation(parentOrg.getOrganisationId());
