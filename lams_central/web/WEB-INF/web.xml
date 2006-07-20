@@ -74,13 +74,13 @@
 
    </servlet>
    <servlet>
-      <servlet-name>deserialise</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.development.DisplayDeserialisedPacketServlet</servlet-class>
+      <servlet-name>storeLD</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>storeLD</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
+      <servlet-name>dumpWDDX</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -192,12 +192,12 @@
       <url-pattern>/flashCrashDump</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>deserialise</servlet-name>
-      <url-pattern>/deserialise</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>storeLD</servlet-name>
       <url-pattern>/authoring/storeLearningDesignDetails</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>dumpWDDX</servlet-name>
+      <url-pattern>/dumpWDDX</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>storeTheme</servlet-name>
@@ -298,10 +298,10 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
-    		<role-name>TEACHER</role-name>
     		<role-name>STAFF</role-name>
     		<role-name>AUTHOR</role-name>
-    		<role-name>ADMIN</role-name>
+    	    <role-name>COURSE MANAGER</role-name>
+    		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -325,24 +325,6 @@
     	</auth-constraint>
     </security-constraint>
 
-    <security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>Adminstrator Content</web-resource-name>
-		    <url-pattern>/admin.do</url-pattern> 
-    	</web-resource-collection>
-    	<auth-constraint>
-    		<role-name>ADMIN</role-name>
-    	</auth-constraint>
-    </security-constraint>
-    <security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
-		    <url-pattern>/sysadmin.do</url-pattern> 
-    	</web-resource-collection>
-    	<auth-constraint>
-    		<role-name>SYSADMIN</role-name>
-    	</auth-constraint>
-    </security-constraint>
 	<!--  some combine role security setting -->
     <security-constraint>
 	   	<web-resource-collection>
@@ -352,7 +334,8 @@
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>STAFF</role-name>
-    		<role-name>ADMIN</role-name>
+    	    <role-name>COURSE MANAGER</role-name>
+    		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -373,10 +356,6 @@
 		<description>Student</description>
 		<role-name>LEARNER</role-name>
 	</security-role>
-	<security-role>
-		<description>Student</description>
-		<role-name>TEACHER</role-name>
-	</security-role>
 
 	<security-role>
 		<description>Can create/modify a learning design</description>
@@ -388,9 +367,11 @@
 		<role-name>STAFF</role-name>
 	</security-role>
 
-	<security-role>
-		<description>Can add/remove users to the system, set up classes of users for sessions</description>
-		<role-name>ADMIN</role-name>
+    <security-role>
+		<role-name>COURSE MANAGER</role-name>
+	</security-role>
+   	<security-role>
+		<role-name>COURSE ADMIN</role-name>
 	</security-role>
 
 	<security-role>
