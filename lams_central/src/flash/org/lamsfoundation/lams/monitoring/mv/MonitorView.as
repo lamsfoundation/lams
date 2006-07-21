@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.ToolTip;
 import mx.managers.*
 import mx.containers.*
 import mx.events.*
@@ -52,6 +53,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var V_GAP:Number;
 	private var Offset_Y_TabLayer_mc:Number;
 	private var _tm:ThemeManager;
+	private var _tip:ToolTip;
 	
 	private var _monitorView_mc:MovieClip;
 	
@@ -75,7 +77,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	//private var _transitionPropertiesOK:Function;
     private var _monitorView:MonitorView;
-	
+	private var _monitorModel:MonitorModel;
 	//Tab Views Initialisers
 	
 	//LessonTabView
@@ -105,7 +107,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	function MonitorView(){
 		_monitorView = this;
 		_tm = ThemeManager.getInstance();
-		
+		_tip = new ToolTip();
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -119,7 +121,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
-		
+		//_monitorModel = getModel();
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
     }    
@@ -203,6 +205,16 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		refresh_btn.addEventListener("click",mcontroller);
 		help_btn.addEventListener("click",mcontroller);
 		exportPortfolio_btn.addEventListener("click", mcontroller);
+		
+		refresh_btn.onRollOver = Proxy.create(this,this['showToolTip'], refresh_btn, "refresh_btn_tooltip");
+		refresh_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		help_btn.onRollOver = Proxy.create(this,this['showToolTip'], help_btn, "help_btn_tooltip");
+		help_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		exportPortfolio_btn.onRollOver = Proxy.create(this,this['showToolTip'], exportPortfolio_btn, "class_exportPortfolio_btn_tooltip");
+		exportPortfolio_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		
 		setLabels();
@@ -254,6 +266,28 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		
 		
+	}
+	
+	public function showToolTip(btnObj, btnTT:String):Void{
+		var btnLabel = btnObj.label;
+		var xpos:Number;
+		if (btnLabel == "Help"){
+			xpos = btnObj._x - 105
+		}else if (btnLabel == "Refresh"){
+			xpos = btnObj._x - 40
+		}else{
+			xpos = btnObj._x
+		}
+		var Xpos = Application.MONITOR_X+ xpos;
+		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
+		var ttHolder = Application.tooltip;
+		var ttMessage = Dictionary.getValue(btnTT);
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
 	}
 
 	/**
@@ -328,7 +362,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		trace("Called getMonitorScp")
 		return monitor_scp;
 	}
-	 /*
+	
+	/*
     * Returns the default controller for this view.
     */
     public function defaultController (model:Observable):Controller {
