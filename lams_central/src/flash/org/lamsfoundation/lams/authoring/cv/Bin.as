@@ -77,11 +77,12 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	
 	private function onRollOver():Void{
 		var Xpos = (Application.CANVAS_X+ this._x)-tooltipXoffset;
-		var Ypos = (Application.CANVAS_Y+ this._y)-up_mc._height;
+		var Ypos = (Application.CANVAS_Y+ this._y);
 		var ttHolder = Application.tooltip;
 		//var ttMessage = btnObj.label;
 		var ttMessage = Dictionary.getValue("bin_tooltip");
-		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
+		//param "true" is to specify that tooltip needs to be shown above the component 
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
 	}
 	
 	private function onRollOut():Void{
