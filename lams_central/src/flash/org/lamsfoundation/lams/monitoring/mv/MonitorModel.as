@@ -60,7 +60,9 @@ class MonitorModel extends Observable{
 	private var _isProgressChanged:Boolean;
 	private var _isSequenceSet:Boolean = false;
 	private var _isDragging:Boolean;
-	
+	private var monitor_y:Number;
+	private var monitor_x:Number;
+	private var ttHolder:MovieClip;
 	private var _monitor:Monitor;
 	
 	// add model data
@@ -116,7 +118,9 @@ class MonitorModel extends Observable{
 		_learnersLoaded = false;
 
 		_resultDTO = new Object();
-
+		ttHolder = Application.tooltip;
+		monitor_y = Application.MONITOR_Y;
+		monitor_x = Application.MONITOR_X;
 		mx.events.EventDispatcher.initialize(this);
 	}
 	
@@ -874,6 +878,15 @@ class MonitorModel extends Observable{
 
 	public function getMonitor():Monitor{
 		return _monitor;
+	}
+	
+	public function getTTData():Object{
+		var myObj:Object = new Object();
+		myObj.monitorX = monitor_x;
+		myObj.monitorY = monitor_y;
+		myObj.ttHolderMC = ttHolder;
+		
+		return myObj;
 	}
 	
 	/**
