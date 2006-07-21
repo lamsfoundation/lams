@@ -610,6 +610,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	   return flashMessage.serializeMessage();
 	}
 	
+	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyToolContent(java.lang.Long) */
+	public String copyToolContent(Long toolContentID) throws IOException
+	{ 
+		Long newContentID = lamsCoreToolService.notifyToolToCopyContent(toolContentID);
+		FlashMessage flashMessage = new FlashMessage("copyToolContent", newContentID);
+		return flashMessage.serializeMessage();
+	}
+
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAvailableLicenses() */
 	public Vector getAvailableLicenses() {
 		List licenses = licenseDAO.findAll(License.class);

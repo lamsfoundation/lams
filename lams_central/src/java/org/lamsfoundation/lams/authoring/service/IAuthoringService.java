@@ -170,6 +170,19 @@ public interface IAuthoringService {
 	 */
 	public String getToolContentID(Long toolID) throws IOException;
 
+	/**
+	 * Calls an appropriate tool to copy the content indicated by toolContentId.
+	 * Returns a string representing the new tool content id in WDDX format.
+	 * 
+	 * The is called when the user copies and pastes a tool activity icon in authoring.
+	 * It should only be called on a ToolActivity - never a Gate or Grouping or
+	 * Complex activity.
+	 * 
+	 * @param toolContentID The toolContentID indicating the content to copy
+	 * @return String The new tool content id in WDDX Format
+	 */
+	public String copyToolContent(Long toolContentID) throws IOException;
+	
 	/** Get the available licenses. This will include our supported Creative Common
 	 * licenses and an "OTHER" license which may be used for user entered license details.
 	 * The picture url supplied should be a full URL i.e. if it was a relative URL in the 

@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -171,6 +172,24 @@ public class AuthoringAction extends LamsDispatchAction{
 	    
 	}
 	
+	/** Copy some existing content. Used when the user copies an activity in authoring.
+	 * Expects one parameters - toolContentId (the content to be copied) */
+	public ActionForward copyToolContent(ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+	 
+		String wddxPacket;
+		IAuthoringService authoringService = getAuthoringService();
+		try {
+		    long toolContentID = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID);
+		    wddxPacket = authoringService.copyToolContent(toolContentID);
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "copyToolContent", authoringService).serializeMessage();
+		}
+	    return outputPacket(mapping, request, response, wddxPacket, "details");   
+	    
+	}
 	/**
 	 * This method returns a list of all available license in
 	 * WDDX format. 
