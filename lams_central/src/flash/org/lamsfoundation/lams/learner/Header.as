@@ -27,7 +27,8 @@ import mx.managers.*
 import mx.events.*
 
 import org.lamsfoundation.lams.learner.*
-import org.lamsfoundation.lams.common.Sequence
+import org.lamsfoundation.lams.common.Sequence;
+import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
@@ -41,7 +42,7 @@ class Header extends MovieClip {
     private var exit_btn:MovieClip;
 	private var resume_lbl:TextField;
 	private var exit_lbl:TextField;
-	
+	private var _tip:ToolTip;
 	private var export_btn:Button;
 	private var export_lbl:TextField;
 	
@@ -66,6 +67,7 @@ class Header extends MovieClip {
         EventDispatcher.initialize(this);
 		
 		_tm = ThemeManager.getInstance();
+		_tip = new ToolTip();
 		_dictionary = Dictionary.getInstance();
 		_dictionary.addEventListener('init',Proxy.create(this,setLabels));
 		
@@ -88,11 +90,8 @@ class Header extends MovieClip {
 		setLabels();
 		resize(Stage.width);
 		
-		//get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
-		//fm = _container.getFocusManager();
-        //fm.enabled = true;
 		
-        //Add event listeners for resume and exit buttons
+		//Add event listeners for resume and exit buttons
 		
 		resume_btn.onRelease = function(){
 			trace('on releasing resuming button..');
@@ -111,8 +110,32 @@ class Header extends MovieClip {
 			app.getLesson().exportLesson();
 		}
 		
+		resume_btn.onRollOver = Proxy.create(this,this['showToolTip'], resume_btn, "hd_resume_tooltip");
+		resume_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		exit_btn.onRollOver = Proxy.create(this,this['showToolTip'], exit_btn, "hd_exit_tooltip");
+		exit_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		export_btn.onRollOver = Proxy.create(this,this['showToolTip'], export_btn, "ln_export_tooltip");
+		export_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		this.onEnterFrame = setLabels;
 		
+	}
+	
+	public function showToolTip(btnObj, btnTT:String):Void{
+		
+		var Xpos = Application.HEADER_X+ 5;
+		var Ypos = Application.HEADER_Y+( btnObj._y+btnObj._height)+2;
+		var ttHolder = Application.tooltip;
+		var ttMessage = Dictionary.getValue(btnTT);
+		var ttWidth = 150
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, undefined, ttWidth);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
 	}
 	
 	private function setStyles(){
