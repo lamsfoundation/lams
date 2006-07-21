@@ -43,6 +43,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	var xoffset:Number = 0;
 	var yoffset:Number = 5;	
 	var showAbove:Boolean = false;
+	var ttWidth:Number = 175
 	// Visible features
 	var textFormat:Object;
 	var tiptext:TextFormat;
@@ -86,10 +87,10 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 			_height = textHeight + 5;
 			
 			// see if we should wrap the text
-			if(_width > 175){
+			if(_width > this.ttWidth){
 				multiline = true;
 				wordWrap = true;
-				_width = 175;
+				_width = this.ttWidth;
 				_height = textHeight + 5;
 			}
 			_visible = false
@@ -172,7 +173,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	}
 	
 	
-	public function DisplayToolTip(p_ttHolder:MovieClip, p_message:String, p_xoffset:Number, p_yoffset:Number, p_above:Boolean, p_btn:Button, p_tiptext:TextFormat, p_tiptextshadow:TextFormat, p_backgroundcolour:Number, p_bordercolour:Number, p_delay:Number, p_shadow:Boolean){
+	public function DisplayToolTip(p_ttHolder:MovieClip, p_message:String, p_xoffset:Number, p_yoffset:Number, p_above:Boolean, p_width:Number, p_btn:Button, p_tiptext:TextFormat, p_tiptextshadow:TextFormat, p_backgroundcolour:Number, p_bordercolour:Number, p_delay:Number, p_shadow:Boolean){
 		// wait
 		//Our tooltip holder (required parameter).
 		ttHolder = p_ttHolder
@@ -198,6 +199,8 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 		}
 		
 		if(p_above != undefined) showAbove = p_above;
+		
+		if(p_width != undefined) ttWidth = p_width;
 		
 		// The visible features (optional).
 		if(p_backgroundcolour != undefined) backgroundcolour = p_backgroundcolour;
