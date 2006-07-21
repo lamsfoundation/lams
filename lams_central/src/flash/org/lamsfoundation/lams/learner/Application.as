@@ -47,15 +47,15 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
     private static var QUESTION_MARK_KEY:Number = 191;
 	
-	private static var HEADER_X:Number = -10;
-	private static var HEADER_Y:Number = -13.5;
-	private static var LESSON_X:Number = 0;
-	private static var LESSON_Y:Number = 82;
+	public static var HEADER_X:Number = 0;
+	public static var HEADER_Y:Number = 0;
+	public static var LESSON_X:Number = 0;
+	public static var LESSON_Y:Number = 82;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
 	private static var HEADER_DEPTH:Number = 20;
-	
+	private static var TOOLTIP_DEPTH:Number = 60;	//depth of the cursors
 	// UI Elements
 	
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
@@ -84,7 +84,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	//Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
 	private var _container_mc:MovieClip;               //Main container
-	
+	private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
 
 
@@ -202,6 +202,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         
         _header_mc = _appRoot_mc.createChildAtDepth('LHeader', DepthManager.kTop, {_x:HEADER_X,_y:HEADER_Y});
+		_tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
 	    _header_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
@@ -324,6 +325,25 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		}
 	}
      
+	 
+	/**
+    * Returns the tooltip conatiner mc
+    * 
+    * @usage    Import monioring package and then use
+	* 
+    */
+    static function get tooltip():MovieClip {
+		trace("tooltip called")
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._tooltipContainer_mc != undefined) {
+            return _instance._tooltipContainer_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if mc hasn't been created
+			
+        }
+    }
+    
+	
 	// onKey*** methods - TODO
 	
 	/**
