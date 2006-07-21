@@ -123,6 +123,22 @@ dynamic class Dictionary {
 		
 		
     }
+	
+	/**
+    * @returns a string holding the text requested
+    */
+    public static function getDescription(key:String):String{
+        Debugger.log('requesting description for :' + key + ' > ' + getInstance().items.get(key).description,Debugger.GEN,'getValue','org.lamsfoundation.lams.dict.Dictionary');
+        var v:String = _instance.items.get(key).description;
+		if(v!=null){
+			return v;
+		}else{
+			Debugger.log('Entry not found in '+getInstance()._currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'createFromData','Dictionary');
+			return "?";
+		}
+		
+		
+    }
     
     /**
     * Converts the dictionary data into a data object ready for serializing
