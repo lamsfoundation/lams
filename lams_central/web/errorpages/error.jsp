@@ -1,3 +1,11 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -41,15 +49,15 @@
 					Some errors happen:
 				</h2>
 				<p class="warning">
-					<c:if test="${not empty errorName}">
+					<c:if test="${not empty param.errorName}">
 
-						<c:out value="${errorName}" escapeXml="false" />:
-						<c:out value="${errorMessage}" escapeXml="false" />
+						<c:out value="${param.errorName}" escapeXml="false" />:
+						<c:out value="${param.errorMessage}" escapeXml="false" />
 						<BR>
 						<a href="#" onclick="showHide()"><span id="showButt">Show
 								Message</span> </a>
 						<BR>
-						<span id="messageDetail" style="display:none"> <c:out value="${errorStack}"
+						<span id="messageDetail" style="display:none"> <c:out value="${param.errorStack}"
 								escapeXml="false" /> </span>
 					</c:if>
 				</p>

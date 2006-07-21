@@ -1,25 +1,63 @@
-<%@ page language="java" isErrorPage="true" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page language="java" isErrorPage="true" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%-- Catch JSP Servlet Exception --%>
+<%
+if (exception != null) {
+%>
+<c:set var="errorMessage">
+	<%=exception.getMessage()%>
+</c:set>
+<c:set var="errorName">
+	<%=exception.getClass().getName()%>
+</c:set>
+<%
+		java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+		java.io.PrintStream os = new java.io.PrintStream(bos);
+		exception.printStackTrace(os);
+		String stack = new String(bos.toByteArray());
+%>
+<c:set var="errorStack">
+	<%=stack%>
+</c:set>
+<%
+} else if ((Exception) request.getAttribute("javax.servlet.error.exception") != null) {
+%>
 
-<html>
-<head>
-    <title><fmt:message key="errorPage.title"/></title>
-</head>
+<c:set var="errorMessage">
+	<%=((Exception) request.getAttribute("javax.servlet.error.exception")).getMessage()%>
+</c:set>
+<c:set var="errorName">
+	<%=((Exception) request.getAttribute("javax.servlet.error.exception")).getMessage()
+									.getClass().getName()%>
+</c:set>
+<%
+		java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+		java.io.PrintStream os = new java.io.PrintStream(bos);
+		((Exception) request.getAttribute("javax.servlet.error.exception")).printStackTrace(os);
+		String stack = new String(bos.toByteArray());
+%>
+<c:set var="errorStack">
+	<%=stack%>
+</c:set>
+<%
+}
+%>
+<form action="${lams}errorpages/error.jsp" method="post" id="errorForm">
+	<input type="hidden" name="errorName" value="${errorName}"/>
+	<input type="hidden" name="errorMessage" value="${errorMessage}"/>
+	<input type="hidden" name="errorStack" value="${errorStack}"/>
+</form>
 
-<body>
-<div id="screen">
-    <div id="content">
-    <h1><fmt:message key="errorPage.heading"/></h1>
- <% if (exception != null) { %>
-    <pre><% exception.printStackTrace(new java.io.PrintWriter(out)); %></pre>
- <% } else if ((Exception)request.getAttribute("javax.servlet.error.exception") != null) { %>
-    <pre><% ((Exception)request.getAttribute("javax.servlet.error.exception"))
-                           .printStackTrace(new java.io.PrintWriter(out)); %></pre>
- <% } %>
-    </div>
-</body>
-</html>
+<script type="text/javascript">
+
+if(window.top != null)
+	document.getElementById("errorForm").target = "_top";
+document.getElementById("errorForm").submit();
+
+</script>
