@@ -43,6 +43,7 @@ import mx.effects.*
 class MonitorController extends AbstractController {
 	private var _monitorModel:MonitorModel;
 	private var _monitorController:MonitorController;
+	private var _app:Application;
 	private var _isBusy:Boolean;
 	
 	
@@ -55,6 +56,7 @@ class MonitorController extends AbstractController {
 		super (mm);
 		_monitorModel = MonitorModel(model);
 		_monitorController = this;
+		_app = Application.getInstance();
 		_isBusy = false;
 		
 	}
@@ -373,5 +375,14 @@ class MonitorController extends AbstractController {
 	
 	public function clearBusy(){
 		_isBusy = false;
+	}
+	public function get appData():Object{
+		trace("called monitor application")
+		var myObj:Object = new Object();
+		myObj.compX = Application.MONITOR_X
+		myObj.compY = Application.MONITOR_Y
+		myObj.ttHolder = Application.tooltip;
+		return myObj;
+		
 	}
 }
