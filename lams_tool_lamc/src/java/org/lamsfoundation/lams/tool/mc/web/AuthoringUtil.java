@@ -867,9 +867,8 @@ public class AuthoringUtil implements McAppConstants {
 	 * @param mapQuestionsUidContent
 	 * @return
 	 */
-    public static Map rebuildStartupGeneralOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+    public static Map rebuildStartupGeneralOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent, IMcService mcService)
 	{
-		IMcService mcService =McUtils.getToolService(request);
 		Map mapStartupGeneralOptionsContent= new TreeMap(new McComparator());
     	
     	Iterator itMap = mapQuestionsUidContent.entrySet().iterator();
@@ -945,11 +944,9 @@ public class AuthoringUtil implements McAppConstants {
 	 * @param toolContentId
 	 * @return Map
 	 */
-    public static Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
+    public static Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId, IMcService mcService)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
-    	
-    	IMcService mcService =McUtils.getToolService(request);
     	logger.debug("toolContentId:" + toolContentId);
 
 		McContent mcContent=mcService.retrieveMc(toolContentId);
@@ -981,11 +978,9 @@ public class AuthoringUtil implements McAppConstants {
      * @param toolContentId
      * @return Map
      */
-    public static Map rebuildQuestionUidMapfromDB(HttpServletRequest request, Long toolContentId)
+    public static Map rebuildQuestionUidMapfromDB(HttpServletRequest request, Long toolContentId, IMcService mcService)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
-    	
-    	IMcService mcService =McUtils.getToolService(request);
     	logger.debug("toolContentId:" + toolContentId);
 
 		McContent mcContent=mcService.retrieveMc(toolContentId);
@@ -2548,16 +2543,16 @@ public class AuthoringUtil implements McAppConstants {
      * @param request
      * @param toolContentId
      */
-    public static void  refreshMaps(HttpServletRequest request, long toolContentId)
+    public static void  refreshMaps(HttpServletRequest request, long toolContentId, IMcService mcService)
     {
     	logger.debug("refreshing maps..");
-    	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId));
+    	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId), mcService);
     	logger.debug("mapQuestionsUidContent:" + mapQuestionsUidContent);
     	
     	logger.debug("mapQuestionsUidContent size:" + mapQuestionsUidContent.size());
     	if (mapQuestionsUidContent.size() > 0)
     	{
-    		Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent);
+    		Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent, mcService);
         	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
         	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
         	

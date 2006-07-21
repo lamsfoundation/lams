@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -298,7 +299,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	{
     		logger.debug("requested learner finished, the learner should be directed to next activity.");
     		
-    		Long toolSessionId = (Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+    		String toolSessionId=mcLearningForm.getToolSessionId();
+        	logger.debug("toolSessionId: " + toolSessionId);
+        	
+        	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
+            logger.debug("retrieving mcSession: " + mcSession);
     		
     	    String userID = "";
     	    HttpSession ss = SessionManager.getSession();
@@ -321,7 +326,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		String nextUrl=null;
     		try
     		{
-    			nextUrl=mcService.leaveToolSession(toolSessionId, new Long(userID));
+    			nextUrl=mcService.leaveToolSession(new Long(toolSessionId), new Long(userID));
     			logger.debug("nextUrl: "+ nextUrl);
     		}
     		catch (DataMissingException e)
@@ -349,9 +354,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		logger.debug("success getting nextUrl: "+ nextUrl);
     		mcLearningForm.resetCommands();
     		
-    		McSession mcSession=mcService.retrieveMcSession(toolSessionId);
-    	    logger.debug("retrieving mcSession: " + mcSession);
-    	    
     	    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
     	    logger.debug("mcQueUsr:" + mcQueUsr);
     	    
@@ -385,29 +387,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		
     		return null;
     	}
-    	else if (mcLearningForm.getDonePreview() != null)
-    	{
-    		logger.debug("requested  donePreview.");
-        	mcLearningForm.resetCommands();
-        	McUtils.cleanUpSessionAbsolute(request);
-        	return (mapping.findForward(LEARNING_STARTER));
-    	}
-    	else if (mcLearningForm.getDoneLearnerProgress() != null)
-    	{
-    		logger.debug("requested  doneLearnerProgress.");
-        	mcLearningForm.resetCommands();
-        	McUtils.cleanUpSessionAbsolute(request);
-        	return (mapping.findForward(LEARNING_STARTER));
-    	}
     	
     	mcLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
    }
     
     
-    protected Set parseLearnerInput(List learnerInput)
+    protected Set parseLearnerInput(List learnerInput, McContent mcContent, IMcService mcService)
     {
         logger.debug("learnerInput: " + learnerInput);
+        logger.debug("mcContent: " + mcContent);
+        logger.debug("mcContent uid: " + mcContent.getUid());
+        
         Set questionUids= new HashSet();
 
         Iterator listLearnerInputIterator=learnerInput.iterator();
@@ -422,19 +413,50 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		questionUids.add(questionUid);
     	}
     	logger.debug("final set questionUid: " + questionUids);
-    	return questionUids;
+    	
+    	
+    	List questionEntriesOrdered=mcService.getAllQuestionEntries(mcContent.getUid());
+    	logger.debug("questionEntriesOrdered: " + questionEntriesOrdered);
+    	
+    	Set questionOrderedUids= new TreeSet();
+    	Iterator questionEntriesOrderedIterator=questionEntriesOrdered.iterator();
+    	while (questionEntriesOrderedIterator.hasNext())
+    	{
+    	    McQueContent mcQueContent= (McQueContent)questionEntriesOrderedIterator.next();
+    	    logger.debug("mcQueContent: " + mcQueContent);
+    	    logger.debug("mcQueContent text: " + mcQueContent.getQuestion());
+    	    
+    	    
+    	    Iterator questionUidsIterator=questionUids.iterator();
+    	    while (questionUidsIterator.hasNext())
+    	    {
+    	        String questionUid= (String)questionUidsIterator.next();
+    	        logger.debug("questionUid: " + questionUid);
+    	        
+    	        logger.debug("questionUid versus objects uid : " + questionUid + " versus " +  mcQueContent.getUid());
+    	        if (questionUid.equals(mcQueContent.getUid().toString()))
+    	        {
+    	            questionOrderedUids.add(questionUid);
+    	        }
+    	    }
+    	}
+    	logger.debug("questionOrderedUids: " + questionOrderedUids);
+    	return questionOrderedUids;
     }
 
     
     
-    protected List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, IMcService mcService)
+    protected List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, 
+            IMcService mcService, McContent mcContent)
     {
         logger.debug("mcService: " + mcService);
+        logger.debug("mcContent: " + mcContent);
+        
         logger.debug("learnerInput: " + learnerInput);
         int mark=0;
         int userWeight=0;
         
-        Set questionUids=parseLearnerInput(learnerInput);
+        Set questionUids=parseLearnerInput(learnerInput, mcContent, mcService);
         logger.debug("set questionUids: " + questionUids);
         
         List questionAndCandidateAnswersList= new LinkedList();
@@ -555,7 +577,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	    logger.debug("retrieving mcService from proxy: " + mcService);
 	 	
-	 	String[] checkedCa=mcLearningForm.getCheckedCa(); 
+	 	String[] checkedCa=mcLearningForm.getCheckedCa();
+	 	mcLearningForm.resetCa(mapping, request);
+
+	 	
 	 	logger.debug("checkedCa: " + checkedCa);
 	 	logger.debug("checkedCa length: " + checkedCa.length );
 	 	
@@ -570,14 +595,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	 	String toolContentId=mcLearningForm.getToolContentId();
 	 	logger.debug("toolContentId: " + toolContentId);
-	 	
-	 	
-	 	//Integer learnerMark= new Integer(0);
-	 	//Integer totalUserWeight= new Integer(0);
+
+	 	/* process the answers */
+    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+    	logger.debug("mcContent: " + mcContent);
+
 	 	McTempDataHolderDTO mcTempDataHolderDTO= new McTempDataHolderDTO();
 
 	 	List selectedQuestionAndCandidateAnswersDTO=buildSelectedQuestionAndCandidateAnswersDTO(learnerInput,mcTempDataHolderDTO 
-	 	        , mcService);
+	 	        , mcService, mcContent);
 	 	logger.debug("selectedQuestionAndCandidateAnswersDTO: " + selectedQuestionAndCandidateAnswersDTO);
 	 	request.setAttribute(LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO, selectedQuestionAndCandidateAnswersDTO);
 		logger.debug("LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO));
@@ -591,9 +617,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
 		
 		
-	 	/* process the answers */
-    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
-    	logger.debug("mcContent: " + mcContent);
     	
     	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
     	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
@@ -874,19 +897,51 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+        
+        
     	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewAnswers...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
-		String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-		logger.debug("totalQuestionCount: " + totalQuestionCount);
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		
+		String toolContentId=mcLearningForm.getToolContentId();
+	 	logger.debug("toolContentId: " + toolContentId);
+	 	
+	 	String toolSessionId=mcLearningForm.getToolSessionId();
+	 	logger.debug("toolSessionId: " + toolSessionId);
+	 	
+    	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
+        logger.debug("retrieving mcSession: " + mcSession);
+
+    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+    	logger.debug("mcContent: " + mcContent);
+    	
+    	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+
+    	int intTotalQuestionCount=mcContent.getMcQueContents().size();
+    	String totalQuestionCount= new Integer(intTotalQuestionCount).toString();
+    	logger.debug("totalQuestionCount: " + totalQuestionCount);
 		
 		/* this section is needed to separate learner progress view from standard attempts list. Goes from here.. */
-		String learnerProgress=(String)request.getSession().getAttribute(LEARNER_PROGRESS);
+		String learnerProgress=mcLearningForm.getLearnerProgress();
 		logger.debug("learnerProgress: " + learnerProgress);
-		
-		String learnerProgressUserId=(String)request.getSession().getAttribute(LEARNER_PROGRESS_USERID);
+		mcGeneralLearnerFlowDTO.setLearnerProgress(learnerProgress);
+
+		String learnerProgressUserId=mcLearningForm.getLearnerProgressUserId();
 		logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+		mcGeneralLearnerFlowDTO.setLearnerProgressUserId(learnerProgressUserId);
+
+    	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId), mcService);
+    	logger.debug("mapQuestionsUidContent:" + mapQuestionsUidContent);
+
+    	Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent, mcService);
+    	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
+    	mcGeneralLearnerFlowDTO.setMapGeneralOptionsContent(mapStartupGeneralOptionsContent);
+    	
+    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId), mcService);
+    	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
+    	mcGeneralLearnerFlowDTO.setMapQuestionsContent(mapQuestionsContent);
+		
 		
 		boolean learnerProgressOn=false;
 		if (learnerProgressUserId != null)
@@ -906,7 +961,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		Long queUsrId=null;
 		if (learnerProgressOn == false)
 		{
-			mcQueUsr=LearningUtil.getUser(request, mcService);
+			mcQueUsr=LearningUtil.getUser(request, mcService, toolSessionId);
 			logger.debug("mcQueUsr: " + mcQueUsr);
 			
 			queUsrId=mcQueUsr.getUid();
@@ -914,13 +969,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		}
 		else
 		{
-	    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-	    	logger.debug("toolSessionId: " + toolSessionId);
-	    	
-	    	McSession mcSession=mcService.retrieveMcSession(toolSessionId);
-	        logger.debug("retrieving mcSession: " + mcSession);
-
+	        logger.debug("using mcSession: " + mcSession);
+	        logger.debug("using learnerProgressUserId: " + learnerProgressUserId);
+	        
 		    mcQueUsr=mcService.getMcUserBySession(new Long(learnerProgressUserId), mcSession.getUid());
+		    logger.debug("mcQueUsr: " + mcQueUsr);
 			
 			queUsrId=mcQueUsr.getUid();
 			logger.debug("queUsrId: " + queUsrId);
@@ -928,7 +981,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("final mcQueUsr: " + mcQueUsr);
 		logger.debug("final queUsrId: " + queUsrId);
 		
-		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
+		Long toolContentUID=mcContent.getUid();
 		logger.debug("toolContentUID: " + toolContentUID);
     	
 		Map mapQueAttempts= new TreeMap(new McComparator());
@@ -1029,13 +1082,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     			mapQueIncorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderIncorrectAttempts);	
 	    	}    			
 		}
-		request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
-		request.getSession().setAttribute(MAP_QUE_CORRECT_ATTEMPTS, mapQueCorrectAttempts);
-		request.getSession().setAttribute(MAP_QUE_INCORRECT_ATTEMPTS, mapQueIncorrectAttempts);
-		
+
 		logger.debug("final mapQueAttempts is: " + mapQueAttempts);
 		logger.debug("final mapQueCorrectAttempts is: " + mapQueCorrectAttempts);
 		logger.debug("final mapQueIncorrectAttempts is: " + mapQueIncorrectAttempts);
+
+		mcGeneralLearnerFlowDTO.setMapQueAttempts(mapQueAttempts);
+		mcGeneralLearnerFlowDTO.setMapQueCorrectAttempts(mapQueCorrectAttempts);
+		mcGeneralLearnerFlowDTO.setMapQueIncorrectAttempts(mapQueIncorrectAttempts);
+
+		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
+		
 		mcLearningForm.resetCommands();
 		return (mapping.findForward(VIEW_ANSWERS));
 	}
@@ -1072,7 +1130,24 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 		
-		int countSessionComplete=mcService.countSessionComplete();
+		int countSessionComplete=0;
+		Iterator sessionsIterator=mcContent.getMcSessions().iterator();
+		while (sessionsIterator.hasNext())
+        {
+		    McSession mcSession= (McSession)sessionsIterator.next();
+		    if  (mcSession != null)
+		    {
+			    logger.debug("mcSession: " + mcSession);
+			    if (mcSession.getSessionStatus().equals(COMPLETED))
+			    {
+			        logger.debug("COMPLETED session found: " + mcSession);
+			        ++countSessionComplete;
+			    }
+		    }
+        }
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		
+		
 		int topMark=LearningUtil.getTopMark(request, mcService);
 		int lowestMark=LearningUtil.getLowestMark(request, mcService);
 		int averageMark=LearningUtil.getAverageMark(request, mcService);
@@ -1081,11 +1156,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("topMark: " + topMark);
 		logger.debug("lowestMark: " + lowestMark);
 		logger.debug("averageMark: " + averageMark);
-		
-		//request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
-		//request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
-		//request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
-		//request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
 		
 		mcGeneralLearnerFlowDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 		mcGeneralLearnerFlowDTO.setTopMark(new Integer(topMark).toString());
@@ -1136,9 +1206,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
     	/* reset the checked options MAP */
     	Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
-    	//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-    	
-	 	String toolContentId=mcLearningForm.getToolContentId();
+
+    	String toolContentId=mcLearningForm.getToolContentId();
 	 	logger.debug("toolContentId: " + toolContentId);
 
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
@@ -1155,9 +1224,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 
     	mcLearningForm.resetCommands();
-		
-		//String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
-		//logger.debug("previewOnly: " + previewOnly);
 
 		logger.debug("fwding to LOAD_LEARNER: " + LOAD_LEARNER);
     	return (mapping.findForward(LOAD_LEARNER));

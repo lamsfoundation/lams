@@ -22,7 +22,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
 /**
@@ -51,9 +54,16 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String learningMode;
 	protected String currentQuestionIndex;
 	
+	/**put tghese under SessionMap*/
 	protected String userOverPassMark;
 	protected String passMarkApplicable;
-	
+    protected String learnerProgress;
+    protected String learnerProgressUserId;
+    	
+ 	public void resetCa(ActionMapping mapping, HttpServletRequest request) {
+ 	   checkedCa = new String[0];
+	}
+
 	
 	public void resetCommands()
 	{
@@ -297,4 +307,28 @@ public class McLearningForm extends ActionForm implements McAppConstants {
         this.currentQuestionIndex = currentQuestionIndex;
     }
     
+    /**
+     * @return Returns the learnerProgress.
+     */
+    public String getLearnerProgress() {
+        return learnerProgress;
+    }
+    /**
+     * @param learnerProgress The learnerProgress to set.
+     */
+    public void setLearnerProgress(String learnerProgress) {
+        this.learnerProgress = learnerProgress;
+    }
+    /**
+     * @return Returns the learnerProgressUserId.
+     */
+    public String getLearnerProgressUserId() {
+        return learnerProgressUserId;
+    }
+    /**
+     * @param learnerProgressUserId The learnerProgressUserId to set.
+     */
+    public void setLearnerProgressUserId(String learnerProgressUserId) {
+        this.learnerProgressUserId = learnerProgressUserId;
+    }
 }

@@ -296,8 +296,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			commonContentSetup(request, mcContent, mcService);
 	    	
 			/* LEARNER_PROGRESS for jsp*/
-			request.getSession().setAttribute(LEARNER_PROGRESS_USERID, userId);
-			request.getSession().setAttribute(LEARNER_PROGRESS, new Boolean(true).toString());
+			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
+			mcLearningForm.setLearnerProgressUserId(userId);
+			
 			McLearningAction mcLearningAction= new McLearningAction();
 			/* pay attention that this userId is the learner's userId passed by the request parameter.
 			 * It is differerent than USER_ID kept in the session of the current system user*/
@@ -308,7 +309,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
 		    	persistError(request, "error.learner.required");
-		    	request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
+		    	//request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
 				return (mapping.findForward(ERROR_LIST));
 		    }
 		    
@@ -323,7 +324,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				 (mcSessionLocal.getMcSessionId().longValue() != toolSessionId.longValue()))
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
-		    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
+		    	//request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
 		    	persistError(request, "error.learner.sessionId.inconsistent");
 				return (mapping.findForward(ERROR_LIST));
 		    }
@@ -406,18 +407,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			if (highestAttemptOrder == 0)
 				highestAttemptOrder=1;
 			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
-			//request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER,new Integer(highestAttemptOrder).toString());
 			
 			int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId, mcService);
 			logger.debug("learnerBestMark: " + learnerBestMark);
-			//request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());	
 	    }
 	    else
 	    {
 	    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
-	    	//request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER,new Integer(1).toString());
-	    	//request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(0).toString());
-	    	
 	    }
 	    
 	    String learningMode=mcLearningForm.getLearningMode();
@@ -517,41 +513,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
 	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + mcContent.isRunOffline());
 	    mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
-	    
-	    
-	    /* the following attributes are unused for the moment.
-	     * from here...
-	     */
-	    /*
-		logger.debug("IS_USERNAME_VISIBLE: " + mcContent.isUsernameVisible());
-	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(mcContent.isUsernameVisible()).toString());
-	    
-		logger.debug("IS_SHOW_FEEDBACK: " + new Boolean(mcContent.isShowFeedback()).toString());
-	    request.getSession().setAttribute(IS_SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback()).toString());
-	    
-	    Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
-	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-	    
-	    Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
-	    request.getSession().setAttribute(MAP_LEARNER_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
-	    
-	    Map mapLeanerAssessmentResults= new TreeMap(new McComparator());
-	    request.getSession().setAttribute(MAP_LEARNER_ASSESSMENT_RESULTS, mapLeanerAssessmentResults);
-	    
-	    
-	    Map mapLeanerFeedbackIncorrect=AuthoringUtil.buildInCorrectFeedbackMap(request, mcContent.getMcContentId());
-	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_INCORRECT, mapLeanerFeedbackIncorrect);
-	    logger.debug("MAP_LEARNER_FEEDBACK_INCORRECT: " + mapLeanerFeedbackIncorrect);
-	    
-	    Map mapLeanerFeedbackCorrect=AuthoringUtil.buildCorrectFeedbackMap(request, mcContent.getMcContentId());
-	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_CORRECT, mapLeanerFeedbackCorrect);
-	    logger.debug("MAP_LEARNER_FEEDBACK_CORRECT: " + mapLeanerFeedbackCorrect);
-
-	    Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId());
-	    request.getSession().setAttribute(MAP_QUESTION_WEIGHTS, mapQuestionWeights);
-	    logger.debug("MAP_QUESTION_WEIGHTS: " + mapQuestionWeights);
-	    */
-	    /* .. till here */
 	}
 	
 	

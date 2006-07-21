@@ -22,6 +22,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
+import java.util.Map;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -67,8 +69,48 @@ public class McGeneralLearnerFlowDTO implements Comparable
     protected String lowestMark;
 
     protected String averageMark;
-
     
+    protected String learnerProgress;
+    
+    protected String learnerProgressUserId;
+    
+    protected Map mapQueAttempts;
+	
+    protected Map mapQueCorrectAttempts;
+	
+    protected Map mapQueIncorrectAttempts;
+    
+    protected Map mapGeneralOptionsContent;
+    
+    protected Map mapQuestionsContent;
+    
+    protected String toolSessionId;
+
+        
+    /**
+     * @return Returns the toolSessionId.
+     */
+    public String getToolSessionId() {
+        return toolSessionId;
+    }
+    /**
+     * @param toolSessionId The toolSessionId to set.
+     */
+    public void setToolSessionId(String toolSessionId) {
+        this.toolSessionId = toolSessionId;
+    }
+    /**
+     * @return Returns the mapGeneralOptionsContent.
+     */
+    public Map getMapGeneralOptionsContent() {
+        return mapGeneralOptionsContent;
+    }
+    /**
+     * @param mapGeneralOptionsContent The mapGeneralOptionsContent to set.
+     */
+    public void setMapGeneralOptionsContent(Map mapGeneralOptionsContent) {
+        this.mapGeneralOptionsContent = mapGeneralOptionsContent;
+    }
     /**
      * @return Returns the averageMark.
      */
@@ -302,5 +344,77 @@ public class McGeneralLearnerFlowDTO implements Comparable
      */
     public void setCurrentQuestionIndex(String currentQuestionIndex) {
         this.currentQuestionIndex = currentQuestionIndex;
+    }
+    /**
+     * @return Returns the mapQueAttempts.
+     */
+    public Map getMapQueAttempts() {
+        return mapQueAttempts;
+    }
+    /**
+     * @param mapQueAttempts The mapQueAttempts to set.
+     */
+    public void setMapQueAttempts(Map mapQueAttempts) {
+        this.mapQueAttempts = mapQueAttempts;
+    }
+    /**
+     * @return Returns the mapQueCorrectAttempts.
+     */
+    public Map getMapQueCorrectAttempts() {
+        return mapQueCorrectAttempts;
+    }
+    /**
+     * @param mapQueCorrectAttempts The mapQueCorrectAttempts to set.
+     */
+    public void setMapQueCorrectAttempts(Map mapQueCorrectAttempts) {
+        this.mapQueCorrectAttempts = mapQueCorrectAttempts;
+    }
+    /**
+     * @return Returns the mapQueIncorrectAttempts.
+     */
+    public Map getMapQueIncorrectAttempts() {
+        return mapQueIncorrectAttempts;
+    }
+    /**
+     * @param mapQueIncorrectAttempts The mapQueIncorrectAttempts to set.
+     */
+    public void setMapQueIncorrectAttempts(Map mapQueIncorrectAttempts) {
+        this.mapQueIncorrectAttempts = mapQueIncorrectAttempts;
+    }
+    /**
+     * @return Returns the learnerProgress.
+     */
+    public String getLearnerProgress() {
+        return learnerProgress;
+    }
+    /**
+     * @param learnerProgress The learnerProgress to set.
+     */
+    public void setLearnerProgress(String learnerProgress) {
+        this.learnerProgress = learnerProgress;
+    }
+    /**
+     * @return Returns the learnerProgressUserId.
+     */
+    public String getLearnerProgressUserId() {
+        return learnerProgressUserId;
+    }
+    /**
+     * @param learnerProgressUserId The learnerProgressUserId to set.
+     */
+    public void setLearnerProgressUserId(String learnerProgressUserId) {
+        this.learnerProgressUserId = learnerProgressUserId;
+    }
+    /**
+     * @return Returns the mapQuestionsContent.
+     */
+    public Map getMapQuestionsContent() {
+        return mapQuestionsContent;
+    }
+    /**
+     * @param mapQuestionsContent The mapQuestionsContent to set.
+     */
+    public void setMapQuestionsContent(Map mapQuestionsContent) {
+        this.mapQuestionsContent = mapQuestionsContent;
     }
 }

@@ -94,11 +94,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								mcGeneralLearnerFlowDTO.passMarkApplicable == 'true' }">
 						 <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
-							  	 <bean:message key="label.mustGet"/> &nbsp
-							  	<c:out value="${mcGeneralLearnerFlowDTO.learnerMarkAtLeast}"/>  &nbsp
-								<bean:message key="label.outof"/> &nbsp
-							  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/>
-								<bean:message key="label.toFinish"/>						  	
+							   <bean:message key="label.notEnoughMarks"/> 
 						  	</td>
 						  </tr>	
   					</c:if> 			

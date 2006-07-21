@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content-learner">
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 				<table class="forms">
-					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
 						  	 <bean:message key="label.assessment"/> 
@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 
 
-					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	<b>  <bean:message key="label.viewAnswers"/>  </b>
@@ -73,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 					</c:if> 								  
 
-					<c:if test="${sessionScope.learnerProgress == 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress == 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	 <b> <bean:message key="label.learner.viewAnswers"/> </b>
@@ -82,9 +82,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if> 								  
 
 					
-  		  	 		<c:set var="mainQueIndex" scope="session" value="0"/>
-					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
-					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
+  		  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
+					<c:forEach var="questionEntry" items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
+					<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
 						  <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
 								  		<c:out value="${questionEntry.value}"/> 
@@ -95,10 +95,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  <tr>						 
 							<td NOWRAP align=left>
 							<table align=left>
-			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-								<c:forEach var="mainEntry" items="${sessionScope.mapGeneralOptionsContent}">
-									<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
+			  		  	 		<c:set var="queIndex" scope="request" value="0"/>
+								<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
+										<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}"> 		
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
 													<td NOWRAP align=left valign=top> 
@@ -117,18 +117,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<tr>
 													<td  NOWRAP align=left valign=top> 											
 													<table align=left>
-														<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
-															<c:if test="${sessionScope.mainQueIndex == attemptEntry.key}"> 		
- 											  		  	 		<c:set var="aIndex" scope="session" value="1"/>
+														<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
+															<c:if test="${requestScope.mainQueIndex == attemptEntry.key}"> 		
+ 											  		  	 		<c:set var="aIndex" scope="request" value="1"/>
 																 <c:forEach var="i" begin="1" end="30" step="1">
 
 					 													<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
 																				<c:if test="${distinctAttemptEntry.key == i}"> 	
 																					<tr>
 																						<td NOWRAP align=left valign=top> 
-																								<b> <bean:message key="label.attempt"/> <c:out value="${sessionScope.aIndex}"/>:  </b>
+																								<b> <bean:message key="label.attempt"/> <c:out value="${requestScope.aIndex}"/>:  </b>
 																						</td>
-																						<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
+																						<c:set var="aIndex" scope="request" value="${requestScope.aIndex +1}"/>
 								 														<td align=left valign=top> 																					
 									 														<table align=left>
 											 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
@@ -159,8 +159,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-				<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
-				 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
+				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
+				 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
 			  	   		  <tr>
 						  	<td NOWRAP valign=top> 
 						  			<html:submit property="redoQuestions" styleClass="button">
@@ -170,17 +170,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			   						<html:submit property="viewSummary" styleClass="button">
 										<bean:message key="label.view.summary"/>
 									</html:submit>	 				 		  					
-
-								<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
-								  	   <html:submit property="learnerFinished" styleClass="button">
-											<bean:message key="label.finished"/>
-									   </html:submit>
-							  	   </c:if>
 						  	 </td>
 						  </tr>
 						</c:if> 																		
 	
-						<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+						<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
 			  	   		  <tr>
 			  	   		    <td  valign=top>
 				   						<html:submit property="viewSummary" styleClass="button">
@@ -198,7 +192,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	 
 						  </tr>
 						</c:if> 																		
-					</c:if> 																								
+				</c:if> 																								
 					
 				  	<html:hidden property="doneLearnerProgress"/>						   
 				</table>

@@ -180,7 +180,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		
-    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, toolContentId);
+    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, toolContentId, mcService);
     	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
@@ -385,7 +385,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		}
 		
 		/* this section is related to Stats tab. Starts here. */
-		//int countSessionComplete=mcService.countSessionComplete();
 		int countSessionComplete=mcService.countSessionComplete(mcContent);
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		

@@ -1893,7 +1893,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McContent mcContent=mcService.retrieveMc(toolContentId);
     	logger.debug("mcContent: " + mcContent);
 
-    	AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+    	AuthoringUtil.refreshMaps(request, toolContentId.longValue(), mcService);
 		logger.debug("refreshed maps...");
 	 	
 		Map mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
@@ -2257,7 +2257,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
 		
 		
-		AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+		AuthoringUtil.refreshMaps(request, toolContentId.longValue(), mcService);
 		logger.debug("refreshed maps...");
 		
 		logger.debug("start processing questions content...");
@@ -2280,7 +2280,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
 		
 		logger.debug("will refresh maps...");
-		AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+		AuthoringUtil.refreshMaps(request, toolContentId.longValue(), mcService);
 		
 		mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("mapStartupGeneralOptionsContent: " + mapStartupGeneralOptionsContent);

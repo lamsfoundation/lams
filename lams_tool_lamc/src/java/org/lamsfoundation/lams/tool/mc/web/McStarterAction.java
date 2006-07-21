@@ -586,12 +586,12 @@ public class McStarterAction extends Action implements McAppConstants {
     	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
     	
     	
-    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
+    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId), mcService);
     	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
     	
-	    AuthoringUtil.refreshMaps(request, toolContentId);
+	    AuthoringUtil.refreshMaps(request, toolContentId, mcService);
 	    AuthoringUtil.assignStaterMapsToCurrentMaps(request);
 	    
 	    /*process offline files metadata*/
