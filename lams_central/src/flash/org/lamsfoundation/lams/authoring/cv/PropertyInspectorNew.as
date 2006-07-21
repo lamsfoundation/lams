@@ -251,6 +251,15 @@ class PropertyInspectorNew extends MovieClip{
 		}
 	}
 	
+	public function isPIExpanded():Boolean{
+		return _piIsExpended;
+	}
+	
+	public function piFullHeight():Number{
+		return piHeightFull;
+	}
+	
+	
 	public function localOnReleaseOutside():Void{
 		Debugger.log('Release outside so no event has been fired, current state is: ' + _piIsExpended,Debugger.GEN,'localOnReleaseOutside','PropertyInspectorNew');
 		
