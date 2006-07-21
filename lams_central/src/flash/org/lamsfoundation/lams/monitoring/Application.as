@@ -21,12 +21,9 @@
  * ************************************************************************
  */
 
-//import org.lamsfoundation.lams.authoring.*       	//Design Data model n stuffimport org.lamsfoundation.lams.authoring.*       	//Design Data model n stuff
-import org.lamsfoundation.lams.monitoring.*
-import org.lamsfoundation.lams.monitoring.ls.*       //Lessons
-import org.lamsfoundation.lams.monitoring.mv.* 		 //Monitor
-//import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
-//import org.lamsfoundation.lams.authoring.cv.*       //Canvas
+//import org.lamsfoundation.lams.monitoring.*
+import org.lamsfoundation.lams.monitoring.ls.*      //Lessons
+import org.lamsfoundation.lams.monitoring.mv.* 	 //Monitor
 import org.lamsfoundation.lams.common.ws.*          //Workspace
 import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.common.util.*        //Utils
@@ -50,31 +47,31 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private static var TOOLBAR_X:Number = 10;
     private static var TOOLBAR_Y:Number = 35;*/
 	private static var _controlKeyPressed:String;
-	private static var TOOLBAR_X:Number = 0;
-    private static var TOOLBAR_Y:Number = 21;
+	public static var TOOLBAR_X:Number = 0;
+    public static var TOOLBAR_Y:Number = 21;
     //private static var LESSONS_X:Number = 0;
     //private static var LESSONS_Y:Number = 21;
     
-    private static var MONITOR_X:Number = 0;
-    private static var MONITOR_Y:Number = 55;
-    private static var MONITOR_W:Number = 550;
-    private static var MONITOR_H:Number = 550;
+    public static var MONITOR_X:Number = 0;
+    public static var MONITOR_Y:Number = 55;
+    public static var MONITOR_W:Number = 550;
+    public static var MONITOR_H:Number = 550;
     
-    private static var WORKSPACE_X:Number = 200;
-    private static var WORKSPACE_Y:Number = 200;
-    private static var WORKSPACE_W:Number = 300;
-    private static var WORKSPACE_H:Number = 200;
+    public static var WORKSPACE_X:Number = 200;
+    public static var WORKSPACE_Y:Number = 200;
+    public static var WORKSPACE_W:Number = 300;
+    public static var WORKSPACE_H:Number = 200;
     
-    private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
-    private static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
-    private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
-    private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
-    private static var MENU_DEPTH:Number = 25;   //depth of the menu
+    public static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
+    public static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
+    public static var TOOLTIP_DEPTH:Number = 60;	//depth of the cursors
+    public static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
+    public static var MENU_DEPTH:Number = 25;   //depth of the menu
     
-    private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
-	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
-	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
-	private static var DATA_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+    public static var UI_LOAD_CHECK_INTERVAL:Number = 50;
+	public static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+	public static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
+	public static var DATA_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 
     private static var QUESTION_MARK_KEY:Number = 191;
     private static var X_KEY:Number = 88;
@@ -426,9 +423,11 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
-        _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
+        
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
 		
+		_tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
+
 		
 
         //MENU
@@ -630,13 +629,14 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
 			
         }
-    }	 /**
+    }	/**
     * Returns the tooltip conatiner mc
     * 
-    * @usage    Import authoring package and then use
+    * @usage    Import monioring package and then use
 	* 
     */
     static function get tooltip():MovieClip {
+		trace("tooltip called")
         //Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance._tooltipContainer_mc != undefined) {
             return _instance._tooltipContainer_mc;
