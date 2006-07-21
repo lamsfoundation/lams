@@ -21,17 +21,19 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.ApplicationParent;
+
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
+import org.lamsfoundation.lams.monitoring.Application;
+import org.lamsfoundation.lams.monitoring.ContributeActivity;
 import org.lamsfoundation.lams.wizard.*
-import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.ToolTip;
 import mx.controls.*;
 import mx.managers.*;
 import mx.containers.*;
@@ -62,6 +64,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	//constants:
 	private var _tm:ThemeManager;
+	private var _tip:ToolTip;
 	private var mm:MonitorModel;
 	
 	//TabView clips
@@ -88,7 +91,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var start_date_lbl:Label;
 	private var schedule_date_lbl:Label;
 	private var btnLabel:String;
-		
+	
 	//Text Items
     private var LSTitle_txt:TextField;
 	private var LSDescription_txt:TextField;
@@ -133,7 +136,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		_lessonTabView = this;
 		this._visible = false;
 		_tm = ThemeManager.getInstance();
-        //Init for event delegation
+		_tip = new ToolTip();
+		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 		MovieClipUtils.doLater(Proxy.create(this,init));
 	}
@@ -144,6 +148,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public function init(m:Observable,c:Controller){
 		trace("called Lesson Tab Init")
 		super (m, c);
+		
 		btnLabel = Dictionary.getValue('td_goContribute_btn');
 		MovieClipUtils.doLater(Proxy.create(this,setupTab));
 	}    
@@ -240,6 +245,21 @@ public function update (o:Observable,infoObj:Object):Void{
 		start_btn.addEventListener("click", _monitorController);
 		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
 		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
+		
+		editClass_btn.onRollOver = Proxy.create(this,this['showToolTip'], editClass_btn, "ls_manage_editclass_btn_tooltip");
+		editClass_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		viewLearners_btn.onRollOver = Proxy.create(this,this['showToolTip'], viewLearners_btn, "ls_manage_learners_btn_tooltip");
+		viewLearners_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		schedule_btn.onRollOver = Proxy.create(this,this['showToolTip'], schedule_btn, "ls_manage_schedule_btn_tooltip");
+		schedule_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		start_btn.onRollOver = Proxy.create(this,this['showToolTip'], start_btn, "ls_manage_start_btn_tooltip");
+		start_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		statusApply_btn.onRollOver = Proxy.create(this,this['showToolTip'], statusApply_btn, "ls_manage_apply_btn_tooltip");
+		statusApply_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 
 	}
 
@@ -371,6 +391,10 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case Sequence.NOTSTARTED_STATE_ID :
 				showStartFields(true, false);
+				editClass_btn.enabled = true;
+				break;
+			case Sequence.STARTED_STATE_ID :
+				showStartFields(false, false);
 				editClass_btn.enabled = true;
 				break;
 			default :
@@ -546,10 +570,9 @@ public function update (o:Observable,infoObj:Object):Void{
 				requiredTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contribute Type is: "+o.taskURL);
 					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
-					
-					//getURL(String(o.taskURL), "_blank");
-					//getURL("http://localhost:8080/lams/monitoring/monitoring.do?method=getAllContributeActivities&lessonID=4", "_blank");
 				}
+				requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
+				requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
 				requiredTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
 				listCount++
 			}else{
@@ -609,6 +632,28 @@ public function update (o:Observable,infoObj:Object):Void{
 		return _dialog;
 	}
 	
+	public function showToolTip(btnObj, btnTT:String, goBtnYpos:Number, goBtnXpos:Number):Void{
+		var ttData = mm.getTTData();
+		trace("Monitor_X: " + ttData.monitorX);
+		trace("Monitor_Y: " + ttData.monitorY);
+		trace("ttHolder : " + ttData.ttHolderMC);
+		
+		
+		if(goBtnYpos != null && goBtnXpos != null){
+			var xpos:Number = (ttData.monitorX + goBtnXpos + btnObj._x)-150;
+			var ypos:Number = ttData.monitorY + (goBtnYpos +5);
+		}else {
+			var xpos:Number = ttData.monitorX + btnObj._x;
+			var ypos:Number = ttData.monitorY + (btnObj._y+btnObj.height)+5;
+		}
+		
+		var ttMessage = Dictionary.getValue(btnTT);
+		_tip.DisplayToolTip(ttData.ttHolderMC, ttMessage, xpos, ypos);
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
+	}
 	public function setupLabels(){
 		
 		//max_lbl.text = Dictionary.getValue('pi_max_act');
@@ -746,6 +791,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		reqTasks_scp.setSize(s.w-30,reqTasks_scp._height);
 		for (var i=0; i<requiredTaskList.length; i++){
 			requiredTaskList[i].contributeActivity._width = reqTasks_scp._width-20;
+			requiredTaskList[i].goContribute._x = reqTasks_scp._width-50
 		}
 		//contributeActivity.textWidth
 				

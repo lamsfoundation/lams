@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
-//import org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity;
+import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.authoring.Transition;
 //import org.lamsfoundation.lams.authoring.cv.*;
 import mx.managers.*
@@ -67,6 +67,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var learnerListArr:Array;
 	
 	private var _tm:ThemeManager;
+	private var _tip:ToolTip;
 	private var mm:MonitorModel;
 	private var _learnerTabView:LearnerTabView;
 
@@ -100,6 +101,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		_learnerTabView = this;
 		_learnerTabViewContainer_mc = this;
 		_tm = ThemeManager.getInstance();
+		_tip = new ToolTip();
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -334,6 +336,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			//trace("Contribute Type is: "+o.taskURL);
 			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 		}
+		learnerExp_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerExp_btn, "learner_exportPortfolio_btn_tooltip");
+		learnerExp_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 			
 		nameTextFormat.bold = true;
 		nameTextFormat.font = "Verdana";
@@ -352,6 +356,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		count++
 	}
 
+	public function showToolTip(btnObj, btnTT:String):Void{
+		var btnLabel = btnObj.label;
+		var xpos:Number;
+		xpos = btnObj._x - 65
+		
+		var Xpos = Application.MONITOR_X+ xpos;
+		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
+		var ttHolder = Application.tooltip;
+		var ttMessage = Dictionary.getValue(btnTT);
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
+	}
 	
 	/**
 	 * Draws new activity to monitor tab view stage.
@@ -441,6 +461,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		for (var i=0; i<learnerListArr.length; i++){
 			learnerListArr[i][0]._width = _activityLayer_mc._width;
 			learnerListArr[i][1]._x = _activityLayer_mc._width-110;
+			//learnerListArr[i][1].
 		}
 	}
 	

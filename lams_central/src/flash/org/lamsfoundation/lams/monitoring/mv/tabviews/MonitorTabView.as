@@ -64,6 +64,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
 	private var _monitorTabView:MonitorTabView;
+	private var _tip:ToolTip;
 	
 	//Canvas clip
 	//private var _monitor_mc:MovieClip;
@@ -98,6 +99,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		_monitorTabView = this;
 		_monitorTabViewContainer_mc = this;
 		_tm = ThemeManager.getInstance();
+		_tip = new ToolTip();
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -235,7 +237,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 		mm.endGate(endGate_mc);
 		mm.endGate = endGate_mc;
-		
+		endGate_mc.tt_btn.onRollOver = Proxy.create(this,this['showToolTip'], "finish_learner_tooltip");
+		endGate_mc.tt_btn.onRollOut =  Proxy.create(this,this['hideToolTip']);
 		//_activityLayer_mc.endgate
 		setStyles();
 		
@@ -264,6 +267,21 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		//setSize(mm);
 	}
 	
+	public function showToolTip(btnTT:String):Void{
+		var Xpos = Application.MONITOR_X+ 5;
+		var Ypos = Application.MONITOR_Y+ endGate_mc._y;
+		var ttHolder = Application.tooltip;
+		//var ttMessage = btnObj.label;
+		var ttMessage = Dictionary.getValue(btnTT);
+		
+		//param "true" is to specify that tooltip needs to be shown above the component 
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
+	}
 	
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
@@ -429,6 +447,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		endGate_mc._y = s.h-endGateOffset;
 		endGate_mc.bg_pnl.setSize(s.w-17,endGate_mc.bg_pnl.height);
 		endGate_mc.bar_pnl.setSize(s.w-37,endGate_mc.bar_pnl.height);
+		endGate_mc.tt_btn.setSize(s.w-17,endGate_mc.bg_pnl.height);
 		for (var i=0; i<finishedLearnersList.length; i++){
 			finishedLearnersList[i]._y = endGate_mc._y+learner_Y
 		}
