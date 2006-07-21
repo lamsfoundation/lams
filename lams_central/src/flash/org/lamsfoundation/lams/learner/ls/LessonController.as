@@ -133,4 +133,14 @@ class LessonController extends AbstractController {
 	public function clearBusy(){
 		_isBusy = false;
 	}
+	
+	public function get appData():Object{
+		trace("called monitor application")
+		var myObj:Object = new Object();
+		myObj.compX = Application.LESSON_X
+		myObj.compY = Application.LESSON_Y
+		myObj.ttHolder = Application.tooltip;
+		return myObj;
+		
+	}
 }
