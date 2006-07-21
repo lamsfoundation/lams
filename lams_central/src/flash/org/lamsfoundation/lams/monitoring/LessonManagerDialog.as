@@ -178,12 +178,12 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		//get a ref to the controller and kkep it here to listen for events:
 		_monitorController = _monitorView.getController();
-		_monitorModel = MonitorModel(_monitorView.getModel());
+		_monitorModel = MonitorModel(_monitorController.getModel());
 		
 		 //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('onPress',Delegate.create(this, ok));
         cancel_btn.addEventListener('onPress',Delegate.create(this, cancel));
-		
+		trace("OrganisationID is: "+_monitorModel.getSequence().organisationID)
 		getOrganisations(_monitorModel.getSequence().organisationID, null);
 		
 		//Set up the treeview
