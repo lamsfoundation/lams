@@ -133,15 +133,15 @@ class LearnersDialog extends MovieClip implements Dialog{
 		
 		//get a ref to the controller and kkep it here to listen for events:
 		_monitorController = _monitorView.getController();
-		_monitorModel = MonitorModel(_monitorView.getModel());
+		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 		
-		learners_lbl.text = Dictionary.getValue('ls_win_learners_heading_lbl') + " " + _monitorModel.getSequence().organisationName;
+		learners_lbl.text = Dictionary.getValue('ls_win_learners_heading_lbl') + " " + mm.getSequence().organisationName;
 		
 		 //Add event listeners for ok, cancel and close buttons
         close_btn.addEventListener('onPress',Delegate.create(this, close));
 		
 		var callback:Function = Proxy.create(this,loadLearners);
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+_monitorModel.getSequence().ID,callback, false);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+_root.lessonID,callback, false);
 		
 	}
 	
