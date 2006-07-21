@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
@@ -64,6 +65,7 @@ class LearnerActivity extends MovieClip {
 	private var _activity:Activity;
 	private var _isSelected:Boolean;
 	private var app:ApplicationParent;
+	private var _tip:ToolTip;
 	//locals
 	private var actStatus:String;
 	private var actLabel:String;
@@ -89,6 +91,7 @@ class LearnerActivity extends MovieClip {
 	function LearnerActivity(){
 		Debugger.log("_activity:"+_activity.title,4,'Constructor','Activity');
 		_tm = ThemeManager.getInstance();
+		_tip = new ToolTip();
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();
 		//let it wait one frame to set up the components.
@@ -189,18 +192,14 @@ class LearnerActivity extends MovieClip {
 		switch (actStatus){
 		    case 'completed_mc' :
 				completed_mc._visible = true;
-				//this.attachMovie("completed_mc", "completed_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 		        break;
             case 'current_mc' :
-				//this.attachMovie("current_mc", "current_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 				current_mc._visible = true;
-                break;
+				break;
             case 'attempted_mc' :
-				//this.attachMovie("attempted_mc", "attempted_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 			    attempted_mc._visible = true;
                 break;
 			default :
-				//this.attachMovie("todo_mc", "todo_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 				todo_mc._visible = true;
                 //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -212,13 +211,51 @@ class LearnerActivity extends MovieClip {
 		}else {
 			title_lbl.text = actLabel;
 		}
-									//Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
+		//this.completed_mc.onRollOver = Proxy.create(this,this['showToolTip'], this.completed_mc, "completed_act_tooltip");
+		//this.completed_mc.onRollOut = Proxy.create(this,this['hideToolTip']);
+		//this.current_mc.onRollOver = Proxy.create(this,this['showToolTip'], this.current_mc, "current_act_tooltip");
+		//this.current_mc.onRollOut = Proxy.create(this,this['hideToolTip']);							//Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		//_visible = true;
 	}
 	
+	public function showToolTip(btnObj, btnTT:String):Void{
+		var appData = getAppData();
+		if(_complex){
+			var ttXpos = appData.compX + xPos;
+			var ttYpos = appData.compY + yPos;
+		} else {
+			var ttXpos = appData.compX + this._x;
+			var ttYpos = appData.compY + this._y+btnObj._height;
+		}
 		
+		var ttHolder = appData.ttHolder;
+		trace("x pos: "+ttXpos+" and y pos: "+ttYpos+" and tt holder is: "+ttHolder)
+		var ttMessage = Dictionary.getValue(btnTT);
+		var ttWidth = 140;
+		_tip.DisplayToolTip(ttHolder, ttMessage, ttXpos, ttYpos, undefined, ttWidth);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
+	}
+	
+	private function onRollOver(){
+		if (actStatus == "completed_mc"){
+			showToolTip(this.completed_mc, "completed_act_tooltip");
+		}else if (actStatus == "current_mc"){
+			showToolTip(this.current_mc, "current_act_tooltip");
+		}
+		
+	}
+	
+	private function onRollOut(){
+		
+		hideToolTip();
+	}
+	
 	private function onPress():Void{
-			
+			hideToolTip();
 			// check double-click
 			var now:Number = new Date().getTime();
 			
@@ -236,6 +273,7 @@ class LearnerActivity extends MovieClip {
 			_dcStartTime = now;
 	
 	}
+	
 	
 	private function onRelease():Void{
 		if(!_doubleClicking){
@@ -261,6 +299,10 @@ class LearnerActivity extends MovieClip {
 		} else {
 			return MonitorController(_controller);
 		}
+	}
+	
+	public function getAppData():Object{
+		return controller.appData;
 	}
 	
 	/**

@@ -22,6 +22,7 @@
 */
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.authoring.Activity;
@@ -49,7 +50,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	//this is set by the init object
 	private var _controller:AbstractController;
 	private var _view:AbstractView;
-	
+	private var _tip:ToolTip;
 	//Set by the init obj
 	private var _activity : Activity;
 	private var _children : Array;
@@ -94,6 +95,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		app = ApplicationParent.getInstance();
 		_visible = false;
 		_tm = ThemeManager.getInstance ();
+		_tip = new ToolTip();
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		
@@ -112,7 +114,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		childActivities_mc = this;
 		_locked = false;
 		showStatus(false);
-		
+		clickTarget_mc.onRollOver = Proxy.create(this, localOnRollOver);
+		clickTarget_mc.onRollOut = Proxy.create(this, localOnRollOut);
 		clickTarget_mc.onPress = Proxy.create(this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create(this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
@@ -127,16 +130,17 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		} else {
 			childrenArray = _children;
 		}
-		
+		var childCoordY = 0
 		for (var i = 0; i < childrenArray.length; i ++)
 		{
 			var progStatus:String = Progress.compareProgressData(learner, childrenArray[i].activityID);
 			
-			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:childrenArray[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true});
+			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:childrenArray[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true, xPos:this._x, yPos:childCoordY});
 			Debugger.log('attaching child movieL ' + children_mc[i],Debugger.CRITICAL,'init','LearnerComplexActivity');
         
 			//set the positioning co-ords
 			children_mc [i]._y = (i*21);
+			childCoordY = this._y + ((i+1)*21)+29 ;
 			children_mc [i]._visible = true;
 			
 		}
@@ -232,8 +236,41 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		_visible = true;
 		
 	}
+	
+	public function showToolTip(btnObj, btnTT:String):Void{
+		var appData = getAppData();
+		var Xpos = appData.compX+ this._x;
+		var Ypos = appData.compY+( (this._y+btnObj._height)-4);
+		var ttHolder = appData.ttHolder;
+		trace("x pos: "+Xpos+" and y pos: "+Ypos+" and tt holder is: "+ttHolder)
+		var ttMessage = Dictionary.getValue(btnTT);
+		var ttWidth = 140;
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, undefined, ttWidth);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
+	}
+	
+	private function localOnRollOver(){
+		if (actStatus == "completed_mc"){
+			showToolTip(this.completed_mc, "completed_act_tooltip");
+		}else if (actStatus == "current_mc"){
+			showToolTip(this.current_mc, "current_act_tooltip");
+		}else if (actStatus == "attempted_mc"){
+			showToolTip(this.current_mc, "current_act_tooltip");
+		}
+		
+	}
+	
+	private function localOnRollOut(){
+		
+		hideToolTip();
+	}
 
 	private function localOnPress():Void{
+		hideToolTip();
 		this.swapDepths(this._parent.getNextHighestDepth());
 		// check double-click
 		var now : Number = new Date ().getTime ();
@@ -307,6 +344,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		} else {
 			return MonitorController(_controller);
 		}
+	}
+	
+	public function getAppData():Object{
+		return controller.appData;
 	}
 	
 	public function isLearnerModule():Boolean{
