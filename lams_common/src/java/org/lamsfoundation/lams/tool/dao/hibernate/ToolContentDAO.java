@@ -23,9 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 /**
@@ -33,7 +33,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Jacky Fang 8/02/2005
  * 
  */
-public class ToolContentDAO extends HibernateDaoSupport implements IToolContentDAO
+public class ToolContentDAO extends BaseDAO implements IToolContentDAO
 {
 
     /**

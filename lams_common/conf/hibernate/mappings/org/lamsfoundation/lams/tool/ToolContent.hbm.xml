@@ -39,7 +39,9 @@
 
 	<many-to-one name="tool"
 			class="org.lamsfoundation.lams.tool.Tool"
-			not-null="true" cascade="none">
+			not-null="true" 
+			lazy="false"
+			cascade="none">
 			<column name="tool_id" />
 	</many-to-one>
 

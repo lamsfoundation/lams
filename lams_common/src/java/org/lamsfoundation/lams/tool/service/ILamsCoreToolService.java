@@ -133,6 +133,18 @@ public interface ILamsCoreToolService
     	throws DataMissingException, ToolException;
     
     /**
+     * Calls the tool to copy the content for an activity. Used when copying an activity in authoring. Can't
+     * use the notifyToolToCopyContent(ToolActivity, boolean) version in authoring as the tool activity won't
+     * exist if the user hasn't saved the sequence yet. But the tool content (as that is saved by the 
+     * tool) may already exist.
+     * 
+     * @param toolContentId the content to be copied.
+     * @throws DataMissingException, ToolException
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
+     */
+    public Long notifyToolToCopyContent(Long toolContentId) 
+    		throws DataMissingException, ToolException;
+    /**
      * Ask a tool to delete a tool content. If any related tool session data exists then it should 
      * be deleted.
      * 

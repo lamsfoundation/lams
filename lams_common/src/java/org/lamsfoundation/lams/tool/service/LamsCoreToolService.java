@@ -33,17 +33,21 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.SystemTool;
+import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
+import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -68,6 +72,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     private IToolSessionDAO toolSessionDAO;
     private ISystemToolDAO systemToolDAO;
     private ToolContentIDGenerator contentIDGenerator;
+	protected IToolContentDAO toolContentDAO;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -188,7 +193,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     public void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException
     {
     	try {
-	        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
+	        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity.getTool());
 	
 	        sessionManager.createToolSession(toolSession.getToolSessionId(),toolSession.getToolSessionName(),
 	                                         activity.getToolContentId());
@@ -211,7 +216,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     {
         Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
         try {
-			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
+			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
             contentManager.copyToolContent(toolActivity.getToolContentId(),
                                            newToolcontentID);
             
@@ -233,6 +238,46 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
     
     /**
+     * Calls the tool to copy the content for an activity. Used when copying an activity in authoring. Can't
+     * use the notifyToolToCopyContent(ToolActivity, boolean) version in authoring as the tool activity won't
+     * exist if the user hasn't saved the sequence yet. But the tool content (as that is saved by the 
+     * tool) may already exist.
+     * 
+     * @param toolContentId the content to be copied.
+     * @throws DataMissingException, ToolException
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
+     */
+    public Long notifyToolToCopyContent(Long toolContentId) 
+    		throws DataMissingException, ToolException
+    {
+    	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
+    	if ( toolContent == null ) {
+    		String error = "The toolContentID "+ toolContentId + " is not valid. No such record exists on the database.";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+    	
+		Tool tool = toolContent.getTool();
+    	if ( tool == null ) {
+    		String error = "The tool for toolContentId "+ toolContentId + " is missing.";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+
+    	Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(tool);
+        try {
+			ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
+            contentManager.copyToolContent(toolContentId,newToolcontentID);
+		} catch ( NoSuchBeanDefinitionException e ) {
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolContentId "+toolContentId;
+			log.error(message,e);
+			throw new ToolException(message,e);
+		}
+
+        return newToolcontentID;
+    }
+    
+    /**
      * Ask a tool to delete a tool content. If any related tool session data exists then it should 
      * be deleted.
      * 
@@ -242,7 +287,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException
     {
     	try {
-			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
+			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
 			contentManager.removeToolContent(toolActivity.getToolContentId(),true);
 		} catch ( NoSuchBeanDefinitionException e ) {
 			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete the tool content. ToolActivity "+toolActivity;
@@ -278,7 +323,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 		}
 
     	// call the tool to remove the session details
-        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(toolSession.getToolActivity());
+        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(toolSession.getToolActivity().getTool());
 
         try {
 			sessionManager.removeToolSession(toolSession.getToolSessionId());
@@ -487,10 +532,14 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * @return the service object from tool.
      * @throws NoSuchBeanDefinitionException if the tool is not the classpath or the supplied service name is wrong.
      */
-    private Object findToolService(ToolActivity toolActivity) throws NoSuchBeanDefinitionException
+    private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException
     {
-        return context.getBean(toolActivity.getTool().getServiceName());
+        return context.getBean(tool.getServiceName());
     }
+
+	public void setToolContentDAO(IToolContentDAO toolContentDAO) {
+		this.toolContentDAO = toolContentDAO;
+	}
 
 
 }

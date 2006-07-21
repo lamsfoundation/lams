@@ -39,6 +39,7 @@
 	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService"
 		singleton="false"
 	>
+		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>	
@@ -51,7 +52,7 @@
 			<props>
 				<prop key="createToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="createToolSessions">PROPAGATION_REQUIRED</prop>
-				<prop key="notifyToolsToCreateSession">PROPAGATION_REQUIRED</prop>
+				<prop key="notifyTool*">PROPAGATION_REQUIRED</prop>
 			    <prop key="update*">PROPAGATION_REQUIRED</prop>
 			    <prop key="get*">PROPAGATION_REQUIRED</prop>
 			</props>

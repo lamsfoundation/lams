@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.dao;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.ToolContent;
 
 
@@ -31,7 +32,7 @@ import org.lamsfoundation.lams.tool.ToolContent;
  * @author Jacky Fang 8/02/2005
  * 
  */
-public interface IToolContentDAO
+public interface IToolContentDAO extends IBaseDAO
 {
     
     public void saveToolContent(ToolContent toolContent);
