@@ -90,7 +90,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>	
 
 					
-					<c:if test="${mcGeneralLearnerFlowDTO.userPassed != 'true'}">
+					<c:if test="${mcGeneralLearnerFlowDTO.userOverPassMark != 'true' && 
+								mcGeneralLearnerFlowDTO.passMarkApplicable == 'true' }">
 						 <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
 							  	 <bean:message key="label.mustGet"/> &nbsp
@@ -131,10 +132,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
+											<b> <bean:message key="label.feedback"/> </b>																				  									  	
 											<c:if test="${dto.attemptCorrect == 'true'}"> 											  
-													<c:out value="${dto.feedbackCorrect}" escapeXml="false"/><BR>											
+													 <c:out value="${dto.feedbackCorrect}" escapeXml="false"/><BR>											
 											</c:if>																
-											<c:if test="${dto.attemptCorrect != 'true'}"> 											  
+											<c:if test="${dto.attemptCorrect != 'true'}"> 		
 													<c:out value="${dto.feedbackIncorrect}" escapeXml="false"/><BR>											
 											</c:if>																
 									  	</td>

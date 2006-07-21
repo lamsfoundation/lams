@@ -64,66 +64,6 @@ public class LearningUtil implements McAppConstants {
      * @param form
      * @param questionIndex
      */
-    public static  void selectOptionsCheckBox(HttpServletRequest request,McLearningForm mcLearningForm, String questionIndex)
-    {
-    	logger.debug("requested optionCheckBoxSelected...");
-    	logger.debug("questionIndex: " + mcLearningForm.getQuestionIndex());
-    	logger.debug("optionIndex: " + mcLearningForm.getOptionIndex());
-    	logger.debug("optionValue: " + mcLearningForm.getOptionValue());
-    	logger.debug("checked: " + mcLearningForm.getChecked());
-    	
-    	Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	logger.debug("mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
-    	
-    	if (mapGeneralCheckedOptionsContent.size() == 0)
-    	{
-    		logger.debug("mapGeneralCheckedOptionsContent size is 0");
-    		Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
-    		
-    		if (mcLearningForm.getChecked().equals("true"))
-    			mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), mcLearningForm.getOptionValue());
-    		else
-    			mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());
-    		
-    		mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
-    		request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-    	}
-    	else
-    	{
-    		Map mapCurrentOptions=(Map) mapGeneralCheckedOptionsContent.get(questionIndex);
-    		
-    		logger.debug("mapCurrentOptions: " + mapCurrentOptions);
-    		if (mapCurrentOptions != null)
-    		{
-    			if (mcLearningForm.getChecked().equals("true"))
-    				mapCurrentOptions.put(mcLearningForm.getOptionIndex(), mcLearningForm.getOptionValue());
-    			else
-    				mapCurrentOptions.remove(mcLearningForm.getOptionIndex());
-    			
-    			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
-    			
-    			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapCurrentOptions);
-    			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);	
-    		}
-    		else
-    		{
-    			logger.debug("no options for this questions has been selected yet");
-    			Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
-    			        			
-    			if (mcLearningForm.getChecked().equals("true"))
-    				mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), mcLearningForm.getOptionValue());
-    			else
-    				mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());        			
-    			
-    			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
-    			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-    		}
-    	}
-    	
-    	mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
-    }
-    
     
     /**
      * continueOptions(HttpServletRequest request)
@@ -131,10 +71,8 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return boolean
      */
-    public static boolean continueOptions(HttpServletRequest request)
+    public static boolean continueOptions(HttpServletRequest request, IMcService mcService)
     {
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	
     	logger.debug("continue options requested.");
     	String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
     	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
@@ -184,57 +122,12 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+  
+    
+    
     /**
-     * readParameters(HttpServletRequest request, McLearningForm mcLearningForm)
+     * redundant method:
      * 
-     * @param request
-     * @param mcLearningForm
-     */
-    public static void readParameters(HttpServletRequest request, McLearningForm mcLearningForm)
-    {
-    	String optionCheckBoxSelected=request.getParameter("optionCheckBoxSelected");
-    	logger.debug("parameter optionCheckBoxSelected: " + optionCheckBoxSelected);
-
-    	if ((optionCheckBoxSelected != null) && optionCheckBoxSelected.equals("1"))
-    	{
-    		logger.debug("parameter optionCheckBoxSelected is selected " + optionCheckBoxSelected);
-    		mcLearningForm.setOptionCheckBoxSelected("1");
-    	}
-    	
-    	String questionIndex=request.getParameter("questionIndex");
-    	logger.debug("parameter questionIndex: " + questionIndex);
-    	if ((questionIndex != null))
-    	{
-    		logger.debug("parameter questionIndex is selected " + questionIndex);
-    		mcLearningForm.setQuestionIndex(questionIndex);
-    	}
-    	
-    	String optionIndex=request.getParameter("optionIndex");
-    	logger.debug("parameter optionIndex: " + optionIndex);
-    	if (optionIndex != null)
-    	{
-    		logger.debug("parameter optionIndex is selected " + optionIndex);
-    		mcLearningForm.setOptionIndex(optionIndex);
-    	}
-    	
-    	String optionValue=request.getParameter("optionValue");
-    	logger.debug("parameter optionValue: " + optionValue);
-    	if (optionValue != null)
-    	{
-    		mcLearningForm.setOptionValue(optionValue);
-    	}
-    	
-    	String checked=request.getParameter("checked");
-    	logger.debug("parameter checked: " + checked);
-    	if (checked != null)
-    	{
-    		logger.debug("parameter checked is selected " + checked);
-    		mcLearningForm.setChecked(checked);
-    	}
-    }
-    
-    
-    /**
      * assess(HttpServletRequest request, Map mapGeneralCheckedOptionsContent)
      * 
      * @param request
@@ -375,9 +268,8 @@ public class LearningUtil implements McAppConstants {
      * @param queUsrId
      * @return
      */
-    public static int getHighestMark(HttpServletRequest request, Long queUsrId)
+    public static int getHighestMark(HttpServletRequest request, Long queUsrId, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
     	List listMarks=mcService.getHighestMark(queUsrId);
     	
     	Iterator itMarks=listMarks.iterator();
@@ -399,9 +291,8 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return
      */
-    public static int getTopMark(HttpServletRequest request)
+    public static int getTopMark(HttpServletRequest request, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
     	List listMarks=mcService.getMarks();
     	
     	Iterator itMarks=listMarks.iterator();
@@ -424,9 +315,8 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return
      */
-    public static int getLowestMark(HttpServletRequest request)
+    public static int getLowestMark(HttpServletRequest request, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
     	List listMarks=mcService.getMarks();
     	
     	Iterator itMarks=listMarks.iterator();
@@ -453,9 +343,8 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return
      */
-    public static int getAverageMark(HttpServletRequest request)
+    public static int getAverageMark(HttpServletRequest request, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
     	List listMarks=mcService.getMarks();
     	
     	Iterator itMarks=listMarks.iterator();
@@ -644,9 +533,8 @@ public class LearningUtil implements McAppConstants {
     	return false;
     }
 	
-    public static McQueUsr getUser(HttpServletRequest request)
+    public static McQueUsr getUser(HttpServletRequest request, IMcService mcService)
 	{
-		IMcService mcService =McUtils.getToolService(request);
 	    Long queUsrId=McUtils.getUserId();
 	    
     	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
@@ -685,13 +573,40 @@ public class LearningUtil implements McAppConstants {
 		return mcQueUsr;
 	}
 
-    
-    /**
-     * creates a user attempt in the db
-     * createAttempt(HttpServletRequest request)
-     * 
-     * @param request
-     */
+    public static void createLearnerAttempt(HttpServletRequest request, McQueUsr mcQueUsr, List selectedQuestionAndCandidateAnswersDTO, 
+            int mark,  boolean passed, int highestAttemptOrder, Map mapLeanerAssessmentResults, IMcService mcService)
+	{
+        logger.debug("starting createLearnerAttempt: ");
+		Date attempTime=McUtils.getGMTDateTime();
+		String timeZone= McUtils.getCurrentTimeZone();
+		logger.debug("timeZone: " + timeZone);
+		
+		
+		Iterator itSelectedMap = selectedQuestionAndCandidateAnswersDTO.iterator();
+		while (itSelectedMap.hasNext())
+		{
+		    McLearnerAnswersDTO mcLearnerAnswersDTO=(McLearnerAnswersDTO)itSelectedMap.next();
+			logger.debug("mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+			String questionUid=mcLearnerAnswersDTO.getQuestionUid();
+			logger.debug("questionUid: " + questionUid);
+			
+			McQueContent mcQueContent=mcService.findMcQuestionContentByUid(new Long(questionUid));
+			logger.debug("mcQueContent: " + mcQueContent);
+			
+			Map candidateAnswers=mcLearnerAnswersDTO.getCandidateAnswers();
+			logger.debug("candidateAnswers: " + candidateAnswers);
+			
+			String isAttemptCorrect=mcLearnerAnswersDTO.getAttemptCorrect();
+			logger.debug("isAttemptCorrect: " + isAttemptCorrect);
+			
+			logger.debug("requesting  createIndividualOptions");
+			createIndividualOptions(request, candidateAnswers, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, 
+			        new Integer(highestAttemptOrder), isAttemptCorrect,mcService);
+		}
+		
+	 }
+
+    /*
     public static void createAttempt(HttpServletRequest request, McQueUsr mcQueUsr, Map mapGeneralCheckedOptionsContent, int mark,  boolean passed, int highestAttemptOrder, Map mapLeanerAssessmentResults)
 	{
 		IMcService mcService =McUtils.getToolService(request);
@@ -725,24 +640,26 @@ public class LearningUtil implements McAppConstants {
 	        }			
 		}
 	 }
+    */
     
-    
-    public static void createIndividualOptions(HttpServletRequest request, Map mapCheckedOptions, McQueContent mcQueContent, McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect)
+    public static void createIndividualOptions(HttpServletRequest request, Map candidateAnswers, McQueContent mcQueContent, 
+            McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect, 
+            IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
+        logger.debug("starting createIndividualOptions");
     	Integer IntegerMark= new Integer(mark);
 		
     	logger.debug("createIndividualOptions-> isAttemptCorrect: " + isAttemptCorrect);
     	logger.debug("mcQueContent: " + mcQueContent);
-    	logger.debug("mapCheckedOptions: " + mapCheckedOptions);
+    	logger.debug("candidateAnswers: " + candidateAnswers);
     	logger.debug("highestAttemptOrder used : " + highestAttemptOrder);
     	
     	
     	if (mcQueContent != null)
     	{
-    	    if (mapCheckedOptions != null)
+    	    if (candidateAnswers != null)
         	{
-        	    Iterator itCheckedMap = mapCheckedOptions.entrySet().iterator();
+        	    Iterator itCheckedMap = candidateAnswers.entrySet().iterator();
                 while (itCheckedMap.hasNext()) 
                 {
                 	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
@@ -767,29 +684,32 @@ public class LearningUtil implements McAppConstants {
      * @param toolContentId
      * @return Map
      */
-    public static Map buildWeightsMap(HttpServletRequest request, Long toolContentId)
+    public static Map buildWeightsMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
+        logger.debug("starting buildWeightsMap : " + toolContentId);
     	Map mapWeights= new TreeMap(new McComparator());
     	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent : " + mcContent);
 		
     	List questionsContent=mcService.refreshQuestionContent(mcContent.getUid());
+    	logger.debug("questionsContent : " + questionsContent);
     	
     	Iterator listIterator=questionsContent.iterator();
     	Long mapIndex=new Long(1);
     	while (listIterator.hasNext())
     	{
     		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent : " + mcQueContent);
     		mapWeights.put(mapIndex.toString(),mcQueContent.getWeight().toString());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
+    	logger.debug("mapWeights : " + mapWeights);
     	return mapWeights;
     }
     
     
-    public static Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent)
+    public static Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
     	Map mapQuestionsContent= new TreeMap(new McComparator());
     	
         Iterator contentIterator=mcContent.getMcQueContents().iterator();
@@ -935,16 +855,18 @@ public class LearningUtil implements McAppConstants {
     	logger.debug("passMark: " + passMark);
     	logger.debug("original mapQuestionWeights: " + mapQuestionWeights);
     	
+    	boolean mapExcluded=false;
     	int minimumQuestionCount=0;
     	int totalHighestWeights=0;
     	while (totalHighestWeights <= passMark.intValue())
     	{
     		logger.debug("totalHighestWeights versus passMark: " + totalHighestWeights + " versus" + passMark);
-        	int highestWeight=getHighestWeight(mapQuestionWeights);
+        	int highestWeight=getHighestWeight(mapQuestionWeights, mapExcluded);
         	logger.debug("highestWeight: " + highestWeight);
         	totalHighestWeights=totalHighestWeights + highestWeight;
         	logger.debug("totalHighestWeights: " + totalHighestWeights);
         	mapQuestionWeights=rebuildWeightsMapExcludeHighestWeight(mapQuestionWeights, highestWeight);
+        	mapExcluded=true;
     		logger.debug("mapQuestionWeights: " + mapQuestionWeights);
     		++minimumQuestionCount;
     		if (mapQuestionWeights.size() == 0)
@@ -958,17 +880,18 @@ public class LearningUtil implements McAppConstants {
     }
     
     
-	public static int getHighestWeight(Map mapQuestionWeights)
+	public static int getHighestWeight(Map mapQuestionWeights, boolean mapExcluded)
 	{
+	    logger.debug("mapExcluded: " + mapExcluded);
 	   
-		if (mapQuestionWeights.size() == 1)
+		if ((mapQuestionWeights.size() == 1) && (!mapExcluded))
 		{
 			logger.debug("using map with 1 question only");
 			/*the only alternative is 100*/
 			return 100;
 		}
 		
-		logger.debug("using map with > 1 questions");
+	   logger.debug("continue excluding map");
 	   Iterator itMap = mapQuestionWeights.entrySet().iterator();
  	   int highestWeight=0; 	   
        while (itMap.hasNext()) 

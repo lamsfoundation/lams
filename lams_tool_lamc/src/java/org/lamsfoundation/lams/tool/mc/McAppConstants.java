@@ -147,6 +147,7 @@ public interface McAppConstants {
     public static final String INSTRUCTIONS								="instructions";
     public static final String CREATION_DATE							="creationDate";
     public static final String DEFINE_LATER								="defineLater";
+    public static final String RUN_OFFLINE								="runOffline";
     public static final String RETRIES									="retries";
     public static final String PASSMARK									="passMark";
     public static final String VIEW_ANSWERS								="viewAnswers";

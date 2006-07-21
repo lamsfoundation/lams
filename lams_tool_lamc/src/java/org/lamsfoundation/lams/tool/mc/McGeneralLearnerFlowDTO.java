@@ -56,8 +56,79 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String activityTitle;
     
+    protected String learnerBestMark;
+    
+    protected String currentQuestionIndex;
+    
+    protected String countSessionComplete;
+    
+    protected String topMark;
+    
+    protected String lowestMark;
+
+    protected String averageMark;
 
     
+    /**
+     * @return Returns the averageMark.
+     */
+    public String getAverageMark() {
+        return averageMark;
+    }
+    /**
+     * @param averageMark The averageMark to set.
+     */
+    public void setAverageMark(String averageMark) {
+        this.averageMark = averageMark;
+    }
+    /**
+     * @return Returns the countSessionComplete.
+     */
+    public String getCountSessionComplete() {
+        return countSessionComplete;
+    }
+    /**
+     * @param countSessionComplete The countSessionComplete to set.
+     */
+    public void setCountSessionComplete(String countSessionComplete) {
+        this.countSessionComplete = countSessionComplete;
+    }
+    /**
+     * @return Returns the lowestMark.
+     */
+    public String getLowestMark() {
+        return lowestMark;
+    }
+    /**
+     * @param lowestMark The lowestMark to set.
+     */
+    public void setLowestMark(String lowestMark) {
+        this.lowestMark = lowestMark;
+    }
+    /**
+     * @return Returns the topMark.
+     */
+    public String getTopMark() {
+        return topMark;
+    }
+    /**
+     * @param topMark The topMark to set.
+     */
+    public void setTopMark(String topMark) {
+        this.topMark = topMark;
+    }
+    /**
+     * @return Returns the learnerBestMark.
+     */
+    public String getLearnerBestMark() {
+        return learnerBestMark;
+    }
+    /**
+     * @param learnerBestMark The learnerBestMark to set.
+     */
+    public void setLearnerBestMark(String learnerBestMark) {
+        this.learnerBestMark = learnerBestMark;
+    }
     /**
      * @return Returns the activityInstructions.
      */
@@ -220,4 +291,16 @@ public class McGeneralLearnerFlowDTO implements Comparable
     public void setUserPassed(String userPassed) {
         this.userPassed = userPassed;
     }    
+    /**
+     * @return Returns the currentQuestionIndex.
+     */
+    public String getCurrentQuestionIndex() {
+        return currentQuestionIndex;
+    }
+    /**
+     * @param currentQuestionIndex The currentQuestionIndex to set.
+     */
+    public void setCurrentQuestionIndex(String currentQuestionIndex) {
+        this.currentQuestionIndex = currentQuestionIndex;
+    }
 }

@@ -392,13 +392,13 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		int countMaxAttempt=1;
 		logger.debug("countMaxAttempt: " + countMaxAttempt);
 		
-		int topMark=LearningUtil.getTopMark(request);
+		int topMark=LearningUtil.getTopMark(request, mcService);
 		logger.debug("topMark: " + topMark);
 		
-		int lowestMark=LearningUtil.getLowestMark(request);
+		int lowestMark=LearningUtil.getLowestMark(request, mcService);
 		logger.debug("lowestMark: " + lowestMark);
 		
-		int averageMark=LearningUtil.getAverageMark(request);
+		int averageMark=LearningUtil.getAverageMark(request, mcService);
 		logger.debug("averageMark: " + averageMark);
 		
 		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());

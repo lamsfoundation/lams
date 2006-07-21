@@ -100,12 +100,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 			  	   	<tr> 
-				  	   	<html:hidden property="optionCheckBoxSelected"/>
-						<html:hidden property="questionIndex"/>
-						<html:hidden property="optionIndex"/>
-						<html:hidden property="optionValue"/>						
-						<html:hidden property="checked"/>
 				 		<td NOWRAP colspan=2 valign=top> 
+				 		&nbsp
 				 		</td>
 			  	   </tr>
 			  	   

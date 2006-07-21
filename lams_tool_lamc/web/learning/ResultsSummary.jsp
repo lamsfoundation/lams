@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	</th>
 				  </tr>
 			
-		 			<c:if test="${sessionScope.isRetries == 'true'}"> 		
+		 			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
 							  	  <b> <bean:message key="label.withRetries.results.summary"/> </b>
@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  </tr>
   					</c:if> 			
 
-					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	<b> <bean:message key="label.withoutRetries.results.summary"/>  </b>
@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				  <tr>
 				  	<td NOWRAP align=left valign=top colspan=2> 
-					  	  <c:out value="${sessionScope.countSessionComplete}"/> 
+					  	  <c:out value="${mcGeneralLearnerFlowDTO.countSessionComplete}"/> 
 					  	  <bean:message key="label.learnersFinished.simple"/> 
 				  	</td>
 				  </tr>	
@@ -86,7 +86,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	  <b> <bean:message key="label.topMark"/> </b>
 						 </td> 
 						 <td NOWRAP align=left>	
-							  	 <c:out value="${sessionScope.topMark}"/>
+							  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
 					  	</td>
 					  </tr>	
 
@@ -95,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	<b> <bean:message key="label.avMark"/> </b>
 					  	</td>
 					  	<td NOWRAP align=left>
-							  	<c:out value="${sessionScope.averageMark}"/>
+							  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
 					  	</td>
 					  </tr>	
 
@@ -104,31 +104,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  <b> <bean:message key="label.loMark"/> </b>
 					  	</td>
 					  	<td NOWRAP align=left>
-							  	<c:out value="${sessionScope.lowestMark}"/>
+							  	<c:out value="${mcGeneralLearnerFlowDTO.lowestMark}"/>
 					  	</td>
 					  </tr>	
 					  
 
 
-		 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
+		 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2  valign=top> 
 					  			<html:submit property="redoQuestions" styleClass="button">
 									<bean:message key="label.redo.questions"/>
 								</html:submit>	 		
-
-	  						<div class="right-buttons">			       
-								<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
-							  	   <html:submit property="learnerFinished" styleClass="button">
-										<bean:message key="label.finished"/>
-								   </html:submit>
-						  	   </c:if>
-					  	   </div>
 				  	 </td>
 				  </tr>
 				</c:if> 																		
 
-				<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+				<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
 	  	   		  <tr>
 	  	   		    <td NOWRAP colspan=2 valign=top>
 	  						<div class="right-buttons">	  	   		    

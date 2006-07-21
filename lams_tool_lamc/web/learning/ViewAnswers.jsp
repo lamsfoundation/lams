@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -60,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<c:out value="${reportTitleLearner}" escapeXml="false" />
+						  	<c:out value="${mcGeneralLearnerFlowDTO.reportTitleLearner}" escapeXml="false" />
 					  	</td>
 					  </tr>
 

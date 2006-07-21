@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McStringComparator;
+import org.lamsfoundation.lams.tool.mc.McTempDataHolderDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -271,12 +272,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	    setContentInUse(request, toolContentId, mcService);
 	 		return getNextOptions(mapping, form, request, response);
 	 	}
-    	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
-    	{
-    	    setContentInUse(request, toolContentId, mcService);
-    		mcLearningForm.resetCommands();
-    		LearningUtil.selectOptionsCheckBox(request,mcLearningForm, mcLearningForm.getQuestionIndex());
-    	}
     	else if (mcLearningForm.getRedoQuestions() != null)
     	{
     	    setContentInUse(request, toolContentId, mcService);
@@ -432,8 +427,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
     
     
-    protected List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, Integer learnerMark, 
-            Integer totalUserWeight, IMcService mcService)
+    protected List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, IMcService mcService)
     {
         logger.debug("mcService: " + mcService);
         logger.debug("learnerInput: " + learnerInput);
@@ -529,8 +523,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("final questionAndCandidateAnswersList: " + questionAndCandidateAnswersList);
         logger.debug("final mark: " + mark);
         logger.debug("final userWeight: " + userWeight);
-        learnerMark= new Integer(mark);
-        totalUserWeight= new Integer(userWeight);
+        
+        mcTempDataHolderDTO.setLearnerMark(new Integer(mark).toString());
+        mcTempDataHolderDTO.setTotalUserWeight(new Integer(userWeight).toString());
         
         return questionAndCandidateAnswersList;
     }
@@ -576,23 +571,37 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	 	String toolContentId=mcLearningForm.getToolContentId();
 	 	logger.debug("toolContentId: " + toolContentId);
 	 	
-	 	Integer learnerMark= new Integer(0);
-	 	Integer totalUserWeight= new Integer(0);
+	 	
+	 	//Integer learnerMark= new Integer(0);
+	 	//Integer totalUserWeight= new Integer(0);
+	 	McTempDataHolderDTO mcTempDataHolderDTO= new McTempDataHolderDTO();
 
-	 	List selectedQuestionAndCandidateAnswersDTO=buildSelectedQuestionAndCandidateAnswersDTO(learnerInput,learnerMark, 
-	 	        totalUserWeight, mcService);
+	 	List selectedQuestionAndCandidateAnswersDTO=buildSelectedQuestionAndCandidateAnswersDTO(learnerInput,mcTempDataHolderDTO 
+	 	        , mcService);
 	 	logger.debug("selectedQuestionAndCandidateAnswersDTO: " + selectedQuestionAndCandidateAnswersDTO);
 	 	request.setAttribute(LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO, selectedQuestionAndCandidateAnswersDTO);
 		logger.debug("LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO));
-		logger.debug("learnerMark becomes: " + learnerMark);
-		logger.debug("totalUserWeight becomes: " + totalUserWeight);
 		
-
+		logger.debug("mcTempDataHolderDTO becomes: " + mcTempDataHolderDTO);
+		String learnerMark=mcTempDataHolderDTO.getLearnerMark(); 
+		logger.debug("learnerMark: " + learnerMark);
+		
+		String totalUserWeight=mcTempDataHolderDTO.getTotalUserWeight();
+		logger.debug("totalUserWeight: " + totalUserWeight);
+		
+		
+		
 	 	/* process the answers */
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
     	
-		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+    	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+    	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
+    	
+    	int totalQuestionCount=mcContent.getMcQueContents().size();
+    	logger.debug("totalQuestionCount: " + totalQuestionCount);
+    	mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(totalQuestionCount).toString());
+    	
 		mcGeneralLearnerFlowDTO.setLearnerMark(learnerMark.toString());
     	
 		Integer passMark=mcContent.getPassMark();
@@ -605,7 +614,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		{
     	    mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(true).toString());
 
-    	    if (totalUserWeight.intValue()  < passMark.intValue())
+    	    logger.debug("totalUserWeight versus passMark: " + totalUserWeight + " versus " + passMark);
+    	    if (new Integer(totalUserWeight).intValue()  < passMark.intValue())
     		{
     			logger.debug("USER FAILED");
     			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
@@ -703,20 +713,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	logger.debug("new highestAttemptOrder: " + highestAttemptOrder);
     	
         
-    	/*
-        logger.debug("passed: " + passed);
-    	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, learnerMark.intValue(), passed, new Integer(highestAttemptOrder).intValue(), mapLearnerAssessmentResults);
+    	LearningUtil.createLearnerAttempt(request, mcQueUsr, selectedQuestionAndCandidateAnswersDTO, new Integer(learnerMark).intValue(), passed, new Integer(highestAttemptOrder).intValue(), null, mcService);
     	logger.debug("created user attempt in the db");
-    	
-        logger.debug("before getLearnerMarkAtLeast: passMark" + passMark);
-        logger.debug("before getLearnerMarkAtLeast: mapQuestionWeights" + mapQuestionWeights);
+    		
+        Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId(), mcService);
+        logger.debug("mapQuestionWeights:" + mapQuestionWeights);
         
         int learnerMarkAtLeast=LearningUtil.getLearnerMarkAtLeast(passMark,mapQuestionWeights);
         logger.debug("learnerMarkAtLeast:" + learnerMarkAtLeast);
-        request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(learnerMarkAtLeast).toString());
-    	mcGeneralLearnerFlowDTO.setLearnerMarkAtLeast (new Integer(learnerMarkAtLeast).toString());
-    	*/
-        
+        mcGeneralLearnerFlowDTO.setLearnerMarkAtLeast (new Integer(learnerMarkAtLeast).toString());
 		
         logger.debug("user over passmark:" + mcLearningForm.getUserOverPassMark());
         logger.debug("is passmark applicable:" + mcLearningForm.getPassMarkApplicable());
@@ -798,15 +803,24 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching redoQuestions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		
+	 	String toolContentId=mcLearningForm.getToolContentId();
+	 	logger.debug("toolContentId: " + toolContentId);
+
+    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+    	logger.debug("mcContent: " + mcContent);
+		
+		
+		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
  		
 		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
 		
-    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-    	logger.debug("toolSessionId: " + toolSessionId);
+		String toolSessionId=mcLearningForm.getToolSessionId();
+		logger.debug("toolSessionId: " + toolSessionId);
     	
-    	McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+    	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
         logger.debug("retrieving mcSession: " + mcSession);
         
         String userID = "";
@@ -830,9 +844,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		Long queUsrId=mcQueUsr.getUid();
 		logger.debug("queUsrId: " + queUsrId);
 		
-		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
+		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId, mcService);
 		logger.debug("learnerBestMark: " + learnerBestMark);
-		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
+		mcGeneralLearnerFlowDTO.setLearnerBestMark(new Integer(learnerBestMark).toString());
+		
+		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 		
 		mcLearningForm.resetCommands();
 		return (mapping.findForward(REDO_QUESTIONS));
@@ -889,7 +906,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		Long queUsrId=null;
 		if (learnerProgressOn == false)
 		{
-			mcQueUsr=LearningUtil.getUser(request);
+			mcQueUsr=LearningUtil.getUser(request, mcService);
 			logger.debug("mcQueUsr: " + mcQueUsr);
 			
 			queUsrId=mcQueUsr.getUid();
@@ -1046,21 +1063,37 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("dispatching viewSummary...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
+
+	 	String toolContentId=mcLearningForm.getToolContentId();
+	 	logger.debug("toolContentId: " + toolContentId);
+
+    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+    	logger.debug("mcContent: " + mcContent);
+
+		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 		
 		int countSessionComplete=mcService.countSessionComplete();
-		int topMark=LearningUtil.getTopMark(request);
-		int lowestMark=LearningUtil.getLowestMark(request);
-		int averageMark=LearningUtil.getAverageMark(request);
+		int topMark=LearningUtil.getTopMark(request, mcService);
+		int lowestMark=LearningUtil.getLowestMark(request, mcService);
+		int averageMark=LearningUtil.getAverageMark(request, mcService);
 		
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		logger.debug("topMark: " + topMark);
 		logger.debug("lowestMark: " + lowestMark);
 		logger.debug("averageMark: " + averageMark);
 		
-		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
-		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
-		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
-		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
+		//request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+		//request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
+		//request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
+		//request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
+		
+		mcGeneralLearnerFlowDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
+		mcGeneralLearnerFlowDTO.setTopMark(new Integer(topMark).toString());
+		mcGeneralLearnerFlowDTO.setLowestMark(new Integer(lowestMark).toString());
+		mcGeneralLearnerFlowDTO.setAverageMark(new Integer(averageMark).toString());
+		
+		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 		
 		mcLearningForm.resetCommands();
 		return (mapping.findForward(RESULTS_SUMMARY));	
@@ -1099,13 +1132,32 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     {
     	McUtils.cleanUpUserExceptions(request);
     	logger.debug("requested redoQuestions...");
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		
     	/* reset the checked options MAP */
     	Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
-    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+    	//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+    	
+	 	String toolContentId=mcLearningForm.getToolContentId();
+	 	logger.debug("toolContentId: " + toolContentId);
+
+    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+    	logger.debug("mcContent: " + mcContent);
+
+    	
+		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
+		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
+		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
+		
+		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
+
     	mcLearningForm.resetCommands();
 		
-		String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
-		logger.debug("previewOnly: " + previewOnly);
+		//String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
+		//logger.debug("previewOnly: " + previewOnly);
 
 		logger.debug("fwding to LOAD_LEARNER: " + LOAD_LEARNER);
     	return (mapping.findForward(LOAD_LEARNER));

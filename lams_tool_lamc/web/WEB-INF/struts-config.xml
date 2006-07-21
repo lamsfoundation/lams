@@ -256,6 +256,12 @@
 	  	/>
 
 	  	<forward
+		    name="runOffline"
+	        path="/learning/RunOffline.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
 		    redirect="false"

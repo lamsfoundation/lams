@@ -339,9 +339,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    {
 	    	McUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("warning to learner: the activity is offline.");
-	    	//request.getSession().setAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE, new Boolean(true).toString());
-	    	persistError(request,"label.learning.runOffline");
-			return (mapping.findForward(ERROR_LIST));
+	    	logger.debug("fwding to :" + RUN_OFFLINE);
+			return (mapping.findForward(RUN_OFFLINE));
 	    }
 
 	    /* find out if the content is being modified at the moment. */
@@ -350,6 +349,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if (isDefineLater == true)
 	    {
 	    	McUtils.cleanUpSessionAbsolute(request);
+	    	logger.debug("fwding to :" + DEFINE_LATER);
 	    	return (mapping.findForward(DEFINE_LATER));
 	    }
 
@@ -408,7 +408,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
 			//request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER,new Integer(highestAttemptOrder).toString());
 			
-			int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
+			int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId, mcService);
 			logger.debug("learnerBestMark: " + learnerBestMark);
 			//request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());	
 	    }
