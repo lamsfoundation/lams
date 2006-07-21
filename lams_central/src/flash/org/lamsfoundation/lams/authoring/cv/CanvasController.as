@@ -37,7 +37,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	
 	private var _canvasModel:CanvasModel;
 	private var _canvasView:CanvasView;
-	
+	private var _pi:PropertyInspectorNew;
 	/**
 	* Constructor
 	*
@@ -47,6 +47,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		super (cm);
 		//have to do an upcast
 		_canvasModel = CanvasModel(getModel());
+		_pi = new PropertyInspectorNew();
 		
 	}
    
@@ -99,8 +100,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_canvasModel.selectedItem = ca;
 		if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
 			_canvasModel.openToolActivityContent(ca.activity);
-		}else{
-			//TODO: Show the property inspector if its a parralel activity or whatever
+		}else if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
+			if (!_pi.isPIExpanded()){
+				_canvasModel.setPIHeight(_pi.piFullHeight());
+			}
 		}
     }
    
