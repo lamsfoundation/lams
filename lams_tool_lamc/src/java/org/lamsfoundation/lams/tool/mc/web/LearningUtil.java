@@ -671,6 +671,12 @@ public class LearningUtil implements McAppConstants {
         mcGeneralLearnerFlowDTO.setPassMark(mcContent.getPassMark().toString());
         mcGeneralLearnerFlowDTO.setReportTitleLearner(mcContent.getReportTitle());
         
+        if (mcContent.isQuestionsSequenced()) 
+            mcGeneralLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
+        else
+            mcGeneralLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
+            
+        
         logger.debug("continue buildMcGeneralLearnerFlowDTO: " + mcContent);
         mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(mcContent.getMcQueContents().size()).toString());
         logger.debug("final mcGeneralLearnerFlowDTO: " + mcGeneralLearnerFlowDTO);

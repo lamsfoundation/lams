@@ -34,8 +34,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  * ActionForm for the Learning environment
  */
 public class McLearningForm extends ActionForm implements McAppConstants {
-
-    protected String continueOptions;
+	protected String continueOptions;
 	protected String nextOptions;
 	protected String continueOptionsCombined;
 	protected String redoQuestions;
@@ -59,8 +58,13 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String passMarkApplicable;
     protected String learnerProgress;
     protected String learnerProgressUserId;
+    
+    protected String questionListingMode;
+
+    protected String questionIndex;
+    protected String nextQuestionSelected;
     	
- 	public void resetCa(ActionMapping mapping, HttpServletRequest request) {
+    public void resetCa(ActionMapping mapping, HttpServletRequest request) {
  	   checkedCa = new String[0];
 	}
 
@@ -81,6 +85,7 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 
 	public void resetParameters()
 	{
+	    this.setNextQuestionSelected(null);
 	}
 
 
@@ -331,4 +336,45 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     public void setLearnerProgressUserId(String learnerProgressUserId) {
         this.learnerProgressUserId = learnerProgressUserId;
     }
+    
+    /**
+     * @return Returns the nextQuestionSelected.
+     */
+    public String getNextQuestionSelected() {
+        return nextQuestionSelected;
+    }
+    /**
+     * @param nextQuestionSelected The nextQuestionSelected to set.
+     */
+    public void setNextQuestionSelected(String nextQuestionSelected) {
+        this.nextQuestionSelected = nextQuestionSelected;
+    }
+    
+    /**
+     * @return Returns the questionIndex.
+     */
+    public String getQuestionIndex() {
+        return questionIndex;
+    }
+    /**
+     * @param questionIndex The questionIndex to set.
+     */
+    public void setQuestionIndex(String questionIndex) {
+        this.questionIndex = questionIndex;
+    }
+    
+    /**
+     * @return Returns the questionListingMode.
+     */
+    public String getQuestionListingMode() {
+        return questionListingMode;
+    }
+    /**
+     * @param questionListingMode The questionListingMode to set.
+     */
+    public void setQuestionListingMode(String questionListingMode) {
+        this.questionListingMode = questionListingMode;
+    }
+    
+
 }

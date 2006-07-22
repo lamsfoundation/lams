@@ -64,6 +64,7 @@ public interface McAppConstants {
     public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
     public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
+    public static final String QUESTION_INDEX							="questionIndex";
     
     /*
      * authoring mode controllers

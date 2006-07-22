@@ -64,7 +64,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${mcGeneralLearnerFlowDTO.passMark}"/><bean:message key="label.percent"/> )  </b>
+						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${mcGeneralLearnerFlowDTO.passMark}"/>
+						  	 <bean:message key="label.percent"/> )  </b>
 					  	</td>
 					  </tr>
 					</c:if>

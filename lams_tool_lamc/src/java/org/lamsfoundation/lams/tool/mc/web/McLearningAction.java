@@ -259,9 +259,20 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	 	
-    	mcLearningForm.resetParameters();
-    	String toolContentId=mcLearningForm.getToolContentId();
+	 	String toolContentId=mcLearningForm.getToolContentId();
     	logger.debug("toolContentId: " + toolContentId);
+    	
+    	logger.debug("mcLearningForm nextQuestionSelected : " + mcLearningForm.getNextQuestionSelected());
+    	
+	 	if ((mcLearningForm.getNextQuestionSelected() != null) && 
+	 	    (!mcLearningForm.getNextQuestionSelected().equals(""))) 
+	 	{
+	 	   logger.debug("presenting next question...");
+	 	   mcLearningForm.resetParameters();
+	   	   setContentInUse(request, toolContentId, mcService);
+	 	   return getNextOptions(mapping, form, request, response);
+	 	}
+	 	    	
     	
     	if (mcLearningForm.getContinueOptionsCombined() != null)
     	{
@@ -379,8 +390,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     			logger.debug("updated user records to finished");
         	}
 
-    	    
-    		
     		/* pay attention here*/
     		logger.debug("redirecting to the nextUrl: "+ nextUrl);
     		response.sendRedirect(nextUrl);
@@ -620,6 +629,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
     	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
+    	mcGeneralLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
     	
     	int totalQuestionCount=mcContent.getMcQueContents().size();
     	logger.debug("totalQuestionCount: " + totalQuestionCount);
@@ -780,26 +790,39 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
 	 	
-		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
-    	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
+ 	    String questionIndex=mcLearningForm.getQuestionIndex();
+ 	    logger.debug("questionIndex: " + questionIndex);
+
+	 	String toolContentId=mcLearningForm.getToolContentId();
+	 	logger.debug("toolContentId: " + toolContentId);
+
+    	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+    	logger.debug("mcContent: " + mcContent);
     	
-    	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-    	logger.debug("totalQuestionCount:" + totalQuestionCount);
+    	List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
+		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
+		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
+
+    	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+
+		String totalQuestionCount=mcGeneralLearnerFlowDTO.getTotalQuestionCount();
+		logger.debug("totalQuestionCount: " + totalQuestionCount);
     	
     	int intTotalQuestionCount=new Integer(totalQuestionCount).intValue();
-    	int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue();
+    	int intQuestionIndex=new Integer(questionIndex).intValue();
     	
-    	if (intTotalQuestionCount-1 == intCurrentQuestionIndex)
+    	logger.debug("intTotalQuestionCount versus intCurrentQuestionIndex: " + intTotalQuestionCount + " versus " + intQuestionIndex);
+    	if (intTotalQuestionCount == intQuestionIndex)
     	{
     			logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
-        		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
+    			mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(true).toString());
        	}
     		
    		mcLearningForm.resetCommands();
    
-       	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
-       	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
-       	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+       	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(questionIndex).toString());
+       	request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
        	return (mapping.findForward(LOAD_LEARNER));
     }
@@ -833,12 +856,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
-		
-		
+    	
+    	List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
+		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
+		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
+
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
- 		
-		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
+		mcGeneralLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1).toString());
+		mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
+		
+		//request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		//request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
 		
 		String toolSessionId=mcLearningForm.getToolSessionId();
 		logger.debug("toolSessionId: " + toolSessionId);

@@ -237,7 +237,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	McUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("error: The tool expects mcContent.");
 	    	persistError(request,"error.content.doesNotExist");
-	    	//request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
 	    	return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -247,9 +246,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * And the passed tool session id already refers to it.
 	     */
 	    setupAttributes(request, mcContent, mcLearnerStarterDTO);
+	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
 	    mcLearningForm.setToolContentId(mcContent.getMcContentId().toString());
 	    mcLearningForm.setToolContentUID(mcContent.getUid().toString());
+	    
+	    commonContentSetup(request, mcContent, mcService);
+	    
 	    
     	/* Is the request for a preview by the author?
     	Preview The tool must be able to show the specified content as if it was running in a lesson. 
@@ -262,7 +265,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
 	    
 	    /*handle PREVIEW mode*/
-	    //String mode=(String) request.getSession().getAttribute(LEARNING_MODE);
 	    String mode=mcLearningForm.getLearningMode();
 	    
 	    logger.debug("mode: " + mode);
@@ -270,18 +272,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	{
     		logger.debug("Author requests for a preview of the content.");
 			logger.debug("existing mcContent:" + mcContent);
-    		
-			commonContentSetup(request, mcContent, mcService);
-    		
-	    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
-	    	mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
-	    	/* PREVIEW_ONLY for jsp*/
 
-	    	
-	    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-    		McLearningAction mcLearningAction= new McLearningAction();
-	    	//return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
-    		/*presenting the teacher with a view of how students normally take the activity*/
+	    	/* PREVIEW_ONLY for jsp*/
     		return (mapping.findForward(LOAD_LEARNER));
     	}
 	    
@@ -293,7 +285,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		if ((userId != null) && (mode.equals("teacher")))
 		{
 			logger.debug("request is for learner progress");
-			commonContentSetup(request, mcContent, mcService);
 	    	
 			/* LEARNER_PROGRESS for jsp*/
 			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
@@ -309,7 +300,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
 		    	persistError(request, "error.learner.required");
-		    	//request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
 				return (mapping.findForward(ERROR_LIST));
 		    }
 		    
@@ -324,7 +314,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				 (mcSessionLocal.getMcSessionId().longValue() != toolSessionId.longValue()))
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
-		    	//request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
 		    	persistError(request, "error.learner.sessionId.inconsistent");
 				return (mapping.findForward(ERROR_LIST));
 		    }
@@ -354,22 +343,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return (mapping.findForward(DEFINE_LATER));
 	    }
 
-	    /*
-    	 * fetch question content from content
-    	 */
-    	
-		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
-		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
-		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
-		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
-		
-		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
-
-    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-		
 		/*also prepare data into mapGeneralOptionsContent for combined answers view */
     	
     	/*
@@ -479,11 +452,14 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
 		
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+		mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
+		mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1).toString());
+
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 		
-		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		//request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		//logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 	}
 	
 	

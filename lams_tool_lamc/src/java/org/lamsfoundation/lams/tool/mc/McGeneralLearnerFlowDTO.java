@@ -85,8 +85,51 @@ public class McGeneralLearnerFlowDTO implements Comparable
     protected Map mapQuestionsContent;
     
     protected String toolSessionId;
+    
+    protected String totalCountReached;
+    
+    protected String questionIndex;
+    
+    protected String questionListingMode;
+    
 
         
+    /**
+     * @return Returns the questionListingMode.
+     */
+    public String getQuestionListingMode() {
+        return questionListingMode;
+    }
+    /**
+     * @param questionListingMode The questionListingMode to set.
+     */
+    public void setQuestionListingMode(String questionListingMode) {
+        this.questionListingMode = questionListingMode;
+    }
+    /**
+     * @return Returns the questionIndex.
+     */
+    public String getQuestionIndex() {
+        return questionIndex;
+    }
+    /**
+     * @param questionIndex The questionIndex to set.
+     */
+    public void setQuestionIndex(String questionIndex) {
+        this.questionIndex = questionIndex;
+    }
+    /**
+     * @return Returns the totalCountReached.
+     */
+    public String getTotalCountReached() {
+        return totalCountReached;
+    }
+    /**
+     * @param totalCountReached The totalCountReached to set.
+     */
+    public void setTotalCountReached(String totalCountReached) {
+        this.totalCountReached = totalCountReached;
+    }
     /**
      * @return Returns the toolSessionId.
      */
@@ -292,6 +335,7 @@ public class McGeneralLearnerFlowDTO implements Comparable
             .append("reportTitleLearner: ", reportTitleLearner)
             .append("activityInstructions: ", activityInstructions)
             .append("activityTitle: ", activityTitle)
+            .append("questionListingMode: ", questionListingMode)
             .toString();
     }
 
