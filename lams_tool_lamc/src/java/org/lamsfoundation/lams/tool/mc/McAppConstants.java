@@ -90,6 +90,8 @@ public interface McAppConstants {
     public static final long MAX_QUESTION_COUNT 		=20;
     public static final long MAX_OPTION_COUNT 			=10;
     public static final int  MAX_ATTEMPT_HISTORY 		=30;
+    public static final String  QUESTION_AND_CANDIDATE_ANSWERS_KEY		="questionAndCandidateAnswersKey";
+    
     
     
     /*

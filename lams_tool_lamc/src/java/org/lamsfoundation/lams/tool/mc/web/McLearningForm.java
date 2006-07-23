@@ -47,7 +47,9 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	
 	
 	protected String[] checkedCa;
-	protected String toolContentID;
+	protected String[] sequentialCheckedCa;
+	
+    protected String toolContentID;
 	protected String toolContentUID;
 	protected String toolSessionID;
 	
@@ -64,6 +66,7 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 
     protected String questionIndex;
     protected String nextQuestionSelected;
+    protected String httpSessionID;
     	
     public void resetCa(ActionMapping mapping, HttpServletRequest request) {
  	   checkedCa = new String[0];
@@ -376,5 +379,30 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setToolSessionID(String toolSessionID) {
         this.toolSessionID = toolSessionID;
+    }
+    /**
+     * @return Returns the httpSessionID.
+     */
+    public String getHttpSessionID() {
+        return httpSessionID;
+    }
+    /**
+     * @param httpSessionID The httpSessionID to set.
+     */
+    public void setHttpSessionID(String httpSessionID) {
+        this.httpSessionID = httpSessionID;
+    }
+
+    /**
+     * @return Returns the sequentialCheckedCa.
+     */
+    public String[] getSequentialCheckedCa() {
+        return sequentialCheckedCa;
+    }
+    /**
+     * @param sequentialCheckedCa The sequentialCheckedCa to set.
+     */
+    public void setSequentialCheckedCa(String[] sequentialCheckedCa) {
+        this.sequentialCheckedCa = sequentialCheckedCa;
     }
 }

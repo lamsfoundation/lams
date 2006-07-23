@@ -51,10 +51,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 			<html:hidden property="toolContentID"/>						
 			<html:hidden property="toolSessionID"/>								
+			<html:hidden property="httpSessionID"/>											
 			<html:hidden property="userOverPassMark"/>						
 			<html:hidden property="passMarkApplicable"/>										
 			<html:hidden property="learnerProgress"/>										
 			<html:hidden property="learnerProgressUserId"/>										
+			<html:hidden property="questionListingMode"/>													
 		
 				<table class="forms">
 					  <tr>
@@ -89,8 +91,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=right valign=top colspan=2> 
-						  	<bean:message key="label.mark"/>  
-						  	<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}"/>  &nbsp
+						  	<b> <bean:message key="label.mark"/> </b>
+							<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}"/>  &nbsp
 							<bean:message key="label.outof"/> &nbsp
 						  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/>
 					  	</td>

@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 
 /**
@@ -97,13 +99,16 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
-   			input=".learningStarter"> 
+	      	scope="request"
+	      	validate="false"
+	      	unknown="false"
+   			input="/learningIndex.jsp"> 
 
 		<exception
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -111,38 +116,38 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			   			
 
 	  	<forward
 		    name="loadLearner"
-		    path=".answers"
-		    redirect="true"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="viewAnswers"
-		    path=".viewAnswers"
-		    redirect="true"
+		    path="/learning/ViewAnswers.jsp"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="redoQuestions"
-		    path=".redoQuestions"
-		    redirect="true"
+		    path="/learning/RedoQuestions.jsp"
+		    redirect="false"
 	  	/>
 	  	
 	     <forward
 	        name="preview"
-	        path=".preview"
-	        redirect="true"
+	        path="/learning/Preview.jsp"
+		    redirect="false"
 	     />
 
 	  	<forward
 		    name="learningStarter"
-		    path=".learningStarter"
-		    redirect="true"
+		    path="/learningIndex.jsp"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
@@ -152,11 +157,17 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 	  	/>
 
 	  	<forward
-		    name="errorList"
-		    path=".mcErrorBox"
-		    redirect="true"
+		    name="runOffline"
+	        path="/learning/RunOffline.jsp"
+		    redirect="false"
 	  	/>
-	</action>    
+
+	  	<forward
+		    name="errorList"
+		    path="/McErrorBox.jsp"
+		    redirect="false"
+	  	/>
+	</action>  
  *
  */
 
@@ -201,7 +212,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return validateParameters;
 	    }
 	    
-	    //String toolSessionID=mcLearningForm.getToolSessionId();
+	    SessionMap sessionMap = new SessionMap();
+	    List sequentialCheckedCa= new LinkedList();
+	    sessionMap.put(QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	    mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
+	        
+	    
 	    String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    logger.debug("retrieved toolSessionID: " + toolSessionID);
 	    mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
@@ -249,10 +266,12 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if (mcContent.isQuestionsSequenced())
 		{
 			mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
+			mcLearningForm.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
 		}
 	    else
 	    {
 	    	mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
+	    	mcLearningForm.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
 	    }
 	    
 	    
@@ -265,8 +284,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
 	    mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
-	    //mcLearningForm.setToolContentUID(mcContent.getUid().toString());
-	    
 	    commonContentSetup(request, mcContent, mcService);
 	    
 	    
@@ -406,8 +423,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
 	    }
 	    
-
-	    //String learningMode=mcLearningForm.getLearningMode();
 	    logger.debug("users learning mode is: " + mode);
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
@@ -477,9 +492,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
-		
-		//request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		//logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 	}
 	
 	
@@ -551,7 +563,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			return (mapping.findForward(ERROR_LIST));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);
-		//mcLearningForm.setLearningMode(mode);
 	    
 	    return null;
 	}
