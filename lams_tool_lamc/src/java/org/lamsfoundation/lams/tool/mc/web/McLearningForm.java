@@ -47,9 +47,10 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	
 	
 	protected String[] checkedCa;
-	protected String toolContentId;
+	protected String toolContentID;
 	protected String toolContentUID;
-	protected String toolSessionId;
+	protected String toolSessionID;
+	
 	protected String learningMode;
 	protected String currentQuestionIndex;
 	
@@ -249,31 +250,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the toolContentId.
-     */
-    public String getToolContentId() {
-        return toolContentId;
-    }
-    /**
-     * @param toolContentId The toolContentId to set.
-     */
-    public void setToolContentId(String toolContentId) {
-        this.toolContentId = toolContentId;
-    }
-    /**
-     * @return Returns the toolSessionId.
-     */
-    public String getToolSessionId() {
-        return toolSessionId;
-    }
-    /**
-     * @param toolSessionId The toolSessionId to set.
-     */
-    public void setToolSessionId(String toolSessionId) {
-        this.toolSessionId = toolSessionId;
-    }
-
-    /**
      * @return Returns the learningMode.
      */
     public String getLearningMode() {
@@ -377,4 +353,28 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     }
     
 
+    /**
+     * @return Returns the toolContentID.
+     */
+    public String getToolContentID() {
+        return toolContentID;
+    }
+    /**
+     * @param toolContentID The toolContentID to set.
+     */
+    public void setToolContentID(String toolContentID) {
+        this.toolContentID = toolContentID;
+    }
+    /**
+     * @return Returns the toolSessionID.
+     */
+    public String getToolSessionID() {
+        return toolSessionID;
+    }
+    /**
+     * @param toolSessionID The toolSessionID to set.
+     */
+    public void setToolSessionID(String toolSessionID) {
+        this.toolSessionID = toolSessionID;
+    }
 }

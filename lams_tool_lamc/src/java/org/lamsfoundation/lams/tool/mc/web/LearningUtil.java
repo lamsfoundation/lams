@@ -56,6 +56,27 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 public class LearningUtil implements McAppConstants {
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 	
+	
+	public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm)
+	{
+	 	String passMarkApplicable=request.getParameter("passMarkApplicable");
+	 	logger.debug("passMarkApplicable: " + passMarkApplicable);
+	 	mcLearningForm.setPassMarkApplicable(passMarkApplicable);
+	 	
+	 	String userOverPassMark=request.getParameter("userOverPassMark");
+	 	logger.debug("userOverPassMark: " + userOverPassMark);
+	 	mcLearningForm.setUserOverPassMark(userOverPassMark);
+	 	
+	 	String learnerProgress=request.getParameter("learnerProgress");
+	 	logger.debug("learnerProgress: " + learnerProgress);
+	 	mcLearningForm.setLearnerProgress(learnerProgress);
+	 	
+	 	String learnerProgressUserId=request.getParameter("learnerProgressUserId");
+	 	logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+	 	mcLearningForm.setLearnerProgressUserId(learnerProgressUserId);
+	 	logger.debug("done saving form request data.");
+	}
+	
     /**
      * updates the Map based on learner activity
      * selectOptionsCheckBox(HttpServletRequest request,McLearningForm mcLearningForm, String questionIndex)

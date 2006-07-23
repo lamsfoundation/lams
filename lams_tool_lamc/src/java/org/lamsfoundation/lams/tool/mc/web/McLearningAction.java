@@ -207,9 +207,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
                                                             ServletException
     {
     	McUtils.cleanUpUserExceptions(request);
-	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
-	 	mcAuthoringForm.resetUserAction();
+    	McLearningForm mcLearningForm = (McLearningForm) form;
+	 	LearningUtil.saveFormRequestData(request, mcLearningForm);
 	 	return null;
     }
 
@@ -259,8 +258,21 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	 	
-	 	String toolContentId=mcLearningForm.getToolContentId();
-    	logger.debug("toolContentId: " + toolContentId);
+	 	LearningUtil.saveFormRequestData(request, mcLearningForm);
+	 	
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	mcLearningForm.setToolSessionID(toolSessionID);
+	 	
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
+	 	
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);
+	    mcLearningForm.setToolContentID(toolContentId);
+	    
+	 	//String toolContentId=mcLearningForm.getToolContentId();
+    	//logger.debug("toolContentId: " + toolContentId);
     	
     	logger.debug("mcLearningForm nextQuestionSelected : " + mcLearningForm.getNextQuestionSelected());
     	
@@ -293,7 +305,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	{
     	    setContentInUse(request, toolContentId, mcService);
     		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
-    		mcLearningForm.resetCommands();
+    		//mcLearningForm.resetCommands();
     		return redoQuestions(request, mcLearningForm, mapping);
     	}
     	else if (mcLearningForm.getViewAnswers() != null)
@@ -310,12 +322,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	{
     		logger.debug("requested learner finished, the learner should be directed to next activity.");
     		
-    		String toolSessionId=mcLearningForm.getToolSessionId();
-        	logger.debug("toolSessionId: " + toolSessionId);
+    		logger.debug("toolSessionID: " + toolSessionID);
         	
-        	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
-            logger.debug("retrieving mcSession: " + mcSession);
-    		
     	    String userID = "";
     	    HttpSession ss = SessionManager.getSession();
     	    logger.debug("ss: " + ss);
@@ -330,40 +338,40 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		    }
     	    }
     		
-    		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
+    		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionID + " and userID:"+userID);
     		
     		McUtils.cleanUpSessionAbsolute(request);
     		
     		String nextUrl=null;
     		try
     		{
-    			nextUrl=mcService.leaveToolSession(new Long(toolSessionId), new Long(userID));
+    			nextUrl=mcService.leaveToolSession(new Long(toolSessionID), new Long(userID));
     			logger.debug("nextUrl: "+ nextUrl);
     		}
     		catch (DataMissingException e)
     		{
     			logger.debug("failure getting nextUrl: "+ e);
-        		mcLearningForm.resetCommands();
+        		//mcLearningForm.resetCommands();
     			//throw new ServletException(e);
         		return (mapping.findForward(LEARNING_STARTER));
     		}
     		catch (ToolException e)
     		{
     			logger.debug("failure getting nextUrl: "+ e);
-        		mcLearningForm.resetCommands();
+        		//mcLearningForm.resetCommands();
     			//throw new ServletException(e);
         		return (mapping.findForward(LEARNING_STARTER));        		
     		}
     		catch (Exception e)
     		{
     			logger.debug("unknown exception getting nextUrl: "+ e);
-        		mcLearningForm.resetCommands();
+        		//mcLearningForm.resetCommands();
     			//throw new ServletException(e);
         		return (mapping.findForward(LEARNING_STARTER));        		
     		}
 
     		logger.debug("success getting nextUrl: "+ nextUrl);
-    		mcLearningForm.resetCommands();
+    		//mcLearningForm.resetCommands();
     		
     	    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
     	    logger.debug("mcQueUsr:" + mcQueUsr);
@@ -390,14 +398,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     			logger.debug("updated user records to finished");
         	}
 
-    		/* pay attention here*/
+    		
     		logger.debug("redirecting to the nextUrl: "+ nextUrl);
     		response.sendRedirect(nextUrl);
     		
     		return null;
     	}
     	
-    	mcLearningForm.resetCommands();	
+    	//mcLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
    }
     
@@ -602,8 +610,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	 	}
 	 	logger.debug("learnerInput: " + learnerInput);
 
-	 	String toolContentId=mcLearningForm.getToolContentId();
-	 	logger.debug("toolContentId: " + toolContentId);
+	 	//String toolContentId=mcLearningForm.getToolContentId();
+	 	//logger.debug("toolContentId: " + toolContentId);
+	 	
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
+	 	
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);
+	 	
 
 	 	/* process the answers */
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
@@ -676,13 +694,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	}
     	*/
     	
-    	String toolSessionId=mcLearningForm.getToolSessionId();
-    	logger.debug("toolSessionId: " + toolSessionId);
+    	//String toolSessionId=mcLearningForm.getToolSessionId();
+    	//logger.debug("toolSessionId: " + toolSessionId);
     	
-    	
-    	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
-        logger.debug("retrieving mcSession: " + mcSession);
-        
         Long toolSessionUid=mcSession.getUid();
         logger.debug("toolSessionUid: " + toolSessionUid);
 
@@ -716,7 +730,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McQueUsr mcQueUsr=null;
     	if (isUserDefined == false)
     	{
-    	    mcQueUsr=LearningUtil.createUser(request, mcService, new Long(toolSessionId));
+    	    mcQueUsr=LearningUtil.createUser(request, mcService, new Long(toolSessionID));
     		logger.debug("created user in the db: " + mcQueUsr);
     	}
     	else
@@ -758,7 +772,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
         logger.debug("user over passmark:" + mcLearningForm.getUserOverPassMark());
         logger.debug("is passmark applicable:" + mcLearningForm.getPassMarkApplicable());
-		mcLearningForm.resetCommands();
+		//mcLearningForm.resetCommands();
 		
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
@@ -793,8 +807,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
  	    String questionIndex=mcLearningForm.getQuestionIndex();
  	    logger.debug("questionIndex: " + questionIndex);
 
-	 	String toolContentId=mcLearningForm.getToolContentId();
-	 	logger.debug("toolContentId: " + toolContentId);
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
+	 	
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);
+ 	    
+	 	//String toolContentId=mcLearningForm.getToolContentId();
+	 	//logger.debug("toolContentId: " + toolContentId);
 
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
@@ -819,7 +842,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     			mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(true).toString());
        	}
     		
-   		mcLearningForm.resetCommands();
+   		//mcLearningForm.resetCommands();
    
        	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(questionIndex).toString());
        	request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
@@ -851,8 +874,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 		
-	 	String toolContentId=mcLearningForm.getToolContentId();
-	 	logger.debug("toolContentId: " + toolContentId);
+	 	//String toolContentId=mcLearningForm.getToolContentId();
+	 	//logger.debug("toolContentId: " + toolContentId);
+		
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
+	 	
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);		
 
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
@@ -869,12 +901,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		//request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 		//request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
 		
-		String toolSessionId=mcLearningForm.getToolSessionId();
-		logger.debug("toolSessionId: " + toolSessionId);
-    	
-    	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
-        logger.debug("retrieving mcSession: " + mcSession);
-        
+		//String toolSessionId=mcLearningForm.getToolSessionId();
+		//logger.debug("toolSessionId: " + toolSessionId);
+		
         String userID = "";
 	    HttpSession ss = SessionManager.getSession();
 	    logger.debug("ss: " + ss);
@@ -903,7 +932,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 		
-		mcLearningForm.resetCommands();
+		//mcLearningForm.resetCommands();
 		return (mapping.findForward(REDO_QUESTIONS));
     }
         
@@ -933,15 +962,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 		
-		String toolContentId=mcLearningForm.getToolContentId();
-	 	logger.debug("toolContentId: " + toolContentId);
+		//String toolContentId=mcLearningForm.getToolContentId();
+	 	//logger.debug("toolContentId: " + toolContentId);
+		
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
 	 	
-	 	String toolSessionId=mcLearningForm.getToolSessionId();
-	 	logger.debug("toolSessionId: " + toolSessionId);
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
 	 	
-    	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
-        logger.debug("retrieving mcSession: " + mcSession);
-
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);
+		
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
     	
@@ -990,7 +1022,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		Long queUsrId=null;
 		if (learnerProgressOn == false)
 		{
-			mcQueUsr=LearningUtil.getUser(request, mcService, toolSessionId);
+			mcQueUsr=LearningUtil.getUser(request, mcService, toolSessionID);
 			logger.debug("mcQueUsr: " + mcQueUsr);
 			
 			queUsrId=mcQueUsr.getUid();
@@ -1123,7 +1155,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 		
-		mcLearningForm.resetCommands();
+		//mcLearningForm.resetCommands();
 		return (mapping.findForward(VIEW_ANSWERS));
 	}
 
@@ -1150,10 +1182,19 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("dispatching viewSummary...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
-
-	 	String toolContentId=mcLearningForm.getToolContentId();
-	 	logger.debug("toolContentId: " + toolContentId);
-
+		
+	 	//String toolContentId=mcLearningForm.getToolContentId();
+	 	//logger.debug("toolContentId: " + toolContentId);
+		
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
+	 	
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);
+		
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
 
@@ -1163,13 +1204,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		Iterator sessionsIterator=mcContent.getMcSessions().iterator();
 		while (sessionsIterator.hasNext())
         {
-		    McSession mcSession= (McSession)sessionsIterator.next();
+		    McSession mcSessionLocal= (McSession)sessionsIterator.next();
 		    if  (mcSession != null)
 		    {
-			    logger.debug("mcSession: " + mcSession);
-			    if (mcSession.getSessionStatus().equals(COMPLETED))
+			    logger.debug("mcSessionLocal: " + mcSessionLocal);
+			    if (mcSessionLocal.getSessionStatus().equals(COMPLETED))
 			    {
-			        logger.debug("COMPLETED session found: " + mcSession);
+			        logger.debug("COMPLETED session found: " + mcSessionLocal);
 			        ++countSessionComplete;
 			    }
 		    }
@@ -1194,7 +1235,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 		
-		mcLearningForm.resetCommands();
+		//mcLearningForm.resetCommands();
 		return (mapping.findForward(RESULTS_SUMMARY));	
     }
         
@@ -1236,13 +1277,22 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	/* reset the checked options MAP */
     	Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
 
-    	String toolContentId=mcLearningForm.getToolContentId();
-	 	logger.debug("toolContentId: " + toolContentId);
+    	//String toolContentId=mcLearningForm.getToolContentId();
+	 	//logger.debug("toolContentId: " + toolContentId);
 
+    	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	
+	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
+	    logger.debug("retrieving mcSession: " + mcSession);
+	 	
+	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
+	    logger.debug("toolContentId: " + toolContentId);
+		
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
-
     	
+    	    	
 		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
 		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
 		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
@@ -1252,7 +1302,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 
-    	mcLearningForm.resetCommands();
+    	//mcLearningForm.resetCommands();
 
 		logger.debug("fwding to LOAD_LEARNER: " + LOAD_LEARNER);
     	return (mapping.findForward(LOAD_LEARNER));

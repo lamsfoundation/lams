@@ -198,7 +198,7 @@
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
-	      	scope="session"
+	      	scope="request"
 	      	validate="false"
 	      	unknown="false"
    			input="/learningIndex.jsp"> 
@@ -273,7 +273,7 @@
 	<action	path="/learning"
 		    type="org.lamsfoundation.lams.tool.mc.web.McLearningAction"
 			name="McLearningForm"
-      		scope="session"
+      		scope="request"
       		input="/learning/AnswersContent.jsp"
       		parameter="method"
       		unknown="false"

@@ -184,8 +184,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		
 		McUtils.cleanUpSessionAbsolute(request);
 		
-		McLearnerStarterDTO mcLearnerStarterDTO= new McLearnerStarterDTO();
-		
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapAnswers= new TreeMap(new McComparator());
 
@@ -196,17 +194,17 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
 		mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
 
-	    mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
-	    
-	    ActionForward validateParameters=validateParameters(request, mcLearningForm, mapping);
+		ActionForward validateParameters=validateParameters(request, mcLearningForm, mapping);
 	    logger.debug("validateParameters: " + validateParameters);
 	    if (validateParameters != null)
 	    {
 	    	return validateParameters;
 	    }
 	    
-	    String toolSessionID=mcLearningForm.getToolSessionId();
+	    //String toolSessionID=mcLearningForm.getToolSessionId();
+	    String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    logger.debug("retrieved toolSessionID: " + toolSessionID);
+	    mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
 	    
 	    
 		/*
@@ -245,11 +243,29 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.
 	     */
-	    setupAttributes(request, mcContent, mcLearnerStarterDTO);
+	    
+	    McLearnerStarterDTO mcLearnerStarterDTO= new McLearnerStarterDTO();
+	    logger.debug("IS_QUESTIONS_SEQUENCED: " + mcContent.isQuestionsSequenced());
+	    if (mcContent.isQuestionsSequenced())
+		{
+			mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
+		}
+	    else
+	    {
+	    	mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
+	    }
+	    
+	    
+	    /*
+	     * Is the tool activity been checked as Run Offline in the property inspector?
+	     */
+	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + mcContent.isRunOffline());
+	    mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
+	    mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
-	    mcLearningForm.setToolContentId(mcContent.getMcContentId().toString());
-	    mcLearningForm.setToolContentUID(mcContent.getUid().toString());
+	    mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
+	    //mcLearningForm.setToolContentUID(mcContent.getUid().toString());
 	    
 	    commonContentSetup(request, mcContent, mcService);
 	    
@@ -265,9 +281,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
 	    
 	    /*handle PREVIEW mode*/
-	    String mode=mcLearningForm.getLearningMode();
-	    
+	    //String mode=mcLearningForm.getLearningMode();
+	    String mode=request.getParameter(MODE);
 	    logger.debug("mode: " + mode);
+	    
     	if ((mode != null) && (mode.equals("author")))
     	{
     		logger.debug("Author requests for a preview of the content.");
@@ -389,12 +406,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
 	    }
 	    
-	    String learningMode=mcLearningForm.getLearningMode();
-	    logger.debug("users learning mode is: " + learningMode);
+
+	    //String learningMode=mcLearningForm.getLearningMode();
+	    logger.debug("users learning mode is: " + mode);
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
 	    /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
-	    if ((mcQueUsr != null) && learningMode.equals("learner"))
+	    if ((mcQueUsr != null) && mode.equals("learner"))
 	    {
 	    	Long sessionUid=mcQueUsr.getMcSessionId();
 	    	logger.debug("users sessionUid: " + sessionUid);
@@ -402,12 +420,12 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	logger.debug("mcUserSession: " + mcUserSession);
 	    	String userSessionId=mcUserSession.getMcSessionId().toString();
 	    	logger.debug("userSessionId: " + userSessionId);
-	    	String toolSessionId=mcLearningForm.getToolSessionId();
-	    	logger.debug("current toolSessionId: " + toolSessionId);
 	    	
-	    	if (toolSessionId.equals(userSessionId))
+	    	logger.debug("current toolSessionID: " + toolSessionID);
+	    	
+	    	if (toolSessionID.equals(userSessionId))
 	    	{
-	    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " mcQueUsr: " + 
+	    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " mcQueUsr: " + 
 	    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
 	    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
 	    		
@@ -423,10 +441,12 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    		}
 	    	}
 	    }
-	    else if (learningMode.equals("teacher"))
+	    else if (mode.equals("teacher"))
 	    {
 	    	McLearningAction mcLearningAction= new McLearningAction();
 	    	logger.debug("present to teacher learners progress...");
+			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
+			mcLearningForm.setLearnerProgressUserId(userId);
 	    	return mcLearningAction.viewAnswers(mapping, form, request, response);	
 	    }
 	    logger.debug("just presenting standard learner screen");
@@ -462,34 +482,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		//logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 	}
 	
-	
-	/**
-	 * sets up session scope attributes based on content linked to the passed tool session id
-	 * setupAttributes(HttpServletRequest request, McContent mcContent)
-	 * 
-	 * @param request
-	 * @param mcContent
-	 */
-	protected void setupAttributes(HttpServletRequest request, McContent mcContent, McLearnerStarterDTO mcLearnerStarterDTO)
-	{
-	    /* same as 1 page per question */
-	    logger.debug("IS_QUESTIONS_SEQUENCED: " + mcContent.isQuestionsSequenced());
-	    if (mcContent.isQuestionsSequenced())
-		{
-			mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
-		}
-	    else
-	    {
-	    	mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
-	    }
-	    mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
-	    
-	    /*
-	     * Is the tool activity been checked as Run Offline in the property inspector?
-	     */
-	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + mcContent.isRunOffline());
-	    mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
-	}
 	
 	
 	protected ActionForward validateParameters(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
@@ -530,7 +522,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			{
 	    		toolSessionId=new Long(strToolSessionId).longValue();
 		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	mcLearningForm.setToolSessionId(new Long(toolSessionId).toString());
+		    	//mcLearningForm.setToolSessionId(new Long(toolSessionId).toString());
 			}
 	    	catch(NumberFormatException e)
 			{
@@ -559,7 +551,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			return (mapping.findForward(ERROR_LIST));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);
-		mcLearningForm.setLearningMode(mode);
+		//mcLearningForm.setLearningMode(mode);
 	    
 	    return null;
 	}

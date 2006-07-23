@@ -49,6 +49,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content-learner">
 
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
+			<html:hidden property="toolContentID"/>						
+			<html:hidden property="toolSessionID"/>								
+			<html:hidden property="userOverPassMark"/>						
+			<html:hidden property="passMarkApplicable"/>										
+			<html:hidden property="learnerProgress"/>										
+			<html:hidden property="learnerProgressUserId"/>										
+		
 				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
