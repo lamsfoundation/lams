@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
 /**
  * @author Ozgur Demirtas
@@ -67,6 +68,8 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String questionIndex;
     protected String nextQuestionSelected;
     protected String httpSessionID;
+    
+    public IMcService mcService;
     	
     public void resetCa(ActionMapping mapping, HttpServletRequest request) {
  	   checkedCa = new String[0];
@@ -404,5 +407,18 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setSequentialCheckedCa(String[] sequentialCheckedCa) {
         this.sequentialCheckedCa = sequentialCheckedCa;
+    }
+    
+    /**
+     * @return Returns the mcService.
+     */
+    public IMcService getMcService() {
+        return mcService;
+    }
+    /**
+     * @param mcService The mcService to set.
+     */
+    public void setMcService(IMcService mcService) {
+        this.mcService = mcService;
     }
 }

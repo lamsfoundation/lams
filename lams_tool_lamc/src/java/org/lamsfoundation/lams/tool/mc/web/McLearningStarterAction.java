@@ -202,6 +202,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("retrieving mcService from proxy: " + mcService);
 
 		McLearningForm mcLearningForm = (McLearningForm) form;
+		mcLearningForm.setMcService(mcService);
     	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
 		mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
 
@@ -324,6 +325,14 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
 			mcLearningForm.setLearnerProgressUserId(userId);
 			
+			McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=(McGeneralLearnerFlowDTO)request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO);
+			mcGeneralLearnerFlowDTO.setLearnerProgress(new Boolean(true).toString());
+			mcGeneralLearnerFlowDTO.setLearnerProgressUserId(userId);			
+			request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+			logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
+			
+			
+			
 			McLearningAction mcLearningAction= new McLearningAction();
 			/* pay attention that this userId is the learner's userId passed by the request parameter.
 			 * It is differerent than USER_ID kept in the session of the current system user*/
@@ -339,13 +348,15 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    
 		    /* check whether the user's session really referrs to the session id passed to the url*/
 		    Long sessionUid=mcQueUsr.getMcSessionId();
-		    logger.debug("sessionUid" + sessionUid);
+		    logger.debug("sessionUid: " + sessionUid);
 		    McSession mcSessionLocal=mcService.getMcSessionByUID(sessionUid);
 		    logger.debug("checking mcSessionLocal" + mcSessionLocal);
-		    Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-		    logger.debug("toolSessionId: " + toolSessionId + " versus" + mcSessionLocal);
+
+		    toolSessionID=(String)mcLearningForm.getToolSessionID();
+		    logger.debug("toolSessionID: " + toolSessionID + " versus" + mcSessionLocal);
+		    
 		    if  ((mcSessionLocal ==  null) ||
-				 (mcSessionLocal.getMcSessionId().longValue() != toolSessionId.longValue()))
+				 (mcSessionLocal.getMcSessionId().longValue() != new Long(toolSessionID).longValue()))
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
 		    	persistError(request, "error.learner.sessionId.inconsistent");
@@ -534,7 +545,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			{
 	    		toolSessionId=new Long(strToolSessionId).longValue();
 		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	//mcLearningForm.setToolSessionId(new Long(toolSessionId).toString());
 			}
 	    	catch(NumberFormatException e)
 			{

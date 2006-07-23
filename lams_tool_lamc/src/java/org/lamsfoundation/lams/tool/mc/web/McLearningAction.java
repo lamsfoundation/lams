@@ -257,7 +257,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McUtils.cleanUpUserExceptions(request);
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	 	
+    		 	
 	 	LearningUtil.saveFormRequestData(request, mcLearningForm);
 	 	
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -579,7 +579,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("dispatching continueOptionsCombined...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	    logger.debug("retrieving mcService from proxy: " + mcService);
+		logger.debug("retrieving mcService: " + mcService);
 	    
 	    String questionListingMode=mcLearningForm.getQuestionListingMode();
 	    logger.debug("questionListingMode: " + questionListingMode);
@@ -844,7 +844,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching getNextOptions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		logger.debug("mcService: " + mcService);
 	 	
  	    String questionIndex=mcLearningForm.getQuestionIndex();
  	    logger.debug("questionIndex: " + questionIndex);
@@ -1036,12 +1037,22 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-        
-        
-    	McUtils.cleanUpUserExceptions(request);
-		logger.debug("dispatching viewAnswers...");
+		logger.debug("dispatching viewAnswers..." + form);
 		McLearningForm mcLearningForm = (McLearningForm) form;
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		logger.debug("mcLearningForm :" + mcLearningForm);
+		
+		logger.debug("getServlet() :" + getServlet());
+		IMcService mcService=null;
+		if (getServlet() != null)
+		    mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		else
+		{
+		    logger.debug("getting service from the form :");
+		    mcService=mcLearningForm.getMcService();
+		}
+		logger.debug("mcService :" + mcService);
+		
+		LearningUtil.saveFormRequestData(request, mcLearningForm);
 		
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	 	logger.debug("toolSessionID: " + toolSessionID);
@@ -1258,7 +1269,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewSummary...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());		
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		logger.debug("mcService: " + mcService);
 		
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	 	logger.debug("toolSessionID: " + toolSessionID);
