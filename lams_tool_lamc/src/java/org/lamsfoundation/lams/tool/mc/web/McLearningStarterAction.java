@@ -325,14 +325,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
 			mcLearningForm.setLearnerProgressUserId(userId);
 			
-			McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=(McGeneralLearnerFlowDTO)request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO);
-			mcGeneralLearnerFlowDTO.setLearnerProgress(new Boolean(true).toString());
-			mcGeneralLearnerFlowDTO.setLearnerProgressUserId(userId);			
-			request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-			logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
-			
-			
-			
 			McLearningAction mcLearningAction= new McLearningAction();
 			/* pay attention that this userId is the learner's userId passed by the request parameter.
 			 * It is differerent than USER_ID kept in the session of the current system user*/

@@ -1067,6 +1067,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	logger.debug("mcContent: " + mcContent);
     	
     	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+    	mcGeneralLearnerFlowDTO.setLearnerProgress(new Boolean(true).toString());
+		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 
     	int intTotalQuestionCount=mcContent.getMcQueContents().size();
     	String totalQuestionCount= new Integer(intTotalQuestionCount).toString();
