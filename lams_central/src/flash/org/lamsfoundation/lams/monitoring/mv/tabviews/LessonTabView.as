@@ -393,10 +393,10 @@ public function update (o:Observable,infoObj:Object):Void{
 				showStartFields(true, false);
 				editClass_btn.enabled = true;
 				break;
-			case Sequence.STARTED_STATE_ID :
-				showStartFields(false, false);
-				editClass_btn.enabled = true;
-				break;
+			//case Sequence.STARTED_STATE_ID :
+				//showStartFields(false, false);
+				//editClass_btn.enabled = true;
+				//break;
 			default :
 				showStartFields(false, false);
 				editClass_btn.enabled = false;
