@@ -103,7 +103,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		clickTarget_mc.onReleaseOutside = Proxy.create(this,localOnReleaseOutside);
 
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
-		_locked = true;
+		_locked = false;
 		
 		showStatus(false);
 		
