@@ -57,7 +57,7 @@ if (exception != null) {
 <script type="text/javascript">
 
 if(window.top != null)
-	document.getElementById("errorForm").target = "_top";
+	document.getElementById("errorForm").target = "_parent";
 document.getElementById("errorForm").submit();
 
 </script>
