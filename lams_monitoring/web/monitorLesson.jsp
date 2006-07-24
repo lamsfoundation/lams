@@ -38,7 +38,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	<!--
-	
 		function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
 	// refocus code commented out as we want to replace contents due to tool's session issues. Code will be 
 	// wanted again the future.
@@ -48,7 +47,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	//}else{
 		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
 	//}
-}
+		}
+		
+	//-->
 	</script>
 </head>
 
