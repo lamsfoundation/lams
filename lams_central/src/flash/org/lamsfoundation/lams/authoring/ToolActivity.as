@@ -146,7 +146,8 @@ class ToolActivity extends Activity{
 			_supportsContribute = dto.supportsContribute;
 			_supportsDefineLater = dto.supportsDefineLater;
 			_supportsModeration = dto.supportsRunOffline
-
+			activityToolContentID = _toolContentID;
+			trace("Tool "+_toolDisplayName +" has ToolContent ID: "+_toolContentID)
 			//maybe return isValid();
 	}
 	
