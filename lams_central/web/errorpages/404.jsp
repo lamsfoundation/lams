@@ -11,7 +11,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf8">
-		<title><fmt:message key="403.title" /></title>
+		<title><fmt:message key="404.title" /></title>
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
 	</head>
@@ -21,7 +21,7 @@
 			<!--main box 'page'-->
 
 			<h1 class="no-tabs-below">
-				<fmt:message key="403.title" />
+				<fmt:message key="404.title" />
 			</h1>
 			<div id="header-no-tabs-learner"></div>
 			<!--closes header-->
@@ -29,7 +29,7 @@
 			<div id="content-learner">
 				<%-- Error Messages --%>
 				<p class="warning">
-					<fmt:message key="403.message" />
+					<fmt:message key="404.message" />
 				</p>
 				<!--
 				<div class="right-buttons">
