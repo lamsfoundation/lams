@@ -53,6 +53,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
 	private var _config:Config;
+	private var _newToolContentID:Number;
 	private var _undoStack:Array;	
 	private var _redoStack:Array;	
 	
@@ -542,23 +543,46 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @param   o Item to be copied
 	 * @return  
 	 */
-	public function setPastedItem(o:Object):Object{
+	public function setPastedItem(o:Object){
 		if (o.data instanceof CanvasActivity){
 			Debugger.log('instance is CA',Debugger.GEN,'setPastedItem','Canvas');
-			return pasteItem(o.data.activity, o);
+			var callback:Function = Proxy.create(this,setNewContentID, o);
+			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.data.activity.toolContentID+'&userID='+_root.userID,callback, false);
+		
 		} else if(o.data instanceof ToolActivity){
 			Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
-			return pasteItem(o.data, o);
+			var callback:Function = Proxy.create(this,setNewContentID, o);
+			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID,callback, false);
+			
 		} else{
 			Debugger.log('Cant paste this item!',Debugger.GEN,'setPastedItem','Canvas');
 		}
 	}
 	
+	private function setNewContentID(r, o):Void{
+		if(r instanceof LFError){
+			r.showMessageConfirm();
+		}else{
+			trace("new Content ID is: "+r)
+			_newToolContentID = r
+			trace("new _newToolContentID is: "+_newToolContentID)
+			if (o.data instanceof CanvasActivity){
+				return pasteItem(o.data.activity, o, _newToolContentID);
+			}else if(o.data instanceof ToolActivity){
+				return pasteItem(o.data, o, _newToolContentID, _newToolContentID);
+			}
+		}
+		
+	}
 	
-	private function pasteItem(toolToCopy:ToolActivity, o:Object):Object{
+	private function pasteItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number):Object{
 		//clone the activity
+		trace("New Content Id passed is: "+newToolContentID )
 		var newToolActivity:ToolActivity = toolToCopy.clone();
 		newToolActivity.activityUIID = _ddm.newUIID();
+		if (newToolContentID != null || newToolContentID != undefined){
+			newToolActivity.toolContentID = newToolContentID;
+		}
 			
 		if(o.type == Application.CUT_TYPE){ 
 			Application.getInstance().setClipboardData(newToolActivity, Application.COPY_TYPE);
