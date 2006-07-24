@@ -559,7 +559,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 	}
 	
-	private function setNewContentID(r, o):Void{
+	private function setNewContentID(r, o){
 		if(r instanceof LFError){
 			r.showMessageConfirm();
 		}else{
@@ -583,6 +583,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if (newToolContentID != null || newToolContentID != undefined){
 			newToolActivity.toolContentID = newToolContentID;
 		}
+		newToolActivity.xCoord = o.data.activity.xCoord + 10
+		newToolActivity.yCoord = o.data.activity.yCoord + 10
+		canvasModel.selectedItem = newToolActivity;
 			
 		if(o.type == Application.CUT_TYPE){ 
 			Application.getInstance().setClipboardData(newToolActivity, Application.COPY_TYPE);
