@@ -141,7 +141,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	private var _yCoord:Number;
 	private var _libraryActivityUIImage:String;	
 	private var _applyGrouping:Boolean;
-
+	private var _activityToolContentID:Number;
 
 	private var _runOffline:Boolean;
 	/*
@@ -392,6 +392,15 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function get activityTypeID ():Number {
 		return _activityTypeID;
 	}
+	
+	public function set activityToolContentID (newToolContentID:Number) {
+		_activityToolContentID = newToolContentID;
+	}
+	
+	public function get activityToolContentID ():Number {
+		return _activityToolContentID;
+	}
+	
 
 	public function set activityID(a:Number):Void{
 		_activityID = a;
