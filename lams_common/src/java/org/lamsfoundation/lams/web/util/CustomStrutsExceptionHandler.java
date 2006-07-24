@@ -23,14 +23,20 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.StringBufferInputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ExceptionHandler;
 import org.apache.struts.config.ExceptionConfig;
 
@@ -61,11 +67,8 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler
                                  HttpServletResponse response) 
     {
         // write the exception information to the log file
-        logger.fatal("fatal System exception: [" + ex.getMessage() + "] ", ex);
+        logger.fatal("fatal System exception: [" + ex + "] :" + ex.getMessage(), ex);
         ActionForward forward = null;
-
-        String property = null;
-
         /*
          * Get the path for the forward either from the exception element or
          * from the input attribute.
@@ -83,10 +86,14 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler
         // Construct the forward object
         forward = new ActionForward(path);
 
-        String errorMessage = ex.getMessage().equals("null")?UNKNOWN_EXCEPTION:ex.getMessage();
-        ActionError error = new ActionError( "error.system.survey", errorMessage );
-        
-        storeException(request, property, error, forward, ae.getScope( ));
+        String errorMessage = ex.getMessage() == null ?UNKNOWN_EXCEPTION:ex.getMessage();
+        request.setAttribute("errorMessage",errorMessage );
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        PrintStream os =  new PrintStream(bos);
+        ex.printStackTrace(os);
+        request.setAttribute("errorStack", new String(bos.toByteArray()));
+        request.setAttribute("errorName", ex.getClass().getName());
+
         // process the exception as normal
         return forward;
     }
