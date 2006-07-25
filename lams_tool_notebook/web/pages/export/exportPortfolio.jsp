@@ -39,11 +39,6 @@
 						<h2>
 							${session.sessionName}
 						</h2>
-						<p>
-						<c:forEach var="message" items="${session.messageDTOs}">
-								${message.from} : ${message.body}<BR>
-						</c:forEach>
-						</p>
 					</div>
 				</c:forEach>
 		

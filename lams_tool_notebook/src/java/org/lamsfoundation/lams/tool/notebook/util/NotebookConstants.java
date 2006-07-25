@@ -24,10 +24,6 @@
 
 package org.lamsfoundation.lams.tool.notebook.util;
 
-import java.util.LinkedList;
-
-import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
-
 public interface NotebookConstants {
 	public static final String TOOL_SIGNATURE = "lantbk11";
 	

@@ -82,12 +82,14 @@ public class MonitoringAction extends LamsDispatchAction {
 		}
 		
 		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
-		// TODO check for null
+		
+		if (notebook == null) {
+			// TODO need to define error page.
+		}
 		
 		NotebookDTO notebookDT0 = new NotebookDTO(notebook);
-				
-		request.setAttribute("monitoringDTO", notebookDT0);
 		
+		request.setAttribute("notebookDTO", notebookDT0);
 		return mapping.findForward("success");
 	}
 }

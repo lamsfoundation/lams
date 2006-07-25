@@ -56,6 +56,8 @@ public class NotebookUser implements java.io.Serializable {
 	private NotebookSession notebookSession;
 	
 	private Boolean finishedActivity;
+	
+	private Long entryUID;
 
 	// Constructors
 
@@ -164,6 +166,17 @@ public class NotebookUser implements java.io.Serializable {
 		this.notebookSession = notebookSession;
 	}
 
+	/**
+	 * @hibernate.property column="entry_uid"
+	 */
+	public Long getEntryUID() {
+		return entryUID;
+	}
+
+	public void setEntryUID(Long entryUID) {
+		this.entryUID = entryUID;
+	}
+	
 	/**
 	 * toString
 	 * 

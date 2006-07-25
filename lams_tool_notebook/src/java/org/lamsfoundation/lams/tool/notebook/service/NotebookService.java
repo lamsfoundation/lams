@@ -44,11 +44,12 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
-import org.lamsfoundation.lams.journal.service.IJournalService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -101,8 +102,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	private IAuditService auditService = null;
 
 	private IExportToolContentService exportContentService;
-	
-	private IJournalService journalService;
+
+	private ICoreNotebookService coreNotebookService;
 
 	public NotebookService() {
 		super();
@@ -149,7 +150,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	public void removeToolSession(Long toolSessionId)
 			throws DataMissingException, ToolException {
 		notebookSessionDAO.deleteBySessionID(toolSessionId);
-		//TODO check if cascade worked
+		// TODO check if cascade worked
 	}
 
 	/* ************ Methods from ToolContentManager ************************* */
@@ -181,8 +182,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	public void setAsDefineLater(Long toolContentId)
 			throws DataMissingException, ToolException {
 		Notebook notebook = notebookDAO.getByContentId(toolContentId);
-		if(notebook == null){
-			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+		if (notebook == null) {
+			throw new ToolException("Could not find tool with toolContentID: "
+					+ toolContentId);
 		}
 		notebook.setDefineLater(true);
 		notebookDAO.saveOrUpdate(notebook);
@@ -191,8 +193,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	public void setAsRunOffline(Long toolContentId)
 			throws DataMissingException, ToolException {
 		Notebook notebook = notebookDAO.getByContentId(toolContentId);
-		if(notebook == null){
-			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+		if (notebook == null) {
+			throw new ToolException("Could not find tool with toolContentID: "
+					+ toolContentId);
 		}
 		notebook.setRunOffline(true);
 		notebookDAO.saveOrUpdate(notebook);
@@ -222,7 +225,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.
-		toolContentObj = Notebook.newInstance(toolContentObj, toolContentId, null);
+		toolContentObj = Notebook.newInstance(toolContentObj, toolContentId,
+				null);
 		toolContentObj.setToolContentHandler(null);
 		toolContentObj.setNotebookSessions(null);
 		Set<NotebookAttachment> atts = toolContentObj.getNotebookAttachments();
@@ -230,9 +234,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 			att.setNotebook(null);
 		}
 		try {
-			exportContentService
-					.registerFileClassForExport(NotebookAttachment.class.getName(),
-							"fileUuid", "fileVersionId");
+			exportContentService.registerFileClassForExport(
+					NotebookAttachment.class.getName(), "fileUuid",
+					"fileVersionId");
 			exportContentService.exportToolContent(toolContentId,
 					toolContentObj, notebookToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
@@ -272,7 +276,21 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
-	/* ********** INotebookService Methods ************************************** */
+	/* ********** INotebookService Methods ********************************* */
+
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry) {
+		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+	}
+
+	public NotebookEntry getEntry(Long uid) {
+		return coreNotebookService.getEntry(uid);
+	}
+
+	public void updateEntry(Long uid, String entry) {
+		coreNotebookService.updateEntry(uid, "", entry);
+	}
+	
 	public Long getDefaultContentIdBySignature(String toolSignature) {
 		Long toolContentId = null;
 		toolContentId = new Long(toolService
@@ -315,7 +333,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	}
 
 	public Notebook getNotebookByContentId(Long toolContentID) {
-		Notebook notebook = (Notebook) notebookDAO.getByContentId(toolContentID);
+		Notebook notebook = (Notebook) notebookDAO
+				.getByContentId(toolContentID);
 		if (notebook == null) {
 			logger.debug("Could not find the content with toolContentID:"
 					+ toolContentID);
@@ -324,21 +343,25 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	}
 
 	public NotebookSession getSessionBySessionId(Long toolSessionId) {
-		NotebookSession notebookSession = notebookSessionDAO.getBySessionId(toolSessionId);
+		NotebookSession notebookSession = notebookSessionDAO
+				.getBySessionId(toolSessionId);
 		if (notebookSession == null) {
-			logger.debug("Could not find the notebook session with toolSessionID:"
-					+ toolSessionId);
+			logger
+					.debug("Could not find the notebook session with toolSessionID:"
+							+ toolSessionId);
 		}
 		return notebookSession;
 	}
 
-	public NotebookUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
+	public NotebookUser getUserByUserIdAndSessionId(Long userId,
+			Long toolSessionId) {
 		return notebookUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
 	}
 
 	public NotebookUser getUserByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
-		return notebookUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
+		return notebookUserDAO.getByLoginNameAndSessionId(loginName,
+				toolSessionId);
 	}
 
 	public NotebookUser getUserByUID(Long uid) {
@@ -398,7 +421,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		return notebookUser;
 	}
 
-
 	public IAuditService getAuditService() {
 		return auditService;
 	}
@@ -407,8 +429,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		this.auditService = auditService;
 	}
 
-	
-	
 	private NodeKey processFile(FormFile file, String type) {
 		NodeKey node = null;
 		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
@@ -462,7 +482,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 			throw new NotebookException("Access Denied to repository."
 					+ ae.getMessage());
 		} catch (WorkspaceNotFoundException we) {
-			throw new NotebookException("Workspace not found." + we.getMessage());
+			throw new NotebookException("Workspace not found."
+					+ we.getMessage());
 		} catch (LoginException e) {
 			throw new NotebookException("Login failed." + e.getMessage());
 		}
@@ -536,11 +557,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		this.exportContentService = exportContentService;
 	}
 
-	public IJournalService getJournalService() {
-		return journalService;
+	public ICoreNotebookService getCoreNotebookService() {
+		return coreNotebookService;
 	}
 
-	public void setJournalService(IJournalService journalService) {
-		this.journalService = journalService;
+	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+		this.coreNotebookService = coreNotebookService;
 	}
 }

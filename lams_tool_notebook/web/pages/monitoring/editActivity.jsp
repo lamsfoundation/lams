@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="dto" value="${requestScope.monitoringDTO}" />
+<c:set var="dto" value="${notebookDTO}" />
 
 <table cellspacing="0">
 	<tbody>

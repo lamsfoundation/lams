@@ -14,16 +14,16 @@
   <form-beans>
 
     <form-bean
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.notebook.web.forms.MonitoringForm"
+    />
+    <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm"
     />
     <form-bean
       name="learningForm"
       type="org.lamsfoundation.lams.tool.notebook.web.forms.LearningForm"
-    />
-    <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.notebook.web.forms.MonitoringForm"
     />
 
   </form-beans>
@@ -51,7 +51,7 @@
       validate="true"
     >
       <forward
-        name="notebook_client"
+        name="notebook"
         path="tiles:/learning/main"
         redirect="false"
       />
@@ -63,26 +63,6 @@
       <forward
         name="defineLater"
         path="tiles:/learning/defineLater"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringAction"
-      name="authoringForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="tiles:/authoring/main"
-        redirect="false"
-      />
-      <forward
-        name="message_page"
-        path="tiles:/generic/message"
         redirect="false"
       />
     </action>
@@ -117,6 +97,26 @@
       unknown="false"
       validate="false"
     >
+    </action>
+    <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringAction"
+      name="authoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="tiles:/authoring/main"
+        redirect="false"
+      />
+      <forward
+        name="message_page"
+        path="tiles:/generic/message"
+        redirect="false"
+      />
     </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->

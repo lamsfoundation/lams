@@ -24,7 +24,10 @@
 
 package org.lamsfoundation.lams.tool.notebook.service;
 
+import java.util.List;
+
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
@@ -134,5 +137,32 @@ public interface INotebookService {
 	 */
 	public NotebookUser createNotebookUser(UserDTO user,
 			NotebookSession notebookSession);
-
+	
+	/**
+	 * 
+	 * @param id
+	 * @param idType
+	 * @param signature
+	 * @param userID
+	 * @param title
+	 * @param entry
+	 * @return
+	 */
+	Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry);
+	
+	/**
+	 * 
+	 * @param uid
+	 * @return
+	 */
+	NotebookEntry getEntry(Long uid);
+	
+	/**
+	 * 
+	 * @param uid
+	 * @param title
+	 * @param entry
+	 */
+	void updateEntry(Long uid, String entry);
 }

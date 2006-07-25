@@ -34,11 +34,33 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
+import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 
 public class NotebookDTO {
 
 	private static Logger logger = Logger.getLogger(NotebookDTO.class);
 
+	public Long toolContentId;
+
+	public String title;
+
+	public String instructions;
+
+	public String onlineInstructions;
+
+	public String offlineInstructions;
+	
+	public boolean defineLater;
+	
+	public boolean contentInUse;
+	
+	public Set<NotebookAttachmentDTO> onlineInstructionsFiles;
+
+	public Set<NotebookAttachmentDTO> offlineInstructionsFiles;
+
+	public Set<NotebookSessionDTO> sessionDTOs;
+	
+	/* Constructors */
 	public NotebookDTO(){
 		
 	}
@@ -71,32 +93,20 @@ public class NotebookDTO {
 		}
 		
 		sessionDTOs = new HashSet<NotebookSessionDTO>();
+		
+		for (Iterator iter = notebook.getNotebookSessions().iterator(); iter.hasNext();) {
+			NotebookSession session = (NotebookSession) iter.next();
+			NotebookSessionDTO sessionDTO = new NotebookSessionDTO(session);
+			
+			sessionDTOs.add(sessionDTO);
+		}
 	}
 
-	public Long toolContentId;
-
-	public String title;
-
-	public String instructions;
-
-	public String onlineInstructions;
-
-	public String offlineInstructions;
-	
-	public boolean defineLater;
-	
-	public boolean contentInUse;
-	
-	public Set<NotebookAttachmentDTO> onlineInstructionsFiles;
-
-	public Set<NotebookAttachmentDTO> offlineInstructionsFiles;
-
-	public Set<NotebookSessionDTO> sessionDTOs;
-
+	/* Getters / Setters */
 	public Set<NotebookSessionDTO> getSessionDTOs() {
 		return sessionDTOs;
 	}
-
+	
 	public void setSessionDTOs(Set<NotebookSessionDTO> sessionDTOs) {
 		this.sessionDTOs = sessionDTOs;
 	}

@@ -28,12 +28,12 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -56,8 +57,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
- * @struts.action-forward name="notebook_client" path="tiles:/learning/main"
+ * @struts.action path="/learning" parameter="dispatch" scope="request"
+ *                name="learningForm"
+ * @struts.action-forward name="notebook" path="tiles:/learning/main"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  */
@@ -72,20 +74,21 @@ public class LearningAction extends LamsDispatchAction {
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+
+		LearningForm learningForm = (LearningForm) form;
+
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
 		// TODO need to catch exceptions and handle errors.
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
 				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
-		
-		request.setAttribute("mode", mode.toString());
-		
+
 		Long toolSessionID = WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 
 		// set up notebookService
 		if (notebookService == null) {
-			notebookService = NotebookServiceProxy.getNotebookService(this.getServlet()
-					.getServletContext());
+			notebookService = NotebookServiceProxy.getNotebookService(this
+					.getServlet().getServletContext());
 		}
 
 		// Retrieve the session and content.
@@ -99,37 +102,48 @@ public class LearningAction extends LamsDispatchAction {
 
 		Notebook notebook = notebookSession.getNotebook();
 
-		// Retrieve the current user
-		NotebookUser notebookUser = getCurrentUser(toolSessionID);
-		
 		// check defineLater
 		if (notebook.getDefineLater()) {
 			return mapping.findForward("defineLater");
 		}
 
-		// check runOffline
-		if (notebook.getRunOffline()) {
-			request.setAttribute("mode", mode.toString());
-			request.setAttribute("USER_UID", notebookUser.getUid());
-			request.setAttribute("SESSION_ID", toolSessionID);
-			
-			
-			return mapping.findForward("runOffline");
-		}
-		
+		// set mode, toolSessionID and NotebookDTO
+		request.setAttribute("mode", mode.toString());
+		learningForm.setToolSessionID(toolSessionID);
+
 		NotebookDTO notebookDTO = new NotebookDTO();
 		notebookDTO.title = notebook.getTitle();
 		notebookDTO.instructions = notebook.getInstructions();
-		
 		request.setAttribute("notebookDTO", notebookDTO);
-		
-		// Ensure that the content is use flag is set.
+
+		// Set the content in use flag.
 		if (!notebook.getContentInUse()) {
 			notebook.setContentInUse(new Boolean(true));
 			notebookService.saveOrUpdateNotebook(notebook);
 		}
+
+		// check runOffline
+		if (notebook.getRunOffline()) {
+			return mapping.findForward("runOffline");
+		}
+
+		NotebookUser notebookUser = getCurrentUser(toolSessionID);
 		
-		return mapping.findForward("notebook_client");
+		// get any existing notebook entry
+		NotebookEntry nbEntry = notebookService.getEntry(notebookUser
+				.getEntryUID());
+		if (nbEntry != null) {
+			learningForm.setEntryText(nbEntry.getEntry());
+		}
+		
+		// set readOnly flag.
+		if (notebook.getLockOnFinished() && notebookUser.getFinishedActivity()) {
+			request.setAttribute("contentEditable", false);
+		} else {
+			request.setAttribute("contentEditable", true);
+		}
+
+		return mapping.findForward("notebook");
 	}
 
 	private NotebookUser getCurrentUser(Long toolSessionId) {
@@ -137,13 +151,15 @@ public class LearningAction extends LamsDispatchAction {
 				AttributeNames.USER);
 
 		// attempt to retrieve user using userId and toolSessionId
-		NotebookUser notebookUser = notebookService.getUserByUserIdAndSessionId(new Long(
-				user.getUserID().intValue()), toolSessionId);
+		NotebookUser notebookUser = notebookService
+				.getUserByUserIdAndSessionId(new Long(user.getUserID()
+						.intValue()), toolSessionId);
 
 		if (notebookUser == null) {
 			NotebookSession notebookSession = notebookService
 					.getSessionBySessionId(toolSessionId);
-			notebookUser = notebookService.createNotebookUser(user, notebookSession);
+			notebookUser = notebookService.createNotebookUser(user,
+					notebookSession);
 		}
 
 		return notebookUser;
@@ -152,33 +168,42 @@ public class LearningAction extends LamsDispatchAction {
 	public ActionForward finishActivity(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		Long notebookUserUID = WebUtil.readLongParam(request, "notebookUserUID");
 		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
-		// set the finished flag
-		NotebookUser notebookUser = notebookService.getUserByUID(notebookUserUID);
+		NotebookUser notebookUser = getCurrentUser(toolSessionID);
+
 		if (notebookUser != null) {
+
+			LearningForm learningForm = (LearningForm) form;
+
+			// TODO fix idType to use real value not 999
+
+			if (notebookUser.getEntryUID() == null) {
+				notebookUser.setEntryUID(notebookService.createNotebookEntry(
+						toolSessionID, 999, NotebookConstants.TOOL_SIGNATURE,
+						notebookUser.getUserId().intValue(), learningForm
+								.getEntryText()));
+			} else {
+				// update existing entry.
+				notebookService.updateEntry(notebookUser.getEntryUID(),
+						learningForm.getEntryText());
+			}
+
 			notebookUser.setFinishedActivity(true);
 			notebookService.saveOrUpdateNotebookUser(notebookUser);
 		} else {
-			log.error("finishActivity(): couldn't find NotebookUser with uid: "
-					+ notebookUserUID);
+			log.error("finishActivity(): couldn't find NotebookUser with id: "
+					+ notebookUser.getUserId() + "and toolSessionID: "
+					+ toolSessionID);
 		}
 
 		ToolSessionManager sessionMgrService = NotebookServiceProxy
 				.getNotebookSessionManager(getServlet().getServletContext());
 
-		// get back login user DTO
-		// get session from shared session.
-
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Long userID = new Long(user.getUserID().longValue());
-
 		String nextActivityUrl;
 		try {
 			nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID,
-					userID);
+					notebookUser.getUserId());
 			response.sendRedirect(nextActivityUrl);
 		} catch (DataMissingException e) {
 			throw new NotebookException(e);

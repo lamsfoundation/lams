@@ -41,9 +41,10 @@ public class LearningForm extends ActionForm {
 	String instructions;
 	
 	String dispatch;
-	Long notebookUserUID;
 	Long toolSessionID;
 	String mode;
+	
+	String entryText;
 
 	public String getMode() {
 		return mode;
@@ -51,14 +52,6 @@ public class LearningForm extends ActionForm {
 
 	public void setMode(String mode) {
 		this.mode = mode;
-	}
-
-	public Long getNotebookUserUID() {
-		return notebookUserUID;
-	}
-
-	public void setNotebookUserUID(Long notebookUserUID) {
-		this.notebookUserUID = notebookUserUID;
 	}
 
 	public String getDispatch() {
@@ -91,5 +84,13 @@ public class LearningForm extends ActionForm {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getEntryText() {
+		return entryText;
+	}
+
+	public void setEntryText(String entryText) {
+		this.entryText = entryText;
 	}
 }

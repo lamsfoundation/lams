@@ -25,11 +25,13 @@
 
 package org.lamsfoundation.lams.tool.notebook.dto;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
+import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 
 public class NotebookSessionDTO implements Comparable {
 	
@@ -44,15 +46,17 @@ public class NotebookSessionDTO implements Comparable {
 	public NotebookSessionDTO(NotebookSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
-		
+				
 		userDTOs = new TreeSet<NotebookUserDTO>();
-	}
-	
-	public NotebookSessionDTO (NotebookSession session, List messages) {
-		this.sessionID = session.getSessionId();
-		this.sessionName = session.getSessionName();
 		
-		userDTOs = new TreeSet<NotebookUserDTO>();
+		for (Iterator iterator = session.getNotebookUsers().iterator(); iterator.hasNext();) {
+			NotebookUser user = (NotebookUser) iterator.next();
+			NotebookUserDTO userDTO = new NotebookUserDTO(user);
+			
+			userDTOs.add(userDTO);
+		}
+		
+		numberOfLearners = userDTOs.size();
 	}
 	
 	public NotebookSessionDTO() {
