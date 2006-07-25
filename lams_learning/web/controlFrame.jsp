@@ -60,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 	%>
 
-	<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/></c:set>
+	<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if></c:set>
 	<c:set var="learnerurl_js">lams_learner<c:out value="${learnerurl_params}"/></c:set>
 	<c:set var="learnerurl_nojs">lams_learner.swf<c:out value="${learnerurl_params}"/></c:set>
 	
