@@ -404,6 +404,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(7), enable);
 	}
 	
+	public function enableSave(enable:Boolean){
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(4), enable);
+	}
+	
 	public function get fileMenu():Menu {
 		return file_menu;
 	}
