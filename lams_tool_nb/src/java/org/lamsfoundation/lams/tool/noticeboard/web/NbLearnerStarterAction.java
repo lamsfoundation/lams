@@ -69,10 +69,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @struts:action path="/starter/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
  *               validate="false" parameter="mode"
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
- *                          path=".error"
- *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * @struts:action-forward name="displayMessage" path=".message"
  * @struts:action-forward name="defineLater" path=".defineLater"

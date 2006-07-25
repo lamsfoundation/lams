@@ -61,14 +61,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * @struts:action path="/monitoring" name="NbMonitoringForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
  *                input=".monitoringContent" validate="false" parameter="method"
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
- *                          path=".error"
- *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                          type="java.lang.NullPointerException"
- *                          path=".error"
- *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="monitorPage" path="/monitoring/monitoring.jsp"
  * ----------------XDoclet Tags--------------------
  */

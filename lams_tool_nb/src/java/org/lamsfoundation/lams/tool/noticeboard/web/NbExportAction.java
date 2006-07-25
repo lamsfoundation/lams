@@ -56,10 +56,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * @struts:action path="/exportPortfolio" name="NbExportForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportAction"
  *                validate="false" parameter="mode"
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
- *                          path=".error"
- *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="exportPortfolio" path="/exportPortfolio.jsp"
  * ----------------XDoclet Tags--------------------
  */

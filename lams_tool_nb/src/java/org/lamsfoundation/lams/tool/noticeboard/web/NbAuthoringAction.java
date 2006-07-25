@@ -81,15 +81,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @struts:action path="/authoring" name="NbAuthoringForm" scope="request"
  * 				  type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
  *                parameter="method" validate="true" input="/author_page.jsp"
- * 
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
- *                          path=".error"
- *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                          type="java.lang.NullPointerException"
- *                          path=".error"
- *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  *
  * @struts:action-forward name="authoringContent" path="/authoring/authoring.jsp"
  * @struts:action-forward name="displayMessage" path=".message"

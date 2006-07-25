@@ -73,10 +73,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
  * 
  * @struts:action path="/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
  *                input=".learnerContent" validate="false" parameter="method"
- * @struts.action-exception key="error.exception.NbApplication" scope="request"
- *                type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
- *                path=".error"
- *                handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * ----------------XDoclet Tags--------------------
  */
