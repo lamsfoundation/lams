@@ -54,6 +54,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var _dictionary:Dictionary;
 	private var _config:Config;
 	private var _newToolContentID:Number;
+	private var _newChildToolContentID:Number;
 	private var _undoStack:Array;	
 	private var _redoStack:Array;	
 	
@@ -376,19 +377,27 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				Debugger.log('parallel activity given new UIID of:'+actToAdd.activityUIID ,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 				 //now get this acts children and add them to the design (WHINEY VOICE:"will somebody pleeeease think of the children.....")
 				for(var i=0;i<ta.childActivities.length;i++){
-					//TODO: Find out if other types of activity can be held by complex acts
-					var child:Activity = Activity(ta.childActivities[i].clone());
+					
+					trace("child's old toolContentID: "+ta.childActivities[i].toolContentID)
+					
+					//Note: The next few line os code is now execute in the setNewChildContentID method
+					//Find out if other types of activity can be held by complex acts 
+					
+					var child:Activity = ToolActivity(ta.childActivities[i].clone());
 					child.activityUIID = _ddm.newUIID();
 					//tell it who's the daddy (set its parent UIID)
+					//child.activityToolContentID = _newToolContentID;
 					child.parentUIID = actToAdd.activityUIID;
 					Debugger.log('child.parentUIID:'+child.parentUIID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 					child.learningDesignID = _ddm.learningDesignID;
 					//does not need mouse co-ords as in in container act.
 					
 					_ddm.addActivity(child);
-					
-				}
-				 
+					var callback:Function = Proxy.create(this,setNewChildContentID, child);
+					var passChildToolID = ta.childActivities[i].toolID;
+					trace("Child: "+ta.childActivities[i].toolDisplayName+" has Tool Content ID: "+passChildToolID)
+			Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+passChildToolID,callback, false);
+				}				 
 			break;
 			
 			default:
@@ -414,6 +423,18 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
 	}
 	
+	private function setNewChildContentID(r, ta:ToolActivity){
+		if(r instanceof LFError){
+			r.showMessageConfirm();
+		}else{
+			//var actToAdd:Activity;
+			trace("new Content ID is: "+r)
+			_newChildToolContentID = r
+			trace("new child ToolContentID is: "+_newChildToolContentID)
+			ta.toolContentID = _newChildToolContentID;
+		}
+		
+	}
 
 /*	public function addActivity(a:Activity){
 		
@@ -569,7 +590,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			if (o.data instanceof CanvasActivity){
 				return pasteItem(o.data.activity, o, _newToolContentID);
 			}else if(o.data instanceof ToolActivity){
-				return pasteItem(o.data, o, _newToolContentID, _newToolContentID);
+				return pasteItem(o.data, o, _newToolContentID);
 			}
 		}
 		
