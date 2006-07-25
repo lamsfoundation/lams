@@ -212,6 +212,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function saveDesign(){
 		if(_ddm.learningDesignID == undefined){
 			saveDesignToServerAs();
+		}else if(_ddm.readOnly){
+			saveDesignToServerAs();
 		}else{
 			saveDesignToServer();
 		}
@@ -292,6 +294,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 			_ddm.learningDesignID = r.learningDesignID;
 			_ddm.validDesign = r.valid;
+			_ddm.readOnly = r.readOnly;
+			_ddm.copyTypeID = r.copyTypeID;
 			_ddm.modified = false;
 			LFMenuBar.getInstance().enableExport(true);
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
@@ -312,6 +316,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			}
 			
 			checkValidDesign();
+			checkReadOnlyDesign();
 			
 		}
 	}
@@ -338,6 +343,16 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			Application.getInstance().getToolbar().setButtonState('preview',false);
 		}
 		
+	}
+	
+	public function checkReadOnlyDesign(){
+		if(_ddm.readOnly){
+			LFMenuBar.getInstance().enableSave(false);
+			canvasView.showReadOnly(true);
+		} else {
+			LFMenuBar.getInstance().enableSave(true);
+			canvasView.showReadOnly(false);
+		}
 	}
 	
 	/**
@@ -374,7 +389,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				actToAdd.activityUIID = _ddm.newUIID();
 				
 				
-				Debugger.log('parallel activity given new UIID of:'+actToAdd.activityUIID ,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
+			Debugger.log('parallel activity given new UIID of:'+actToAdd.activityUIID ,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 				 //now get this acts children and add them to the design (WHINEY VOICE:"will somebody pleeeease think of the children.....")
 				for(var i=0;i<ta.childActivities.length;i++){
 					
@@ -399,6 +414,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+passChildToolID,callback, false);
 				}				 
 			break;
+			
 			
 			default:
 				new LFError("NOT ready to handle activity this Activivty type","Canvas.setDroppedTemplateActivity",this,ObjectUtils.printObject(ta));
@@ -490,6 +506,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(clearCanvas(true)){
 			_ddm.setDesign(designData);
 			checkValidDesign();
+			checkReadOnlyDesign();
 			canvasModel.setDirty();
 			LFMenuBar.getInstance().enableExport(true);
 		}else{
@@ -515,6 +532,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
 			_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
 			checkValidDesign();
+			checkReadOnlyDesign();
 			canvasModel.setDirty();
 			
 			return true;
