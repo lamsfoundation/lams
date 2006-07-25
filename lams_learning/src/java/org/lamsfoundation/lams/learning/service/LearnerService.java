@@ -30,13 +30,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -50,6 +53,7 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -333,6 +337,24 @@ public class LearnerService implements ICoreLearnerService
     	return progress;
     }
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#moveToActivity(java.lang.Integer, java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.learningdesign.Activity)
+     */
+    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity){
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+    	
+    	if(fromActivity != null)
+    		progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED);
+    	
+    	if(toActivity != null) { 
+	    	progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED);
+	    	progress.setCurrentActivity(toActivity);
+	    	progress.setNextActivity(toActivity);
+    	}
+    	
+    	learnerProgressDAO.updateLearnerProgress(progress);
+    	return progress;
+    }
     
     /**
      * Calculates learner progress and returns the data required to be displayed 
@@ -556,6 +578,7 @@ public class LearnerService implements ICoreLearnerService
 		}
 		return lesson;
    }
+   
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------

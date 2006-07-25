@@ -44,6 +44,7 @@
 				<prop key="joinLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="calculateProgress">PROPAGATION_REQUIRED</prop>
 				<prop key="chooseActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="moveToActivity">PROPAGATION_REQUIRED</prop>
 				<prop key="completeToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="completeActivity">PROPAGATION_REQUIRED</prop>
 				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,9 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.monitoring.MonitoringConstants;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -445,6 +449,85 @@ public class LearnerAction extends LamsDispatchAction
        	return redirectToURL(mapping, response, url);
     }
 	
+    /**
+     * Forces a move to a destination Activity in the learning sequence.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward forceMove(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                                 ServletException {
+    	FlashMessage flashMessage = null;
+    	
+    	//initialize service object
+		ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+		//getting requested object according to coming parameters
+		Integer learnerId = LearningWebUtil.getUserId();
+		User learner = (User)LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(User.class,learnerId);
+
+		//get parameters
+    	Long fromActivityId = null;
+    	Long toActivityId = null;
+    	
+    	String fromActId = request.getParameter(AttributeNames.PARAM_CURRENT_ACTIVITY_ID);
+    	String toActId = request.getParameter(AttributeNames.PARAM_DEST_ACTIVITY_ID);
+    	if(fromActId != null)
+    		try{
+    			fromActivityId = new Long(Long.parseLong(fromActId));
+    		}catch(Exception e){
+    			fromActivityId = null;
+    		}
+    	
+    	if(toActId != null)
+        	try{
+        		toActivityId = new Long(Long.parseLong(toActId));
+        	}catch(Exception e){
+        		toActivityId = null;
+        	}
+    		
+    	//force complete
+    	try {
+        	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+            
+        	Activity fromActivity = null;
+        	Activity toActivity = null;
+        	
+        	if(fromActivityId != null)
+        		fromActivity = learnerService.getActivity(fromActivityId);
+        	
+        	if(toActivityId != null)
+        		toActivity = learnerService.getActivity(toActivityId);
+        	 
+        	learnerService.moveToActivity(learnerId, new Long(lessonId), fromActivity, toActivity);
+        	
+    		if ( log.isDebugEnabled() ) {
+    			log.debug("Force move for learner "+learnerId+" lesson "+lessonId+". ");
+    		}
+    		flashMessage = new FlashMessage("forceMove", mapping.findForward(DISPLAY_ACTIVITY).getPath());
+		} catch (Exception e) {
+			flashMessage = handleException(e, "forceMove", learnerService);
+		}
+		String message =  flashMessage.serializeMessage();
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
+    	
+    }
+    
 	/**
 	 * Get AuditService bean.
 	 * @return

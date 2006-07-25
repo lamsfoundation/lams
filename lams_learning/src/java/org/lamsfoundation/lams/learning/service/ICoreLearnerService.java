@@ -242,4 +242,13 @@ public interface ICoreLearnerService extends ILearnerService
      */
     public Lesson getLessonByActivity(Activity activity);
 
+    /**
+     * 
+     * @param learnerId the learner who triggers the move
+     * @param lessonId lesson id
+     * @param fromActivity Activity moving from
+     * @param toActivity Activity moving to (being run)
+     * @return updated Learner Progress
+     */
+    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity);
 }
