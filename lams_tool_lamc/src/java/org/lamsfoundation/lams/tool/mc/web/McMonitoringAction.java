@@ -72,22 +72,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
       		unknown="false"
       		validate="true"> 
 
-		<exception
-	        key="error.exception.McApplication"
-	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />
-
-		<exception
-	        key="error.exception.McApplication"
-	        type="java.lang.NullPointerException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />	         			      		
-
 	  	<forward
 		    name="loadMonitoring"
 		    path=".monitoringContent"

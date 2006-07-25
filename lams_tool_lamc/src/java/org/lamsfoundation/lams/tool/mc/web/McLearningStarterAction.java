@@ -104,22 +104,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 	      	unknown="false"
    			input="/learningIndex.jsp"> 
 
-		<exception
-	        key="error.exception.McApplication"
-	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path="/McErrorBox.jsp"
-	        scope="request"
-	      />
-
-		<exception
-	        key="error.exception.McApplication"
-	        type="java.lang.NullPointerException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path="/McErrorBox.jsp"
-	        scope="request"
-	      />	         			   			
-
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"

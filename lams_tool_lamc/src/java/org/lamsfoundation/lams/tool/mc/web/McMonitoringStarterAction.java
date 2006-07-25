@@ -59,22 +59,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
    			name="McMonitoringForm" 
    			input=".monitoringStarter"> 
-
-		<exception
-	        key="error.exception.McApplication"
-	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />
-
-		<exception
-	        key="error.exception.McApplication"
-	        type="java.lang.NullPointerException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />	         			   			
    			
 	  	<forward
 		    name="loadMonitoring"
