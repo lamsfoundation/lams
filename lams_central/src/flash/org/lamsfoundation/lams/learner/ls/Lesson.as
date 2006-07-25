@@ -178,6 +178,23 @@ class Lesson {
 		
 	}  
 	
+	public function moveToActivity(fromAct, toAct){
+		var callback:Function = Proxy.create(this, afterMoveActivity);
+		
+		// call action
+		var lessonId:Number = lessonModel.ID;
+		
+		// do request
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=forceMove&lessonID='+String(lessonId)+'&learnerID='+_root.userID+'&currentActivityID='+fromAct+'&destActivityID='+toAct, callback, false);
+			
+		return true;
+		
+	}
+	
+	private function afterMoveActivity(pkt:Object){
+		getURL(_root.serverURL + 'learning'+String(pkt)+'?lessonID='+lessonModel.getLessonID(),'contentFrame');
+	}
+	
 	private function getFlashProgress():Void{
 		var callback:Function = Proxy.create(this,saveProgressData);
 		var lessonId:Number = lessonModel.ID;
