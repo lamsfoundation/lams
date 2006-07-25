@@ -52,6 +52,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	private var _canvas_mc:MovieClip;
 	private var canvas_scp:ScrollPane;
     private var bkg_pnl:Panel;
+	private var read_only:MovieClip;
 	//private var act_pnl:Panel;
 	
     private var _gridLayer_mc:MovieClip;
@@ -190,15 +191,15 @@ public function viewUpdate(event:Object):Void{
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 		
 		bkg_pnl = _canvas_mc.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
-
 		//set up the 
 		//_canvas_mc = this;
 		_gridLayer_mc = _canvas_mc.createEmptyMovieClip("_gridLayer_mc", _canvas_mc.getNextHighestDepth());
 		_transitionLayer_mc = _canvas_mc.createEmptyMovieClip("_transitionLayer_mc", _canvas_mc.getNextHighestDepth());
 		_activityLayerComplex_mc = _canvas_mc.createEmptyMovieClip("_activityLayerComplex_mc", _canvas_mc.getNextHighestDepth());
 		_activityLayer_mc = _canvas_mc.createEmptyMovieClip("_activityLayer_mc", _canvas_mc.getNextHighestDepth());
-		
-
+		var styleObj = _tm.getStyleObject('redLabel');
+		read_only = _canvas_mc.attachMovie('Label', 'read_only', _canvas_mc.getNextHighestDepth(), {_x:1, _y:1, _visible:false, styleName:styleObj});
+		read_only.text = "Read Only";
 		
 		//_canvas_mc.addEventListener('onRelease',this);
 		bkg_pnl.onRelease = function(){
@@ -454,6 +455,10 @@ public function viewUpdate(event:Object):Void{
 	
 	public function getViewMc():MovieClip{
 		return _canvas_mc;
+	}
+	
+	public function showReadOnly(b:Boolean){
+		_canvas_mc.read_only._visible = b;
 	}
 	
 	/**
