@@ -70,11 +70,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                validate="true"
  * 
  * @struts.action-forward name="success" path="/authoring/authoring.jsp"
- * @struts.action-exception 
- * 				type="org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException" 
- * 				key="authoring.exception"
- * 				path="/authoring/authoring.jsp"
-
  */
 public class AuthoringAction extends LamsDispatchAction {
 	private Logger log = Logger.getLogger(AuthoringAction.class);

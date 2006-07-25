@@ -68,10 +68,14 @@
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
-  <!--
-    Define your exceptions in a file called global-exceptions.xml and place
-    it in your merge directory.
-  -->
+  <global-exceptions>
+  <exception
+    handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+    key="error.system"
+    path="/error.jsp"
+    scope="request"
+    type="java.lang.Exception"/>
+</global-exceptions>
 
   <!-- ========== Global Forward Definitions =================================== -->
   <!--
@@ -180,11 +184,6 @@
       unknown="false"
       validate="true"
     >
-      <exception
-        key="authoring.exception"
-        type="org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException"
-        path="/authoring/authoring.jsp"
-      />
       <forward
         name="success"
         path="/authoring/authoring.jsp"
