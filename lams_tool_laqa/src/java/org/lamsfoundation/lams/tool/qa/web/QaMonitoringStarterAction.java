@@ -65,23 +65,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 		parameter="method"
 		unknown="false"
 		validate="false">
-		
-		<exception
-			key="error.exception.QaApplication"
-			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
-			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
-			path="/SystemErrorContent.jsp"
-			scope="request"
-		/>
-		    
-		<exception
-		    key="error.exception.QaApplication"
-		    type="java.lang.NullPointerException"
-		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
-		    path="/SystemErrorContent.jsp"
-		    scope="request"
-		/>	         			
-		
+
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"

@@ -1,22 +1,12 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-core" prefix="c" %>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<script type="text/javascript">
+	if(window.top != null){
+		window.top.location.href = "${lams}index.jsp";
+	}else
+		location.href = "${lams}index.jsp";
+</script>
 
 
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-  <head>
-    <base href="<%=basePath%>">
-    
-    <title>System logon required</title>
-
-  </head>
-  
-  <body>
-	You need login <a href="/lams/index.jsp">here</a>.
-
-  </body>
-</html>

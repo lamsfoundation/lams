@@ -113,22 +113,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
    		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
    		name="QaLearningForm" input="/learningIndex.jsp"> 
    			
-		<exception
-			key="error.exception.QaApplication"
-			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
-			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
-			path="/SystemErrorContent.jsp"
-			scope="request"
-		/>
-		    
-		<exception
-		    key="error.exception.QaApplication"
-		    type="java.lang.NullPointerException"
-		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
-		    path="/SystemErrorContent.jsp"
-		    scope="request"
-		/>	         			
-
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"
