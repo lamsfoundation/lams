@@ -1,16 +1,63 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" %>
+<%@ page language="java" isErrorPage="true" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%-- Catch JSP Servlet Exception --%>
+<%
+if (exception != null) {
+%>
+<c:set var="errorMessage">
+	<%=exception.getMessage()%>
+</c:set>
+<c:set var="errorName">
+	<%=exception.getClass().getName()%>
+</c:set>
+<%
+		java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+		java.io.PrintStream os = new java.io.PrintStream(bos);
+		exception.printStackTrace(os);
+		String stack = new String(bos.toByteArray());
+%>
+<c:set var="errorStack">
+	<%=stack%>
+</c:set>
+<%
+} else if ((Exception) request.getAttribute("javax.servlet.error.exception") != null) {
+%>
 
-<table width="80%" algin="center" valign="middle">
-<tr>
-	<td width="30%" align="left"><img src="<lams:LAMSURL/>/images/error.jpg" /></td>
-	<td></td>
-</tr>
-<tr>
-	<td colspan=2 align=center>
-		<html:errors/>
-	</td>
-</tr>
-</table>
+<c:set var="errorMessage">
+	<%=((Exception) request.getAttribute("javax.servlet.error.exception")).getMessage()%>
+</c:set>
+<c:set var="errorName">
+	<%=((Exception) request.getAttribute("javax.servlet.error.exception")).getMessage()
+									.getClass().getName()%>
+</c:set>
+<%
+		java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+		java.io.PrintStream os = new java.io.PrintStream(bos);
+		((Exception) request.getAttribute("javax.servlet.error.exception")).printStackTrace(os);
+		String stack = new String(bos.toByteArray());
+%>
+<c:set var="errorStack">
+	<%=stack%>
+</c:set>
+<%
+}
+%>
+<form action="${lams}errorpages/error.jsp" method="post" id="errorForm">
+	<input type="hidden" name="errorName" value="${errorName}"/>
+	<input type="hidden" name="errorMessage" value="${errorMessage}"/>
+	<input type="hidden" name="errorStack" value="${errorStack}"/>
+</form>
+
+<script type="text/javascript">
+
+if(window.top != null)
+	document.getElementById("errorForm").target = "_parent";
+document.getElementById("errorForm").submit();
+
+</script>

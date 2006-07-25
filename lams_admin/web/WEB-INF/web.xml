@@ -14,12 +14,7 @@
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
-		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
-  		classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
-  		classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 	</param-value>
 </context-param>
 
@@ -88,12 +83,6 @@
 </listener>
 
  <servlet>
-	<servlet-name>context</servlet-name>
-	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-	<load-on-startup>1</load-on-startup>
-</servlet>
-
-<servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
     <init-param>
@@ -112,7 +101,7 @@
       <param-name>validate</param-name>
       <param-value>true</param-value>
     </init-param>
-    <load-on-startup>2</load-on-startup>
+    <load-on-startup>1</load-on-startup>
 </servlet>
 
   <servlet-mapping>
@@ -217,7 +206,8 @@
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
-    		<role-name>ADMIN</role-name>
+    	    <role-name>COURSE MANAGER</role-name>
+    		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -228,7 +218,19 @@
 		<realm-name>LAMS</realm-name>
    		<form-login-config>
     		<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>    		    		
    		</form-login-config>
    	</login-config>
+
+    <!--  Security Roles -->
+    <security-role>
+		<role-name>COURSE MANAGER</role-name>
+	</security-role>
+   	<security-role>
+		<role-name>COURSE ADMIN</role-name>
+	</security-role>
+	<security-role>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
 
 </web-app>
