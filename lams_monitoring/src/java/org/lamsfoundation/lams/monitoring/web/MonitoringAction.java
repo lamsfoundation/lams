@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -89,7 +88,6 @@ public class MonitoringAction extends LamsDispatchAction
 	
 	/** See deleteOldPreviewLessons */
 	public static final String NUM_DELETED = "numDeleted";
-	public static final String MONITORING_MODULE_NAME = "MonitoringAction";
 	
 	private static IAuditService auditService;
 
@@ -104,7 +102,7 @@ public class MonitoringAction extends LamsDispatchAction
  	  private FlashMessage handleException(Exception e, String methodKey, IMonitoringService monitoringService) {
 			log.error("Exception thrown "+methodKey,e);
 			auditService = getAuditService();
-			auditService.log(MONITORING_MODULE_NAME+":"+methodKey, e.toString());
+			auditService.log(MonitoringAction.class.getName()+":"+methodKey, e.toString());
 			
 			if ( e instanceof UserAccessDeniedException ) {
 				return new FlashMessage(methodKey,
@@ -123,7 +121,7 @@ public class MonitoringAction extends LamsDispatchAction
 		  String message = monitoringService.getMessageService().getMessage(messageKey); 
 			log.error("Error occured "+methodKey+" error ");
 			auditService = getAuditService();
-			auditService.log(MONITORING_MODULE_NAME+":"+methodKey, message);
+			auditService.log(MonitoringAction.class.getName()+":"+methodKey, message);
 			
 			return new FlashMessage(methodKey,
 					message,
