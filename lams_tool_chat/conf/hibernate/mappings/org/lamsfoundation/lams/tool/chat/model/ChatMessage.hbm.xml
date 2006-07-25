@@ -45,7 +45,7 @@
             insert="true"
         >
             <column
-                name="from_user_id" 
+                name="from_user_uid" 
             />
         </many-to-one>
 
@@ -58,7 +58,7 @@
             insert="true"
         >
             <column
-                name="to_user_id" 
+                name="to_user_uid" 
             />
         </many-to-one>
 
@@ -73,11 +73,10 @@
 
         <property
             name="body"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="body"
-            length="255"
         />
 
         <property
