@@ -23,19 +23,22 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.journal.dao.hibernate;
+package org.lamsfoundation.lams.notebook.service;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.journal.dao.IJournalEntryDAO;
+import java.util.List;
 
-public class JournalEntryDAO extends BaseDAO implements IJournalEntryDAO {
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+public interface ICoreNotebookService {
 
-	}
+	Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String title, String entry);
 
+	List<NotebookEntry> getEntry(String id, Long idType, Long userID);
+	
+	NotebookEntry getEntry(Long uid);
+	
+	void updateEntry(Long uid, String title, String entry);
+	
+	void updateEntry(NotebookEntry notebookEntry);
 }

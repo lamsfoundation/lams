@@ -72,8 +72,8 @@
 				<value>org/lamsfoundation/lams/themes/CSSStyle.hbm.xml</value>
 				<value>org/lamsfoundation/lams/themes/CSSThemeVisualElement.hbm.xml</value>
 				
-				<!-- Journal Service related mapping files -->
-				<value>org/lamsfoundation/lams/journal/model/JournalEntry.hbm.xml</value>
+				<!-- Core Notebook Service related mapping files -->
+				<value>org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -182,9 +182,9 @@
 	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource"  singleton="false">
 	</bean>
 			
-	<!--  journal service -->
-	<bean id="journalService" class="org.lamsfoundation.lams.journal.service.JournalService" singleton="true">
-		<property name="journalEntryDAO"><ref bean="journalEntryDAO" /></property>
+	<!--  Core Notebook Service -->
+	<bean id="coreNotebookService" class="org.lamsfoundation.lams.notebook.service.CoreNotebookService" singleton="true">
+		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
 	</bean>
 	
 	<!-- auditing service -->
@@ -226,8 +226,8 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
-	<!-- Journal related beans -->
-	<bean id="journalEntryDAO" class="org.lamsfoundation.lams.journal.dao.hibernate.JournalEntryDAO">
+	<!-- Core Notebook related beans -->
+	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
 	

@@ -23,23 +23,29 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.journal.service;
+package org.lamsfoundation.lams.notebook.dao.hibernate;
 
-public interface IJournalService {
+import java.util.List;
 
-	Long createJournalEntry(String toolSignature, Long toolSessionID,
-			Integer userID, String title, String entry);
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
-	Long createNotebookEntry(String toolSignature, Long toolSessionID,
-			Integer userID, String title, String entry);
+public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
+	
+	public static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "";
+	
+	public void saveOrUpdate(NotebookEntry notebookEntry) {
+		this.getHibernateTemplate().saveOrUpdate(notebookEntry);
+		this.getHibernateTemplate().flush();
+	}
 
-	Long createJournalEntry(Long lessonID, Integer userID, String title,
-			String entry);
+	public List get(String id, Long idType, Long userID) {
+		return getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID, new Object[]{id, idType, userID});
+	}
 
-	Long createNotebookEntry(Long lessonID, Integer userID, String title,
-			String entry);
-
-	void getEntry(String toolSignature, Long toolSessionID, Long userID);
-
-	void getEntry(Long JournalEntryID);
+	public NotebookEntry get(Long uid) {
+		Object o = getHibernateTemplate().get(NotebookEntry.class, uid);
+        return (NotebookEntry)o;
+	}
 }

@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.journal.model.JournalEntry"
-        table="lams_journal_entry"
+        name="org.lamsfoundation.lams.notebook.model.NotebookEntry"
+        table="lams_notebook_entry"
     >
 
         <id
@@ -19,40 +19,39 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-JournalEntry.xml 
+                  hibernate-generator-params-NotebookEntry.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="lessionID"
+            name="externalID"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="lesson_id"
-            length="20"
+            column="external_id"
         />
 
         <property
-            name="toolSessionID"
-            type="java.lang.Long"
+            name="externalIDType"
+            type="java.lang.Integer"
             update="true"
             insert="true"
-            column="tool_session_id"
+            column="external_id_type"
         />
 
         <property
-            name="toolSignature"
+            name="externalSignature"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="toolSignature"
+            column="external_signature"
         />
 
         <property
             name="userID"
-            type="java.lang.Long"
+            type="java.lang.Integer"
             update="true"
             insert="true"
             column="user_id"
@@ -76,7 +75,7 @@
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-JournalEntry.xml
+                hibernate-properties-NotebookEntry.xml
             containing the additional properties and place it in your merge dir.
         -->
 

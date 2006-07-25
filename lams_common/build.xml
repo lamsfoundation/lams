@@ -276,8 +276,8 @@ Ant build file.
 			<transaction src="${db.scripts}/insert_users.sql"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
-			<!-- Create tables for Journal Service -->
-			<transaction src="${db.scripts}/create_journal_tables.sql"/>
+			<!-- Create tables for Core Notebook Service -->
+			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
 			<!-- Test the scripts for shaun 
             <transaction src="${db.scripts}/shaun/lams_user_swedish.sql"/>
             <transaction src="${db.scripts}/shaun/lams_user_french.sql"/>
@@ -355,9 +355,9 @@ Ant build file.
 	</target>
 	
 	<!-- =================================================================== -->
-	<!-- Generate Journal hibernate xml files                             	 -->
+	<!-- Generate Notebook hibernate xml files                             	 -->
 	<!-- =================================================================== -->
-	<target name="generate-journal-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
+	<target name="generate-notebook-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
 
 		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
 
@@ -365,7 +365,7 @@ Ant build file.
 
 		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
 			<fileset dir="${src.java.dir}">
-				<include name="**/JournalEntry.java" />
+				<include name="**/NotebookEntry.java" />
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>
@@ -373,7 +373,7 @@ Ant build file.
 	
 	
 	<!-- =================================================================== -->
-	<!-- Journal Schema export				                             	 -->
+	<!-- Notebook Schema export				                             	 -->
 	<!-- =================================================================== -->
 	<path id="schemaexport.classpath">
 		<path refid="project.classpath"/>
@@ -381,8 +381,8 @@ Ant build file.
 	</path>
 	
 	<!-- exports all the hbm mappings to the specified database -->
-	<target name="journal-schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
-		depends="generate-journal-hbm-files">
+	<target name="notebook-schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
+		depends="generate-notebook-hbm-files">
 	    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
 		<taskdef
 			name="schemaexport"
@@ -396,12 +396,11 @@ Ant build file.
 			text="no"
 			drop="no"
 			delimiter=";"
-			output="${db.scripts}/journal_table-schema.sql">
+			output="${db.scripts}/notebook_table-schema.sql">
 			<fileset dir="${conf.hibernate.mapping.dir}">
-				<include name="**/JournalEntry.hbm.xml"/>
+				<include name="**/NotebookEntry.hbm.xml"/>
 			</fileset>
 		</schemaexport>	
 	</target>
-	
 </project>
 

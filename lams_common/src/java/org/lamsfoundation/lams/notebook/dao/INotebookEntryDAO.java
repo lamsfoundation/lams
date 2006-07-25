@@ -23,8 +23,18 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.journal.dao;
+package org.lamsfoundation.lams.notebook.dao;
 
-public interface IJournalEntryDAO {
+import java.util.List;
+
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+
+public interface INotebookEntryDAO {
+
+	void saveOrUpdate(NotebookEntry nb);
+
+	List get(String id, Long idType, Long userID);
+
+	NotebookEntry get(Long uid);
 
 }

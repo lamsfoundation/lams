@@ -23,28 +23,39 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.journal.model;
+package org.lamsfoundation.lams.notebook.model;
 
 /**
- * @hibernate.class table="lams_journal_entry"
+ * @hibernate.class table="lams_notebook_entry"
  */
-public class JournalEntry implements java.io.Serializable, Cloneable {
+public class NotebookEntry implements java.io.Serializable, Cloneable {
 
 	private static final long serialVersionUID = 653296132134948803L;
 
 	private Long uid;
 
-	private Long lessionID;
+	private Long externalID;
 
-	private Long toolSessionID;
+	private Integer externalIDType;
 
-	private String toolSignature;
+	private String externalSignature;
 
-	private Long userID;
+	private Integer userID;
 
 	private String title;
 
 	private String entry;
+	
+	public NotebookEntry() {}
+	
+	public NotebookEntry(Long externalID, Integer externalIDType, String externalSignature, Integer userID, String title, String entry) {
+		this.externalID = externalID;
+		this.externalIDType = externalIDType;
+		this.externalSignature = externalSignature;
+		this.userID = userID;
+		this.title = title;
+		this.entry = entry;
+	}
 
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
@@ -56,49 +67,48 @@ public class JournalEntry implements java.io.Serializable, Cloneable {
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
-
-	public void setLessionID(Long lessionID) {
-		this.lessionID = lessionID;
-	}
-
+	
 	/**
-	 * @hibernate.property column="lesson_id" length="20"
-	 * 
+	 * @hibernate.property column="external_id"
 	 */
-	public Long getLessionID() {
-		return lessionID;
+	public Long getExternalID() {
+		return externalID;
 	}
 
+	public void setExternalID(Long externalID) {
+		this.externalID = externalID;
+	}
+	
 	/**
-	 * @hibernate.property column="tool_session_id"
+	 * @hibernate.property column="external_id_type"
 	 */
-	public Long getToolSessionID() {
-		return toolSessionID;
+	public Integer getExternalIDType() {
+		return externalIDType;
 	}
 
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
+	public void setExternalIDType(Integer externalIDType) {
+		this.externalIDType = externalIDType;
 	}
-
+	
 	/**
-	 * @hibernate.property column="toolSignature"
+	 * @hibernate.property column="external_signature"
 	 */
-	public String getToolSignature() {
-		return toolSignature;
+	public String getExternalSignature() {
+		return externalSignature;
 	}
 
-	public void setToolSignature(String toolSignature) {
-		this.toolSignature = toolSignature;
-	}
+	public void setExternalSignature(String externalSignature) {
+		this.externalSignature = externalSignature;
+	}	
 
 	/**
 	 * @hibernate.property column="user_id"
 	 */
-	public Long getUserID() {
+	public Integer getUserID() {
 		return userID;
 	}
 
-	public void setUserID(Long userID) {
+	public void setUserID(Integer userID) {
 		this.userID = userID;
 	}
 
@@ -123,5 +133,4 @@ public class JournalEntry implements java.io.Serializable, Cloneable {
 	public void setEntry(String entry) {
 		this.entry = entry;
 	}
-
 }
