@@ -284,11 +284,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_userID = design.userID;
 		_workspaceFolderID = design.workspaceFolderID;
 		_createDateTime = design.createDateTime;
-		_readOnly = design.readReadOnly;
+		_readOnly = design.readOnly;
 		_validDesign = design.validDesign;
 		
 		_maxID = design.maxID;
 		_firstActivityID = design.firstActivityUIID;
+		_copyTypeID = design.copyTypeID;
 		
 		_licenseID = design.licenseID;
 		_licenseText = design.licenseText;
@@ -450,8 +451,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		*/
 		
 		//if the value is null, it is not included in the DTO
-		
-		if(_copyTypeID){		design.copyTypeID 		= _copyTypeID;			}
+		if(_copyTypeID == COPY_TYPE_ID_RUN){
+			design.copyTypeID = COPY_TYPE_ID_AUTHORING;
+		}else if(_copyTypeID){	design.copyTypeID 	= _copyTypeID;		}
 		if(_learningDesignID){	design.learningDesignID	= _learningDesignID;	}
 		if(_title){				design.title			= _title;				}
 		if(_description){		design.description		= _description;			}
@@ -460,9 +462,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(_userID){			design.userID			= _userID;				}
 		if(_duration){			design.duration			= _duration;			}
 		//readOnly must be in the DTO, so if its null, then give a false
-		design.readOnly = (_readOnly==null) ? false : _readOnly;
+		
+		if(_copyTypeID == COPY_TYPE_ID_RUN){
+			design.readOnly = false;
+		} else {
+			design.readOnly = (_readOnly==null) ? false : _readOnly;
+		}
+		
 		//valid design must be in the DTO, so if its null, then give a false
 		design.validDesign = (_validDesign==null) ? false : _validDesign;
+		
 		if(_maxID){				design.maxID			= _maxID;				}
 		if(_firstActivityID){	design.firstActivityID	= _firstActivityID;		}
 		if(_firstActivityUIID){	design.firstActivityUIID= _firstActivityID;		}
