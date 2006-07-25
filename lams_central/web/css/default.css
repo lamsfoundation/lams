@@ -40,10 +40,10 @@ h1.no-tabs-below {
 	padding-top:25px; }
 
 h2 {color:#47bc23; 
-font-size:14px; 
-margin-left:10px; 
-margin-bottom:0px; 
-margin-top:10px; }; 
+	font-size:14px; 
+	margin-left:10px; 
+	margin-bottom:0px; 
+	margin-top:10px; } 
 
 
 h4 {color:#47bc23; font-size:11px;}
@@ -435,19 +435,19 @@ table.chosengrouping {
 	 }
 
 table.chosengrouping tr { 
-	valign:top
+	vertical-align:top
 }
 
 table.chosengrouping th { 
 	padding:0px; 
 	font-size:11px;
-	align:center;
+	text-align:center;
 }
 
 table.chosengrouping td { 
 	padding:0px; 
 	font-size:11px;
-	align:center;
+	text-align:center;
 }
 
 table.chosengrouping td p{ 

@@ -54,10 +54,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action path="/dummylearner" 
  *                parameter="method" 
  *                validate="false"
- * @struts.action-exception key="error.system.learner" scope="request"
- *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
- *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="controlActivity" path="/dummyControlFrame.jsp"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * 

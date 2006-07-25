@@ -81,10 +81,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/learner" 
  *                parameter="method" 
  *                validate="false"
- * @struts.action-exception key="error.system.learner" scope="request"
- *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
- *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do" 
  * ----------------XDoclet Tags--------------------
  * 

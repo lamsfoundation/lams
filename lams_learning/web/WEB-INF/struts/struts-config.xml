@@ -108,16 +108,6 @@
         path="/DisplayActivity.do"
         redirect="false"
       />
-      <forward
-        name="welcome"
-        path=".welcome"
-        redirect="false"
-      />
-      <forward
-        name="exit"
-        path="/exit.do"
-        redirect="false"
-      />
     </action>
     <action
       path="/DisplayToolActivity"
@@ -321,9 +311,6 @@
 <action path="/content"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".welcome" />
-<action path="/exit"
-	type="org.apache.struts.actions.ForwardAction"
-	parameter=".exit" />
 <action path="/requestDisplay"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".requestDisplay"/>

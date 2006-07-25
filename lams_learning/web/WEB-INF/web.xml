@@ -110,12 +110,6 @@
 		<servlet-name>exportDownload</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
 	</servlet>
-	<servlet>
-		<description>Tool does not support portfolio exports</description>
-		<display-name>Export Portfolio Unavailable</display-name>
-		<servlet-name>exportNotSupported</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportNotSupportedServlet</servlet-class>
-	</servlet>
 
   <servlet-mapping>
 	<servlet-name>action</servlet-name>
@@ -130,11 +124,6 @@
 <servlet-mapping>
 		<servlet-name>exportDownload</servlet-name>
 		<url-pattern>/exportDownload</url-pattern>
-</servlet-mapping>
-
-<servlet-mapping>
-	<servlet-name>exportNotSupported</servlet-name>
-	<url-pattern>/exportNotSupported</url-pattern>
 </servlet-mapping>
 
    <servlet-mapping>

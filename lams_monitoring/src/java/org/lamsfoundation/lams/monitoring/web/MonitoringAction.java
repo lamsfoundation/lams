@@ -64,10 +64,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/monitoring" 
  *                parameter="method" 
  *                validate="false"
- * @struts.action-exception key="error.system.monitor" scope="request"
- *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
- *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * @struts.action-forward name = "notsupported" path = ".notsupported"
  * 

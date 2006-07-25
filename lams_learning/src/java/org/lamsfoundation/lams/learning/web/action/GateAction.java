@@ -74,10 +74,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 				  path="/gate" 
  *                parameter="method" 
  *                validate="false"
- * @struts.action-exception key="error.system.learner" scope="request"
- *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
- *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * 
  * @struts:action-forward name="permissionGate" path=".permissionGate"
  * @struts:action-forward name="scheduleGate" path=".scheduleGate"
