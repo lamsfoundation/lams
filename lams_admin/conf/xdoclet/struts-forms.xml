@@ -42,6 +42,3 @@
     <form-property name="orgName" type="java.lang.String" />
     <form-property name="userIds" type="java.lang.String[]" />
 </form-bean>
-
-<form-bean name="UserOrgRoleForm" type="org.lamsfoundation.lams.admin.web.UserOrgRoleForm">
-</form-bean>
