@@ -57,8 +57,9 @@ public class LearningUtil implements McAppConstants {
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 	
 	
-	public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm)
+	public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm, boolean prepareViewAnswersDataMode)
 	{
+	    logger.debug("prepareViewAnswersDataMode: " + prepareViewAnswersDataMode);
 	    
 	 	String httpSessionID=request.getParameter("httpSessionID");
 	 	logger.debug("httpSessionID: " + httpSessionID);
@@ -72,9 +73,13 @@ public class LearningUtil implements McAppConstants {
 	 	logger.debug("userOverPassMark: " + userOverPassMark);
 	 	mcLearningForm.setUserOverPassMark(userOverPassMark);
 	 	
-	 	String learnerProgress=request.getParameter("learnerProgress");
-	 	logger.debug("learnerProgress: " + learnerProgress);
-	 	mcLearningForm.setLearnerProgress(learnerProgress);
+	 	if (prepareViewAnswersDataMode == false)
+	 	{
+		 	String learnerProgress=request.getParameter("learnerProgress");
+		 	logger.debug("learnerProgress: " + learnerProgress);
+		 	mcLearningForm.setLearnerProgress(learnerProgress);
+		 	logger.debug("form is populated with learnerProgress");
+	 	}
 	 	
 	 	String learnerProgressUserId=request.getParameter("learnerProgressUserId");
 	 	logger.debug("learnerProgressUserId: " + learnerProgressUserId);

@@ -338,7 +338,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    	persistError(request, "error.learner.sessionId.inconsistent");
 				return (mapping.findForward(ERROR_LIST));
 		    }
-			return mcLearningAction.viewAnswers(mapping, form, request, response);
+		    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
+		    logger.debug("learnerProgress before presenting learner Progress screen: " + mcLearningForm.getLearnerProgress());
+		    
+		    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 		}
     	
 		/* by now, we know that the mode is learner*/
@@ -439,7 +442,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    		{
 		    		McLearningAction mcLearningAction= new McLearningAction();
 			    	logger.debug("present to learner with previous attempts data");
-			    	return mcLearningAction.viewAnswers(mapping, form, request, response);
+			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	    		}
 	    	}
 	    }
@@ -449,7 +452,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	logger.debug("present to teacher learners progress...");
 			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
 			mcLearningForm.setLearnerProgressUserId(userId);
-	    	return mcLearningAction.viewAnswers(mapping, form, request, response);	
+	    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);	
 	    }
 	    logger.debug("just presenting standard learner screen");
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
