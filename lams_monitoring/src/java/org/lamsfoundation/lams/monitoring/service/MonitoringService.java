@@ -523,32 +523,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         newLesson.setLessonClass(newLessonClass);
         newLesson.setOrganisation(organisation);
         
-        // put the copied design in the class/course default workspace folder for run sequences
-        WorkspaceFolder folder;
-        try {
-	        if(organisation.getWorkspace() == null)
-	        	folder = organisation.getParentOrganisation().getWorkspace().getDefaultRunSequencesFolder();
-	        else
-	        	folder = organisation.getWorkspace().getDefaultRunSequencesFolder();
-	        
-	        if(folder != null) {
-	        	newLesson.getLearningDesign().setWorkspaceFolder(folder);
-	        	Iterator it = folder.getLearningDesigns().iterator();
-	        	String title = newLesson.getLearningDesign().getTitle();
-	        	
-	        	while(it.hasNext()){
-	        		LearningDesign ld = (LearningDesign)it.next();
-	        		if(ld.getTitle().equals(title)){
-	        			newLesson.getLearningDesign().setTitle(title + '_' + newLesson.getCreateDateTime().toString());
-	        			break;
-	        		}
-	        	}
-	        }
-	        
-        } catch (NullPointerException e){
-        	// no workspace folder could be found (possibly running lesson preview)
-        }
-        
         lessonDAO.updateLesson(newLesson);
         
         if ( oldLessonClass != null ) {

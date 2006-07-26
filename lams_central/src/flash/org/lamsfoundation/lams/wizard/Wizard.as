@@ -252,10 +252,11 @@ class Wizard {
 		var designId:Number = resultDTO.selectedResourceID;
 		var lessonName:String = resultDTO.resourceTitle;
 		var lessonDesc:String = resultDTO.resourceDescription;
+		var orgId:Number = resultDTO.organisationID;
 		if(lessonDesc == undefined){
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName,callback, false);
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&organisationID='+orgId,callback, false);
 		} else {
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc,callback, false);
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc+'&organisationID='+orgId,callback, false);
 		}
 	}
 	
