@@ -95,7 +95,7 @@ class LessonController extends AbstractController {
 				
 				if(ca.activityStatus == 'completed_mc' && ca.activity.activityTypeID != Activity.OPTIONAL_ACTIVITY_TYPE){
 					_lessonModel.getLesson().getActivityURL(URLToSend, true);
-				} else if(ca.activityStatus == 'attempted_mc') {
+				} else if(ca.activityStatus == 'attempted_mc' && _root.mode == 'preview') {
 					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
 				} else {
 					_lessonModel.getLesson().getActivityURL(URLToSend, false);
