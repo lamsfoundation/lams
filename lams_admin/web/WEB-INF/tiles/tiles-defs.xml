@@ -2,6 +2,11 @@
 
 <tiles-definitions>
 	
+	<definition name=".userorgrole" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="userorgrole.jsp" />	
+	</definition>
+	
 	<definition name=".userorg" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="userorg.jsp" />	
