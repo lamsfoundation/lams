@@ -25,24 +25,16 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -82,7 +74,7 @@ public class UserOrgRoleSaveAction extends Action {
 		log.debug("userBeans is null?"+userBeans==null);
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
 		request.setAttribute("org",orgId);
-		
+		request.getSession().removeAttribute("UserOrgRoleForm");		
 		if(isCancelled(request)){
 			return mapping.findForward("userlist");
 		}
@@ -101,7 +93,6 @@ public class UserOrgRoleSaveAction extends Action {
 				getService().save(newUor);
 			}
 		}
-		
 		return mapping.findForward("userlist");
 	}
 	
