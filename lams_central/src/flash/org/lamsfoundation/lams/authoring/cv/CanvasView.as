@@ -199,7 +199,7 @@ public function viewUpdate(event:Object):Void{
 		_activityLayer_mc = _canvas_mc.createEmptyMovieClip("_activityLayer_mc", _canvas_mc.getNextHighestDepth());
 		var styleObj = _tm.getStyleObject('redLabel');
 		read_only = _canvas_mc.attachMovie('Label', 'read_only', _canvas_mc.getNextHighestDepth(), {_x:1, _y:1, _visible:false, styleName:styleObj});
-		read_only.text = "Read Only";
+		read_only.text = Dictionary.getValue('cv_readonly_lbl');
 		
 		//_canvas_mc.addEventListener('onRelease',this);
 		bkg_pnl.onRelease = function(){
