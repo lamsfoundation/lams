@@ -88,11 +88,14 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler
 
         String errorMessage = ex.getMessage() == null ?UNKNOWN_EXCEPTION:ex.getMessage();
         request.setAttribute("errorMessage",errorMessage );
+        request.setAttribute("errorName", ex.getClass().getName());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         PrintStream os =  new PrintStream(bos);
         ex.printStackTrace(os);
-        request.setAttribute("errorStack", new String(bos.toByteArray()));
-        request.setAttribute("errorName", ex.getClass().getName());
+        String errorStack = new String(bos.toByteArray());
+        request.setAttribute("errorStack", errorStack);
+        logger.fatal(errorStack);
+
 
         // process the exception as normal
         return forward;
