@@ -88,21 +88,26 @@ class LessonController extends AbstractController {
 		setBusy()
 		Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID + ' status: ' + ca.activityStatus + 'type id: ' + ca.activity.activityTypeID,Debugger.GEN,'activityDoubleClick','LessonController');
 	   
-		if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+		if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 			
 			if(ca.activityStatus != undefined){
 				var URLToSend:String = 'learning/learner.do?method=getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
 				
 				if(ca.activityStatus == 'completed_mc' && ca.activity.activityTypeID != Activity.OPTIONAL_ACTIVITY_TYPE){
 					_lessonModel.getLesson().getActivityURL(URLToSend, true);
+				} else if(ca.activityStatus == 'attempted_mc') {
+					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
 				} else {
 					_lessonModel.getLesson().getActivityURL(URLToSend, false);
 				}
 			} else if(_root.mode == 'preview') {
-				_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
-				
-			}else {
-			
+				/* if child Activity is double-clicked then load the parent Activity */
+				if(ca.activity.parentActivityID != null || ca.activity.parentActivityID != undefined){
+					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.parentActivityID);
+				} else {
+					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
+				}
+			} else {
 				var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity')
 				getURL("javascript:alert('"+alertMSG+"');");
 				
