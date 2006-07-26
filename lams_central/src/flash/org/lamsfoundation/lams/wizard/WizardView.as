@@ -59,6 +59,10 @@ class WizardView extends AbstractView {
 	public static var FINISH_MODE:Number = 0;
 	public static var START_MODE:Number = 1;
 	public static var START_SCH_MODE:Number = 2;
+	
+	private static var X_BUTTON_OFFSET:Number = 10;
+	private static var Y_BUTTON_OFFSET:Number = 15;
+	
 
 	private var _wizardView:WizardView;
 	private var _tm:ThemeManager;
@@ -148,6 +152,7 @@ class WizardView extends AbstractView {
 	*/
 	function WizardView(){
 		_wizardView = this;
+		_wizardView_mc = this;
         mx.events.EventDispatcher.initialize(this);
 		
 		_tm = ThemeManager.getInstance();
@@ -310,6 +315,52 @@ class WizardView extends AbstractView {
 		
 		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
 		
+		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn]);
+		positionButtons();
+	}
+	
+	/** Resize the buttons according to the label length */
+	private function resizeButtons(btns:Array) {
+		this.createTextField("dummylabel", this.getNextHighestDepth(), -1000, -1000, 0, 0); 
+		Debugger.log('//////////////////// Resizing Buttons ////////////////////',Debugger.CRITICAL,'resizeButtons','org.lamsfoundation.lams.WizardView');
+        
+		for(var i=0; i<btns.length; i++) {
+			var btn:Button = btns[i];
+			var btnLabel:String = btn.label;
+			var btn_text = this["dummylabel"];
+			
+			btn_text.autoSize = true;
+			btn_text.text = btnLabel;
+			
+			var btnWidth:Number = btn_text._width;
+			Debugger.log('item: ' + i + ' width: ' + btnWidth + ' label: ' + btnLabel,Debugger.CRITICAL,'resizeButtons','org.lamsfoundation.lams.WizardView');
+        
+			btn.setSize(btnWidth + 37, 20);
+		}
+		
+		btn_text.removeTextField();
+	}
+	
+	/** Align the buttons correctly on the screen  */
+	private function positionButtons(a:Boolean) {
+			// set button x position
+			next_btn._x = panel._width - next_btn._width - X_BUTTON_OFFSET;
+			start_btn._x = panel._width - start_btn._width - X_BUTTON_OFFSET;
+			close_btn._x = panel._width - close_btn._width - X_BUTTON_OFFSET;
+			finish_btn._x = panel._width - finish_btn._width - X_BUTTON_OFFSET;
+			
+			if(a){ prev_btn._x = start_btn._x - prev_btn._width - X_BUTTON_OFFSET; }
+			else { prev_btn._x = next_btn._x - prev_btn._width - X_BUTTON_OFFSET; }
+			cancel_btn._x = prev_btn._x - cancel_btn._width - (2*X_BUTTON_OFFSET);
+			
+			// set button y position
+			next_btn._y = panel._y + panel._height - next_btn._height - Y_BUTTON_OFFSET;
+			prev_btn._y = next_btn._y;
+			close_btn._y = next_btn._y;
+			start_btn._y = next_btn._y;
+			cancel_btn._y = next_btn._y;
+			
+			finish_btn._y = next_btn._y - finish_btn._height - Y_BUTTON_OFFSET;
 	}
 	
 	/**
@@ -646,6 +697,7 @@ class WizardView extends AbstractView {
 				clearStep3();
 				break;
 			case 4:
+				positionButtons(false);
 				clearStep4();
 				break;
 			case 5:
@@ -666,6 +718,7 @@ class WizardView extends AbstractView {
 				showStep3();
 				break;
 			case 4:
+				positionButtons(true);
 				showStep4();
 				break;
 			case 5:
