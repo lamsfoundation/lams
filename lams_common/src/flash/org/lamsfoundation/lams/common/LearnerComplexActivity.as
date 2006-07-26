@@ -75,6 +75,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var containerPanelHeader:MovieClip;
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
+	private var attempted_mc:MovieClip;
 	private var todo_mc:MovieClip;
 	private var childHolder_mc:MovieClip;
 	var children_mc:Array
@@ -153,6 +154,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function showStatus(isVisible:Boolean){
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
+		attempted_mc._visible = isVisible;
 		todo_mc._visible = isVisible;
 		
 	}
@@ -189,6 +191,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		draw();
 	}
 	
+	private function hasCurrentChild(){
+		for(var i=0; i<children_mc.length;i++){
+			if(children_mc[i].activityStatus == 'current_mc'){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	private function draw (){
 		
 		if (actStatus == null || actStatus == undefined){
@@ -203,7 +214,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				current_mc._visible = true;
                 break;
             case 'attempted_mc' :
-			    current_mc._visible = true;
+			if(_root.mode == 'preview'){  
+				if(hasCurrentChild()){current_mc._visible = true; } 
+				else { attempted_mc._visible = true; } }
+			else {current_mc._visible = true; }
                 break;
 			default :
 				todo_mc._visible = true;
