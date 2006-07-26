@@ -200,6 +200,7 @@ class LearnerActivity extends MovieClip {
 			    attempted_mc._visible = true;
                 break;
 			default :
+				//actStatus = "todo_mc";
 				todo_mc._visible = true;
                 //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -351,27 +352,8 @@ class LearnerActivity extends MovieClip {
 	public function get learnerID():Number{
 		return learner.getLearnerId();
 	}
-
-	/**
-	 * Get the CSSStyleDeclaration objects for each component and applies them
-	 * directly to the instanced
-	 * @usage   
-	 * @return  
-	 
-	private function setStyles() {
-		var styleObj;
-		if(app.module == 'learner'){
-			Debugger.log('setting style - smallLabel : ' ,Debugger.CRITICAL,'setStyles','org.lamsfoundation.lams.LearnerActivity');
-			styleObj = _tm.getStyleObject('smallLabel');
-		} else {
-			styleObj = _tm.getStyleObject('label');
-		}
-		
-		Debugger.log('setting style to title: ' + styleObj ,Debugger.CRITICAL,'setStyles','org.lamsfoundation.lams.LearnerActivity');
-			
-		title_lbl.setStyle('styleName',styleObj);
-		title_lbl.setStyle('textAlign', 'center');
-			
-    }
-	*/
+	
+	public function get learnerName():String{
+		return learner.getFullName();
+	}
 }
