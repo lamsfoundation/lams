@@ -484,11 +484,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid, design.getLearningDesignId()));			
 			}
 
+			if(design.getCopyTypeID() != LearningDesign.COPY_TYPE_NONE)
+				throw new Exception("Unable to save learning design.  Learning design is read-only");
+			
 			design.setValidDesign(valid);
 			learningDesignDAO.insertOrUpdate(design);
 			
 			//flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
-		} catch ( ObjectExtractorException e ) {
+		} catch ( Exception e ) {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
 											messageService.getMessage("invalid.wddx.packet",new Object[]{e.getMessage()}),
 											FlashMessage.ERROR);
