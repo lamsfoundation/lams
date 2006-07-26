@@ -41,6 +41,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -167,28 +168,34 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		/*holds the answers */  
 		Map mapAnswers= new TreeMap(new QaComparator());
 		
-		QaLearningForm qaQaLearningForm = (QaLearningForm) form;
+		QaLearningForm qaLearningForm = (QaLearningForm) form;
 		
-		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		request.getSession().setAttribute(CURRENT_ANSWER, "");
+		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO= new McGeneralLearnerFlowDTO();
+		mcGeneralLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
+		//request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		
+		//request.getSession().setAttribute(CURRENT_ANSWER, "");
+		mcGeneralLearnerFlowDTO.setCurrentAnswer("");
+		
 
 		/*initialize available question display modes in the session */
-		request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
-	    request.getSession().setAttribute(QUESTION_LISTING_MODE_COMBINED, QUESTION_LISTING_MODE_COMBINED);
-	    request.getSession().setAttribute(QUESTION_LISTING_MODE_PREVIEW, QUESTION_LISTING_MODE_PREVIEW);
+		//request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
+	    //request.getSession().setAttribute(QUESTION_LISTING_MODE_COMBINED, QUESTION_LISTING_MODE_COMBINED);
+	    //request.getSession().setAttribute(QUESTION_LISTING_MODE_PREVIEW, QUESTION_LISTING_MODE_PREVIEW);
+	    
 	    
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
-	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
+	    //request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	    
 	    /*mark the http session as a learning activity  */
-	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
+	    //request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
 	    
 	    
-	    QaUtils.persistTimeZone(request);
+	    //QaUtils.persistTimeZone(request);
 	    
 	    /*validate learning mode parameters*/
-	    ActionForward validateParameters=validateParameters(request, mapping);
+	    ActionForward validateParameters=validateParameters(request, mapping, qaLearningForm);
 	    logger.debug("validateParamaters: " + validateParameters);
 	    if (validateParameters != null)
 	    {
@@ -472,13 +479,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 * @param mapping
 	 * @return ActionForward
 	 */
-	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
+	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping, QaLearningForm qaLearningForm)
 	{
 		/*
 	     * obtain and setup the current user's data 
 	     */
-
-
 	    String userID = "";
 	    HttpSession ss = SessionManager.getSession();
 	    logger.debug("ss: " + ss);
@@ -490,7 +495,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    {
 		    	userID = user.getUserID().toString();
 			    logger.debug("retrieved userId: " + userID);
-		    	request.getSession().setAttribute(USER_ID, userID);
+		    	//request.getSession().setAttribute(USER_ID, userID);
 		    }
 	    }
 		
@@ -503,7 +508,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
 	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
+	    	//request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
 	    	persistError(request, "error.toolSessionId.required");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
@@ -513,12 +518,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			{
 	    		toolSessionId=new Long(strToolSessionId).longValue();
 		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
+		    	//request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));
+		    	qaLearningForm.setToolSessionID(new Long(toolSessionId).toString());
 			}
 	    	catch(NumberFormatException e)
 			{
 	    		QaUtils.cleanUpSessionAbsolute(request);
-		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());				
+		    	//request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());				
 	    		persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
 				return (mapping.findForward(ERROR_LIST_LEARNER));
@@ -532,7 +538,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
     		QaUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());			
+	    	//request.getSession().setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());			
 	    	persistError(request, "error.mode.required");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
@@ -540,13 +546,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
 	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());			
+	    	//request.getSession().setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());			
 	    	persistError(request, "error.mode.invalid");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);
-	    request.getSession().setAttribute(LEARNING_MODE, mode);
-	    
+	    //request.getSession().setAttribute(LEARNING_MODE, mode);
+		qaLearningForm.setMode(mode);	    
 	    return null;
 	}
 	

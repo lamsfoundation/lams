@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 
 <h1 class="no-tabs-below">
-	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -70,23 +70,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<html:errors/>
 			</td></tr>
 
-			<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
+			<c:if test="${mcGeneralLearnerFlowDTO.activityOffline == 'true'}"> 			
 				<tr> <td NOWRAP>
 					<bean:message key="label.learning.forceOfflineMessage"/>
 				</td></tr>
 			</c:if> 		
 		
-			<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
+			<c:if test="${mcGeneralLearnerFlowDTO.activityOffline == 'false'}"> 			
 				<tr><td NOWRAP>
-					<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/> 
+					<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false"/> 
 				</td></tr>
 	
 				<tr> <td NOWRAP>
-					 <c:out value="${sessionScope.userFeedback}" escapeXml="true"/> 
+					 <c:out value="${mcGeneralLearnerFlowDTO.userFeedback}" escapeXml="true"/> 
 				</td></tr>
 			
 				<c:choose> 
-				  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
+				  <c:when test="${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
 						<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
 					  </c:when> 
 

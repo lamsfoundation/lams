@@ -34,8 +34,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!--question content goes here-->
 			<tr> <td>
 			<table class="forms">
-				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
-			  		<c:if test="${questionEntry.key == sessionScope.currentQuestionIndex}"> 			
+				<c:forEach var="questionEntry" items="${mcGeneralLearnerFlowDTO.mapQuestionContentLearner}">
+			  		<c:if test="${questionEntry.key == mcGeneralLearnerFlowDTO.currentQuestionIndex}"> 			
 					  <tr>
 						<td colspan=2 NOWRAP> 
 					  		<b> <bean:message key="label.question"/> 
@@ -47,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  <tr> 
 						<td NOWRAP>  <b> <bean:message key="label.answer"/> </b> </td>
 						<td NOWRAP>
-				 			<html:text property="answer" size="60" maxlength="255" value="${sessionScope.currentAnswer}"/>
+				 			<html:text property="answer" size="60" maxlength="255" value="${mcGeneralLearnerFlowDTO.currentAnswer}"/>
 				 			<html:hidden property="currentQuestionIndex" value="${questionEntry.key}"/>
 				 		</td>
 				  	  </tr>
@@ -59,8 +59,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<table class="forms">
 				<tr>
 				<c:choose>  
-				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
-				  				  (sessionScope.totalQuestionCount !=1) }"> 
+				  <c:when test="${(mcGeneralLearnerFlowDTO.currentQuestionIndex == mcGeneralLearnerFlowDTO.totalQuestionCount) && 
+				  				  (sessionScope.totalQuestionCount != 1) }"> 
 					<td NOWRAP>
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
@@ -71,8 +71,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td> 
 				  </c:when> 
 
-  				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
-				  				  (sessionScope.totalQuestionCount == 1) }"> 
+  				  <c:when test="${(mcGeneralLearnerFlowDTO.currentQuestionIndex == mcGeneralLearnerFlowDTO.totalQuestionCount) && 
+				  				  (mcGeneralLearnerFlowDTO.totalQuestionCount == 1) }"> 
 					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<bean:message key="button.done"/>
@@ -81,7 +81,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  </c:when> 
 				  
 				  
- 				  <c:when test="${sessionScope.currentQuestionIndex != sessionScope.totalQuestionCount && sessionScope.currentQuestionIndex > 1}"> 
+ 				  <c:when test="${mcGeneralLearnerFlowDTO.currentQuestionIndex != mcGeneralLearnerFlowDTO.totalQuestionCount && 
+				 				  mcGeneralLearnerFlowDTO.currentQuestionIndex > 1}"> 
 					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>

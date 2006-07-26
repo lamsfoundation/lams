@@ -41,6 +41,21 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String getPreviousQuestion;
 	protected String endLearning;
 	
+	protected String toolSessionID;
+	protected String mode;
+	
+    /**
+     * @return Returns the mode.
+     */
+    public String getMode() {
+        return mode;
+    }
+    /**
+     * @param mode The mode to set.
+     */
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 	protected String viewAllResults;
 	protected String responseId;
 	
@@ -167,5 +182,18 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
      */
     public void setViewAllResults(String viewAllResults) {
         this.viewAllResults = viewAllResults;
-    }	
+    }
+    
+    /**
+     * @return Returns the toolSessionID.
+     */
+    public String getToolSessionID() {
+        return toolSessionID;
+    }
+    /**
+     * @param toolSessionID The toolSessionID to set.
+     */
+    public void setToolSessionID(String toolSessionID) {
+        this.toolSessionID = toolSessionID;
+    }    
 }
