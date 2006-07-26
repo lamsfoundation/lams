@@ -45,7 +45,11 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	}
 
 	public NotebookEntry get(Long uid) {
-		Object o = getHibernateTemplate().get(NotebookEntry.class, uid);
-        return (NotebookEntry)o;
+		if (uid != null) {
+			Object o = getHibernateTemplate().get(NotebookEntry.class, uid);
+			return (NotebookEntry)o;
+		} else {
+			return null;
+		}
 	}
 }
