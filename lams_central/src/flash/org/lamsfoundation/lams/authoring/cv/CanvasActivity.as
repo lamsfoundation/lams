@@ -54,6 +54,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
 	private var _monitorView;
+	private var _canvasModel:CanvasModel;
 	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
@@ -127,6 +128,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_activity = initObj.activity;
 		}
 		
+		_canvasModel = CanvasModel(_canvasController.getModel());
 		showAssets(false);
 		
 		
@@ -497,6 +499,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 */
 	private function setStyles() {
 		var my_color:Color = new Color(this);
+		var styleObj;
+		
 		var transNegative = {ra:-100, ga:-100, ba:-100, rb:255, gb:255, bb:255};
 		var transPositive = {ra:100, ga:100, ba:100, rb:0, gb:0, bb:0};
 		title_lbl.setStyle('textAlign', 'center');
@@ -505,14 +509,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}else if(bgNegative == "false"){
 			my_color.setTransform(transPositive);
 		}else if(bgNegative == "original"){
-			var styleObj = _tm.getStyleObject('label');
+			styleObj = _tm.getStyleObject('label');
 			title_lbl.setStyle('styleName',styleObj);
-			styleObj = _tm.getStyleObject('ACTPanel')
-			act_pnl.setStyle('styleName',styleObj);
-		}
-		
-		
+			if (this.activity.parentUIID != null || this.activity.parentUIID != undefined){
+				var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(this.activity.parentUIID)
+				if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+					styleObj = _tm.getStyleObject('OptActPanel')
+					act_pnl.setStyle('styleName',styleObj);
+				}
+			}else {
+					styleObj = _tm.getStyleObject('ACTPanel')
+					act_pnl.setStyle('styleName',styleObj);
+				}
 			
+		}
     }
     
 
