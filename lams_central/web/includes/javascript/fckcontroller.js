@@ -78,11 +78,11 @@ function doWYSWYGEdit(index, size){
     //resize the fck editor
     fckFrameElement = document.getElementById("FCKeditor1___Frame");
     if (size == "small") {
-        fckFrameElement.style.height = "100px";
-        wyswygEditorScreenElement.style.height = "120px";
+        fckFrameElement.style.height = "80px";
+        wyswygEditorScreenElement.style.height = "100x";
     } else {
-        fckFrameElement.style.height = "200px";
-        wyswygEditorScreenElement.style.height = "220px";
+        fckFrameElement.style.height = "160px";
+        wyswygEditorScreenElement.style.height = "180px";
     }
 
      showElementById("wyswygEditorScreen");

@@ -1,6 +1,6 @@
 .previewPanel {
 	width: 625px;
-	height: 220px;
+	height: 160px;
 	border-style: none;
 	border-width: 1px;
 	padding: 5px;
@@ -11,7 +11,7 @@
 
 .textareaPanel {
 	width: 625px;
-	height: 220px;
+	height: 160px;
 	margin-left: 20px;
 		margin-top: 12px;
 }
@@ -37,7 +37,7 @@
 #wyswygEditorScreen {
 	position: absolute;
 	width: 625px;
-	height: 220px;
+	height: 160px;
 	padding: 0px;
 	margin: 0px;
 }
