@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.LearnerComplexActivity;
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.comms.Communication;
 import org.lamsfoundation.lams.learner.*
 import org.lamsfoundation.lams.authoring.Activity;
@@ -98,9 +99,12 @@ class LessonController extends AbstractController {
 					_lessonModel.getLesson().getActivityURL(URLToSend, false);
 				}
 			} else if(_root.mode == 'preview') {
-				//var URLToSend:String = 'learning/learner.do?method=getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
-				//_lessonModel.getLesson().getActivityURL(URLToSend, false);
 				_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
+				
+			}else {
+			
+				var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity')
+				getURL("javascript:alert('"+alertMSG+"');");
 				
 			}
 		}
