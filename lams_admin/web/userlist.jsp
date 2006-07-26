@@ -28,7 +28,7 @@
 	<th><fmt:message key="admin.user.title"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
 	<th><fmt:message key="admin.user.last_name"/></th>
-	<th>Roles</th>
+	<th><fmt:message key="admin.user.roles"/></th>
 	<th></th>
 </tr>
 <logic:iterate id="userManageBean" name="UserManageForm" property="userManageBeans">
