@@ -62,7 +62,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/userorgrole"
  *                name="UserOrgRoleForm"
- *                scope="request"
+ *                scope="session"
  *                validate="false"
  *
  * @struts:action-forward name="userorgrole"
@@ -91,7 +91,7 @@ public class UserOrgRoleAction extends Action {
 			UserBean userBean = new UserBean();
 			User user = ((UserOrganisation)userOrgs.get(i)).getUser();
 			BeanUtils.copyProperties(userBean,user);
-			userOrgRoleForm.setBean(i,userBean);
+			userOrgRoleForm.addUserBean(userBean);
 		}
 		log.debug("userBeans.size: "+userOrgRoleForm.getUserBeans().size());
 		userOrgRoleForm.setOrgId((Integer)request.getAttribute("orgId"));

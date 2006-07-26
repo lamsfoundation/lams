@@ -62,7 +62,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/userorgrolesave"
  *                name="UserOrgRoleForm"
  *                input=".userorgrole"
- *                scope="request"
+ *                scope="session"
  *                validate="false"
  *
  * @struts:action-forward name="userlist"
@@ -79,6 +79,7 @@ public class UserOrgRoleSaveAction extends Action {
             HttpServletResponse response) throws Exception {
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
 		ArrayList userBeans = userOrgRoleForm.getUserBeans();
+		log.debug("userBeans is null?"+userBeans==null);
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
 		request.setAttribute("org",orgId);
 		

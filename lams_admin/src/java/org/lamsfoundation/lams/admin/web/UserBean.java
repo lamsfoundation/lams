@@ -24,19 +24,17 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  * @author jliew
  * 
  * Bean used as member of UserOrgRoleForm, representing a user's roles.
  *
  */
-public class UserBean extends ActionForm {
+public class UserBean {
 
     private Integer userId;
     private String login;
-    private String[] roleIds;
+    private String[] roleIds = {};
     
     public Integer getUserId() {
     	return this.userId;
@@ -62,11 +60,4 @@ public class UserBean extends ActionForm {
     	this.roleIds = roleIds;
     }
     
-    public Object getRoleId(int key) {
-    	return roleIds[key];
-    }
-    
-    public void setRoleId(int key, String roleId) {
-    	roleIds[key] = roleId;
-    }
 }

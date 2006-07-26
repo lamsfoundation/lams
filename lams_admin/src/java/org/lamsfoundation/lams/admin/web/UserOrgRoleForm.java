@@ -34,11 +34,17 @@ import org.apache.struts.action.ActionForm;
  * This is the Action Form that is used when a user has added users
  * to an organisation via UserOrgForm.  Used to record roles for each
  * of the added users.
- *
+ * 
+ */
+
+/**
+ * struts doclet
+ * 
+ * @struts.form name="UserOrgRoleForm"
  */
 public class UserOrgRoleForm extends ActionForm {
 
-	private static ArrayList userBeans;
+	private ArrayList userBeans = new ArrayList();
 	private Integer orgId;
 
 	public ArrayList getUserBeans() {
@@ -46,7 +52,7 @@ public class UserOrgRoleForm extends ActionForm {
 	}
 	
 	public void setUserBeans(ArrayList userBeans) {
-		UserOrgRoleForm.userBeans = userBeans;
+		this.userBeans = userBeans;
 	}
 	
 	public Integer getOrgId() {
@@ -56,19 +62,10 @@ public class UserOrgRoleForm extends ActionForm {
 	public void setOrgId(Integer orgId) {
 		this.orgId = orgId;
 	}
-	
-	public Object getBean(int key) {
-    	return userBeans.get(key);
-    }
-    
-    public void setBean(int key, Object bean) {
-    	if(userBeans==null) userBeans = new ArrayList();
-    	if(userBeans.size()<=key) {
-    		userBeans.add(bean);
-    	}else{
-    		userBeans.set(key, bean);
-    	}
-    }
+
+	public void addUserBean(UserBean userBean) {
+		userBeans.add(userBean);
+	}
 
 }
 
