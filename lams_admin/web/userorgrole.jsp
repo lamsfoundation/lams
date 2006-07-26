@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-html-el" prefix="html-el" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <div align="center"><html-el:errors/></div>
@@ -15,18 +15,18 @@
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.roles"/></th>
 </tr>
-<logic:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">
+<logic-el:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">
 	<tr>
 		<td>
 			<c:out value="${userBean.login}" /><br />
 		</td>
 		<td>
-			<logic:iterate id="role" name="roles" indexId="roleIndex">
-				<html-el:multibox name="UserOrgRoleForm" property="bean[${beanIndex}].roleIds" value="${role.roleId}" /> <c:out value="${role.name}" />&nbsp;
-			</logic:iterate>
+			<logic-el:iterate id="role" name="roles">
+				<html-el:multibox property="userBeans[${beanIndex}].roleIds" value="${role.roleId}" /> <c:out value="${role.name}" />&nbsp;
+			</logic-el:iterate>
 		</td>
 	</tr>
-</logic:iterate>
+</logic-el:iterate>
 <tr>
 	<td colspan=2 align="right">
 		<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
