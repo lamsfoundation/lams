@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
@@ -311,16 +313,25 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         
         // The duplicated sequence should go in the run sequences folder under the given organisation
         WorkspaceFolder runSeqFolder = null;
+        int MAX_DEEP_LEVEL_FOLDER = 50;
         if ( organisationId != null ) {
         	Organisation org = (Organisation)baseDAO.find(Organisation.class,organisationId);
-        	if ( org!=null ) {
-        		Workspace workspace = org.getWorkspace();
-        		if ( workspace != null ) {
-        			runSeqFolder = workspace.getDefaultRunSequencesFolder();
-        		}
-        		
+        	// Don't use unlimited loop to avoid dead lock. For instance, orgA is orgB parent, but orgB parent is orgA as well. 
+        	for(int idx=0;idx<MAX_DEEP_LEVEL_FOLDER;idx++){
+	        	if ( org!=null ) {
+	        		Workspace workspace = org.getWorkspace();
+	        		if ( workspace != null ) {
+	        			runSeqFolder = workspace.getDefaultRunSequencesFolder();
+	        		}
+	        		if(runSeqFolder == null)
+	        			org = org.getParentOrganisation();
+	        		else //if find out an available runSeqFolder, use it
+	        			break;
+	        	}else // if arrive the root orgranisation, then exit.
+	        		break;
         	}
         }
+ 
     	User user = (userID != null ? (User)baseDAO.find(User.class,userID) : null);
         return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, runSeqFolder, LearningDesign.COPY_TYPE_LESSON);
         
@@ -352,12 +363,49 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             WorkspaceFolder workspaceFolder,
             int copyType) { 
     
+//    		if the learning design has duplicated name in same folder, then rename it with timestamp.
+    	// the new name format will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1.  
+    	String newName = originalLearningDesign.getTitle();
+        if(workspaceFolder != null && copyType == LearningDesign.COPY_TYPE_LESSON){
+			boolean dupName;
+			List<LearningDesign> ldList = learningDesignDAO.getAllLearningDesignsInFolder(workspaceFolder.getWorkspaceFolderId());
+			int idx = 1;
+			
+			//contruct middle part of name by timestamp
+			Calendar calendar = Calendar.getInstance();
+			int mth = calendar.get(Calendar.MONTH) + 1;
+			String mthStr = new Integer(mth).toString();
+			if(mth < 10)
+				mthStr = "0" + mthStr;
+			int day = calendar.get(Calendar.DAY_OF_MONTH);
+			String dayStr = new Integer(day).toString();
+			if(day < 10)
+				dayStr = "0" + dayStr;
+			String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
+			while(true){
+				dupName = false;
+				for(LearningDesign eld :ldList){
+					if(StringUtils.equals(eld.getTitle(),newName)){
+						dupName = true;
+						break;
+					}
+				}
+				if(!dupName)
+					break;
+				newName = originalLearningDesign.getTitle() + "_" + nameMid + "_" + idx;
+				idx++;
+			}
+        }
+            	
         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(copyType),
                                                                                   user,
                                                                                   workspaceFolder,
                                                                                   true);
+        
+		copiedLearningDesign.setTitle(newName);
+		
         // copy the tool content
         // unfortuanately, we have to reaccess the activities to make sure we get the
         // subclass, not a hibernate proxy.

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -169,9 +170,9 @@ public class MonitoringAction extends LamsDispatchAction
     		if ( title == null ) title = "lesson";
     		String desc = WebUtil.readStrParam(request,"lessonDescription", true);
     		if ( desc == null ) desc = "description";
-    		Integer courseId = WebUtil.readIntParam(request,"courseId",true);
+    		Integer organisationId = WebUtil.readIntParam(request,"organisationID",true);
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,courseId,getUserId(request));
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,organisationId,getUserId(request));
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
