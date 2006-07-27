@@ -56,6 +56,8 @@ public class AuthoringForm extends ActionForm {
 
 	boolean lockOnFinished;
 	
+	boolean allowRichEditor;
+	
 	FormFile onlineFile; 
 
 	FormFile offlineFile;
@@ -181,5 +183,13 @@ public class AuthoringForm extends ActionForm {
 
 	public void setDeleteFileUuid(Long deleteFile) {
 		this.deleteFileUuid = deleteFile;
+	}
+
+	public boolean isAllowRichEditor() {
+		return allowRichEditor;
+	}
+
+	public void setAllowRichEditor(boolean allowRichEditor) {
+		this.allowRichEditor = allowRichEditor;
 	}
 }

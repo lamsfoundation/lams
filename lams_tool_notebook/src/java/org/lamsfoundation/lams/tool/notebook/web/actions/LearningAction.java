@@ -114,6 +114,8 @@ public class LearningAction extends LamsDispatchAction {
 		NotebookDTO notebookDTO = new NotebookDTO();
 		notebookDTO.title = notebook.getTitle();
 		notebookDTO.instructions = notebook.getInstructions();
+		notebookDTO.allowRichEditor = notebook.getAllowRichEditor();
+		
 		request.setAttribute("notebookDTO", notebookDTO);
 
 		// Set the content in use flag.

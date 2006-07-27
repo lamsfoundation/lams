@@ -68,6 +68,8 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	private Boolean runOffline;
 
 	private Boolean lockOnFinished;
+	
+	private Boolean allowRichEditor;
 
 	private String onlineInstructions;
 
@@ -218,6 +220,18 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
 	public void setLockOnFinished(Boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
+	}
+	
+	/**
+	 * @hibernate.property column="allow_rich_editor" length="1"
+	 * @return
+	 */
+	public Boolean getAllowRichEditor() {
+		return allowRichEditor;
+	}
+
+	public void setAllowRichEditor(Boolean allowRichEditor) {
+		this.allowRichEditor = allowRichEditor;
 	}
 
 	/**

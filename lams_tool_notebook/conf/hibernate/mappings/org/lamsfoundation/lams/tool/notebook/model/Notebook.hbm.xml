@@ -87,6 +87,15 @@
         />
 
         <property
+            name="allowRichEditor"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="allow_rich_editor"
+            length="1"
+        />
+
+        <property
             name="onlineInstructions"
             type="java.lang.String"
             update="true"

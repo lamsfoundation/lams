@@ -14,35 +14,31 @@
 						${notebookDTO.instructions}
 					</td>
 				</tr>
-				
-				<c:if test="${not contentEditable}">
-					<tr>
-						<td>
-							
-						</td>
-					</tr>
-				</c:if>
-
 
 				<tr>
 					<td>
-						<div>
-							<html:textarea property="entryText" readonly="${not contentEditable}" rows="5" cols="66"></html:textarea>
-						</div>
+						<c:set var="lrnForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+						<lams:SetEditor id="entryText" text="${lrnForm.entryText}" />
+						
+						=== ${lrnForm.entryText} ===
 					</td>
 				</tr>
-
+				
+				 
+				
 				<tr>
-					<td class="right-buttons">
-						<html:hidden property="dispatch" value="finishActivity" />
-						<html:hidden property="toolSessionID" />
-						<html:submit styleClass="button">
-							<fmt:message>button.finish</fmt:message>
-						</html:submit>
-					</td>
-				</tr>
-			</table>
+						<td class="right-buttons">
+							<html:hidden property="dispatch" value="finishActivity" />
+							<html:hidden property="toolSessionID" />
+							<html:submit styleClass="button">
+								<fmt:message>button.finish</fmt:message>
+							</html:submit>
+						</td>
+					</tr>
+				</table>
 		</html:form>
 	</c:if>
 </div>
 <div id="footer-learner"></div>
+
+<lams:HTMLEditor />

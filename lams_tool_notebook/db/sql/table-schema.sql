@@ -6,7 +6,7 @@ drop table if exists tl_lantbk11_notebook;
 drop table if exists tl_lantbk11_session;
 drop table if exists tl_lantbk11_user;
 create table tl_lantbk11_attachment (uid bigint not null auto_increment, file_version_id bigint, file_type varchar(255), file_name varchar(255), file_uuid bigint, create_date datetime, notebook_uid bigint, primary key (uid));
-create table tl_lantbk11_notebook (uid bigint not null auto_increment, create_date datetime, update_date datetime, create_by bigint, title varchar(255), instructions text, run_offline bit, lock_on_finished bit, online_instructions text, offline_instructions text, content_in_use bit, define_later bit, tool_content_id bigint, primary key (uid));
+create table tl_lantbk11_notebook (uid bigint not null auto_increment, create_date datetime, update_date datetime, create_by bigint, title varchar(255), instructions text, run_offline bit, lock_on_finished bit, allow_rich_editor bit, online_instructions text, offline_instructions text, content_in_use bit, define_later bit, tool_content_id bigint, primary key (uid));
 create table tl_lantbk11_session (uid bigint not null auto_increment, session_end_date datetime, session_start_date datetime, status integer, session_id bigint, session_name varchar(250), notebook_uid bigint, primary key (uid));
 create table tl_lantbk11_user (uid bigint not null auto_increment, user_id bigint, last_name varchar(255), login_name varchar(255), first_name varchar(255), finishedActivity bit, notebook_session_uid bigint, entry_uid bigint, primary key (uid));
 alter table tl_lantbk11_attachment add index FK12090F57FC940906 (notebook_uid), add constraint FK12090F57FC940906 foreign key (notebook_uid) references tl_lantbk11_notebook (uid);

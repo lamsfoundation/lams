@@ -54,6 +54,8 @@ public class NotebookDTO {
 	
 	public boolean contentInUse;
 	
+	public boolean allowRichEditor;
+	
 	public Set<NotebookAttachmentDTO> onlineInstructionsFiles;
 
 	public Set<NotebookAttachmentDTO> offlineInstructionsFiles;
@@ -72,6 +74,7 @@ public class NotebookDTO {
 		onlineInstructions = notebook.getOnlineInstructions();
 		offlineInstructions = notebook.getOfflineInstructions();
 		contentInUse = notebook.getContentInUse();
+		allowRichEditor = notebook.getAllowRichEditor();
 
 		onlineInstructionsFiles = new TreeSet<NotebookAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<NotebookAttachmentDTO>();
@@ -175,5 +178,13 @@ public class NotebookDTO {
 
 	public void setContentInUse(Boolean contentInUse) {
 		this.contentInUse = contentInUse;
+	}
+
+	public boolean isAllowRichEditor() {
+		return allowRichEditor;
+	}
+
+	public void setAllowRichEditor(boolean allowRichEditor) {
+		this.allowRichEditor = allowRichEditor;
 	}
 }

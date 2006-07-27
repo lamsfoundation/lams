@@ -353,6 +353,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		notebook.setOfflineInstructions(authForm.getOnlineInstruction());
 		notebook.setOnlineInstructions(authForm.getOfflineInstruction());
 		notebook.setLockOnFinished(authForm.isLockOnFinished());
+		notebook.setAllowRichEditor(authForm.isAllowRichEditor());
 	}
 
 	/**
@@ -369,6 +370,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setOnlineInstruction(notebook.getOnlineInstructions());
 		authForm.setOfflineInstruction(notebook.getOfflineInstructions());
 		authForm.setLockOnFinished(notebook.getLockOnFinished());
+		authForm.setAllowRichEditor(notebook.getAllowRichEditor());
 	}
 
 	/**
