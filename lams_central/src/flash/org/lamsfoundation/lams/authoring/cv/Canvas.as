@@ -56,7 +56,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var _newToolContentID:Number;
 	private var _newChildToolContentID:Number;
 	private var _undoStack:Array;	
-	private var _redoStack:Array;	
+	private var _redoStack:Array;
+	private var toolActWidth:Number = 123;
+	private var toolActHeight:Number = 50;
+	private var complexActWidth:Number = 143;
+
 	
 	
     //private var _pi:MovieClip; //Property inspector
@@ -373,12 +377,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var actToCopy:Activity = ta.mainActivity;
 		//loosly typed this var as it might be any type of activity
 		var actToAdd:Activity;
-		
+		var actType:String;
 		Debugger.log('actToCopy.activityTypeID:'+actToCopy.activityTypeID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 		//_global.breakpoint();
 		switch(actToCopy.activityTypeID){
 			
 			case(Activity.TOOL_ACTIVITY_TYPE):
+				actType = "Tool"
 				 actToAdd = ToolActivity(actToCopy.clone());
 				//give it a new UIID:
 				actToAdd.activityUIID = _ddm.newUIID();
@@ -389,7 +394,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				actToAdd.activityUIID = _ddm.newUIID();
 			
 			case(Activity.PARALLEL_ACTIVITY_TYPE):
-			
+				actType = "Parallel"
 				actToAdd = Activity(actToCopy.clone());
 				
 				//give it a new UIID:
@@ -434,8 +439,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		actToAdd.learningDesignID = _ddm.learningDesignID;
 		
 		//give it the mouse co-ords
-		actToAdd.xCoord = canvasView.getViewMc()._xmouse;
-		actToAdd.yCoord = canvasView.getViewMc()._ymouse;
+		if (actType = "Parallel"){
+			actToAdd.xCoord = canvasView.getViewMc()._xmouse - (complexActWidth/2);
+			actToAdd.yCoord = canvasView.getViewMc()._ymouse;
+		}
+		if(actType = "Tool"){
+			actToAdd.xCoord = canvasView.getViewMc()._xmouse - (toolActWidth/2);
+			actToAdd.yCoord = canvasView.getViewMc()._ymouse - (toolActHeight/2);
+		}
 				
 		Debugger.log('actToAdd:'+actToAdd.title+':'+actToAdd.activityUIID,4,'setDroppedTemplateActivity','Canvas');		
 
@@ -766,7 +777,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function startTransitionTool():Void{
 		//Debugger.log('Starting transition tool',Debugger.GEN,'startTransitionTool','Canvas');			
 		Cursor.showCursor(Application.C_TRANSITION);
+		canvasModel.lockAllComplexActivities();
 		canvasModel.startTransitionTool();
+		
 	}
 	
 	/**
@@ -777,6 +790,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function stopTransitionTool():Void{
 		//Debugger.log('Stopping transition tool',Debugger.GEN,'stopTransitionTool','Canvas');			
 		Cursor.showCursor(Application.C_DEFAULT);
+		canvasModel.unlockAllComplexActivities();
 		canvasModel.stopTransitionTool();
 	}
 	
@@ -1042,7 +1056,17 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	}
 	
+	public function get toolActivityWidth():Number{
+		return toolActWidth;
+	}
 	
+	public function get toolActivityHeight():Number{
+		return toolActHeight;
+	}
+	
+	public function get complexActivityWidth():Number{
+		return complexActWidth;
+	}
 	
 	
 	/**
