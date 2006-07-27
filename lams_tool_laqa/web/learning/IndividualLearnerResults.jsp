@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 
 <h1 class="no-tabs-below">
-	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -77,7 +77,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 					<tr> <td align=left>		
 						<table align="left">
-							<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
+							<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 									  <tr>
 										<td colspan=2 NOWRAP>
 										<b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  
@@ -85,7 +85,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  	 </td>
 									  </tr>
 									  
-				  			  		<c:forEach var="answerEntry" items="${sessionScope.mapAnswers}">
+				  			  		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
 										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
 										  <tr>
 											<td colspan=2 NOWRAP> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  
