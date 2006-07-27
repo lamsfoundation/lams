@@ -204,8 +204,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	
 	public function openDesignByImport(learningDesignID:Number){
-		var callback:Function = Proxy.create(this,setDesign);
-        Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
+		var callback:Function = Proxy.create(this,setDesign, true);
+        canvasModel.importing = true;
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
 		
 	}
 	
@@ -505,6 +506,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		if(clearCanvas(true)){
 			_ddm.setDesign(designData);
+			if(canvasModel.importing){ 
+				Application.getInstance().getWorkspace().getWorkspaceModel().clearWorkspaceCache(_ddm.workspaceFolderID);
+				canvasModel.importing = false;
+			}
 			checkValidDesign();
 			checkReadOnlyDesign();
 			canvasModel.setDirty();

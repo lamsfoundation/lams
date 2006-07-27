@@ -56,6 +56,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _isDrawingTransition:Boolean;
 	private var _transitionActivities:Array;
 	private var _isDragging:Boolean;
+	private var _importing:Boolean;
 	
 
 	
@@ -978,6 +979,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	public function set isDragging (newisDragging:Boolean):Void{
 		_isDragging = newisDragging;
+	}
+	
+	public function get importing():Boolean {
+		return _importing;
+	}
+	
+	public function set importing(importing:Boolean):Void {
+		_importing = importing;
 	}
 	
 }
