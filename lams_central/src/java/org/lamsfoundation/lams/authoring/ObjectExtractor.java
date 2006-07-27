@@ -833,14 +833,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    } else {
 	        transition = existingTransition;
 	    }
-	    
-	    if (keyExists(transitionDetails, WDDXTAGS.TRANSITION_ID))
-	    {
-			Long transitionID= WDDXProcessor.convertToLong(transitionDetails,WDDXTAGS.TRANSITION_ID);
-			if ( transitionID != null )
-				transition.setTransitionId(transitionID);
-	    }		
-		
+
 	    if (keyExists(transitionDetails, WDDXTAGS.TO_ACTIVITY_UIID))
 	    {
 	        Integer toUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TO_ACTIVITY_UIID); 
