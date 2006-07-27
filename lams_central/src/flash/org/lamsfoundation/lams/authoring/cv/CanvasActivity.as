@@ -248,6 +248,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		//Code for Drawing learner on the activty. 
 		trace("Activity type ID : "+_activity.activityTypeID)
+		trace("Activity has parent UI ID : "+_activity.parentUIID)
 		trace("value of _Module in Canvas Activity: "+_module)
 		trace("Monitor Model is: "+_monitorController.getModel())
 		if (_module == "monitoring"){
@@ -353,8 +354,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 
 		//position
-		_x = _activity.xCoord;
-		_y = _activity.yCoord;
+		_x = _activity.xCoord //- (clickTarget_mc._width/2);
+		_y = _activity.yCoord //- (clickTarget_mc._height/2);
 		
 
 		
@@ -514,7 +515,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			if (this.activity.parentUIID != null || this.activity.parentUIID != undefined){
 				var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(this.activity.parentUIID)
 				if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+					trace("called by view")
 					styleObj = _tm.getStyleObject('OptActPanel')
+					act_pnl.setStyle('styleName',styleObj);
+				}else {
+					styleObj = _tm.getStyleObject('ACTPanel')
 					act_pnl.setStyle('styleName',styleObj);
 				}
 			}else {
