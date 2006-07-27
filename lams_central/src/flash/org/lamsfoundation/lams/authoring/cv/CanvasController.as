@@ -38,6 +38,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private var _canvasModel:CanvasModel;
 	private var _canvasView:CanvasView;
 	private var _pi:PropertyInspectorNew;
+	
 	/**
 	* Constructor
 	*
@@ -357,6 +358,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 * @return  
 	 */
 	public function canvasRelease(canvas_mc:MovieClip){
+		var toolActWidth:Number = _canvasModel.getCanvas().toolActivityWidth;
+		var toolActHeight:Number = _canvasModel.getCanvas().toolActivityHeight;
+		var complexActWidth:Number = _canvasModel.getCanvas().complexActivityWidth;
 		Debugger.log(canvas_mc,Debugger.GEN,'canvasRelease','CanvasController');
 		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
 		_canvasModel.selectedItem = null;
@@ -367,14 +371,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 		}
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
-			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
+			var p = new Point(canvas_mc._xmouse-(complexActWidth/2), canvas_mc._ymouse); 
 			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p);
 			//_canvasModel.createNewOptionalActivity(p);
 			_canvasModel.getCanvas().stopOptionalActivity();
 			
 		}
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
-			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
+			var p = new Point(canvas_mc._xmouse-(toolActWidth/2), canvas_mc._ymouse-(toolActHeight/2)); 
 			_canvasModel.createNewGroupActivity(p);
 			_canvasModel.getCanvas().stopGroupTool();
 			
