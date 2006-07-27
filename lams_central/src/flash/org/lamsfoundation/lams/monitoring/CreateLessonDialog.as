@@ -211,6 +211,9 @@ class CreateLessonDialog extends MovieClip{
 			case 'OPEN_FOLDER' :
 				openFolder(event.data, wm);
 				break;
+			case 'CLOSE_FOLDER' :
+				closeFolder(event.data, wm);
+				break;
 			case 'REFRESH_FOLDER' :
 				refreshFolder(event.data, wm);
 				break;
@@ -283,6 +286,26 @@ class CreateLessonDialog extends MovieClip{
 		refreshTree();
 	
 	}
+	
+	/**
+	 * Closes the folder node
+	 * 
+	 * @usage   
+	 * @param   nodeToClose 
+	 * @param   wm          
+	 * @return  
+	 */
+	
+	private function closeFolder(nodeToClose:XMLNode, wm:WorkspaceModel){
+		Debugger.log('closeFolder:'+nodeToClose ,Debugger.GEN,'closeFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		// close the node
+		nodeToClose.attributes.isOpen = false;
+		treeview.setIsOpen(nodeToClose, false);
+		
+		refreshTree();
+	}
+	
 	/**
 	 * Closes folder, then sends openEvent to controller
 	 * @usage   
