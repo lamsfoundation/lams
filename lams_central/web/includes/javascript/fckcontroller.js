@@ -79,7 +79,7 @@ function doWYSWYGEdit(index, size){
     fckFrameElement = document.getElementById("FCKeditor1___Frame");
     if (size == "small") {
         fckFrameElement.style.height = "80px";
-        wyswygEditorScreenElement.style.height = "100x";
+        wyswygEditorScreenElement.style.height = "100px";
     } else {
         fckFrameElement.style.height = "160px";
         wyswygEditorScreenElement.style.height = "180px";
