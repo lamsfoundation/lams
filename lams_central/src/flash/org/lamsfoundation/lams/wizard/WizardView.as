@@ -666,7 +666,7 @@ class WizardView extends AbstractView {
 	
 	private function close(evt:Object){
 		trace('CLOSE WINDOW');
-		getURL('javascript:window.close()');
+		getURL('javascript:closeWizard()');
 	}
 	
 	private function scheduleChange(evt:Object){
