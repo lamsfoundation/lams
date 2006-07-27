@@ -265,6 +265,9 @@ class WorkspaceDialog extends MovieClip{
 			case 'OPEN_FOLDER' :
 				openFolder(event.data, wm, false);
 				break;
+			case 'CLOSE_FOLDER' :
+				closeFolder(event.data, wm);
+				break;
 			case 'REFRESH_FOLDER' :
 				refreshFolder(event.data, wm);
 				break;
@@ -335,6 +338,7 @@ class WorkspaceDialog extends MovieClip{
 	private function openFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
 		Debugger.log('openFolder:'+nodeToOpen ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//open the node
+		nodeToOpen.attributes.isOpen = true;
 		treeview.setIsOpen(nodeToOpen,true);
 		
 		Debugger.log('openFolder forced:'+wm.isForced() ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
@@ -353,7 +357,27 @@ class WorkspaceDialog extends MovieClip{
 		refreshTree();
 
 	}
-		/**
+	
+	/**
+	 * Closes the folder node
+	 * 
+	 * @usage   
+	 * @param   nodeToClose 
+	 * @param   wm          
+	 * @return  
+	 */
+	
+	private function closeFolder(nodeToClose:XMLNode, wm:WorkspaceModel){
+		Debugger.log('closeFolder:'+nodeToClose ,Debugger.GEN,'closeFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		// close the node
+		nodeToClose.attributes.isOpen = false;
+		treeview.setIsOpen(nodeToClose, false);
+		
+		refreshTree();
+	}
+	
+	/**
 	 * Closes folder, then sends openEvent to controller
 	 * @usage   
 	 * @param   nodeToOpen 
@@ -931,7 +955,7 @@ class WorkspaceDialog extends MovieClip{
 		treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
 		treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
-
+		
 		//location_dnd.addEventListener('double_click', dndList);
 		//location_dnd.addEventListener('drag_start', dndList);
 		//location_dnd.addEventListener('drag_fail', dndList);

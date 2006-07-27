@@ -175,6 +175,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeChange','org.lamsfoundation.lams.WorkspaceController');
 		var treeview = evt.target;
 		_workspaceModel.setSelectedTreeNode(treeview.selectedNode);
+		if(treeview.selectedNode.attributes.data.resourceType == _workspaceModel.RT_FOLDER) {
+			if(treeview.selectedNode.attributes.isOpen) { _workspaceModel.broadcastViewUpdate('CLOSE_FOLDER', treeview.selectedNode); }
+			else { forceNodeOpen(treeview.selectedNode); }
+		}
 	}
 	
 	/**
