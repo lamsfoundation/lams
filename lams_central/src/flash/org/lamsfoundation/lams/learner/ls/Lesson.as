@@ -267,28 +267,27 @@ class Lesson {
 		}
 	}
 	
+	/** Loads the Activity page in frame or popup-window depending on the status of the Acvtivity. */
 	public function getActivityURL(request:String, popup:Boolean){
 		
-		var callback:Function;
 		if(popup){
-			callback = Proxy.create(this,popupActivity);
+			popupActivity(_root.serverURL + request);
 		} else {
-			callback = Proxy.create(this,loadActivity);
+			loadActivity(_root.serverURL + request);
 		}
 		
-		Application.getInstance().getComms().getRequest(request,callback, false);
 	}
 	
-	private function loadActivity(url:Object){
-		Debugger.log('loading activity : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
+	private function loadActivity(url:String){
+		Debugger.log('loading activity path using forward: ' + url,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
 
-		getURL(url.activityURL,"contentFrame");
+		getURL(url,"contentFrame");
 	}
 	
-	private function popupActivity(url:Object){
-		Debugger.log('loading activity (popup window) : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
+	private function popupActivity(url:String){
+		Debugger.log('loading activity (popup window) path using forward: ' + url,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
 
-		JsPopup.getInstance().launchPopupWindow(url.activityURL, 'LearnerActivity', 600, 800, true, true, true, false, false);
+		JsPopup.getInstance().launchPopupWindow(url, 'LearnerActivity', 600, 800, true, true, true, false, false);
 	
 	}
 	
