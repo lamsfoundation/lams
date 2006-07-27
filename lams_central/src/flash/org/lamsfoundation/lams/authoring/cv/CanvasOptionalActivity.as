@@ -40,6 +40,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	//class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip {
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
+	private var newContainerXCoord:Number; 
+	private var newContainerYCoord:Number;
 	private var CHILD_INCRE : Number = 60;
 	private var learnerOffset_X:Number = 4
 	private var learnerOffset_Y:Number = 3
@@ -108,7 +110,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		CHILD_OFFSET_X = 8;
 		CHILD_OFFSET_Y = 57;
-		childActivities_mc = this;
+		//childActivities_mc = this;
 		for (var j=0; j<children_mc.length; j++){
 			children_mc[j].removeMovieClip();
 		}
@@ -168,24 +170,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		actCount_lbl.text = _children.length +" - "+ Dictionary.getValue('lbl_num_activities'); //" activities";
 		
 		//position the container (this)
-		
-			
-		if (numOfChildren > 1) {
+		if(numOfChildren > 1){
 			container_pnl._height = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		}
+		
 		_x = _activity.xCoord;
 		_y = _activity.yCoord;
+
+		
+		
 		
 		//dimentions of container (this)
-		if (_locked){
-			padlockClosed_mc._visible = true;
-			padlockOpen_mc._visible = false;
-			clickTarget_mc._height = container_pnl._height;
-		}else{
-			padlockOpen_mc._visible = true;
-			padlockClosed_mc._visible = false;
-			clickTarget_mc._height = 45;
-		}
+		setLocking();
 			
 
 		if(fromModuleTab == "monitorMonitorTab"){
@@ -222,6 +218,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		//child1_mc._visible = true;
 	}
 	
+	private function setLocking():Void{
+		if (_locked){
+			padlockClosed_mc._visible = true;
+			padlockOpen_mc._visible = false;
+			clickTarget_mc._height = container_pnl._height;
+		}else{
+			padlockOpen_mc._visible = true;
+			padlockClosed_mc._visible = false;
+			clickTarget_mc._height = 45;
+		}
+	}
+	
+	public function set locked(setLock:Boolean):Void {
+		_locked = setLock;
+		setLocking();
+		
+	}
+	
+	public function get locked():Boolean {
+		return _locked;
+	}
 	
 	private function localOnPress ():Void{
 		
@@ -273,9 +290,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	*/
 	public function getVisibleHeight():Number {
 		return _visibleHeight;
-	}
-	public function get locked():Boolean {
-		return _locked;
 	}
 	
 	public function get actChildren():Array {

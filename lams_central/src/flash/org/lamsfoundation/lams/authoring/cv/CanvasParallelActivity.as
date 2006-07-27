@@ -42,8 +42,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 //class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip {   
   
 	private var CHILD_OFFSET_X:Number = 8;
-	private var CHILD1_OFFSET_Y:Number = 45;
-	private var CHILD2_OFFSET_Y:Number = 108;
+	private var CHILD1_OFFSET_Y:Number = 45 //67.5;
+	private var CHILD2_OFFSET_Y:Number = 108 //130.5;
+	private var newContainerXCoord:Number; 
+	private var newContainerYCoord:Number;
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
@@ -119,10 +121,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		
 		}
 		//set the positioning co-ords
-			child1.xCoord = CHILD_OFFSET_X;
+			newContainerXCoord = container_pnl._width/2
+			newContainerYCoord = container_pnl._height/2
+			child1.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
 			child1.yCoord = CHILD1_OFFSET_Y;
-			child2.xCoord = CHILD_OFFSET_X;
-			child2.yCoord = CHILD2_OFFSET_Y;
+			child2.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
+			child2.yCoord = CHILD2_OFFSET_Y //+ newContainerYCoord;
 		//so now it is placed on in the IDE and we just call init
 		if (fromModuleTab == "monitorMonitorTab"){
 			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring"});
@@ -203,9 +207,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			}
 		}
 		//position the container (this)
-		_x = _activity.xCoord;
-		_y = _activity.yCoord;
+		_x = _activity.xCoord //- newContainerXCoord;
+		_y = _activity.yCoord
 	
+		setLocking()
+		_visible = true;
+		//child1_mc._visible = true;
+					
+	}
+	
+	private function setLocking():Void{
 		if(_locked){
 			padlockClosed_mc._visible = true;
 			padlockOpen_mc._visible = false;
@@ -215,13 +226,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			padlockClosed_mc._visible = false;
 			clickTarget_mc._height = 30;
 		}
-		
-	
-		_visible = true;
-		//child1_mc._visible = true;
-					
 	}
 	
+	public function set locked(setLock:Boolean):Void {
+		_locked = setLock;
+		setLocking();
+		
+	}
+	
+	public function get locked():Boolean {
+		return _locked;
+	}
 	
 	private function localOnPress():Void{
 			
