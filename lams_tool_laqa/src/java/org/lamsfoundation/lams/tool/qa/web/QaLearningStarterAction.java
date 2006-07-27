@@ -366,6 +366,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	//request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
     	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
     	//request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
+    	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
     	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
     	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
     	

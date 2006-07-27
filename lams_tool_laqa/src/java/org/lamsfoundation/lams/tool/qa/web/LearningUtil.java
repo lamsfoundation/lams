@@ -52,6 +52,16 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class LearningUtil implements QaAppConstants{
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
+	
+	public static void saveFormRequestData(HttpServletRequest request, QaLearningForm qaLearningForm)
+	{
+	 	String toolSessionID=request.getParameter("toolSessionID");
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	qaLearningForm.setToolSessionID(toolSessionID);
+
+	 	logger.debug("done saving form request data.");
+	}
+
 
     /**
      * createUsersAndResponses(Map mapAnswers, HttpServletRequest request)

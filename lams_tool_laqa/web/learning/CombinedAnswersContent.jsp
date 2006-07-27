@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<tr> <td>
 			<table class="forms">
-				<c:forEach var="questionEntry" items="${mcGeneralLearnerFlowDTO.mapQuestionContentLearner}">
+				<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 						  <tr>
 						  	<td colspan=2 NOWRAP> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  
 						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 

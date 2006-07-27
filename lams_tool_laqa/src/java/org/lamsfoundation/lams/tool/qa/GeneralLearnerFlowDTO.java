@@ -67,6 +67,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected Map mapQuestions;
     
+    protected Map mapQuestionContentLearner;
+    
     
     /**
      * @return Returns the currentAnswer.
@@ -82,7 +84,7 @@ public class GeneralLearnerFlowDTO implements Comparable
     }
     protected String userFeedback;
     
-    protected Map mapQuestionContentLearner;
+    
     
     /**
      * @return Returns the mapQuestionContentLearner.

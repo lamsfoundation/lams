@@ -64,6 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content-learner">
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
+		<html:hidden property="toolSessionID"/>						  		
 
 				<table class="forms">
 				  <tr><th scope="col">
@@ -94,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									
 									  <tr>
 										<td colspan=2 NOWRAP >
-											&nbsp&nbsp
+											&nbsp
 									  	 </td>
 									  </tr>
 									

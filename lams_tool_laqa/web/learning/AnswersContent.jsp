@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 
 <h1 class="no-tabs-below">
-	<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+	<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -64,29 +64,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content-learner">
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
+		<html:hidden property="toolSessionID"/>						
+  		
 			<table class="forms">
 
 			<tr> <td>
 				<html:errors/>
 			</td></tr>
 
-			<c:if test="${mcGeneralLearnerFlowDTO.activityOffline == 'true'}"> 			
+			<c:if test="${generalLearnerFlowDTO.activityOffline == 'true'}"> 			
 				<tr> <td NOWRAP>
 					<bean:message key="label.learning.forceOfflineMessage"/>
 				</td></tr>
 			</c:if> 		
 		
-			<c:if test="${mcGeneralLearnerFlowDTO.activityOffline == 'false'}"> 			
+			<c:if test="${generalLearnerFlowDTO.activityOffline == 'false'}"> 			
 				<tr><td NOWRAP>
-					<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false"/> 
+					<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false"/> 
 				</td></tr>
 	
 				<tr> <td NOWRAP>
-					 <c:out value="${mcGeneralLearnerFlowDTO.userFeedback}" escapeXml="true"/> 
+					 <c:out value="${generalLearnerFlowDTO.userFeedback}" escapeXml="true"/> 
 				</td></tr>
 			
 				<c:choose> 
-				  <c:when test="${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
+				  <c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
 						<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
 					  </c:when> 
 
