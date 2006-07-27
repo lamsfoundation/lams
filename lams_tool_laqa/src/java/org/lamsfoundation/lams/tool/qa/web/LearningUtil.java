@@ -26,13 +26,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
@@ -59,9 +62,62 @@ public class LearningUtil implements QaAppConstants{
 	 	logger.debug("toolSessionID: " + toolSessionID);
 	 	qaLearningForm.setToolSessionID(toolSessionID);
 
+	 	String httpSessionID=request.getParameter("httpSessionID");
+	 	logger.debug("httpSessionID: " + httpSessionID);
+	 	qaLearningForm.setHttpSessionID(httpSessionID);
+	 	
+	 	String totalQuestionCount=request.getParameter("totalQuestionCount");
+	 	logger.debug("totalQuestionCount: " + totalQuestionCount);
+	 	qaLearningForm.setTotalQuestionCount(totalQuestionCount);
+	 	
+
 	 	logger.debug("done saving form request data.");
 	}
 
+	
+    public static GeneralLearnerFlowDTO buildGeneralLearnerFlowDTO(QaContent qaContent)
+    {
+        logger.debug("starting buildMcGeneralLearnerFlowDTO: " + qaContent);
+        GeneralLearnerFlowDTO generalLearnerFlowDTO =new GeneralLearnerFlowDTO();
+        generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
+        generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
+        generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
+        //generalLearnerFlowDTO.setLearnerProgress(new Boolean(false).toString());
+        
+        if (qaContent.isQuestionsSequenced()) 
+            generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
+        else
+            generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
+            
+        
+        generalLearnerFlowDTO.setActivityOffline(new Boolean(qaContent.isRunOffline()).toString());
+        
+        logger.debug("continue buildGeneralLearnerFlowDTO: " + qaContent);
+        generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
+        logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+        
+        Map mapQuestions= new TreeMap(new QaComparator());
+        
+    	Iterator contentIterator=qaContent.getQaQueContents().iterator();
+    	while (contentIterator.hasNext())
+    	{
+    		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
+    		if (qaQueContent != null)
+    		{
+    			int displayOrder=qaQueContent.getDisplayOrder();
+        		if (displayOrder != 0)
+        		{
+        			/*
+    	    		 *  add the question to the questions Map in the displayOrder
+    	    		 */
+            		mapQuestions.put(new Integer(displayOrder).toString(),qaQueContent.getQuestion());
+        		}
+    		}
+    	}
+		
+    	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
+        return generalLearnerFlowDTO;
+    }
 
     /**
      * createUsersAndResponses(Map mapAnswers, HttpServletRequest request)
@@ -230,9 +286,8 @@ public class LearningUtil implements QaAppConstants{
 	 * @param qaLearningForm
 	 * return void
 	 */
-    protected void feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex)
+    protected String feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex, String totalQuestionCount)
     {
-    	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
     	logger.debug("totalQuestionCount: " + totalQuestionCount);
     	int remainingQuestionCount=new Long(totalQuestionCount).intValue() - currentQuestionIndex +1;
     	logger.debug("remainingQuestionCount: " + remainingQuestionCount);
@@ -242,7 +297,8 @@ public class LearningUtil implements QaAppConstants{
     	else
     		userFeedback= "End of the questions.";
     			
-    	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
+    	//request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
+    	return userFeedback;
     }
     
     public void setContentInUse(long toolContentId, IQaService qaService)

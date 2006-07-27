@@ -54,6 +54,7 @@ public interface QaAppConstants {
 	public static final String COPY_TOOL_CONTENT 						="copyToolContent";
 	public static final String ERROR_LIST								="errorList";
 	public static final String ERROR_LIST_LEARNER						="errorListLearner";
+	public static final String MAP_SEQUENTIAL_ANSWERS_KEY				="mapSequentialAnswersKey";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
 	public static final String DEFAULT_ONLINE_INST						="online instructions";
 	public static final String DEFAULT_OFFLINE_INST						="offline instructions";

@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -53,6 +54,7 @@ import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
@@ -179,6 +181,15 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		
 		//request.getSession().setAttribute(CURRENT_ANSWER, "");
 		generalLearnerFlowDTO.setCurrentAnswer("");
+		
+		
+	    SessionMap sessionMap = new SessionMap();
+	    Map mapSequentialAnswers= new HashMap();
+	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+		
 		
 		/*initialize available question display modes in the session */
 		//request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
@@ -372,6 +383,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	
     	//request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestions.size()).toString());
     	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
+    	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
+    	
     	
     	//String userFeedback= feedBackType + request.getSession().getAttribute(TOTAL_QUESTION_COUNT) + QUESTIONS;
     	String userFeedback= feedBackType + generalLearnerFlowDTO.getTotalQuestionCount() + QUESTIONS;

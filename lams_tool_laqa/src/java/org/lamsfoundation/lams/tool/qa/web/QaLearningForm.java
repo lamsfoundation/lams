@@ -41,34 +41,11 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String getPreviousQuestion;
 	protected String endLearning;
 	
-	protected String toolSessionID;
+	protected String totalQuestionCount;
+	protected String httpSessionID;
+    protected String toolSessionID;
+    protected String questionIndex;		
 	protected String userID;
-    /**
-     * @return Returns the userID.
-     */
-    public String getUserID() {
-        return userID;
-    }
-    /**
-     * @param userID The userID to set.
-     */
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-	protected String mode;
-	
-    /**
-     * @return Returns the mode.
-     */
-    public String getMode() {
-        return mode;
-    }
-    /**
-     * @param mode The mode to set.
-     */
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
 	protected String viewAllResults;
 	protected String responseId;
 	
@@ -208,5 +185,68 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
      */
     public void setToolSessionID(String toolSessionID) {
         this.toolSessionID = toolSessionID;
+    }
+    
+    /**
+     * @return Returns the httpSessionID.
+     */
+    public String getHttpSessionID() {
+        return httpSessionID;
+    }
+    /**
+     * @param httpSessionID The httpSessionID to set.
+     */
+    public void setHttpSessionID(String httpSessionID) {
+        this.httpSessionID = httpSessionID;
+    }
+	/**
+     * @return Returns the userID.
+     */
+    public String getUserID() {
+        return userID;
+    }
+    /**
+     * @param userID The userID to set.
+     */
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+	protected String mode;
+	
+    /**
+     * @return Returns the mode.
+     */
+    public String getMode() {
+        return mode;
+    }
+    /**
+     * @param mode The mode to set.
+     */
+    public void setMode(String mode) {
+        this.mode = mode;
     }    
+    /**
+     * @return Returns the questionIndex.
+     */
+    public String getQuestionIndex() {
+        return questionIndex;
+    }
+    /**
+     * @param questionIndex The questionIndex to set.
+     */
+    public void setQuestionIndex(String questionIndex) {
+        this.questionIndex = questionIndex;
+    }
+    /**
+     * @return Returns the totalQuestionCount.
+     */
+    public String getTotalQuestionCount() {
+        return totalQuestionCount;
+    }
+    /**
+     * @param totalQuestionCount The totalQuestionCount to set.
+     */
+    public void setTotalQuestionCount(String totalQuestionCount) {
+        this.totalQuestionCount = totalQuestionCount;
+    }
 }

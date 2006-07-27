@@ -99,6 +99,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
@@ -108,6 +109,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 
 public class QaLearningAction extends LamsDispatchAction implements QaAppConstants
@@ -179,7 +181,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     		else 
     		{
     		    logger.debug("populating mapAnswers...");
-    		    mapAnswers=populateAnswersMap(mapping, form, request, response);
+    		    GeneralLearnerFlowDTO generalLearnerFlowDTO= new GeneralLearnerFlowDTO();
+    		    mapAnswers=populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO);
     		    logger.debug("mapAnswers: " + mapAnswers);
     		}
     		
@@ -287,46 +290,105 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	throws IOException, ServletException, ToolException
 	{
     	logger.debug("dispatching getNextQuestion...");
-    	populateAnswersMap(mapping, form, request, response);
+    	QaLearningForm qaLearningForm = (QaLearningForm) form;
+    	
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+
+    	
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	qaLearningForm.setToolSessionID(toolSessionID);
+	 	
+	 	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
+	    logger.debug("retrieving qaSession: " + qaSession);
+	 	
+	    String toolContentID=qaSession.getQaContent().getQaContentId().toString();
+	    logger.debug("toolContentID: " + toolContentID);
+	    
+	    QaContent qaContent=qaSession.getQaContent();
+	    logger.debug("using qaContent: " + qaContent);
+	    
+    	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
+	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+    	
+    	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO);
     	
         return (mapping.findForward(LOAD_LEARNER));
     }
     
     
-    public Map populateAnswersMap(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    public Map populateAnswersMap(ActionForm form, HttpServletRequest request, GeneralLearnerFlowDTO generalLearnerFlowDTO)
     {
-    	logger.debug("doing populateAnswersMap");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
 
-    	Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
-        logger.debug("MAP_ANSWERS:" + mapAnswers);
+    	//Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
+        //logger.debug("MAP_ANSWERS:" + mapAnswers);
         
-        int currentQuestionIndex=new Long(qaLearningForm.getCurrentQuestionIndex()).intValue();
-        logger.debug("currentQuestionIndex is: " + currentQuestionIndex);
-        logger.debug("getting answer for question: " + currentQuestionIndex + "as: " +  qaLearningForm.getAnswer());
-        logger.debug("mapAnswers size:" + mapAnswers.size());
-        
-        if  (mapAnswers.size() >= currentQuestionIndex)
-        {
-            logger.debug("mapAnswers size:" + mapAnswers.size() + " and currentQuestionIndex: " + currentQuestionIndex);
-            mapAnswers.remove(new Long(currentQuestionIndex).toString());
-        }
-        logger.debug("before adding to mapAnswers: " + mapAnswers);
-        mapAnswers.put(new Long(currentQuestionIndex).toString(), qaLearningForm.getAnswer());
-        logger.debug("adding new answer:" + qaLearningForm.getAnswer() + " to mapAnswers.");
+ 	    String httpSessionID=qaLearningForm.getHttpSessionID();
+ 	    logger.debug("httpSessionID: " + httpSessionID);
+ 	    
+	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	    logger.debug("sessionMap: " + sessionMap);
+	    
+	    Map mapSequentialAnswers=(Map)sessionMap.get(MAP_SEQUENTIAL_ANSWERS_KEY);
+	    logger.debug("pre mapSequentialAnswers: " + mapSequentialAnswers);
 
-        currentQuestionIndex++;
+        String currentQuestionIndex=qaLearningForm.getCurrentQuestionIndex(); 
+        logger.debug("currentQuestionIndex:" + currentQuestionIndex);
+        
+        
+        //int currentQuestionIndex=new Long(qaLearningForm.getCurrentQuestionIndex()).intValue();
+        logger.debug("getting answer for question: " + currentQuestionIndex + "as: " +  qaLearningForm.getAnswer());
+        logger.debug("mapSequentialAnswers size:" + mapSequentialAnswers.size());
+        
+                
+        if  (mapSequentialAnswers.size() >= new Integer(currentQuestionIndex).intValue())
+        {
+            logger.debug("mapSequentialAnswers size:" + mapSequentialAnswers.size() + " and currentQuestionIndex: " + currentQuestionIndex);
+            mapSequentialAnswers.remove(new Long(currentQuestionIndex).toString());
+        }
+        logger.debug("before adding to mapSequentialAnswers: " + mapSequentialAnswers);
+        mapSequentialAnswers.put(new Long(currentQuestionIndex).toString(), qaLearningForm.getAnswer());
+        logger.debug("adding new answer:" + qaLearningForm.getAnswer() + " to mapSequentialAnswers.");
+        
+        logger.debug("updated mapSequentialAnswers:" + mapSequentialAnswers);
+
+        int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue(); 
+        logger.debug("intCurrentQuestionIndex:" + intCurrentQuestionIndex);
+        intCurrentQuestionIndex++;
         
         LearningUtil learningUtil= new LearningUtil();
-        request.getSession().setAttribute(CURRENT_ANSWER, mapAnswers.get(new Long(currentQuestionIndex).toString()));
-        logger.debug("currentQuestionIndex will be: " + currentQuestionIndex);
-        request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Long(currentQuestionIndex));
-        learningUtil.feedBackAnswersProgress(request,currentQuestionIndex);
+        //request.getSession().setAttribute(CURRENT_ANSWER, mapSequentialAnswers.get(new Long(currentQuestionIndex).toString()));
+        String currentAnswer=(String)mapSequentialAnswers.get(new Long(currentQuestionIndex).toString());
+        logger.debug("currentAnswer:" + currentAnswer);
+        generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
+        
+        logger.debug("currentQuestionIndex will be: " + intCurrentQuestionIndex);
+        //request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Long(currentQuestionIndex));
+        generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(intCurrentQuestionIndex));
+        
+        String totalQuestionCount=qaLearningForm.getTotalQuestionCount();
+        logger.debug("totalQuestionCount: " + totalQuestionCount);
+        
+        String userFeedback=learningUtil.feedBackAnswersProgress(request,intCurrentQuestionIndex,totalQuestionCount);
+        logger.debug("userFeedback: " + userFeedback);
+        generalLearnerFlowDTO.setUserFeedback(userFeedback);
+        
         qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
         
-        request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
-        logger.debug("final MAP_ANSWERS: " + mapAnswers);
-        return mapAnswers;
+        //request.getSession().setAttribute(MAP_ANSWERS, mapSequentialAnswers);
+        //logger.debug("final MAP_ANSWERS: " + mapSequentialAnswers);
+        
+	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+
+        request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);        
+        return mapSequentialAnswers;
     }
     
     
@@ -373,7 +435,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    request.getSession().setAttribute(CURRENT_ANSWER, mapAnswers.get(new Long(currentQuestionIndex).toString()));
 	    logger.debug("currentQuestionIndex will be: " + currentQuestionIndex);
 	    request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Long(currentQuestionIndex));
-	    learningUtil.feedBackAnswersProgress(request,currentQuestionIndex);
+	    //learningUtil.feedBackAnswersProgress(request,currentQuestionIndex);
 	    qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
 	    
 	    request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);

@@ -49,6 +49,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String toolSessionID;
     
+    protected String httpSessionID;
+    
     protected String toolContentID;
     
     protected Integer currentQuestionIndex;
@@ -304,4 +306,17 @@ public class GeneralLearnerFlowDTO implements Comparable
     public void setMapQuestions(Map mapQuestions) {
         this.mapQuestions = mapQuestions;
     }
+    
+    /**
+     * @return Returns the httpSessionID.
+     */
+    public String getHttpSessionID() {
+        return httpSessionID;
+    }
+    /**
+     * @param httpSessionID The httpSessionID to set.
+     */
+    public void setHttpSessionID(String httpSessionID) {
+        this.httpSessionID = httpSessionID;
+    }    
 }
