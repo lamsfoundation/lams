@@ -45,7 +45,7 @@ class WorkspaceDialog extends MovieClip{
     private var cancel_btn:Button;
     private var panel:MovieClip;            //The underlaying panel base
     
-	private var switchView_tab:TabBar;
+	private var switchView_tab:MovieClip;
 	
 	//location tab elements
 	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
@@ -92,8 +92,11 @@ class WorkspaceDialog extends MovieClip{
 	
 
     private var _selectedDesignId:Number;
-    
+    private var _currentTab:Number;
+	
 	private static var OTHER_LICENSE_ID:Number = 2;
+	private static var LOCATION_TAB:Number = 0;
+	private static var PROP_TAB:Number = 1;
 	
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -483,7 +486,7 @@ class WorkspaceDialog extends MovieClip{
 		}
 		
 		// if Other Licensing Agreement is selected then show the textarea box for addition comments
-		if(licenseID_cmb.value.licenseID == OTHER_LICENSE_ID){
+		if((licenseID_cmb.value.licenseID == OTHER_LICENSE_ID) && (_currentTab == PROP_TAB)){
 			license_txa.visible = true;
 			license_comment_lbl.visible = true;
 		} else {
@@ -521,13 +524,17 @@ class WorkspaceDialog extends MovieClip{
 		Debugger.log('v:'+v,Debugger.GEN,'setPropertiesContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		description_lbl.visible = v;
 		license_lbl.visible = v;
-		license_comment_lbl.visible = false;
 		resourceDesc_txa.visible = v;
-		license_txa.visible = false;
 		licenseImg_pnl.visible = v;
 		viewLicense_btn.visible = v;
 		
-	
+		if(licenseID_cmb.value.licenseID == OTHER_LICENSE_ID) {
+			license_comment_lbl.visible = v;
+			license_txa.visible = v;
+		} else {
+			license_comment_lbl.visible = false;
+			license_txa.visible = false;
+		}
 
 	}
 	
@@ -544,13 +551,12 @@ class WorkspaceDialog extends MovieClip{
 		if(tabToSelect == "LOCATION"){
 			setLocationContentVisible(true);
 			setPropertiesContentVisible(false);
-			
-				
+			_currentTab = LOCATION_TAB;
 				
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
 			setPropertiesContentVisible(true);
-			
+			_currentTab = PROP_TAB;
 		
 		}
 		
