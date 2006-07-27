@@ -362,7 +362,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @param   ta TemplateActivity
 	 * @return  
 	 */
-	public function setDroppedTemplateActivity(ta:TemplateActivity):Void{
+	public function setDroppedTemplateActivity(ta:TemplateActivity, taParent:Number):Void{
 		
 		var actToCopy:Activity = ta.mainActivity;
 		//loosly typed this var as it might be any type of activity
@@ -391,18 +391,17 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				
 				
 			Debugger.log('parallel activity given new UIID of:'+actToAdd.activityUIID ,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
-				 //now get this acts children and add them to the design (WHINEY VOICE:"will somebody pleeeease think of the children.....")
+			//now get this acts children and add them to the design (WHINEY VOICE:"will somebody pleeeease think of the children.....")
 				for(var i=0;i<ta.childActivities.length;i++){
 					
 					trace("child's old toolContentID: "+ta.childActivities[i].toolContentID)
 					
-					//Note: The next few line os code is now execute in the setNewChildContentID method
-					//Find out if other types of activity can be held by complex acts 
+				//Note: The next few line os code is now execute in the setNewChildContentID method
+				//Find out if other types of activity can be held by complex acts 
 					
 					var child:Activity = ToolActivity(ta.childActivities[i].clone());
 					child.activityUIID = _ddm.newUIID();
 					//tell it who's the daddy (set its parent UIID)
-					//child.activityToolContentID = _newToolContentID;
 					child.parentUIID = actToAdd.activityUIID;
 					Debugger.log('child.parentUIID:'+child.parentUIID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 					child.learningDesignID = _ddm.learningDesignID;
@@ -427,6 +426,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		//assign it the LearningDesignID
 		actToAdd.learningDesignID = _ddm.learningDesignID;
+		
 		//give it the mouse co-ords
 		actToAdd.xCoord = canvasView.getViewMc()._xmouse;
 		actToAdd.yCoord = canvasView.getViewMc()._ymouse;
@@ -436,8 +436,16 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		_ddm.addActivity(actToAdd);
 		//refresh the design
 		canvasModel.setDirty();
-		//select the new thing
 		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
+		//select the new thing
+		if (taParent != undefined || taParent != null){
+			actToAdd.parentUIID = taParent;
+			canvasModel.removeActivity(actToAdd.activityUIID);
+			canvasModel.removeActivity(taParent);
+			trace("actToAdd.parentUIID: "+actToAdd.parentUIID)
+		}
+		canvasModel.setDirty();
+		
 	}
 	
 	private function setNewChildContentID(r, ta:ToolActivity){
