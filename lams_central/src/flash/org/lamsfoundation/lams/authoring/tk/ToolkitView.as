@@ -360,8 +360,8 @@ class ToolkitView extends AbstractView {
 		//Debugger.log('_dragging:'+_dragging,4,'dragIcon','TemplateActivity');
 		if(_dragging){
 			dragIcon_mc._visible = true;
-			dragIcon_mc._x = Application.cursor._xmouse;
-			dragIcon_mc._y = Application.cursor._ymouse;
+			dragIcon_mc._x = Application.cursor._xmouse-(dragIcon_mc._width/2);
+			dragIcon_mc._y = Application.cursor._ymouse-(dragIcon_mc._height/2);
 		}
 		
 	}
