@@ -246,6 +246,9 @@ class WizardView extends AbstractView {
 			case 'OPEN_FOLDER' :
 				openFolder(event.data, wm);
 				break;
+			case 'CLOSE_FOLDER' :
+				closeFolder(event.data, wm);
+				break;
 			case 'REFRESH_FOLDER' :
 				refreshFolder(event.data, wm);
 				break;
@@ -574,6 +577,7 @@ class WizardView extends AbstractView {
 	private function openFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
 		Debugger.log('openFolder:'+nodeToOpen ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//open the node
+		nodeToOpen.attributes.isOpen = true;
 		location_treeview.setIsOpen(nodeToOpen,true);
 		
 		if(wm.isForced() && nodeToOpen.attributes.data.resourceID == WorkspaceModel.ROOT_VFOLDER){
@@ -590,6 +594,26 @@ class WizardView extends AbstractView {
 		refreshTree();
 	
 	}
+	
+	/**
+	 * Closes the folder node
+	 * 
+	 * @usage   
+	 * @param   nodeToClose 
+	 * @param   wm          
+	 * @return  
+	 */
+	
+	private function closeFolder(nodeToClose:XMLNode, wm:WorkspaceModel){
+		Debugger.log('closeFolder:'+nodeToClose ,Debugger.GEN,'closeFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		// close the node
+		nodeToClose.attributes.isOpen = false;
+		location_treeview.setIsOpen(nodeToClose, false);
+		
+		refreshTree();
+	}
+	
 	/**
 	 * Closes folder, then sends openEvent to controller
 	 * @usage   
