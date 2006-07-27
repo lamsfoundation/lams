@@ -233,7 +233,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return actOptional
 	}
 	
+	public function lockAllComplexActivities():Void{
+		var k:Array = _activitiesDisplayed.values();
+		//trace("findOptionalActivities Called "+k.length )
+		for (var i=0; i<k.length; i++){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				k[i].locked = true;
+				trace("complex activity with id:"+k[i].activity.activityUIID )
+			}
+		}
+	}
 	
+	
+	public function unlockAllComplexActivities():Void{
+		var k:Array = _activitiesDisplayed.values();
+		//trace("findOptionalActivities Called "+k.length )
+		for (var i=0; i<k.length; i++){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				k[i].locked = false;
+				trace("complex activity with id:"+k[i].activity.activityUIID )
+			}
+		}
+	}
 	/**
 	 * Craetes a [trans][gate act][trans] combo from an existing transition.
 	 * NOT used anymore as we dont want to allow users to think they can click transitions
