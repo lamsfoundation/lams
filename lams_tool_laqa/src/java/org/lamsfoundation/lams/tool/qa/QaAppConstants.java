@@ -76,6 +76,7 @@ public interface QaAppConstants {
 	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
 	public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
 	public static final String IS_PORTFOLIO_EXPORT						="isPortfolioExport";
+	public static final String GENERAL_LEARNER_FLOW_DTO					="generalLearnerFlowDTO";
 			
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
     

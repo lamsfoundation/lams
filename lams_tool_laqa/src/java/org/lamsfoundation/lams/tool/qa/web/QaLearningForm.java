@@ -42,6 +42,19 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String endLearning;
 	
 	protected String toolSessionID;
+	protected String userID;
+    /**
+     * @return Returns the userID.
+     */
+    public String getUserID() {
+        return userID;
+    }
+    /**
+     * @param userID The userID to set.
+     */
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
 	protected String mode;
 	
     /**

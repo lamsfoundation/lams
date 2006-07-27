@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McGeneralLearnerFlowDTO implements Comparable
+public class GeneralLearnerFlowDTO implements Comparable
 {
     protected String activityOffline;
     
@@ -47,13 +47,26 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String countSessionComplete;
     
-    protected String toolSessionId;
+    protected String toolSessionID;
+    
+    protected String toolContentID;
     
     protected Integer currentQuestionIndex;
     
     protected String questionListingMode;
     
     protected String currentAnswer;
+    
+    protected String reportTitleLearner;
+    
+    protected String endLearningMessage;
+    
+    protected String userNameVisible;
+    
+    protected Map mapAnswers;
+    
+    protected Map mapQuestions;
+    
     
     /**
      * @return Returns the currentAnswer.
@@ -156,24 +169,12 @@ public class McGeneralLearnerFlowDTO implements Comparable
     public void setQuestionListingMode(String questionListingMode) {
         this.questionListingMode = questionListingMode;
     }
-    /**
-     * @return Returns the toolSessionId.
-     */
-    public String getToolSessionId() {
-        return toolSessionId;
-    }
-    /**
-     * @param toolSessionId The toolSessionId to set.
-     */
-    public void setToolSessionId(String toolSessionId) {
-        this.toolSessionId = toolSessionId;
-    }
     
 	public int compareTo(Object o)
     {
-	    McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = (McGeneralLearnerFlowDTO) o;
+	    GeneralLearnerFlowDTO gneralLearnerFlowDTO = (GeneralLearnerFlowDTO) o;
      
-        if (mcGeneralLearnerFlowDTO == null)
+        if (gneralLearnerFlowDTO == null)
         	return 1;
 		else
 			return 0;
@@ -186,7 +187,7 @@ public class McGeneralLearnerFlowDTO implements Comparable
             .append("activityInstructions: ", activityInstructions)
             .append("activityTitle: ", activityTitle)
             .append("countSessionComplete: ", countSessionComplete)
-            .append("toolSessionId: ", toolSessionId)
+            .append("toolSessionID: ", toolSessionID)
             .append("currentQuestionIndex: ", currentQuestionIndex)
             .append("questionListingMode: ", questionListingMode)
             .toString();
@@ -204,5 +205,101 @@ public class McGeneralLearnerFlowDTO implements Comparable
      */
     public void setTotalQuestionCount(Integer totalQuestionCount) {
         this.totalQuestionCount = totalQuestionCount;
+    }
+    /**
+     * @return Returns the toolContentID.
+     */
+    public String getToolContentID() {
+        return toolContentID;
+    }
+    /**
+     * @param toolContentID The toolContentID to set.
+     */
+    public void setToolContentID(String toolContentID) {
+        this.toolContentID = toolContentID;
+    }
+    /**
+     * @return Returns the toolSessionID.
+     */
+    public String getToolSessionID() {
+        return toolSessionID;
+    }
+    /**
+     * @param toolSessionID The toolSessionID to set.
+     */
+    public void setToolSessionID(String toolSessionID) {
+        this.toolSessionID = toolSessionID;
+    }
+    /**
+     * @return Returns the currentQuestionIndex.
+     */
+    public Integer getCurrentQuestionIndex() {
+        return currentQuestionIndex;
+    }
+    /**
+     * @return Returns the totalQuestionCount.
+     */
+    public Integer getTotalQuestionCount() {
+        return totalQuestionCount;
+    }
+    /**
+     * @return Returns the endLearningMessage.
+     */
+    public String getEndLearningMessage() {
+        return endLearningMessage;
+    }
+    /**
+     * @param endLearningMessage The endLearningMessage to set.
+     */
+    public void setEndLearningMessage(String endLearningMessage) {
+        this.endLearningMessage = endLearningMessage;
+    }
+    /**
+     * @return Returns the reportTitleLearner.
+     */
+    public String getReportTitleLearner() {
+        return reportTitleLearner;
+    }
+    /**
+     * @param reportTitleLearner The reportTitleLearner to set.
+     */
+    public void setReportTitleLearner(String reportTitleLearner) {
+        this.reportTitleLearner = reportTitleLearner;
+    }
+    /**
+     * @return Returns the userNameVisible.
+     */
+    public String getUserNameVisible() {
+        return userNameVisible;
+    }
+    /**
+     * @param userNameVisible The userNameVisible to set.
+     */
+    public void setUserNameVisible(String userNameVisible) {
+        this.userNameVisible = userNameVisible;
+    }
+    /**
+     * @return Returns the mapAnswers.
+     */
+    public Map getMapAnswers() {
+        return mapAnswers;
+    }
+    /**
+     * @param mapAnswers The mapAnswers to set.
+     */
+    public void setMapAnswers(Map mapAnswers) {
+        this.mapAnswers = mapAnswers;
+    }
+    /**
+     * @return Returns the mapQuestions.
+     */
+    public Map getMapQuestions() {
+        return mapQuestions;
+    }
+    /**
+     * @param mapQuestions The mapQuestions to set.
+     */
+    public void setMapQuestions(Map mapQuestions) {
+        this.mapQuestions = mapQuestions;
     }
 }
