@@ -93,6 +93,8 @@ class WorkspaceDialog extends MovieClip{
 
     private var _selectedDesignId:Number;
     
+	private static var OTHER_LICENSE_ID:Number = 2;
+	
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -136,8 +138,10 @@ class WorkspaceDialog extends MovieClip{
         currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
         license_lbl.text = Dictionary.getValue('ws_license_lbl');
 		license_comment_lbl.text = Dictionary.getValue('ws_license_comment_lbl');
+		
 		name_lbl.text = Dictionary.getValue('ws_dlg_filename');
-        //Set the text for buttons
+        
+		//Set the text for buttons
 		ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
 		viewLicense_btn.label = Dictionary.getValue('ws_view_license_button');
@@ -369,7 +373,7 @@ class WorkspaceDialog extends MovieClip{
 
 		//Only update the details if the node if its a resource:a
 		var nodeData = newSelectedNode.attributes.data;
-		
+				
 		if(nodeData.resourceType == _workspaceModel.RT_FOLDER){
 			
 			resourceTitle_txi.text = "";
@@ -452,11 +456,14 @@ class WorkspaceDialog extends MovieClip{
 	private function populateAvailableLicenses(licenses:Array, wm:WorkspaceModel){
 		Debugger.log('Got this many:'+licenses.length,Debugger.GEN,'populateAvailableLicenses','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//add the blank one
+		
+		var _licenses = licenses;
+		_licenses.sortOn("licenseID", Array.NUMERIC);
 		var lic_dp = new Array();
 		lic_dp.addItem({label:Dictionary.getValue('license_not_selected'),data:""});
 		licenseID_cmb.dataProvider = lic_dp;
-		for (var i=0;i<licenses.length;i++){
-			lic_dp.addItem({label:licenses[i].name,data:licenses[i]});
+		for (var i=0;i<_licenses.length;i++){
+			lic_dp.addItem({label:_licenses[i].name,data:_licenses[i]});
 		}
 		
 	}
@@ -473,6 +480,15 @@ class WorkspaceDialog extends MovieClip{
 			viewLicense_btn.enabled = false;
 		}else{
 			viewLicense_btn.enabled = true;
+		}
+		
+		// if Other Licensing Agreement is selected then show the textarea box for addition comments
+		if(licenseID_cmb.value.licenseID == OTHER_LICENSE_ID){
+			license_txa.visible = true;
+			license_comment_lbl.visible = true;
+		} else {
+			license_txa.visible = false;
+			license_comment_lbl.visible = false;
 		}
 	}
 		
@@ -505,9 +521,9 @@ class WorkspaceDialog extends MovieClip{
 		Debugger.log('v:'+v,Debugger.GEN,'setPropertiesContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		description_lbl.visible = v;
 		license_lbl.visible = v;
-		license_comment_lbl.visible = v;
+		license_comment_lbl.visible = false;
 		resourceDesc_txa.visible = v;
-		license_txa.visible = v;
+		license_txa.visible = false;
 		licenseImg_pnl.visible = v;
 		viewLicense_btn.visible = v;
 		
