@@ -212,7 +212,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function saveDesign(){
 		if(_ddm.learningDesignID == undefined){
-			saveDesignToServerAs();
+			// raise alert if design is empty
+			if (canvasModel.activitiesDisplayed.size() < 1){
+				var msg:String = Dictionary.getValue('al_empty_design');
+				LFMessage.showMessageAlert(msg);
+			}else {
+				saveDesignToServerAs();
+			}
 		}else if(_ddm.readOnly){
 			saveDesignToServerAs();
 		}else{
