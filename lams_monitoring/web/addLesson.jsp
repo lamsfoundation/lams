@@ -36,6 +36,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css/>
 	<title><fmt:message key="monitor.title"/></title>
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	<!--
+		function closeWizard() {
+			window.opener.location.reload();
+			window.close();
+		}
+	//-->
+	</script>
 	</head>
 
 <BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
