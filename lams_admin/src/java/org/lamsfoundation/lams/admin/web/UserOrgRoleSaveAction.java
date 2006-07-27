@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +46,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author jliew
  * 
  * Saves roles for users that were just added.
+ * Uses session scope because using request scope doesn't copy the form data
+ * into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
  *
  */
 
@@ -85,13 +88,16 @@ public class UserOrgRoleSaveAction extends Action {
 			UserBean bean = (UserBean)userBeans.get(i);
 			log.debug("user: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
+			UserOrganisation uo = getService().getUserOrganisation(bean.getUserId(),orgId);
+			Set uors = uo.getUserOrganisationRoles();
 			for(int j=0; j<roleIds.length; j++) {
 				Role currentRole = (Role)getService().findById(Role.class,new Integer(roleIds[j]));
 				log.debug("setting role: "+currentRole.getRoleId());
-				UserOrganisation uo = getService().getUserOrganisation(bean.getUserId(),orgId);
 				UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
-				getService().save(newUor);
+				uors.add(newUor);
 			}
+			uo.setUserOrganisationRoles(uors);
+			getService().save(uo);
 		}
 		return mapping.findForward("userlist");
 	}

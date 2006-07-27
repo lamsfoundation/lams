@@ -128,8 +128,6 @@ public class UserSaveAction extends Action {
 					userForm.set("password",user.getPassword());
 				}
 				BeanUtils.copyProperties(user,userForm);
-				log.debug("country: "+user.getLocaleCountry());
-				log.debug("language: "+user.getLocaleLanguage());
 				user.setLocaleCountry(locale.getCountryIsoCode());
 				user.setLocaleLanguage(locale.getLanguageIsoCode());
 				log.debug("country: "+user.getLocaleCountry());
@@ -158,7 +156,7 @@ public class UserSaveAction extends Action {
 				        		Role currentRole = (Role)getService().findById(Role.class,roleId);
 					            log.debug("setting role: "+currentRole);
 					            UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
-					            getService().save(newUor);
+					            uors.add(newUor);
 				        	}
 				        }
 				        Iterator iter3 = uors.iterator();
@@ -171,11 +169,11 @@ public class UserSaveAction extends Action {
 				        		log.debug("removing role: "+currentRoleId);
 				        		iter3.remove();
 				        		//log.debug("num roles: "+uors.size());
-				        		uo.setUserOrganisationRoles(uors);
-				        		uos.add(uo);
-				        		user.setUserOrganisations(uos);
 				        	}
 				        }
+				        uo.setUserOrganisationRoles(uors);
+		        		uos.add(uo);
+		        		user.setUserOrganisations(uos);
 				        break;  // already found uo that matches this org
 				    }
 				}
