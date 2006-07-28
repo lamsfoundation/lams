@@ -94,7 +94,7 @@ class WorkspaceDialog extends MovieClip{
     private var _selectedDesignId:Number;
     private var _currentTab:Number;
 	
-	private static var OTHER_LICENSE_ID:Number = 2;
+	private static var OTHER_LICENSE_ID:Number = 6;
 	private static var LOCATION_TAB:Number = 0;
 	private static var PROP_TAB:Number = 1;
 	
