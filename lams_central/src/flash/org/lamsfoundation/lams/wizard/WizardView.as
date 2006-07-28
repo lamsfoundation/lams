@@ -52,8 +52,11 @@ class WizardView extends AbstractView {
 	public var STRING_NULL:String = "string_null_value"
 	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
-	public var SUMMERY_X:Number = 20;
-	public var SUMMERY_Y:Number = 20;
+	public static var SUMMERY_X:Number = 11;
+	public static var SUMMERY_Y:Number = 150;
+	public static var SUMMERY_W:Number = 500;
+	public static var SUMMERY_H:Number = 22;
+	public static var SUMMERY_OFFSET:Number = 2;
 	
 	// submission modes
 	public static var FINISH_MODE:Number = 0;
@@ -102,7 +105,8 @@ class WizardView extends AbstractView {
 	private var _summery_mc:MovieClip;
 	private var _summeryList:Array;
 	private var scheduleDate_dt:DateField;
-
+	private var summery_lbl_arr:Array;
+		
 	// conclusion UI elements
 	private var confirmMsg_txt:TextField;
 
@@ -656,30 +660,35 @@ class WizardView extends AbstractView {
 	
 	private function finish(evt:Object){
 		trace('FINISH CLICKED');
-		disableButtons();
-		resultDTO.mode = FINISH_MODE;
-		_wizardController.initializeLesson(resultDTO);
+		var wm:WizardModel = WizardModel(getModel());
+		if(validateStep(wm)){
+			disableButtons();
+			resultDTO.mode = FINISH_MODE;
+			_wizardController.initializeLesson(resultDTO);
+		}
 	}
 	
 	private function start(evt:Object){
 		trace('START CLICKED');
-		
-		if(schedule_cb.selected){
-			resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
-			
-			if(resultDTO.scheduleDateTime != null){
-				trace(resultDTO.scheduleDateTime);
-				resultDTO.mode = START_SCH_MODE;
+		var wm:WizardModel = WizardModel(getModel());
+		if(validateStep(wm)){
+			if(schedule_cb.selected){
+				resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+				
+				if(resultDTO.scheduleDateTime != null){
+					trace(resultDTO.scheduleDateTime);
+					resultDTO.mode = START_SCH_MODE;
+				} else {
+					LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+					return;
+				}
 			} else {
-				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
-				return;
+				resultDTO.mode = START_MODE;
 			}
-		} else {
-			resultDTO.mode = START_MODE;
+			
+			disableButtons();
+			_wizardController.initializeLesson(resultDTO);
 		}
-		
-		disableButtons();
-		_wizardController.initializeLesson(resultDTO);
 	}
 	
 	private function cancel(evt:Object){
@@ -717,14 +726,11 @@ class WizardView extends AbstractView {
 			case 2: 
 				clearStep2();
 				break;
-			case 3: 
+			case 3:
+				positionButtons(false);
 				clearStep3();
 				break;
 			case 4:
-				positionButtons(false);
-				clearStep4();
-				break;
-			case 5:
 				clearFinish();
 				break;
 			default:
@@ -738,14 +744,11 @@ class WizardView extends AbstractView {
 			case 2: 
 				showStep2();
 				break;
-			case 3: 
+			case 3:
+				positionButtons(true);
 				showStep3();
 				break;
 			case 4:
-				positionButtons(true);
-				showStep4();
-				break;
-			case 5:
 				showFinish();
 				break;
 			default:
@@ -765,11 +768,8 @@ class WizardView extends AbstractView {
 			case 2: 
 				return validateStep2(wm);
 				break;
-			case 3: 
+			case 3:
 				return validateStep3(wm);
-				break;
-			case 4:
-				return validateStep4(wm);
 				break;
 			default:
 				return false;
@@ -820,6 +820,7 @@ class WizardView extends AbstractView {
 		location_treeview.visible = false;
 	}
 	
+	
 	private function validateStep1(wm:WizardModel):Boolean{
 		var snode = location_treeview.selectedNode;
 		if (snode.attributes.data.resourceType==wm.RT_FOLDER){
@@ -845,6 +846,7 @@ class WizardView extends AbstractView {
 		}
 	}
 	
+	/**
 	private function showStep2():Void{
 		trace('showing step 2');
 		
@@ -866,6 +868,7 @@ class WizardView extends AbstractView {
 		
 	}
 	
+	
 	private function clearStep2():Void{
 		// display Step 2
 		title_lbl.visible = false;
@@ -873,6 +876,7 @@ class WizardView extends AbstractView {
 		desc_lbl.visible = false;
 		resourceDesc_txa.visible = false;
 	}
+	
 	
 	private function validateStep2(wm:WizardModel):Boolean{
 		var valid:Boolean = true;
@@ -889,11 +893,14 @@ class WizardView extends AbstractView {
 		}
 		return valid;
 	}
-	
-	private function showStep3():Void{
-		trace('showing step 3');
+	*/
+	private function showStep2():Void{
+		trace('showing step 2');
 		setTitle(Dictionary.getValue('wizardTitle_3_lbl'));
 		setDescription(Dictionary.getValue('wizardDesc_3_lbl'));
+		
+		// enable prev button after Step 1
+		prev_btn.enabled = true;
 		
 		if(!resultDTO.selectedLearners && !resultDTO.selectedStaff){
 			WizardModel(getModel()).getWizard().getOrganisations(_root.courseID, _root.classID);
@@ -907,7 +914,7 @@ class WizardView extends AbstractView {
 		learner_scp.visible = true;
 	}
 	
-	private function clearStep3():Void{
+	private function clearStep2():Void{
 		org_treeview.visible = false;
 		
 		staff_lbl.visible = false;
@@ -915,7 +922,8 @@ class WizardView extends AbstractView {
 		learner_lbl.visible = false;
 		learner_scp.visible = false;
 	}
-	private function validateStep3(wm:WizardModel):Boolean{
+	
+	private function validateStep2(wm:WizardModel):Boolean{
 		_global.breakpoint();
 		
 		var valid:Boolean = true;
@@ -988,18 +996,27 @@ class WizardView extends AbstractView {
 		return valid;
 	}
 	
-	
-	private function showStep4():Void{
-		
+	private function showStep3():Void{
 		
 		setTitle(Dictionary.getValue('wizardTitle_4_lbl'));
 		setDescription(Dictionary.getValue('wizardDesc_4_lbl'));
+		
+		title_lbl.visible = true;
+		resourceTitle_txi.visible = true;
+		desc_lbl.visible = true;
+		resourceDesc_txa.visible = true;
+		
+		// check for NULL value
+		if(resourceDesc_txa.text == STRING_NULL){
+			resourceDesc_txa.text = "";
+		}
 		
 		writeSummery();
 		
 		summery_lbl.visible = true;
 		schedule_cb.visible = true;
 		start_btn.visible = true;
+		
 		if(schedule_cb.selected){
 			schedule_time.f_enableTimeSelect(true);
 			scheduleDate_dt.enabled = true;
@@ -1007,6 +1024,7 @@ class WizardView extends AbstractView {
 			schedule_time.f_enableTimeSelect(false);
 			scheduleDate_dt.enabled = false;
 		}
+		
 		schedule_time._visible = true;
 		scheduleDate_dt.visible = true;
 		next_btn.visible = false;
@@ -1014,33 +1032,48 @@ class WizardView extends AbstractView {
 	}
 	
 	private function writeSummery():Void{
-		if(_summery_mc != null){
-			_summery_mc.removeMovieClip();
+		
+		if(summery_lbl_arr.length > 0) {
+			for(var i=0; i<summery_lbl_arr.length; i++) {
+				summery_lbl_arr[i].removeMovieClip();
+			}
 		}
 		
-		_summery_mc = this.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:SUMMERY_X+panel._x, _y:SUMMERY_Y+panel._y, _wizardController:getController, _wizardView:this});
-		_summery_mc.design_txt.text = resultDTO.resourceName;
-		_summery_mc.title_txt.text = resultDTO.resourceTitle;
-		_summery_mc.desc_txt.text = resultDTO.resourceDescription;
-		_summery_mc.coursename_txt.text = resultDTO.courseName;
-		_summery_mc.classname_txt.text = resultDTO.className;
-		_summery_mc.staff_txt.text = String(resultDTO.selectedStaff.length) + '/' + staffList.length;
-		_summery_mc.learners_txt.text = String(resultDTO.selectedLearners.length) + '/' + learnerList.length;
+		summery_lbl_arr = new Array();
+		var summery_lbl;
 		
-		trace('text height ' + _summery_mc.desc_txt.textHeight);
-		trace(_summery_mc.desc_scr);
-		if(_summery_mc.desc_txt.textHeight <= 69){
-			trace('making in visible');
-			_summery_mc.desc_scr._visible = false;
-		}
+		// design label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_design', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:SUMMERY_Y+panel._y, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_design_lbl') + ' ' + resultDTO.resourceName}));
+		summery_lbl = this['wizardSummery_lbl_design'];
 		
-		_summery_mc.redraw(true);
+		// course label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_course', this.getNextHighestDepth(), {_x:summery_lbl._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET + SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_course_lbl') + ' ' + resultDTO.courseName}));
+		summery_lbl = this['wizardSummery_lbl_course'];
 		
+		// class label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_class', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_class_lbl') + ' ' + resultDTO.className}));
+		summery_lbl = this['wizardSummery_lbl_class'];
+		
+		// staff label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_staff', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_staff_lbl') + ' ' + String(resultDTO.selectedStaff.length) + '/' + staffList.length}));
+		summery_lbl = this['wizardSummery_lbl_staff'];
+		
+		// learners label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + String(resultDTO.selectedLearners.length) + '/' + learnerList.length}));
+
 	}
 	
-	
-	private function clearStep4():Void{
-		_summery_mc.removeMovieClip();
+	private function clearStep3():Void{
+		if(summery_lbl_arr.length > 0) {
+			for(var i=0; i<summery_lbl_arr.length; i++) {
+				summery_lbl_arr[i].removeMovieClip();
+			}
+		}
+		
+		title_lbl.visible = false;
+		resourceTitle_txi.visible = false;
+		desc_lbl.visible = false;
+		resourceDesc_txa.visible = false;
 		
 		summery_lbl.visible = false;
 		schedule_cb.visible = false;
@@ -1051,8 +1084,21 @@ class WizardView extends AbstractView {
 		finish_btn.visible= false;
 	}
 	
-	private function validateStep4(wm:WizardModel):Boolean{
-		return true;
+	private function validateStep3(wm:WizardModel):Boolean{
+		
+		var valid:Boolean = true;
+		if(resourceTitle_txi.text == ""){
+			trace('title is empty must contain value');
+			valid = false;
+		} 
+		
+		if(valid){
+			if(resourceTitle_txi.text != ""){resultDTO.resourceTitle = resourceTitle_txi.text;}
+			resultDTO.resourceDescription = resourceDesc_txa.text;
+		} else {
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg2'), null, null);
+		}
+		return valid;
 	}
 	
 	private function showFinish():Void{
@@ -1148,7 +1194,7 @@ class WizardView extends AbstractView {
 			}
 		}
 		array = new Array();
-	return array;
+		return array;
 	}
 	
 
@@ -1163,6 +1209,7 @@ class WizardView extends AbstractView {
 		_learner_mc = learner_scp.content;
 		var _selected:Boolean = true;
 		trace('list length: ' + users.length);
+		
 		for(var i=0; i<users.length; i++){
 			var user:User = User(users[i]);
 			
@@ -1178,6 +1225,7 @@ class WizardView extends AbstractView {
 			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 			
 		}
+		
 		learner_scp.redraw(true);
 	}
 	
