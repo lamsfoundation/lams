@@ -137,10 +137,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																					<c:set var="viewURL">
 																						<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
 																					</c:set>
-																  																					
-																					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-																						 <c:out value="${currentUserCount.value}"/>  
-																					</a>
+
+																					 <c:out value="${currentUserCount.value}"/>  
+
 																				</c:if> 	    
 																  				<c:if test="${currentNomination.value == 'Open Vote'}"> 				
 																						 <c:out value="${currentUserCount.value}"/>  
