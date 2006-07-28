@@ -127,7 +127,7 @@
    		path="/learningStarter" 
    		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
    		name="QaLearningForm" 
-   		scope="session"
+   		scope="request"
 	    unknown="false"
     	validate="false"
    		input="/learningIndex.jsp"> 
@@ -185,7 +185,7 @@
       path="/learning"
       type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
       name="QaLearningForm"
-      scope="session"
+      scope="request"
       input="/learning/AnswersContent.jsp"
       parameter="method"
       unknown="false"
