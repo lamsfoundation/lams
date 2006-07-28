@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
+
+	<definition name=".profile" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="profile.jsp" />	
+	</definition>
+
+	<definition name=".usersearchlist" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="usersearchlist.jsp" />	
+	</definition>
 	
 	<definition name=".userorgrole" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
