@@ -30,9 +30,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${userData.visible != 'true' }"> 			
                          <i><bean:message key="label.response.hidden"/> </i> 
 			</c:if> 								
-	 </td>
+			 </td>
 	
-			<c:if test="${(requestLearningReport != 'true')}"> 	
+			
 				 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
 				 <td NOWRAP valign=top> 				 
 				<c:if test="${userData.visible == 'true' }"> 			
@@ -51,7 +51,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                             </html:submit>
 				</c:if> 						
 			 	</td>	  	 
-			</c:if>				 
 		</c:if>
 		
 		<c:if test="${editResponse == 'true'}">	  	
@@ -65,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if> 								
 				 </td>
 		
-				<c:if test="${(requestLearningReport != 'true')}"> 				 
+	
 					 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/tick.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">	</td>	  	 
 					 <td NOWRAP valign=top> 
 						<c:if test="${userData.visible == 'true' }"> 			
@@ -84,8 +83,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                            </html:submit>
 						</c:if> 						
 				 	</td>	  	 
-				</c:if>				 				 
-		</c:if>
+				</c:if>
 		
 		<c:if test="${editableResponseId != responseUid}">	  	 									 			
 				 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
@@ -96,7 +94,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if> 								
 				 </td>
 		
-				<c:if test="${(requestLearningReport != 'true')}"> 	
+		
 					 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
 					 <td NOWRAP valign=top> 
 						<c:if test="${userData.visible == 'true' }"> 			
@@ -115,7 +113,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                            </html:submit>
 						</c:if> 						
 					 	</td>	  	 
-				</c:if>				 			 
 			</c:if>														  					 									  													  			
 		</c:if>														  					 									  													  			
 	</tr>		

@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 
-				<c:if test="${(requestLearningReport != 'true')}"> 	
+				<c:if test="${(generalLearnerFlowDTO.requestLearningReport != 'true')}"> 	
 						<tr> 
 							<td NOWRAP  valign=top align=center> <b> <bean:message key="label.selectGroup"/> </b>
 									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr>
 					</c:if>			
 
-					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 			  	 		<tr>
 			  	 			<td> &nbsp&nbsp&nbsp</td>
@@ -97,12 +97,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-		  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
+		  	 									<c:if test="${requestScope.currentMonitoredToolSession == 'All'}"> 			
 															<jsp:include page="/monitoring/UserResponses.jsp" />
 												</c:if>														  					 									  			
 												
-		  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
-		  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
+		  	 									<c:if test="${requestScope.currentMonitoredToolSession != 'All'}"> 			
+		  	 										<c:if test="${requestScope.currentMonitoredToolSession == userData.sessionId}"> 			
 															<jsp:include page="/monitoring/UserResponses.jsp" />										
 													</c:if>														  					 									  													  			
 												</c:if>														  					 									  													  			

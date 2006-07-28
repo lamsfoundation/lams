@@ -39,16 +39,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<script language="JavaScript" type="text/JavaScript">
 
-		function submitMonitoringMethod(actionMethod) 
+		function submitLearningMethod(actionMethod) 
 		{
-			document.QaMonitoringForm.method.value=actionMethod; 
-			document.QaMonitoringForm.submit();
+			document.QaLearningForm.method.value=actionMethod; 
+			document.QaLearningForm.submit();
 		}
 		
 		function submitMethod(actionMethod) 
 		{
-			submitMonitoringMethod(actionMethod);
+			submitLearningMethod(actionMethod);
 		}
+		
+		
 	</script>		
 </head>
 
@@ -56,24 +58,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+		<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
 	<div id="header-no-tabs-learner"></div>
 	
 
 	<div id="content-learner">
-		<c:if test="${ requestLearningReportProgress != 'true'}"> 			
-			<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
+		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}"> 			
+			<c:if test="${ generalLearnerFlowDTO.requestLearningReportViewOnly != 'true'}"> 			
 		     	<table class="forms"> 	  
 					<tr> <th scope="col">
-						 <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> 
+						 <c:out value="${generalLearnerFlowDTO.reportTitleLearner}" escapeXml="false"/> 
 					 </th>
 					</tr>
 				</table>		
 			</c:if> 				    
 		
-			<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
+			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true'}"> 			
 		       	<table class="forms"> 	  
 					<tr> <th scope="col">
 						<bean:message key="label.learning.viewOnly"/>
@@ -86,43 +88,83 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<html:rewrite page="/monitoring.do" />
 				</c:set>
 		
-			  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-				<html:hidden property="method"/>	 
+			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		  		<html:hidden property="method"/>	 
+				<html:hidden property="toolSessionID"/>						
+				<html:hidden property="httpSessionID"/>		
+				<html:hidden property="totalQuestionCount"/>		
+
+					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+			  	 		<tr>
+			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 		</tr>
+						<tr>			
+							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+								<c:out value="${currentDto.question}" escapeXml="false"/>
+							 </td>
+						</tr>	
+						
+						<tr> 
+							<td NOWRAP valign=top>
+								<table align=center>
+									<tr> 
+										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
+						  			</tr>				 
+		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+										<c:forEach var="sData" items="${questionAttemptData.value}">
+								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
+								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
+
+	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
+		  	 									<c:if test="${requestScope.currentMonitoredToolSession == 'All'}"> 			
+													<tr> 
+														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
+														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+													</tr>															
+												</c:if>														  					 									  			
+												
+		  	 									<c:if test="${requestScope.currentMonitoredToolSession != 'All'}"> 			
+		  	 										<c:if test="${requestScope.currentMonitoredToolSession == userData.sessionId}"> 			
+														<tr> 
+															 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+															 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
+															 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+														</tr>															
+													</c:if>														  					 									  													  			
+												</c:if>														  					 									  													  			
+											</c:if>														  					 
+	 									</c:forEach>		  	
+									</c:forEach>		  	
+								</table>
+							</td>  
+			  			</tr>
+					</c:forEach>		  	
+
+
 		
-					<jsp:include page="/monitoring/SummaryContent.jsp" />
+
+			       	<table> 	  
+							<tr> <td  valign=top>
+								<div class="right-buttons">
+
+									<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
+										<bean:message key="button.endLearning"/>
+									</html:submit>	 				
+								</div> 		  															 		  					
+								</td> 
+							</tr>
+					</table>
+
 		
-						<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
-					       	<table> 	  
-									<tr> <td  valign=top>
-										<div class="right-buttons">
-											 <bean:message key="label.learning.forceFinish"/> &nbsp
-			
-											<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-												<bean:message key="button.endLearning"/>
-											</html:submit>	 				
-										</div> 		  															 		  					
-										</td> 
-									</tr>
-							</table>
-						</c:if> 			
-		
-						<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-					       	<table> 	  
-									<tr> <td  valign=top>
-										<div class="right-buttons">
-											<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-												<bean:message key="button.endLearning"/>
-											</html:submit>	 				
-										</div> 		  					
-										</td> 
-									</tr>
-							</table>
-						</c:if> 			
 		
 			</html:form>
 		</c:if> 				    
 		
-		<c:if test="${ requestLearningReportProgress == 'true'}"> 			
+		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}"> 			
 		       	<table class="forms"> 	  
 					<tr> <th scope="col">
 						<bean:message key="label.learner.progress"/>
@@ -134,11 +176,62 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<html:rewrite page="/monitoring.do" />
 				</c:set>
 		
-			  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-				<html:hidden property="method"/>	 
-		
-						<jsp:include page="/monitoring/SummaryContent.jsp" />
-		
+			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		  		<html:hidden property="method"/>	 
+				<html:hidden property="toolSessionID"/>						
+				<html:hidden property="httpSessionID"/>		
+				<html:hidden property="totalQuestionCount"/>		
+						
+				<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+			  	 		<tr>
+			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 		</tr>
+						<tr>			
+							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+								<c:out value="${currentDto.question}" escapeXml="false"/>
+							 </td>
+						</tr>	
+						
+						<tr> 
+							<td NOWRAP valign=top>
+								<table align=center>
+									<tr> 
+										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
+						  			</tr>				 
+		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+										<c:forEach var="sData" items="${questionAttemptData.value}">
+								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
+								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
+
+	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
+		  	 									<c:if test="${requestScope.currentMonitoredToolSession == 'All'}"> 			
+													<tr> 
+														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
+														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+													</tr>															
+												</c:if>														  					 									  			
+												
+		  	 									<c:if test="${requestScope.currentMonitoredToolSession != 'All'}"> 			
+		  	 										<c:if test="${requestScope.currentMonitoredToolSession == userData.sessionId}"> 			
+														<tr> 
+															 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+															 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
+															 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+														</tr>															
+													</c:if>														  					 									  													  			
+												</c:if>														  					 									  													  			
+											</c:if>														  					 
+	 									</c:forEach>		  	
+									</c:forEach>		  	
+								</table>
+							</td>  
+			  			</tr>
+					</c:forEach>		  	
+
 			</html:form>
 		</c:if> 				    
 

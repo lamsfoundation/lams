@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -65,11 +66,20 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String userNameVisible;
     
+	protected String requestLearningReport;
+
+	protected String requestLearningReportProgress;
+	
+	protected String requestLearningReportViewOnly;
+
     protected Map mapAnswers;
     
     protected Map mapQuestions;
     
     protected Map mapQuestionContentLearner;
+    
+    protected List listMonitoredAnswersContainerDTO;
+    
     
     
     /**
@@ -184,6 +194,7 @@ public class GeneralLearnerFlowDTO implements Comparable
 			return 0;
     }
 
+	
 	public String toString() {
         return new ToStringBuilder(this)
             .append("activityOffline: ", activityOffline)
@@ -194,6 +205,15 @@ public class GeneralLearnerFlowDTO implements Comparable
             .append("toolSessionID: ", toolSessionID)
             .append("currentQuestionIndex: ", currentQuestionIndex)
             .append("questionListingMode: ", questionListingMode)
+            .append("reportTitleLearner: ", reportTitleLearner)            
+            .append("userNameVisible: ", userNameVisible)
+            .append("requestLearningReport: ", requestLearningReport)            
+            .append("requestLearningReportProgress: ", requestLearningReportProgress)            
+            .append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)            
+            .append("mapAnswers: ", mapAnswers)            
+            .append("mapQuestions: ", mapQuestions)            
+            .append("mapQuestionContentLearner: ", mapQuestionContentLearner)            
+            .append("listMonitoredAnswersContainerDTO: ", listMonitoredAnswersContainerDTO)            
             .toString();
     }
     
@@ -319,4 +339,58 @@ public class GeneralLearnerFlowDTO implements Comparable
     public void setHttpSessionID(String httpSessionID) {
         this.httpSessionID = httpSessionID;
     }    
+    /**
+     * @return Returns the requestLearningReport.
+     */
+    public String getRequestLearningReport() {
+        return requestLearningReport;
+    }
+    /**
+     * @param requestLearningReport The requestLearningReport to set.
+     */
+    public void setRequestLearningReport(String requestLearningReport) {
+        this.requestLearningReport = requestLearningReport;
+    }
+    /**
+     * @return Returns the requestLearningReportProgress.
+     */
+    public String getRequestLearningReportProgress() {
+        return requestLearningReportProgress;
+    }
+    /**
+     * @param requestLearningReportProgress The requestLearningReportProgress to set.
+     */
+    public void setRequestLearningReportProgress(
+            String requestLearningReportProgress) {
+        this.requestLearningReportProgress = requestLearningReportProgress;
+    }
+    
+    /**
+     * @return Returns the requestLearningReportViewOnly.
+     */
+    public String getRequestLearningReportViewOnly() {
+        return requestLearningReportViewOnly;
+    }
+    /**
+     * @param requestLearningReportViewOnly The requestLearningReportViewOnly to set.
+     */
+    public void setRequestLearningReportViewOnly(
+            String requestLearningReportViewOnly) {
+        this.requestLearningReportViewOnly = requestLearningReportViewOnly;
+    }
+
+    /**
+     * @return Returns the listMonitoredAnswersContainerDTO.
+     */
+    public List getListMonitoredAnswersContainerDTO() {
+        return listMonitoredAnswersContainerDTO;
+    }
+    /**
+     * @param listMonitoredAnswersContainerDTO The listMonitoredAnswersContainerDTO to set.
+     */
+    public void setListMonitoredAnswersContainerDTO(
+            List listMonitoredAnswersContainerDTO) {
+        this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
+    }
+
 }

@@ -112,7 +112,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
     	logger.debug("start refreshSummaryData for learner mode.");
-    	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, true, toolSessionID.toString(), userID.toString());
+    	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, true, toolSessionID.toString(), userID.toString(), null);
     	logger.debug("end refreshSummaryData for learner mode.");
     	logger.debug("ending learner mode: ");
     }
@@ -143,7 +143,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 		
         QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
         logger.debug("start refreshSummaryData for teacher mode.");
-        qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null);
+        qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null, null);
         logger.debug("end refreshSummaryData for teacher mode.");
         logger.debug("teacher uses content id: " + content.getQaContentId());
         logger.debug("ending teacher mode: ");

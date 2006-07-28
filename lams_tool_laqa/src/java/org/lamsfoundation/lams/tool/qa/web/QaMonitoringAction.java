@@ -99,6 +99,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
@@ -507,8 +508,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 	    
 	    
-	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
-	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    //request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    //logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    
 	    
 	    logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
     	return (mapping.findForward(LOAD_MONITORING));	
@@ -643,7 +646,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    qaService.removeUserResponse(qaUsrResp);
 	    logger.debug("response deleted.");
 	    
-	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    //logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
 	    refreshUserInput(request);
     	return (mapping.findForward(LOAD_MONITORING));	
@@ -773,17 +776,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException, ToolException
     {
     	logger.debug("dispatching proxy endLearning to learnng module...");
-    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	//IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());    	
 		logger.debug("qaService: " + qaService);
-		if (qaService == null)
-		{
-			logger.debug("will retrieve qaService");
-			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-			logger.debug("retrieving qaService from session: " + qaService);
-		}
 
     	QaLearningAction qaLearningAction= new QaLearningAction();
-    	qaLearningAction.endLearning(request, qaService, response);
+    	//qaLearningAction.endLearning(request, qaService, response);
     	return null; 
     }
     
@@ -801,21 +799,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      * @param currentSessionId
      * @param userId
      */
-	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+    public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
+			GeneralLearnerFlowDTO generalLearnerFlowDTO)
 	{
-		if (qaService == null)
-		{
-			logger.debug("will retrieve qaService");
-			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-			logger.debug("retrieving qaService from session: " + qaService);
-		}
-		if (qaService == null)
-		{
-	    	qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-			logger.debug("qaService: " + qaService);
-		}
-
+        logger.debug("starting refreshSummaryData: ");
+	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	    logger.debug("qaService: " + isUserNamesVisible);
 		
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
@@ -847,15 +837,24 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 	    
 	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
-	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
-	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    //request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
+	    //logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
+	    request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
 	    
 	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
 	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService, 
 	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    
+	    if (generalLearnerFlowDTO != null)
+	    {
+	        logger.debug("placing LIST_MONITORED_ANSWERS_CONTAINER_DTO within generalLearnerFlowDTO.");
+		    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
+		    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	    }
+	    
 	    /* ends here. */
 	}
 
@@ -945,7 +944,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	        currentMonitoredToolSession="All";
 	    }
 
-	    refreshSummaryData(request, qaContent, qaService, true, false, null, null);
+	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, null);
 		
 		
 		if (currentMonitoredToolSession.equals("All"))
@@ -958,8 +957,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    }
 	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 
-	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
-	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    //request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    //logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
@@ -1008,7 +1008,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	        currentMonitoredToolSession="All";
 	    }
 
-	    refreshSummaryData(request, qaContent, qaService, true, false, null, null);
+	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, null);
 		
 		
 		if (currentMonitoredToolSession.equals("All"))
@@ -1021,8 +1021,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    }
 	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 
-	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
-	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    //request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    //logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));

@@ -630,6 +630,25 @@ public abstract class QaUtils implements QaAppConstants {
     	}
     }
 
+
+    public static String getCurrentLearnerID()
+    {
+        String userID = "";
+        HttpSession ss = SessionManager.getSession();
+        logger.debug("ss: " + ss);
+        
+        if (ss != null)
+        {
+    	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	    if ((user != null) && (user.getUserID() != null))
+    	    {
+    	    	userID = user.getUserID().toString();
+    		    logger.debug("retrieved userId: " + userID);
+    	    }
+        }
+        return userID;
+    }
+    
     
 	public static UserDTO getToolUser()
 	{

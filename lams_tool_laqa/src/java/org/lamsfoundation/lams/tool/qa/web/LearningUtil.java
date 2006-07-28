@@ -82,14 +82,14 @@ public class LearningUtil implements QaAppConstants{
         generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
         generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
         generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
-        //generalLearnerFlowDTO.setLearnerProgress(new Boolean(false).toString());
         
         if (qaContent.isQuestionsSequenced()) 
             generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
         else
             generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
-            
         
+        
+        generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString()); 
         generalLearnerFlowDTO.setActivityOffline(new Boolean(qaContent.isRunOffline()).toString());
         
         logger.debug("continue buildGeneralLearnerFlowDTO: " + qaContent);
@@ -126,9 +126,13 @@ public class LearningUtil implements QaAppConstants{
      * return void
      *
      */
-    protected void createUsersAndResponses(Map mapAnswers, HttpServletRequest request, IQaService qaService)
+    protected void createUsersAndResponses(Map mapAnswers, HttpServletRequest request, IQaService qaService, 
+            Long toolContentID, Long toolSessionID)
     {
         logger.debug("createUsers-retrieving qaService: " + qaService);
+        logger.debug("mapAnswers: " + mapAnswers);
+        logger.debug("toolContentID: " + toolContentID);
+        logger.debug("toolSessionID: " + toolSessionID);
         
 	    HttpSession ss = SessionManager.getSession();
 	    /* get back login user DTO */
@@ -144,22 +148,12 @@ public class LearningUtil implements QaAppConstants{
     	Long userId=new Long(toolUser.getUserID().longValue());
     	
         /*
-         * retrive contentId from the http session
-         */
-        logger.debug("createUsers-attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
-        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-        /*
          * obtain QaContent to be used in creating QaQueUsr
          */  
-        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
+        QaContent qaContent=qaService.retrieveQa(toolContentID.longValue());
         logger.debug("createUsers-retrieving qaContent: " + qaContent);
 
-        /*
-         * get QaSession to be used in creating QaQueUsr
-         */
-        Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-        logger.debug("createUsers-retrieving toolSessionId: " + toolSessionId);
-        QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionId.longValue()); 
+        QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionID.longValue()); 
         logger.debug("createUsers-retrieving qaSession: " + qaSession);
         
         Iterator contentIterator=qaContent.getQaQueContents().iterator();
@@ -181,7 +175,7 @@ public class LearningUtil implements QaAppConstants{
     	
     	if ((qaQueUsr != null) && (qaQueUsrLocal == null)) 
         {
-    	    qaQueUsr=createUser(request);
+    	    qaQueUsr=createUser(request, toolSessionID, qaService);
             logger.debug("created qaQueUsr: " + qaQueUsr);	
         }
     	else
@@ -213,8 +207,7 @@ public class LearningUtil implements QaAppConstants{
                     logger.debug("iterationg question-answers: displayOrder: " + displayOrder + 
              													 " question: " + question + " answer: " + answer);
             		
-                    String timezoneId=(String)request.getSession().getAttribute(TIMEZONE_ID);
-                    if (timezoneId == null) timezoneId="";
+                    String timezoneId="";
                     
                     List attempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
                     logger.debug("attempts:" + attempts);
@@ -255,16 +248,16 @@ public class LearningUtil implements QaAppConstants{
     }
 
     
-    public static QaQueUsr createUser(HttpServletRequest request)
+    public static QaQueUsr createUser(HttpServletRequest request, Long toolSessionID, IQaService qaService)
 	{
-        logger.debug("creating a new user in the tool db");
-		IQaService qaService =QaUtils.getToolService(request);
+        logger.debug("creating a new user in the tool db, toolSessionID: " + toolSessionID);
+        logger.debug("qaService: " + qaService);
+		
 	    Long queUsrId=QaUtils.getUserId();
 		String username=QaUtils.getUserName();
 		String fullname=QaUtils.getUserFullName();
-		Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
 		
-		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionID.longValue());
 		logger.debug("qaSession: " + qaSession);
 		
 		QaQueUsr qaQueUsr= new QaQueUsr(queUsrId,
@@ -297,7 +290,6 @@ public class LearningUtil implements QaAppConstants{
     	else
     		userFeedback= "End of the questions.";
     			
-    	//request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     	return userFeedback;
     }
     

@@ -41,6 +41,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -243,7 +244,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 		logger.debug("refreshing summary data...");
-		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, false, null, null);
+		
+		GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
+	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO);
 		
 		logger.debug("refreshing stats data...");
 		qaMonitoringAction.refreshStatsData(request);

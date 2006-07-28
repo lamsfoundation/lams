@@ -49,6 +49,10 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String viewAllResults;
 	protected String responseId;
 	
+	protected String requestLearningReport;
+	protected String requestLearningReportProgress;
+	protected String requestLearningReportViewOnly;
+	
 	
 	/**
      * reset user actions in learning mode
@@ -249,4 +253,45 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
     public void setTotalQuestionCount(String totalQuestionCount) {
         this.totalQuestionCount = totalQuestionCount;
     }
+    
+    /**
+     * @return Returns the requestLearningReport.
+     */
+    public String getRequestLearningReport() {
+        return requestLearningReport;
+    }
+    /**
+     * @param requestLearningReport The requestLearningReport to set.
+     */
+    public void setRequestLearningReport(String requestLearningReport) {
+        this.requestLearningReport = requestLearningReport;
+    }
+    /**
+     * @return Returns the requestLearningReportProgress.
+     */
+    public String getRequestLearningReportProgress() {
+        return requestLearningReportProgress;
+    }
+    /**
+     * @param requestLearningReportProgress The requestLearningReportProgress to set.
+     */
+    public void setRequestLearningReportProgress(
+            String requestLearningReportProgress) {
+        this.requestLearningReportProgress = requestLearningReportProgress;
+    }
+    
+    /**
+     * @return Returns the requestLearningReportViewOnly.
+     */
+    public String getRequestLearningReportViewOnly() {
+        return requestLearningReportViewOnly;
+    }
+    /**
+     * @param requestLearningReportViewOnly The requestLearningReportViewOnly to set.
+     */
+    public void setRequestLearningReportViewOnly(
+            String requestLearningReportViewOnly) {
+        this.requestLearningReportViewOnly = requestLearningReportViewOnly;
+    }
+    
 }
