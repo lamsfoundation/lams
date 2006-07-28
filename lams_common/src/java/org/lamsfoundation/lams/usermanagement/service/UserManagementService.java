@@ -161,6 +161,10 @@ public class UserManagementService implements IUserManagementService {
 	public List findAnythingLike(Object object) {
 		return baseDAO.findAnythingLike(object);
 	}
+	
+	public List searchByStringProperties(Class clazz, Map<String, String> properties) {
+		return baseDAO.searchByStringProperties(clazz, properties);
+	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>)

@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +71,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	private static final String SPACE = " ";
 	private static final String SPOT = ".";
 	private static final String EQUAL_TO_WHAT = "=?";
+	private static final String LIKE_WHAT = " like ?";
 	
 	private static Logger log = Logger.getLogger(BaseDAO.class);
 	
@@ -175,7 +177,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	 * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteByProperties(java.lang.Class, java.util.Map)
 	 */
 	public void deleteByProperties(Class clazz, Map<String,Object> properties) {
-		Qv qv = buildQueryString(clazz,properties,DELETE);
+		Qv qv = buildQueryString(clazz,properties,DELETE,EQUAL_TO_WHAT);
 		getHibernateTemplate().bulkUpdate(qv.queryString,qv.values);
 	}
 
@@ -217,7 +219,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	 * @see org.lamsfoundation.lams.dao.IBaseDAO#findByProperties(java.lang.Class, java.util.Map)
 	 */
 	public List findByProperties(Class clazz, Map<String,Object> properties) {
-		Qv qv = buildQueryString(clazz,properties,SELECT);
+		Qv qv = buildQueryString(clazz,properties,SELECT,EQUAL_TO_WHAT);
 		return getHibernateTemplate().find(qv.queryString,qv.values);
 	}
 
@@ -274,23 +276,27 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	}
 
 	public List searchByStringProperties(Class clazz, Map<String, String> properties) {
-		//TODO implement me
-		return null;
+		Map<String,Object> p = new HashMap<String,Object>();
+		for(Map.Entry<String,String> entry : properties.entrySet()){
+			p.put(entry.getKey(), (Object)entry.getValue());
+		}
+		Qv qv = buildQueryString(clazz,p,SELECT,LIKE_WHAT);
+		return getHibernateTemplate().find(qv.queryString,qv.values);
 	}
 
 	public List searchByNumberSpan(Class clazz, String name, Integer min, Boolean minIncluded, Integer max, Boolean maxIncluded) {
 		//TODO implement me
 		return null;
 	}
-
-	private Qv buildQueryString(Class clazz, Map<String,Object> properties, String operation){
+	
+	private Qv buildQueryString(Class clazz, Map<String,Object> properties, String operation, String condition){
 		String clazzName = clazz.getSimpleName();
 		String objName = createObjectName(clazzName);
 		StringBuffer queryString = new StringBuffer(operation).append(clazzName).append(SPACE).append(objName).append(WHERE);
 		Object[] values = new Object[properties.size()];
 		int i=0;
 		for(Map.Entry<String,Object> entry : properties.entrySet()){
-			queryString.append(objName).append(SPOT).append(entry.getKey()).append(EQUAL_TO_WHAT);
+			queryString.append(objName).append(SPOT).append(entry.getKey()).append(condition);
 			if(i!=properties.size()-1){
 				queryString.append(AND);
 			}

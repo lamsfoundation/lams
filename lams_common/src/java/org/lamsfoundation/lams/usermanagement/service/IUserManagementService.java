@@ -147,6 +147,13 @@ public interface IUserManagementService {
 	 */
 	public List findAnythingLike(Object object);
 	
+	/**
+	 * @param clazz
+	 * @param properties
+	 * @return a list of objects which have similar property values
+	 */
+	public List searchByStringProperties(Class clazz, Map<String,String> properties);
+	
     /**
      * Retrieves a tree of organisations for a user. The top of the tree is a "dummy" root
      * organisation, just so that we have a real tree. This makes life easier for Flash.
@@ -290,4 +297,5 @@ public interface IUserManagementService {
      * @return a list of roles according to the organisation type and whether you want sysadmin or not
      */
     public List getRolesForOrgType(OrganisationType orgType, Boolean sysadmin);
+    
 }
