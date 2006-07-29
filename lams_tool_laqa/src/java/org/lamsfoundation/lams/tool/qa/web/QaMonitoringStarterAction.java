@@ -174,7 +174,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		}
 
 		logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
-		
+	
+		request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
+		request.getSession().setAttribute(SELECTION_CASE, new Long(2));
 		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
 		qaMonitoringForm.setActiveModule(MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	
@@ -201,10 +203,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-				/*
-	     * persist time zone information to session scope. 
-	     */
-	    QaUtils.persistTimeZone(request);
+		/* save time zone information to session scope. */
+	    QaUtils.saveTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -220,8 +220,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			persistError(request, "error.content.doesNotExist");
 			return false;
 		}
-		
-		
 		
 		if (qaContent.getTitle() == null)
 		{

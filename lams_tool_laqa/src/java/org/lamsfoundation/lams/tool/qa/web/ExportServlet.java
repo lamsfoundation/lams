@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -54,7 +55,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 	    logger.debug("dispathcing doExport");
-	    request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(true).toString());
+	    //request.setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(true).toString());
 	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 	    logger.debug("basePath:" + basePath);
 
@@ -72,8 +73,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
 	    logger.debug("starting learner mode...");
-	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
-        
+	    
     	IQaService qaService = QaServiceProxy.getQaService(getServletContext());
         
     	logger.debug("userID:" + userID);
@@ -112,15 +112,25 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
     	logger.debug("start refreshSummaryData for learner mode.");
-    	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, true, toolSessionID.toString(), userID.toString(), null);
+
+    	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(content);
+	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+    	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, true, toolSessionID.toString(), userID.toString(), generalLearnerFlowDTO);
     	logger.debug("end refreshSummaryData for learner mode.");
+    	
+    	generalLearnerFlowDTO =(GeneralLearnerFlowDTO)request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
+    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+
+    	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
+    	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+
+    	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
     	logger.debug("ending learner mode: ");
     }
     
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
         logger.debug("starting teacher mode...");
-        request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
         
         IQaService qaService = QaServiceProxy.getQaService(getServletContext());
        
@@ -143,10 +153,20 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 		
         QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
         logger.debug("start refreshSummaryData for teacher mode.");
-        qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null, null);
+
+        GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(content);
+	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+        qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null, generalLearnerFlowDTO);
         logger.debug("end refreshSummaryData for teacher mode.");
         logger.debug("teacher uses content id: " + content.getQaContentId());
+        
+    	generalLearnerFlowDTO =(GeneralLearnerFlowDTO)request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
+    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+    	
+    	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
+    	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+
+        request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
         logger.debug("ending teacher mode: ");
     }
-
 }

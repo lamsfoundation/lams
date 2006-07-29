@@ -80,8 +80,23 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected List listMonitoredAnswersContainerDTO;
     
+    protected String currentMonitoredToolSession;
     
     
+    
+    /**
+     * @return Returns the currentMonitoredToolSession.
+     */
+    public String getCurrentMonitoredToolSession() {
+        return currentMonitoredToolSession;
+    }
+    /**
+     * @param currentMonitoredToolSession The currentMonitoredToolSession to set.
+     */
+    public void setCurrentMonitoredToolSession(
+            String currentMonitoredToolSession) {
+        this.currentMonitoredToolSession = currentMonitoredToolSession;
+    }
     /**
      * @return Returns the currentAnswer.
      */
@@ -214,6 +229,7 @@ public class GeneralLearnerFlowDTO implements Comparable
             .append("mapQuestions: ", mapQuestions)            
             .append("mapQuestionContentLearner: ", mapQuestionContentLearner)            
             .append("listMonitoredAnswersContainerDTO: ", listMonitoredAnswersContainerDTO)            
+            .append("currentMonitoredToolSession: ", currentMonitoredToolSession)
             .toString();
     }
     

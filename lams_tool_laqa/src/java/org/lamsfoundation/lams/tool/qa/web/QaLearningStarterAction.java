@@ -388,7 +388,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 
-	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, toolSessionID, learnerProgressUserId, generalLearnerFlowDTO);
+	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, toolSessionID, learnerProgressUserId, 
+	    	        generalLearnerFlowDTO);
     		
     		logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
     		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		}
@@ -426,7 +427,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    
 		    if ((qaQueUsr != null) && (qaQueUsr.isResponseFinalized()))
 		    {
-		        logger.debug("is current user's response finalized: " + qaQueUsr.isResponseFinalized());
+		        logger.debug("is current user's response finalised: " + qaQueUsr.isResponseFinalized());
 		    		QaSession checkSession=qaQueUsr.getQaSession();
 		    		logger.debug("checkSession:" + checkSession);
 			    	
@@ -437,19 +438,22 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    			if (checkQaSessionId.toString().equals(currentToolSessionID.toString()))
 		    			{
 		    				logger.debug("the learner is in the same session and has already responsed to this content, just generate a read-only report.");
-		    		    	Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+		    				
+		    				logger.debug("isUserNamesVisible: " + qaContent.isUsernameVisible());
+		    				Boolean isUserNamesVisibleBoolean=new Boolean(qaContent.isUsernameVisible());
 		    		    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
-		    		    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-
+		    		    	
 		    		    	
 		    		    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 		    		    	/*the report should have all the users' entries OR
 		    		    	 * the report should have only the current session's entries*/
-
-		    		    	qaLearningForm.setRequestLearningReportViewOnly(new Boolean(true).toString());
-		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionID.toString(), null, null);
 		    		    	
-		    	    		qaLearningForm.setRequestLearningReport(new Boolean(true).toString());
+		    		    	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
+		    		    	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
+
+		    		    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionID.toString(), null, generalLearnerFlowDTO);
+		    		    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		    	    		
 		    	    		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_REPORT);
 		    	    		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));

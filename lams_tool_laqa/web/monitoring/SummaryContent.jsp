@@ -50,10 +50,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											
 													<c:set var="SELECTED_SESSION" scope="request" value=""/>
 													<c:if test="${sessionScope.selectionCase == 2}"> 			
-														<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
+														<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
 													</c:if>						
 													
-													<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
+													<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
 															<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
 													</c:if>						
 													
@@ -97,12 +97,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-		  	 									<c:if test="${requestScope.currentMonitoredToolSession == 'All'}"> 			
+		  	 									<c:if test="${currentMonitoredToolSession == 'All'}"> 			
 															<jsp:include page="/monitoring/UserResponses.jsp" />
 												</c:if>														  					 									  			
 												
-		  	 									<c:if test="${requestScope.currentMonitoredToolSession != 'All'}"> 			
-		  	 										<c:if test="${requestScope.currentMonitoredToolSession == userData.sessionId}"> 			
+		  	 									<c:if test="${currentMonitoredToolSession != 'All'}"> 			
+		  	 										<c:if test="${currentMonitoredToolSession == userData.sessionId}"> 			
 															<jsp:include page="/monitoring/UserResponses.jsp" />										
 													</c:if>														  					 									  													  			
 												</c:if>														  					 									  													  			

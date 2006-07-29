@@ -119,23 +119,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-		  	 									<c:if test="${requestScope.currentMonitoredToolSession == 'All'}"> 			
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
 														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
 													</tr>															
-												</c:if>														  					 									  			
-												
-		  	 									<c:if test="${requestScope.currentMonitoredToolSession != 'All'}"> 			
-		  	 										<c:if test="${requestScope.currentMonitoredToolSession == userData.sessionId}"> 			
-														<tr> 
-															 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-															 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
-															 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
-														</tr>															
-													</c:if>														  					 									  													  			
-												</c:if>														  					 									  													  			
 											</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	
@@ -207,23 +195,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-		  	 									<c:if test="${requestScope.currentMonitoredToolSession == 'All'}"> 			
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
 														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
 													</tr>															
-												</c:if>														  					 									  			
-												
-		  	 									<c:if test="${requestScope.currentMonitoredToolSession != 'All'}"> 			
-		  	 										<c:if test="${requestScope.currentMonitoredToolSession == userData.sessionId}"> 			
-														<tr> 
-															 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-															 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
-															 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
-														</tr>															
-													</c:if>														  					 									  													  			
-												</c:if>														  					 									  													  			
 											</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	

@@ -29,8 +29,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css localLinkPath="../"/>
 	</head>
 	<body>
-	
-	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+
+    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>
 		<html:hidden property="toolContentID"/>
 	
@@ -60,11 +60,50 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>			
 		
 		
-				<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-					<jsp:include page="/export/ExportContent.jsp" />
-				</c:if>						
-		
-			</div>  <!--closes content-->
+		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			
+					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+			  	 		<tr>
+			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 		</tr>
+						<tr>			
+							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+								<c:out value="${currentDto.question}" escapeXml="false"/>
+							 </td>
+						</tr>	
+						
+						<tr> 
+							<td NOWRAP valign=top>
+								<table align=center>
+									<tr> 
+										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/>  	</b></td>
+						  			</tr>				 
+		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+										<c:forEach var="sData" items="${questionAttemptData.value}">
+								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
+								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
+
+	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
+			  	 									<tr>
+														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+													</tr>
+											</c:if>														  					 
+	 									</c:forEach>		  	
+									</c:forEach>		  	
+								</table>
+							</td>  
+			  			</tr>
+					</c:forEach>		  	
+			</table>			
+		</c:if>					
+
+		</div>  <!--closes content-->
 		
 		
 			<div id="footer-learner">
