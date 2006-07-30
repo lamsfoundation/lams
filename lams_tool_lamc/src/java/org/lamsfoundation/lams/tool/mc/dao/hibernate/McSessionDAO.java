@@ -92,6 +92,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     
     public int countSessionComplete(McContent mcContent)
     {
+        logger.debug("starting countSessionComplete: " + mcContent);
     	HibernateTemplate templ = this.getHibernateTemplate();
     	List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
     	.list();

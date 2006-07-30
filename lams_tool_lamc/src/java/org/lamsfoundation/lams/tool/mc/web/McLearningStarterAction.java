@@ -399,7 +399,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	Long queUsrId=mcQueUsr.getUid();
 			logger.debug("queUsrId: " + queUsrId);
 			
-			int highestAttemptOrder=LearningUtil.getHighestAttemptOrder(request, queUsrId);
+			int highestAttemptOrder=LearningUtil.getHighestAttemptOrder(request, queUsrId, mcService);
 			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
 			if (highestAttemptOrder == 0)
 				highestAttemptOrder=1;
@@ -442,6 +442,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    		{
 		    		McLearningAction mcLearningAction= new McLearningAction();
 			    	logger.debug("present to learner with previous attempts data");
+			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());
 			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	    		}
 	    	}

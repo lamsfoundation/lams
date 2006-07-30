@@ -235,9 +235,9 @@ public class LearningUtil implements McAppConstants {
      * @param queUsrId
      * @return
      */
-    public static int getHighestAttemptOrder(HttpServletRequest request, Long queUsrId)
+    public static int getHighestAttemptOrder(HttpServletRequest request, Long queUsrId, IMcService mcService)
     {
-    	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("mcService: " + mcService);
     	List listMarks=mcService.getHighestAttemptOrder(queUsrId);
     	
     	Iterator itMarks=listMarks.iterator();

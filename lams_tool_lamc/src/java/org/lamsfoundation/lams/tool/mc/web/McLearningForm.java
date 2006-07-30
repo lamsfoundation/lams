@@ -62,6 +62,7 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String passMarkApplicable;
     protected String learnerProgress;
     protected String learnerProgressUserId;
+    protected String reportViewOnly;
     
     protected String questionListingMode;
 
@@ -70,6 +71,7 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String httpSessionID;
     
     public IMcService mcService;
+    
     	
     public void resetCa(ActionMapping mapping, HttpServletRequest request) {
  	   checkedCa = new String[0];
@@ -420,5 +422,18 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setMcService(IMcService mcService) {
         this.mcService = mcService;
+    }
+
+    /**
+     * @return Returns the reportViewOnly.
+     */
+    public String getReportViewOnly() {
+        return reportViewOnly;
+    }
+    /**
+     * @param reportViewOnly The reportViewOnly to set.
+     */
+    public void setReportViewOnly(String reportViewOnly) {
+        this.reportViewOnly = reportViewOnly;
     }
 }

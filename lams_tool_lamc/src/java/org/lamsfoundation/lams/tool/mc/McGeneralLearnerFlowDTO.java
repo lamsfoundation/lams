@@ -69,6 +69,8 @@ public class McGeneralLearnerFlowDTO implements Comparable
     protected String lowestMark;
 
     protected String averageMark;
+
+    protected String reportViewOnly;
     
     protected String learnerProgress;
     
@@ -337,6 +339,7 @@ public class McGeneralLearnerFlowDTO implements Comparable
             .append("activityTitle: ", activityTitle)
             .append("questionListingMode: ", questionListingMode)
             .append("learnerProgress: ", learnerProgress)
+            .append("reportViewOnly: ", reportViewOnly)
             .toString();
     }
 
@@ -462,4 +465,17 @@ public class McGeneralLearnerFlowDTO implements Comparable
     public void setMapQuestionsContent(Map mapQuestionsContent) {
         this.mapQuestionsContent = mapQuestionsContent;
     }
+    
+    /**
+     * @return Returns the reportViewOnly.
+     */
+    public String getReportViewOnly() {
+        return reportViewOnly;
+    }
+    /**
+     * @param reportViewOnly The reportViewOnly to set.
+     */
+    public void setReportViewOnly(String reportViewOnly) {
+        this.reportViewOnly = reportViewOnly;
+    }    
 }

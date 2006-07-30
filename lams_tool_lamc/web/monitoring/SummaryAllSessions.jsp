@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
 
 						<tr>
-					 		<td NOWRAP colspan=2 > <b> <bean:message key="label.groupName"/> </b>
+					 		<td NOWRAP colspan=2 > <b> <bean:message key="group.label"/> : </b>
 					 		<c:out value="${sessionMarksDto.sessionName}"/>  </td>
 						</tr>
 

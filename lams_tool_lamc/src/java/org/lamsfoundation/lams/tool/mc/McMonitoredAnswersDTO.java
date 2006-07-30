@@ -99,11 +99,18 @@ public class McMonitoredAnswersDTO implements Comparable
 		this.questionAttempts = questionAttempts;
 	}
 	
+
 	public String toString() {
         return new ToStringBuilder(this)
-            .append("question", getQuestion())
+            .append("questionUid: ", questionUid)
+            .append("question: ", question)
+            .append("weight: ", weight)
+            .append("candidateAnswers: ", candidateAnswers)            
+            .append("questionAttempts: ", questionAttempts)
+            .append("candidateAnswersCorrect:", candidateAnswersCorrect)
             .toString();
     }
+	
 	
 	public int compareTo(Object o)
     {

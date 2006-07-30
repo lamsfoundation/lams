@@ -1219,6 +1219,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		mcGeneralLearnerFlowDTO.setMapQueCorrectAttempts(mapQueCorrectAttempts);
 		mcGeneralLearnerFlowDTO.setMapQueIncorrectAttempts(mapQueIncorrectAttempts);
 
+		String reportViewOnly=mcLearningForm.getReportViewOnly();
+		logger.debug("reportViewOnly: " + reportViewOnly);
+		
+		mcGeneralLearnerFlowDTO.setReportViewOnly(reportViewOnly);
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));    	
 		logger.debug("end of prepareViewAnswersData.");

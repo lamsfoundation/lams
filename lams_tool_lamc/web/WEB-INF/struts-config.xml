@@ -7,7 +7,6 @@
 		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
 		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
 		<form-bean name="McMonitoringForm" type="org.lamsfoundation.lams.tool.mc.web.McMonitoringForm"/>
-		<form-bean name="McExportForm" type="org.lamsfoundation.lams.tool.mc.web.McExportForm"/>		
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->
@@ -350,29 +349,6 @@
 	  	/>
 	</action>  
 
-   <!--Export Portfolio Action -->
-	    <action
-		      path="/exportPortfolio"
-		      type="org.lamsfoundation.lams.tool.mc.web.McExportAction"
-		      name="McExportForm"
-		      scope="session"
-		      parameter="mode"
-		      unknown="false"
-		      validate="false"
-	    >
-         			      		
-	      <forward
-	        name="exportPortfolio"
-	        path="/exportPortfolio.jsp"
-	        redirect="false"
-	      />
-	  	<forward
-		    name="errorList"
-		    path="/McErrorBox.jsp"
-		    redirect="false"
-	  	/>
-    </action>
-	
 	<action path="/clearsession"
 		type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction">
 	</action>       

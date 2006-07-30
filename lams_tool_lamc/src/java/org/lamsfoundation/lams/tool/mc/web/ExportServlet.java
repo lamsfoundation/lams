@@ -54,16 +54,16 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
  */
 
 public class ExportServlet  extends AbstractExportPortfolioServlet implements McAppConstants{
-	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
-	private static final long serialVersionUID = -5119093489007108143L;
+    static Logger logger = Logger.getLogger(ExportServlet.class.getName());
+	private static final long serialVersionUID = -17790L;
 	private final String FILENAME = "mcq_main.html";
 	
 	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 	    logger.debug("dispathcing doExport");
-	    request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(true).toString());
 	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+	    logger.debug("basePath:" + basePath);
 
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
 		    learner(request,response,directoryName,cookies);
@@ -79,9 +79,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
 	    logger.debug("starting learner mode...");
-	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
-        
-    	IMcService mcService = McServiceProxy.getMcService(getServletContext());
+
+	    IMcService mcService = McServiceProxy.getMcService(getServletContext());
     	logger.debug("mcService:" + mcService);
         
     	logger.debug("userID:" + userID);
@@ -117,10 +116,12 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             throw new McApplicationException(error);
         }
         
+        
         McMonitoringAction mcMonitoringAction= new McMonitoringAction();
         List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionDataForExportLearner(request, content, mcService, mcSession, learner );
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    
 
 	    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
 	    logger.debug("intTotalMark: " + intTotalMark);
@@ -128,7 +129,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    request.getSession().setAttribute(LEARNER_MARK,intTotalMark);
 	    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
 	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
-        
+	    
+	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
     	logger.debug("ending learner mode: ");
     }
 
@@ -334,7 +336,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
         logger.debug("starting teacher mode...");
-        request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
         
         IMcService mcService = McServiceProxy.getMcService(getServletContext());
        
@@ -367,6 +368,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
 	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
 
+	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
+	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
         logger.debug("ending teacher mode: ");
     }
 

@@ -152,6 +152,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     
     public int getTotalNumberOfUsers(McContent mcContent)
     {
+        logger.debug("starting getTotalNumberOfUsers: " + mcContent);
 		String strGetUser = "from mcQueUsr in class McQueUsr";
         HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(strGetUser)
@@ -167,6 +168,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 			
 			if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
 			{
+			    logger.debug("increasing user count");
 			    ++totalUserCount;
 			}
 		}
