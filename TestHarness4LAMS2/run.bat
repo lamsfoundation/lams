@@ -5,7 +5,7 @@ rem -------------------------------------------------------------------------
 
 rem $Id$
 
-set JVM_MEM=-Xms256m -Xmx512m
+set JVM_MEM=-XX:MaxPermSize=256m -Xmx512m
 
 @if not "%ECHO%" == ""  echo %ECHO%
 @if "%OS%" == "Windows_NT"  setlocal
