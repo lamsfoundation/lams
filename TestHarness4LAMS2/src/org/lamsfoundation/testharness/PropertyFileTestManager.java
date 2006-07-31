@@ -114,6 +114,7 @@ public class PropertyFileTestManager extends AbstractTestManager {
     private static final String GET_PROGRESS_URL = "GetFlashProgressDataURL";
     private static final String LESSON_ENTRY_URL = "LessonEntryURL";
     private static final String FILES_TO_UPLOAD = "FilesToUpload";
+    private static final String USER_ID_OFFSET = "UserIdOffset";
 
     private String testPropertyFileName;
 
@@ -209,14 +210,20 @@ public class PropertyFileTestManager extends AbstractTestManager {
         		learnerTestPropertyFileName, learnerTestProperties, LESSON_ENTRY_URL, !callType.equals(Call.CallType.WEB));
         String filesToUpload = PropertyUtil.getStringProperty(
         		learnerTestPropertyFileName, learnerTestProperties, FILES_TO_UPLOAD, !callType.equals(Call.CallType.WEB));
+        Integer userIdOffset = PropertyUtil.getIntegerProperty(
+                learnerTestPropertyFileName, learnerTestProperties, USER_ID_OFFSET, true);
         LearnerTest test = new LearnerTest(testName,callType,learnerRMIRegistryName,webServiceAddress,minDelay,maxDelay, getLessonURL,getLearningDesignURL,joinLessonURL,getProgressURL,lessonEntryURL, filesToUpload==null? null : filesToUpload.split(";"));
         numberOfLearners = numberOfLearners == null? 1 : numberOfLearners;
         learnerOffset = learnerOffset==null? 1 : learnerOffset;
         MockLearner[] learners = new MockLearner[numberOfLearners];
+        if(userIdOffset!=null){
+        	userIdOffset --;
+        }
         for(int i=0; i<numberOfLearners; i++){
         	baseLearnerName = baseLearnerName==null? MockLearner.DEFAULT_NAME : baseLearnerName; 
         	String username = TestUtil.buildName(testName, baseLearnerName + (learnerOffset+i), MAX_USERNAME_LENGTH);
-        	learners[i] = new MockLearner(test, username, username, null);
+        	String userId = userIdOffset==null? null : (++userIdOffset).toString();
+        	learners[i] = new MockLearner(test, username, username, userId);
         }
         test.setUsers(learners);
         log.info("Finished creating learner test "+testName);
