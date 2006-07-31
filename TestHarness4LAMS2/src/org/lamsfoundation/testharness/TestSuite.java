@@ -87,9 +87,11 @@ public class TestSuite implements Runnable {
 				monitorTest.start();
 			if (learnerTest != null)
 				learnerTest.start();
-			CountDownLatch stopSignal = new CountDownLatch(1);
-			monitorTest.notifyMonitorToStop(stopSignal);
-			stopSignal.await();
+			if(monitorTest != null){
+				CountDownLatch stopSignal = new CountDownLatch(1);
+				monitorTest.notifyMonitorToStop(stopSignal);
+				stopSignal.await();
+			}
 			finished = true;
 			log.info("Finished test suite "+suiteIndex);
 		} catch(Exception e) {//All the exceptions which happened during test stop propagation here
