@@ -106,6 +106,17 @@ FCKConfig.ToolbarSets["Default"] = [
 	['TextColor','BGColor']
 ] ;
 
+FCKConfig.ToolbarSets["Default-Learner"] = [
+	['Preview','PasteWord'],
+	['Undo','Redo'],
+	['Bold','Italic','Underline', '-','Subscript','Superscript'],
+	['OrderedList','UnorderedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
+	['About'],
+	['TextColor','BGColor'],
+	['Table','Rule','Smiley','SpecialChar','UniversalKey'],
+	['FontFormat','FontName','FontSize']
+] ;
 
 FCKConfig.ToolbarSets["Basic"] = [
 	['Bold','Italic','-','OrderedList','UnorderedList','-','Link','Unlink','-','About']
