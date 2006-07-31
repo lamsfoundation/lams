@@ -43,7 +43,7 @@ class Scratchpad extends MovieClip {
 	private var save_lbl:TextField;
 	private var _tip:ToolTip;
 	
-	public static var SCRATCHPAD_ID:Number = 3;
+	public static var SCRATCHPAD_ID:Number = 1;
 	
 	// notebook data entry fields
 	private var _title:Label;
