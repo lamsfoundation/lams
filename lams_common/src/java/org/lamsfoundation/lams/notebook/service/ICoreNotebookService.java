@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.notebook.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.util.MessageService;
 
 public interface ICoreNotebookService {
 
@@ -41,4 +42,8 @@ public interface ICoreNotebookService {
 	void updateEntry(Long uid, String title, String entry);
 	
 	void updateEntry(NotebookEntry notebookEntry);
+	
+	void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry);
+	
+	MessageService getMessageService();
 }

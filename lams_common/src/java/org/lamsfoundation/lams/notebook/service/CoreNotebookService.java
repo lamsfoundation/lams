@@ -26,19 +26,27 @@
 package org.lamsfoundation.lams.notebook.service;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+
 
 public class CoreNotebookService implements ICoreNotebookService {
 
 	private static Logger log = Logger.getLogger(CoreNotebookService.class);
 
 	private INotebookEntryDAO notebookEntryDAO;
-
+	
+	protected MessageService messageService;
+	
 	public Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String title, String entry) {
 
@@ -77,9 +85,7 @@ public class CoreNotebookService implements ICoreNotebookService {
 		saveOrUpdateNotebookEntry(notebookEntry);
 	}
 
-	/* Private methods */
-
-	private void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry) {
+	public void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry) {
 		notebookEntryDAO.saveOrUpdate(notebookEntry);
 	}
 
@@ -87,5 +93,19 @@ public class CoreNotebookService implements ICoreNotebookService {
 
 	public void setNotebookEntryDAO(INotebookEntryDAO notebookEntryDAO) {
 		this.notebookEntryDAO = notebookEntryDAO;
+	}
+	
+	/**
+	 * Set i18n MessageService
+	 */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+	
+	/**
+	 * Get i18n MessageService
+	 */
+	public MessageService getMessageService() {
+		return this.messageService;
 	}
 }

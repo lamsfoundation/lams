@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.common.style.*;		// styles/themes
 import org.lamsfoundation.lams.common.util.*;		// utilities
 import org.lamsfoundation.lams.common.ui.*;		// ui
 import org.lamsfoundation.lams.common.*;
-import org.lamsfoundation.lams.learner.Header;
+import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import mx.managers.*
 import mx.utils.*
@@ -35,12 +35,13 @@ import mx.utils.*
 * Application - LAMS Learner Application
 * @author   Mitchell Seaton
 */
-class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
+class Application extends ApplicationParent {
 	
 	// private constants
 	//private var _comms:Communication;
 	private var _lesson:Lesson;
 	private var _header_mc:MovieClip;
+	private var _scratchpad_mc:MovieClip;
 
 	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "learner";
@@ -51,6 +52,8 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	public static var HEADER_Y:Number = 0;
 	public static var LESSON_X:Number = 0;
 	public static var LESSON_Y:Number = 82;
+	public static var SPAD_X:Number = 0;
+	public static var SPAD_H:Number = 200;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
@@ -78,7 +81,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
     
 	private var _lessonLoaded:Boolean;                  //Lesson loaded flag
   	private var _headerLoaded:Boolean;
-
+	private var _scratchpadLoaded:Boolean;
     
 	
 	//Application instance is stored as a static in the application class
@@ -96,6 +99,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		
         _lessonLoaded = false;
 		_headerLoaded = false;
+		_scratchpadLoaded = false;
 		
 		_module = Application.MODULE;
  
@@ -208,6 +212,8 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
         _lesson.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
+		_scratchpad_mc = _appRoot_mc.createChildAtDepth('LScratchPad', DepthManager.kTop, {_x:SPAD_X, _y:Stage.height-SPAD_H});
+		_scratchpad_mc.addEventListener('load', Proxy.create(this, UIElementLoaded));
 	}
 	
 	/**
@@ -254,11 +260,15 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 					trace('Header loaded...');
 					_headerLoaded = true;
 					break;
+				case 'Scratchpad' :
+					trace('Scratchpad loaded...');
+					_scratchpadLoaded = true;
+					break;
                 default:
             }
             
             //If all of them are loaded set UILoad accordingly
-            if(_lessonLoaded && _headerLoaded){
+            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded){
                 _UILoaded=true;                
             } 
             
@@ -298,7 +308,8 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		}
 		
 		Header(_header_mc).resize(w);
-		_lesson.setSize(w,h-LESSON_Y);
+		Scratchpad(_scratchpad_mc).resize(w);
+		_lesson.setSize(w,h-LESSON_Y-SPAD_H);
 		
 	}
 	
@@ -370,6 +381,10 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
 	public function getHeader():Header{
 		return Header(_header_mc);
+	}
+	
+	public function getScratchpad():Scratchpad{
+		return Scratchpad(_scratchpad_mc);
 	}
 	
 	public function showDebugger():Void{

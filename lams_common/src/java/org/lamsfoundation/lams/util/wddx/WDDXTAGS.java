@@ -176,4 +176,9 @@ public interface WDDXTAGS {
 	/** Crash Dump Specific Tags */
 	public static final String CRASH_DUMP_BATCH="crashDataBatch";
 	
+	/** Notebook Specific Tags */
+	public static final String EXTERNAL_ID = "externalID";
+	public static final String EXTERNAL_ID_TYPE = "externalIDType";
+	public static final String EXTERNAL_SIG = "externalSignature";
+	public static final String ENTRY = "entry";
 }
