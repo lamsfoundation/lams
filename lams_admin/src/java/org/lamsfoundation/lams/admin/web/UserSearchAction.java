@@ -91,24 +91,24 @@ public class UserSearchAction extends Action {
 		String firstName = ((String)userSearchForm.get("firstName")).trim();
 		String lastName = ((String)userSearchForm.get("lastName")).trim();
 		
-		log.debug("got userId: "+userId);
-		log.debug("got login: "+login);
-		log.debug("got firstName: "+firstName);
-		log.debug("got lastName: "+lastName);
+		log.debug("got userId: '"+userId+"'");
+		log.debug("got login: '"+login+"'");
+		log.debug("got firstName: '"+firstName+"'");
+		log.debug("got lastName: '"+lastName+"'");
 		
 		List userList = new ArrayList();
-		if(userId=="") {
+		if(userId.length()==0) {
 			Map<String, String> stringProperties = new HashMap<String,String>();
-			if(login!="") stringProperties.put("login","%"+login+"%");
-			if(firstName!="") stringProperties.put("firstName","%"+firstName+"%");
-			if(lastName!="") stringProperties.put("lastName","%"+lastName+"%");
+			if(login.length()>0) stringProperties.put("login","%"+login+"%");
+			if(firstName.length()>0) stringProperties.put("firstName","%"+firstName+"%");
+			if(lastName.length()>0) stringProperties.put("lastName","%"+lastName+"%");
 			if(!stringProperties.isEmpty()) userList = getService().searchByStringProperties(User.class,stringProperties);
 		}else{
 			Map<String, Object> objectProperties = new HashMap<String,Object>();
 			objectProperties.put("userId",userId);
-			if(login!="") objectProperties.put("login",login);
-			if(firstName!="") objectProperties.put("firstName",firstName);
-			if(lastName!="") objectProperties.put("lastName",lastName);
+			if(login.length()>0) objectProperties.put("login",login);
+			if(firstName.length()>0) objectProperties.put("firstName",firstName);
+			if(lastName.length()>0) objectProperties.put("lastName",lastName);
 			if(!objectProperties.isEmpty()) userList = getService().findByProperties(User.class,objectProperties);
 		}
 		
