@@ -67,7 +67,7 @@
 
         <property
             name="entry"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="entry"

@@ -124,7 +124,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="entry"
+	 * @hibernate.property column="entry" type="text"
 	 */
 	public String getEntry() {
 		return entry;
