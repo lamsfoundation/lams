@@ -33,7 +33,8 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	
-	public static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "";
+	public static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName() 
+							+ " where external_id=? and external_id_type=? and user_id=?";
 	
 	public void saveOrUpdate(NotebookEntry notebookEntry) {
 		this.getHibernateTemplate().saveOrUpdate(notebookEntry);
