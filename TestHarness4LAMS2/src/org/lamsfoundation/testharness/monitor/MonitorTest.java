@@ -58,6 +58,8 @@ public class MonitorTest extends AbstractTest {
     private String lessonName;
     
     private String lsId;
+    
+    private Thread monitorThread;
 
     /**
      * MonitorTest Construtor
@@ -88,7 +90,8 @@ public class MonitorTest extends AbstractTest {
 			monitor.startLesson(startLessonURL,lsId,monitor.getUserId());
 		}
 		//monitor learners progress
-		new Thread(monitor, monitor.getUsername()).start();
+		monitorThread = new Thread(monitor, monitor.getUsername());
+		monitorThread.start();
 	}
 
 	@Override
@@ -102,7 +105,11 @@ public class MonitorTest extends AbstractTest {
 	}
 
 	public void notifyMonitorToStop(CountDownLatch stopSignal){
-		((MockMonitor)users[0]).setStopFlag(stopSignal);
+		if(monitorThread.isAlive()){
+			((MockMonitor)users[0]).setStopFlag(stopSignal);
+		}else{
+			stopSignal.countDown();
+		}
 	}
 
 	public final String getCreateLessonClassURL() {
