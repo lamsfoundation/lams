@@ -81,6 +81,7 @@ public class UserOrgRoleAction extends Action {
 		
 		// set list of roles appropriate for the organisation type
 		List roles = (List)request.getAttribute("roles");
+		request.setAttribute("numroles", roles.size());
 		log.debug("num roles: "+roles.size());
 		Collections.sort(roles);
 		request.setAttribute("roles",roles);

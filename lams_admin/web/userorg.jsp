@@ -6,6 +6,14 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
+<script language="javascript" type="text/JavaScript">
+function toggleCheckboxes(){
+	<logic:iterate id="user" name="userlist" indexId="index" >
+	document.UserOrgForm.userIds[<bean:write name="index" />].checked=document.UserOrgForm.allCheckboxes.checked;
+	</logic:iterate>
+}
+</script>
+
 <html-el:form action="/userorgsave.do" method="post">
 <html-el:hidden property="orgId" />
 <h2 align="left">
@@ -25,7 +33,7 @@
 	<th><fmt:message key="admin.user.title"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
 	<th><fmt:message key="admin.user.last_name"/></th>
-	<th></th>
+	<th><input type="checkbox" name="allCheckboxes" onclick="toggleCheckboxes();" onkeyup="toggleCheckboxes();" /></th>
 </tr>
 
 <logic:iterate id="user" name="userlist">
