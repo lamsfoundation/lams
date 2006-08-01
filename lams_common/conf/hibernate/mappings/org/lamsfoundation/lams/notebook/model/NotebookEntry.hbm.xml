@@ -73,6 +73,22 @@
             column="entry"
         />
 
+        <property
+            name="createDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
+        <property
+            name="updateDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="update_date"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-NotebookEntry.xml
