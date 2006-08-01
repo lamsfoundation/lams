@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -97,7 +98,7 @@ public class UserOrgAction extends Action {
 				
 		// get list of users in org
 		User user = (User)getService().getUserByLogin(request.getRemoteUser());
-		List<User> users = new ArrayList<User>();
+		List users = new ArrayList<User>();
 		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
 		if(request.isUserInRole(Role.SYSADMIN)){
 			users = getService().findAll(User.class);
@@ -116,6 +117,7 @@ public class UserOrgAction extends Action {
 				return mapping.findForward("error");
 			}
 		}
+		Collections.sort(users);
 		request.setAttribute("userlist",users);
 		
 		// create form object

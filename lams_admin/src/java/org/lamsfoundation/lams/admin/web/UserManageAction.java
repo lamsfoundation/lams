@@ -119,7 +119,8 @@ public class UserManageAction extends Action {
 		}
 		
 		// get list of users in org
-		List<User> users = getService().getUsersFromOrganisation(orgId);
+		List users = getService().getUsersFromOrganisation(orgId);
+		Collections.sort(users);
 		if(users==null){
 			errors.add("org",new ActionMessage("error.org.invalid"));
 			saveErrors(request,errors);
