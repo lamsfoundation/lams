@@ -102,6 +102,10 @@ public class UserOrgSaveAction extends Action{
 			Integer userId = uo.getUser().getUserId();
 			if(userIdList.indexOf(userId.toString())<0){
 				iter.remove();
+				User user = (User)getService().findById(User.class, userId);
+				Set userUos = user.getUserOrganisations();
+				userUos.remove(uo);
+				user.setUserOrganisations(userUos);
 				log.debug("removed: "+userId);
 			}
 		}
@@ -120,9 +124,6 @@ public class UserOrgSaveAction extends Action{
 			if(!alreadyInOrg){
 				User user = (User)getService().findById(User.class,userId);
 				UserOrganisation uo = new UserOrganisation(user,organisation);
-				getService().save(uo);
-				uos.add(uo);
-				log.debug("added: "+userId);
 				newUserOrganisations.add(uo);
 				/*Role role = (Role)getService().findByProperty(Role.class,"name",Role.LEARNER).get(0);
 		        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
