@@ -25,6 +25,8 @@
 
 package org.lamsfoundation.lams.notebook.model;
 
+import java.util.Date;
+
 /**
  * @hibernate.class table="lams_notebook_entry"
  */
@@ -46,15 +48,20 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 
 	private String entry;
 	
+	private Date createDate;
+	
+	private Date updateDate;
+	
 	public NotebookEntry() {}
 	
-	public NotebookEntry(Long externalID, Integer externalIDType, String externalSignature, Integer userID, String title, String entry) {
+	public NotebookEntry(Long externalID, Integer externalIDType, String externalSignature, Integer userID, String title, String entry, Date createDate) {
 		this.externalID = externalID;
 		this.externalIDType = externalIDType;
 		this.externalSignature = externalSignature;
 		this.userID = userID;
 		this.title = title;
 		this.entry = entry;
+		this.createDate = createDate;
 	}
 
 	/**
@@ -132,5 +139,27 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 
 	public void setEntry(String entry) {
 		this.entry = entry;
+	}
+
+	/**
+	 * @hibernate.property column="create_date"
+	 */
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	/**
+	 * @hibernate.property column="update_date"
+	 */
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 }
