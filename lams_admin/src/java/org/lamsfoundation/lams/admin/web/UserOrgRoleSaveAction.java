@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
@@ -74,7 +76,7 @@ public class UserOrgRoleSaveAction extends Action {
             HttpServletResponse response) throws Exception {
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
 		ArrayList userBeans = userOrgRoleForm.getUserBeans();
-		log.debug("userBeans is null?"+userBeans==null);
+		log.debug("userBeans is null? "+userBeans==null);
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
 		request.setAttribute("org",orgId);
 		request.getSession().removeAttribute("UserOrgRoleForm");		
@@ -86,10 +88,10 @@ public class UserOrgRoleSaveAction extends Action {
 		
 		for(int i=0; i<userBeans.size(); i++){
 			UserBean bean = (UserBean)userBeans.get(i);
-			log.debug("user: "+bean.getUserId());
+			log.debug("userId: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
-			UserOrganisation uo = getService().getUserOrganisation(bean.getUserId(),orgId);
-			Set uors = uo.getUserOrganisationRoles();
+			UserOrganisation uo = new UserOrganisation(getService().getUserByLogin(bean.getLogin()),(Organisation)getService().findById(Organisation.class, orgId));
+			Set uors = new HashSet();
 			for(int j=0; j<roleIds.length; j++) {
 				Role currentRole = (Role)getService().findById(Role.class,new Integer(roleIds[j]));
 				log.debug("setting role: "+currentRole.getRoleId());
@@ -98,6 +100,7 @@ public class UserOrgRoleSaveAction extends Action {
 			}
 			uo.setUserOrganisationRoles(uors);
 			getService().save(uo);
+			log.debug("added: "+uo.getUser().getUserId());
 		}
 		return mapping.findForward("userlist");
 	}
