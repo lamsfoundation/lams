@@ -307,8 +307,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_learningLibraryID){		dto.learningLibraryID	= _learningLibraryID;		}
 		if(_learningDesignID){		dto.learningDesignID	= _learningDesignID;		}
 		if(_libraryActivityID){		dto.libraryActivityID	= _libraryActivityID;		}
-		if(_parentActivityID){		dto.parentActivityID	= _parentActivityID;		}
-		if(_parentUIID){			dto.parentUIID			= _parentUIID;				}
+		//if(_parentActivityID){		dto.parentActivityID	= _parentActivityID;		}
+		//if(_parentUIID){			dto.parentUIID			= _parentUIID;				}
 		if(_orderID){				dto.orderID				= _orderID;					}
 		if(_groupingID){			dto.groupingID			= _groupingID;				}
 		if(_groupingUIID){			dto.groupingUIID		= _groupingUIID;			}
@@ -318,6 +318,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_yCoord){				dto.yCoord				= _yCoord;					}
 		if(_xCoord){				dto.xCoord				= _xCoord;					}
 		if(_libraryActivityUIImage){dto.libraryActivityUIImage= _libraryActivityUIImage;}
+		
+		dto.parentUIID = (_parentUIID==null) ? Config.NUMERIC_NULL_VALUE : _parentUIID;
+		dto.parentActivityID = (_parentActivityID==null) ? Config.NUMERIC_NULL_VALUE : _parentActivityID;
+		
 		//bnools need to be included - so do as follows:
 		dto.applyGrouping = (_applyGrouping==null) ? false : _applyGrouping;
 		dto.runOffline = (_runOffline==null) ? false : _runOffline;
