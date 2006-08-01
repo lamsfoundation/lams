@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  *         table="lams_user"
  *     
 */
-public class User implements Serializable {
+public class User implements Serializable,Comparable {
 
     /** identifier field */
     private Integer userId;
@@ -678,6 +678,11 @@ public class User implements Serializable {
             .isEquals();
     }
 
+    public int compareTo(Object user){
+    	User u = (User)user;
+	    return login.compareTo(u.getLogin());
+    }
+    
     public int hashCode() {
         return new HashCodeBuilder()
             .append(getUserId())
