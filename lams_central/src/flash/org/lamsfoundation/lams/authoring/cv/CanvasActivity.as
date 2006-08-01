@@ -54,6 +54,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
 	private var _monitorView;
+	private var mm:MonitorModel; // used only when called from Monitor Environment
 	private var _canvasModel:CanvasModel;
 	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
@@ -253,7 +254,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		trace("Monitor Model is: "+_monitorController.getModel())
 		if (_module == "monitoring"){
 			var ref = this._parent;
-			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
+			mm = MonitorModel(_monitorController.getModel());
 			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
 			var learner_X = _activity.xCoord + learnerOffset_X;
 			var learner_Y = _activity.yCoord + learnerOffset_Y;
@@ -513,7 +514,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			styleObj = _tm.getStyleObject('label');
 			title_lbl.setStyle('styleName',styleObj);
 			if (this.activity.parentUIID != null || this.activity.parentUIID != undefined){
-				var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(this.activity.parentUIID)
+				if (_module != "monitoring"){
+					var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(this.activity.parentUIID)
+				}else {
+					var parentAct = mm.getMonitor().ddm.getActivityByUIID(this.activity.parentUIID)
+				}
 				if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 					trace("called by view")
 					styleObj = _tm.getStyleObject('OptActPanel')
