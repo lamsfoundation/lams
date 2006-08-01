@@ -91,16 +91,17 @@ public class UserOrgRoleSaveAction extends Action {
 			log.debug("userId: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
 			UserOrganisation uo = new UserOrganisation(getService().getUserByLogin(bean.getLogin()),(Organisation)getService().findById(Organisation.class, orgId));
+			getService().save(uo);
+			log.debug("added: "+uo.getUser().getUserId());
 			Set uors = new HashSet();
 			for(int j=0; j<roleIds.length; j++) {
 				Role currentRole = (Role)getService().findById(Role.class,new Integer(roleIds[j]));
 				log.debug("setting role: "+currentRole.getRoleId());
 				UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
+				getService().save(newUor);
 				uors.add(newUor);
 			}
 			uo.setUserOrganisationRoles(uors);
-			getService().save(uo);
-			log.debug("added: "+uo.getUser().getUserId());
 		}
 		return mapping.findForward("userlist");
 	}

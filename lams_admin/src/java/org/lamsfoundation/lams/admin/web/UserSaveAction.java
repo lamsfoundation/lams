@@ -156,6 +156,7 @@ public class UserSaveAction extends Action {
 				        		Role currentRole = (Role)getService().findById(Role.class,roleId);
 					            log.debug("setting role: "+currentRole);
 					            UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
+					            getService().save(newUor);
 					            uors.add(newUor);
 				        	}
 				        }
