@@ -35,7 +35,7 @@ public interface ICoreNotebookService {
 	Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String title, String entry);
 
-	List<NotebookEntry> getEntry(String id, Long idType, Long userID);
+	List<NotebookEntry> getEntry(String id, Long idType, String signature, Integer userID);
 	
 	NotebookEntry getEntry(Long uid);
 	

@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.util.MessageService;
 
 
-public class CoreNotebookService implements ICoreNotebookService {
+public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreNotebookService{
 
 	private static Logger log = Logger.getLogger(CoreNotebookService.class);
 
@@ -53,16 +53,18 @@ public class CoreNotebookService implements ICoreNotebookService {
 		return notebookEntry.getUid();
 	}
 
-	public List<NotebookEntry> getEntry(String id, Long idType, Long userID) {
-		List list = notebookEntryDAO.get(id, idType, userID);
-		List<NotebookEntry> notebookEntries = new ArrayList<NotebookEntry>();
-		for (Iterator iter = list.iterator(); iter.hasNext();) {
-			NotebookEntry element = (NotebookEntry) iter.next();
-			notebookEntries.add(element);
-		}
-		return notebookEntries;
+	public List<NotebookEntry> getEntry(String id, Long idType, String signature, Integer userID) {
+		return notebookEntryDAO.get(id, idType, signature, userID);
 	}
 
+	public List<NotebookEntry> getEntry(Integer userID) {
+		return notebookEntryDAO.get(userID);
+	}
+
+	public List<NotebookEntry> getEntry(Integer userID, Long lessonID) {
+		return notebookEntryDAO.get(userID, lessonID);		
+	}
+	
 	public NotebookEntry getEntry(Long uid) {
 		return notebookEntryDAO.get(uid);
 	}

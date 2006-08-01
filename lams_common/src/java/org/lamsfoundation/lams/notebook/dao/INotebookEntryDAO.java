@@ -33,8 +33,12 @@ public interface INotebookEntryDAO {
 
 	void saveOrUpdate(NotebookEntry nb);
 
-	List get(String id, Long idType, Long userID);
-
 	NotebookEntry get(Long uid);
 
+	List<NotebookEntry> get(Integer userID);
+
+	List<NotebookEntry> get(Integer userID, Long lessonID);
+
+	List<NotebookEntry> get(String id, Long idType, String signature,
+			Integer userID);
 }
