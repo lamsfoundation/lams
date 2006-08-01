@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<input type="hidden" name="toolContentID" value="<c:out value='${sessionScope.toolContentID}'/>" />
+<input type="hidden" name="toolContentID" value="<c:out value='${authoring.contentID}'/>" />
 <table cellpadding="0">
 	<tr>
 		<td class="field-name" width="30%">
@@ -28,7 +28,7 @@
 				<td colspan="2">
 					<c:url value="/definelater.do" var="authoringUrl">
 						<c:param name="mode" value="teacher" />
-						<c:param name="toolContentID" value="${sessionScope.toolContentID}" />
+						<c:param name="toolContentID" value="${authoring.contentID}" />
 					</c:url>
 					<html:link href="${authoringUrl}" styleClass="button" target="_blank">
 						<fmt:message key="label.monitoring.edit.activity.edit" />

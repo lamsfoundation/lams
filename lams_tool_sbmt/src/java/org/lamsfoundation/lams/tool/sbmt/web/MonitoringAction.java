@@ -27,12 +27,15 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +50,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
@@ -58,10 +60,12 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -70,20 +74,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 				path="/monitoring"
  * 				parameter="method"
  * 				scope="request"
+ * 				validate="false"
  * 				name="SbmtMonitoringForm" 				
  * 
- * @struts.action-forward name="userlist" path="/monitoring/monitoring.jsp"
- * @struts.action-forward name="userMarks" path="/monitoring/monitoring.jsp"
- * @struts.action-forward name="updateMarks" path="/monitoring/monitoring.jsp"
- * @struts.action-forward name="allUserMarks" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="listMark" path="/monitoring/mark/mark.jsp"
+ * @struts.action-forward name="updateMark" path="/monitoring/mark/updatemark.jsp"
+ * @struts.action-forward name="listAllMarks" path="/monitoring/mark/allmarks.jsp"
  * 
- * @struts.action-forward name="instructions" path="/monitoring/monitoring.jsp"
- * @struts.action-forward name="showActivity" path="/monitoring/monitoring.jsp"
  * @struts.action-forward name="success" path="/monitoring/monitoring.jsp"
- * @struts.action-forward name="load" path="/monitoring/monitoring.jsp"
- * 
- * @struts.action-forward name="statistic" path="/monitoring/monitoring.jsp"
- * 
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -93,8 +91,6 @@ public class MonitoringAction extends LamsDispatchAction {
     
     /**
      * Default ActionForward for Monitor
-     *  (non-Javadoc)
-     * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     public ActionForward unspecified(
             ActionMapping mapping,
@@ -103,42 +99,23 @@ public class MonitoringAction extends LamsDispatchAction {
             HttpServletResponse response)
     {
     	Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
-        
-        return doTabs(mapping, form, request, response);
-    }
-    
-    private ActionForward doTabs(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-    	 this.userList(mapping, form, request, response);
-         this.instructions(mapping, form, request, response);
-         this.showActivity(mapping, form, request, response);
-         this.statistic(mapping, form, request, response);
-         
-         return mapping.findForward("load");
-    }
-    
-	/**
-	 * List all user for monitor staff choose which user need to do report marking.
-	 * It is first step to do report marking.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward userList(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-		//Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));		
-        Long contentID = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		submitFilesService = getSubmitFilesService();
-		//List userList = submitFilesService.getUsers(sessionID);
+    	submitFilesService = getSubmitFilesService();
+    	
+//    	List userList = submitFilesService.getUsers(sessionID);
         List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
-        Map sessionUserMap = new HashMap();
+        Map<SessionDTO, List> sessionUserMap = new TreeMap<SessionDTO, List>(new Comparator<SessionDTO>(){
+			public int compare(SessionDTO o1, SessionDTO o2) {
+				if(o1 != null && o2 != null){
+					int c = o1.getSessionName().compareTo(o2.getSessionName());
+					//to ensure session can be put into map even they have duplicated name.
+					return c==0?1:c;
+				}else if(o1 != null)
+					return 1;
+				else
+					return -1;
+			}
+        	
+        });
         
         //build a map with all users in the submitFilesSessionList
         Iterator it = submitFilesSessionList.iterator();
@@ -156,134 +133,66 @@ public class MonitoringAction extends LamsDispatchAction {
 		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("sessionUserMap",sessionUserMap);
 		
-		return mapping.findForward("userlist");
-	}
-	/**
-	 * Display special user's marks information. 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward getFilesUploadedByUser(ActionMapping mapping,
-							   ActionForm form,
-							   HttpServletRequest request,
-							   HttpServletResponse response){
-		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		Map sessionStatisticMap = new HashMap();
 
-		submitFilesService = getSubmitFilesService();
-		//return FileDetailsDTO list according to the given userID and sessionID
-		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		UserDTO userDto = submitFilesService.getUserDetails(userID);
-		
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		request.setAttribute("user",userDto);
-		request.setAttribute("userReport",files);
-		
-		setTab(request);
-		doTabs(mapping, form, request, response);
-		return mapping.findForward("userMarks");
-	}
-	/**
-	 * Display update mark initial page.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward markFile(ActionMapping mapping,
-			  ActionForm form,
-			  HttpServletRequest request,
-			  HttpServletResponse response){
-		
-		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
-		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
-		
-		submitFilesService = getSubmitFilesService();
-		
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		request.setAttribute("user",submitFilesService.getUserDetails(userID));
-		request.setAttribute("fileDetails",submitFilesService.getFileDetails(detailID));
-		
-		setTab(request);
-		doTabs(mapping, form, request, response);
-		return mapping.findForward("updateMarks");
-	}
-	
-	public ActionForward updateMarks(ActionMapping mapping,
-							   ActionForm form,
-							   HttpServletRequest request,
-							   HttpServletResponse response){
-		//check whether the mark is validate
-		Long marks = null;
-		DynaActionForm sbmtMonitoringForm = (DynaActionForm) form;
-		
-		ActionMessages errors = new ActionMessages();  
-		try {
-			marks = new Long(WebUtil.readLongParam(request,"marks"));
-		} catch (IllegalArgumentException e) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
-		}
-		//if marks is invalid long, then throw error message directly.
-		String comments = WebUtil.readStrParam(request,"comments",true);
-		if(!errors.isEmpty()){
-			//to echo back to error page.
-			FileDetailsDTO details = (FileDetailsDTO) request.getAttribute("fileDetails");
-			if(details != null)
-				details.setComments(comments);
-			saveErrors(request,errors);
+		// build a map with all users in the submitFilesSessionList
+		it = submitFilesSessionList.iterator();
+		while (it.hasNext()) {
 			
-			setTab(request);
-			doTabs(mapping, form, request, response);
-			sbmtMonitoringForm.set("method", "markFile");
-			return mapping.findForward("updateMarks");
+			SubmitFilesSession sfs = (SubmitFilesSession) it.next();
+			Long sessionID = sfs.getSessionID();
+			String sessionName = sfs.getSessionName();
+				
+			//return FileDetailsDTO list according to the given sessionID
+			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+			Iterator iter = userFilesMap.values().iterator();
+			Iterator dtoIter; 
+			int notMarkedCount = 0;
+			int markedCount = 0;
+			while(iter.hasNext()){
+				List list = (List) iter.next();
+				dtoIter = list.iterator();
+				while(dtoIter.hasNext()){
+					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+					if(dto.getMarks() == null)
+						notMarkedCount++;
+					else
+						markedCount++;
+				}
+			}
+			StatisticDTO statisticDto = new StatisticDTO();
+			SessionDTO sessionDto = new SessionDTO();
+			statisticDto.setMarkedCount(markedCount);
+			statisticDto.setNotMarkedCount(notMarkedCount);
+			statisticDto.setTotalUploadedFiles(markedCount+notMarkedCount);
+			sessionDto.setSessionID(sessionID);
+			sessionDto.setSessionName(sessionName);
+			sessionStatisticMap.put(sessionDto,statisticDto);
 		}
-		
-		//get other request parameters
-		String reportIDStr = request.getParameter("reportID");
-		Long reportID = new Long(-1);
-		if(!StringUtils.isEmpty(reportIDStr))
-			reportID = Long.valueOf(reportIDStr);
 
-		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		request.setAttribute("statisticList",sessionStatisticMap);
 		
-		//get service then update report table
-		submitFilesService = getSubmitFilesService();
+		//instruction
+		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+		//if this content does not exist, then reset the contentID to current value to keep it on HTML page.
+		persistContent.setContentID(contentID); 
 		
-		submitFilesService.updateMarks(reportID,marks,comments);
-		List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		request.setAttribute("userReport",report);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		UserDTO userDto = submitFilesService.getUserDetails(userID);
-		request.setAttribute("user",userDto);
+		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
+		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
+		request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(SbmtWebUtils.isSbmtEditable(persistContent)));
 		
-		setTab(request);
-		doTabs(mapping, form, request, response);
-		return mapping.findForward("userMarks");
-	}
-	public ActionForward viewAllMarks(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-		
-		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
-		submitFilesService = getSubmitFilesService();
-		//return FileDetailsDTO list according to the given sessionID
-		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-//		request.setAttribute("user",submitFilesService.getUserDetails(userID));
-		request.setAttribute("report",userFilesMap);
-		
-		setTab(request);
-		doTabs(mapping, form, request, response);
-		return mapping.findForward("allUserMarks");
+		return mapping.findForward("success");
+    }
+    
 
-	}
+	/**
+	 * Release mark
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward releaseMarks(ActionMapping mapping,
 			   ActionForm form,
 			   HttpServletRequest request,
@@ -294,11 +203,23 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService.releaseMarksForSession(sessionID);
 		
-		setTab(request);
+		try {
+			PrintWriter out = response.getWriter();
+			out.write(getMessageService().getMessage("msg.mark.released"));
+			out.flush();
+		} catch (IOException e) {
+		}
 		
-		//echo message back
-		return doTabs(mapping, form, request, response);
+		return null;
 	}
+	/**
+	 * Download submit file marks by MS Excel file format.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward downloadMarks(ActionMapping mapping,
 			   ActionForm form,
 			   HttpServletRequest request,
@@ -309,7 +230,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		//return FileDetailsDTO list according to the given sessionID
 		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
 		//construct Excel file format and download
-		ActionMessages errors = new ActionMessages();
+		String errors = null;
 		try {
 			//create an empty excel file
 			HSSFWorkbook wb = new HSSFWorkbook();
@@ -380,154 +301,174 @@ public class MonitoringAction extends LamsDispatchAction {
 			byte[] data = bos.toByteArray();
 			response.getOutputStream().write(data,0,data.length);
 			response.getOutputStream().flush();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e);
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.download.error",e.toString()));
+			errors =new ActionMessage("monitoring.download.error",e.toString()).toString();
 		}
 
-		if(!errors.isEmpty()){
-			saveErrors(request,errors);
-			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-			setTab(request);
-			doTabs(mapping, form, request, response);
-			return mapping.findForward("userlist");
+		if(errors != null){
+			try {
+				PrintWriter out = response.getWriter();
+				out.write(errors);
+				out.flush();
+			} catch (IOException e) {
+			}
 		}
 			
 		return null;
 	}
+	//**********************************************************
+	// Mark udpate/view methods
+	//**********************************************************
 	/**
-	 * Display online/offline instruction information from Authoring. This page is read-only.
+	 * Display special user's marks information. 
 	 * @param mapping
 	 * @param form
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	public ActionForward instructions(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-		
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		
-		//get back the upload file list and display them on page
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
-		
-		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
-		//if this content does not exist, then reset the contentID to current value to keep it on HTML page.
-		persistContent.setContentID(contentID); 
-		
-		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
-		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
-		return mapping.findForward("instructions");
-	}
-	/**
-	 * Display acitivty from authoring. The information will be same with "Basic" tab in authoring page.
-	 * This page is read-only.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward showActivity(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
+	public ActionForward listMark(ActionMapping mapping,
+							   ActionForm form,
+							   HttpServletRequest request,
+							   HttpServletResponse response){
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		getAuthoringActivity(contentID, request);
-		return mapping.findForward("showActivity");
-	}
-	/**
-	 * Provide statistic information. Includes:<br>
-	 * <li>Files not marked</li> 
-	 * <li>Files marked</li> 
-	 * <li>Total Files</li> 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward statistic(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-	    Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 		submitFilesService = getSubmitFilesService();
-		// List userList = submitFilesService.getUsers(sessionID);
-		List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
-		Map sessionStatisticMap = new HashMap();
-
-		// build a map with all users in the submitFilesSessionList
-		Iterator it = submitFilesSessionList.iterator();
-		while (it.hasNext()) {
-			
-			SubmitFilesSession sfs = (SubmitFilesSession) it.next();
-			Long sessionID = sfs.getSessionID();
-			String sessionName = sfs.getSessionName();
-				
-			submitFilesService = getSubmitFilesService();
-			//return FileDetailsDTO list according to the given sessionID
-			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
-			Iterator iter = userFilesMap.values().iterator();
-			Iterator dtoIter; 
-			int notMarkedCount = 0;
-			int markedCount = 0;
-			while(iter.hasNext()){
-				List list = (List) iter.next();
-				dtoIter = list.iterator();
-				while(dtoIter.hasNext()){
-					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-					if(dto.getMarks() == null)
-						notMarkedCount++;
-					else
-						markedCount++;
-				}
-			}
-			StatisticDTO statisticDto = new StatisticDTO();
-			SessionDTO sessionDto = new SessionDTO();
-			statisticDto.setMarkedCount(markedCount);
-			statisticDto.setNotMarkedCount(notMarkedCount);
-			statisticDto.setTotalUploadedFiles(markedCount+notMarkedCount);
-			sessionDto.setSessionID(sessionID);
-			sessionDto.setSessionName(sessionName);
-			sessionStatisticMap.put(sessionDto,statisticDto);
-		}
-
-		request.setAttribute("statisticList",sessionStatisticMap);
-		return mapping.findForward("statistic");
+		//return FileDetailsDTO list according to the given userID and sessionID
+		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+		
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		request.setAttribute("report",files);
+		return mapping.findForward("listMark");
 	}
 	/**
-	 * @param request 
+	 * Display update mark initial page.
+	 * @param mapping
 	 * @param form
 	 * @param request
+	 * @param response
+	 * @return
 	 */
-	private void getAuthoringActivity(Long contentID, ServletRequest request) {
+	public ActionForward newMark(ActionMapping mapping,
+			  ActionForm form,
+			  HttpServletRequest request,
+			  HttpServletResponse response){
 		
-		//get back the upload file list and display them on page
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
+		String updateMode = request.getParameter("updateMode");
 		
-		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
-		//if this content does not exist, then reset the contentID to current value to keep it on HTML page.
-		persistContent.setContentID(contentID);
-		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
-		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
-		
-		request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(SbmtWebUtils.isSbmtEditable(persistContent)));
+		setMarkPage(request, sessionID, userID, detailID, updateMode);
+		return mapping.findForward("updateMark");
 	}
+
+
+
+	/**
+	 * Update mark.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward updateMark(ActionMapping mapping,
+							   ActionForm form,
+							   HttpServletRequest request,
+							   HttpServletResponse response){
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
+		String updateMode = request.getParameter("updateMode");
+		Long reportID= new Long(WebUtil.readLongParam(request,"reportID"));
+		
+		//check whether the mark is validate
+		Long marks = null;
+		ActionMessages errors = new ActionMessages();  
+		try {
+			marks = new Long(WebUtil.readLongParam(request,"marks"));
+		} catch (IllegalArgumentException e) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
+		}
+		//if marks is invalid long, then throw error message directly.
+		String comments = WebUtil.readStrParam(request,"comments",true);
+		if(!errors.isEmpty()){
+			setMarkPage(request, sessionID, userID, detailID, updateMode);
+			//to echo back to error page.
+			FileDetailsDTO details = (FileDetailsDTO) request.getAttribute("report");
+			if(details != null)
+				details.setComments(comments);
+			saveErrors(request,errors);
+			return mapping.findForward("updateMark");
+		}
+		
+		//get service then update report table
+		submitFilesService = getSubmitFilesService();
+		
+		submitFilesService.updateMarks(reportID,marks,comments);
+		
+		if(StringUtils.equals(updateMode, "listMark")){
+			List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+			request.setAttribute("report",report);
+			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+			return mapping.findForward("listMark");
+		}else{
+			Map report = submitFilesService.getFilesUploadedBySession(sessionID);
+			request.setAttribute("reports",report);
+			return mapping.findForward("listAllMarks");
+		}
+	}
+	/**
+	 * View mark of all learner from same tool content ID. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward listAllMarks(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		submitFilesService = getSubmitFilesService();
+		//return FileDetailsDTO list according to the given sessionID
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+//		request.setAttribute("user",submitFilesService.getUserDetails(userID));
+		request.setAttribute("reports",userFilesMap);
+		
+		return mapping.findForward("listAllMarks");
+
+	}	
+	//**********************************************************
+	// Private methods
+	//**********************************************************
+	
 	private ISubmitFilesService getSubmitFilesService(){
 		return SubmitFilesServiceProxy
 			   .getSubmitFilesService(this.getServlet()
 			   .getServletContext());
 	}
 	
-	private void setTab(HttpServletRequest request) {
-		String currTab = request.getParameter("currentTab");
-		request.setAttribute("currentTab",currTab);
+	/**
+	 * Return ResourceService bean.
+	 */
+	private MessageService getMessageService() {
+	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+	      return (MessageService) wac.getBean("sbmtMessageService");
+	}	
+	private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID, String updateMode) {
+		submitFilesService = getSubmitFilesService();
+		
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		List report = new ArrayList<FileDetailsDTO>();
+		report.add(submitFilesService.getFileDetails(detailID));
+		request.setAttribute("report",report);
+		request.setAttribute("updateMode", updateMode);
 	}
-	
 }

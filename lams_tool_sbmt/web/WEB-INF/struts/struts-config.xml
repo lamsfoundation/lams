@@ -118,50 +118,25 @@
       scope="request"
       parameter="method"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
-        name="userlist"
-        path="/monitoring/monitoring.jsp"
+        name="listMark"
+        path="/monitoring/mark/mark.jsp"
         redirect="false"
       />
       <forward
-        name="userMarks"
-        path="/monitoring/monitoring.jsp"
+        name="updateMark"
+        path="/monitoring/mark/updatemark.jsp"
         redirect="false"
       />
       <forward
-        name="updateMarks"
-        path="/monitoring/monitoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="allUserMarks"
-        path="/monitoring/monitoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="instructions"
-        path="/monitoring/monitoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="showActivity"
-        path="/monitoring/monitoring.jsp"
+        name="listAllMarks"
+        path="/monitoring/mark/allmarks.jsp"
         redirect="false"
       />
       <forward
         name="success"
-        path="/monitoring/monitoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="load"
-        path="/monitoring/monitoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="statistic"
         path="/monitoring/monitoring.jsp"
         redirect="false"
       />

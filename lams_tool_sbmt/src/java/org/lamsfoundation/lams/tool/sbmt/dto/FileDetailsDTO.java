@@ -57,13 +57,7 @@ public class FileDetailsDTO implements Serializable{
 	private UserDTO userDTO;
 	
 
-	public String getExportedURL() {
-		return exportedURL;
-	}
-	public void setExportedURL(String exportedURL) {
-		this.exportedURL = exportedURL;
-	}
-	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report){
+	public FileDetailsDTO(SubmissionDetails details, UserDTO userDTO){
 		if(details == null){
 			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
 			return;
@@ -81,31 +75,6 @@ public class FileDetailsDTO implements Serializable{
 		this.dateOfSubmission = details.getDateOfSubmission();
 		this.uuID = details.getUuid();
 		this.versionID = details.getVersionID();
-		if(report != null){
-			this.reportID = report.getReportID();
-			this.dateMarksReleased = report.getDateMarksReleased();		
-			this.comments = report.getComments();
-			this.marks = report.getMarks();
-		}
-	}
-	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report,UserDTO userDTO){
-		this(details,report);
-		this.userDTO = userDTO;
-	}
-	public FileDetailsDTO(SubmissionDetails details){
-		
-		if(details == null){
-			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
-			return;
-		}
-		
-		this.submissionID = details.getSubmissionID();
-		this.filePath = details.getFilePath();
-		this.fileDescription = details.getFileDescription();
-		this.dateOfSubmission = details.getDateOfSubmission();
-		this.uuID = details.getUuid();
-		this.versionID = details.getVersionID();
-		
 		SubmitFilesReport report = details.getReport();
 		if(report != null){
 			this.reportID = report.getReportID();
@@ -113,7 +82,16 @@ public class FileDetailsDTO implements Serializable{
 			this.comments = report.getComments();
 			this.marks = report.getMarks();
 		}
+		this.userDTO = userDTO;
 	}
+
+	public String getExportedURL() {
+		return exportedURL;
+	}
+	public void setExportedURL(String exportedURL) {
+		this.exportedURL = exportedURL;
+	}
+
 	/**
 	 * @return Returns the reportID.
 	 */

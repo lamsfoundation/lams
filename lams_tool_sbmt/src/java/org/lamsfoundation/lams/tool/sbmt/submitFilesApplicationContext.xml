@@ -4,7 +4,13 @@
 <!-- Application context definition for Submit Files Tool -->
 
 <beans>
-
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.sbmt.ApplicationResources</value></property>
+	</bean>
+	<bean id="sbmtMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource"><ref local="messageSource"/></property>										
+	</bean>
+	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
   	<!-- Hibernate SessionFactory -->
 	<bean id="sbmtSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">

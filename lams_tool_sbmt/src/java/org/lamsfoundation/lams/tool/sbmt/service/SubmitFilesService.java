@@ -585,9 +585,8 @@ public class SubmitFilesService implements ToolContentManager,
 		Iterator iterator = list.iterator();
 		while(iterator.hasNext()){
 			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-			SubmitFilesReport report = submissionDetails.getReport();
 			UserDTO user = getUserDetails(userID);
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report, user);
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,user);
 			detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
 			details.add(detailDto);
 		}
@@ -606,7 +605,6 @@ public class SubmitFilesService implements ToolContentManager,
 			List userFileList;
 			while(iterator.hasNext()){
 				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-				SubmitFilesReport report = submissionDetails.getReport();
 				Learner learner = submissionDetails.getLearner();
 				if(learner == null){
 					log.error("Could not find learer for special submission item:" + submissionDetails);
@@ -614,7 +612,7 @@ public class SubmitFilesService implements ToolContentManager,
 				}
 				UserDTO user = getUserDetails(learner.getUserID());
 				
-				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report,user);
+				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,user);
 				detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
 				userFileList = (List) map.get(user);
 				//if it is first time to this user, creating a new ArrayList for this user.
@@ -631,7 +629,9 @@ public class SubmitFilesService implements ToolContentManager,
 	public FileDetailsDTO getFileDetails(Long detailID){
 			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
 			details.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), details.getDateOfSubmission()));
-			return new FileDetailsDTO(details);			
+			UserDTO user = getUserDetails(details.getLearner().getUserID());
+			
+			return new FileDetailsDTO(details,user);			
 	}
 	/**
 	 * (non-Javadoc)
