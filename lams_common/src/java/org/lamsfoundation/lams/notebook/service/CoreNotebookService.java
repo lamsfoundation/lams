@@ -26,7 +26,7 @@
 package org.lamsfoundation.lams.notebook.service;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,9 +34,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 
 public class CoreNotebookService implements ICoreNotebookService {
@@ -51,7 +48,7 @@ public class CoreNotebookService implements ICoreNotebookService {
 			Integer userID, String title, String entry) {
 
 		NotebookEntry notebookEntry = new NotebookEntry(id, idType, signature,
-				userID, title, entry);
+				userID, title, entry, new Date());
 		saveOrUpdateNotebookEntry(notebookEntry);
 		return notebookEntry.getUid();
 	}
@@ -75,6 +72,7 @@ public class CoreNotebookService implements ICoreNotebookService {
 		if (ne != null) {
 			ne.setTitle(title);
 			ne.setEntry(entry);
+			ne.setUpdateDate(new Date());
 			saveOrUpdateNotebookEntry(ne);
 		} else {
 			log.debug("updateEntry: uid " + uid + "does not exist");
@@ -82,6 +80,7 @@ public class CoreNotebookService implements ICoreNotebookService {
 	}
 
 	public void updateEntry(NotebookEntry notebookEntry) {
+		notebookEntry.setUpdateDate(new Date());
 		saveOrUpdateNotebookEntry(notebookEntry);
 	}
 
