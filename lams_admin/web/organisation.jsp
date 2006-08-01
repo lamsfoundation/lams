@@ -74,6 +74,7 @@
 			</html-el:select>
 		</td>
 	</tr>
+	<logic:equal name="OrganisationForm" property="typeId" value="2">
 	<tr>
 		<td colspan=2>
 			<html-el:checkbox property="courseAdminCanAddNewUsers" />
@@ -92,6 +93,7 @@
 			<fmt:message key="admin.can.change.status"/>
 		</td>
 	</tr>
+	</logic:equal>
 	<tr>
 		<td colspan=2 align="right">
 			<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
