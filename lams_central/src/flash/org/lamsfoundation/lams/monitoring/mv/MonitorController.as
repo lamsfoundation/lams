@@ -194,11 +194,13 @@ class MonitorController extends AbstractController {
 		}
 
 		//Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','MonitorModel');
-		if (ca.activityStatus == undefined){
-	
-			var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity',[ca.learnerName, ca.activity.title]);
-			getURL("javascript:alert('"+alertMSG+"');");
-			
+		if (forTabView != "MonitorTabView"){
+			if (ca.activityStatus == undefined){
+		
+				var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity',[ca.learnerName, ca.activity.title]);
+				getURL("javascript:alert('"+alertMSG+"');");
+				
+			}
 		}else {
 			JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 		}
