@@ -85,7 +85,7 @@ public class TestSuite implements Runnable {
 				authorTest.start();
 			if (monitorTest != null)
 				monitorTest.start();
-			if (learnerTest != null)
+			if ((learnerTest != null)&&(monitorTest != null))
 				learnerTest.start();
 			if(monitorTest != null){
 				CountDownLatch stopSignal = new CountDownLatch(1);
