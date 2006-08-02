@@ -1,5 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<script type="text/javascript">
+	function refreshTopic(){
+		var reqIDVar = new Date();
+		location.href= "<html:rewrite page="/learning/viewTopic.do?topicId=${rootUid}&reqUid=" />"+reqIDVar.getTime();;
+	}
+</script>
 <h1 class="no-tabs-below">
 	${forum_title}
 </h1>
@@ -22,6 +27,14 @@
 		</html:button>
 	</p>
 	<%@ include file="/jsps/learning/message/topicview.jsp"%>
+	<div class="left-buttons">
+		<c:set var="refreshTopicURL">
+			
+		</c:set>
+		<a href="javascript:refreshTopic();" class="button">
+			<fmt:message key="label.refresh"/>
+		</a>
+	</div>
 </div>
 
 <div id="footer-learner"></div>
