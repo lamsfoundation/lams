@@ -82,7 +82,7 @@
         />
 
         <property
-            name="updateDate"
+            name="lastModified"
             type="java.util.Date"
             update="true"
             insert="true"
