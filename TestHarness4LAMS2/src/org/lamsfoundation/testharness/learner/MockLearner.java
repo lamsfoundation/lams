@@ -346,7 +346,7 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 
 	private String[] chooseArbitraryValues(String[] values) {
-		int length = 1 + TestUtil.generateRandomIndex(values.length);
+		int length = 1; // + TestUtil.generateRandomIndex(values.length);
 		String[] answers = new String[length];
 		for (int i = 0; i < length; i++) {
 			answers[i] = values[TestUtil.generateRandomIndex(values.length)];
