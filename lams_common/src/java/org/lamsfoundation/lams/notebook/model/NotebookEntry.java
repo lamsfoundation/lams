@@ -50,7 +50,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	
 	private Date createDate;
 	
-	private Date updateDate;
+	private Date lastModified;
 	
 	public NotebookEntry() {}
 	
@@ -153,13 +153,13 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="update_date"
+	 * @hibernate.property column="last_modified"
 	 */
 	public Date getUpdateDate() {
-		return updateDate;
+		return lastModified;
 	}
 
 	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
+		this.lastModified = updateDate;
 	}
 }

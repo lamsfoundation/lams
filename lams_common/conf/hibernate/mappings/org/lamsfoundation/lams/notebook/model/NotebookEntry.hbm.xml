@@ -86,7 +86,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="update_date"
+            column="last_modified"
         />
 
         <!--
