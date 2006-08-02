@@ -862,3 +862,12 @@ CREATE TABLE lams_country (
 	 , iso_code VARCHAR(2) NOT NULL UNIQUE
 	 , PRIMARY KEY (country_id)
  )TYPE=InnoDB;
+ 
+CREATE TABLE lams_tool_import_support (
+       id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , installed_tool_signature VARCHAR(15) NOT NULL
+     , supports_tool_signature VARCHAR(50) NOT NULL
+     , PRIMARY KEY (id)
+)TYPE=InnoDB;
+
+ 

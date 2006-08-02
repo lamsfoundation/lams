@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 
 /**
  * @author Mitchell Seaton
@@ -48,6 +49,6 @@ public interface ILearningDesignService{
 	 * @param learningDesign
 	 * @return list of validation errors
 	 */
-	public Vector validateLearningDesign(LearningDesign learningDesign);
+	public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
 	
 }

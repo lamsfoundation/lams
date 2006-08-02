@@ -95,4 +95,14 @@ public interface IExportToolContentService {
 	
 	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler)
 		throws ImportToolContentException;
+	
+	/**
+	 * Import 1.0.2 learning design 
+	 * @return learningDesingID
+	 * @throws ExportToolContentException 
+	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User, WorkspaceFolder)
+	 */
+	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
+			, List<String> toolsErrorMsgs) throws ImportToolContentException;
+
 }

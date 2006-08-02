@@ -37,6 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.Nullable;
@@ -855,7 +856,7 @@ public abstract class Activity implements Serializable,Nullable {
 	 * Validate activity
 	 * 
 	 */
-	public Vector validateActivity(MessageService messageService) { 
+	public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) { 
 		return null; 
 	}
 

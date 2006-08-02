@@ -63,6 +63,7 @@
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/ToolImportSupport.hbm.xml</value>
 				
 				<!-- Workspace related mapping files -->
 				<value>org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>
@@ -146,12 +147,14 @@
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="toolImportSupportDAO"><ref bean="toolImportSupportDAO"/></property>
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
 	</bean>
 	
 	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

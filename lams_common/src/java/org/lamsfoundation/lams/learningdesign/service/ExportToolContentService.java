@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
@@ -94,6 +95,7 @@ import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
+import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -143,6 +145,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private IGroupingDAO groupingDAO;
 	private ITransitionDAO  transitionDAO;
 	private ILearningDesignDAO learningDesignDAO;
+	private ILearningLibraryDAO learningLibraryDAO;
+	private IToolImportSupportDAO toolImportSupportDAO;
 	
 	/**
 	 * Class to sort activity DTO according to the rule: Paretns is before their children.
@@ -441,6 +445,20 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 	
 	/**
+	 * Import 1.0.2 learning design 
+	 * @return learningDesingID
+	 * @throws ExportToolContentException 
+	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User, WorkspaceFolder)
+	 */
+	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
+			, List<String> toolsErrorMsgs) throws ImportToolContentException {
+		WorkspaceFolder folder = null; //getWorkspaceFolderForDesign(importer, workspaceFolderUid);
+    	LD102Importer oldImporter = new LD102Importer(getLearningDesignService(), baseDAO, learningLibraryDAO, activityDAO, toolDAO, toolImportSupportDAO, toolContentDAO, toolsErrorMsgs);
+    	return oldImporter.storeLDDataWDDX(ldWddxPacket, importer, folder);
+	}
+	
+
+	/**
 	 * @return learningDesingID
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
@@ -489,21 +507,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 			}
 			
-			// if workspaceFolderUid == null use the user's default folder
-			WorkspaceFolder folder = null;
-			if ( workspaceFolderUid != null ) {
-				folder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderUid);
-			} 				
-			if ( folder == null && importer.getWorkspace() != null) {
-				folder = importer.getWorkspace().getDefaultFolder();
-			}
-			if ( folder == null ) {
-				String error = "Unable to save design in a folder - folder not found. Input folder uid="+workspaceFolderUid+
-						" user's default folder "+importer.getWorkspace();
-				log.error(error);
-				throw new ImportToolContentException(error);
-			}
-
+			WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
 			return saveLearningDesign(ldDto,importer,folder,toolMapper);
 			
 		}catch (ToolException e) {
@@ -514,6 +518,23 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			throw new ImportToolContentException(e);
 		}
 		
+	}
+	private WorkspaceFolder getWorkspaceFolderForDesign(User importer, Integer workspaceFolderUid) throws ImportToolContentException {
+		// if workspaceFolderUid == null use the user's default folder
+		WorkspaceFolder folder = null;
+		if ( workspaceFolderUid != null ) {
+			folder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderUid);
+		} 				
+		if ( folder == null && importer.getWorkspace() != null) {
+			folder = importer.getWorkspace().getDefaultFolder();
+		}
+		if ( folder == null ) {
+			String error = "Unable to save design in a folder - folder not found. Input folder uid="+workspaceFolderUid+
+					" user's default folder "+importer.getWorkspace();
+			log.error(error);
+			throw new ImportToolContentException(error);
+		}
+		return folder;
 	}
 	/**
 	 * Import tool content 
@@ -1107,6 +1128,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		return act.getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE || 
 		 act.getActivityTypeId().intValue()== Activity.PARALLEL_ACTIVITY_TYPE ||
 		 act.getActivityTypeId().intValue()== Activity.OPTIONS_ACTIVITY_TYPE;
+	}
+	public void setToolImportSupportDAO(IToolImportSupportDAO toolImportSupportDAO) {
+		this.toolImportSupportDAO = toolImportSupportDAO;
+	}
+	public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
+		this.learningLibraryDAO = learningLibraryDAO;
 	}
 
 }

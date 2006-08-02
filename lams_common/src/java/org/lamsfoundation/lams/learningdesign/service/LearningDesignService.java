@@ -23,26 +23,19 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
-import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.OptionsActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -111,10 +104,10 @@ public class LearningDesignService implements ILearningDesignService{
 	 * @param learningDesign
 	 * @return list of validation errors
 	 */
-	public Vector validateLearningDesign(LearningDesign learningDesign)
+	public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign)
 	{
 
-		Vector listOfValidationErrorDTOs = new Vector();		// initialises the list of validation messages.
+		Vector<ValidationErrorDTO> listOfValidationErrorDTOs = new Vector<ValidationErrorDTO>();		// initialises the list of validation messages.
 		
 		validateActivityTransitionRules(learningDesign.getParentActivities(), learningDesign.getTransitions(), listOfValidationErrorDTOs);
 		validateGeneral(learningDesign.getActivities(), listOfValidationErrorDTOs);
@@ -136,11 +129,11 @@ public class LearningDesignService implements ILearningDesignService{
 	 * @param topLevelActivities
 	 * @param transitions
 	 */
-	private void validateActivityTransitionRules(Set topLevelActivities, Set transitions, Vector listOfValidationErrorDTOs)
+	private void validateActivityTransitionRules(Set topLevelActivities, Set transitions, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
 	{
 		validateTransitions(transitions, listOfValidationErrorDTOs);
-		Vector noInputTransition = new Vector(); //a list to hold the activities which have no input transition
-		Vector noOuputTransition = new Vector(); //a list to hold the activities which have no output transition
+		Vector<Activity> noInputTransition = new Vector<Activity>(); //a list to hold the activities which have no input transition
+		Vector<Activity> noOuputTransition = new Vector<Activity>(); //a list to hold the activities which have no output transition
 		int numOfTopLevelActivities = topLevelActivities.size();
 		Iterator activityIterator = topLevelActivities.iterator();
 		
@@ -194,7 +187,7 @@ public class LearningDesignService implements ILearningDesignService{
 	 * the ValidationErrorDTO is added to the list of validation messages.
 	 * @param transitions the set of transitions to iterate through and validate
 	 */
-	private void validateTransitions(Set transitions, Vector listOfValidationErrorDTOs)
+	private void validateTransitions(Set transitions, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
 	{
 		Iterator i = transitions.iterator();
 		while (i.hasNext())
@@ -220,7 +213,7 @@ public class LearningDesignService implements ILearningDesignService{
 	 * @param activity The Activity to validate
 	 * @param numOfActivities The number of activities in the learning design.
 	 */
-	private void checkActivityForTransition(Activity activity, int numOfActivities, Vector listOfValidationErrorDTOs)
+	private void checkActivityForTransition(Activity activity, int numOfActivities, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
 	{
 		//if one activity, then shouldnt have any transitions
 		Transition inputTransition = activity.getTransitionTo();
@@ -246,7 +239,7 @@ public class LearningDesignService implements ILearningDesignService{
 	 * 
 	 * @param activities
 	 */
-	private void validateGeneral(Set activities, Vector listOfValidationErrorDTOs)
+	private void validateGeneral(Set activities, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
 	{
 		Iterator activityIterator = activities.iterator();
 		while (activityIterator.hasNext())
@@ -256,7 +249,7 @@ public class LearningDesignService implements ILearningDesignService{
 			validateGroupingIfGroupingIsApplied(activity, listOfValidationErrorDTOs);	
 			validateOptionalActivity(activity, listOfValidationErrorDTOs);
 			validateOptionsActivityOrderId(activity, listOfValidationErrorDTOs);
-			Vector activityErrors = (Vector)activity.validateActivity(messageService);
+			Vector<ValidationErrorDTO> activityErrors = activity.validateActivity(messageService);
 			if(activityErrors != null && !activityErrors.isEmpty())
 				listOfValidationErrorDTOs.addAll(activityErrors);
 		}
@@ -273,7 +266,7 @@ public class LearningDesignService implements ILearningDesignService{
 	 * 
 	 * @param activity
 	 */
-	private void checkIfGroupingRequired(Activity activity, Vector listOfValidationErrorDTOs)
+	private void checkIfGroupingRequired(Activity activity, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
 	{
 		
 			Integer groupingSupportType = activity.getGroupingSupportType();
@@ -303,7 +296,7 @@ public class LearningDesignService implements ILearningDesignService{
 	 * 
 	 * @param parentActivity
 	 */
-	private void validateOptionalActivity(Activity parentActivity, Vector listOfValidationErrorDTOs)
+	private void validateOptionalActivity(Activity parentActivity, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
 	{
 			
 			if (parentActivity.isOptionsActivity())
