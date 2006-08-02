@@ -83,5 +83,7 @@ public interface ForumConstants {
 	public static final String ATTR_FORUM_INSTRCUTION = "instruction";
 
 	public static final String FORUM_TITLE = "forum_title";
+
+	public static final String ATTR_TOOL_CONTENT_TOPICS = "ToolContentTopicList";
 	
 }

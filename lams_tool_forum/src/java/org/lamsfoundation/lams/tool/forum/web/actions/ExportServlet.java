@@ -26,10 +26,11 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -39,22 +40,43 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
+import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
+import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class ExportServlet  extends AbstractExportPortfolioServlet {
 	private static final long serialVersionUID = -4529093489007108143L;
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 	private final String FILENAME = "forum_main.html";
+	ForumToolContentHandler handler;
 	
 	
+	private class StringComparator implements Comparator<String>{
+		public int compare(String o1, String o2) {
+			if(o1 != null && o2 != null){
+				int c = o1.compareTo(o2);
+				//to ensure String does not overlap even they have duplicated name.
+				return c==0?1:c;
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+	}
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
+		
+		request.setAttribute(AttributeNames.PARAM_MODE, mode);
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
 			learner(request,response,directoryName,cookies);
 		}else if (StringUtils.equals(mode,ToolAccessMode.TEACHER.toString())){
@@ -87,12 +109,24 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             throw new ForumException(error);
         }
         
-        List<MessageDTO> topicList = forumService.getAllTopicsFromSession(toolSessionID);
-		Map topicsByUser = getTopicsSortedByAuthor(topicList);	
-		request.getSession().setAttribute("report",topicsByUser);
+		// get root topic list and its children topics
+        List<MessageDTO> msgDtoList = getSessionTopicList(toolSessionID, directoryName, forumService);
+        ForumToolSession session = forumService.getSessionBySessionId(toolSessionID);
+        
+        //put all message into Map. Key is session name, value is list of all topics in this session.
+        Map sessionTopicMap = new TreeMap();
+        sessionTopicMap.put(session.getSessionName(), msgDtoList);
+        
+		request.setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, msgDtoList);
+		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
+		
+		//set forum title 
+		request.setAttribute(ForumConstants.FORUM_TITLE, session.getForum().getTitle());
+		
     }
+
     
-    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
     	IForumService forumService = ForumServiceProxy.getForumService(getServletContext());
        
@@ -115,31 +149,52 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 		//return FileDetailsDTO list according to the given sessionID
         List sessionList = forumService.getSessionsByContentId(toolContentID);
         Iterator iter = sessionList.iterator();
-        Map topicsByUser = new HashMap();
+        //put all message into Map. Key is session name, value is list of all topics in this session.
+        Map<String,List<MessageDTO>> topicsByUser = new TreeMap<String,List<MessageDTO>>(new StringComparator());
         while(iter.hasNext()){
         	ForumToolSession session = (ForumToolSession) iter.next();
-            List topicList = forumService.getAllTopicsFromSession(session.getSessionId());
-    		topicsByUser.putAll(getTopicsSortedByAuthor(topicList));	
+        	List<MessageDTO> sessionMsgDTO = getSessionTopicList(session.getSessionId(), directoryName, forumService);
+    		topicsByUser.put(session.getSessionName(),sessionMsgDTO);	
         }
-		request.getSession().setAttribute("report",topicsByUser);
+		request.getSession().setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS,topicsByUser);
     }
+
 	/**
-	 * @param topicList
+	 * Get all topics with their children message for a special ToolSessionID.
+	 * @param toolSessionID
+	 * @param directoryName
+	 * @param forumService
 	 * @return
 	 */
-	private Map getTopicsSortedByAuthor(List topicList) {
-		Map topicsByUser = new HashMap();
-		Iterator iter = topicList.iterator();
-		while(iter.hasNext()){
-			MessageDTO dto = (MessageDTO) iter.next();
-			dto.getMessage().getReport();
-			List list = (List) topicsByUser.get(dto.getMessage().getCreatedBy());
-			if(list == null){
-				list = new ArrayList();
-				topicsByUser.put(dto.getMessage().getCreatedBy(),list);
+	private List<MessageDTO> getSessionTopicList(Long toolSessionID, String directoryName, IForumService forumService) {
+		List<MessageDTO> rootTopics = forumService.getRootTopics(toolSessionID);
+		List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
+		for(MessageDTO msgDto : rootTopics){
+			List<MessageDTO> topics = forumService.getTopicThread(msgDto.getMessage().getUid());
+			//check attachement, if it has, save it into local directory.
+			for(MessageDTO topic:topics){
+				if(topic.getHasAttachment()){
+					Iterator iter = topic.getMessage().getAttachments().iterator();
+					while(iter.hasNext()){
+						Attachment att = (Attachment) iter.next();
+						try {
+							handler = getToolContentHandler();
+							handler.saveFile(att.getFileUuid(), directoryName);
+						} catch (Exception e) {
+							logger.equals("Export forum topic attachment failed: " + e.toString());
+						}
+					}
+				}
 			}
-			list.add(dto);
+			msgDtoList.addAll(topics);
 		}
-		return topicsByUser;
+		return msgDtoList;
+	}
+    private ForumToolContentHandler getToolContentHandler() {
+  	    if ( handler == null ) {
+    	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+    	      handler = (ForumToolContentHandler) wac.getBean("forumToolContentHandler");
+    	    }
+    	    return handler;
 	}
 }

@@ -8,129 +8,98 @@
 </head>
 
 <body>
-<div id="page-learner"><!--main box 'page'-->
+<h1 class="no-tabs-below">
+	${forum_title}
+</h1>
 
-	<h1 class="no-tabs-below">  </h1>
-	<div id="header-no-tabs-learner">
+<div id="header-no-tabs-learner"></div>
 
-	</div><!--closes header-->
+<div id="content-learner">
 
-	<div id="content-learner">
-
-	<c:if test="${empty report}">
-		<div align="center"><b><fmt:message key="message.not.avaliable"/></b></div>
-	</c:if>
-	<c:forEach items="${report}" var="userList">
-		<table width="90%" border="1" cellspacing="3" cellpadding="3" align="center">
-			<tr>
-				<td>
-					<table width="100%" border="0" cellspacing="3" cellpadding="3">
-						<c:set var="user" value="${userList.key}" />
-						<c:set var="markList" value="${userList.value}" />
-						<c:set var="first" value="true" />
-						<c:set var="postNum" value="${fn:length(markList)}" />
-						<c:forEach items="${markList}" var="topic" varStatus="status">
-							<c:if test="${status.index == 0}">
-								<tr>
-									<td colspan="2">
-										<c:out value="${user.firstName}" />
-										<c:out value="${user.lastName}" />
-										,
-										<c:out value="${user.loginName}" />
-										,
-										<fmt:message key="monitoring.user.post.topic" />
-									</td>
-								<tr>
-							</c:if>
-							<tr>
-								<td width="150">
-									<b><fmt:message key="lable.topic.title.subject" /></b>
-								</td>
-								<td>
-									<c:out value="${topic.message.subject}" />
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<b><fmt:message key="button.on" /></b>
-								</td>
-								<td>
-									<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />
-									<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
-								</td>
-							</tr>
-							<c:forEach var="file" items="${topic.message.attachments}">
-								<tr>
-									<td>
-										<b><fmt:message key="message.label.attachment" /></b>
-									</td>
-									<td>
-										<c:set var="downloadURL">
-											<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
-										</c:set>
-										<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
-									</td>
-								</tr>
-							</c:forEach>
-							<tr>
-								<td>
-									<b><fmt:message key="lable.topic.title.body" /></b>
-								</td>
-								<td>
-									<c:out value="${topic.message.body}" escapeXml="false" />
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<b><fmt:message key="lable.topic.title.mark" /></b>
-								</td>
-								<td>
-									<c:choose>
-										<c:when test="${empty topic.message.report.mark}">
-											<fmt:message key="message.not.avaliable" />
-										</c:when>
-										<c:otherwise>
-											<c:out value="${topic.message.report.mark}" escapeXml="false" />
-										</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<b><fmt:message key="lable.topic.title.comment" /></b>
-								</td>
-								<td>
-									<c:choose>
-										<c:when test="${empty topic.message.report.comment}">
-											<fmt:message key="message.not.avaliable" />
-										</c:when>
-										<c:otherwise>
-											<c:out value="${topic.message.report.comment}" escapeXml="false" />
-										</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-							<c:if test="${status.count != postNum}">
-								<tr>
-									<td colspan="2">
-										<hr>
-									</td>
-								</tr>
-							</c:if>
-						</c:forEach>
-					</table>
-				</td>
-			</tr>
-		</table>
-	</c:forEach>
+	<h2>
+		<fmt:message key="title.message.view.topic" />
+	</h2>
+<c:forEach var="entry" items=${ToolContentTopicList}">
+	<c:set var="sessionName" value="${entry.key}"/>
+	Message from ${sessionName}:
+	<c:set var="topicThread" value="${entry.value}"/>
+	<c:forEach var="msgDto" items="${topicThread}">
+		<c:set var="indentSize" value="${msgDto.level*3}" />
+		<c:set var="hidden" value="${msgDto.message.hideFlag}" />
+		<div style="margin-left:<c:out value="${indentSize}"/>em;">
+			<table cellspacing="0" class="forum">
+				<tr>
+					<th class="first">
+						<c:choose>
+							<c:when test='${(mode == "teacher") || (not hidden)}'>
+								<b> <c:out value="${msgDto.message.subject}" /> </b>
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="topic.message.subject.hidden" />
+							</c:otherwise>
+						</c:choose>
+					</th>
+				</tr>
+				<tr>
+					<td class="first posted-by">
+						<c:if test='${(mode == "teacher") || (not hidden)}'>
+							<fmt:message key="lable.topic.subject.by" />
+							<c:out value="${msgDto.author}" />
+									-
+									<fmt:formatDate value="${msgDto.message.created}" type="time" timeStyle="short" />
+							<fmt:formatDate value="${msgDto.message.created}" type="date" dateStyle="full" />
+						</c:if>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<c:if test='${(not hidden) || (hidden && mode == "teacher")}'>
+							<c:out value="${msgDto.message.body}" escapeXml="false" />
+						</c:if>
+						<c:if test='${hidden}'>
+							<fmt:message key="topic.message.body.hidden" />
+						</c:if>
+					</td>
+				</tr>
 	
-	</div>  <!--closes content-->
+				<c:if test="${not empty msgDto.message.attachments}">
+					<tr>
+						<td>
+							<c:forEach var="file" items="${msgDto.message.attachments}">
+								<c:set var="downloadURL">
+									<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
+								</c:set>
+								<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
+							</c:forEach>
+						</td>
+					</tr>
+				</c:if>
+				<%-- display mark for teacher --%>
+				<c:if test='${mode == "teacher"}'>
+					<tr>
+						<td>
+							<c:if test="${emtpy msgDto.message.report.mark}">
+							</c:if>
+							<c:if test="${msgDto.message.report.mark}">
+								${msgDto.message.report.mark}
+							</c:if>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<c:out value="${msgDto.message.report.comment}" escapeXml="false" />
+						</td>
+					</tr>
+				</c:if>
+			</table>
+		</div>
+	</c:forEach>
+</c:forEach>
 
 
-	<div id="footer-learner">
-	</div><!--closes footer-->
+</div>
 
-</div><!--closes page-->
+<div id="footer-learner"></div>
 
 </body>
 </html:html>
