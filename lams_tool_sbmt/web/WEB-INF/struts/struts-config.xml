@@ -140,6 +140,11 @@
         path="/monitoring/monitoring.jsp"
         redirect="false"
       />
+      <forward
+        name="statistic"
+        path="/monitoring/parts/statisticpart.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/deletefile"

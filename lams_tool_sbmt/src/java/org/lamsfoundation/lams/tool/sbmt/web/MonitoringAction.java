@@ -83,12 +83,26 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts.action-forward name="success" path="/monitoring/monitoring.jsp"
  * 
+ * @struts.action-forward name="statistic" path="/monitoring/parts/statisticpart.jsp"
+ * 
  */
 public class MonitoringAction extends LamsDispatchAction {
 	
 	public ISubmitFilesService submitFilesService;
 	
     
+	private class SessionComparator implements Comparator<SessionDTO>{
+		public int compare(SessionDTO o1, SessionDTO o2) {
+			if(o1 != null && o2 != null){
+				int c = o1.getSessionName().compareTo(o2.getSessionName());
+				//to ensure session can be put into map even they have duplicated name.
+				return c==0?1:c;
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+	}
     /**
      * Default ActionForward for Monitor
      */
@@ -103,74 +117,8 @@ public class MonitoringAction extends LamsDispatchAction {
     	
 //    	List userList = submitFilesService.getUsers(sessionID);
         List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
-        Map<SessionDTO, List> sessionUserMap = new TreeMap<SessionDTO, List>(new Comparator<SessionDTO>(){
-			public int compare(SessionDTO o1, SessionDTO o2) {
-				if(o1 != null && o2 != null){
-					int c = o1.getSessionName().compareTo(o2.getSessionName());
-					//to ensure session can be put into map even they have duplicated name.
-					return c==0?1:c;
-				}else if(o1 != null)
-					return 1;
-				else
-					return -1;
-			}
-        	
-        });
-        
-        //build a map with all users in the submitFilesSessionList
-        Iterator it = submitFilesSessionList.iterator();
-        while(it.hasNext()){
-        	SessionDTO sessionDto = new SessionDTO();
-        	SubmitFilesSession sfs = (SubmitFilesSession)it.next();
-        	
-            Long sessionID = sfs.getSessionID();
-            sessionDto.setSessionID(sessionID);
-            sessionDto.setSessionName(sfs.getSessionName());
-            List userList = submitFilesService.getUsers(sessionID);
-            sessionUserMap.put(sessionDto, userList);
-        }
-        
-		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		request.setAttribute("sessionUserMap",sessionUserMap);
-		
-		Map sessionStatisticMap = new HashMap();
-
-		// build a map with all users in the submitFilesSessionList
-		it = submitFilesSessionList.iterator();
-		while (it.hasNext()) {
-			
-			SubmitFilesSession sfs = (SubmitFilesSession) it.next();
-			Long sessionID = sfs.getSessionID();
-			String sessionName = sfs.getSessionName();
-				
-			//return FileDetailsDTO list according to the given sessionID
-			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
-			Iterator iter = userFilesMap.values().iterator();
-			Iterator dtoIter; 
-			int notMarkedCount = 0;
-			int markedCount = 0;
-			while(iter.hasNext()){
-				List list = (List) iter.next();
-				dtoIter = list.iterator();
-				while(dtoIter.hasNext()){
-					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-					if(dto.getMarks() == null)
-						notMarkedCount++;
-					else
-						markedCount++;
-				}
-			}
-			StatisticDTO statisticDto = new StatisticDTO();
-			SessionDTO sessionDto = new SessionDTO();
-			statisticDto.setMarkedCount(markedCount);
-			statisticDto.setNotMarkedCount(notMarkedCount);
-			statisticDto.setTotalUploadedFiles(markedCount+notMarkedCount);
-			sessionDto.setSessionID(sessionID);
-			sessionDto.setSessionName(sessionName);
-			sessionStatisticMap.put(sessionDto,statisticDto);
-		}
-
-		request.setAttribute("statisticList",sessionStatisticMap);
+        summary(request, submitFilesSessionList);
+		statistic(request, submitFilesSessionList);
 		
 		//instruction
 		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
@@ -183,8 +131,30 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 		return mapping.findForward("success");
     }
-    
-
+    /**
+     * AJAX call to refresh statisitic page.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward doStatistic(
+            ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+    {
+    	Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+    	submitFilesService = getSubmitFilesService();
+    	
+//    	List userList = submitFilesService.getUsers(sessionID);
+        List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
+		statistic(request, submitFilesSessionList);
+		
+		return mapping.findForward("statistic");
+		
+    }
 	/**
 	 * Release mark
 	 * @param mapping
@@ -202,10 +172,13 @@ public class MonitoringAction extends LamsDispatchAction {
 		submitFilesService = getSubmitFilesService();
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService.releaseMarksForSession(sessionID);
-		
 		try {
 			PrintWriter out = response.getWriter();
-			out.write(getMessageService().getMessage("msg.mark.released"));
+			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+			String sessionName = "";
+			if(session != null)
+				sessionName = session.getSessionName();
+			out.write(getMessageService().getMessage("msg.mark.released",new String[]{sessionName}));
 			out.flush();
 		} catch (IOException e) {
 		}
@@ -398,9 +371,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		if(!errors.isEmpty()){
 			setMarkPage(request, sessionID, userID, detailID, updateMode);
 			//to echo back to error page.
-			FileDetailsDTO details = (FileDetailsDTO) request.getAttribute("report");
-			if(details != null)
-				details.setComments(comments);
+			List<FileDetailsDTO> list = (List<FileDetailsDTO>) request.getAttribute("report");
+			if(list != null){
+				FileDetailsDTO details = list.get(0);
+				if(details != null)
+					details.setComments(comments);
+			}
 			saveErrors(request,errors);
 			return mapping.findForward("updateMark");
 		}
@@ -461,7 +437,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	private MessageService getMessageService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	      return (MessageService) wac.getBean("sbmtMessageService");
-	}	
+	}
+	/**
+	 * Save file mark information into HttpRequest
+	 * @param request
+	 * @param sessionID
+	 * @param userID
+	 * @param detailID
+	 * @param updateMode
+	 */
 	private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID, String updateMode) {
 		submitFilesService = getSubmitFilesService();
 		
@@ -471,4 +455,75 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("report",report);
 		request.setAttribute("updateMode", updateMode);
 	}
+	/**
+	 * Save statistic information into request
+	 * @param request
+	 * @param submitFilesSessionList
+	 */
+	private void statistic(HttpServletRequest request, List submitFilesSessionList) {
+		Iterator it;
+		Map<SessionDTO, StatisticDTO> sessionStatisticMap = new TreeMap<SessionDTO, StatisticDTO>(this.new SessionComparator());
+
+		// build a map with all users in the submitFilesSessionList
+		it = submitFilesSessionList.iterator();
+		while (it.hasNext()) {
+			
+			SubmitFilesSession sfs = (SubmitFilesSession) it.next();
+			Long sessionID = sfs.getSessionID();
+			String sessionName = sfs.getSessionName();
+				
+			//return FileDetailsDTO list according to the given sessionID
+			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+			Iterator iter = userFilesMap.values().iterator();
+			Iterator dtoIter; 
+			int notMarkedCount = 0;
+			int markedCount = 0;
+			while(iter.hasNext()){
+				List list = (List) iter.next();
+				dtoIter = list.iterator();
+				while(dtoIter.hasNext()){
+					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+					if(dto.getMarks() == null)
+						notMarkedCount++;
+					else
+						markedCount++;
+				}
+			}
+			StatisticDTO statisticDto = new StatisticDTO();
+			SessionDTO sessionDto = new SessionDTO();
+			statisticDto.setMarkedCount(markedCount);
+			statisticDto.setNotMarkedCount(notMarkedCount);
+			statisticDto.setTotalUploadedFiles(markedCount+notMarkedCount);
+			sessionDto.setSessionID(sessionID);
+			sessionDto.setSessionName(sessionName);
+			sessionStatisticMap.put(sessionDto,statisticDto);
+		}
+
+		request.setAttribute("statisticList",sessionStatisticMap);
+	}
+	/**
+	 * Save Summary information into HttpRequest.
+	 * @param request
+	 * @param submitFilesSessionList
+	 */
+	private void summary(HttpServletRequest request, List submitFilesSessionList) {
+		Map<SessionDTO, List> sessionUserMap = new TreeMap<SessionDTO, List>(this.new SessionComparator());
+        
+        //build a map with all users in the submitFilesSessionList
+        Iterator it = submitFilesSessionList.iterator();
+        while(it.hasNext()){
+        	SessionDTO sessionDto = new SessionDTO();
+        	SubmitFilesSession sfs = (SubmitFilesSession)it.next();
+        	
+            Long sessionID = sfs.getSessionID();
+            sessionDto.setSessionID(sessionID);
+            sessionDto.setSessionName(sfs.getSessionName());
+            List userList = submitFilesService.getUsers(sessionID);
+            sessionUserMap.put(sessionDto, userList);
+        }
+        
+		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		request.setAttribute("sessionUserMap",sessionUserMap);
+	}
+
 }

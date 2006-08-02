@@ -1,37 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:forEach var="element" items="${statisticList}">
-	<c:set var="sessionName" value="${element.key.sessionName}" />
-	<c:set var="statistic" value="${element.value}" />
-	<table cellpadding="0">
-		<tr>
-			<th colspan="2">
-				<fmt:message key="label.session.name" />: <c:out value="${sessionName}" />
-			</th>
-		</tr>
-		<tr>
-			<td>
-				<bean:message key="monitoring.statistic.marked" />
-			</td>
-			<td>
-				<c:out value="${statistic.markedCount}" />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<bean:message key="monitoring.statistic.not.marked" />
-			</td>
-			<td>
-				<c:out value="${statistic.notMarkedCount}" />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<bean:message key="monitoring.statistic.total.uploaded.file" />
-			</td>
-			<td>
-				<c:out value="${statistic.totalUploadedFiles}" />
-			</td>
-		</tr>
-	</table>
-</c:forEach>
+<img src="${tool}/images/indicator.gif" style="display:none" id="statisticArea_Busy" />
+<div id="statisticArea">
+	<%@ include file="statisticpart.jsp"%>
+</div>

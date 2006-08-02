@@ -31,21 +31,55 @@
         	// start optional tab controller stuff
         	var tag = document.getElementById("currentTab");
 	    	tag.value = tabId;
-	    	// end optional tab controller stuff
-	    	if(active(tabId))
-	    		selectTab(tabId);
+    		selectTab(tabId);
+	    		
+	    	//for statistic page change:
+	    	if(tabId == 4)
+	    		doStatistic();	  
         } 
         
-        function active(tabId) {
-        	//if(document.getElementById("tab" + tabId).className == "tab tabcentre_inactive")
-        	//	return false;
-        	return true;
-        }
         
         function doSubmit(method) {
         	document.SbmtMonitoringForm.method.value=method;
         	document.SbmtMonitoringForm.submit();
         }
+        
+        
+	var statisticTargetDiv = "statisticArea";
+	function doStatistic(){
+		var url = "<c:url value="/monitoring.do"/>";
+	    var reqIDVar = new Date();
+		var param = "method=doStatistic&toolContentID=" + ${param.toolContentID} +"&reqID="+reqIDVar.getTime();
+		messageLoading();
+	    var myAjax = new Ajax.Updater(
+		    	statisticTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:messageComplete,
+		    		evalScripts:true
+		    	}
+	    );
+		
+	}
+	
+	function showBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.show(targetDiv+"_Busy");
+		}
+	}
+	function hideBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.hide(targetDiv+"_Busy");
+		}				
+	}
+	function messageLoading(){
+		showBusy(statisticTargetDiv);
+	}
+	function messageComplete(){
+		hideBusy(statisticTargetDiv);
+	}        
 	</script>
 </head>
 
