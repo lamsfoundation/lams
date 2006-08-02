@@ -155,7 +155,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	/**
 	 * @hibernate.property column="last_modified"
 	 */
-	public Date getLastModifiedDate() {
+	public Date getLastModified() {
 		return lastModified;
 	}
 
