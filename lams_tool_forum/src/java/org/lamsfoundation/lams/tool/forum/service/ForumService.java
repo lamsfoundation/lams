@@ -549,13 +549,19 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
 		forumDao.saveOrUpdate(toContent);
 		
-		//save topics in this forum
+		//save topics in this forum, only save the author created topic!!! and reset its reply number to zero.
 		Set topics = toContent.getMessages();
 		if(topics != null){
 			Iterator iter = topics.iterator();
 			while(iter.hasNext()){
 				Message msg = (Message) iter.next();
 				//set this message forum Uid as toContent
+				if(!msg.getIsAuthored())
+					continue;
+				msg.setReplyNumber(0);
+				msg.setCreated(new Date());
+				msg.setLastReplyDate(new Date());
+				msg.setHideFlag(false);
 				msg.setForum(toContent);
 				createRootTopic(toContent.getUid(),null,msg);
 			}
