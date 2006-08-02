@@ -74,7 +74,7 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 		if (ne != null) {
 			ne.setTitle(title);
 			ne.setEntry(entry);
-			ne.setUpdateDate(new Date());
+			ne.setLastModified(new Date());
 			saveOrUpdateNotebookEntry(ne);
 		} else {
 			log.debug("updateEntry: uid " + uid + "does not exist");
@@ -82,7 +82,7 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 	}
 
 	public void updateEntry(NotebookEntry notebookEntry) {
-		notebookEntry.setUpdateDate(new Date());
+		notebookEntry.setLastModified(new Date());
 		saveOrUpdateNotebookEntry(notebookEntry);
 	}
 
