@@ -24,6 +24,10 @@
 /* $Id$ */
 package org.lamsfoundation.lams.authoring.web;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,12 +46,12 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -63,19 +67,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * Import tool content servlet. It needs an uploaded learning design zip file. 
  * @author Steve.Ni
- * 
- * @version $Revision$
  */
 public class ImportToolContentAction extends LamsAction {
 
-	private static final long serialVersionUID = 1L;
 	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
 	public static final String USER_SERVICE_BEAN_NAME = "userManagementService";
+	public static final String MESSAGE_SERVICE_BEAN_NAME = "authoringMessageService";
 	public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
 	public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
 	public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
 	public static final String ATTR_LD_ID = "learningDesignID";
 	
+	private static final String KEY_MSG_IMPORT_FILE_NOT_FOUND = "msg.import.file.not.found";
+	private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";  
+	private static final String KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON = "msg.import.failed.unknown.reason";
+
 
 	private Logger log = Logger.getLogger(ImportToolContentAction.class);
 	
@@ -99,6 +105,8 @@ public class ImportToolContentAction extends LamsAction {
 	 */
 	private void importLD(HttpServletRequest request) {
 		List<String> ldErrorMsgs = new ArrayList<String>();
+        Long ldId = null;
+
         try {
         	Integer workspaceFolderUid = null;
         	
@@ -109,10 +117,10 @@ public class ImportToolContentAction extends LamsAction {
 			User user = (User)getUserService().findById(User.class,userDto.getUserID());
 			
         	FileItem file = null;
-        	Map params = new HashMap();
+        	Map<String,String> params = new HashMap<String,String>();
         	String filename = null;
         	
-        	String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesing");
+        	String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign");
 
         	DiskFileUpload fu = new DiskFileUpload();
         	// maximum size that will be stored in memory
@@ -134,28 +142,56 @@ public class ImportToolContentAction extends LamsAction {
                 }
                 workspaceFolderUid = NumberUtils.createInteger((String) params.get("WORKSPACE_FOLDER_UID"));
             }
+            
             if (file == null) {
-            	String msg = "Can not find the upload file.";
-            	log.error(msg);
-            	throw new ExportToolContentException(msg);
+            	MessageService msgService = getMessageService(); 
+            	log.error("Upload file missing. Filename was "+filename);
+            	String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_NOT_FOUND);
+            	ldErrorMsgs.add(msg != null ? msg : "Upload file missing");
+            	
+            } else {
+	            
+	            // if it is a .las file then it must be a 1.0.x file. Otherwise assume it is a 2.0 formatting zip file.
+	            List<String> toolsErrorMsgs = new ArrayList<String>();
+	            String extension = filename != null && filename.length() >= 4 ? filename.substring(filename.length()-4) : "";
+	            
+	            if ( extension.equalsIgnoreCase(".las") ) {
+	            	// process 1.0.x file.
+	            	String wddxPacket = getPacket(file.getInputStream());
+		            IExportToolContentService service = getExportService();
+		            ldId = service.importLearningDesign102(wddxPacket,user,workspaceFolderUid,toolsErrorMsgs);
+	            } else if ( extension.equalsIgnoreCase(".zip") ){
+		            // write the file
+		            String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
+		            IExportToolContentService service = getExportService();
+		            ldId = service.importLearningDesign(ldPath,user,workspaceFolderUid,toolsErrorMsgs);
+	            } else {
+	            	log.error("Uploaded file not an expected type. Filename was "+filename);
+	            	MessageService msgService = getMessageService(); 
+	            	String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_FORMAT);
+	            	ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
+	            }
+
+	            if ( toolsErrorMsgs.size() > 0 ) {
+	            	request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
+	            }
             }
-            // write the file
-            String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
-            IExportToolContentService service = getExportService();
-            List<String> toolsErrorMsgs = new ArrayList<String>();
-            Long ldId = service.importLearningDesign(ldPath,user,workspaceFolderUid,toolsErrorMsgs);
-            if(ldId == -1){
-            	String msg = "Learning design saved failed.";
-            	throw new ExportToolContentException(msg);
-        	}
-            request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
-            request.setAttribute(ATTR_LD_ID,ldId);
+            
         } catch (Exception e) {
-        	String msg = e.toString();
-        	log.error(msg);
-        	ldErrorMsgs.add(msg);
-         	request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
+        	String msg = e.getMessage();
+        	log.error("Error occured during import",e);
+        	ldErrorMsgs.add(msg != null ? msg : e.toString());
 		}
+        
+        request.setAttribute(ATTR_LD_ID,ldId);
+        if( (ldId==null || ldId.longValue()==-1) && ldErrorMsgs.size()==0 ) {
+        	MessageService msgService = getMessageService(); 
+        	ldErrorMsgs.add(msgService.getMessage(KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON));
+    	}
+        if ( ldErrorMsgs.size() > 0 ) {
+        	request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
+        }
+
 	}
 	
 	//***************************************************************************************
@@ -169,5 +205,27 @@ public class ImportToolContentAction extends LamsAction {
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);		
 	}
+	private MessageService getMessageService(){
+		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
+		return (MessageService) webContext.getBean(MESSAGE_SERVICE_BEAN_NAME);		
+	}
+	
+	protected String getPacket(InputStream sis)
+		throws IOException
+	{
+	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
+	   
+	    StringBuffer tempStrBuf = new StringBuffer( 200 );
+		String tempStr;
+		tempStr = buff.readLine();
+		while ( tempStr != null )
+		{
+			tempStrBuf.append(tempStr);
+			tempStr = buff.readLine();
+		}
+	
+		return(tempStrBuf.toString()); 
+	}
 
 }
+

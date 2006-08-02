@@ -36,12 +36,13 @@
 				<p>
 					&nbsp;
 				</p>
+				<p>
+					<fmt:message key="msg.import.file.format"/>
+				</p>
 				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
 					<p>
 						<fmt:message key="label.ld.zip.file" />
 						<input type="file" name="UPLOAD_FILE" />
-					</p>
-					<p>
 						<input type="submit" name="import" value="<fmt:message key="button.import" />" class="button" />
 					</p>
 				</form>
