@@ -117,7 +117,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         //_global.breakpoint();
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"newItem"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_open'), instanceName:"openItem"});
-        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_revert'), instanceName:"revertItem", enabled:false});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_recover'), instanceName:"recoverItem", enabled:false});
         //file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_close'), instanceName:"closeItem"});
         file_menu.addMenuItem({type:"separator"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
@@ -257,6 +257,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
             case eventObj.menu.openItem :
                 app.getWorkspace().userSelectItem();
                 break;
+			case eventObj.menu.recoverItem :
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().recoverDesign();
+				break;
 			case eventObj.menu.saveItem:
 				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesign();
@@ -406,6 +409,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 	
 	public function enableSave(enable:Boolean){
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(4), enable);
+	}
+	
+	public function enableRecover(enable:Boolean){
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(2), enable);
 	}
 	
 	public function get fileMenu():Menu {

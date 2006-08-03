@@ -57,7 +57,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _transitionActivities:Array;
 	private var _isDragging:Boolean;
 	private var _importing:Boolean;
-	
+	private var _autoSaveWait:Boolean;
 
 	
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
@@ -87,6 +87,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				
 	
 		_activeTool = null;
+		_autoSaveWait = false;
 		_transitionActivities = new Array();
 		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
 	}
@@ -1008,6 +1009,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public function set importing(importing:Boolean):Void {
 		_importing = importing;
+	}
+	
+	public function get autoSaveWait():Boolean {
+		return _autoSaveWait;
+	}
+	
+	public function set autoSaveWait(autoSaveWait:Boolean):Void {
+		_autoSaveWait = autoSaveWait;
 	}
 	
 }

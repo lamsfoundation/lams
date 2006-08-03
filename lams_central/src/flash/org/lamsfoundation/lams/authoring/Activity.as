@@ -273,8 +273,13 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_learningLibraryID = dto.learningLibraryID;
 			_learningDesignID = dto.learningDesignID;
 			_libraryActivityID = dto.libraryActivityID;
-			_parentActivityID = dto.parentActivityID;
-			_parentUIID = dto.parentUIID
+			
+			if(StringUtils.isWDDXNull(dto.parentActivityID)) { _parentActivityID = null }
+			else { _parentActivityID = dto.parentActivityID; }
+			
+			if(StringUtils.isWDDXNull(dto.parentUIID)) {_parentUIID = null }
+			else { _parentUIID = dto.parentUIID}
+			
 			_orderID = dto.orderID
 			_groupingID = dto.groupingID;
 			_groupingUIID = dto.groupingUIID

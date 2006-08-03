@@ -139,10 +139,18 @@ class ToolActivity extends Activity{
 			//first do the super method for activity props
 			super.populateFromDTO(dto);
 			//Toolactivity class props
-			_authoringURL = dto.authoringURL;
-			_toolDisplayName = dto.toolDisplayName;
-			_toolContentID = dto.toolContentID;
-			_toolID = dto.toolID;
+			if(StringUtils.isWDDXNull(dto.authoringURL)) { _authoringURL = null }
+			else { _authoringURL = dto.authoringURL; }
+			
+			if(StringUtils.isWDDXNull(dto.toolDisplayName)) { _toolDisplayName = null }
+			else { _toolDisplayName = dto.toolDisplayName; }
+			
+			if(StringUtils.isWDDXNull(dto.toolContentID)) { _toolContentID = null }
+			else { _toolContentID = dto.toolContentID; }
+			
+			if(StringUtils.isWDDXNull(dto.toolID)) { _toolID = null }
+			else { _toolID = dto.toolID; }
+			
 			_supportsContribute = dto.supportsContribute;
 			_supportsDefineLater = dto.supportsDefineLater;
 			_supportsModeration = dto.supportsRunOffline
@@ -401,7 +409,6 @@ class ToolActivity extends Activity{
 	public function get contributeUrl ():String {
 		return _contributeURL;
 	}
-
 
 }
 

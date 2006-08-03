@@ -61,6 +61,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _userID:Number;
 	private var _duration:Number;
 	private var _readOnly:Boolean;
+	private var _autoSaved:Boolean
 	private var _validDesign:Boolean;
 	private var _modified:Boolean;
 	private var _maxID:Number;
@@ -98,6 +99,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_version = "1.1_beta";
 		_readOnly = false;
 		_validDesign = false;
+		_autoSaved = false;
 		
 		_userID = Config.getInstance().userID;
 		
@@ -380,6 +382,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 
 	}
 	
+	private function prepareDesignForAutoSaving():Void{
+		
+		//set modified date time to now
+		_lastModifiedDateTime = new Date();
+		_autoSaved = true;
+		
+
+	}
+	
 	/**
 	 * Calls prepare deign and then returns a DTO object ready to be saved to the server
 	 * @usage   
@@ -387,6 +398,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function getDesignForSaving():Object{
 		prepareDesignForSaving();
+		return toData();
+	}
+	
+	public function getDesignForAutoSave():Object{
+		prepareDesignForAutoSaving();
 		return toData();
 	}
 	

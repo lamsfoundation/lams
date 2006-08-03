@@ -346,6 +346,7 @@ class Config {
             return item;
         }else {
             //TODO DI 27/05/05 raise error if config data missing
+			return null;
             Debugger.log('Config item not found: ' + itemID ,Debugger.CRITICAL,'getItem','Config');
         }
     }
@@ -391,7 +392,7 @@ class Config {
             res = false;
         }
     }
-    
+	
     /**
     * Convert a config item to data
     */

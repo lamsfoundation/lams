@@ -48,6 +48,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	//View
 	private var canvasView:CanvasView;
     
+	// CookieMonster (SharedObjects)
+    private var _cm:CookieMonster;
+	
 	private var _canvasView_mc:MovieClip;
 	private var app:Application;
 	private var _ddm:DesignDataModel;
@@ -61,8 +64,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var toolActHeight:Number = 50;
 	private var complexActWidth:Number = 143;
 
-	
-	
+	// auto-save interval
+	//private static var AUTOSAVE_DEFAULT_CHECK_INTERVAL:Number = 10000;
+	private static var AUTOSAVE_CONFIG:String = "autosave";
+	private static var AUTOSAVE_TAG:String = "cv.ddm.autosave.user.";
     //private var _pi:MovieClip; //Property inspector
     private var _bin:MovieClip;//bin
 	
@@ -99,6 +104,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         
         //Get reference to application and design data model
 		app = Application.getInstance();
+		
+		
+        //Get a ref to the cookie monster 
+        _cm = CookieMonster.getInstance();
 		
 		_undoStack = new Array();
 		_redoStack = new Array();
@@ -152,6 +161,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     public function viewLoaded(evt:Object) {
         //Debugger.log('Canvas view loaded: ' + evt.type,Debugger.GEN,'viewLoaded','Canvas');
         if(evt.type=='load') {
+			var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
+			if(autosave_config_interval > 0) {
+				if(CookieMonster.cookieExists(AUTOSAVE_TAG + _root.userID)) {
+					canvasModel.autoSaveWait = true;
+				}
+				setInterval(Proxy.create(this,autoSave), autosave_config_interval);
+			}
+			
             dispatchEvent({type:'load',target:this});
         }else {
             Debugger.log('Event type not recognised : ' + evt.type,Debugger.CRITICAL,'viewLoaded','Canvas');
@@ -212,6 +229,77 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         canvasModel.importing = true;
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
 		
+	}
+	/**
+	 * Auto-saves current DDM (Learning Design on Canvas) to SharedObject
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	
+	private function autoSave(){
+		if(!canvasModel.autoSaveWait && (canvasModel.activitiesDisplayed.size() > 0)) {
+			if(!ddm.readOnly) {
+				var tag:String = AUTOSAVE_TAG + _root.userID;
+				
+				var dto:Object = _ddm.getDesignForSaving();
+				dto.lastModifiedDateTime = new Date();
+				dto.readOnly = true;
+				
+				// remove existing auto-saved ddm
+				if (CookieMonster.cookieExists(tag)) {
+					CookieMonster.deleteCookie(tag);
+				}
+				
+				// auto-save existing ddm
+				var res = CookieMonster.save(dto,tag,true);
+				
+				if(!res){
+					// error auto-saving
+					var msg:String = Dictionary.getValue('cv_design_autosave_err');
+					LFMessage.showMessageAlert(msg);
+				}
+			}
+		} else if(canvasModel.autoSaveWait) {
+			
+		}
+		
+	}
+	
+	/**
+	 * Show auto-save confirmation message
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	
+	public function showAutoSaveMessage(title:String, savetime:Number) {
+		LFMessage.showMessageAlert(Dictionary.getValue('cv_design_autosave_rec', [title, savetime]));
+	}
+	
+	/**
+	 * Recover design data from SharedObject and save.
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	
+	public function recoverDesign() {
+		var recData:Object = CookieMonster.open(AUTOSAVE_TAG + _root.userID,true);
+		
+		var timeDiff:Number = new Date().getTime() - recData.lastModifiedDateTime.getTime();
+		var saveDelay:Number = timeDiff/1000/60;
+		
+		showAutoSaveMessage(recData.title, Math.round(saveDelay));
+		setDesign(recData);
+		discardAutoSaveDesign();
+		
+	}
+	
+	private function discardAutoSaveDesign() {
+		canvasModel.autoSaveWait = false;
+		CookieMonster.deleteCookie(AUTOSAVE_TAG + _root.userID);
+		LFMenuBar.getInstance().enableRecover(false);
 	}
 	
 	public function saveDesign(){
@@ -302,6 +390,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}else{
 			//_global.breakpoint();
 			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');		
+			discardAutoSaveDesign();
 
 			_ddm.learningDesignID = r.learningDesignID;
 			_ddm.validDesign = r.valid;
@@ -538,7 +627,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			checkValidDesign();
 			checkReadOnlyDesign();
 			canvasModel.setDirty();
-			LFMenuBar.getInstance().enableExport(true);
+			if(!canvasModel.autoSaveWait){
+				LFMenuBar.getInstance().enableExport(true);
+			}
 		}else{
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}

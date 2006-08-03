@@ -453,6 +453,11 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			showDebugger();
 		}
 		
+		if(getCanvas().getCanvasModel().autoSaveWait) {
+			// enable menu item - recover...
+			LFMenuBar.getInstance().enableRecover(true);
+		}
+		
     }
     
     /**
@@ -461,7 +466,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     public function showPrefsDialog() {
         PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("prefs_dlg_title"),closeButton:true,scrollContentPath:'preferencesDialog'});
     }
-    
+	
     /**
     * Receives events from the Stage resizing
     */
