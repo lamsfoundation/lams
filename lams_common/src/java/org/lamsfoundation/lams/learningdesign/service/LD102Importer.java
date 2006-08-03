@@ -42,9 +42,11 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.Tool;
@@ -65,6 +67,7 @@ public class LD102Importer {
 	private ILearningDesignService learningDesignService = null;
 	private IBaseDAO baseDAO = null;
 	private ILearningLibraryDAO learningLibraryDAO = null;
+	private ILearningDesignDAO learningDesignDAO = null;
 	private IActivityDAO activityDAO = null;
 	private IToolDAO toolDAO = null;
 	private IToolImportSupportDAO toolImportSupportDAO = null;
@@ -75,22 +78,29 @@ public class LD102Importer {
 	private List<String> toolsErrorMsgs;
 	private Date createDate = new Date();
 	
-	// store the groupings between tasks and groups for processing at the end of a packet -
-	// can't do it as we go as the groupings may not be set up yet! Also use it to validate
-	// if the grouping is already available before it is used.
-	// should contain the task id (Integer) as the key and the grouping ids (Integer) as the value
-	// when we have more than one group, make the data a Vector?
-	private Map m_groupingsToDo = null;
+	/** 
+	* Store relationship between an activity and its grouping for processing after all the activities have been process.
+	* can't do it as we go as the groupings may not be set up yet! 
+	* should contain the activity ui id (Integer) as the key and the grouping ui id (Integer) as the value
+	*/
+	private Map<Integer, Integer> groupingsToAssign = new HashMap<Integer, Integer>();
+	/** As we create a grouping, store it in newGroupings so it can be assigned to its activities later
+	 * key is grouping ui id, value is the grouping object
+	 */
+	private Map<Integer, Grouping> newGroupings= new HashMap<Integer, Grouping>();
 	
-	// put aside all the transitions as we find them and process them after the activities.
+	/** put aside all the transitions as we find them and process them after the activities. */
 	private List<Hashtable> transitionsToDo = new ArrayList<Hashtable>();
-	// as we create an activity, stick it in this map so we can find it quickly later (ie while processing transitions). Key is the UI ID
+	/** as we create an activity, stick it in this map so we can find it quickly later (ie while processing transitions). Key is the UI ID */
 	private Map<Integer, Activity> newActivityMap = new HashMap<Integer, Activity>();
-	// we are "losing" a level of activity when we combined activity and task levels, so need to keep the relationships for getting the 
-	// right activity for a transition. Key is parent ui id, value is the child ui id
+	/** we are "losing" a level of activity when we combined activity and task levels, so need to keep the relationships for getting the 
+	 * right activity for a transition. Key is parent ui id, value is the child ui id
+	 */ 
 	private Map<Integer, Integer> flattenedActivityMap = new HashMap<Integer, Integer>();
-	// images to use for each tool, based on the library activities in the database. Key is tool id, value is url.
+	/** images to use for each tool, based on the library activities in the database. Key is tool id, value is url. */
 	private Map<Long, String> libraryActivityUiImages;
+	/** store the content by content id field, ready for use when the matching activity is processed */
+	private Map<Integer, Hashtable> contentMap = new HashMap<Integer, Hashtable>();
 
 	/** The value to be past back and forth with the 1.0.x authoring tool to indicate a null value for a numeric id */
 	private static final Long NUMERIC_NULL_VALUE_LONG = new Long(-1);
@@ -126,11 +136,12 @@ public class LD102Importer {
 	private static final String TOOLDATA_TAGS_IMAGERANKING = "imageranking";
 	
 	public LD102Importer(ILearningDesignService learningDesignService, IBaseDAO baseDAO, 
-			ILearningLibraryDAO learningLibraryDAO, IActivityDAO activityDAO, IToolDAO toolDAO, 
+			ILearningDesignDAO learningDesignDAO, ILearningLibraryDAO learningLibraryDAO, IActivityDAO activityDAO, IToolDAO toolDAO, 
 			IToolImportSupportDAO toolImportSupportDAO, IToolContentDAO toolContentDAO, List<String> toolsErrorMsgs) {
 		this.learningDesignService = learningDesignService;
 		this.baseDAO = baseDAO;
 		this.learningLibraryDAO = learningLibraryDAO;
+		this.learningDesignDAO = learningDesignDAO;
 		this.activityDAO = activityDAO;
 		this.toolDAO = toolDAO;
 		this.toolImportSupportDAO = toolImportSupportDAO;
@@ -166,6 +177,9 @@ public class LD102Importer {
 	}
 	public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
 		this.learningLibraryDAO = learningLibraryDAO;
+	}
+	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
 	}
 	/**
 	 * Checks whether the hashtable contains the key specified by <code>key</code>
@@ -374,8 +388,7 @@ public class LD102Importer {
 		createLearningDesign(newLdHashTable, importer, folder);
 		baseDAO.insert(ldInProgress);
 
-		m_groupingsToDo = new HashMap();
-				
+		// put all the content in the contentMap ready for use by activities.
 		Vector newContent = (Vector) newLdHashTable.get(WDDXTAGS102.LD_CONTENT);
 		if ( newContent != null )
 		{
@@ -403,9 +416,9 @@ public class LD102Importer {
 			processTransition(transTable);
 		}
 		
-		// now set up the task -> grouping defn links. Can't be done earlier as there
-		// are cross references
-//		setGroupToTaskLinks(); // throws an Exception explaining any inconsistencies
+		// now set up the activity -> grouping defn links. Can't be done earlier as there
+		// are the groupings are set up as the activities are processed.
+		assignGroupings();
 		
 		// finally set all the dummy output tasks to be replaced with dynamic content
 //		setOutputTasksAsReplaceWithDynamic();
@@ -431,7 +444,9 @@ public class LD102Importer {
 		ld.setLearningDesignId(null);
 		ld.setLearningDesignUIID(null);
 		ld.setDescription((String) newLdHashTable.get(WDDXTAGS102.DESCRIPTION));
-		ld.setTitle((String) newLdHashTable.get(WDDXTAGS102.TITLE));
+		
+		String title = (String) newLdHashTable.get(WDDXTAGS102.TITLE);
+		ld.setTitle(ImportExportUtil.generateUniqueLDTitle(folder, title, learningDesignDAO));
 		ld.setHelpText((String) newLdHashTable.get(WDDXTAGS102.LD_HELPTEXT));
 		
 		ld.setValidDesign(Boolean.FALSE);
@@ -448,7 +463,7 @@ public class LD102Importer {
 	
 		ld.setUser(importer);
 		if(folder != null)
-			ldInProgress.setWorkspaceFolder(folder);
+			ld.setWorkspaceFolder(folder);
 
 		ld.setCopyTypeID(LearningDesign.COPY_TYPE_NONE);
 		ld.setCreateDateTime(createDate);
@@ -567,7 +582,7 @@ public class LD102Importer {
 		if ( taskTransitions.size()==1 ) {
 			// easiest case - this is really a single activity 
 			Hashtable task = (Hashtable) taskTransitions.get(0);
-			activity = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd);
+			activity = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID);
 		} else {
 			// TODO parallel and optional
 		}
@@ -579,52 +594,53 @@ public class LD102Importer {
 		
 	}
 
-	private Activity createActivityFromTask(Hashtable taskDetails, Long nextTransition, Integer xCoOrd, Integer yCoOrd) throws WDDXProcessorConversionException {
+	private Activity createActivityFromTask(Hashtable taskDetails, Long nextTransition, Integer xCoOrd, Integer yCoOrd, Integer parentActivityId) throws WDDXProcessorConversionException {
 		
 		String objectType = (String) taskDetails.get(WDDXTAGS102.OBJECT_TYPE);
 		String toolType = (String) taskDetails.get(WDDXTAGS102.TASK_TOOLTYPE);
+		Integer contentId = WDDXProcessor.convertToInteger(taskDetails,WDDXTAGS102.TASK_INPUT_CONTENT);
 		Activity activity = null;
+		Integer taskUIID = null;
 		
+	    if (keyExists(taskDetails, WDDXTAGS102.LD_ITEM_ID)) {
+	    	taskUIID = WDDXProcessor.convertToInteger(taskDetails,WDDXTAGS102.LD_ITEM_ID);
+	    } else {
+			String message = "Id value for task is missing. The activity may not appear in the correct place in the sequence. Activity is "+taskDetails;
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+		}
+
 		if ( isMultiTask(objectType, toolType) )
 		{
 			toolsErrorMsgs.add("Hit a multitask - not yet implemented.");
 			activity.setActivityTypeId(Activity.PARALLEL_ACTIVITY_TYPE);
 		    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		    activity.setActivityUIID(taskUIID);
 //			TODO activity = new OptionsActivity();
 //			TODO activity = new ParallelActivity();
 		}
 		else if ( isGroupingToolTask(objectType, toolType) )
 		{
-			activity = new GroupingActivity();
-			activity.setActivityTypeId(Activity.GROUPING_ACTIVITY_TYPE);
-		    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-			toolsErrorMsgs.add("Hit a grouping task - not yet implemented.");
+			activity = setupGroupingActivity(taskDetails, contentId, taskUIID, parentActivityId);
 		}
-		else
-		{
-			activity = setupToolActivity(taskDetails);
+		else {
+			activity = setupToolActivity(taskDetails, contentId, taskUIID);
 		}
 		
 		if ( activity != null ) {
 			
-		    if (keyExists(taskDetails, WDDXTAGS102.LD_ITEM_ID)) {
-		    	activity.setActivityUIID(WDDXProcessor.convertToInteger(taskDetails,WDDXTAGS102.LD_ITEM_ID));
-		    } else {
-				String message = "Id value for task is missing. The activity may not appear in the correct place in the sequence. Activity is "+taskDetails;
-				log.warn(message);
-				toolsErrorMsgs.add(message);
-			}
-	
-		    if (keyExists(taskDetails, WDDXTAGS102.DESCRIPTION))
+			// title and description may already be set up.
+			if ( activity.getDescription() == null && keyExists(taskDetails, WDDXTAGS102.DESCRIPTION))
 		        activity.setDescription(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.DESCRIPTION));
-		    if (keyExists(taskDetails, WDDXTAGS102.TITLE))
+		    if ( activity.getTitle() == null && keyExists(taskDetails, WDDXTAGS102.TITLE))
 		        activity.setTitle(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.TITLE));
 	
 		    activity.setXcoord(xCoOrd);
 	        activity.setYcoord(yCoOrd);
 	        activity.setHelpText(null);
 	
-	        updateGroupingValue(taskDetails.get(WDDXTAGS102.TASK_GROUPING), activity);
+			activity.setApplyGrouping(false); // not nullable so default to false
+	        parseGroupingValue(taskDetails.get(WDDXTAGS102.TASK_GROUPING), activity);
 	        activity.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
 	        
 	//		TODO if (keyExists(activityDetails, WDDXTAGS.ORDER_ID))
@@ -641,8 +657,46 @@ public class LD102Importer {
 		return activity;
 	}
 
-	private ToolActivity setupToolActivity(Hashtable taskDetails) {
+	private GroupingActivity setupGroupingActivity(Hashtable taskDetails, Integer contentId, Integer taskUIID, Integer parentActivityId) throws WDDXProcessorConversionException {
+		
+		RandomGrouping grouping = (RandomGrouping) Grouping.getGroupingInstance(Grouping.RANDOM_GROUPING_TYPE);
+		grouping.setGroupingUIID(taskUIID);
+		baseDAO.insert(grouping);
+		
+		GroupingActivity groupingActivity = (GroupingActivity) Activity.getActivityInstance(Activity.GROUPING_ACTIVITY_TYPE);
+		groupingActivity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		groupingActivity.setActivityUIID(parentActivityId);
+		groupingActivity.setCreateGrouping(grouping);
+		groupingActivity.setCreateGroupingUIID(grouping.getGroupingUIID());
+
+		Hashtable groupingContent = contentMap.get(contentId);
+		if ( groupingContent == null ) {
+			String message = "Unable to find a content for grouping. Default values will apply. Grouping was "+taskDetails;
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+		} else {
+			Integer numGroups = WDDXProcessor.convertToInteger(groupingContent,WDDXTAGS102.CONTENT_NUMGROUPS);
+			if ( numGroups != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(numGroups) ) {
+		    	grouping.setNumberOfGroups(numGroups);
+			} 
+
+			Integer maxNumLearner = WDDXProcessor.convertToInteger(groupingContent,WDDXTAGS102.CONTENT_MAXNUM_GROUP);
+			if ( maxNumLearner != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(maxNumLearner) ) {
+				grouping.setLearnersPerGroup(maxNumLearner);
+			}
+			
+			groupingActivity.setTitle((String)groupingContent.get(WDDXTAGS102.TITLE));
+			groupingActivity.setDescription((String)groupingContent.get(WDDXTAGS102.DESCRIPTION));
+		}
+		
+		newGroupings.put(grouping.getGroupingUIID(), grouping);
+		return groupingActivity;
+	}
+
+	private ToolActivity setupToolActivity(Hashtable taskDetails, Integer contentId, Integer taskUIID) {
 		ToolActivity activity = new ToolActivity();
+		
+	    activity.setActivityUIID(taskUIID);
 		activity.setActivityTypeId(Activity.TOOL_ACTIVITY_TYPE);
 	    activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
 		
@@ -680,46 +734,7 @@ public class LD102Importer {
 		return activity;
 	}
 	
-	private void clearGrouping(Activity activity) {
-		activity.setGrouping(null);
-		activity.setGroupingUIID(null);
-		activity.setApplyGrouping(false);
-	}
-	
-	private void setGrouping(Activity activity, Grouping grouping, Integer groupingUIID) {
-		activity.setGrouping(grouping);
-		activity.setGroupingUIID(groupingUIID);
-		activity.setApplyGrouping(true);
-	}
-
-/*	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
-		throws WDDXProcessorConversionException, ObjectExtractorException {
-		*//**
-		 * read the createGroupingUUID, get the Grouping Object, and set CreateGrouping to that object
-		 *//*
-	    Integer createGroupingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.CREATE_GROUPING_UIID);	    
-	    Grouping grouping = groupings.get(createGroupingUIID);
-	    if (grouping!=null)
-	    {
-		    groupingActivity.setCreateGrouping(grouping);
-		    groupingActivity.setCreateGroupingUIID(createGroupingUIID);
-	    }
-	    
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.GROUPING);
-		groupingActivity.setSystemTool(systemTool);
-		
-	    Hashtable groupingDetails = (Hashtable) activityDetails.get(WDDXTAGS.GROUPING_DTO); 
-		if( groupingDetails != null ){
-			Grouping grouping = extractGroupingObject(groupingDetails);		
-			groupingActivity.setCreateGrouping(grouping);
-			groupingActivity.setCreateGroupingUIID(grouping.getGroupingUIID());
-		} else {
-			groupingActivity.setCreateGrouping(null);
-			groupingActivity.setCreateGroupingUIID(null);
-		} 
-	}	
-
-	private void buildOptionsActivity(OptionsActivity optionsActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+/*		private void buildOptionsActivity(OptionsActivity optionsActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		if (keyExists(activityDetails, WDDXTAGS.MAX_OPTIONS))
 		    optionsActivity.setMaxNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.MAX_OPTIONS));
 		if (keyExists(activityDetails, WDDXTAGS.MIN_OPTIONS))
@@ -750,34 +765,55 @@ public class LD102Importer {
 	}
 */	
 
-	/** Get the grouping value for a particular task. Could be "c" for class or a number 
+	/** 
+	 * Get the grouping value for a particular task. Could be "c" for class or a number 
 	 * which is the ui id of the related grouping task. Signify class in database as not grouped.
+	 * Can't actually assign the groupings yet as they may not have been created - just
+	 * note it for later in groupingsToDo.
 	 */
-	protected void updateGroupingValue(Object groupingId, Activity activity)
+	private void parseGroupingValue(Object groupingIdRaw, Activity activity)
 	{
 		if ( log.isDebugEnabled())
-			log.debug("updateGroupingValue: groupingId"+(groupingId!=null?groupingId.toString():"null")
+			log.debug("updateGroupingValue: groupingId"+(groupingIdRaw!=null?groupingIdRaw.toString():"null")
 				+ " task "+ activity.toString());
 		
-		Integer grouping = null;		
-		if ( groupingId != null )
+		Integer groupingId = null;		
+		if ( groupingIdRaw != null )
 		{
 			try {
-				grouping = WDDXProcessor.convertToInteger("Grouping ID", groupingId);
+				groupingId = WDDXProcessor.convertToInteger("Grouping ID", groupingIdRaw);
 			} catch ( Exception e)  {}
 		}
 
-		if ( grouping != null )		
+		if ( groupingId != null )		
 		{
-			m_groupingsToDo.put(activity.getActivityUIID(), grouping);
-			log.debug("Is grouped activity, id="+grouping);
-		}
-		else
-		{
-			clearGrouping(activity);
-			log.debug("Is class activity");
+			groupingsToAssign.put(activity.getActivityUIID(), groupingId);
+			log.debug("Is grouped activity, id="+groupingId);
 		}
 	}
+	
+	/** 
+	 * Assign the real groupings to the grouped activities
+	 */
+	private void assignGroupings() {
+		
+		 for ( Map.Entry<Integer, Integer> entry : groupingsToAssign.entrySet()) {
+			 
+			 Activity activity = newActivityMap.get(entry.getKey());
+			 Grouping grouping = newGroupings.get(entry.getValue());
+			 if ( activity != null && grouping != null ) {
+				 activity.setGrouping(grouping);
+				 activity.setGroupingUIID(grouping.getGroupingUIID());
+ 				 activity.setApplyGrouping(true);
+			 } else {
+				String message = "Unable to find a pair (activity/grouping) for a grouped activity. The activity will not be grouped. Activity UIID"+entry.getKey()+" grouping UIID "+entry.getValue();
+				log.warn(message);
+				toolsErrorMsgs.add(message);
+			 }
+		 }
+ 	 }
+
+
 	/*
 	 * get the content's sid based on the internal learning design id - used by 
 	 * updateSimpleTask. Match on the creationToolKey field in the content object
@@ -873,6 +909,7 @@ public class LD102Importer {
 					toolsErrorMsgs.add(message);
 				}
 		
+				contentMap.put(objId, clientObj);
 				// TODO convert the content object to something we can use.
 	/*			ContentConverter converter = new ContentConverter();
 				aContent = converter.createNewContentObject((String) clientObj.get(WDDXTAGS102.CONTENT_TYPE));
@@ -1294,143 +1331,8 @@ public class LD102Importer {
 
 	}
 
-
-	  ******************************* Library routines **********************
-	
-	*//**
-	 * Store an activity in a library
-	 *//*
-	protected ClientStatusMessage processLibraryActivity(Hashtable libHashTable, Long userId)
-		throws NamingException, SQLException
-	{
-		LibraryDefnVO lib = null;
-		ClientStatusMessage result = null;
-		Long libId = null;
-
-		PersistenceSession session = new PersistenceSession();
-		boolean okayToSave = true;
-
-		try {	
-			// convert id to int; if fails due to format or not existing, then
-			// assume we use the "default" library
-			try {
-				libId = WDDXProcessor.convertToLong("Library Id",libHashTable.get(WDDXTAGS102.SID));
-			} catch ( Exception e) {
-				// don't care - assume not valid!
-			}
-			
-			lib = LDWDDXValueObjectFactory.findCreateLibrary( session, libId, userId );
-			storeLibraryActivity(session, libHashTable, lib, userId);
-			result = new ClientStatusMessage(ClientStatusMessage.RECEIVED, 
-							" stored okay",	lib.getSid().toString() );
-		} catch (Exception e) {
-				result = new ClientStatusMessage(ClientStatusMessage.ERROR, 
-							"Error occured while storing activity sequence. Unable to store sequence. "+e.getMessage(),	
-								( lib!=null ? lib.getSid().toString() : "") );
-				log.error("Error occured while storing activity sequence. Unable to store sequence. Trying to store"+
-								( lib!=null ? lib.getSid().toString() : "") , e);
-				okayToSave = false;
-		}
-	
-		try {	
-			if(okayToSave){
-				session.flush();
-				session.close();
-				session = null;
-			}
-		} catch ( Exception e)
-		{
-			log.error("Error occured while saving / closing the database connection. Data may not be saved.",e);
-			result = new ClientStatusMessage(ClientStatusMessage.ERROR, 
-					"Error occured while saving / closing the database connection. Data may not be saved. "+e.getMessage(),	
-					( lib!=null ? lib.getSid().toString() : "") );
-		}
-
-		return(result);
-	}
-	
-	private void storeLibraryActivity(PersistenceSession session, Hashtable newLibHashTable, LibraryDefnVO lib, Long userId)
-		throws RuntimeException, Exception
-	{
-		Set packages = lib.getLibraryPackages();
-		if ( packages == null )
-		{
-			// do the create, set and reload fiddle due to hibernate replacing 
-			// my collection with its own collection.
-			packages = new HashSet();
-			lib.setLibraryPackages(packages);
-			packages = lib.getLibraryPackages();
-		}
-		
-		Vector newPackages = (Vector) newLibHashTable.get(WDDXTAGS102.LIB_PACKAGES);
-		if ( newPackages == null )
-		{
-			// log warning - no packages found in library
-			log.warn("No packages were found for  #"+lib.getSid());
-		}
-		else 
-		{
-								
-			String value = (String) newLibHashTable.get(WDDXTAGS102.DESCRIPTION);		
-			if ( value != null && value.length() > 0 )
-			{
-					lib.setDescription(value);
-			}
-			value = (String) newLibHashTable.get(WDDXTAGS102.TITLE);		
-			if ( value != null && value.length() > 0 )
-			{
-					lib.setTitle(value);
-			}
-			
-			// cycle through packages. Update existing ones, add new ones
-			// don't have delete support at the moment.
-
-			Iterator tempIterator = newPackages.iterator();
-			while ( tempIterator.hasNext() )
-			{
-				Hashtable clientObj = (Hashtable) tempIterator.next();
-			
-				// check that it is the object we expect
-				String objectType = (String) clientObj.get(WDDXTAGS102.OBJECT_TYPE);
-				if ( ! isLibraryPackage(objectType) )
-				{
-					throw new Exception( getExpectedLibraryPackage() + " received "+ objectType + ". Unable to store .");
-				}
-
-				Long sid = null;
-				try {			
-					sid = WDDXProcessor.convertToLong("Package Sid", clientObj.get(WDDXTAGS102.SID) );
-				} catch (Exception e) {
-					// if fails to convert, then assume new...
-				}
-				
-				LearningDesignDefnVO packageToUpdate = null;
-				packageToUpdate = lib.selectPackage(sid);
-				
-				if ( packageToUpdate == null ) 
-				{
-					packageToUpdate = new LearningDesignDefnVO(LearningDesignDefnVO.LIBPACKAGE_OBJECT_TYPE);	
-					storeInSession(session,packageToUpdate);
-					packages.add(packageToUpdate);					
-				} 
-				
-				Long id = null;
-				try {			
-					id = WDDXProcessor.convertToLong("Package ID", 
-							clientObj.get(WDDXTAGS102.LD_ITEM_ID) );
-				} catch (Exception e) {
-				}
-				if ( id == null )
-				{
-					id = new Long(0);
-				}
-
-				updateLearningDesign(session, clientObj, id, packageToUpdate, userId);
-			}
-		}
-	}
-	
-	*//** Create/Update a dummy task (stored using setDummyTask)
+*/
+	/** Create/Update a dummy task (stored using setDummyTask)
 	 * @param optAct - Optional Activity that this dummy task belongs.
 	 *//*
 	public void updateDummyTask(PersistenceSession session, OptionalActivityDefnVO optAct) throws Exception

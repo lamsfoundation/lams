@@ -452,8 +452,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 */
 	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
 			, List<String> toolsErrorMsgs) throws ImportToolContentException {
-		WorkspaceFolder folder = null; //getWorkspaceFolderForDesign(importer, workspaceFolderUid);
-    	LD102Importer oldImporter = new LD102Importer(getLearningDesignService(), baseDAO, learningLibraryDAO, activityDAO, toolDAO, toolImportSupportDAO, toolContentDAO, toolsErrorMsgs);
+		WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
+    	LD102Importer oldImporter = new LD102Importer(getLearningDesignService(), baseDAO, learningDesignDAO, learningLibraryDAO, activityDAO, toolDAO, toolImportSupportDAO, toolContentDAO, toolsErrorMsgs);
     	return oldImporter.storeLDDataWDDX(ldWddxPacket, importer, folder);
 	}
 	
@@ -774,45 +774,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}else
 			ld.setValidDesign(true);
 		
-//		if the learning design has duplicated name in same folder, then rename it with timestamp.
-		// the new name format will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1.  
-		if(folder != null){
-			boolean dupName;
-			List<LearningDesign> ldList = learningDesignDAO.getAllLearningDesignsInFolder(folder.getWorkspaceFolderId());
-			String newName = ld.getTitle();
-			int idx = 1;
-			
-			//contruct middle part of name by timestamp
-			Calendar calendar = Calendar.getInstance();
-			int mth = calendar.get(Calendar.MONTH) + 1;
-			String mthStr = new Integer(mth).toString();
-			if(mth < 10)
-				mthStr = "0" + mthStr;
-			int day = calendar.get(Calendar.DAY_OF_MONTH);
-			String dayStr = new Integer(day).toString();
-			if(day < 10)
-				dayStr = "0" + dayStr;
-			String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
-			while(true){
-				dupName = false;
-				for(LearningDesign eld :ldList){
-					if(StringUtils.equals(eld.getTitle(),newName)){
-						dupName = true;
-						break;
-					}
-				}
-				if(!dupName)
-					break;
-				newName = ld.getTitle() + "_" + nameMid + "_" + idx;
-				idx++;
-			}
-			ld.setTitle(newName);
-		}
+		ld.setTitle(ImportExportUtil.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
+		
 //		persist
 		learningDesignDAO.insert(ld);
 		
 		return ld.getLearningDesignId();
 	}
+	
 	/**
 	 * Get learning design object from this Learning design DTO object. It also following our
 	 * import rules:
