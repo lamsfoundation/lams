@@ -95,9 +95,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	//Text Items
     private var LSTitle_txt:TextField;
 	private var LSDescription_txt:TextField;
-	private var sessionStatus_txt:TextField;
-	private var numLearners_txt:TextField;
-	private var class_txt:TextField;
+	private var sessionStatus_txt:Label;
+	private var numLearners_txt:Label;
+	private var class_txt:Label;
 	private var duration_txt:TextField;
 	private var startMsg_txt:TextField;
 	
@@ -671,14 +671,14 @@ public function update (o:Observable,infoObj:Object):Void{
 		//max_lbl.text = Dictionary.getValue('pi_max_act');
 		
 		//populate the synch type combo:
-		status_lbl.text = Dictionary.getValue('ls_status_lbl');
-		learner_lbl.text = Dictionary.getValue('ls_learners_lbl');
-		class_lbl.text = Dictionary.getValue('ls_class_lbl');
-		elapsed_lbl.text = Dictionary.getValue('ls_duration_lbl');
-		manageClass_lbl.text = Dictionary.getValue('ls_manage_class_lbl');
-		manageStatus_lbl.text = Dictionary.getValue('ls_manage_status_lbl');
-		manageStart_lbl.text = Dictionary.getValue('ls_manage_start_lbl');
-		manageDate_lbl.text = Dictionary.getValue('ls_manage_date_lbl');
+		status_lbl.text = "<b>"+Dictionary.getValue('ls_status_lbl')+"</b>";
+		learner_lbl.text = "<b>"+Dictionary.getValue('ls_learners_lbl')+"</b>";
+		class_lbl.text = "<b>"+Dictionary.getValue('ls_class_lbl')+"</b>";
+		elapsed_lbl.text = "<b>"+Dictionary.getValue('ls_duration_lbl')+"</b>";
+		manageClass_lbl.text = "<b>"+Dictionary.getValue('ls_manage_class_lbl')+"</b>";
+		manageStatus_lbl.text = "<b>"+Dictionary.getValue('ls_manage_status_lbl')+"</b>";
+		manageStart_lbl.text = "<b>"+Dictionary.getValue('ls_manage_start_lbl')+"</b>";
+		manageDate_lbl.text = "<b>"+Dictionary.getValue('ls_manage_date_lbl')+"</b>";
 			
 		//Button
 		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
@@ -725,6 +725,10 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageStart_lbl.setStyle('styleName',styleObj);
 		manageDate_lbl.setStyle('styleName',styleObj);
 		schedule_date_lbl.setStyle('styleName', styleObj);
+		sessionStatus_txt.setStyle('styleName', styleObj);
+		numLearners_txt.setStyle('styleName', styleObj);
+		class_txt.setStyle('styleName', styleObj);
+		
 		
 		//BUTTONS
 		styleObj = _tm.getStyleObject('button');
