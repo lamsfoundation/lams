@@ -58,6 +58,8 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	
 	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
 	    {
+	 	    /*
+	 	    logger.debug("running getToolDefaultQuestionContent: "  + qaContentId);
 	        return (QaQueContent) getHibernateTemplate().execute(new HibernateCallback()
 	         {
 	             public Object doInHibernate(Session session) throws HibernateException
@@ -67,6 +69,18 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	                               .uniqueResult();
 	             }
 	         });
+	         */
+
+	 	    HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+				.setLong("qaContentId", qaContentId)
+				.list();
+
+			if(list != null && list.size() > 0){
+				QaQueContent qa = (QaQueContent) list.get(0);
+				return qa;
+			}
+			return null;
 	    }
 	 	
 

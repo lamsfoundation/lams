@@ -33,6 +33,13 @@ public interface QaAppConstants {
 	public static final String TOOL_SERVICE								="tool_service";
 	public static final String ERROR_QAAPPLICATION 						= "error.exception.QaApplication";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
+	public static final String MAP_QUESTION_CONTENT_KEY					= "mapQuestionContentKey";
+	public static final String ATTACHMENT_LIST_KEY 						= "attachmentListKey";
+	public static final String DELETED_ATTACHMENT_LIST_KEY				= "deletedAttachmentListKey";
+	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
+	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
+	public static final String ACTIVITY_TITLE_KEY						= "activityTitleKey";
+	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
 
 	public static final String TARGET_MODE								="targetMode";
 	public static final String TARGET_MODE_AUTHORING					="Authoring";
@@ -41,6 +48,8 @@ public interface QaAppConstants {
 	public static final String TARGET_MODE_EXPORT_PORTFOLIO				="ExportPortfolio";
 	
 	public static final String AUTHORING_STARTER						="starter";
+	public static final String TITLE									="title";
+	public static final String INSTRUCTIONS								="instructions";
 	public static final String LOAD_LEARNER								="loadLearner";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
@@ -71,16 +80,21 @@ public interface QaAppConstants {
 	public static final String MONITORING_ORIGINATED_DEFINELATER		="monitoringOriginatedDefineLater";
 	public static final String DEFINE_LATER								="defineLater";
 	public static final String REQUESTED_MODULE							="requestedModule";
+	public static final String SYNC_IN_MONITOR							="synchInMonitor";
+	public static final String USERNAME_VISIBLE							="usernameVisible";
+	public static final String QUESTIONS_SEQUENCED						="questionsSequenced";
 	
 	public static final String SOURCE_MC_STARTER						="sourceMcStarter";
 	public static final Integer MAX_QUESTION_COUNT						=new Integer(50);
+	
 	
 	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
 	public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
 	public static final String IS_PORTFOLIO_EXPORT						="isPortfolioExport";
 	public static final String GENERAL_LEARNER_FLOW_DTO					="generalLearnerFlowDTO";
 			
-    public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
+    public static final Long INITIAL_QUESTION_COUNT						=new Long(1);
+    public static final String QA_GENERAL_AUTHORING_DTO					="qaGeneralAuthoringDTO";
     
     /*
      * Struts level constants

@@ -58,6 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaAuthoringForm.submit();
 		}
 
+
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
         
@@ -90,9 +91,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	            initEditor("instructions");
 	            
 	            initEditor("questionContent0");
-	            <c:set var="queIndex" scope="session" value="1"/>
-	            <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-	                <c:set var="queIndex" scope="session" value="${queIndex+1}"/>
+	            <c:set var="queIndex" scope="request" value="1"/>
+	            <c:forEach var="questionEntry" items="${qaGeneralAuthoringDTO.mapQuestionContent}">
+	                <c:set var="queIndex" scope="request" value="${queIndex+1}"/>
 	                initEditor("<c:out value="questionContent${queIndex-1}"/>");
 	            </c:forEach>			
         }     
@@ -120,13 +121,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<h1>  <bean:message key="label.authoring.qa"/> </h1>
 	
 	<div id="header">
-		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<lams:Tabs collection="${tabs}" useKey="true" control="true" />
 		</c:if> 			
-		<c:if test="${(sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
+		<c:if test="${(qaGeneralAuthoringDTO.activeModule == 'defineLater') && (qaGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 			
 			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
 		</c:if> 					
-		<c:if test="${(sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode == 'true') }"> 					
+		<c:if test="${(qaGeneralAuthoringDTO.activeModule == 'defineLater') && (qaGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 					
 			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>		
 		</c:if> 						
 	</div>
@@ -137,8 +138,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="activeModule"/>
+		<html:hidden property="httpSessionID"/>								
+		<html:hidden property="defaultContentIdStr"/>								
 		
-		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+		
+		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 			<!-- end of content (Basic) -->
@@ -152,13 +156,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!-- end of content (Instructions) -->
 		</c:if> 			
 
-		<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
+		<c:if test="${ (qaGeneralAuthoringDTO.activeModule == 'defineLater') && (qaGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 			
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContentViewOnly.jsp"/>
 			<!-- end of content (Basic) -->
 		</c:if> 			
 
-		<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode == 'true') }"> 			
+		<c:if test="${ (qaGeneralAuthoringDTO.activeModule == 'defineLater') && (qaGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 			
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 			<!-- end of content (Basic) -->

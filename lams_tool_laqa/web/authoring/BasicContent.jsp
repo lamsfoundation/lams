@@ -27,12 +27,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-		           <h2>  <bean:message key="label.authoring.qa.basic"/> </h2>
-		           
+
 			    	<table align=center> 	  
 						<tr>   
 						<td NOWRAP class=error>
-							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
+							<c:if test="${qaGeneralAuthoringDTO.sbmtSuccess == '1'}"> 			
 								<img src="images/success.gif" align="left" width=20 height=20>  <bean:message key="submit.successful"/>  </img>
 							</c:if> 			
 						</td>
@@ -40,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<tr>   
 						<td NOWRAP class=error>
-							<c:if test="${userExceptionQuestionsDuplicate == 'true'}"> 			
+							<c:if test="${qaGeneralAuthoringDTO.userExceptionQuestionsDuplicate == 'true'}"> 			
 								<img src="images/error.jpg" align="left" width=20 height=20>  <bean:message key="error.questions.duplicate"/>  </img>
 							</c:if> 			
 						</td>
@@ -51,44 +50,44 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<table class="forms">
 						<tr> 
 							<td colspan=2>							
-								<lams:SetEditor id="title" text="${activityTitle}" small="true" key="label.authoring.title.col"/>								
+								<lams:SetEditor id="title" text="${qaGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
 							</td> 
 							
 					  	</tr>
 
 					  	<tr> 
 							<td colspan=2>							
-								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
+								<lams:SetEditor id="instructions" text="${qaGeneralAuthoringDTO.activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
 							</td> 
 						</tr>
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 				 		<tr> 
 							<td colspan=2>							
-								<lams:SetEditor id="questionContent0" text="${sessionScope.defaultQuestionContent}" small="true" key="label.question.col"/>								
+								<lams:SetEditor id="questionContent0" text="${qaGeneralAuthoringDTO.defaultQuestionContent}" small="true" key="label.question.col"/>								
 							</td> 
 					  	</tr>
 		
 				  	<!--end of default question content -->
 				  	
 			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="queIndex" scope="session" value="1"/>
-						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
+			  	 		<c:set var="queIndex" scope="request" value="1"/>
+						<c:forEach var="questionEntry" items="${qaGeneralAuthoringDTO.mapQuestionContent}">
 					  		<c:if test="${questionEntry.key > 1}"> 			
-								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+								<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 								  <tr>
 									<td colspan=2>							
 
 										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true" key="label.question.col"/>								
                                 
-	                                	<c:if test="${ (sessionScope.activeModule != 'monitoring') }"> 			
+	                                	<c:if test="${ (qaGeneralAuthoringDTO.activeModule != 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
 	                                                     onclick="removeQuestion(${queIndex});">
 												<bean:message key="button.removeQuestion"/>
 											</html:submit>
 										</c:if> 			
-	                                	<c:if test="${ (sessionScope.activeModule == 'monitoring') }"> 			
+	                                	<c:if test="${ (qaGeneralAuthoringDTO.activeModule == 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
 	                                                     onclick="removeMonitoringQuestion(${queIndex});">
@@ -100,7 +99,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${QaAuthoringForm.toolContentId}"/>
+						<html:hidden property="toolContentId" value="${qaGeneralAuthoringDTO.toolContentID}"/>
 						<html:hidden property="questionIndex"/>
                         
                         <tr>
@@ -117,14 +116,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 
 
-	      	<c:if test="${activeModule != 'authoring'}"> 					
+	      	<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
 				<p align="right">
 				    <a href="javascript:submitMethod('submitAllContent')" class="button">
 			        	<bean:message key="label.save"/></a>
 				</p>
 			</c:if> 					
 
-	      	<c:if test="${activeModule == 'authoring'}"> 					
+	      	<c:if test="${qaGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
 				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />

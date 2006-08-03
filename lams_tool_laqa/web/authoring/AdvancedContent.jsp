@@ -79,7 +79,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 		<bean:message key="label.report.title"/>: 
 			 		</td>
 					<td>							
-			 			<html:text property="reportTitle" size="60" maxlength="100"/>
+			 			<html:text property="reportTitle" value="${qaGeneralAuthoringDTO.reportTitle}" size="60" maxlength="100"/>
 			 		</td>
 			  	</tr>
 			  	
@@ -87,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td class="field-name">							
 				 		<bean:message key="label.monitoringReport.title"/>: </td>
 					<td>							
-			 			<html:text property="monitoringReportTitle" size="60" maxlength="100"/>
+			 			<html:text property="monitoringReportTitle" value="${qaGeneralAuthoringDTO.monitoringReportTitle}" size="60" maxlength="100"/>
 			 		</td>
 			  	</tr>
 			  	
@@ -96,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 		<bean:message key="label.report.endLearningMessage"/>: 
 		      		</td>
 					<td>							
-			 			<html:text property="endLearningMessage" size="60" maxlength="100"/>
+			 			<html:text property="endLearningMessage" value="${qaGeneralAuthoringDTO.endLearningMessage}" size="60" maxlength="100"/>
 			 		</td>
 			  	</tr>
 			</table>	  	

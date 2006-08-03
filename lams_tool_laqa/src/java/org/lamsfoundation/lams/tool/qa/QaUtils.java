@@ -22,14 +22,12 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.qa;
 
-import java.security.Principal;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -42,6 +40,7 @@ import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * @author Ozgur Demirtas
@@ -56,34 +55,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public abstract class QaUtils implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaUtils.class.getName());
 	
-	public static IQaService getToolService(HttpServletRequest request)
-	{
-		IQaService qaService=(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-	    return qaService;
-	}
-	
-	public static long generateId()
-	{
-		Random generator = new Random();
-		long longId=generator.nextLong();
-		if (longId < 0) longId=longId * (-1) ;
-		return longId;
-	}
-	
-	/**
-	 * helps create a mock user object in development time.
-	 * static long generateIntegerId()
-	 * @return long
-	 */
-	public static int generateIntegerId()
-	{
-		Random generator = new Random();
-		int intId=generator.nextInt();
-		if (intId < 0) intId=intId * (-1) ;
-		return intId;
-	}
-	
-
     /**
      * setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
      * 
@@ -91,68 +62,147 @@ public abstract class QaUtils implements QaAppConstants {
      * @param defaultQaContent
      * @param qaAuthoringForm
      */
-    public static void setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
+    public static void populateAuthoringDTO(HttpServletRequest request, QaContent defaultQaContent, 
+            QaGeneralAuthoringDTO qaGeneralAuthoringDTO)
 	{
-		/*should never be null anyway as default content MUST exist in the db*/
-        if(defaultQaContent == null)
-            throw new NullPointerException("Default QaContent cannot be null");
+        qaGeneralAuthoringDTO.setActivityTitle(defaultQaContent.getTitle());
+		qaGeneralAuthoringDTO.setActivityInstructions(defaultQaContent.getInstructions());
+		
+	    qaGeneralAuthoringDTO.setReportTitle(defaultQaContent.getReportTitle());
+	    qaGeneralAuthoringDTO.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
+	    qaGeneralAuthoringDTO.setEndLearningMessage(defaultQaContent.getEndLearningMessage());
+	    qaGeneralAuthoringDTO.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
+	    qaGeneralAuthoringDTO.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
+		
+         /* set the status of radio boxes */
+	    qaGeneralAuthoringDTO.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
+	    qaGeneralAuthoringDTO.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
+	    qaGeneralAuthoringDTO.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
+	}
 
-		qaAuthoringForm.setTitle(defaultQaContent.getTitle());
-		qaAuthoringForm.setInstructions(defaultQaContent.getInstructions());
-		request.getSession().setAttribute(ACTIVITY_TITLE, defaultQaContent.getTitle());
-		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, defaultQaContent.getInstructions());
-		
-	    logger.debug("ACTIVITY_INSTRUCTIONS: " + defaultQaContent.getInstructions());
-		
-		qaAuthoringForm.setReportTitle(defaultQaContent.getReportTitle());
-        qaAuthoringForm.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
-		qaAuthoringForm.setEndLearningMessage(defaultQaContent.getEndLearningMessage());
-		qaAuthoringForm.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
-		qaAuthoringForm.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
-		qaAuthoringForm.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
-		
-         //determine the status of radio boxes
-        qaAuthoringForm.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
-        qaAuthoringForm.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
-        qaAuthoringForm.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
-	}
     
-    
-    public static void persistRichText(HttpServletRequest request)
+    public static QaGeneralAuthoringDTO buildGeneralAuthoringDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent, 
+            QaAuthoringForm  qaAuthoringForm)
 	{
-		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
-		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
-		
-		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
+        logger.debug("start buildGeneralAuthoringDTO: " + qaContent);
+        QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
+        
+        logger.debug("setting for existing content: ");
+        qaGeneralAuthoringDTO.setToolContentID(qaContent.getQaContentId().toString());
+        qaAuthoringForm.setToolContentID(qaContent.getQaContentId().toString());
+
+	    Map mapQuestionContent= new TreeMap(new QaComparator());
+		Iterator queIterator=qaContent.getQaQueContents().iterator();
+		Long mapIndex=new Long(1);
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
+		while (queIterator.hasNext())
 		{
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
+			QaQueContent qaQueContent=(QaQueContent) queIterator.next();
+			if (qaQueContent != null)
+			{
+				logger.debug("question: " + qaQueContent.getQuestion());
+	    		mapQuestionContent.put(mapIndex.toString(),qaQueContent.getQuestion());
+
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+			}
 		}
+
+		qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
+	    
+		long defaultContentID=0;
+		logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
+        defaultContentID=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+		logger.debug("retrieved tool default contentId: " + defaultContentID);
 		
-		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
-		}
-		
-	
-		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
-		logger.debug("read parameter richTextTitle: " + richTextTitle);
-		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
-		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
-		
-		
-		if ((richTextTitle != null) && (richTextTitle.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
-		}
-		
-		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
-		}
+		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
+		qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+		qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
+
+		qaGeneralAuthoringDTO.setReportTitle(qaContent.getReportTitle());
+	    qaGeneralAuthoringDTO.setMonitoringReportTitle(qaContent.getMonitoringReportTitle());
+	    qaGeneralAuthoringDTO.setEndLearningMessage(qaContent.getEndLearningMessage());
+	    qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
+	    qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
+	    
+	    qaGeneralAuthoringDTO.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
+	    qaGeneralAuthoringDTO.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
+	    qaGeneralAuthoringDTO.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
+
+	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
+	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
+	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
+        
+	    logger.debug("ending buildGeneralAuthoringDTO with qaGeneralAuthoringDTO : " + qaGeneralAuthoringDTO);
+	    logger.debug("ending buildGeneralAuthoringDTO with qaAuthoringForm: " + qaAuthoringForm);
+	    return qaGeneralAuthoringDTO;
 	}
     
+    
+    public static void setFormProperties(HttpServletRequest request, IQaService qaService, QaContent qaContent, 
+            QaAuthoringForm  qaAuthoringForm, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, String strToolContentID, String defaultContentIdStr, 
+            String activeModule, SessionMap sessionMap, String httpSessionID)
+    {
+    	logger.debug("starting setFormProperties: " + qaContent);
+    	logger.debug("using strToolContentID: " + strToolContentID);
+    	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
+    	logger.debug("using activeModule: " + activeModule);
+    	logger.debug("using httpSessionID: " + httpSessionID);
+
+    	qaAuthoringForm.setHttpSessionID(httpSessionID);
+    	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+    	
+    	qaAuthoringForm.setToolContentID(strToolContentID);
+    	
+    	if (defaultContentIdStr != null)
+    	    qaAuthoringForm.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
+    	
+    	qaAuthoringForm.setActiveModule(activeModule);
+    	
+		String synchInMonitor=request.getParameter(SYNC_IN_MONITOR);
+    	logger.debug("synchInMonitor: " + synchInMonitor);
+		qaAuthoringForm.setSynchInMonitor(synchInMonitor);
+		qaGeneralAuthoringDTO.setSynchInMonitor(synchInMonitor);
+		
+		String usernameVisible=request.getParameter(USERNAME_VISIBLE);
+		logger.debug("usernameVisible: " + usernameVisible);
+		qaAuthoringForm.setUsernameVisible(usernameVisible);
+		qaGeneralAuthoringDTO.setUsernameVisible(usernameVisible);
+		
+		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
+		logger.debug("questionsSequenced: " + questionsSequenced);
+		qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
+		qaGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
+		
+		String reportTitle=request.getParameter(REPORT_TITLE);
+		logger.debug("reportTitle: " + reportTitle);
+		qaAuthoringForm.setReportTitle(reportTitle);
+		qaGeneralAuthoringDTO.setReportTitle(reportTitle);
+		
+		String monitoringReportTitle=request.getParameter(MONITORING_REPORT_TITLE);
+		logger.debug("monitoringReportTitle: " + monitoringReportTitle);
+		qaAuthoringForm.setMonitoringReportTitle(monitoringReportTitle);
+		qaGeneralAuthoringDTO.setMonitoringReportTitle(monitoringReportTitle);
+		
+		String endLearningMessage=request.getParameter(END_LEARNING_MESSSAGE);
+		logger.debug("endLearningMessage: " + endLearningMessage);
+		qaAuthoringForm.setEndLearningMessage(endLearningMessage);
+		qaGeneralAuthoringDTO.setEndLearningMessage(endLearningMessage);
+		
+		
+		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
+		logger.debug("offlineInstructions: " + offlineInstructions);
+		qaAuthoringForm.setOfflineInstructions(offlineInstructions);
+		qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
+		String onlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
+		logger.debug("onlineInstructions: " + onlineInstructions);
+		qaAuthoringForm.setOnlineInstructions(onlineInstructions);
+		qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+		
+		logger.debug("ending setFormProperties qaAuthoringForm: " + qaAuthoringForm);
+		logger.debug("ending setFormProperties qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+    }
+
     
 	public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException
     {
@@ -165,53 +215,14 @@ public abstract class QaUtils implements QaAppConstants {
 	
 	
 	/**
-	 * Modified to throw QaApplicationException insteadof RuntimeException
-	 * String getUsername(HttpServletRequest req,boolean isTesting) throws RuntimeException
-	 * is normally lives in package org.lamsfoundation.lams.util. It generates Runtime exception when the user principal 
-	 * is not found. We find this not too usefulespeciaaly in teh development time. Below is a local and modified version
-	 * of this function. 
-	 * 
-	 * @return username from principal object
-	 */
-	public static String getUsername(HttpServletRequest req,boolean isTesting) throws QaApplicationException
-	{
-	    if(isTesting)
-	        return "test";
-	    
-		Principal principal = req.getUserPrincipal();
-		if (principal == null)
-		{
-			throw new QaApplicationException("Trying to get username but principal object missing. Request is "
-					+ req.toString());
-		}
-			
-		String username = principal.getName();
-		if (username == null)
-		{
-			throw new QaApplicationException("Name missing from principal object. Request is "
-					+ req.toString()
-					+ " Principal object is "
-					+ principal.toString());
-		}
-		return username;
-	}
-	
-	
-	public static boolean getDefineLaterStatus()
-	{
-		return false;
-	}
-	
-	
-	/**
 	 * existsContent(long toolContentId)
 	 * @param long toolContentId
 	 * @return boolean
 	 * determine whether a specific toolContentId exists in the db
 	 */
-	public static boolean existsContent(long toolContentId, IQaService qaService)
+	public static boolean existsContent(long toolContentID, IQaService qaService)
 	{    
-    	QaContent qaContent=qaService.loadQa(toolContentId);
+    	QaContent qaContent=qaService.loadQa(toolContentID);
 	    logger.debug(logger + " " + "QaUtils " +  "retrieving qaContent: " + qaContent);
 	    if (qaContent == null) 
 	    	return false;
@@ -225,10 +236,10 @@ public abstract class QaUtils implements QaAppConstants {
 	 * @param toolSessionId
 	 * @return boolean
 	 */
-	public static boolean existsSession(long toolSessionId, IQaService qaService)
+	public static boolean existsSession(long toolContentID, IQaService qaService)
 	{
 		logger.debug("existsSession");
-	    QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
+	    QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolContentID);
 	    logger.debug("qaSession:" + qaSession);
     	
 	    if (qaSession == null) 
@@ -244,63 +255,17 @@ public abstract class QaUtils implements QaAppConstants {
 				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
-	
-	public static void saveTimeZone(HttpServletRequest request)
-	{
-		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
-	    logger.debug("current timezone id: " + timeZone.getID());
-	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
-	}
 
-	
-	public static void configureContentRepository(HttpServletRequest request)
+	public static void configureContentRepository(HttpServletRequest request, IQaService qaService)
 	{
 		logger.debug("attempt configureContentRepository");
-    	IQaService qaService =QaUtils.getToolService(request);
-    	logger.debug("retrieving qaService from session: " + qaService);
+    	logger.debug("qaService: " + qaService);
     	logger.debug("calling configureContentRepository()");
 	    qaService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
 	
 	
-    public static void populateUploadedFilesData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
-        List attachmentList = qaService.retrieveQaUploadedFiles(qaContent); 
-        request.getSession().setAttribute(ATTACHMENT_LIST, attachmentList);
-        
-        if(request.getSession().getAttribute(DELETED_ATTACHMENT_LIST)==null)
-            request.getSession().setAttribute(DELETED_ATTACHMENT_LIST, new ArrayList());
-        
-        logger.debug("populated UploadedFilesData");
-    }
-    
-    /**
-     * <p>This method is used in authoring and monitoring to display the list of files that have been uploaded.
-     * The current files are included in the attachmentList, files that the user has nominated to delete are 
-     * in the deletedAttachementList.</p>
-     * 
-     * <p>If the input collections are null, then the session variables are not modified. This
-     * is particularly useful for the deleted files.</p>
-     * 
-     * @param request the HttpServletRequest which is used to obtain the HttpSession
-     * @param attachmentList
-     * @param deletedAttachmentList
-     */
-    public static void addUploadsToSession(HttpServletRequest request, List attachmentList, List deletedAttachmentList)
-    {
-        if ( attachmentList != null ) {
-            request.getSession().setAttribute(ATTACHMENT_LIST, attachmentList);
-        }
-        
-        // deleted will be empty most of the time
-        if ( deletedAttachmentList != null ) {
-            request.getSession().setAttribute(DELETED_ATTACHMENT_LIST, deletedAttachmentList);
-        }
-
-    }
-    
     /** If this file exists in attachments map, move it to the deleted attachments map.
      * Returns the updated deletedAttachments map, creating a new one if needed. If uuid supplied
      * then tries to match on that, otherwise uses filename and isOnline. */
@@ -567,14 +532,13 @@ public abstract class QaUtils implements QaAppConstants {
 	 * @param value
 	 * @param toolContentId
 	 */
-	public static void setDefineLater(HttpServletRequest request, boolean value, String toolContentId)
+	public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID, IQaService qaService)
     {
-		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
     	logger.debug("value:" + value);
-    	logger.debug("toolContentId:" + toolContentId);
+    	logger.debug("strToolContentID:" + strToolContentID);
     	
-		QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
+		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
     	logger.debug("qaContent:" + qaContent);
     	if (qaContent != null)
     	{
@@ -612,15 +576,12 @@ public abstract class QaUtils implements QaAppConstants {
 		}
 	}
 	
-    public static void setDefineLater(HttpServletRequest request, boolean value)
+    public static void setDefineLater(HttpServletRequest request, boolean value, IQaService qaService, String toolContentID)
     {
-    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	logger.debug("qaService:" + qaService);
+    	logger.debug("toolContentID:" + toolContentID);
     	
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	
-    	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+    	QaContent qaContent=qaService.loadQa(new Long(toolContentID).longValue());
     	logger.debug("qaContent:" + qaContent);
     	if (qaContent != null)
     	{

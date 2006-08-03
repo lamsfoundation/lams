@@ -204,8 +204,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 		/* save time zone information to session scope. */
-	    QaUtils.saveTimeZone(request);
-		
+	    		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
@@ -254,7 +253,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		qaMonitoringAction.refreshInstructionsData(request, qaContent);
 		
 		logger.debug("populating online and ofline files data for intructions tab");
-		QaUtils.populateUploadedFilesData(request, qaContent, qaService);
+		//FIX HERE!!!
+		//QaUtils.populateUploadedFilesData(request, qaContent, qaService, qaGeneralAuthoringDTO);
 
 		
 		boolean isContentInUse=QaUtils.isContentInUse(qaContent);

@@ -81,6 +81,9 @@
  */
 
 /* $$Id$$ */
+
+// Fix public ActionForward editActivityQuestions(ActionMapping mapping,...)
+
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
@@ -427,10 +430,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ToolException
     {
     	logger.debug("dispatching editActivityQuestions...");
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		
+		//ATTENTION HERE: obtain strToolContentID
+		String strToolContentID= null;
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true).toString());
-		QaUtils.setDefineLater(request, true);
+		QaUtils.setDefineLater(request, true,strToolContentID,  qaService);
         return (mapping.findForward(LOAD_MONITORING));
     }
     

@@ -43,7 +43,7 @@
 		path="/authoringStarter"
 		type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
 		name="QaAuthoringForm"
-		scope="session"
+		scope="request"
 		unknown="false"
 		validate="false"
     >
@@ -85,7 +85,7 @@
       name="QaAuthoringForm"
       input="/AuthoringMaincontent.jsp"
       parameter="dispatch"
-      scope="session"
+      scope="request"
       unknown="false"
       validate="false"
     >

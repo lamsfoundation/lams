@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 /* ActionForm for the Authoring environment*/
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
@@ -55,7 +56,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String instructions;
 	protected String questionIndex;
 	protected String isRemoveContent;
-	protected String toolContentId;
+
 	/* instructions content */
 	protected String onlineInstructions;
 	protected String offlineInstructions;
@@ -78,6 +79,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String statsMonitoring;
 
 	protected String edit;
+	
+	protected String defaultContentIdStr;
 	
 	public void resetUserAction()
     {
@@ -115,7 +118,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		this.instructions=null;
 		this.questionIndex=null;
 		this.isRemoveContent=null;
-		this.toolContentId=null;
 
 		this.onlineInstructions=null;
 		this.offlineInstructions=null;
@@ -141,6 +143,25 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		this.usernameVisible	=OPTION_OFF;
 		this.questionsSequenced	=OPTION_OFF;
 	}
+
+	public String toString() {
+        return new ToStringBuilder(this)
+            .append("toolContentID: ", toolContentID)
+            .append("currentTab: ", currentTab)
+            .append("activeModule: ", activeModule)
+            .append("defaultContentIdStr: ", defaultContentIdStr)
+            .append("title: ", title)
+            .append("instructions: ", instructions)
+            .append("reportTitle: ", reportTitle)
+            .append("monitoringReportTitle: ", monitoringReportTitle)
+            .append("endLearningMessage: ", endLearningMessage)
+            .append("onlineInstructions: ", onlineInstructions)
+            .append("offlineInstructions: ", offlineInstructions)
+            .append("usernameVisible: ", usernameVisible)
+            .append("synchInMonitor: ", synchInMonitor)
+            .append("questionsSequenced: ", questionsSequenced)
+            .toString();
+    }
 
 	
 	/**
@@ -240,18 +261,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	/**
-	 * @return Returns the toolContentId.
-	 */
-	public String getToolContentId() {
-		return toolContentId;
-	}
-	/**
-	 * @param toolContentId The toolContentId to set.
-	 */
-	public void setToolContentId(String toolContentId) {
-		this.toolContentId = toolContentId;
-	}
+
 	/**
 	 * @return Returns the offlineInstructions.
 	 */
@@ -572,5 +582,19 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setActiveModule(String activeModule) {
         this.activeModule = activeModule;
-    }	
+    }
+    
+    /**
+     * @return Returns the defaultContentIdStr.
+     */
+    public String getDefaultContentIdStr() {
+        return defaultContentIdStr;
+    }
+    /**
+     * @param defaultContentIdStr The defaultContentIdStr to set.
+     */
+    public void setDefaultContentIdStr(String defaultContentIdStr) {
+        this.defaultContentIdStr = defaultContentIdStr;
+    }
+
 }

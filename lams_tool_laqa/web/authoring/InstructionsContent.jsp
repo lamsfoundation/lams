@@ -24,23 +24,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<table class="forms">
           		<tr> 
 					<td NOWRAP colspan=2 valign=top>
-						<lams:SetEditor id="onlineInstructions" text="${QaAuthoringForm.onlineInstructions}" small="true" key="label.onlineInstructions.col"/>								
+						<lams:SetEditor id="onlineInstructions" text="${qaGeneralAuthoringDTO.onlineInstructions}" small="true" key="label.onlineInstructions.col"/>								
 					</td> 
 				</tr>
 				
 				<tr>
-					<td NOWRAP colspan=2 valign=top>
+				<td NOWRAP colspan=2 valign=top>
 				<table class="forms">
 					<tr><td align=center>
-					<logic:present name="attachmentList">
-					<bean:size id="count" name="attachmentList" />
-					<logic:notEqual name="count" value="0">
+
 							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 								<tr>
 									<td>
 										<table width="70%" align="left">
 
-							            <logic:iterate name="attachmentList" id="attachment">
+									<c:forEach var="attachment" items="${qaGeneralAuthoringDTO.attachmentList}">
 											<c:if test="${attachment.fileOnline == true }"> 			
 								            	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
 												<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
@@ -60,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                	<bean:message key="link.download" />
 													                </html:link>
 																	&nbsp&nbsp
-													            	<html:link page="/authoring.do?dispatch=deleteFile" 
+													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reportTitle=${qaGeneralAuthoringDTO.reportTitle}&monitoringReportTitle=${qaGeneralAuthoringDTO.monitoringReportTitle}&endLearningMessage=${qaGeneralAuthoringDTO.endLearningMessage}"
 													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
@@ -71,14 +69,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											            </table>
 										           	</td>
 									   	     	</tr>
-										</c:if> 											   	     	
-							    	    </logic:iterate>
+											</c:if> 											   	     	
+										</c:forEach>
 										</table>
 								 	</td>
 								</tr>
 							</table>
-					 </logic:notEqual>
-					 </logic:present>
+
+
+
 							 	</td>
 							</tr>
 				</table>
@@ -102,7 +101,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 				<tr> 
 					<td colspan=2 NOWRAP> 
-						<lams:SetEditor id="offlineInstructions" text="${QaAuthoringForm.offlineInstructions}" small="true" key="label.offlineInstructions.col"/>								
+						<lams:SetEditor id="offlineInstructions" text="${qaGeneralAuthoringDTO.offlineInstructions}" small="true" key="label.offlineInstructions.col"/>								
 					</td> 
 				</tr>
 
@@ -111,15 +110,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td NOWRAP colspan=2 valign=top>
 				<table class="forms">
 					<tr><td align=center>
-					<logic:present name="attachmentList">
-					<bean:size id="count" name="attachmentList" />
-					<logic:notEqual name="count" value="0">
 							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 								<tr>
 									<td>
 										<table width="70%" align="left">
 
-							            <logic:iterate name="attachmentList" id="attachment">
+									<c:forEach var="attachment" items="${qaGeneralAuthoringDTO.attachmentList}">
+		
 											<c:if test="${attachment.fileOnline == false}"> 			
 								            	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
 												<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
@@ -139,8 +136,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                	<bean:message key="link.download" />
 													                </html:link>
 																	&nbsp&nbsp
-													            	<html:link page="/authoring.do?dispatch=deleteFile" 
-													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
+													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reportTitle=${qaGeneralAuthoringDTO.reportTitle}&monitoringReportTitle=${qaGeneralAuthoringDTO.monitoringReportTitle}&endLearningMessage=${qaGeneralAuthoringDTO.endLearningMessage}"
+													            	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
 													                	<bean:message key="link.delete" />
@@ -151,13 +148,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										           	</td>
 									   	     	</tr>
 										</c:if> 											   	     	
-							    	    </logic:iterate>
+											</c:forEach>
 										</table>
 								 	</td>
 								</tr>
 							</table>
-					 </logic:notEqual>
-					 </logic:present>
+
 							 	</td>
 							</tr>
 				</table>
