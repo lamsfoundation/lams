@@ -57,7 +57,9 @@ class MonitorModel extends Observable{
 	
 	private var _staffLoaded:Boolean;
 	private var _learnersLoaded:Boolean;
-	private var _isProgressChanged:Boolean;
+	private var _isLessonProgressChanged:Boolean;
+	private var _isSequenceProgressChanged:Boolean;
+	private var _isLearnerProgressChanged:Boolean;
 	private var _isSequenceSet:Boolean = false;
 	private var _isDragging:Boolean;
 	private var monitor_y:Number;
@@ -128,16 +130,23 @@ class MonitorModel extends Observable{
 	
 	public function setSequence(activeSeq:Sequence){
 		
-		if(_activeSeq == null){ 
-			setLastSelectedSequence(activeSeq);
-		} else {
-			setLastSelectedSequence(_activeSeq);
-		}
+		//if(_activeSeq == null){ 
+			//setLastSelectedSequence(activeSeq);
+		//} else {
+			//setLastSelectedSequence(_activeSeq);
+		//}
 
 		_activeSeq = activeSeq;
-		if (!getIsSequenceSet){
+		trace("value of isSetSequence (outside if): "+getIsSequenceSet())
+		if (!getIsSequenceSet()){
+			trace("value of isSetSequence (inside if): "+getIsSequenceSet())
 			_monitor.openLearningDesign(_activeSeq)
 		}
+		var seq:Sequence = Sequence(_activeSeq);
+		if (seq.getLearningDesignModel() == null){
+			seq.setLearningDesignModel(getMonitor().ddm);
+		}
+		
 		//_monitor.getContributeActivities(_activeSeq.getSequenceID());
 		setChanged();
 		
@@ -155,7 +164,7 @@ class MonitorModel extends Observable{
 	public function setIsSequenceSet(setSeq:Boolean){
 		_isSequenceSet = setSeq;
 	}
-	
+
 	private function getIsSequenceSet():Boolean{
 		return _isSequenceSet;
 	}
@@ -223,12 +232,24 @@ class MonitorModel extends Observable{
 		return _lastSelectedSeq;
 	}
 
-	public function setIsProgressChanged(isChanged:Boolean):Void{
-		_isProgressChanged = isChanged;
+	public function setIsProgressChangedLesson(isChanged:Boolean):Void{
+		_isLessonProgressChanged = isChanged;
+	}
+	public function setIsProgressChangedSequence(isChanged:Boolean):Void{
+		_isSequenceProgressChanged = isChanged;
+	}
+	public function setIsProgressChangedLearner(isChanged:Boolean):Void{
+		_isLearnerProgressChanged = isChanged;
 	}
 	
-	public function getIsProgressChanged():Boolean{
-		return _isProgressChanged;
+	public function getIsProgressChangedLesson():Boolean{
+		return _isLessonProgressChanged;
+	}
+	public function getIsProgressChangedSequence():Boolean{
+		return _isSequenceProgressChanged;
+	}
+	public function getIsProgressChangedLearner():Boolean{
+		return _isLearnerProgressChanged;
 	}
 	public function setOrganisation(org:Organisation){
 		_org = org;
@@ -869,6 +890,7 @@ class MonitorModel extends Observable{
 	}	
 	
 	public function getActivityKeys():Array{
+		trace("ddmActivity_keys length: "+ ddmActivity_keys.length)
 		return ddmActivity_keys;
 	}
 	
