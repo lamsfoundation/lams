@@ -634,6 +634,16 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 
 		String activeModule=request.getParameter(ACTIVE_MODULE);
 		logger.debug("activeModule: " + activeModule);
+		
+		String onlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
+		logger.debug("onlineInstructions: " + onlineInstructions);
+		
+		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
+		logger.debug("offlineInstructions: " + offlineInstructions);
+		
+		sessionMap.put(ONLINE_INSTRUCTIONS_KEY, onlineInstructions);
+		sessionMap.put(OFFLINE_INSTRUCTIONS, offlineInstructions);
+
 
 		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		logger.debug("strToolContentID: " + strToolContentID);
@@ -654,6 +664,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= QaUtils.buildGeneralAuthoringDTO(request, qaService, qaContent, qaAuthoringForm);
 		logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+		
+	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
 
         Map mapQuestionContent=(Map)sessionMap.get(MAP_QUESTION_CONTENT_KEY);
         logger.debug("mapQuestionContent: " + mapQuestionContent);
@@ -674,13 +688,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
   		qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-        String onlineInstructions=(String)sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
-        logger.debug("onlineInstructions: " + onlineInstructions);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-        String offlineInstructions=(String)sessionMap.get(OFFLINE_INSTRUCTIONS_KEY);
-        logger.debug("offlineInstructions: " + offlineInstructions);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList=(List)sessionMap.get(ATTACHMENT_LIST_KEY);
 	    logger.debug("attachmentList: " + attachmentList);
@@ -759,7 +766,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 
 		String activeModule=request.getParameter(ACTIVE_MODULE);
 		logger.debug("activeModule: " + activeModule);
+		
+		
+		String onlineInstructions=(String) sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
+		logger.debug("onlineInstructions: " + onlineInstructions);
 
+		String offlineInstructions=(String) sessionMap.get(OFFLINE_INSTRUCTIONS);
+		logger.debug("offlineInstructions: " + offlineInstructions);
+		
 		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		logger.debug("strToolContentID: " + strToolContentID);
 		
@@ -768,6 +782,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		
 		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("qaContent: " + qaContent);
+		
+		
 		
 		if (qaContent == null)
 		{
@@ -779,6 +795,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= QaUtils.buildGeneralAuthoringDTO(request, qaService, qaContent, qaAuthoringForm);
 		logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+		
+	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
 		
 		qaGeneralAuthoringDTO.setSbmtSuccess( new Integer(0).toString());
         Map mapQuestionContent=(Map)sessionMap.get(MAP_QUESTION_CONTENT_KEY);
@@ -797,13 +817,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 	             qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
         
-        String onlineInstructions=(String)sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
-        logger.debug("onlineInstructions: " + onlineInstructions);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-        String offlineInstructions=(String)sessionMap.get(OFFLINE_INSTRUCTIONS_KEY);
-        logger.debug("offlineInstructions: " + offlineInstructions);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
         String richTextTitle = (String)sessionMap.get(ACTIVITY_TITLE_KEY);
 	 	String richTextInstructions = (String)sessionMap.get(ACTIVITY_INSTRUCTIONS_KEY);

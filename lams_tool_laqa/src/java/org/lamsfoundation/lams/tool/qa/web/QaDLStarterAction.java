@@ -106,7 +106,6 @@ public class QaDLStarterAction extends Action implements QaAppConstants {
 		logger.debug("init defineLater mode. removed attributes...");
 		
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-		request.getSession().setAttribute(TOOL_SERVICE, qaService);
 		
 	    QaStarterAction qaStarterAction= new QaStarterAction();
 	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);

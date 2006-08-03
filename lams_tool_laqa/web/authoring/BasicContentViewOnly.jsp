@@ -32,13 +32,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<tr> 
 	 							<td> <b>  <bean:message key="label.authoring.title"/>: </b> </td>
 						 		<td NOWRAP> 
-	                                     <c:out value="${activityTitle}" escapeXml="false"/>
+	                                     <c:out value="${qaGeneralAuthoringDTO.activityTitle}" escapeXml="false"/>
 								</td> 
 						  	</tr>
 						  	<tr> 
 	 							<td> <b> <bean:message key="label.authoring.instructions"/>:  </b></td>
 						 		<td NOWRAP> 
-	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
+	                                    <c:out value="${qaGeneralAuthoringDTO.activityInstructions}" escapeXml="false"/>
 								</td>
 							</tr>
 					
@@ -47,15 +47,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									 <b> <bean:message key="label.question1"/>:  </b>
 							 	</td>
 							  	<td>
-										<c:out value="${sessionScope.defaultQuestionContent}"  escapeXml="false"/>
+										<c:out value="${qaGeneralAuthoringDTO.defaultQuestionContent}"  escapeXml="false"/>
 							  	</td>
 						  	</tr>
 	
 				  		<!-- if there is more than just the default content start presenting them -->
-				  	 		<c:set var="queIndex" scope="session" value="1"/>
-							<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
+				  	 		<c:set var="queIndex" scope="request" value="1"/>
+							<c:forEach var="questionEntry" items="${qaGeneralAuthoringDTO.mapQuestionContent}">
 						  		<c:if test="${questionEntry.key > 1}"> 			
-									<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 									  <tr>
 			 							<td class="field-name"> <b> <c:out value="Question ${queIndex}"/>:  </b></td>
 									  	<td>
@@ -64,7 +64,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  </tr>
 								</c:if> 			
 							</c:forEach>
-							<html:hidden property="toolContentId" value="${QaAuthoringForm.toolContentId}"/>
 							<html:hidden property="questionIndex"/>
 				
 						<tr>
