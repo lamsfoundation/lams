@@ -140,6 +140,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
 
+		request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
+		
 		return mapping.findForward("success");
 	}
 
@@ -191,6 +193,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		// add the sessionMapID to form
 		authForm.setSessionMapID(map.getSessionID());
 
+		request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
+		
 		return mapping.findForward("success");
 	}
 
