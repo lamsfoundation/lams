@@ -56,7 +56,7 @@
 			<td colspan="4">
 				<c:choose>
 					<c:when test="${empty topic.message.report.mark}">
-						<c:out value="Not Available" />
+						<fmt:message key="message.not.avaliable" />
 					</c:when>
 					<c:otherwise>
 						<c:out value="${topic.message.report.mark}" escapeXml="false" />
@@ -91,5 +91,10 @@
 			</td>
 		</tr>
 	</c:forEach>
+	<tr>
+		<td>
+			<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
+		</td>
+	</tr>
 </table>
 

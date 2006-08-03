@@ -100,4 +100,9 @@
 
 		</c:forEach>
 	</c:forEach>
+	<tr>
+		<td>
+			<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
+		</td>
+	</tr>
 </table>

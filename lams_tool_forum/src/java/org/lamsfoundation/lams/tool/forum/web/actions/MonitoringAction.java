@@ -40,6 +40,8 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -336,8 +338,8 @@ public class MonitoringAction extends Action {
 		ForumUser user = forumService.getUser(userUid);
 
 		// each back to web page
-		request.setAttribute("topicList", messageList);
-		request.setAttribute("user", user);
+		request.setAttribute(ForumConstants.ATTR_TOPIC_LIST, messageList);
+		request.setAttribute(ForumConstants.ATTR_USER, user);
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		return mapping.findForward("success");
 	}
@@ -374,9 +376,12 @@ public class MonitoringAction extends Action {
 				markForm.setMark("");
 			markForm.setComment(msg.getReport().getComment());
 		}
-		markForm.setUser(user);
-		markForm.setMessageDto(MessageDTO.getMessageDTO(msg));
-		markForm.setSessionId(sessionId);
+		
+		// each back to web page
+		request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
+		request.setAttribute(ForumConstants.ATTR_USER, user);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		
 		return mapping.findForward("success");
 	}
 
@@ -391,6 +396,7 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward updateMark(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
+		MarkForm markForm = (MarkForm) form;
 		Long messageId = new Long(WebUtil.readLongParam(request,
 				ForumConstants.MESSAGE_UID));
 		Long userUid = new Long(WebUtil.readLongParam(request,
@@ -398,29 +404,53 @@ public class MonitoringAction extends Action {
 		Long sessionId = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID));
 
+		String mark = markForm.getMark();
+        ActionErrors errors = new ActionErrors();
+        if (StringUtils.isBlank(mark)) {
+          ActionMessage error = new ActionMessage("error.valueReqd");
+          errors.add("report.mark", error);
+        }else if(!NumberUtils.isNumber(mark)){
+        	ActionMessage error = new ActionMessage("error.mark.needNumber");
+        	errors.add("report.mark", error);
+        }else {
+        	try{
+        		Float.parseFloat(mark);
+        	}catch(Exception e){
+              	ActionMessage error = new ActionMessage("error.mark.invalid.number");
+            	errors.add("report.mark", error);
+        	}
+        }
+        
 		forumService = getForumService();
+		// echo back to web page
+		List messageList = forumService.getMessagesByUserUid(userUid, sessionId);
+		ForumUser user = forumService.getUser(userUid);
 		Message msg = forumService.getMessage(messageId);
+		
+		request.setAttribute(ForumConstants.ATTR_USER, user);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		if(!errors.isEmpty()){
+			// each back to web page
+			request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
+        	saveMessages(request, errors);
+        	return mapping.getInputForward();
+        }
 
-		// save it into database
-		MarkForm markForm = (MarkForm) form;
+		//update message report
+		
 		forumService = getForumService();
 		ForumReport report = msg.getReport();
 		if (report == null) {
 			report = new ForumReport();
 			msg.setReport(report);
 		}
-		report.setMark(new Float(Float.parseFloat(markForm.getMark())));
+		report.setMark(new Float(Float.parseFloat(mark)));
 		report.setComment(markForm.getComment());
+		
+		//echo back to topic list page
+		request.setAttribute(ForumConstants.ATTR_TOPIC_LIST, messageList);
 		forumService.updateTopic(msg);
 
-		// echo back to web page
-		forumService = getForumService();
-		List messageList = forumService
-				.getMessagesByUserUid(userUid, sessionId);
-		ForumUser user = forumService.getUser(userUid);
-		request.setAttribute("topicList", messageList);
-		request.setAttribute("user", user);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		return mapping.findForward("success");
 
 	}

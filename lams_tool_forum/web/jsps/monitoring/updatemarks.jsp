@@ -1,82 +1,71 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
 <html:form action="/monitoring/updateMark" method="post">
-	<c:set var="formBean" value="<%= session.getAttribute("markForm") %>" />
 
 	<table cellpadding="0">
 		<tr>
 			<td colspan="5">
 				<fmt:message key="message.assign.mark" />
-				<c:out value="${formBean.user.loginName}" />
+				<c:out value="${user.loginName}" />
 				,
-				<c:out value="${formBean.user.firstName}" />
-				<c:out value="${formBean.user.lastName}" />
+				<c:out value="${user.firstName}" />
+				<c:out value="${user.lastName}" />
 			</td>
 		</tr>
 
 		<tr>
 			<td>
 				<c:set var="viewtopic">
-					<html:rewrite page="/monitoring/viewTopic.do?messageID=${formBean.messageDto.message.uid}&create=${formBean.messageDto.message.created.time}" />
+					<html:rewrite page="/monitoring/viewTopic.do?messageID=${topic.message.uid}&create=${topic.message.created.time}" />
 				</c:set>
 				<html:link href="javascript:launchPopup('${viewtopic}','viewtopic')">
-					<c:out value="${formBean.messageDto.message.subject}" />
+					<c:out value="${topic.message.subject}" />
 				</html:link>
 			</td>
 			<td>
-				<c:if test="${formBean.messageDto.hasAttachment}">
+				<c:if test="${topic.hasAttachment}">
 					<img src="<html:rewrite page="/images/paperclip.gif"/>">
 				</c:if>
 			</td>
 			<td>
-				<c:out value="${formBean.messageDto.author}" />
+				<c:out value="${topic.author}" />
 			</td>
 			<td>
-				<c:out value="${formBean.messageDto.message.replyNumber}" />
+				<c:out value="${topic.message.replyNumber}" />
 			</td>
 			<td>
-				<fmt:formatDate value="${formBean.messageDto.message.updated}" type="time" timeStyle="short" />
-				<fmt:formatDate value="${formBean.messageDto.message.updated}" type="date" dateStyle="full" />
+				<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />
+				<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
 			</td>
 		</tr>
 	</table>
 	<table>
-		<input type="hidden" name="toolSessionID" value="<c:out value='${formBean.sessionId}'/>" />
-		<input type="hidden" name="messageID" value="<c:out value='${formBean.messageDto.message.uid}'/>" />
-		<input type="hidden" name="userID" value="<c:out value='${formBean.user.uid}'/>" />
+		<input type="hidden" name="toolSessionID" value="<c:out value='${toolSessionID}'/>" />
+		<input type="hidden" name="messageID" value="<c:out value='${topic.message.uid}'/>" />
+		<input type="hidden" name="userID" value="<c:out value='${user.uid}'/>" />
 		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="lable.topic.title.mark" />
-				* :
+			<td colspan="2">
+				<%@ include file="/common/messages.jsp"%>
+			</td>
+		<tr>
+			<td class="field-name" width="100" >
+				<fmt:message key="lable.topic.title.mark" />* 
 			</td>
 			<td>
-				<input type="text" name="mark" value="<c:out value='${formBean.mark}'/>" />
-			</td>
-			<td>
-				<html:errors property="report.mark" />
+				<html:text property="mark"/>
 			</td>
 		</tr>
-
 		<tr>
-			<td colspan="3">
+			<td colspan="2">
+				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />					
 				<lams:SetEditor id="comment" small="true" text="${formBean.comment}" key="lable.topic.title.comment" />
 			</td>
 		</tr>
-
 		<tr>
-			<td colspan="3">
-				<html:errors property="report.comment" />
-			</td>
-		</tr>
-
-		<tr>
-			<td class="field-name" colspan="3">
-				<html:errors property="report.globel" />
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3">
+			<td colspan="2">
 				<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
+				&nbsp;&nbsp;
+				<input type="button" onclick="javascript:history.back();" class="button" value="<fmt:message key="button.cancel"/>">
 			</td>
 		</tr>
 	</table>

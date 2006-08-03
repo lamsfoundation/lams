@@ -25,58 +25,19 @@
 
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.validator.ValidatorForm;
-import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.apache.struts.action.ActionForm;
 /**
  * @struts.form name="markForm"
  * @author Steve.Ni
  * 
  * @version $Revision$
  */
-public class MarkForm  extends ValidatorForm{
+public class MarkForm  extends ActionForm{
 	private static final long serialVersionUID = -4967675292027554366L;
-	private static Logger logger = Logger.getLogger(MarkForm.class.getName());
 	
 	private String mark;
 	private String comment;
-	private ForumUser user;
-	private MessageDTO messageDto;
-	private Long sessionId;
-
-	/**
-     * MessageForm validation method from STRUCT interface.
-     * 
-     */
-    public ActionErrors validate(ActionMapping mapping,
-                                 javax.servlet.http.HttpServletRequest request) {
-        ActionErrors errors = super.validate(mapping, request);
-        try{
-            if ("".equals(mark)) {
-              ActionMessage error = new ActionMessage("error.valueReqd");
-              errors.add("report.mark", error);
-            }else if(!NumberUtils.isNumber(mark)){
-            	ActionMessage error = new ActionMessage("error.mark.needNumber");
-            	errors.add("report.mark", error);
-            }else {
-            	try{
-            		Float.parseFloat(mark);
-            	}catch(Exception e){
-                  	ActionMessage error = new ActionMessage("error.mark.invalid.number");
-                	errors.add("report.mark", error);
-            	}
-            }
-        } catch (Exception e) {
-            logger.error("", e);
-        }
-        return errors;
-    }
-    
 	public String getComment() {
 		return comment;
 	}
@@ -88,28 +49,5 @@ public class MarkForm  extends ValidatorForm{
 	}
 	public void setMark(String mark) {
 		this.mark = mark;
-	}
-	
-    public MessageDTO getMessageDto() {
-		return messageDto;
-	}
-
-	public void setMessageDto(MessageDTO message) {
-		this.messageDto = message;
-	}
-
-	public ForumUser getUser() {
-		return user;
-	}
-
-	public void setUser(ForumUser user) {
-		this.user = user;
-	}
-	public Long getSessionId() {
-		return sessionId;
-	}
-
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
 	}
 }
