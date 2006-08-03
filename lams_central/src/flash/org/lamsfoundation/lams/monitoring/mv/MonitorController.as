@@ -107,7 +107,7 @@ class MonitorController extends AbstractController {
 						LFMessage.showMessageAlert(msg);
 					}
 				hasHit = true;
-				break;
+				
 				}
 				
 			}
