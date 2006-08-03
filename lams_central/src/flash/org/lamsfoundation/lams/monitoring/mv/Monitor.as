@@ -176,7 +176,7 @@ class Monitor {
 	
 	private function loadLessonToMonitor(lessonID:Number){
 		var callback:Function = Proxy.create(monitorModel,monitorModel.loadSequence);
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + lessonID,callback, false);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID),callback, false);
 	}
 	
 	public function reloadLessonToMonitor(){
