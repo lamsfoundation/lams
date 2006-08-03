@@ -134,7 +134,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	function LessonTabView(){
 		trace("loaded lesson tab view")
 		_lessonTabView = this;
-		this._visible = false;
+		//this._visible = false;
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		//Init for event delegation
@@ -151,6 +151,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		btnLabel = Dictionary.getValue('td_goContribute_btn');
 		MovieClipUtils.doLater(Proxy.create(this,setupTab));
+		//MovieClipUtils.doLater(Proxy.create(this,draw));
 	}    
 	
 	/**
@@ -175,12 +176,14 @@ public function update (o:Observable,infoObj:Object):Void{
 			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
-					this._visible = true;
+					//this._visible = true;
+					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
+					//mm.getMonitor().getMV().getMonitorScp().contentPath = this;
 					hideMainExp(mm);
 					//mm.setDirty();
 					//MovieClipUtils.doLater(Proxy.create(this,draw));
 					
-					if(mm.getIsProgressChanged()){
+					if(mm.getIsProgressChangedLesson()){
 						trace("I am calling reloadProgress now")
 						reloadProgress(false);
 					}
@@ -188,23 +191,29 @@ public function update (o:Observable,infoObj:Object):Void{
 					setMenu();
 				
 				} else {
-					this._visible = false;
+					mm.getMonitor().getMV().getMonitorLessonScp()._visible = false;
+					//this._visible = false;
 				}
 				break;
 			case 'SEQUENCE' :
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
-					this._visible = true;
+					//this._visible = true;
+					trace("ContentPath: "+this)
+					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
 					hideMainExp(mm);
 					MovieClipUtils.doLater(Proxy.create(this,draw));
+					
+					
 				}else {
-					this._visible = false;
+					mm.getMonitor().getMV().getMonitorLessonScp()._visible = false;
+					//this._visible = false;
 				}
 				break;
 			case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID){
 						trace("called Reload progress")
-						reloadProgress();
+						reloadProgress(true);
 					}
 					break;
 			case 'LM_DIALOG' :
@@ -284,10 +293,12 @@ public function update (o:Observable,infoObj:Object):Void{
 			
 			
 			if (isChanged == false){
-				mm.setIsProgressChanged(false);
+				mm.setIsProgressChangedLesson(false);
 				
 			}else {
-				mm.setIsProgressChanged(true);
+				//mm.setIsProgressChangedLesson(true);
+				mm.setIsProgressChangedLearner(true);
+				mm.setIsProgressChangedSequence(true)
 			}
 			//mm.getMonitor().getProgressData(mm.getSequence());
 			mm.getMonitor().reloadLessonToMonitor();
@@ -332,7 +343,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		setMenu();
 		setStyles();
-		
+		mm.getMonitor().getMV().getMonitorLessonScp().redraw(true);
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -573,7 +584,8 @@ public function update (o:Observable,infoObj:Object):Void{
 				}
 				requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
 				requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
-				requiredTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
+				var styleObj = _tm.getStyleObject('button');
+				requiredTaskList[listCount].goContribute.setStyle('styleName',styleObj); 
 				listCount++
 			}else{
 				// child CA
@@ -640,7 +652,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		
 		if(goBtnYpos != null && goBtnXpos != null){
-			var xpos:Number = (ttData.monitorX + goBtnXpos + btnObj._x)-150;
+			var xpos:Number = mm.getMonitor().getMV().getMonitorLessonScp().width - 150;
 			var ypos:Number = ttData.monitorY + (goBtnYpos +5);
 		}else {
 			var xpos:Number = ttData.monitorX + btnObj._x;
@@ -788,13 +800,14 @@ public function update (o:Observable,infoObj:Object):Void{
 		lessonManager.setSize(s.w-20,lessonManager._height);
 		taskManager.setSize(s.w-20,lessonManager._height);
 		//qTasks_scp.setSize(s.w._width,reqTasks_scp._height);
-		reqTasks_scp.setSize(s.w-30,reqTasks_scp._height);
+		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLessonScp()._height
+		trace("scpHeight in lesson tab:"+scpHeight)
+		reqTasks_scp.setSize(s.w-30,(scpHeight-reqTasks_scp._y)-20);
 		for (var i=0; i<requiredTaskList.length; i++){
 			requiredTaskList[i].contributeActivity._width = reqTasks_scp._width-20;
 			requiredTaskList[i].goContribute._x = reqTasks_scp._width-50
 		}
-		//contributeActivity.textWidth
-				
+		mm.getMonitor().getMV().getMonitorLessonScp().redraw(true);
 	}
 	
 	 /**
