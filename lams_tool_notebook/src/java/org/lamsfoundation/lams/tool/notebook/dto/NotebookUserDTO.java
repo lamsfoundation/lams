@@ -25,7 +25,10 @@
 
 package org.lamsfoundation.lams.tool.notebook.dto;
 
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
+import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 
 public class NotebookUserDTO implements Comparable{
 	
@@ -37,11 +40,25 @@ public class NotebookUserDTO implements Comparable{
 	
 	public String lastName;
 	
+	public NotebookEntryDTO entryDTO;
+
+	public Long entryUID;
+	
+	public NotebookUserDTO(NotebookUser user, NotebookEntry entry) {
+		this.uid = user.getUid();
+		this.loginName = user.getLoginName();
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.entryUID = user.getEntryUID();
+		this.entryDTO = new NotebookEntryDTO(entry);
+	}
+	
 	public NotebookUserDTO(NotebookUser user) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.entryUID = user.getEntryUID();		
 	}
 
 	public int compareTo(Object o) {
@@ -85,5 +102,20 @@ public class NotebookUserDTO implements Comparable{
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
-	
+
+	public NotebookEntryDTO getEntryDTO() {
+		return entryDTO;
+	}
+
+	public void setEntryDTO(NotebookEntryDTO entryDTO) {
+		this.entryDTO = entryDTO;
+	}
+
+	public Long getEntryUID() {
+		return entryUID;
+	}
+
+	public void setEntryUID(Long entryUID) {
+		this.entryUID = entryUID;
+	}
 }

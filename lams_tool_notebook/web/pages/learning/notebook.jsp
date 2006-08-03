@@ -58,5 +58,3 @@
 	</c:if>
 </div>
 <div id="footer-learner"></div>
-
-<lams:HTMLEditor />

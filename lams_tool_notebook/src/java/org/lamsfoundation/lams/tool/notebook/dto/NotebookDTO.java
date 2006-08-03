@@ -60,12 +60,10 @@ public class NotebookDTO {
 
 	public Set<NotebookAttachmentDTO> offlineInstructionsFiles;
 
-	public Set<NotebookSessionDTO> sessionDTOs;
+	public Set<NotebookSessionDTO> sessionDTOs = new HashSet<NotebookSessionDTO>();
 	
 	/* Constructors */
-	public NotebookDTO(){
-		
-	}
+	public NotebookDTO(){}
 	
 	public NotebookDTO(Notebook notebook) {
 		toolContentId = notebook.getToolContentId();
@@ -94,8 +92,6 @@ public class NotebookDTO {
 						+ " contains invalid fileType: " + att.getFileType());
 			}
 		}
-		
-		sessionDTOs = new HashSet<NotebookSessionDTO>();
 		
 		for (Iterator iter = notebook.getNotebookSessions().iterator(); iter.hasNext();) {
 			NotebookSession session = (NotebookSession) iter.next();

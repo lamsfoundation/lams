@@ -5,23 +5,30 @@
 
 <html>
 	<head>
-		<title><c:out value="${notebookDTO.title}" escapeXml="false" /></title>
+		<title><c:out value="${notebookDTO.title}" escapeXml="false" />
+		</title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<lams:css localLinkPath="../"/>
+		<lams:css localLinkPath="../" />
 	</head>
 
 	<body>
-	<div id="page-learner"><!--main box 'page'-->
-	
-		<h1 class="no-tabs-below"><c:out value="${notebookDTO.title}" escapeXml="false" /></h1>
-		<div id="header-no-tabs-learner">
-	
-		</div><!--closes header-->
-	
-		<div id="content-learner">
-	
-			<p><c:out value="${notebookDTO.instructions}" escapeXml="false" /></p>
-	
+		<div id="page">
+			<!--main box 'page'-->
+
+			<h1 class="no-tabs-below">
+				<c:out value="${notebookDTO.title}" escapeXml="false" />
+			</h1>
+			<div id="header-no-tabs">
+
+			</div>
+			<!--closes header-->
+
+			<div id="content">
+
+				<p>
+					<c:out value="${notebookDTO.instructions}" escapeXml="false" />
+				</p>
+
 				<c:if test='${mode == "teacher"}'>
 					<div id="sessionContents">
 						<ul>
@@ -33,22 +40,60 @@
 						</ul>
 					</div>
 				</c:if>
-		
+
 				<c:forEach var="session" items="${notebookDTO.sessionDTOs}">
 					<div id="sid-${session.sessionID}">
 						<h2>
 							${session.sessionName}
 						</h2>
+						<p>
+							&nbsp;
+						</p>
+						<c:forEach var="user" items="${session.userDTOs}">
+							<table>
+								<tr>
+									<th colspan="2">
+										${user.firstName} ${user.lastName }
+									</th>
+								</tr>
+								<tr>
+									<td class="field-name" width="20%">
+										<fmt:message key="label.created" />
+									</td>
+									<td>
+										${user.entryDTO.createDate }
+									</td>
+								</tr>
+								<tr>
+									<td class="field-name" width="20%">
+										<fmt:message key="label.lastModified" />
+									</td>
+									<td>
+										${user.entryDTO.lastModified }
+									</td>
+								</tr>
+
+								<tr>
+									<td class="field-name">
+										<fmt:message key="label.notebookEntry" />
+									</td>
+									<td>
+										<c:out value="${user.entryDTO.entry}" escapeXml="false"></c:out>
+									</td>
+								</tr>
+							</table>
+						</c:forEach>
 					</div>
 				</c:forEach>
-		
-		</div>  <!--closes content-->
-	
-	
-		<div id="footer-learner">
-		</div><!--closes footer-->
-	
-	</div><!--closes page-->
+			</div>
+			<!--closes content-->
+
+			<div id="footer">
+			</div>
+			<!--closes footer-->
+
+		</div>
+		<!--closes page-->
 	</body>
 </html>
 

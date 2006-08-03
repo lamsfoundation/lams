@@ -25,24 +25,23 @@
 
 package org.lamsfoundation.lams.tool.notebook.web.servlets;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookDTO;
+import org.lamsfoundation.lams.tool.notebook.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionDTO;
+import org.lamsfoundation.lams.tool.notebook.dto.NotebookUserDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
+import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -94,7 +93,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
 			throws NotebookException {
 
-		logger.debug("doExportTeacher: toolContentID:" + toolSessionID);
+		logger.debug("doExportLearner: toolContentID:" + toolSessionID);
 
 		// check if toolContentID available
 		if (toolSessionID == null) {
@@ -106,15 +105,32 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		NotebookSession notebookSession = notebookService
 				.getSessionBySessionId(toolSessionID);
 
-		// get all messages for current user and filter.
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
-				AttributeNames.USER);
+		Notebook notebook = notebookSession.getNotebook();
 
-		// get the notebook user
-		NotebookUser notebookUser = notebookService.getUserByUserIdAndSessionId(
-				new Long(user.getUserID()), toolSessionID);
+		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession()
+				.getAttribute(AttributeNames.USER);
 
-		NotebookDTO notebookDTO = new NotebookDTO(notebookSession.getNotebook());
+		NotebookUser notebookUser = notebookService
+				.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),
+						toolSessionID);
+
+		NotebookEntry notebookEntry = notebookService.getEntry(notebookUser
+				.getEntryUID());
+
+		// construct dto's
+		NotebookDTO notebookDTO = new NotebookDTO();
+		notebookDTO.setTitle(notebook.getTitle());
+		notebookDTO.setInstructions(notebook.getInstructions());
+
+		NotebookSessionDTO sessionDTO = new NotebookSessionDTO();
+		sessionDTO.setSessionName(notebookSession.getSessionName());
+		sessionDTO.setSessionID(notebookSession.getSessionId());
+
+		NotebookUserDTO userDTO = new NotebookUserDTO(notebookUser,
+				notebookEntry);
+
+		sessionDTO.getUserDTOs().add(userDTO);
+		notebookDTO.getSessionDTOs().add(sessionDTO);
 
 		request.getSession().setAttribute("notebookDTO", notebookDTO);
 	}
@@ -132,16 +148,23 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new NotebookException(error);
 		}
 
-		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
+		Notebook notebook = notebookService
+				.getNotebookByContentId(toolContentID);
 
 		NotebookDTO notebookDTO = new NotebookDTO(notebook);
-
-		for (Iterator iter = notebook.getNotebookSessions().iterator(); iter
-				.hasNext();) {
-			// NB session DTO will contain all messages in session unfiltered.
-			notebookDTO.getSessionDTOs().add(
-					new NotebookSessionDTO((NotebookSession) iter.next()));
+		
+		// add the notebookEntry for each user in each session
+		
+		for (NotebookSessionDTO session : notebookDTO.getSessionDTOs()) {
+			for (NotebookUserDTO user : session.getUserDTOs()) {
+				NotebookEntry entry = notebookService.getEntry(user.getEntryUID());
+				if (entry != null) { 
+					NotebookEntryDTO entryDTO = new NotebookEntryDTO(entry);
+					user.setEntryDTO(entryDTO);
+				}
+			}
 		}
+		
 		request.getSession().setAttribute("notebookDTO", notebookDTO);
 	}
 

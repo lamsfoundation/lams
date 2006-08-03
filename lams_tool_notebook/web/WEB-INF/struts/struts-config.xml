@@ -81,13 +81,8 @@
         redirect="false"
       />
       <forward
-        name="notebook_client"
-        path="tiles:/monitoring/notebook_client"
-        redirect="false"
-      />
-      <forward
-        name="notebook_history"
-        path="tiles:/monitoring/notebook_history"
+        name="notebook_display"
+        path="tiles:/monitoring/notebook_display"
         redirect="false"
       />
     </action>

@@ -24,10 +24,6 @@
 
 package org.lamsfoundation.lams.tool.notebook.web.actions;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,15 +31,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookDTO;
-import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionDTO;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookUserDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -56,10 +50,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="notebook_client"
- *                        path="tiles:/monitoring/notebook_client"
- * @struts.action-forward name="notebook_history"
- *                        path="tiles:/monitoring/notebook_history"
+ * @struts.action-forward name="notebook_display"
+ *                        path="tiles:/monitoring/notebook_display"
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -70,26 +62,49 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		log.info("excuting monitoring action");
+
+		setupService();
 
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
-		// set up notebookService
-		if (notebookService == null) {
-			notebookService = NotebookServiceProxy.getNotebookService(this.getServlet()
-					.getServletContext());
-		}
-		
-		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
-		
+		Notebook notebook = notebookService
+				.getNotebookByContentId(toolContentID);
+
 		if (notebook == null) {
-			// TODO need to define error page.
+			// TODO error page.
 		}
-		
+
 		NotebookDTO notebookDT0 = new NotebookDTO(notebook);
-		
+
 		request.setAttribute("notebookDTO", notebookDT0);
 		return mapping.findForward("success");
+	}
+
+	public ActionForward showNotebook(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		
+		setupService();
+		
+		Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
+
+		NotebookUser user = notebookService.getUserByUID(uid);
+		NotebookEntry entry = notebookService.getEntry(user.getEntryUID());
+
+		NotebookUserDTO userDTO = new NotebookUserDTO(user, entry);
+
+		request.setAttribute("userDTO", userDTO);
+
+		return mapping.findForward("notebook_display");
+	}
+	
+	/**
+	 * set up notebookService
+	 */
+	private void setupService() {
+		if (notebookService == null) {
+			notebookService = NotebookServiceProxy.getNotebookService(this
+					.getServlet().getServletContext());
+		}
 	}
 }

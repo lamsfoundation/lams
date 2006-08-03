@@ -39,29 +39,31 @@ public class NotebookSessionDTO implements Comparable {
 
 	String sessionName;
 	
-	Set<NotebookUserDTO> userDTOs;
+	Set<NotebookUserDTO> userDTOs = new TreeSet<NotebookUserDTO>();
 	
 	int numberOfLearners;
+	
+	int numberOfFinishedLearners;;
 	
 	public NotebookSessionDTO(NotebookSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
-				
-		userDTOs = new TreeSet<NotebookUserDTO>();
 		
+		numberOfFinishedLearners = 0;
 		for (Iterator iterator = session.getNotebookUsers().iterator(); iterator.hasNext();) {
 			NotebookUser user = (NotebookUser) iterator.next();
 			NotebookUserDTO userDTO = new NotebookUserDTO(user);
-			
+			if (userDTO.getEntryUID() != null) {
+				numberOfFinishedLearners++;
+			}
 			userDTOs.add(userDTO);
 		}
 		
 		numberOfLearners = userDTOs.size();
+		
 	}
 	
-	public NotebookSessionDTO() {
-		userDTOs = new TreeSet<NotebookUserDTO>();
-	}
+	public NotebookSessionDTO() {}
 	
 	public Long getSessionID() {
 		return sessionID;
@@ -103,5 +105,13 @@ public class NotebookSessionDTO implements Comparable {
 
 	public void setNumberOfLearners(int numberOfLearners) {
 		this.numberOfLearners = numberOfLearners;
+	}
+
+	public int getNumberOfFinishedLearners() {
+		return numberOfFinishedLearners;
+	}
+
+	public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
+		this.numberOfFinishedLearners = numberOfFinishedLearners;
 	}
 }

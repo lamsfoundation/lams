@@ -34,6 +34,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -182,7 +183,7 @@ public class LearningAction extends LamsDispatchAction {
 
 			if (notebookUser.getEntryUID() == null) {
 				notebookUser.setEntryUID(notebookService.createNotebookEntry(
-						toolSessionID, 999, NotebookConstants.TOOL_SIGNATURE,
+						toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
 						notebookUser.getUserId().intValue(), learningForm
 								.getEntryText()));
 			} else {
