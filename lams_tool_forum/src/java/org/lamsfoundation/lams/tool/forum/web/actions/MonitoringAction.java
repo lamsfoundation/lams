@@ -30,10 +30,12 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,7 +75,19 @@ public class MonitoringAction extends Action {
 	private static Logger log = Logger.getLogger(MonitoringAction.class);
 
 	private IForumService forumService;
-
+	
+	private class SessionDTOComparator implements Comparator<SessionDTO>{
+		public int compare(SessionDTO o1, SessionDTO o2) {
+			if(o1 != null && o2 != null){
+				int c = o1.getSessionName().compareTo(o2.getSessionName());
+				//to ensure session can be put into map even they have duplicated name.
+				return c==0?1:c;
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+	}
 	public final ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -492,7 +506,7 @@ public class MonitoringAction extends Action {
 				AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 		forumService = getForumService();
-		Map sessionTopicsMap = new HashMap();
+		Map sessionTopicsMap = new TreeMap<SessionDTO, List<MessageDTO>>(this.new SessionDTOComparator());
 		Map sessionAvaMarkMap = new HashMap();
 		Map sessionTotalMsgMap = new HashMap();
 
@@ -586,7 +600,7 @@ public class MonitoringAction extends Action {
 		forumService = getForumService();
 		List sessionsList = forumService.getSessionsByContentId(contentID);
 
-		Map sessionUsersMap = new HashMap();
+		Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
 		// build a map with all users in the submitFilesSessionList
 		Iterator it = sessionsList.iterator();
 		while (it.hasNext()) {
