@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -73,13 +74,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 				return -1;
 		}
 	}
+	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 		
-		request.setAttribute(AttributeNames.PARAM_MODE, mode);
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
+			 request.getSession().setAttribute(AttributeNames.PARAM_MODE, ToolAccessMode.LEARNER);
 			learner(request,response,directoryName,cookies);
 		}else if (StringUtils.equals(mode,ToolAccessMode.TEACHER.toString())){
+			request.getSession().setAttribute(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER);
 			teacher(request,response,directoryName,cookies);
 		}
 		
@@ -117,8 +120,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         Map sessionTopicMap = new TreeMap();
         sessionTopicMap.put(session.getSessionName(), msgDtoList);
         
-		request.setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, msgDtoList);
-		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
+		request.getSession().setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
 		
 		//set forum title 
 		request.setAttribute(ForumConstants.FORUM_TITLE, session.getForum().getTitle());
@@ -150,7 +152,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         List sessionList = forumService.getSessionsByContentId(toolContentID);
         Iterator iter = sessionList.iterator();
         //put all message into Map. Key is session name, value is list of all topics in this session.
-        Map<String,List<MessageDTO>> topicsByUser = new TreeMap<String,List<MessageDTO>>(new StringComparator());
+        Map<String,List<MessageDTO>> topicsByUser = new TreeMap<String,List<MessageDTO>>(this.new StringComparator());
         while(iter.hasNext()){
         	ForumToolSession session = (ForumToolSession) iter.next();
         	List<MessageDTO> sessionMsgDTO = getSessionTopicList(session.getSessionId(), directoryName, forumService);
@@ -179,7 +181,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 						Attachment att = (Attachment) iter.next();
 						try {
 							handler = getToolContentHandler();
-							handler.saveFile(att.getFileUuid(), directoryName);
+							handler.saveFile(att.getFileUuid(), FileUtil.getFullPath(directoryName, att.getFileName()));
 						} catch (Exception e) {
 							logger.equals("Export forum topic attachment failed: " + e.toString());
 						}

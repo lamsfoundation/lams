@@ -19,9 +19,12 @@
 	<h2>
 		<fmt:message key="title.message.view.topic" />
 	</h2>
-<c:forEach var="entry" items=${ToolContentTopicList}">
+<c:forEach var="entry" items="${ToolContentTopicList}">
 	<c:set var="sessionName" value="${entry.key}"/>
-	Message from ${sessionName}:
+	<h2>
+		${sessionName}
+	</h2>
+	
 	<c:set var="topicThread" value="${entry.value}"/>
 	<c:forEach var="msgDto" items="${topicThread}">
 		<c:set var="indentSize" value="${msgDto.level*3}" />
@@ -66,10 +69,7 @@
 					<tr>
 						<td>
 							<c:forEach var="file" items="${msgDto.message.attachments}">
-								<c:set var="downloadURL">
-									<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
-								</c:set>
-								<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
+								<a href="${file.fileName}"> <c:out value="${file.fileName}" /> </a>
 							</c:forEach>
 						</td>
 					</tr>
@@ -78,16 +78,30 @@
 				<c:if test='${mode == "teacher"}'>
 					<tr>
 						<td>
-							<c:if test="${emtpy msgDto.message.report.mark}">
-							</c:if>
-							<c:if test="${msgDto.message.report.mark}">
-								${msgDto.message.report.mark}
-							</c:if>
+							<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
+							<BR>
+							<c:choose>
+								<c:when test="${empty msgDto.mark}">
+									<fmt:message key="message.not.avaliable"/>
+								</c:when>
+								<c:otherwise>
+									${msgDto.mark}
+								</c:otherwise>
+							</c:choose>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<c:out value="${msgDto.message.report.comment}" escapeXml="false" />
+							<span class="field-name" ><fmt:message key="lable.topic.title.comment"/></span>
+							<BR>
+							<c:choose>
+								<c:when test="${empty msgDto.comment}">
+									<fmt:message key="message.not.avaliable"/>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${msgDto.comment}" escapeXml="false" />
+								</c:otherwise>
+							</c:choose>
 						</td>
 					</tr>
 				</c:if>

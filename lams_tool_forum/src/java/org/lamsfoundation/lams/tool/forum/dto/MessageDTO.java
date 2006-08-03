@@ -42,6 +42,9 @@ public class MessageDTO {
 	private int threadNum;
 	private boolean isAuthor;
 	private Float mark;
+	private String comment;
+
+
 
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
@@ -62,8 +65,10 @@ public class MessageDTO {
 			dto.setHasAttachment(true);
 		
 		ForumReport report = msg.getReport();
-		if(report != null && report.getMark() != null)
+		if(report != null && report.getMark() != null){
 			dto.mark = report.getMark();
+			dto.comment = report.getComment();
+		}
 		
 		return dto;
 	}
@@ -90,8 +95,10 @@ public class MessageDTO {
 			else
 				msgDto.setHasAttachment(true);
 			ForumReport report = msg.getReport();
-			if(report != null && report.getMark() != null)
+			if(report != null && report.getMark() != null){
 				msgDto.mark = report.getMark();
+				msgDto.comment = report.getComment();
+			}
 
 			retSet.add(msgDto);
 		}
@@ -143,5 +150,12 @@ public class MessageDTO {
 
 	public void setMark(Float mark) {
 		this.mark = mark;
-	}	
+	}
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }
