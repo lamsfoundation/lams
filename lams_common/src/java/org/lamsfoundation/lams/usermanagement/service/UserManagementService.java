@@ -435,7 +435,22 @@ public class UserManagementService implements IUserManagementService {
                     if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){ 	 
                             Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime); 	 
                             organisation.setWorkspace(workspace); 	 
-                    } 	 
+                    }
+                    
+                    if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){ 	 
+                    		// get course managers and give them staff role in this new class
+                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(organisation.getParentOrganisation().getOrganisationId(),Role.COURSE_MANAGER);
+                    		HashSet uos = new HashSet();
+                    		for(UserDTO m: managers){
+                    				UserOrganisation uo = new UserOrganisation((User)findById(User.class,m.getUserID()),organisation);
+                    				UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)findById(Role.class,Role.ROLE_STAFF));
+                    				HashSet uors = new HashSet();
+                    				uors.add(uor);
+                    				uo.setUserOrganisationRoles(uors);
+                    				uos.add(uo);
+                    		}
+                    		organisation.setUserOrganisations(uos);
+                    } 
             } 	 
 	 
             save(organisation); 	 
