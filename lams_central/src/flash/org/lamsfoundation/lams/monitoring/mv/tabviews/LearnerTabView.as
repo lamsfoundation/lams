@@ -64,7 +64,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var activeLearner:Number;
 	private var prevLearner:Number;
 	private var learnersDrawn:Number;
-	private var learnerListArr:Array;
+	private var learnerListArr:Array = new Array();
 	
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
@@ -118,7 +118,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		V_GAP = 10;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
-		
+		mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
     }    
 	
 	/**
@@ -139,30 +139,29 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
-						this._visible = true;
+						//this._visible = true;
+						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = true;
 						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
-							break;
+							
+						}else {
+									
+							if (learnersDrawn != mm.allLearnersProgress.length){
+								drawAllLearnersDesign(mm, infoObj.tabID)
+							}
+							
+							if(mm.getIsProgressChangedLearner()){
+								reloadProgress(false);
+							}
 						}
-						
-						trace("learnerDrawn are: "+learnersDrawn)
-						trace("all learner progress length is: "+mm.allLearnersProgress.length)
-						
-						if (learnersDrawn != mm.allLearnersProgress.length){
-							drawAllLearnersDesign(mm, infoObj.tabID)
-						}
-						
-						if(mm.getIsProgressChanged()){
-							reloadProgress(false);
-						}
-						
 						LFMenuBar.getInstance().setDefaults();
 						
 					}else {
-						this._visible = false;
+						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
+						//this._visible = false;
 					}
 					break;
 				case 'PROGRESS' :
@@ -173,7 +172,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					
 				case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID){
-						reloadProgress()
+						reloadProgress(true)
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
@@ -207,9 +206,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     * layout visual elements on the MonitorTabView on initialisation
     */
 	private function draw(){
-		//activityArr = new Array;
-		//bkg_pnl = this.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
-
 		//set up the Movie Clips to load relevant  
 
 		_learnersLayer_mc = this.createEmptyMovieClip("_learnersLayer_mc", this.getNextHighestDepth());
@@ -279,10 +275,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			//}
 			if (isChanged == false){
-				mm.setIsProgressChanged(false);
-				
+				mm.setIsProgressChangedLearner(false);
+				mm.setIsProgressChangedSequence(true)
 			}else {
-				mm.setIsProgressChanged(true);
+				mm.setIsProgressChangedLesson(true);
+				mm.setIsProgressChangedSequence(true)
 			}
 			mm.getMonitor().getProgressData(mm.getSequence());
 			
@@ -297,6 +294,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			ACT_X = 0;
 			ACT_Y = (j*80)+35;
 			mm.drawDesign(tabID, mm.allLearnersProgress[j]);
+			setSize(mm);
 		}
 	}
 	
@@ -325,13 +323,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
 		trace("Monitor Tab Grid Width: "+z.w+" Monitor Tab Grid Height: "+z.h);
 		
-		_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y, z.w-20, 20);
-		_activityLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _activityLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2} )
+		_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X+2, ACT_Y, z.w-22, 20);
+		_activityLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _activityLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )
 		var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
 		
 		var learnerExp_btn = _activityLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
 		learnerExp_btn.setSize(90, 17);
-		learnerExp_btn.setStyle('styleName',styleObj);
 		learnerExp_btn.onRelease = function (){
 			//trace("Contribute Type is: "+o.taskURL);
 			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
@@ -345,23 +342,25 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerName_txt.border = true;
 		learnerName_txt.selectable = false;
 		learnerName_txt.background = true;
-		learnerName_txt.backgroundColor = 0xCCCCCC;
+		learnerName_txt.backgroundColor = 0xE7EEFE;
+		learnerName_txt.textColor = 0x555555;
 		learnerName_txt.setNewTextFormat(nameTextFormat);
 		learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
 		trace("Ypos for name field is: "+ACT_Y)
-		
-		learnerListArr[count][0] = learnerName_txt
-		learnerListArr[count][1] = learnerExp_btn
+		var tempObj = new Object()
+		tempObj.learnerName = learnerName_txt
+		tempObj.learnerButton = learnerExp_btn
+		learnerListArr.push(tempObj)
 		
 		count++
 	}
 
 	public function showToolTip(btnObj, btnTT:String):Void{
+		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp().width
+		trace("xlocation for tooltip: "+scpWidth)
 		var btnLabel = btnObj.label;
-		var xpos:Number;
-		xpos = btnObj._x - 65
-		
-		var Xpos = Application.MONITOR_X+ xpos;
+		var xpos:Number = scpWidth - 190
+		var Xpos = xpos;
 		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
 		var ttHolder = Application.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
@@ -412,15 +411,16 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 		
 		var actItems:Number = mm.activitiesDisplayed.size()
+		
 		if (actItems < mm.getActivityKeys().length){
+			trace("total: "+mm.getActivityKeys().length)
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
 		s = true;
 		//actLenght++;
-		mm.getMonitor().getMV().getMonitorScp().redraw(true);
-		if (count == mm.getActivityKeys().length-1){
-			setSize(mm);
-		} 
+		trace("total activities: "+mm.getActivityKeys().length-1)
+		//setSize(mm);
+		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 		return s;
 	}
 
@@ -457,12 +457,24 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
+		
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
+		trace("scp width: "+mm.getMonitor().getMV().getMonitorLearnerScp()._width)
+		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width
+		var newWidth:Number
+		if (_activityLayer_mc._width < scpWidth){
+			newWidth = scpWidth - 6
+		}else {
+			newWidth = _activityLayer_mc._width
+		}
 		for (var i=0; i<learnerListArr.length; i++){
-			learnerListArr[i][0]._width = _activityLayer_mc._width;
-			learnerListArr[i][1]._x = _activityLayer_mc._width-110;
+			trace("button is: "+learnerListArr[i].learnerButton)
+			learnerListArr[i].learnerName._width = newWidth;
+			learnerListArr[i].learnerButton._x = newWidth-110;
 			//learnerListArr[i][1].
 		}
+		
+		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 	}
 	
 	 /**
