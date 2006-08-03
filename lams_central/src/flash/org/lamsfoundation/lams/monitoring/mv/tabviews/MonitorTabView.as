@@ -116,6 +116,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		V_GAP = 10;
 		//drawDesignCalled = false;
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
+		mm.getMonitor().getMV().getMonitorSequenceScp()._visible = false;
 		
     }    
 	
@@ -136,26 +137,35 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					setSize(mm);
 					break;
 				case 'TABCHANGE' :
-					trace("isChanged value in monitorModel is: "+mm.getIsProgressChanged())
+					//trace("isChanged value in monitorModel is: "+mm.getIsProgressChanged())
 					if (infoObj.tabID == _tabID){
 						setStyles();
-						this._visible = true;
+						//this._visible = true;
+						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = true;
 						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
-						}else if (drawDesignCalled == undefined){
-							drawDesignCalled = "called";
-							mm.drawDesign(infoObj.tabID);
-						}else if(mm.getIsProgressChanged()){
-							trace("I am calling reloadProgress now")
-							reloadProgress(false);
+						}else {
+							
+							if (drawDesignCalled == undefined){
+								drawDesignCalled = "called";
+								mm.drawDesign(infoObj.tabID);
+							}
+							
+							if(mm.getIsProgressChangedSequence()){
+								trace("I am calling reloadProgress now")
+								reloadProgress(false);
+							}
 						}
+						
+						
 						
 						LFMenuBar.getInstance().setDefaults();
 						
 					}else {
-						this._visible = false;
+						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = false;
+						//this._visible = false;
 					}
 					break;
 				case 'PROGRESS' :
@@ -311,10 +321,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 			endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 			
 			if (isChanged == false){
-				mm.setIsProgressChanged(false);
+				mm.setIsProgressChangedSequence(false);
 				
 			}else {
-				mm.setIsProgressChanged(true);
+				mm.setIsProgressChangedLesson(true);
+				mm.setIsProgressChangedLearner(true);
+				//mm.setIsProgressChangedSequence(true)
 			}
 			mm.getMonitor().getProgressData(mm.getSequence());
 	}
@@ -388,8 +400,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		
 		var actItems:Number = mm.activitiesDisplayed.size()
 		if (actItems < mm.getActivityKeys().length){
+			trace("total activities: "+mm.getActivityKeys().length)
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
+		if (actItems == mm.getActivityKeys().length){
+			//setSize(mm);
+		} 
+		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 		s = true;
 		
 		return s;
@@ -428,7 +445,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private function setStyles():Void{
 		var styleObj = _tm.getStyleObject('CanvasPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
-		styleObj = _tm.getStyleObject('WZPanel');
+		styleObj = _tm.getStyleObject('MHPanel');
 		endGate_mc.bg_pnl.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('BGPanel');
 		endGate_mc.bar_pnl.setStyle('styleName',styleObj);
@@ -443,17 +460,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
         var s:Object = mm.getSize();
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		//monitor_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(s.w-17,s.h-17);
+		bkg_pnl.setSize(s.w,s.h);
 		endGate_mc._y = s.h-endGateOffset;
-		endGate_mc.bg_pnl.setSize(s.w-17,endGate_mc.bg_pnl.height);
-		endGate_mc.bar_pnl.setSize(s.w-37,endGate_mc.bar_pnl.height);
-		endGate_mc.tt_btn.setSize(s.w-17,endGate_mc.bg_pnl.height);
+		endGate_mc.bg_pnl.setSize(s.w,endGate_mc.bg_pnl.height);
+		endGate_mc.bar_pnl.setSize(s.w-20,endGate_mc.bar_pnl.height);
+		endGate_mc.tt_btn.setSize(s.w,endGate_mc.bg_pnl.height);
 		for (var i=0; i<finishedLearnersList.length; i++){
 			finishedLearnersList[i]._y = endGate_mc._y+learner_Y
 		}
-		mm.getMonitor().getMV().getMonitorScp().redraw(true); 
+		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true); 
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-17),Math.round(s.h-17),V_GAP,H_GAP);
+		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 				
 	}
 	
