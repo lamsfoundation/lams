@@ -196,6 +196,8 @@ INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_cod
 VALUES (16, 'th', null, 'Thai');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (17, 'el', null, 'Greek');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
+VALUES (18, 'nl', null, 'Dutch');
 
 -- to be removed when the admin converted over to use lams_supported_locale
 INSERT INTO lams_country VALUES (1, 'AU');
