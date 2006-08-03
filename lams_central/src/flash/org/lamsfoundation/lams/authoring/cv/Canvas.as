@@ -261,7 +261,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				}
 			}
 		} else if(canvasModel.autoSaveWait) {
-			
+			discardAutoSaveDesign();
 		}
 		
 	}
@@ -272,10 +272,16 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @usage   
 	 * @return  
 	 */
-	
-	public function showAutoSaveMessage(title:String, savetime:Number) {
-		LFMessage.showMessageAlert(Dictionary.getValue('cv_design_autosave_rec', [title, savetime]));
+
+	public function showRecoverMessage() {
+		var recData:Object = CookieMonster.open(AUTOSAVE_TAG + _root.userID,true);
+		
+		//var timeDiff:Number = new Date().getTime() - recData.lastModifiedDateTime.getTime();
+		//var saveDelay:Number = timeDiff/1000/60;
+		
+		LFMessage.showMessageConfirm(Dictionary.getValue('al_autosave_rec'), Proxy.create(this, recoverDesign, recData), Proxy.create(this, discardAutoSaveDesign), null, null, Dictionary.getValue('al_autosave_rec_title'));
 	}
+	
 	
 	/**
 	 * Recover design data from SharedObject and save.
@@ -284,16 +290,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	
-	public function recoverDesign() {
-		var recData:Object = CookieMonster.open(AUTOSAVE_TAG + _root.userID,true);
-		
-		var timeDiff:Number = new Date().getTime() - recData.lastModifiedDateTime.getTime();
-		var saveDelay:Number = timeDiff/1000/60;
-		
-		showAutoSaveMessage(recData.title, Math.round(saveDelay));
+	public function recoverDesign(recData:Object) {
 		setDesign(recData);
 		discardAutoSaveDesign();
-		
 	}
 	
 	private function discardAutoSaveDesign() {
@@ -627,9 +626,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			checkValidDesign();
 			checkReadOnlyDesign();
 			canvasModel.setDirty();
-			if(!canvasModel.autoSaveWait){
-				LFMenuBar.getInstance().enableExport(true);
-			}
+			LFMenuBar.getInstance().enableExport(!canvasModel.autoSaveWait);
 		}else{
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
