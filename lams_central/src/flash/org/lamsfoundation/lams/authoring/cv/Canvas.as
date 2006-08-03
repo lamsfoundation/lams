@@ -256,7 +256,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				
 				if(!res){
 					// error auto-saving
-					var msg:String = Dictionary.getValue('cv_design_autosave_err');
+					var msg:String = Dictionary.getValue('cv_autosave_err_msg');
 					LFMessage.showMessageAlert(msg);
 				}
 			}
@@ -279,7 +279,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//var timeDiff:Number = new Date().getTime() - recData.lastModifiedDateTime.getTime();
 		//var saveDelay:Number = timeDiff/1000/60;
 		
-		LFMessage.showMessageConfirm(Dictionary.getValue('al_autosave_rec'), Proxy.create(this, recoverDesign, recData), Proxy.create(this, discardAutoSaveDesign), null, null, Dictionary.getValue('al_autosave_rec_title'));
+		LFMessage.showMessageConfirm(Dictionary.getValue('cv_autosave_rec_msg'), Proxy.create(this, recoverDesign, recData), Proxy.create(this, discardAutoSaveDesign), null, null, Dictionary.getValue('cv_autosave_rec_title'));
 	}
 	
 	
