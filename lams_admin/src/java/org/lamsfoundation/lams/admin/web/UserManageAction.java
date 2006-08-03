@@ -110,12 +110,12 @@ public class UserManageAction extends Action {
         // check permission
 		if(request.isUserInRole(Role.SYSADMIN)){
 			request.setAttribute("canAdd",true);
-		}else if(!getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)){
+		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) || getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
+			request.setAttribute("canAdd",orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
+		}else{
 			errors.add("authorisation",new ActionMessage("error.authorisation"));
 			saveErrors(request,errors);
 			return mapping.findForward("error");
-		}else{
-			request.setAttribute("canAdd",orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 		}
 		
 		// get list of users in org
