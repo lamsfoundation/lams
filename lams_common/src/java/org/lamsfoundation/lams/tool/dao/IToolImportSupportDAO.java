@@ -29,4 +29,7 @@ public interface IToolImportSupportDAO
 {
 	/** Get all the ToolImportSupport objects which record support for the given old tool signature */
     public List getToolSignatureWhichSupports(String oldToolSignature);
+    
+    /** Get all the ToolImportSupport objects */
+    public List getAllToolImportSupport();
 }

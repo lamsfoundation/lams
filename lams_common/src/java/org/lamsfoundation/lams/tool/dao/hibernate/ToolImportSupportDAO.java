@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.lamsfoundation.lams.tool.ToolImportSupport;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -34,6 +35,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class ToolImportSupportDAO extends HibernateDaoSupport implements IToolImportSupportDAO
 {
 	private static final String LOAD_BY_OLD_SIG = "from tis in class ToolImportSupport where tis.supportsToolSignature=:supportsToolSignature";
+	private static final String FIND_ALL = "from obj in class " + ToolImportSupport.class.getName();
 	
 	/** Get all the ToolImportSupport objects which record support for the given old tool signature */
     public List getToolSignatureWhichSupports(final String oldToolSignature) {
@@ -47,6 +49,10 @@ public class ToolImportSupportDAO extends HibernateDaoSupport implements IToolIm
             }
         });
 
+    }
+
+    public List getAllToolImportSupport(){    	
+    	return this.getHibernateTemplate().find(FIND_ALL);
     }
 
 }

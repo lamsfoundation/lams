@@ -42,6 +42,8 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
@@ -59,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /** Create a learning design from the LAMS 1.0.x WDDX packet. Used by the Import action. */
 public class LD102Importer {
@@ -89,21 +92,24 @@ public class LD102Importer {
 	 */
 	private Map<Integer, Grouping> newGroupings= new HashMap<Integer, Grouping>();
 	
-	/** put aside all the transitions as we find them and process them after the activities. */
-	private List<Hashtable> transitionsToDo = new ArrayList<Hashtable>();
+	/** put aside all the optional activities as we find them and process after the first pass through the activities. */
+	private Set<Hashtable> optionalActivitiesToDo = new HashSet<Hashtable>();
+	/** put aside all the transitions as we find them and process them after the activities (including the optional activities. */
+	private Set<Hashtable> transitionsToDo = new HashSet<Hashtable>();
 	/** as we create an activity, stick it in this map so we can find it quickly later (ie while processing transitions). Key is the UI ID */
 	private Map<Integer, Activity> newActivityMap = new HashMap<Integer, Activity>();
 	/** we are "losing" a level of activity when we combined activity and task levels, so need to keep the relationships for getting the 
 	 * right activity for a transition. Key is parent ui id, value is the child ui id
 	 */ 
 	private Map<Integer, Integer> flattenedActivityMap = new HashMap<Integer, Integer>();
-	/** images to use for each tool, based on the library activities in the database. Key is tool id, value is url. */
-	private Map<Long, String> libraryActivityUiImages;
 	/** store the content by content id field, ready for use when the matching activity is processed */
 	private Map<Integer, Hashtable> contentMap = new HashMap<Integer, Hashtable>();
 
-	/** The value to be past back and forth with the 1.0.x authoring tool to indicate a null value for a numeric id */
-	private static final Long NUMERIC_NULL_VALUE_LONG = new Long(-1);
+	/** images to use for each tool, based on the library activities in the database. Key is tool id, value is url. */
+	private Map<Long, String> libraryActivityUiImages;
+	/** Map of the 1.0.2 tool signature (key) to the tool which now supports it (value) */
+	private Map<String, Tool> toolImportSupport;
+
 	/** The value to be past back and forth with the 1.0.x authoring tool to indicate a null value for a numeric id */
 	private static final Integer NUMERIC_NULL_VALUE_INTEGER = new Integer(-1);
 	
@@ -152,7 +158,8 @@ public class LD102Importer {
 			toolsErrorMsgs = new ArrayList<String>();
 		}
 		
-		this.libraryActivityUiImages = getLibraryActivityUiImages();  
+		this.libraryActivityUiImages = getLibraryActivityUiImages();
+		this.toolImportSupport = getToolImportSupport();
 	}
 	
 	public void setLearningDesignService(ILearningDesignService learningDesignService) {
@@ -397,23 +404,21 @@ public class LD102Importer {
 
 		// activities
 		Vector newActivitiesTransitions = (Vector) newLdHashTable.get(WDDXTAGS102.LD_ACTTRAN);
-		Set optionalActivitiesToProcess = null;
-		if ( newActivitiesTransitions == null )
-		{
+		if ( newActivitiesTransitions == null ) {
 			// log warning - no activities found in learning design.
 			log.warn("No activities or transitions were found for  #"+ldInProgress.getLearningDesignId());
-		}
-		else 
-		{
-			optionalActivitiesToProcess = processActivitiesTransitions(newActivitiesTransitions);
+		} else {
+			processActivitiesTransitions(newActivitiesTransitions);
 		}
 		
-	//	processOptionalActivities(optionalActivitiesToProcess);
+		for ( Hashtable optionTable : optionalActivitiesToDo) {
+			setupOptionalActivity(optionTable);
+		}
 		ldInProgress.setFirstActivity(ldInProgress.calculateFirstActivity());
 		
 		// all activities are set up so now we can do the transitions
 		for ( Hashtable transTable: transitionsToDo ) {
-			processTransition(transTable);
+			setupTransition(transTable);
 		}
 		
 		// now set up the activity -> grouping defn links. Can't be done earlier as there
@@ -513,10 +518,8 @@ public class LD102Importer {
 	/** Process the activities and transitions. Returns a list of optional Activities yet to
 	 * be processed.
 	 */
-	protected Set processActivitiesTransitions(List newActivitiesTransitions)
+	protected void processActivitiesTransitions(List newActivitiesTransitions)
 	{	
-		Set newOptionalActivities = new HashSet();
-										
 		Iterator tempIterator = newActivitiesTransitions.iterator();
 		while ( tempIterator.hasNext() )
 		{
@@ -533,24 +536,21 @@ public class LD102Importer {
 
 			try {
 				Integer objId = WDDXProcessor.convertToInteger("Activity/Transition ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID) );
-				if ( NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-				{
+				if ( NUMERIC_NULL_VALUE_INTEGER.equals(objId) ) {
 					String message = "Id value for activity/transition is internal null value. The activity/transition may not appear in the correct place in the sequence. Activity/transition is "+clientObj;
 					log.warn(message);
 					toolsErrorMsgs.add(message);
 				}
 	
-				if ( isActivity(objectType) )
-				{
+				if ( isActivity(objectType) ) {
 					processActivity(clientObj, objId);
 				}
-				else if ( isOptionalActivity(objectType) )
-				{
+				else if ( isOptionalActivity(objectType) ) {
 					// put aside for processing later.
-					newOptionalActivities.add(clientObj);				
+					optionalActivitiesToDo.add(clientObj);				
 				}	
-				else
-				{
+				else				{
+					// put aside for processing later.
 					transitionsToDo.add(clientObj);
 				}
 				
@@ -560,41 +560,52 @@ public class LD102Importer {
 
 		}
 		
-		return newOptionalActivities;
-		
 	}
 
 	private void processActivity(Hashtable activityDetails, Integer activityUIID) throws WDDXProcessorConversionException {
 
-//		Long activityUIID = ui_id;
-//		Long systemID =  WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.SID);
+		// Long systemID =  WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.SID); not needed
 		Long nextTransition;
 		nextTransition = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.FOLLOWING_TRANSITION);
 		Integer xCoOrd = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_X);
 		Integer yCoOrd = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_Y);
-//		Long firstTask = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.ACT_FIRSTTASK);
-//		String libraryID = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.ACT_LIBRARY_ID);
-//		String title = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.TITLE);
-//		String description = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.DESCRIPTION);
+		// Long firstTask = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.ACT_FIRSTTASK); 
+		// String libraryID = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.ACT_LIBRARY_ID); not needed
+		String title = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.TITLE);
+		String description = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.DESCRIPTION);
 		List taskTransitions = 	(List)activityDetails.get(WDDXTAGS102.ACT_TASKTRAN);
 		
 		Activity activity = null;
 		if ( taskTransitions.size()==1 ) {
-			// easiest case - this is really a single activity 
 			Hashtable task = (Hashtable) taskTransitions.get(0);
-			activity = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID);
+			activity = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
 		} else {
-			// TODO parallel and optional
+			// TODO combined pairs - probably a reflective bit on the second part.
+			// TODO do use for reflection bit public static final String MTASK_INPUT_CONTENT_TASK = "inputContentTask";
+//			 TODO do use for reflection bit public static final String MTASK_OUTPUT_CONTENT_TASK = "outputContentTask";
+/*			Integer taskId = WDDXProcessor.convertToInteger("InputContentTask",
+								clientObj.get(WDDXTAGS102.MTASK_INPUT_CONTENT_TASK));
+			if ( ! LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
+			multiTask.setInputContentTask(taskId);
+			else
+			multiTask.setInputContentTask(null);
+			
+			taskId = WDDXProcessor.convertToInteger("OutputContentTask",
+								clientObj.get(WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK));
+			if ( ! LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
+			multiTask.setOutputContentTask(taskId);
+			else
+			multiTask.setOutputContentTask(null);
+	*/
 		}
 		
-		if ( activity != null ) {
-			newActivityMap.put(activity.getActivityUIID(), activity);
-			flattenedActivityMap.put(activityUIID, activity.getActivityUIID());
-		}
 		
 	}
 
-	private Activity createActivityFromTask(Hashtable taskDetails, Long nextTransition, Integer xCoOrd, Integer yCoOrd, Integer parentActivityId) throws WDDXProcessorConversionException {
+	/** Handles simple (including grouping), parallel and optional activities. Can cope with the sub activities but not
+	 * transitions between activities. */ 
+	private Activity createActivityFromTask(Hashtable taskDetails, Long nextTransition, Integer xCoOrd, Integer yCoOrd, 
+			Integer parentActivityId, String parentTitle, String parentDescription) throws WDDXProcessorConversionException {
 		
 		String objectType = (String) taskDetails.get(WDDXTAGS102.OBJECT_TYPE);
 		String toolType = (String) taskDetails.get(WDDXTAGS102.TASK_TOOLTYPE);
@@ -610,17 +621,10 @@ public class LD102Importer {
 			toolsErrorMsgs.add(message);
 		}
 
-		if ( isMultiTask(objectType, toolType) )
-		{
-			toolsErrorMsgs.add("Hit a multitask - not yet implemented.");
-			activity.setActivityTypeId(Activity.PARALLEL_ACTIVITY_TYPE);
-		    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-		    activity.setActivityUIID(taskUIID);
-//			TODO activity = new OptionsActivity();
-//			TODO activity = new ParallelActivity();
+		if ( isMultiTask(objectType, toolType) ) {
+			activity = setupParallelActivity(taskDetails, contentId, taskUIID, parentTitle, parentDescription);
 		}
-		else if ( isGroupingToolTask(objectType, toolType) )
-		{
+		else if ( isGroupingToolTask(objectType, toolType) ) {
 			activity = setupGroupingActivity(taskDetails, contentId, taskUIID, parentActivityId);
 		}
 		else {
@@ -628,32 +632,88 @@ public class LD102Importer {
 		}
 		
 		if ( activity != null ) {
-			
-			// title and description may already be set up.
-			if ( activity.getDescription() == null && keyExists(taskDetails, WDDXTAGS102.DESCRIPTION))
-		        activity.setDescription(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.DESCRIPTION));
-		    if ( activity.getTitle() == null && keyExists(taskDetails, WDDXTAGS102.TITLE))
-		        activity.setTitle(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.TITLE));
-	
-		    activity.setXcoord(xCoOrd);
-	        activity.setYcoord(yCoOrd);
-	        activity.setHelpText(null);
-	
-			activity.setApplyGrouping(false); // not nullable so default to false
-	        parseGroupingValue(taskDetails.get(WDDXTAGS102.TASK_GROUPING), activity);
-	        activity.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
-	        
-	//		TODO if (keyExists(activityDetails, WDDXTAGS.ORDER_ID))
-	//		    activity.setOrderId(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ORDER_ID));
-		    
-		    activity.setDefineLater(Boolean.FALSE);
-			activity.setLearningDesign(ldInProgress);
-		    activity.setCreateDateTime(createDate);
-		    activity.setRunOffline(Boolean.FALSE);
-			
-		    baseDAO.insert(activity);
+			processCommonActivityFields(taskDetails, xCoOrd, yCoOrd, activity);
+			newActivityMap.put(activity.getActivityUIID(), activity);
+			flattenedActivityMap.put(parentActivityId, activity.getActivityUIID());
+			baseDAO.insert(activity);
 		}
 		
+		return activity;
+	}
+
+	private void processCommonActivityFields(Hashtable taskDetails, Integer xCoOrd, Integer yCoOrd, Activity activity) throws WDDXProcessorConversionException {
+		// Don't overwrite title and description if they have already be set up from the content. 
+		if ( activity.getDescription() == null && keyExists(taskDetails, WDDXTAGS102.DESCRIPTION))
+		    activity.setDescription(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.DESCRIPTION));
+		if ( activity.getTitle() == null && keyExists(taskDetails, WDDXTAGS102.TITLE))
+		    activity.setTitle(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.TITLE));
+
+		activity.setXcoord(xCoOrd);
+		activity.setYcoord(yCoOrd);
+		activity.setHelpText(null);
+
+		activity.setApplyGrouping(false); // not nullable so default to false
+		parseGroupingValue(taskDetails.get(WDDXTAGS102.TASK_GROUPING), activity);
+		activity.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
+		
+		activity.setOrderId(null); // if needed, will be set when the parent activity is created.
+		
+		activity.setDefineLater(Boolean.FALSE);
+		activity.setLearningDesign(ldInProgress);
+		activity.setCreateDateTime(createDate);
+		activity.setRunOffline(Boolean.FALSE);
+		
+	}
+
+	private Activity setupParallelActivity(Hashtable taskDetails, Integer contentId, Integer taskUIID, String parentTitle, String parentDescription) throws WDDXProcessorConversionException {
+		ParallelActivity activity = (ParallelActivity) Activity.getActivityInstance(Activity.PARALLEL_ACTIVITY_TYPE);
+		activity.setActivityTypeId(Activity.PARALLEL_ACTIVITY_TYPE);
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		activity.setActivityUIID(taskUIID);
+		activity.setDescription(parentDescription);
+		activity.setTitle(parentTitle);
+		
+		// create the child activities and set their order id
+		List subTasks = (List) taskDetails.get(WDDXTAGS102.MTASK_SUBTASKS);
+		String subTaskOrderString = (String ) taskDetails.get(WDDXTAGS102.MTASK_SUBTASK_ORDER); 
+		if ( subTasks == null || subTasks.size() != 2) {
+			String message = "Can't find two subtasks for the parallel activity "+parentTitle+". The parallel activity will not be in the sequence. Activity is "+taskDetails;
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+			return null;
+		}
+		String[] subTaskOrder = subTaskOrderString.split(",");
+		int backupUnusedOrderId = subTaskOrder.length;
+		
+		Iterator iter = subTasks.iterator();
+		while ( iter.hasNext() )
+		{
+			Hashtable subTask = (Hashtable) iter.next();
+			Activity subActivity = createActivityFromTask(subTask, null, null, null, null, parentTitle, parentDescription);
+			if ( subActivity != null ) {
+				// won't be created if it can't find a matching tool.
+				subActivity.setParentActivity(activity);
+				subActivity.setParentUIID(activity.getActivityUIID());
+				
+				Integer orderId = null;
+				String subTaskUIID = subActivity.getActivityUIID()!=null ? subActivity.getActivityUIID().toString() : "";
+				for ( int i=0; orderId==null && i<subTaskOrder.length; i++ ) {
+					if ( subTaskOrder[i].equals(subTaskUIID) ) {
+						orderId = new Integer(i);
+					}
+				}
+				if ( orderId == null ) {
+					// can't find its order in the task list so just assign it the next clear id. 
+					orderId = backupUnusedOrderId++;
+					String message = "Order of activities in parallel activity "+parentTitle+" can't be determined properly. The order on the screen may be wrong. Activity is "+taskDetails;
+					log.warn(message);
+					toolsErrorMsgs.add(message);
+				}
+				
+				subActivity.setOrderId(orderId);
+			}
+		}
+
 		return activity;
 	}
 
@@ -701,20 +761,8 @@ public class LD102Importer {
 	    activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
 		
 	    // first, find the matching new tool and set up the tool, tool content details.  
-
 	    String toolType = (String) taskDetails.get(WDDXTAGS102.TASK_TOOLTYPE);
-	    List toolsSupportingSignature = toolImportSupportDAO.getToolSignatureWhichSupports(toolType);
-	    Tool tool = null;
-	    Iterator iter = toolsSupportingSignature.iterator();
-	    while ( iter.hasNext() && tool == null ) {
-	    	ToolImportSupport support = (ToolImportSupport) iter.next();
-	    	tool = toolDAO.getToolBySignature(support.getInstalledToolSignature());
-	    	if ( tool != null && ! tool.isValid() ) {
-	    		// if not valid then not installed properly so don't use it!
-	    		tool = null;
-	    	}
-	    }
-	    
+	    Tool tool = toolType != null ? toolImportSupport.get(toolType) : null;
 	    if ( tool == null ) {
 			String message = "Unable to find a tool that supports the activity "+taskDetails.get(WDDXTAGS102.TITLE)+". This activity will be skipped. Activity is "+taskDetails;
 			log.warn(message);
@@ -742,10 +790,6 @@ public class LD102Importer {
 		if (keyExists(activityDetails, WDDXTAGS.OPTIONS_INSTRUCTIONS))
 		    optionsActivity.setOptionsInstructions(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.OPTIONS_INSTRUCTIONS));		
 	}
-	private void buildParallelActivity(ParallelActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
-	}
-	private void buildSequenceActivity(SequenceActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		
 	}
 	private void buildGateActivity(Object activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		if(activity instanceof SynchGateActivity)
@@ -841,34 +885,6 @@ public class LD102Importer {
 		return ( content.getSid() ); 
 	}
 
-	*//** Update the grouping task and the related  group definition. This is the task that 
-	 * triggers the creation of a group. *//*
-	protected void updateGroupingTask(PersistenceSession session, Hashtable clientObj, GroupingTaskVO groupTask, Integer objId)
-		throws Exception 
-	{
-		// update the values shared with simple task
-		updateSimpleTask(clientObj, groupTask);
-		
-		// set up matching GroupDefnVO if needed
-		GroupDefnVO groupDefn = groupTask.getGroupDefn();
-		if ( groupDefn == null )
-		{
-			groupDefn = new GroupDefnVO();
-			storeInSession(session, groupDefn);
-			groupTask.setGroupDefn(groupDefn);
-		}
-		groupTask.getGroupDefn().setId(objId.intValue());
-		
-		// found the matching content object and store link to that!
-		Integer contentId = WDDXProcessor.convertToInteger("Group Defn Content Id", clientObj.get(WDDXTAGS102.TASK_INPUT_CONTENT) );
-		if ( contentId != null )
-		{
-			Map contentMap = m_contentUtil.getCurrentContentsAsMapByCreationToolKey();
-			Content content = (Content) contentMap.get(contentId.toString());
-			groupDefn.setDefnContentSid(content.getSid());
-		}
-	}
-
 	*/
 	
 	/** Process the content from the WDDX packet. In 1.0.x, the content was managed by the 
@@ -925,232 +941,67 @@ public class LD102Importer {
 	}
 	
 
-	/** Process the optional activities
-	 *//*
-	protected void processOptionalActivities(PersistenceSession session, Set newOptionalActivities )
-		throws Exception
-	{	
+	/** 
+	 * Create an optional activity. Must process all the other activities first as the optional definition entry 
+	 * only refers to the activities, it doesn't include them.
+	 */ 
+	private void setupOptionalActivity(Hashtable optionObj) {
 		
-		if ( ldInProgress.getOptionalActivities() == null )
-		{
-			ldInProgress.setOptionalActivities(new HashSet());
-		}
-
-		if ( newOptionalActivities == null )
-			return;
-			
-		// after processing the optional activities, this set will contain all the ids
-		// of the "desired" ones. Any other optional activities whose
-		// ids don't appear in this set are then due to be deleted.
-		Set idsUpdated = new HashSet(); 	
-			
-		Iterator tempIterator = newOptionalActivities.iterator();
-		while ( tempIterator.hasNext() )
-		{
-			Hashtable clientObj = (Hashtable) tempIterator.next();
-			
-			// check that it is the object we expect
-			String objectType = (String) clientObj.get(WDDXTAGS102.OBJECT_TYPE);
-			if ( ! isOptionalActivity(objectType)  )
-			{
-				throw new Exception(getExpectedOptionalActivity()
-					+ " received "+ objectType + ". Unable to store .");
-			}
-			
-			Integer objId = WDDXProcessor.convertToInteger("Optional Activity ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID) );
-			if ( LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-			{
-				throw new Exception("Id for optional activity is the internal null value. Optional activity is"+clientObj.toString());
-			}
-
-			OptionalActivityDefnVO optAct = ldInProgress.selectOptionalActivity(objId.intValue());
-			if ( optAct == null ) {
-					optAct = new OptionalActivityDefnVO();
-					storeInSession(session, optAct);
-					ldInProgress.getOptionalActivities().add(optAct);					
-			} 
-			updateOptionalActivity(session, clientObj, objId, optAct);
-			m_allItems.put(objId, optAct);
-			idsUpdated.add(objId);
-			
-		}
+		try {
+			OptionsActivity optionsActivity = (OptionsActivity) Activity.getActivityInstance(Activity.OPTIONS_ACTIVITY_TYPE);
+			optionsActivity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+			optionsActivity.setActivityUIID(WDDXProcessor.convertToInteger(optionObj, WDDXTAGS102.LD_ITEM_ID));
+			if (keyExists(optionObj, WDDXTAGS102.OPTACT_MIN_NUMBER_COMPLETE))
+				optionsActivity.setMinNumberOfOptions(WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.OPTACT_MIN_NUMBER_COMPLETE));
+			optionsActivity.setMaxNumberOfOptions(null); // not supported in 1.0.2.
+			optionsActivity.setOptionsInstructions(null); // not supported in 1.0.2. // check this!!!!!
 		
-		// now delete all the old, untouched optional activities
-		tempIterator = ldInProgress.getOptionalActivities().iterator();
-		while ( tempIterator.hasNext() )
-		{
-			OptionalActivityDefnVO activity = (OptionalActivityDefnVO) tempIterator.next();
-			Integer activityId = new Integer(activity.getId());
-			if ( ! idsUpdated.contains(activityId) )
-			{
-				log.debug("Removing optional activity as no longer needed in design #"
-					+ldInProgress.getSid()+" activity: "+activity.toString());
-				tempIterator.remove();
-				deleteOptionalActivity(session, activity);
-			}
-		}
-
+			Integer xCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_X);
+			Integer yCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_Y);
+			processCommonActivityFields(optionObj, xCoOrd, yCoOrd, optionsActivity);
 		
-	}
-
-
-
-		
-	*//** Update a multitask - this will contain inner tasks
-	 *//*	
-	protected void updateMultiTask(PersistenceSession session, Hashtable clientObj, MultiTaskVO multiTask, Integer objId) 
-		throws Exception
-	{
-		Integer taskId = WDDXProcessor.convertToInteger("InputContentTask",
-									clientObj.get(WDDXTAGS102.MTASK_INPUT_CONTENT_TASK));
-		if ( ! LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-			multiTask.setInputContentTask(taskId);
-		else
-			multiTask.setInputContentTask(null);
-
-		taskId = WDDXProcessor.convertToInteger("OutputContentTask",
-									clientObj.get(WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK));
-		if ( ! LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-			multiTask.setOutputContentTask(taskId);
-		else
-			multiTask.setOutputContentTask(null);
-		
-		multiTask.setTaskOrderOnScreen((String)clientObj.get(WDDXTAGS102.MTASK_SUBTASK_ORDER));
-		
-		Set subTasks = multiTask.getSubTasks();
-		if ( subTasks == null ) {
-			subTasks = new HashSet();
-			multiTask.setSubTasks(subTasks);
-			subTasks = multiTask.getSubTasks();
-		}
-		
-		List subTasksWDDX = (List)clientObj.get(WDDXTAGS102.MTASK_SUBTASKS);
-		if ( subTasksWDDX != null )
-		{
-			Iterator iter = subTasksWDDX.iterator();
-			while ( iter.hasNext() )
-			{
-				
-				Hashtable subTaskWDDX = (Hashtable) iter.next();
-
-				String objectType = (String) subTaskWDDX.get(WDDXTAGS102.OBJECT_TYPE);
-				if ( ! isTask(objectType)	)
-				{
-					throw new Exception(getExpectedTask() + "received "  +  objectType );
+			// work out the child activities and move them from the main activity set to the optional activity.
+			Vector subActivityUIIDs = (Vector) optionObj.get(WDDXTAGS102.OPTACT_ACTIVITIES);
+			int orderId = 1;
+			if ( subActivityUIIDs != null ) {
+				Iterator subActIter =  subActivityUIIDs.iterator();
+				while ( subActIter.hasNext() ) {
+					Integer id = WDDXProcessor.convertToInteger("Activity ID in Optional Activity", subActIter.next());
+					Activity childActivity = getMatchingActivity(id);
+					if ( childActivity == null ) {
+						String message = "Activity inside optional activity "+optionsActivity.getTitle()+" cannot be matched to a known activity. The child activity will be missing from the optional activity but it may appear in the design elsewhere. Child activity UI ID "+id;
+						log.warn(message);
+						toolsErrorMsgs.add(message);
+					} else { 
+						optionsActivity.getActivities().add(childActivity);
+						childActivity.setParentActivity(optionsActivity);
+						childActivity.setParentUIID(optionsActivity.getActivityUIID());
+						childActivity.setOrderId(new Integer(orderId++));
+					}
 				}
-				taskId = WDDXProcessor.convertToInteger("Task ID", subTaskWDDX.get(WDDXTAGS102.LD_ITEM_ID) );
-				AbstractTaskVO subTask = multiTask.selectTaskById(taskId.intValue());
-				if ( subTask == null ) {
-					subTask = createNewTask( subTaskWDDX );
-					storeInSession(session,subTask);
-					subTasks.add(subTask);	
-				}
-				
-				updateTask(session, subTaskWDDX, subTask, taskId );
-
 			}
+			
+			// don't need to put it in the flatten map as the optional activity is a single entity in the wddx packet, 
+			// not a two parter like the other activities
+			newActivityMap.put(optionsActivity.getActivityUIID(), optionsActivity);
+			optionsActivity.setLearningDesign(ldInProgress);
+			ldInProgress.getActivities().add(optionsActivity);
+			
+			baseDAO.insert(optionsActivity);
+			
+		} catch (WDDXProcessorConversionException e) {
+			handleWDDXProcessorConversionException(e);
 		}
-	
+		
 	}
 
-
-	*/
-	
-	/** Links the tasks that are done as a group to the group definition. 
-	 * <p>
-	 * throws exception with any errors
-	 *//*
-	protected void setGroupToTaskLinks() throws Exception
-	{
-		if ( log.isDebugEnabled() )
-			log.debug("setGroupToTaskLinks: m_groupingsToDo="+(m_groupingsToDo!=null?m_groupingsToDo.toString():"null"));
-			
-		if ( m_groupingsToDo == null || m_groupingsToDo.isEmpty())
-			return;
-
-		Map allTasksById = ldInProgress.allTasks(false);
-		Set keys = m_groupingsToDo.keySet();
-		Iterator linksToProcess = keys.iterator();
-		while ( linksToProcess.hasNext() )
-		{
-			Integer taskId = (Integer) linksToProcess.next();
-			AbstractTaskVO task = (AbstractTaskVO) allTasksById.get(taskId);	
-			if ( task == null )
-			{
-				String message = "Assigning grouping definition to a task. Internal error task not found. Task sid = "+taskId;
-				log.error(message);
-				throw new Exception (message);
-			}
-
-			Integer groupingTaskId = (Integer) m_groupingsToDo.get(taskId);
-			
-			log.debug("Processing group link, task id="+taskId+" groupingTaskId "+groupingTaskId);
-
-			Object obj  = null;
-			GroupingTaskVO groupingtask  = null;
-			try {
-				obj = allTasksById.get(groupingTaskId);
-				groupingtask  = (GroupingTaskVO) obj;
-			} catch ( ClassCastException cce )
-			{
-				String message = "Assigning grouping definition to a task. Grouping task not correct type. Task id = "+groupingTaskId
-					+" expected to be grouping task, got "+obj.toString() 
-					+" Was trying to find grouping task for task "+task.toString();
-				log.error(message);
-				throw new Exception (message);
-			}			
-			
-			if ( groupingtask == null )
-			{
-				String message = "Assigning grouping definition to a task. Matching grouping task not found. "
-					+ "Looking for grouping task "
-					+ groupingTaskId
-					+ " for task "
-					+ task.toString();
-				log.error(message);
-				throw new Exception (message);
-			}
-			
-			GroupDefnVO groupDefn = groupingtask.getGroupDefn();
-			if ( groupDefn == null )
-			{
-				String message = "Assigning grouping definition to a task. Matching grouping task missing grouping defn. "
-					+ "Grouping task "
-					+ groupingtask.toString()
-					+ " for task "
-					+ task.toString();
-				log.error(message);
-				throw new Exception (message);
-			}
-	
-			if ( log.isDebugEnabled() )
-				log.debug("Adding group definition to groupsForTask. GroupDefn="+groupDefn);
-				
-
-			// finally, all is well so add definition link to task. Really should be
-			// validating that the the grouping task is done first in the sequence but
-			// haven't implemented that yet!		
-			if ( task.getGroupsForTask() == null )
-			{
-				task.setGroupsForTask(new HashSet());
-			}				
-			
-			task.getGroupsForTask().add(groupDefn);
-
-			if ( log.isDebugEnabled() )
-				log.debug("GroupsForTask is now ="+task.getGroupsForTask());
-						
-		}
-	}
-
-	*/
 	
 	/** 
 	 * @param clientObj - hashtable from WDDX
 	 * @param ui_id - Flash assigned id.
 	 * @param transition - transition to update
 	 */
-	protected void processTransition( Hashtable clientObj) {
+	protected void setupTransition( Hashtable clientObj) {
 	
 		try {
 		    Transition transition = new Transition();
@@ -1222,162 +1073,6 @@ public class LD102Importer {
 		}
 		return activity;
 	}
-/*
-	protected void processTaskTransitions(PersistenceSession session, List newTT, ActivityDefnVO activity ) 
-		throws Exception
-	{	
-		Set currentTasks = activity.getTasks();
-		Set currentTransitions = activity.getTransitions();
-		
-		// much the same again - cycle through tasks and transitions. Update existing ones, add new ones
-		
-		Iterator iterator = newTT.iterator();
-		while ( iterator.hasNext() )
-		{
-			Hashtable clientObj = (Hashtable) iterator.next();
-			
-			// check that it is the object we expect
-			String objectType = (String) clientObj.get(WDDXTAGS102.OBJECT_TYPE);
-			if ( ! ( isTask(objectType) || isTransition(objectType))	)
-			{
-				throw new Exception(getExpectedTaskTransition()+ " received "  +  objectType );
-			}
-
-			Integer objId = WDDXProcessor.convertToInteger("Task/Transition ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID) );
-			if ( LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-				throw new Exception("Id value for task/transition is internal null value. Task/transition is "+clientObj.toString());
-
-			if ( isTask(objectType) ) {
-				AbstractTaskVO task = activity.selectTaskById(objId.intValue());
-				if ( task == null ) {
-					task = createNewTask( clientObj );
-					storeInSession(session,task);
-					currentTasks.add(task);	
-				} 
-				updateTask(session, clientObj, task, objId );
-				m_allItems.put(objId, task);
-			} else {
-				TransitionDefnVO transition = activity.selectTransitionbyId(objId.intValue());
-				if ( transition == null ) {
-					transition = new TransitionDefnVO();
-					storeInSession(session,transition);
-					currentTransitions.add(transition);					
-				}
-				updateTransition(clientObj, objId, transition);
-				m_allItems.put(objId, transition);
-			}
-		}
-		
-	}
-
-	*//** 
-	 * update Optional Activity (OptionalActivityDefnVO)
-	 * @param clientObj - hashtable from WDDX
-	 * @param objId - internal id within learning design. will be 0 or 1 for library activities
-	 * @param activity - optional activity to update
-	 *//*
-	protected void updateOptionalActivity(PersistenceSession session, Hashtable clientObj,Integer objId,
-												OptionalActivityDefnVO optAct)
-		throws Exception 
-	{
-		optAct.setId(objId.intValue());
-		optAct.setDescription((String)clientObj.get(WDDXTAGS102.DESCRIPTION));
-		optAct.setTitle((String)clientObj.get(WDDXTAGS102.TITLE));
-
-		Integer toTask = WDDXProcessor.convertToInteger("Minimum number activities to complete",
-							clientObj.get(WDDXTAGS102.OPTACT_MIN_NUMBER_COMPLETE));
-		optAct.setMinNumberComplete(toTask);
-		
-		optAct.setXcoordStart(WDDXProcessor.convertToInteger("X co-ord start",
-												clientObj.get(WDDXTAGS102.OPTACT_X_START)));
-		optAct.setYcoordStart(WDDXProcessor.convertToInteger("Y co-ord start",
-												clientObj.get(WDDXTAGS102.OPTACT_Y_START)));
-		optAct.setXcoordEnd(WDDXProcessor.convertToInteger("X co-ord start",
-												clientObj.get(WDDXTAGS102.OPTACT_X_END)));
-		optAct.setYcoordEnd(WDDXProcessor.convertToInteger("Y co-ord start",
-												clientObj.get(WDDXTAGS102.OPTACT_Y_END)));
-
-		
-		// activites, min # to compelte
-		Set activities = optAct.getActivities();
-		if (  activities == null )
-		{
-			optAct.setActivities(new HashSet());
-		}					
-		
-		Vector activityIds = (Vector) clientObj.get(WDDXTAGS102.OPTACT_ACTIVITIES);
-		if ( activityIds != null )
-		{
-			Iterator iter = activityIds.iterator();
-			while ( iter.hasNext()) 
-			{
-				Integer id = WDDXProcessor.convertToInteger("Activity ID in Optional Activity", iter.next());
-				ActivityDefnVO act = ldInProgress.selectActivity(id.intValue());
-				if ( act == null )
-				{
-					log.error("Unable to find activity object to match optional activity definition. Optional activity is "
-						+optAct.toString()	+" looking for activity id "	+id);
-					throw new Exception("Unable to find activity object to match optional activity definition. "
-						+" Optional activity id is "+ 
-						+optAct.getId()	+" looking for activity id "	+id);
-				}
-				
-				optAct.getActivities().add(act);
-			}
-		}
-		
-		// now create/update the dummy task used at runtime (never passed to authoring client)
-		updateDummyTask(session, optAct);
-
-	}
-
-*/
-	/** Create/Update a dummy task (stored using setDummyTask)
-	 * @param optAct - Optional Activity that this dummy task belongs.
-	 *//*
-	public void updateDummyTask(PersistenceSession session, OptionalActivityDefnVO optAct) throws Exception
-	{
-		OptionalActivityDummyTaskVO result = optAct.getDummyTask();
-
-		if ( result == null ) {
-			result =  new OptionalActivityDummyTaskVO();
-		}			
-		result.setCompletion("");
-		result.setDescription(optAct.getDescription());
-		if ( result.getGroupsForTask() == null )
-		{
-			result.setGroupsForTask(new HashSet());
-		}
-		result.setId(optAct.getId()); 
-		result.setTitle(optAct.getTitle());
-		
-		if ( result.getSubFirstTasks() == null )
-		{
-			result.setSubFirstTasks(new HashSet());
-		}
-		result.getSubFirstTasks().clear();
-		
-		if ( optAct.getActivities() != null )
-		{
-			Iterator iter = optAct.getActivities().iterator();
-			while ( iter.hasNext())
-			{
-				ActivityDefnVO activity = (ActivityDefnVO) iter.next();	
-				AbstractTaskVO task = activity.getFirstTask();
-				if ( task != null )
-				{
-					result.getSubFirstTasks().add(task);
-				}
-			}
-		}
-		result.setOptionalActivity(optAct);
-		
-		storeInSession(session,result);
-		//session.flush();
-		
-		optAct.setDummyTask(result);
-	}
-*/
 
 	/** Get all the tool icons based on the library activities
 	 * @return Map of tool icons - key is tool id, value is url. */
@@ -1402,4 +1097,20 @@ public class LD102Importer {
 		}
 		return imageURLS;
 	}
+	
+	/** Get all Map of the current tools that support the 1.0.2 signatures. */
+	private Map<String, Tool> getToolImportSupport() {
+		
+		HashMap<String, Tool> supportedTools = new HashMap<String, Tool>();
+	    Iterator iter = toolImportSupportDAO.getAllToolImportSupport().iterator();
+	    while ( iter.hasNext() ) {
+	    	ToolImportSupport support = (ToolImportSupport) iter.next();
+	    	Tool tool = toolDAO.getToolBySignature(support.getInstalledToolSignature());
+	    	if ( tool != null && tool.isValid() ) {
+	    		supportedTools.put(support.getSupportsToolSignature(), tool);
+	    	}
+	    }
+		return supportedTools;
+	}
+
 }
