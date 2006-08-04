@@ -55,6 +55,7 @@ class LessonView extends AbstractView {
 	private var _lesson_mc:MovieClip;
 	
 	private var bkg_pnl:MovieClip;
+	private var lessonHead_pnl:MovieClip;
 	private var progress_scp:MovieClip;
 	private var _activityList:Array;
 	
@@ -315,7 +316,7 @@ class LessonView extends AbstractView {
     * Set the styles for the Lesson
     */
     private function setStyles() {
-		var styleObj = _tm.getStyleObject('BGPanel');
+		var styleObj = _tm.getStyleObject('WZPanel');
 		bkg_pnl.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('scrollpane');
@@ -330,7 +331,15 @@ class LessonView extends AbstractView {
 	public function getModel():LessonModel{
 			return LessonModel(model);
 	}
-	
+	/**
+	 * Overrides method in abstract view to ensure cortect type of controller is returned
+	 * @usage   
+	 * @return  LessonController
+	 */
+	public function getController():LessonController{
+		var c:Controller = super.getController();
+		return LessonController(c);
+	}
 	/*
     * Returns the default controller for this view.
     */
