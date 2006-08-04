@@ -103,12 +103,12 @@ class PropertyInspectorNew extends MovieClip{
 	//Complex Activity
 	private var min_lbl:Label;
 	private var max_lbl:Label;
-	private var min_act:ComboBox;
-	private var max_act:ComboBox;
+	private var minAct_stp:NumericStepper ;
+	private var maxAct_stp:NumericStepper;
 	
 	//screen assets:
-	private var body_pnl:Label;
-	private var bar_pnl:Label;
+	private var body_pnl:Panel;
+	private var bar_pnl:Panel;
 	
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -162,6 +162,10 @@ class PropertyInspectorNew extends MovieClip{
 		groupType_cmb.addEventListener("change",Delegate.create(this,onGroupTypeChange));
 		gateType_cmb.addEventListener("change",Delegate.create(this,onGateTypeChange));
 		appliedGroupingActivity_cmb.addEventListener("change",Delegate.create(this,onAppliedGroupingChange));
+		minAct_stp.addEventListener("change",Delegate.create(this,updateOptionalData));
+		minAct_stp.addEventListener("focusOut",Delegate.create(this,updateOptionalData));
+		maxAct_stp.addEventListener("change",Delegate.create(this,updateOptionalData));
+		maxAct_stp.addEventListener("focusOut",Delegate.create(this,updateOptionalData));
 		hours_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
 		mins_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
 		hours_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
@@ -477,8 +481,8 @@ class PropertyInspectorNew extends MovieClip{
 		
 		min_lbl.visible = v;	
 		max_lbl.visible = v;
-		min_act.visible = v;
-		max_act.visible = v;
+		minAct_stp.visible = v;
+		maxAct_stp.visible = v;
 		desc_lbl.visible = v;
 		desc_txt.visible = v;
 		//grouping_opt_lbl.visible = v; 
@@ -576,10 +580,29 @@ class PropertyInspectorNew extends MovieClip{
 		//desc_txt.text = StringUtils.cleanNull(ta.description);
 		runOffline_chk.selected = ca.runOffline;
 		defineLater_chk.selected = ca.defineLater;
-					
+		trace("min options when starting: "+ca.minOptions)
+		if (ca.minOptions == undefined){
+			minAct_stp.value = 0
+		}else{
+			minAct_stp.value = ca.minOptions
+		}
+		
+		if (ca.maxOptions == undefined){
+			maxAct_stp.value = 0
+		}else{
+			maxAct_stp.value = ca.maxOptions
+		}
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
 			
 
+	}
+	
+	private function updateOptionalData(){
+		var oa = _canvasModel.selectedItem.activity;
+		var	o = ComplexActivity(oa);
+		o.minOptions = minAct_stp.value;
+		o.maxOptions = maxAct_stp.value;
+		oa.init();
 	}
 	
 	private function showParallelActivityProperties(ca:ComplexActivity){
@@ -779,6 +802,9 @@ class PropertyInspectorNew extends MovieClip{
 		MovieClipUtils.doLater(Proxy.create(this,reDrawTroublesomeSteppers));
 	}
 	
+	
+	
+	
 	/**
 	 * Called when there is a change in the values of the group method steppers
 	 * Butdates the value inthe grouping class being edited.
@@ -870,8 +896,8 @@ class PropertyInspectorNew extends MovieClip{
 		mins_stp.setStyle('styleName',styleObj);
 		endHours_stp.setStyle('styleName',styleObj);
 		endMins_stp.setStyle('styleName',styleObj);
-		min_act.setStyle('styleName',styleObj);
-		max_act.setStyle('styleName',styleObj);
+		minAct_stp.setStyle('styleName',styleObj);
+		maxAct_stp.setStyle('styleName',styleObj);
 		
 		
 		styleObj = _tm.getStyleObject('picombo');
@@ -970,6 +996,7 @@ class PropertyInspectorNew extends MovieClip{
 		checkEnableGroupsOptions();
 		
 	}
+	
 	
 	private function onScheduleOffsetChange(evt:Object){
 		
