@@ -98,6 +98,10 @@ public class MonitoringAction extends Action {
 		if (param.equals("init")) {
 			return init(mapping, form, request, response);
 		}
+		//refresh statistic page by Ajax call.
+		if (param.equals("statistic")) {
+			return statistic(mapping, form, request, response);
+		}
 		// ***************** Marks Functions ********************
 		if (param.equals("viewAllMarks")) {
 			return viewAllMarks(mapping, form, request, response);
@@ -695,7 +699,7 @@ public class MonitoringAction extends Action {
 		try {
 			NumberFormat format = NumberFormat.getInstance();
 			format.setMaximumFractionDigits(1);
-			return new Float(Float.parseFloat(format.format(aver)));
+			return format.parse(format.format(aver)).floatValue();
 		} catch (Exception e) {
 			return new Float(0);
 		}

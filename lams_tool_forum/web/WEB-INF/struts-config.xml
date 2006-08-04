@@ -266,6 +266,12 @@
 		    parameter="init" >
 			<forward name="load" path="tiles:/monitoring/forum/main" redirect="false" />	        
 		</action>
+		<action path="/monitoring/statistic" 
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+		    scope="request"
+		    parameter="statistic" >
+			<forward name="success" path="/jsps/monitoring/statisticpart.jsp"/>	        
+		</action>
 		<action path="/monitoring/downloadMarks"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 			input="tiles:/monitoring/forum/listContentUsers"

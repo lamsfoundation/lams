@@ -1,8 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<input type="hidden" name="currentTab" id="currentTab" />
 <div id="header">
 
-	<lams:Tabs>
+	<lams:Tabs control="true">
 		<lams:Tab id="1" key="monitoring.tab.summary" />
 		<lams:Tab id="2" key="monitoring.tab.instructions" />
 		<lams:Tab id="3" key="monitoring.tab.edit.activity" />
