@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -75,6 +76,8 @@ public class OrgManageAction extends Action {
 	private static final Logger log = Logger.getLogger(OrgManageAction.class);
 	
 	private static IUserManagementService service;
+	
+	private static MessageService messageService;
 
 	
 	public ActionForward execute(ActionMapping mapping,
@@ -88,8 +91,8 @@ public class OrgManageAction extends Action {
 			orgId = (Integer)request.getAttribute("org");
 		}
 		if((orgId==null)||(orgId<=0)){
-			errors.add("org",new ActionMessage("error.org.invalid"));
-			saveErrors(request,errors);
+			request.setAttribute("errorName","OrgManageAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
 		String username = request.getRemoteUser();
@@ -97,14 +100,15 @@ public class OrgManageAction extends Action {
 		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 		log.debug("orgId:"+orgId);
 		if(org==null){
-			errors.add("org",new ActionMessage("error.org.invalid"));
+			request.setAttribute("errorName","OrgManageAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
+			return mapping.findForward("error");
 		}else if(org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){
-			errors.add("org",new ActionMessage("error.orgtype.invalid"));
-		}
-		if(!errors.isEmpty()){
-			saveErrors(request,errors);
+			request.setAttribute("errorName","OrgManageAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.orgtype.invalid"));
 			return mapping.findForward("error");
 		}
+		
 		orgManageForm.setParentId(orgId);
 		orgManageForm.setParentName(org.getName());
 		orgManageForm.setType(org.getOrganisationType().getOrganisationTypeId());
@@ -147,6 +151,14 @@ public class OrgManageAction extends Action {
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
 		}
 		return service;
+	}
+	
+	private MessageService getMessageService(){
+		if(messageService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			messageService = (MessageService)ctx.getBean("adminMessageService");
+		}
+		return messageService;
 	}
 
 }

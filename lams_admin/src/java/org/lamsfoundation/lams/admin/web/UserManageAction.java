@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -67,6 +68,7 @@ public class UserManageAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(UserManageAction.class);
 	private static IUserManagementService service;
+	private static MessageService messageService;
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -80,8 +82,8 @@ public class UserManageAction extends Action {
 			orgId = (Integer)request.getAttribute("org");
 		}
 		if((orgId==null)||(orgId<=0)){
-			errors.add("org",new ActionMessage("error.org.invalid"));
-			saveErrors(request,errors);
+			request.setAttribute("errorName","UserManageAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
 		log.debug("orgId: "+orgId);
@@ -89,8 +91,8 @@ public class UserManageAction extends Action {
 		// get org name
 		Organisation organisation = (Organisation)getService().findById(Organisation.class,orgId);
 		if(organisation==null) {
-			errors.add("org",new ActionMessage("error.org.invalid"));
-			saveErrors(request,errors);
+			request.setAttribute("errorName","UserManageAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
 		String orgName = organisation.getName();
@@ -113,19 +115,14 @@ public class UserManageAction extends Action {
 		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) || getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
 			request.setAttribute("canAdd",orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 		}else{
-			errors.add("authorisation",new ActionMessage("error.authorisation"));
-			saveErrors(request,errors);
+			request.setAttribute("errorName","UserManageAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
 		// get list of users in org
 		List users = getService().getUsersFromOrganisation(orgId);
 		Collections.sort(users);
-		if(users==null){
-			errors.add("org",new ActionMessage("error.org.invalid"));
-			saveErrors(request,errors);
-			return mapping.findForward("error");
-		}
 		
 		// create form object
 		UserListDTO userManageForm = new UserListDTO();
@@ -162,5 +159,13 @@ public class UserManageAction extends Action {
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
 		}
 		return service;
+	}
+	
+	private MessageService getMessageService(){
+		if(messageService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			messageService = (MessageService)ctx.getBean("adminMessageService");
+		}
+		return messageService;
 	}
 }

@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -68,6 +69,7 @@ public class UserOrgAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(UserOrgAction.class);
 	private static IUserManagementService service;
+	private static MessageService messageService;
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -81,8 +83,8 @@ public class UserOrgAction extends Action {
 		Organisation organisation = (Organisation)getService().findById(Organisation.class,orgId);
 
 		if((orgId==null)||(orgId<=0)||organisation==null){
-			errors.add("orgId",new ActionMessage("error.org.invalid"));
-			saveErrors(request,errors);
+			request.setAttribute("errorName","UserOrgAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
 		
@@ -112,8 +114,8 @@ public class UserOrgAction extends Action {
 					users = getService().getUsersFromOrganisation(orgId);
 				}
 			}else{
-				errors.add("authorisation",new ActionMessage("error.authorisation"));
-				saveErrors(request,errors);
+				request.setAttribute("errorName","UserOrgAction");
+				request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
 				return mapping.findForward("error");
 			}
 		}
@@ -144,4 +146,11 @@ public class UserOrgAction extends Action {
 		return service;
 	}
 	
+	private MessageService getMessageService(){
+		if(messageService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			messageService = (MessageService)ctx.getBean("adminMessageService");
+		}
+		return messageService;
+	}
 }
