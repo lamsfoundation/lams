@@ -40,6 +40,7 @@ class Header extends MovieClip {
 	private var lams:MovieClip; 			// LAMS logo
 	private var resume_btn:MovieClip;         //Resume and Exit buttons
     private var exit_btn:MovieClip;
+	private var lessonHead_pnl:MovieClip;
 	private var resume_lbl:TextField;
 	private var exit_lbl:TextField;
 	private var _tip:ToolTip;
@@ -141,6 +142,9 @@ class Header extends MovieClip {
 	private function setStyles(){
 		var styleObj = _tm.getStyleObject('smallLabel');
 		_lessonName.setStyle('styleName', styleObj);
+		
+		styleObj = _tm.getStyleObject('BGPanel');
+		lessonHead_pnl.setStyle('styleName', styleObj);
 		
 	}
 	
