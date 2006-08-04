@@ -252,7 +252,7 @@
    	path="/defineLaterStarter" 
    	type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
    	name="QaAuthoringForm" 
-	scope="session"
+	scope="request"
    	input="/index.jsp"> 
 
 	  	<forward

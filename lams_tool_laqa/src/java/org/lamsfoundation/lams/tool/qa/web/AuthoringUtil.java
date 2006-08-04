@@ -88,13 +88,10 @@ public class AuthoringUtil implements QaAppConstants {
     	 	logger.debug("pre-delete map content:  " + mapQuestionContent);
     	 	logger.debug("questionIndex: " + questionIndex);
     	 	
-    	 	//String defLater=(String)request.getSession().getAttribute(ACTIVE_MODULE);
-    	 	//logger.debug("defLater: " + defLater);
-    	 	
+    	 	// watch here and remove request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
     	 	String removableQuestionIndex=null;
     	 	if (activeModule.equals(MONITORING))
     	 	{
-    	 	    //remove REMOVABLE_QUESTION_INDEX from the session
        	 		removableQuestionIndex=(String)request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
         	 	logger.debug("removableQuestionIndex: " + removableQuestionIndex);
         	 	questionIndex=removableQuestionIndex;
@@ -114,7 +111,6 @@ public class AuthoringUtil implements QaAppConstants {
 	 		logger.debug("returning mapQuestionContent:" + mapQuestionContent);
 	 		return mapQuestionContent;
 
-	 		//request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
     }
 
     
@@ -155,14 +151,6 @@ public class AuthoringUtil implements QaAppConstants {
     protected void repopulateMap(Map mapQuestionContent, HttpServletRequest request)
     {
         logger.debug("starting repopulateMap");
-        
-        
-        /*
-        logger.debug("queIndex: " + request.getSession().getAttribute("queIndex"));
-    	logger.debug("queIndex: " + request.getSession().getAttribute("queIndex"));
-    	long queIndex= new Long(request.getSession().getAttribute("queIndex").toString()).longValue();
-    	logger.debug("queIndex: " + queIndex);
-    	*/
         int intQuestionIndex= mapQuestionContent.size();
         logger.debug("intQuestionIndex: " + intQuestionIndex);
 
@@ -175,7 +163,6 @@ public class AuthoringUtil implements QaAppConstants {
 			String candidateQuestionEntry =request.getParameter("questionContent" + i);
 			if (i==0)
     		{
-    			//request.getSession().setAttribute("defaultQuestionContent", candidateQuestionEntry);
     			logger.debug("defaultQuestionContent set to: " + candidateQuestionEntry);
     		}
 			if ((candidateQuestionEntry != null) && (candidateQuestionEntry.length() > 0))
@@ -196,51 +183,24 @@ public class AuthoringUtil implements QaAppConstants {
         boolean isQuestionsSequenced=false;
         boolean isSynchInMonitor=false;
         boolean isUsernameVisible=false;
-        //String reportTitle = qaAuthoringForm.getReportTitle();
-        //String richTextTitle = qaAuthoringForm.getTitle();
 
-        String richTextTitle = request.getParameter("title");
-        String richTextInstructions = request.getParameter("instructions");
+        String richTextTitle = request.getParameter(TITLE);
+        String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
         logger.debug("richTextTitle: " + richTextTitle);
         logger.debug("richTextInstructions: " + richTextInstructions);
 
-		String synchInMonitor=request.getParameter("synchInMonitor");
-		//qaAuthoringForm.setSynchInMonitor(synchInMonitor);
-		
-		String usernameVisible=request.getParameter("usernameVisible");
-		//qaAuthoringForm.setUsernameVisible(usernameVisible);
-		
-		String questionsSequenced=request.getParameter("questionsSequenced");
-		//qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
-		
-		String reportTitle=request.getParameter("reportTitle");
-		
-		String monitoringReportTitle=request.getParameter("monitoringReportTitle");
-		
-		String endLearningMessage=request.getParameter("endLearningMessage");
-		
-		String richTextOfflineInstructions=request.getParameter("offlineInstructions");
-
-		String richTextOnlineInstructions=request.getParameter("onlineInstructions");
-        
-		String activeModule=request.getParameter("activeModule");
+		String synchInMonitor=request.getParameter(SYNC_IN_MONITOR);
+		String usernameVisible=request.getParameter(USERNAME_VISIBLE);
+		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
+		String reportTitle=request.getParameter(REPORT_TITLE);
+		String monitoringReportTitle=request.getParameter(MONITORING_REPORT_TITLE);
+		String endLearningMessage=request.getParameter(END_LEARNING_MESSAGE);
+		String richTextOfflineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
+		String richTextOnlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
+		String activeModule=request.getParameter(ACTIVE_MODULE);
 		logger.debug("activeModule: " + activeModule);
         
-        //String monitoringReportTitle = qaAuthoringForm.getMonitoringReportTitle();
-        //String richTextOnlineInstructions = qaAuthoringForm.getOnlineInstructions(); 
-        //String richTextInstructions = qaAuthoringForm.getInstructions(); 
-        //String richTextOfflineInstructions = qaAuthoringForm.getOfflineInstructions(); 
-        //String endLearningMessage = qaAuthoringForm.getEndLearningMessage();
-        
-        //String questionsSequenced = qaAuthoringForm.getQuestionsSequenced();
-        //logger.debug("questionsSequenced: " + questionsSequenced);
-        
-        //String synchInMonitor = qaAuthoringForm.getSynchInMonitor(); 
-        //logger.debug("synchInMonitor: " + synchInMonitor);
-        
-        //String usernameVisible = qaAuthoringForm.getUsernameVisible();
-        //logger.debug("usernameVisible: " + usernameVisible);
         
         boolean setCommonContent=true; 
         if ((questionsSequenced == null) || (synchInMonitor == null) || (usernameVisible == null))
@@ -249,9 +209,6 @@ public class AuthoringUtil implements QaAppConstants {
         }
         logger.debug("setCommonContent: " + setCommonContent);
 		
-        //String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
-        
-
         boolean questionsSequencedBoolean=false;
         boolean synchInMonitorBoolean=false;
         boolean usernameVisibleBoolean=false;
@@ -291,17 +248,6 @@ public class AuthoringUtil implements QaAppConstants {
     		}
         }
         logger.debug("userId: " + userId);
-        
-        
-        //Long toolContentIdLong =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-        //logger.debug("toolContentIdLong: " + toolContentIdLong);
-        
-        
-        //String toolContentId=qaAuthoringForm.getToolContentId();
-        //String toolContentId=toolContentIdLong.toString();
-    	//logger.debug("toolContentId:  " + toolContentId);
-     	
-     	//QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
      	logger.debug("qaContent: " + qaContent);
      	
      	boolean newContent=false;
@@ -325,7 +271,6 @@ public class AuthoringUtil implements QaAppConstants {
         if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
 		{
         	logger.debug("setting other content values...");
-         	//qaContent.setUsernameVisible(isUsernameVisible);
          	qaContent.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
          	qaContent.setSynchInMonitor(isSynchInMonitor);
          	qaContent.setOnlineInstructions(richTextOnlineInstructions);
@@ -373,10 +318,7 @@ public class AuthoringUtil implements QaAppConstants {
 	{
     	logger.debug("removing unused entries... ");
     	logger.debug("mapQuestionContent:  " + mapQuestionContent);
-    	
-    	//String toolContentID=qaAuthoringForm.getToolContentId();
     	logger.debug("toolContentID:  " + toolContentID);
-    	
     	
     	QaContent qaContent=qaService.loadQa( new Long(toolContentID).longValue());
     	logger.debug("qaContent:  " + qaContent);

@@ -444,6 +444,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
         qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+        
         authoringUtil.reconstructQuestionContentMapForAdd(mapQuestionContent, qaGeneralAuthoringDTO, request);
         
         sessionMap.put(MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
@@ -768,12 +769,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		logger.debug("activeModule: " + activeModule);
 		
 		
-		String onlineInstructions=(String) sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
-		logger.debug("onlineInstructions: " + onlineInstructions);
-
-		String offlineInstructions=(String) sessionMap.get(OFFLINE_INSTRUCTIONS);
-		logger.debug("offlineInstructions: " + offlineInstructions);
-		
 		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		logger.debug("strToolContentID: " + strToolContentID);
 		
@@ -795,9 +790,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= QaUtils.buildGeneralAuthoringDTO(request, qaService, qaContent, qaAuthoringForm);
 		logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
-		
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 		
 		qaGeneralAuthoringDTO.setSbmtSuccess( new Integer(0).toString());
@@ -817,7 +809,16 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 	             qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
         
+		String onlineInstructions=(String) sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
+		logger.debug("onlineInstructions: " + onlineInstructions);
 
+		String offlineInstructions=(String) sessionMap.get(OFFLINE_INSTRUCTIONS);
+		logger.debug("offlineInstructions: " + offlineInstructions);
+
+	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
+		
         String richTextTitle = (String)sessionMap.get(ACTIVITY_TITLE_KEY);
 	 	String richTextInstructions = (String)sessionMap.get(ACTIVITY_INSTRUCTIONS_KEY);
         
@@ -1270,12 +1271,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		IQaService qaService =QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
 
-		String httpSessionID=qaAuthoringForm.getHttpSessionID();
-		logger.debug("httpSessionID: " + httpSessionID);
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		logger.debug("sessionMap: " + sessionMap);
-		
 		String activeModule=request.getParameter(ACTIVE_MODULE);
 		logger.debug("activeModule: " + activeModule);
 
@@ -1298,11 +1293,22 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= QaUtils.buildGeneralAuthoringDTO(request, qaService, qaContent, qaAuthoringForm);
 		logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+		Map mapQuestionContent=qaAuthoringForm.getMapQuestionContent();
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
+		
+        if ((mapQuestionContent != null) && (mapQuestionContent.size() > 0))
+        {
+            String defaultQuestionContent = (String)mapQuestionContent.get("1");
+            logger.debug("defaultQuestionContent: " + defaultQuestionContent);
+            qaGeneralAuthoringDTO.setDefaultQuestionContent(defaultQuestionContent);
+        }
+		
 		
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 
+		qaAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
      	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
      	qaGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(false).toString());
      	
@@ -1319,20 +1325,21 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
      	
 		QaUtils.setDefineLater(request, true, strToolContentID, qaService);
 
-		QaUtils.setFormProperties(request, qaService, qaContent, 
-	             qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+		//QaUtils.setFormProperties(request, qaService, qaContent, 
+	    //         qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 		
-		
+
 		qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+		//qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 		qaGeneralAuthoringDTO.setActiveModule(activeModule);
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
 		qaAuthoringForm.setToolContentID(strToolContentID);
-		qaAuthoringForm.setHttpSessionID(httpSessionID);
+		//qaAuthoringForm.setHttpSessionID(httpSessionID);
 		qaAuthoringForm.setActiveModule(activeModule);
 		qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 		qaAuthoringForm.setCurrentTab("1");
 
+		logger.debug("before fwding to jsp, qaAuthoringForm: " + qaAuthoringForm);
 		logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 		request.setAttribute(QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 

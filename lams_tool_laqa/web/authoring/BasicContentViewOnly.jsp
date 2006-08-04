@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  		<c:if test="${questionEntry.key > 1}"> 			
 									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 									  <tr>
-			 							<td class="field-name"> <b> <c:out value="Question ${queIndex}"/>:  </b></td>
+			 							<td> <b> <c:out value="Question ${queIndex}"/>:  </b></td>
 									  	<td>
 												<c:out value="${questionEntry.value}" escapeXml="false"/>                         
 	                                    </td>

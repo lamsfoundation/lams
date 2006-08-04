@@ -301,6 +301,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching editActivity...");
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+    	logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+    	
     	
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
@@ -336,7 +339,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
 	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
 	    
-	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);
+	    /* note that we are casting monitoring form subclass into Authoring form*/
+	    logger.debug("watch here: note that we are casting monitoring form subclass into Authoring form");
+	    return qaStarterAction.executeDefineLater(mapping, qaMonitoringForm, request, response, qaService);
 	}
 
     

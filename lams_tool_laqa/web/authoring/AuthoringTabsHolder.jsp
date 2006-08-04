@@ -140,6 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="activeModule"/>
 		<html:hidden property="httpSessionID"/>								
 		<html:hidden property="defaultContentIdStr"/>								
+		<html:hidden property="defineLaterInEditMode"/>										
 		
 		
 		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			

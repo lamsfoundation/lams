@@ -293,14 +293,14 @@ public class LearningUtil implements QaAppConstants{
     	return userFeedback;
     }
     
-    public void setContentInUse(long toolContentId, IQaService qaService)
+    public void setContentInUse(long toolContentID, IQaService qaService)
     {
-    	QaContent qaContent=qaService.loadQa(toolContentId);
+    	QaContent qaContent=qaService.loadQa(toolContentID);
     	logger.debug("retrieve qaContent: " + qaContent);
     	
         qaContent.setContentLocked(true);
-        logger.debug("content with id : " + toolContentId + "has been marked LOCKED");
+        logger.debug("content with id : " + toolContentID + "has been marked LOCKED");
         qaService.updateQa(qaContent);
-        logger.debug("content with id : " + toolContentId + "has been marked LOCKED and updated in the db");
+        logger.debug("content with id : " + toolContentID + "has been marked LOCKED and updated in the db");
     }
 }

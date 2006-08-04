@@ -178,11 +178,11 @@ public class QaServicePOJO
     }
     
     
-    public QaContent retrieveQa(long toolContentId) throws QaApplicationException
+    public QaContent retrieveQa(long toolContentID) throws QaApplicationException
     {
         try
         {
-            return qaDAO.getQaById(toolContentId);
+            return qaDAO.getQaById(toolContentID);
         }
         catch (DataAccessException e)
         {
@@ -210,11 +210,11 @@ public class QaServicePOJO
     /**
      * returns null if not found
      */
-    public QaContent loadQa(long toolContentId) throws QaApplicationException
+    public QaContent loadQa(long toolContentID) throws QaApplicationException
     {
         try
         {
-            return qaDAO.loadQaById(toolContentId);
+            return qaDAO.loadQaById(toolContentID);
         }
         catch (DataAccessException e)
         {
@@ -1019,7 +1019,7 @@ public class QaServicePOJO
 	 * default content (or author created content) already goes.
 	 * ToolContentManager CONTRACT
 	 * 
-	 * similar to public void removeToolContent(Long toolContentId)
+	 * similar to public void removeToolContent(Long toolContentID)
 	 * gets called by Container+Flash
 	 * 
 	 */
@@ -1187,16 +1187,16 @@ public class QaServicePOJO
     }
     
     
-    public void unsetAsDefineLater(Long toolContentId) throws QaApplicationException
+    public void unsetAsDefineLater(Long toolContentID) throws QaApplicationException
     {
-    	logger.debug("request for unsetAsDefineLater with toolContentId: " + toolContentId);
-    	if  (toolContentId == null)
+    	logger.debug("request for unsetAsDefineLater with toolContentID: " + toolContentID);
+    	if  (toolContentID == null)
     	{
-    		logger.debug("WARNING!: retrieved toolContentId is null.");
+    		logger.debug("WARNING!: retrieved toolContentID is null.");
             throw new QaApplicationException("Fail to setAsDefineLater"
-                    + " based on null toolContentId.");
+                    + " based on null toolContentID.");
     	}
-    	QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+    	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
     	if (qaContent == null)
     	{
     		logger.debug("WARNING!!!: retrieved qaContent is null.");
@@ -1210,20 +1210,20 @@ public class QaServicePOJO
     
 
     /**
-     * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
+     * setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
      * 
-     * @param toolContentId
+     * @param toolContentID
      * return void
      */
-    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
+    public void setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsDefineLater with toolContentId: " + toolContentId);
-    	if  (toolContentId == null)
+    	logger.debug("request for setAsDefineLater with toolContentID: " + toolContentID);
+    	if  (toolContentID == null)
     	{
-    		logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
-            throw new DataMissingException("toolContentId is missing");
+    		logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+            throw new DataMissingException("toolContentID is missing");
     	}
-    	QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+    	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
     	if (qaContent == null)
     	{
     		logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
@@ -1235,21 +1235,21 @@ public class QaServicePOJO
     }
 
     /**
-     * setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
+     * setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException
      * set the runOffline to true on this content
      * 
-     * @param toolContentId
+     * @param toolContentID
      * return void
      */
-    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
+    public void setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsRunOffline with toolContentId:" + toolContentId);
-    	if  (toolContentId == null)
+    	logger.debug("request for setAsRunOffline with toolContentID:" + toolContentID);
+    	if  (toolContentID == null)
     	{
-    		logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
-            throw new DataMissingException("toolContentId is missing");
+    		logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+            throw new DataMissingException("toolContentID is missing");
     	}
-    	QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+    	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
     	if (qaContent == null)
     	{
     		logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
@@ -1263,18 +1263,18 @@ public class QaServicePOJO
         
     /** 
      * 
-     * removeToolContent(Long toolContentId)
+     * removeToolContent(Long toolContentID)
      * gets automatically called only in monitoring mode when the author chooses to delete a lesson.
      * 
      * The idea is to remove content + its relevant sessions + in q/a tools's case the question's content from the db. 
      * ToolContentManager CONTRACT
      *  this gets called automatically by Flash when a deletion is detected in the tool interface.
      */
-    public void removeToolContent(Long toolContentId) 
+    public void removeToolContent(Long toolContentID) 
     {
-    	logger.debug("start of removeToolContent with toolContentId: " + toolContentId);
+    	logger.debug("start of removeToolContent with toolContentID: " + toolContentID);
     	
-    	QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+    	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
     	logger.debug("retrieving qaContent: " + qaContent);
     	
     	if (qaContent != null)
@@ -1302,16 +1302,16 @@ public class QaServicePOJO
             	}
             }
             
-            logger.debug("removed all existing responses of toolContent with toolContentId:" + 
-            																toolContentId);                
-            qaDAO.removeQa(toolContentId);
+            logger.debug("removed all existing responses of toolContent with toolContentID:" + 
+            																toolContentID);                
+            qaDAO.removeQa(toolContentID);
             logger.debug("removed qaContent:" + qaContent);
     	}
     }
     
-    public void removeQuestions(Long toolContentId) throws QaApplicationException 
+    public void removeQuestions(Long toolContentID) throws QaApplicationException 
 	{
-        QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+        QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
         qaContent.setQaQueContents(new TreeSet());
         
         if (qaContent != null)
@@ -1343,22 +1343,22 @@ public class QaServicePOJO
     
     
     /**
-     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+     * removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException
      * Will need an update on the core tool signature: reason : when  qaContent is null throw an exception 
      * 
      */
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+    public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException
 	{
-    	logger.debug("start of: removeToolContent(Long toolContentId, boolean removeSessionData");
-    	logger.debug("start of removeToolContent with toolContentId: " + toolContentId + "removeSessionData: " + removeSessionData);
+    	logger.debug("start of: removeToolContent(Long toolContentID, boolean removeSessionData");
+    	logger.debug("start of removeToolContent with toolContentID: " + toolContentID + "removeSessionData: " + removeSessionData);
     	
-    	if (toolContentId == null)
+    	if (toolContentID == null)
     	{
-    		logger.debug("toolContentId is null");
-    		throw new ToolException("toolContentId is missing");
+    		logger.debug("toolContentID is null");
+    		throw new ToolException("toolContentID is missing");
     	}
     	
-    	QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+    	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
     	logger.debug("retrieving qaContent: " + qaContent);
     	
     	if (qaContent != null)
@@ -1392,15 +1392,15 @@ public class QaServicePOJO
             	}
             }
             
-            logger.debug("removed all existing responses of toolContent with toolContentId:" + 
-            																toolContentId);                
-            qaDAO.removeQa(toolContentId);        
+            logger.debug("removed all existing responses of toolContent with toolContentID:" + 
+            																toolContentID);                
+            qaDAO.removeQa(toolContentID);        
             logger.debug("removed qaContent:" + qaContent);
     	}
     	else
     	{
         	logger.debug("Warning!!!, We should have not come here. qaContent is null.");
-        	throw new ToolException("toolContentId is missing");
+        	throw new ToolException("toolContentID is missing");
     	}
 	}
     
@@ -1411,14 +1411,14 @@ public class QaServicePOJO
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
-		QaContent toolContentObj = qaDAO.getQaById(toolContentId);
+	public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
+		QaContent toolContentObj = qaDAO.getQaById(toolContentID);
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentID);
  		
 		try {
 			//set ToolContentHandler as null to avoid copy file node in repository again.
-			toolContentObj = QaContent.newInstance(null,toolContentObj,toolContentId);
+			toolContentObj = QaContent.newInstance(null,toolContentObj,toolContentID);
 			
 			//don't export following fields value
 			toolContentObj.setQaSessions(null);
@@ -1435,7 +1435,7 @@ public class QaServicePOJO
 			}
 			
 			exportContentService.registerFileClassForExport(QaUploadedFile.class.getName(),"uuid",null);
-			exportContentService.exportToolContent( toolContentId, toolContentObj,qaToolContentHandler, rootPath);
+			exportContentService.exportToolContent( toolContentID, toolContentObj,qaToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
 		} catch (ItemNotFoundException e) {
@@ -1450,7 +1450,7 @@ public class QaServicePOJO
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	 public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	 public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath) throws ToolException {
 		 try {
 				exportContentService.registerFileClassForImport(QaUploadedFile.class.getName(),"uuid",null,"fileName","fileProperty",null,null);
 				
@@ -1459,8 +1459,8 @@ public class QaServicePOJO
 					throw new ImportToolContentException("Import QA tool content failed. Deserialized object is " + toolPOJO);
 				QaContent toolContentObj = (QaContent) toolPOJO;
 				
-//				reset it to new toolContentId
-				toolContentObj.setQaContentId(toolContentId);
+//				reset it to new toolContentID
+				toolContentObj.setQaContentId(toolContentID);
 				toolContentObj.setCreatedBy(newUserUid);
 				
 				//set back the tool content
@@ -1504,16 +1504,16 @@ public class QaServicePOJO
 	}
     
     /**
-     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId) throws ToolException
+     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentID) throws ToolException
      * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
      * 
      * gets called only in the Learner mode.
      * All the learners in the same group have the same toolSessionId.
      * 
      */
-    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException
     {
-    	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
+    	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentID);
     	logger.debug("toolSessionName: " + toolSessionName);
     	
     	if (toolSessionId == null)
@@ -1523,16 +1523,16 @@ public class QaServicePOJO
     	}
     	
     	long defaultContentId=0;
-    	if (toolContentId == null)
+    	if (toolContentID == null)
         {
-        	logger.debug("toolContentId is null.");
+        	logger.debug("toolContentID is null.");
         	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
         
 			try
 			{
 				defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
-				toolContentId=new Long(defaultContentId);
-				logger.debug("updated toolContentId to: " + toolContentId);
+				toolContentID=new Long(defaultContentId);
+				logger.debug("updated toolContentID to: " + toolContentID);
 			}
 			catch(Exception e)
 			{
@@ -1540,9 +1540,9 @@ public class QaServicePOJO
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
         }
-    	logger.debug("final toolSessionId and toolContentId: " +  toolSessionId + " " + toolContentId);
+    	logger.debug("final toolSessionId and toolContentID: " +  toolSessionId + " " + toolContentID);
     	
-        QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+        QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
         logger.debug("retrieved qaContent: " + qaContent);
         
         if (qaContent == null)
@@ -1553,8 +1553,8 @@ public class QaServicePOJO
 			try
 			{
 				defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
-				toolContentId=new Long(defaultContentId);
-				logger.debug("updated toolContentId to: " + toolContentId);
+				toolContentID=new Long(defaultContentId);
+				logger.debug("updated toolContentID to: " + toolContentID);
 			}
 			catch(Exception e)
 			{
@@ -1562,7 +1562,7 @@ public class QaServicePOJO
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
 
-			qaContent = qaDAO.loadQaById(toolContentId.longValue());
+			qaContent = qaDAO.loadQaById(toolContentID.longValue());
         }
         logger.debug("final - retrieved qaContent: " + qaContent);
 

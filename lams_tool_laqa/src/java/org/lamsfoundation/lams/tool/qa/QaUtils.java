@@ -87,7 +87,6 @@ public abstract class QaUtils implements QaAppConstants {
         logger.debug("start buildGeneralAuthoringDTO: " + qaContent);
         QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
         
-        logger.debug("setting for existing content: ");
         qaGeneralAuthoringDTO.setToolContentID(qaContent.getQaContentId().toString());
         qaAuthoringForm.setToolContentID(qaContent.getQaContentId().toString());
 
@@ -107,7 +106,9 @@ public abstract class QaUtils implements QaAppConstants {
 			}
 		}
 
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
+		qaAuthoringForm.setMapQuestionContent(mapQuestionContent);
 	    
 		long defaultContentID=0;
 		logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
@@ -115,9 +116,26 @@ public abstract class QaUtils implements QaAppConstants {
 		logger.debug("retrieved tool default contentId: " + defaultContentID);
 		
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
-		qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
-		qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
+		
+		if (qaContent.getTitle() == null)
+		{
+			qaGeneralAuthoringDTO.setActivityTitle("Q&A Title");
+		}
+		else
+		{
+			qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+		}
 
+		if (qaContent.getInstructions() == null)
+		{
+		    qaGeneralAuthoringDTO.setActivityInstructions("Q&A Instructions");
+		}
+		else
+		{
+		    qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
+		}
+		
+		
 		qaGeneralAuthoringDTO.setReportTitle(qaContent.getReportTitle());
 	    qaGeneralAuthoringDTO.setMonitoringReportTitle(qaContent.getMonitoringReportTitle());
 	    qaGeneralAuthoringDTO.setEndLearningMessage(qaContent.getEndLearningMessage());
@@ -131,6 +149,7 @@ public abstract class QaUtils implements QaAppConstants {
 	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
 	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
 	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
+	    
         
 	    logger.debug("ending buildGeneralAuthoringDTO with qaGeneralAuthoringDTO : " + qaGeneralAuthoringDTO);
 	    logger.debug("ending buildGeneralAuthoringDTO with qaAuthoringForm: " + qaAuthoringForm);
@@ -157,6 +176,7 @@ public abstract class QaUtils implements QaAppConstants {
     	    qaAuthoringForm.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
     	
     	qaAuthoringForm.setActiveModule(activeModule);
+    	qaGeneralAuthoringDTO.setActiveModule(activeModule);
     	
 		String synchInMonitor=request.getParameter(SYNC_IN_MONITOR);
     	logger.debug("synchInMonitor: " + synchInMonitor);
@@ -198,9 +218,14 @@ public abstract class QaUtils implements QaAppConstants {
 		logger.debug("onlineInstructions: " + onlineInstructions);
 		qaAuthoringForm.setOnlineInstructions(onlineInstructions);
 		qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+
+		String defineLaterInEditMode=request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
+		logger.debug("defineLaterInEditMode: " + defineLaterInEditMode);
+		qaAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
+		qaGeneralAuthoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
 		
-		logger.debug("ending setFormProperties qaAuthoringForm: " + qaAuthoringForm);
-		logger.debug("ending setFormProperties qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+		logger.debug("ending setFormProperties with qaAuthoringForm: " + qaAuthoringForm);
+		logger.debug("ending setFormProperties with qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
     }
 
     
@@ -215,10 +240,10 @@ public abstract class QaUtils implements QaAppConstants {
 	
 	
 	/**
-	 * existsContent(long toolContentId)
-	 * @param long toolContentId
+	 * existsContent(long toolContentID)
+	 * @param long toolContentID
 	 * @return boolean
-	 * determine whether a specific toolContentId exists in the db
+	 * determine whether a specific toolContentID exists in the db
 	 */
 	public static boolean existsContent(long toolContentID, IQaService qaService)
 	{    
@@ -527,10 +552,10 @@ public abstract class QaUtils implements QaAppConstants {
 	
 
 	/**
-	 * setDefineLater(HttpServletRequest request, boolean value, String toolContentId)
+	 * setDefineLater(HttpServletRequest request, boolean value, String toolContentID)
 	 * @param request
 	 * @param value
-	 * @param toolContentId
+	 * @param toolContentID
 	 */
 	public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID, IQaService qaService)
     {

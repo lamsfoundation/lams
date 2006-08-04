@@ -105,9 +105,14 @@ public class QaDLStarterAction extends Action implements QaAppConstants {
 		QaUtils.cleanUpSessionAbsolute(request);
 		logger.debug("init defineLater mode. removed attributes...");
 		
+		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+		logger.debug("qaAuthoringForm: " + qaAuthoringForm);
+		
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		qaAuthoringForm.setQaService(qaService);
+		
 		
 	    QaStarterAction qaStarterAction= new QaStarterAction();
-	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);
+	    return qaStarterAction.executeDefineLater(mapping, qaAuthoringForm, request, response, qaService);
 	}
 }

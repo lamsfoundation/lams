@@ -23,9 +23,12 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 /* ActionForm for the Authoring environment*/
+import java.util.Map;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
 /**
  * @author Ozgur Demirtas
@@ -80,7 +83,11 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
 	protected String edit;
 	
+	protected String defineLaterInEditMode;
 	protected String defaultContentIdStr;
+	protected Map mapQuestionContent;
+	protected IQaService qaService;
+	
 	
 	public void resetUserAction()
     {
@@ -160,6 +167,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
             .append("usernameVisible: ", usernameVisible)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
+            .append("defineLaterInEditMode: ", defineLaterInEditMode)
             .toString();
     }
 
@@ -597,4 +605,43 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
         this.defaultContentIdStr = defaultContentIdStr;
     }
 
+    /**
+     * @return Returns the qaService.
+     */
+    public IQaService getQaService() {
+        return qaService;
+    }
+    /**
+     * @param qaService The qaService to set.
+     */
+    public void setQaService(IQaService qaService) {
+        this.qaService = qaService;
+    }
+    
+    /**
+     * @return Returns the mapQuestionContent.
+     */
+    public Map getMapQuestionContent() {
+        return mapQuestionContent;
+    }
+    /**
+     * @param mapQuestionContent The mapQuestionContent to set.
+     */
+    public void setMapQuestionContent(Map mapQuestionContent) {
+        this.mapQuestionContent = mapQuestionContent;
+    }
+    
+    
+    /**
+     * @return Returns the defineLaterInEditMode.
+     */
+    public String getDefineLaterInEditMode() {
+        return defineLaterInEditMode;
+    }
+    /**
+     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     */
+    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
+        this.defineLaterInEditMode = defineLaterInEditMode;
+    }
 }

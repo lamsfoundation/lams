@@ -186,9 +186,19 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		qaAuthoringForm.resetRadioBoxes();
 		
-		IQaService qaService =QaServiceProxy.getQaService(getServlet().getServletContext());
+		IQaService qaService =null;
+		if ((getServlet() == null) || (getServlet().getServletContext() == null))
+		{
+		    logger.debug("obtaining qaService from the form");
+		    qaService=qaAuthoringForm.getQaService();
+		}
+		else
+		{
+		    logger.debug("obtaining qaService via proxy");
+		    qaService =QaServiceProxy.getQaService(getServlet().getServletContext());
+		}
 		logger.debug("qaService: " + qaService);
-
+		
 		qaGeneralAuthoringDTO.setCurrentTab("1");
 		logger.debug("setting currrent tab to 1:");
 		
@@ -357,9 +367,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		String destination=QaUtils.getDestination(sourceMcStarter, requestedModule);
 		logger.debug("destination: " + destination);
 		
-		
-		logger.debug("setting form properties: " + qaContent);
-		
 		Map mapQuestionContentLocal=qaGeneralAuthoringDTO.getMapQuestionContent(); 
 		logger.debug("mapQuestionContentLocal: " + mapQuestionContentLocal);
 		
@@ -368,6 +375,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		logger.debug("persisting sessionMap into session: " + sessionMap);
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
+		logger.debug("before fwding to jsp, qaAuthoringForm : " + qaAuthoringForm);
 		logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 		request.setAttribute(QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 		
@@ -609,12 +617,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * @throws ServletException
 	 * @throws QaApplicationException
 	 */
-	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
+	public ActionForward executeDefineLater(ActionMapping mapping, QaAuthoringForm qaAuthoringForm, 
 			HttpServletRequest request, HttpServletResponse response, IQaService qaService) 
 		throws IOException, ServletException, QaApplicationException {
-		logger.debug("passed qaService: " + qaService);
 		logger.debug("calling execute..., qaService will be needed next.");
-		return execute(mapping, form, request, response);
+		return execute(mapping, qaAuthoringForm, request, response);
 	}
 
 	

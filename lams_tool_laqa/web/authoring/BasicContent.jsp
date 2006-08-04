@@ -99,7 +99,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${qaGeneralAuthoringDTO.toolContentID}"/>
+
 						<html:hidden property="questionIndex"/>
                         
                         <tr>
