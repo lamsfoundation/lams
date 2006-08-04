@@ -22,6 +22,12 @@
  */
 package org.lamsfoundation.testharness;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -132,8 +138,46 @@ public class TestReporter {
 	public static void generateReport(AbstractTestManager manager) {
 		report(manager);
 		log.info("Generating the formal test report document...");
-		//TODO implement me
 		log.info("Sorry, this feature is not ready yet. It should come soon.");
 	}
 
+	private static class TemplateCompiler{
+		static String loadAndCompile() throws IOException{
+			StringBuilder result = new StringBuilder();
+			LineNumberReader lnReader = new LineNumberReader(new FileReader(fileTemplate));
+			String line = lnReader.readLine();
+			while (line != null){
+				List<String> block = new ArrayList<String>();
+				int statementIdx = line.indexOf("<#");
+				int elIdx = line.indexOf("${");
+				if(statementIdx!=-1){
+					block.add(line);
+					String keyword = line.substring(statementIdx+2,line.indexOf(' ',statementIdx));
+					String endTag = "</#" + keyword + '>';
+					while((line!=null)&&(line.indexOf(endTag) == -1)){
+						block.add(line = lnReader.readLine());
+					}
+					if(line == null){
+						throw new TestHarnessException("Cannot find end tag "+endTag);
+					}
+					result.append(compileBlock((String[])block.toArray(),keyword, endTag));
+				}else if(elIdx!=-1){
+					String el = line.substring(elIdx,line.indexOf('}',elIdx)+1);
+					result.append(line.replace(el, compileEl(el)));
+				}else{
+					result.append(line).append('\n');
+				}
+				line = lnReader.readLine();
+			}
+			return null;
+		}
+
+		private static Object compileBlock(String[] strings, String keyword, String endTag) {
+			return null;
+		}
+
+		private static String compileEl(String el) {
+			return null;
+		}
+	}
 }

@@ -105,7 +105,7 @@ public class MonitorTest extends AbstractTest {
 	}
 
 	public void notifyMonitorToStop(CountDownLatch stopSignal){
-		if(monitorThread.isAlive()){
+		if((monitorThread != null) && monitorThread.isAlive()){
 			((MockMonitor)users[0]).setStopFlag(stopSignal);
 		}else{
 			stopSignal.countDown();

@@ -118,7 +118,7 @@ public class Call {
     }
     
     /**
-     *  need add CallRecord to TestReport
+     *  need add CallRecord to TestReporter
      */
     public Object execute(){
     	switch(test.callType){
@@ -215,10 +215,8 @@ public class Call {
 	}
 	
 	private boolean isCancelButton(SubmitButton button) {
-		if(button.getName().contains("CANCEL")||button.getName().contains("Cancel")||button.getName().contains("cancel")
-				||button.getValue().contains("cancel")||button.getValue().contains("Cancel")||button.getValue().contains("CANCEL"))
-			return true;
-		return false;
+		return button.getName().contains("CANCEL")||button.getName().contains("Cancel")||button.getName().contains("cancel")
+				||button.getValue().contains("cancel")||button.getValue().contains("Cancel")||button.getValue().contains("CANCEL");
 	}
 
 	/**
