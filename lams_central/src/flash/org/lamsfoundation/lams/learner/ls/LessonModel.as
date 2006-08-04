@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.common.util.Observable;
+import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.Progress;
@@ -40,6 +41,7 @@ class LessonModel extends Observable {
 	private var __height:Number;
 	private var __x:Number;
 	private var __y:Number;
+	private var _spadHeight:Number;
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
 	
@@ -99,6 +101,17 @@ class LessonModel extends Observable {
 		notifyObservers(infoObj);
 	}
 	
+	
+	public function setSpadHeight(h:Number){
+		trace ("height is set to: "+h)
+		_spadHeight = h
+		Application.getInstance().onResize();
+	}
+	
+	public function getSpadHeight(){
+		trace ("returning pi height: "+_spadHeight)
+		return _spadHeight;
+	}
 	
 	/**
 	 * Set Lesson's unique ID
