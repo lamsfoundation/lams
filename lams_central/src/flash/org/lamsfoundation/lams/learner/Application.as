@@ -53,7 +53,8 @@ class Application extends ApplicationParent {
 	public static var LESSON_X:Number = 0;
 	public static var LESSON_Y:Number = 82;
 	public static var SPAD_X:Number = 0;
-	public static var SPAD_H:Number = 200;
+	public static var SPAD_Y:Number = 554;
+	public static var SPAD_H:Number = 220;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
@@ -212,7 +213,7 @@ class Application extends ApplicationParent {
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
         _lesson.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
-		_scratchpad_mc = _appRoot_mc.createChildAtDepth('LScratchPad', DepthManager.kTop, {_x:SPAD_X, _y:Stage.height-SPAD_H});
+		_scratchpad_mc = _container_mc.createChildAtDepth('LScratchPad', DepthManager.kTop, {_x:SPAD_X, _y:SPAD_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
 		_scratchpad_mc.addEventListener('load', Proxy.create(this, UIElementLoaded));
 	}
 	
@@ -304,12 +305,17 @@ class Application extends ApplicationParent {
 		
 		var someListener:Object = new Object();
 		someListener.onMouseUp = function () {
-			_lesson.setSize(w,h);
+			_lesson.setSize(w,h-(LESSON_Y+_lesson.model.getSpadHeight()));
+			
+			_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
 		}
 		
 		Header(_header_mc).resize(w);
-		Scratchpad(_scratchpad_mc).resize(w);
-		_lesson.setSize(w,h-LESSON_Y-SPAD_H);
+		
+		_lesson.setSize(w,h-(LESSON_Y+_lesson.model.getSpadHeight()));
+		//Property Inspector
+		//_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
+		_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
 		
 	}
 	

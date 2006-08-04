@@ -20,23 +20,36 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
-import mx.controls.*
-import mx.utils.*
-import mx.managers.*
-import mx.events.*
-
 import org.lamsfoundation.lams.learner.*;
+import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.style.*;
+import mx.controls.*
+import mx.utils.*
+import mx.managers.*
+import mx.events.*
+
 
 class Scratchpad extends MovieClip {
 	
+	//Height Properties
+	private var spadHeightHide:Number = 20;
+	private var spadHeightFull:Number = 217;
+	
+	//Open Close Identifier
+	private var _spadIsExpended:Boolean;
+	
+	//Component properties
 	private var _scratchpad_mc:MovieClip;
+	private var spadHead_pnl:MovieClip;
+	private var spadTitle_lbl:Label;
 	private var _container:MovieClip;		// Holding Container
+	private var minIcon:MovieClip;
+	private var maxIcon:MovieClip;
+	private var clickTarget_mc:MovieClip;
 	private var view_btn:MovieClip;         // buttons
     private var save_btn:MovieClip;
 	private var view_lbl:TextField;
@@ -51,7 +64,8 @@ class Scratchpad extends MovieClip {
 	private var entry_txa:TextArea;
 	
 	private var panel:MovieClip;       //The underlaying panel base
-    
+    private var _lessonModel:LessonModel;
+	 private var _lessonController:LessonController;
 	private var _tm:ThemeManager;
 	private var _dictionary:Dictionary;
 	
@@ -86,9 +100,12 @@ class Scratchpad extends MovieClip {
 		
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
-		
+		_lessonModel = _lessonModel;
+		_lessonController = _lessonController;
 		_scratchpad_mc = this;
-		
+		_spadIsExpended = false;
+		maxIcon._visible = false;
+		_lessonModel.setSpadHeight(spadHeightHide);
 		setLabels();
 		resize(Stage.width);
 		
@@ -111,11 +128,44 @@ class Scratchpad extends MovieClip {
 		
 		save_btn.onRollOver = Proxy.create(this,this['showToolTip'], save_btn, "sp_save_tooltip");
 		save_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
-		
+		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
+		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		this.onEnterFrame = setLabels;
 		
 	}
 	
+	public function localOnRelease():Void{
+		
+		if (_spadIsExpended){
+			trace("P Pressed in 'localOnRelease' and _spadIsExpended is: "+_spadIsExpended)
+			_spadIsExpended = false
+			minIcon._visible = true;
+			maxIcon._visible = false;
+			_lessonModel.setSpadHeight(spadHeightHide);
+			
+		}else {
+			trace("P Pressed in 'localOnRelease' and _spadIsExpended is: "+_spadIsExpended)
+			_spadIsExpended = true
+			minIcon._visible = false;
+			maxIcon._visible = true;
+			_lessonModel.setSpadHeight(spadHeightFull);
+			//Application.getInstance().onResize();
+		}
+	}
+	
+	public function isSpadExpanded():Boolean{
+		return _spadIsExpended;
+	}
+	
+	public function spadFullHeight():Number{
+		return spadHeightFull;
+	}
+	
+	
+	public function localOnReleaseOutside():Void{
+		Debugger.log('Release outside so no event has been fired, current state is: ' + _spadIsExpended,Debugger.GEN,'localOnReleaseOutside','Scratch Pad');
+		
+	}
 	public function showToolTip(btnObj, btnTT:String):Void{
 		
 		var Xpos = Application.HEADER_X+ 5;
@@ -138,14 +188,22 @@ class Scratchpad extends MovieClip {
 		styleObj = _tm.getStyleObject('textarea');
 		title_txi.setStyle('styleName', styleObj);
 		entry_txa.setStyle('styleName', styleObj);
+		spadTitle_lbl.setStyle('styleName', styleObj);
 		
+		//For Panels
+		styleObj = _tm.getStyleObject('BGPanel');
+		spadHead_pnl.setStyle('styleName',styleObj);
 	}
 	
 	private function setLabels(){
 		//Set the text for buttons
         view_lbl.text = Dictionary.getValue('sp_view_lbl');
         save_lbl.text = Dictionary.getValue('sp_save_lbl');
+		
+		//Set text for Scratch pad labels
+		spadTitle_lbl.text = Dictionary.getValue('sp_panel_lbl');
 		_title.text = Dictionary.getValue('sp_title_lbl');
+		
 		
 		setStyles();
 		
