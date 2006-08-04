@@ -50,11 +50,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var _canvasView : CanvasView;
 	private var _monitorController : MonitorController;
 	private var _monitorTabView : MonitorTabView;
+	private var _ca = ComplexActivity;
 	//Set by the init obj
 	private var _activity : Activity;
 	private var _children : Array;
 	private var children_mc : Array 
 	private var panelHeight : Number;
+	private var actMinOptions: Number;
+	private var actMaxOptions: Number;
 	//refs to screen items:
 	private var container_pnl : Panel;
 	private var header_pnl : Panel;
@@ -88,11 +91,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	function CanvasOptionalActivity ()	{
 		optionalActivity_mc = this
 		_ddm = new DesignDataModel ();
+		
 		_visible = false;
 		_tm = ThemeManager.getInstance ();
 		_dictionary = Dictionary.getInstance();
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
+		_ca = new ComplexActivity(_activity.activityUIID)
 		//_activity.title = Dictionary.getValue('opt_activity_title')
 		//init();
 		MovieClipUtils.doLater (Proxy.create (this, init));
@@ -104,6 +109,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
+		trace("complex MinOptions :"+_ca.minOptions)
+		actMinOptions = _ca.minOptions;
+		actMaxOptions = _ca.maxOptions;
+		
+		trace("MinOptions :"+actMinOptions)
+		trace("MaxOptions :"+actMaxOptions)
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		_locked = false;
 		showStatus(false);
