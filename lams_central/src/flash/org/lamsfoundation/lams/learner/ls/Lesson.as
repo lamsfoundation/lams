@@ -291,6 +291,15 @@ class Lesson {
 	
 	}
 	
+	
+	//class accesssor methods
+	public function get model():LessonModel{
+		return lessonModel;
+	}
+	
+	public function get view():LessonView{
+		return lessonView;
+	}
 	/**
 	* Used by application to set the size
 	* @param width The desired width
