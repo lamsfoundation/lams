@@ -338,17 +338,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			log.error("Failed on getting session by given sessionID:" + sessionId);
 			throw new ForumException("Failed on getting session by given sessionID:" + sessionId);
 		}
-		List topicsFromAuthor = messageDao.getTopicsFromAuthor(session.getForum().getUid());
 		
 		//sorted by last post date
 		Message msg;
 		SortedMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
 		Iterator iter = topicsBySession.iterator();
-		while(iter.hasNext()){
-			msg = (Message) iter.next();
-			map.put(msg.getLastReplyDate(),msg);
-		}
-		iter = topicsFromAuthor.iterator();
 		while(iter.hasNext()){
 			msg = (Message) iter.next();
 			map.put(msg.getLastReplyDate(),msg);
@@ -695,6 +689,34 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		Forum forum = forumDao.getByContentId(toolContentId);
 		session.setForum(forum);
 		forumToolSessionDao.saveOrUpdate(session);
+		
+		//also clone author created topic from this forum tool content!!!
+		//this can avoid topic record information conflict when multiple sessions are against same tool content
+		//for example, the reply number maybe various for different sessions.
+		List topicsFromAuthor = messageDao.getTopicsFromAuthor(session.getForum().getUid());
+		
+		//sorted by last post date
+		Message msg;
+		SortedMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
+		Iterator iter = topicsFromAuthor.iterator();
+		while(iter.hasNext()){
+			msg = (Message) iter.next();
+			//Don't copy other session's topic, only from tool content!!!.
+			if(msg.getToolSession() != null)
+				continue;
+			//set this message forum Uid as toContent
+			if(!msg.getIsAuthored())
+				continue;
+			Message newMsg = (Message) msg.clone();
+			//reset some value.
+			newMsg.setReplyNumber(0);
+			newMsg.setHideFlag(false);
+			//it should be new message
+			newMsg.setUid(null);
+			//!!! set current session to authored message
+			newMsg.setToolSession(session);
+			createRootTopic(toolContentId,null,newMsg);
+		}
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {

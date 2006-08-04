@@ -92,20 +92,21 @@ public class Message implements Cloneable{
   		try{
   			msg = (Message) super.clone();
   			msg.setUid(null);
-  			if(parent != null){
-  				msg.parent = (Message) parent.clone();
-  				//try to keep parent uid, so avoid persistant a new instance in database for parent message 
-  				msg.parent.uid = parent.uid;
-  			}
-  			if(toolSession != null){
-  				msg.toolSession = (ForumToolSession) toolSession.clone();
-  			}
+  			//it is not necessary to deep clone following comment fields.
   			//don't  deep clone forum to avoid dead loop in clone
-  			if(createdBy != null){
-  				msg.createdBy = (ForumUser) createdBy.clone();
-  			}
-  			if(modifiedBy != null)
-  				msg.modifiedBy = (ForumUser) modifiedBy.clone();
+//  			if(parent != null){
+//  				msg.parent = (Message) parent.clone();
+//  				//try to keep parent uid, so avoid persistant a new instance in database for parent message 
+//  				msg.parent.uid = parent.uid;
+//  			}
+//  			if(toolSession != null){
+//  				msg.toolSession = (ForumToolSession) toolSession.clone();
+//  			}
+//  			if(createdBy != null){
+//  				msg.createdBy = (ForumUser) createdBy.clone();
+//  			}
+//  			if(modifiedBy != null)
+//  				msg.modifiedBy = (ForumUser) modifiedBy.clone();
   			//clone attachment
   			if(attachments != null){
   				Iterator iter = attachments.iterator();
