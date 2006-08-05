@@ -389,7 +389,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 
 	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, toolSessionID, learnerProgressUserId, 
-	    	        generalLearnerFlowDTO);
+	    	        generalLearnerFlowDTO, false);
     		
     		logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
     		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		}
@@ -452,7 +452,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    		    	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
 
 		    		    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
-		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionID.toString(), null, generalLearnerFlowDTO);
+		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
+		    		    	        currentToolSessionID.toString(), null, generalLearnerFlowDTO, false);
 		    		    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		    	    		
 		    	    		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_REPORT);

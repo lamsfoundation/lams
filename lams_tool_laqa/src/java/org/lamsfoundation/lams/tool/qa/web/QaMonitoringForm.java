@@ -24,7 +24,9 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 /* ActionForm for the Monitoring environment */
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
 /**
  * @author Ozgur Demirtas
@@ -36,10 +38,52 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
 	protected String selectedToolSessionId;
 	protected String isToolSessionChanged;
 	
+	protected String editResponse;
 	protected String hideResponse;
 	protected String showResponse;
 	protected String currentUid;
 	
+	protected IQaService qaService;
+	
+	
+	public String toString() {
+	    super.toString();
+        return new ToStringBuilder(this)
+        	.append("Listing current QaMonitoringForm properties: ")
+            .append("method: ", method)
+            .append("selectedToolSessionId: ", selectedToolSessionId)
+            .append("isToolSessionChanged: ", isToolSessionChanged)
+            .append("editResponse: ", editResponse)
+            .append("hideResponse: ", hideResponse)
+            .append("showResponse: ", showResponse)
+            .append("currentUid: ", currentUid)
+            .toString();
+    }
+	
+    /**
+     * @return Returns the editResponse.
+     */
+    public String getEditResponse() {
+        return editResponse;
+    }
+    /**
+     * @param editResponse The editResponse to set.
+     */
+    public void setEditResponse(String editResponse) {
+        this.editResponse = editResponse;
+    }
+    /**
+     * @return Returns the qaService.
+     */
+    public IQaService getQaService() {
+        return qaService;
+    }
+    /**
+     * @param qaService The qaService to set.
+     */
+    public void setQaService(IQaService qaService) {
+        this.qaService = qaService;
+    }
     /**
      * @return Returns the currentUid.
      */

@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -462,7 +461,6 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
 		request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
 		request.getSession().removeAttribute(COUNT_ALL_USERS);
-		request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
 		request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
 		request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS);
 		request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS_ID);
@@ -529,7 +527,7 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
 		request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
 		request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
-		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
+		//request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
 		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
 		request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
 		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);

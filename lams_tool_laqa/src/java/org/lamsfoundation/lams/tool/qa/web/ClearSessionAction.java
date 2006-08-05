@@ -45,23 +45,6 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
 			session.removeAttribute(QaAction.SUBMIT_SUCCESS);
-			session.removeAttribute(QaAction.TOOL_SERVICE);
-			session.removeAttribute(QaAction.MAP_QUESTION_CONTENT);
-			session.removeAttribute(QaAction.EDITACTIVITY_EDITMODE);
-			session.removeAttribute(QaAction.RENDER_MONITORING_EDITACTIVITY);
-			session.removeAttribute(QaAction.ATTACHMENT_LIST);
-			session.removeAttribute(QaAction.DELETED_ATTACHMENT_LIST);
-			session.removeAttribute(QaAction.USER_EXCEPTION_QUESTIONS_DUPLICATE);
-			session.removeAttribute(QaAction.ACTIVITY_TITLE);
-			session.removeAttribute(QaAction.ACTIVITY_INSTRUCTIONS);
-			session.removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-			session.removeAttribute(QaAction.DEFINE_LATER_IN_EDIT_MODE);
-			session.removeAttribute(QaAction.TARGET_MODE);
-			session.removeAttribute(QaAction.REQUESTED_MODULE);
-			session.removeAttribute(QaAction.ACTIVE_MODULE);
-			session.removeAttribute(QaAction.IS_DEFINE_LATER);
-			session.removeAttribute(QaAction.SHOW_AUTHORING_TABS);
-			session.removeAttribute("queIndex");
 		}
 	}
 

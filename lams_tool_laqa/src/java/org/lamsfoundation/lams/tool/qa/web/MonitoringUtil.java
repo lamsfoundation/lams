@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -43,9 +42,6 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -396,7 +392,7 @@ public class MonitoringUtil implements QaAppConstants{
 			{
 				logger.debug("just populating data normally just like monitoring summary, except that the data is ony for a specific session" );
 				logger.debug("isUserNamesVisible true, isLearnerRequest true" );
-				//String userID= (String)request.getSession().getAttribute(USER_ID);
+
 			    String userID = QaUtils.getCurrentLearnerID();				
 				logger.debug("userID: " + userID);
 				QaQueUsr qaQueUsr=qaService.getQaQueUsrById(new Long(userID).longValue());
@@ -442,7 +438,7 @@ public class MonitoringUtil implements QaAppConstants{
 					logger.debug("populating data normally exception are for a specific session and other user names are not visible.");				
 					logger.debug("isUserNamesVisible false, isLearnerRequest true" );
 					logger.debug("getting only current user's data" );
-					//String userID= (String)request.getSession().getAttribute(USER_ID);
+
 					String userID = QaUtils.getCurrentLearnerID();
 					logger.debug("userID: " + userID);
 								
@@ -577,7 +573,7 @@ public class MonitoringUtil implements QaAppConstants{
 		{
 				Map data=(Map)listIterator.next();
 				map.put(mapIndex.toString(), data);
-			mapIndex=new Long(mapIndex.longValue()+1);
+				mapIndex=new Long(mapIndex.longValue()+1);
 		}
 		return map;
 	}

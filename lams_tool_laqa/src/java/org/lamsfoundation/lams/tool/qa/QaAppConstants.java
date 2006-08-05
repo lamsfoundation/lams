@@ -28,9 +28,9 @@ package org.lamsfoundation.lams.tool.qa;
 public interface QaAppConstants {
 
 	public static final String MY_SIGNATURE 							="laqa11";
-	public static final long DEFAULT_CONTENT_ID 						=0;
-    public static final long DEFAULT_QUE_CONTENT_ID 					=1;
-	public static final String TOOL_SERVICE								="tool_service";
+	public static final long   DEFAULT_CONTENT_ID 						=0;
+    public static final long   DEFAULT_QUE_CONTENT_ID 					=1;
+	//public static final String TOOL_SERVICE								="tool_service";
 	public static final String ERROR_QAAPPLICATION 						= "error.exception.QaApplication";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
 	public static final String MAP_QUESTION_CONTENT_KEY					= "mapQuestionContentKey";
@@ -95,6 +95,7 @@ public interface QaAppConstants {
 			
     public static final Long INITIAL_QUESTION_COUNT						=new Long(1);
     public static final String QA_GENERAL_AUTHORING_DTO					="qaGeneralAuthoringDTO";
+    public static final String QA_GENERAL_MONITORING_DTO				="qaGeneralMonitoringDTO";
     
     /*
      * Struts level constants
@@ -146,7 +147,7 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_WRONG_FORMAT				="userExceptionWrongFormat";
     public static final String USER_EXCEPTION_UNCOMPATIBLE_IDS      	="userExceptionUncompatibleIds";
     public static final String USER_EXCEPTION_NUMBERFORMAT  	    	="userExceptionNumberFormat";
-    public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST		="userExceptionContentDoesNotExist";
+    //public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST		="userExceptionContentDoesNotExist";
     public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST	="userExceptionToolSessionDoesNotExist";
     public static final String USER_EXCEPTION_CONTENTID_REQUIRED		="userExceptionContentIdRequired";
     public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED	="userExceptionToolSessionIdRequired";
@@ -171,7 +172,6 @@ public interface QaAppConstants {
     
     
     public static final String COUNT_ALL_USERS							="countAllUsers";
-    public static final String CURRENT_MONITORING_TAB					="currentMonitoringTab";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
     public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";

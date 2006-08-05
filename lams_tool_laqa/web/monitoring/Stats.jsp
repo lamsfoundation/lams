@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  				<b> <bean:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	  <c:out value="${sessionScope.countAllUsers}"/>
+							  	  <c:out value="${qaGeneralMonitoringDTO.countAllUsers}"/>
 							</td> 
 						</tr>
 						
@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  				<b>  <bean:message key="count.finished.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	 <c:out value="${sessionScope.countSessionComplete}"/>
+							  	 <c:out value="${qaGeneralMonitoringDTO.countSessionComplete}"/>
 							</td> 
 						</tr>
 		</table>

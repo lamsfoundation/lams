@@ -83,7 +83,6 @@ public class GeneralLearnerFlowDTO implements Comparable
     protected String currentMonitoredToolSession;
     
     
-    
     /**
      * @return Returns the currentMonitoredToolSession.
      */

@@ -284,7 +284,7 @@
 		path="/monitoringStarter"
 		type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
 		name="QaMonitoringForm"
-		scope="session"
+		scope="request"
 		parameter="method"
 		unknown="false"
 		validate="true">
@@ -312,7 +312,7 @@
 	      path="/monitoring"
 	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
 	      name="QaMonitoringForm"
-	      scope="session"
+	      scope="request"
 	      parameter="method"
 	      unknown="false"
 	      validate="true">

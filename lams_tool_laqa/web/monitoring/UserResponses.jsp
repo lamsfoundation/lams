@@ -22,7 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp" %>
 
 	<tr> 
-		<c:if test="${editResponse != 'true'}">	  	 									 			
+		<c:if test="${qaGeneralMonitoringDTO.editResponse != 'true'}">	  	 									 			
 			 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 			 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
 			 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
@@ -53,7 +53,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 	</td>	  	 
 		</c:if>
 		
-		<c:if test="${editResponse == 'true'}">	  	
+		<c:if test="${qaGeneralMonitoringDTO.editResponse == 'true'}">	  	
 			<c:if test="${editableResponseId == responseUid}">	  	 									 			
 				 <td NOWRAP valign=top>  <c:out value="${userData.userName}"/>   </td>  
 				 <td NOWRAP valign=top>  <c:out value="${userData.attemptTime}"/>  </td>

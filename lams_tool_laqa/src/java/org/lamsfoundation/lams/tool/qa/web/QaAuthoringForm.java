@@ -153,6 +153,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
 	public String toString() {
         return new ToStringBuilder(this)
+        	.append("Listing current QaAuthoringForm properties: ")
             .append("toolContentID: ", toolContentID)
             .append("currentTab: ", currentTab)
             .append("activeModule: ", activeModule)

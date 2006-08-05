@@ -112,9 +112,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             initEditor("instructions");
             initEditor("questionContent0");
             
-            <c:set var="queIndex" scope="session" value="1"/>
-            <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-                <c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+            <c:set var="queIndex" scope="request" value="1"/>
+            <c:forEach var="questionEntry" items="${requestScope.mapQuestionContent}">
+                <c:set var="queIndex" scope="request" value="${queIndex +1}"/>
                 initEditor("<c:out value="questionContent${queIndex-1}"/>");
             </c:forEach>
         }     
@@ -150,7 +150,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="currentUid"/>
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-	
+		<html:hidden property="editResponse"/>		
+		
 		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />

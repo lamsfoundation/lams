@@ -297,7 +297,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, null, generalLearnerFlowDTO);
+    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, null, generalLearnerFlowDTO, false);
 
 		generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 		generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
