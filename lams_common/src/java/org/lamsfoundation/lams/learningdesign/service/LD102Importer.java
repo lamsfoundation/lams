@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -351,6 +352,17 @@ public class LD102Importer {
 			throw new ImportToolContentException("Invalid packet format - contains nulls. See log for details.");
 		}
 
+		if ( ! ldWddxPacket.startsWith("<wddxPacket") ) {
+			// assume it is encrypted
+			log.debug("Packet is probably encrypting. Attempting to decrypt.");
+			try {
+				ldWddxPacket = ImportExportUtil.decryptImport(ldWddxPacket);
+			} catch (GeneralSecurityException e) {
+				log.error("Unable to decrypt packet",e);
+				throw new ImportToolContentException("Invalid packet format - failed decryption. See log for details.", e);
+			}
+		}
+		
 		Hashtable ldHashTable = null;
 
 		if (log.isDebugEnabled())
@@ -1008,7 +1020,7 @@ public class LD102Importer {
 			if (keyExists(optionObj, WDDXTAGS102.OPTACT_MIN_NUMBER_COMPLETE))
 				optionsActivity.setMinNumberOfOptions(WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.OPTACT_MIN_NUMBER_COMPLETE));
 			optionsActivity.setMaxNumberOfOptions(null); // not supported in 1.0.2.
-			optionsActivity.setOptionsInstructions(null); // not supported in 1.0.2. // check this!!!!!
+			optionsActivity.setOptionsInstructions(null); // not supported in 1.0.2. 
 		
 			Integer xCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_X);
 			Integer yCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_Y);
@@ -1034,14 +1046,13 @@ public class LD102Importer {
 					}
 				}
 			}
+			optionsActivity.setLearningDesign(ldInProgress);
+			baseDAO.insert(optionsActivity);
 			
 			// don't need to put it in the flatten map as the optional activity is a single entity in the wddx packet, 
 			// not a two parter like the other activities
 			newActivityMap.put(optionsActivity.getActivityUIID(), optionsActivity);
-			optionsActivity.setLearningDesign(ldInProgress);
 			ldInProgress.getActivities().add(optionsActivity);
-			
-			baseDAO.insert(optionsActivity);
 			
 		} catch (WDDXProcessorConversionException e) {
 			handleWDDXProcessorConversionException(e);
