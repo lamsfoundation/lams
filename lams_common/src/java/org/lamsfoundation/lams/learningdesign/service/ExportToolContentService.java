@@ -41,7 +41,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,9 +89,11 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
@@ -101,6 +102,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -118,6 +120,7 @@ import com.thoughtworks.xstream.converters.Converter;
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
 	public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
+	public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
 	
 	//export tool content zip file prefix
 	public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
@@ -140,6 +143,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private IActivityDAO activityDAO;
 	private IToolDAO toolDAO;
 	private IToolContentDAO toolContentDAO;
+	private ISystemToolDAO systemToolDAO;
 	private IBaseDAO baseDAO;
 	private ILicenseDAO licenseDAO;
 	private IGroupingDAO groupingDAO;
@@ -453,7 +457,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
 			, List<String> toolsErrorMsgs) throws ImportToolContentException {
 		WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
-    	LD102Importer oldImporter = new LD102Importer(getLearningDesignService(), baseDAO, learningDesignDAO, learningLibraryDAO, activityDAO, toolDAO, toolImportSupportDAO, toolContentDAO, toolsErrorMsgs);
+    	LD102Importer oldImporter = new LD102Importer(getLearningDesignService(), getMessageService(),
+    			baseDAO, learningDesignDAO, learningLibraryDAO, activityDAO, toolDAO, 
+    			toolImportSupportDAO, toolContentDAO, systemToolDAO, toolsErrorMsgs);
     	return oldImporter.storeLDDataWDDX(ldWddxPacket, importer, folder);
 	}
 	
@@ -689,6 +695,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}	
 	private ILearningDesignService getLearningDesignService(){
 		return (ILearningDesignService) applicationContext.getBean(LEARNING_DESIGN_SERVICE_BEAN_NAME);		
+	}
+	private MessageService getMessageService(){
+		return (MessageService) applicationContext.getBean(MESSAGE_SERVICE_BEAN_NAME);		
 	}
 	
 	private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException
@@ -964,6 +973,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//always set false
 				((SynchGateActivity)act).setGateOpen(false);
 				((SynchGateActivity)act).setWaitingLearners(null);
+				((SynchGateActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE));
 				break;
 			case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
 				act = new ScheduleGateActivity();
@@ -976,12 +986,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				((ScheduleGateActivity)act).setGateStartDateTime(actDto.getGateStartDateTime());
 				((ScheduleGateActivity)act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
 				((ScheduleGateActivity)act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
+				((ScheduleGateActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
 				break;
 			case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
 				act = new PermissionGateActivity();
 				((PermissionGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 				((PermissionGateActivity)act).setGateOpen(false);
 				((PermissionGateActivity)act).setWaitingLearners(null);
+				((PermissionGateActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
 				break;
 			case Activity.PARALLEL_ACTIVITY_TYPE:
 				act = new ParallelActivity();
@@ -1103,6 +1115,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 	public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
 		this.learningLibraryDAO = learningLibraryDAO;
+	}
+	public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
+		this.systemToolDAO = systemToolDAO;
 	}
 
 }

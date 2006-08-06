@@ -120,7 +120,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	    this.activities=activities;
 	}
 	public void addActivity(Activity activity){
-		this.activities.add(activity);
+		this.getActivities().add(activity);
 	}
 	
 	/**

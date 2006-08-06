@@ -38,6 +38,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -51,23 +53,29 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolImportSupport;
+import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /** Create a learning design from the LAMS 1.0.x WDDX packet. Used by the Import action. */
 public class LD102Importer {
 
+	private static final String MSG_KEY_PERM_GATE = "imported.permission.gate.title";
+	private static final String MSG_KEY_SYNC_GATE = "imported.synchronise.gate.title";
+			
 	private Logger log = Logger.getLogger(LD102Importer.class);
 	private ILearningDesignService learningDesignService = null;
+	private MessageService messageService = null;
 	private IBaseDAO baseDAO = null;
 	private ILearningLibraryDAO learningLibraryDAO = null;
 	private ILearningDesignDAO learningDesignDAO = null;
@@ -75,8 +83,9 @@ public class LD102Importer {
 	private IToolDAO toolDAO = null;
 	private IToolImportSupportDAO toolImportSupportDAO = null;
 	private IToolContentDAO toolContentDAO = null;
-
+	private ISystemToolDAO systemToolDAO = null;
 	private LearningDesign ldInProgress = null;
+	private Integer maxId = null; 
 	private String originalPacket = null;
 	private List<String> toolsErrorMsgs;
 	private Date createDate = new Date();
@@ -94,7 +103,7 @@ public class LD102Importer {
 	
 	/** put aside all the optional activities as we find them and process after the first pass through the activities. */
 	private Set<Hashtable> optionalActivitiesToDo = new HashSet<Hashtable>();
-	/** put aside all the transitions as we find them and process them after the activities (including the optional activities. */
+	/** put aside all the transitions as we find them and process them after the activities (including the optional activities). */
 	private Set<Hashtable> transitionsToDo = new HashSet<Hashtable>();
 	/** as we create an activity, stick it in this map so we can find it quickly later (ie while processing transitions). Key is the UI ID */
 	private Map<Integer, Activity> newActivityMap = new HashMap<Integer, Activity>();
@@ -141,15 +150,17 @@ public class LD102Importer {
 	private static final String TOOLDATA_TAGS_IMAGEGALLERY = "imagegallery"; 
 	private static final String TOOLDATA_TAGS_IMAGERANKING = "imageranking";
 	
-	public LD102Importer(ILearningDesignService learningDesignService, IBaseDAO baseDAO, 
+	public LD102Importer(ILearningDesignService learningDesignService, MessageService messageService,IBaseDAO baseDAO, 
 			ILearningDesignDAO learningDesignDAO, ILearningLibraryDAO learningLibraryDAO, IActivityDAO activityDAO, IToolDAO toolDAO, 
-			IToolImportSupportDAO toolImportSupportDAO, IToolContentDAO toolContentDAO, List<String> toolsErrorMsgs) {
+			IToolImportSupportDAO toolImportSupportDAO, IToolContentDAO toolContentDAO, ISystemToolDAO systemToolDAO, List<String> toolsErrorMsgs) {
 		this.learningDesignService = learningDesignService;
+		this.messageService = messageService;
 		this.baseDAO = baseDAO;
 		this.learningLibraryDAO = learningLibraryDAO;
 		this.learningDesignDAO = learningDesignDAO;
 		this.activityDAO = activityDAO;
 		this.toolDAO = toolDAO;
+		this.systemToolDAO = systemToolDAO;
 		this.toolImportSupportDAO = toolImportSupportDAO;
 		this.toolContentDAO = toolContentDAO;
 		this.toolsErrorMsgs = toolsErrorMsgs;
@@ -165,12 +176,21 @@ public class LD102Importer {
 	public void setLearningDesignService(ILearningDesignService learningDesignService) {
 		this.learningDesignService = learningDesignService;
 	}
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+
 	public void setBaseDAO (IBaseDAO baseDAO) {
 		this.baseDAO = baseDAO;
 	}
 	public void setToolDAO (IToolDAO toolDAO) {
 		this.toolDAO = toolDAO;
 	}
+	
+	public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
+		this.systemToolDAO = systemToolDAO;
+	}
+
 	public void setToolImportSupportDAO (
 			IToolImportSupportDAO toolImportSupportDAO) {
 		this.toolImportSupportDAO = toolImportSupportDAO;
@@ -415,6 +435,7 @@ public class LD102Importer {
 			setupOptionalActivity(optionTable);
 		}
 		ldInProgress.setFirstActivity(ldInProgress.calculateFirstActivity());
+		ldInProgress.setMaxID(maxId);
 		
 		// all activities are set up so now we can do the transitions
 		for ( Hashtable transTable: transitionsToDo ) {
@@ -460,8 +481,11 @@ public class LD102Importer {
 		ld.setOfflineInstructions(null);	
 		ld.setOnlineInstructions(null);
 		
+		// set up maxId locally and then save at the end of the process - the max id may need to be changed
+		// when setting up the transitions to accomodate the addition of permission and sync gates.
 		try {
-			ld.setMaxID(WDDXProcessor.convertToInt("Max ID", newLdHashTable.get(WDDXTAGS102.LD_MAXID)) );
+			maxId = WDDXProcessor.convertToInt("Max ID", newLdHashTable.get(WDDXTAGS102.LD_MAXID));
+			ld.setMaxID(maxId );
 		} catch ( WDDXProcessorConversionException e) {
 			handleWDDXProcessorConversionException(e);
 		}
@@ -486,33 +510,6 @@ public class LD102Importer {
 		ld.setLessonStartDateTime(null);
 
 		ldInProgress = ld;
-	}
-	/* Go through all the simple tasks and set any output contents as "to be replaced
-	 * with dynamic content at runtime".
-	 */
-	protected void setOutputTasksAsReplaceWithDynamic()
-		throws Exception
-	{	
-		// get a map of all the simple tasks by id.
-		// use the map to iterate over all the output tasks
-/*		Hashtable tasksMap = ldInProgress.allTasksWithContent(true);
-		Collection simpleTasks = tasksMap.values();
-		if ( simpleTasks != null )
-		{
-			Iterator iter = simpleTasks.iterator();
-			Map contentMap = m_contentUtil.getCurrentContentsAsMapBySid();
-			while ( iter.hasNext() )
-			{
-				SimpleTaskVO task = (SimpleTaskVO) iter.next();
-				Long outputContentSid = task.getOutputContentSid();
-				if ( outputContentSid != null )
-				{
-					Content content = (Content) contentMap.get(outputContentSid);
-					content.setReplaceWithDynamic(true);
-					m_contentUtil.updateContent(content);
-				}
-			}
-		} */
 	}
 
 	/** Process the activities and transitions. Returns a list of optional Activities yet to
@@ -565,45 +562,158 @@ public class LD102Importer {
 	private void processActivity(Hashtable activityDetails, Integer activityUIID) throws WDDXProcessorConversionException {
 
 		// Long systemID =  WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.SID); not needed
-		Long nextTransition;
-		nextTransition = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.FOLLOWING_TRANSITION);
+		Long nextTransition = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.FOLLOWING_TRANSITION);
 		Integer xCoOrd = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_X);
 		Integer yCoOrd = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_Y);
-		// Long firstTask = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS102.ACT_FIRSTTASK); 
 		// String libraryID = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.ACT_LIBRARY_ID); not needed
 		String title = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.TITLE);
 		String description = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.DESCRIPTION);
 		List taskTransitions = 	(List)activityDetails.get(WDDXTAGS102.ACT_TASKTRAN);
 		
-		Activity activity = null;
 		if ( taskTransitions.size()==1 ) {
+			// standard case - a single tool, grouping or parallel activity
 			Hashtable task = (Hashtable) taskTransitions.get(0);
-			activity = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
-		} else {
-			// TODO combined pairs - probably a reflective bit on the second part.
-			// TODO do use for reflection bit public static final String MTASK_INPUT_CONTENT_TASK = "inputContentTask";
-//			 TODO do use for reflection bit public static final String MTASK_OUTPUT_CONTENT_TASK = "outputContentTask";
-/*			Integer taskId = WDDXProcessor.convertToInteger("InputContentTask",
-								clientObj.get(WDDXTAGS102.MTASK_INPUT_CONTENT_TASK));
-			if ( ! LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-			multiTask.setInputContentTask(taskId);
-			else
-			multiTask.setInputContentTask(null);
+			createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
 			
-			taskId = WDDXProcessor.convertToInteger("OutputContentTask",
-								clientObj.get(WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK));
-			if ( ! LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_INTEGER.equals(objId) )
-			multiTask.setOutputContentTask(taskId);
-			else
-			multiTask.setOutputContentTask(null);
-	*/
+		} else if ( taskTransitions.size()==3 ) {
+			createReflectiveActivity(activityDetails, activityUIID, nextTransition, xCoOrd, yCoOrd, title, description, taskTransitions);
+			
+		} else {
+			String message = "Unexpected activity format for activity "+ title +" expect either 1 or 3 tasks within an activity. This activity will be missing from the sequence. Activity "+activityDetails;
+			log.warn(message);
+			toolsErrorMsgs.add(message);
 		}
-		
 		
 	}
 
+	/** Assume this is a "do something on one task/multi-task, reflect on it another multitask" 
+	 * e.g. Chat & Scribe + Notebook Scribe + Notebook
+	 * In all cases in 1.0.2 the second part should only be for the purposes of reflection
+	 * so we just need to convert the first part and set the "journal" flag on the task that
+	 * had the content output (as that is the one displayed on the following notebook).
+	 */ 
+	private Activity createReflectiveActivity(Hashtable activityDetails, Integer activityUIID, Long nextTransition, Integer xCoOrd, Integer yCoOrd, String title, String description, List taskTransitions) throws WDDXProcessorConversionException {
+		Activity realTask = null;
+		Activity reflectiveTask = null;
+		String reflectiveTitle = null;
+		String reflectiveDescription = null;
+
+		Integer firstTaskId = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_FIRSTTASK);
+		if ( firstTaskId == null ) {
+			// hmmm, firstTaskId missing - try to derive it from the transition.
+			Iterator iter = taskTransitions.iterator();
+			while ( iter.hasNext() ) {
+				Hashtable task = (Hashtable) iter.next();
+				if ( isTransition((String) task.get(WDDXTAGS102.OBJECT_TYPE)) ) {
+					firstTaskId =  WDDXProcessor.convertToInteger(task, WDDXTAGS102.TRANSITION_FROM_TASKS);
+				}
+			}
+			
+			if ( firstTaskId == null || NUMERIC_NULL_VALUE_INTEGER.equals(firstTaskId) ) {
+				firstTaskId = null;
+				String message = "Unable to determine the first task definition in a combined activity "+ title +". This activity will be missing from the sequence. Activity "+activityDetails;
+				log.warn(message);
+				toolsErrorMsgs.add(message);
+				return null;
+			} else {
+				String message = "First task definition missing from activity "+ title +". Guessed it from the rest of the packet. This activity may be incorrect. Activity "+activityDetails;
+				log.warn(message);
+				toolsErrorMsgs.add(message);
+			}
+		}
+		
+		Iterator iter = taskTransitions.iterator();
+		while ( iter.hasNext() ) {
+			Hashtable task = (Hashtable) iter.next();
+			String objectType = (String) task.get(WDDXTAGS102.OBJECT_TYPE);
+			String toolType = (String) task.get(WDDXTAGS102.TASK_TOOLTYPE);
+			
+			if ( ! isTransition(objectType) ) {
+				// Throw away the transition - we only keep the first activity so don't need the transition
+				// So only process what we assume is a simple task or a multitask.
+				Integer taskId = WDDXProcessor.convertToInteger(task,WDDXTAGS102.LD_ITEM_ID);
+				if ( firstTaskId.equals(taskId) ) {
+					
+					// create the activity that we keep
+					realTask = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
+
+					Integer outputContentTaskId  = null;
+					if ( isMultiTask(objectType, toolType) ) {
+						outputContentTaskId = WDDXProcessor.convertToInteger(task, WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK);
+						ComplexActivity cActivity = (ComplexActivity) realTask;
+						if ( outputContentTaskId != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(outputContentTaskId) ) {
+							Iterator actIter = cActivity.getActivities().iterator();
+							while (reflectiveTask==null && actIter.hasNext()) {
+								Activity subActivity = (Activity) actIter.next();
+								if ( outputContentTaskId.equals(subActivity.getActivityUIID()) ) {
+									reflectiveTask = subActivity;
+								}
+							}
+						}
+					} else {
+						reflectiveTask = realTask;
+					}
+					
+					if ( reflectiveTask==null ) {
+						String message = "Can't find the task in activity "+title+" that should be reflective. The activity will be created but the reflective part will be missing. Task is "+activityDetails;
+						log.warn(message);
+						toolsErrorMsgs.add(message);
+					} 
+					
+				} else {
+					
+					// reflective part - just need the title and description - don't create matching activities
+					List subTasks = (List) task.get(WDDXTAGS102.MTASK_SUBTASKS);
+					Integer journalTaskInputContentId = null;
+					if ( subTasks != null ) {
+						Iterator subTaskIterator = subTasks.iterator();
+						while (subTaskIterator.hasNext()) {
+							Hashtable subTask = (Hashtable) subTaskIterator.next();
+							if ( TOOLDATA_TAGS_JOURNAL.equals(subTask.get(WDDXTAGS102.TASK_TOOLTYPE)) ) {
+								journalTaskInputContentId = WDDXProcessor.convertToInteger(subTask, WDDXTAGS102.TASK_INPUT_CONTENT);
+							}
+						}
+					}
+					
+					Hashtable journalContent = null;
+					if ( journalTaskInputContentId != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(journalTaskInputContentId) ) {
+						journalContent = contentMap.get(journalTaskInputContentId);
+					} 
+					
+					if ( journalContent != null ) {
+						reflectiveTitle = (String) journalContent.get(WDDXTAGS102.TITLE);
+						reflectiveDescription = (String) journalContent.get(WDDXTAGS102.CONTENT_BODY);
+					} else {
+						String message = "Can't find the journal details in the reflective part of "+title+". The reflective settings in this activity will be missing. Task is "+task;
+						log.warn(message);
+						toolsErrorMsgs.add(message);
+					}
+
+				}
+			}
+		}
+		
+		if ( realTask == null ) {
+			String message = "Couldn't find the \"real\" activity inside "+title+". This activity will be missing from the sequence. Activity "+activityDetails;
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+		} else if ( reflectiveTask == null ) {
+			String message = "Couldn't find \"reflective\" activity inside "+title+". The reflective settings in this activity will be missing. ";
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+		} else {
+			// TODO make the appropriate activity reflective. Don't have support for this in the tools yet!
+			String message = "Activity "+reflectiveTask.getTitle()+" should be reflective ("+reflectiveTitle+":"+reflectiveDescription+") but this isn't supported in the tools yet. To be added when the tools are ready.";
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+		}
+		
+		return realTask;
+	}
+
 	/** Handles simple (including grouping), parallel and optional activities. Can cope with the sub activities but not
-	 * transitions between activities. */ 
+	 * transitions between activities. 
+	 */ 
 	private Activity createActivityFromTask(Hashtable taskDetails, Long nextTransition, Integer xCoOrd, Integer yCoOrd, 
 			Integer parentActivityId, String parentTitle, String parentDescription) throws WDDXProcessorConversionException {
 		
@@ -694,6 +804,7 @@ public class LD102Importer {
 				// won't be created if it can't find a matching tool.
 				subActivity.setParentActivity(activity);
 				subActivity.setParentUIID(activity.getActivityUIID());
+				activity.addActivity(subActivity);
 				
 				Integer orderId = null;
 				String subTaskUIID = subActivity.getActivityUIID()!=null ? subActivity.getActivityUIID().toString() : "";
@@ -781,33 +892,6 @@ public class LD102Importer {
 	    activity.setLibraryActivityUiImage(libraryActivityUiImages.get(tool.getToolId()));
 		return activity;
 	}
-	
-/*		private void buildOptionsActivity(OptionsActivity optionsActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		if (keyExists(activityDetails, WDDXTAGS.MAX_OPTIONS))
-		    optionsActivity.setMaxNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.MAX_OPTIONS));
-		if (keyExists(activityDetails, WDDXTAGS.MIN_OPTIONS))
-		    optionsActivity.setMinNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.MIN_OPTIONS));
-		if (keyExists(activityDetails, WDDXTAGS.OPTIONS_INSTRUCTIONS))
-		    optionsActivity.setOptionsInstructions(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.OPTIONS_INSTRUCTIONS));		
-	}
-	}
-	private void buildGateActivity(Object activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		if(activity instanceof SynchGateActivity)
-			buildSynchGateActivity((SynchGateActivity)activity,activityDetails);
-		else if (activity instanceof PermissionGateActivity)
-			buildPermissionGateActivity((PermissionGateActivity)activity,activityDetails);
-		else
-			buildScheduleGateActivity((ScheduleGateActivity)activity,activityDetails);
-		GateActivity gateActivity = (GateActivity)activity ;
-		gateActivity.setGateActivityLevelId(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.GATE_ACTIVITY_LEVEL_ID));
-		gateActivity.setGateOpen(WDDXProcessor.convertToBoolean(activityDetails,WDDXTAGS.GATE_OPEN));
-				
-	}
-	private void buildSynchGateActivity(SynchGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{	
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE);
-		activity.setSystemTool(systemTool);
-	}
-*/	
 
 	/** 
 	 * Get the grouping value for a particular task. Could be "c" for class or a number 
@@ -858,35 +942,7 @@ public class LD102Importer {
  	 }
 
 
-	/*
-	 * get the content's sid based on the internal learning design id - used by 
-	 * updateSimpleTask. Match on the creationToolKey field in the content object
-	 * Throws an exception if there was a "valid" creationToolKey value but the content
-	 * could not be found.
-	 
-	private Long getContentSid( Long creationToolKey )
-		throws Exception
-	{
-		if ( creationToolKey == null || creationToolKey.equals(LDWDDXValueObjectFactory.NUMERIC_NULL_VALUE_LONG) )
-			return null;
-			
-		Map currentContents = m_contentUtil.getCurrentContentsAsMapByCreationToolKey();
-		Content content = (Content) currentContents.get(creationToolKey.toString());
-		if ( content == null ){
-			if ( log.isDebugEnabled())
-				log.debug("Content missing - looking for creationToolKey "+creationToolKey);
 
-			throw new Exception("There is something wrong in the learning design you are trying to save. " +
-				"If you are importing it, it may contain Share Resources that has a  reference to an uploaded file. "+
-				"Currently LAMS does not support export/import designs with a file resource. "+
-				"(Missing: creationToolKey="+creationToolKey+")");
-		}
-
-		return ( content.getSid() ); 
-	}
-
-	*/
-	
 	/** Process the content from the WDDX packet. In 1.0.x, the content was managed by the 
 	 * content manager. In 2.x it is managed by the tools. So we go through the content vector
 	 * and build up a list of all the tool content. Then as we go through the activities 
@@ -895,8 +951,6 @@ public class LD102Importer {
 	 */
 	protected void processContent(List newContent) {	
 
-		// cycle through content from the packet. Update existing ones, add new ones
-		// don't have delete support at the moment.
 		Iterator iterator = newContent.iterator();
 		while ( iterator.hasNext() )
 		{
@@ -1005,23 +1059,38 @@ public class LD102Importer {
 	
 		try {
 		    Transition transition = new Transition();
+		    GateActivity gate = null; // only needed for synchronise
+		    Transition gateTransition = null; 
 		    transition.setTransitionUIID(WDDXProcessor.convertToInteger("Transition ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID)));
 		    transition.setCreateDateTime(createDate);			
-	
+
+		    // if there is a completion type then we need to set up a gate and add an extra transition.
 		    String completion = (String)clientObj.get(WDDXTAGS102.TRANSITION_COMPLETIONTYPE);
-		    if ( WDDXTAGS102.TRANSITION_COMPLETION_SYNCRONIZE.equals(completion)) {
-		    	// TODO create synchronise gate
-		    } else if ( completion != null && completion.length() > 0 ) {
-		    	// TODO create permission gate
+		    if ( completion != null && completion.length() > 0 ) {
+			    gate = setupGateActivity(completion);
+			    
+			    gateTransition = new Transition();
+		    	gateTransition.setTransitionUIID(maxId++);
+		    	gate.setTransitionTo(gateTransition);
+		    	gateTransition.setFromActivity(gate);
+		    	gateTransition.setFromUIID(gate.getActivityUIID());
 		    }
 	
 			Integer toActivity = WDDXProcessor.convertToInteger("ToTaskActivities",clientObj.get(WDDXTAGS102.TRANSITION_TO_TASKS));
 			if ( ! NUMERIC_NULL_VALUE_INTEGER.equals(toActivity) ) {
 				Activity activity = getMatchingActivity(toActivity);
 				if ( activity != null ) {
-					transition.setToUIID(activity.getActivityUIID());
-					transition.setToActivity(activity);
-					activity.setTransitionTo(transition);
+					if ( gate != null ) {
+						setToActivity(transition, gate);
+						setToActivity(gateTransition, activity);
+						// don't have x,y co-ords for the made up gate so make some that would overlap with the destination activity.
+						int x = activity.getXcoord() != null ? activity.getXcoord() : 0;
+						gate.setXcoord(x>=20 ? x-20 : 5);
+						gate.setYcoord(activity.getYcoord());
+						
+					} else {
+						setToActivity(transition, activity);
+					}
 				}
 			} 
 			if ( transition.getToActivity() == null ) {
@@ -1051,9 +1120,65 @@ public class LD102Importer {
 			ldInProgress.getTransitions().add(transition);
 		    baseDAO.insert(transition);
 
+			if ( gateTransition != null ) {
+				gateTransition.setLearningDesign(ldInProgress);		
+				ldInProgress.getTransitions().add(gateTransition);
+				baseDAO.insert(gateTransition);
+			}
+
 		} catch ( WDDXProcessorConversionException e ) {
 			handleWDDXProcessorConversionException(e);
 		}
+	}
+
+	private GateActivity setupGateActivity(String completion) {
+		
+		GateActivity gate = null;
+		Integer syncType = null; 
+		SystemTool systemTool = null;
+		Integer activityType = null;
+		String title = null;
+		
+		if ( WDDXTAGS102.TRANSITION_COMPLETION_SYNCRONIZE.equals(completion)) {
+			syncType = new Integer(Activity.SYNCH_GATE_ACTIVITY_TYPE);
+			systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE);
+			activityType = new Integer(Activity.SYNCH_GATE_ACTIVITY_TYPE);
+			title = messageService.getMessage(MSG_KEY_SYNC_GATE);
+		} else {
+			syncType = new Integer(Activity.PERMISSION_GATE_ACTIVITY_TYPE);
+			systemTool = systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE);
+			activityType = new Integer(Activity.PERMISSION_GATE_ACTIVITY_TYPE);
+			title = messageService.getMessage(MSG_KEY_PERM_GATE);
+		}
+		
+		if ( syncType != null ) {
+			gate = (GateActivity) Activity.getActivityInstance(syncType.intValue());
+			gate.setActivityTypeId(activityType.intValue());
+			gate.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+			gate.setSystemTool(systemTool);
+			gate.setActivityUIID(maxId++);
+			gate.setTitle(title!=null?title:"Gate");
+			gate.setGateOpen(false);
+			gate.setWaitingLearners(null);
+			gate.setGateActivityLevelId(GateActivity.LEARNER_GATE_LEVEL);
+			gate.setApplyGrouping(false); // not nullable so default to false
+			gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
+			gate.setOrderId(null); 
+			gate.setDefineLater(Boolean.FALSE);
+			gate.setCreateDateTime(createDate);
+			gate.setRunOffline(Boolean.FALSE);
+			gate.setLearningDesign(ldInProgress);
+			
+		    ldInProgress.getActivities().add(gate);
+		    baseDAO.insert(gate);
+		}
+		return gate;
+	}
+
+	private void setToActivity(Transition transition, Activity activity) {
+		transition.setToUIID(activity.getActivityUIID());
+		transition.setToActivity(activity);
+		activity.setTransitionTo(transition);
 	}
 
 	/** 1.0.x has tasks within activities, so the UIID on the 2.0 activity is the UIID of the task but the transition may be looking for
