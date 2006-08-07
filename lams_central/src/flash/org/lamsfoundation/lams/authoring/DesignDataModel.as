@@ -499,6 +499,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(_lastModifiedDateTime){ design.lastModifiedDateTime = _lastModifiedDateTime;	}
 		if(_dateReadOnly){		design.dateReadOnly		= _dateReadOnly;		}
 		
+		if(_autoSaved) { 		design.autoSaved 		= _autoSaved 					}
 		
 		design.activities = new Array();
 		var classActs:Array = _activities.values();
