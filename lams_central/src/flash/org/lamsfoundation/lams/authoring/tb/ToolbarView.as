@@ -92,7 +92,7 @@ class ToolbarView extends AbstractView {
 	
 	public function showHideAssets(v:Boolean){
 		
-		branch_btn.enabled = false;
+		//branch_btn.enabled = false;
 		gate_btn.visible = v;
 		branch_btn.visible = v;
 		flow_bkg_pnl.visible = v;
@@ -164,6 +164,9 @@ class ToolbarView extends AbstractView {
 		
 		gate_btn.onRollOver = Proxy.create(this,this['showToolTip'], gate_btn, "gate_btn_tooltip");
 		gate_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		branch_btn.onRollOver = Proxy.create(this,this['showToolTip'], branch_btn, "branch_btn_tooltip");
+		branch_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		group_btn.onRollOver = Proxy.create(this,this['showToolTip'], group_btn, "group_btn_tooltip");
 		group_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
