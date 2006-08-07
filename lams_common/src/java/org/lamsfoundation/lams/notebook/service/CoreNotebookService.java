@@ -25,9 +25,7 @@
 
 package org.lamsfoundation.lams.notebook.service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -53,7 +51,7 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 		return notebookEntry.getUid();
 	}
 
-	public List<NotebookEntry> getEntry(String id, Long idType, String signature, Integer userID) {
+	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID) {
 		return notebookEntryDAO.get(id, idType, signature, userID);
 	}
 

@@ -29,7 +29,7 @@ package org.lamsfoundation.lams.web.util;
 
 import java.util.HashMap;
 
-public class SessionMap extends HashMap {
+public class SessionMap<K,V> extends HashMap<K,V> {
 
 	private static final long serialVersionUID = -4702185515740658324L;
 
@@ -40,7 +40,6 @@ public class SessionMap extends HashMap {
 	public SessionMap() {
 		long count = getCount();
 		this.sessionID = "sessionMapID-" + count;
-		this.put("sessionID", "sessionMapID-" + count);
 	}
 
 	private long getCount() {
