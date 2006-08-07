@@ -56,16 +56,16 @@ values(7,null,'Three Test Workspace',7,'20041223','20041223',1);
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(8,null,'Four Test Workspace',8,'20041223','20041223',1);
 
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (1,1);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (2,2);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (2,22);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (3,3);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (3,23);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (4,4);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (5,5);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (6,6);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (7,7);
-insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (8,8);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (1, 1,1);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (2, 2,2);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (3, 2,22);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (4, 3,3);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (5, 3,23);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (6, 4,4);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (7, 5,5);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (8, 6,6);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (9, 7,7);
+insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (10, 8,8);
 
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
 	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,'en','AU',1);

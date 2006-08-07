@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -386,9 +387,7 @@ public class UserManagementService implements IUserManagementService {
 		save(workspace);
 		WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL);
 		save(folder);
-		if ( workspace.getFolders() == null )
-			workspace.setFolders(new HashSet());
-		workspace.getFolders().add(folder);
+		workspace.addFolder(folder);
 		workspace.setDefaultFolder(folder);
 		user.setWorkspace(workspace);
 		return user;
@@ -412,14 +411,10 @@ public class UserManagementService implements IUserManagementService {
 		save(workspaceFolder2);
 
 		Workspace workspace =  new Workspace(workspaceName);
-		if ( workspace.getFolders() == null )
-			workspace.setFolders(new HashSet());
-
-		workspace.getFolders().add(workspaceFolder);
 		workspace.setDefaultFolder(workspaceFolder);
-		workspace.getFolders().add(workspaceFolder2);
 		workspace.setDefaultRunSequencesFolder(workspaceFolder2);
-
+		workspace.addFolder(workspaceFolder);
+		workspace.addFolder(workspaceFolder2);
 		save(workspace);
 
 		return workspace;

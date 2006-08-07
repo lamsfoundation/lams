@@ -26,7 +26,9 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -64,7 +66,7 @@ public class WorkspaceFolder implements Serializable {
     private WorkspaceFolder parentWorkspaceFolder;
 
     /** persistent field */
-    private Set workspaces;
+    private Set workspaceWorkspaceFolders;
 
     /** persistent field */
     private Set childWorkspaceFolders;
@@ -139,7 +141,7 @@ public class WorkspaceFolder implements Serializable {
     public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspaces, Set childWorkspaceFolders) {
         this.name = name;    
         this.parentWorkspaceFolder = parentWorkspaceFolder;
-        this.workspaces = workspaces;
+        this.workspaceWorkspaceFolders = workspaces;
         this.childWorkspaceFolders = childWorkspaceFolders;
     }
 
@@ -189,20 +191,34 @@ public class WorkspaceFolder implements Serializable {
         this.parentWorkspaceFolder = parentWorkspaceFolder;
     }
 
-    /** 
-     * @hibernate.set role="workspaces" table="lams_workspace_workspace_folder" cascase="all-delete-orphan"
-     * @hibernate.collection-key column="workspace_folder_id"
-     * @hibernate.collection-many-to-manyclass="org.lamsfoundation.lams.usermanagement.Workspace" 
-     *   column="workspace_id"
+    /**
+     * WorkspaceWorkspaceFolder is a join object that links a workspace folder to its workspaces. 
+	 *	@hibernate.set inverse="false" cascade="all-delete-orphan"
+     *  @hibernate.collection-key column="workspace_folder"
+     *  @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"
      */
-    public Set getWorkspaces() {
-        return workspaces;	
+    protected Set getWorkspaceWorkspaceFolders() {
+        return workspaceWorkspaceFolders;	
     }
 
-    public void setWorkspaces(Set workspaces) {
-        this.workspaces = workspaces;	
+    protected void setWorkspaceWorkspaceFolders(Set workspaceWorkspaceFolders) {
+        this.workspaceWorkspaceFolders = workspaceWorkspaceFolders;	
     }
 
+     /** Get all the workspaces for this folder, based on the lams_workspace_workspace join table. This set is not a persistent
+     * set so to add a folder you cannot use "addWorkspace(workspace)". You must go to the Workspace and do workspace.addFolder(folder). */
+    public Set<Workspace> getWorkspaces() {
+    	HashSet<Workspace> set = new HashSet<Workspace>();
+    	if ( getWorkspaceWorkspaceFolders() != null ) {
+    		Iterator iter = getWorkspaceWorkspaceFolders().iterator();
+    		while ( iter.hasNext() ) {
+    			WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder) iter.next();
+    			set.add(wwf.getWorkspace());
+    		}
+    	}
+    	return set;
+    }
+    
 	/** 
      *            @hibernate.set
      *             lazy="true"

@@ -113,7 +113,10 @@ public class ImportExportUtil {
 	}
 	
 	/**
-	 * Method decryptDesign.
+	 * Decrypt Import packet. Exports were encrypted back in LAMS 1.0beta6 and prior but
+	 * encryption is not longer supported. We will not be supporting encryption of exports
+	 * in the future - this code is here only to support the importing of old encrypted designs.
+	 * 
 	 * @param fileContent
 	 * @return String
 	 */

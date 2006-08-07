@@ -729,7 +729,7 @@ public class User implements Serializable,Comparable {
 				UserOrganisation userOrganisation = (UserOrganisation)iterator.next();
 				// not all orgs have a folder
 				Workspace workspace = userOrganisation.getOrganisation().getWorkspace();
-				if ( workspace != null && workspace.getFolders() != null ) {
+				if ( workspace != null ) {
 					foundMemberFolder = checkFolders(workspace.getFolders(),workspaceFolderID); 
 				}
 			}		

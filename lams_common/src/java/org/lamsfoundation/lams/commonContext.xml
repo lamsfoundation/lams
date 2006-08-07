@@ -42,6 +42,7 @@
 				<value>org/lamsfoundation/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Workspace.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/WorkspaceFolder.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/WorkspaceWorkspaceFolder.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/SupportedLocale.hbm.xml</value>
 				
 				<!-- learning design related mapping files -->

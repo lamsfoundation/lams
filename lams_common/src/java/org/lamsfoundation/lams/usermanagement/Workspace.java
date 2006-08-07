@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -41,7 +43,7 @@ public class Workspace implements Serializable {
     private Integer workspaceId;
 
     /** persistent field */
-    private Set folders;
+    private Set workspaceWorkspaceFolders;
 
     /** persistent field */
     private WorkspaceFolder defaultFolder;
@@ -104,18 +106,53 @@ public class Workspace implements Serializable {
         this.defaultFolder = defaultFolder;
     }
 
-    /** 
-     * @hibernate.set role="folders" table="lams_workspace_workspace_folder" cascade="all-delete-orphan" 
-     * @hibernate.collection-key column="workspace_id"
-     * @hibernate.collection-many-to-manyclass="org.lamsfoundation.lams.usermanagement.WorkspaceFolder" 
-     *   column="workspace_folder_id"
+    /**
+     * WorkspaceWorkspaceFolder is a join object that links a workspace folder to its workspaces. 
+	 *	@hibernate.set inverse="false" cascade="all-delete-orphan"
+     *  @hibernate.collection-key column="workspace_id"
+     *  @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"
      */
-    public Set getFolders() {
-        return folders;	
+    public Set getWorkspaceWorkspaceFolders() {
+        return workspaceWorkspaceFolders;	
     }
 
-    public void setFolders(Set folders) {
-        this.folders = folders;	
+    public void setWorkspaceWorkspaceFolders(Set workspaceWorkspaceFolders) {
+        this.workspaceWorkspaceFolders = workspaceWorkspaceFolders;	
+    }
+
+    /** Get all the folders for this workspace, based on the lams_workspace_workspace join table. This set is not a persistent
+     * set so to add a folder use "addFolder(folder)" rather than getFolders().put(folder). */
+    public Set<WorkspaceFolder> getFolders() {
+    	HashSet<WorkspaceFolder> set = new HashSet<WorkspaceFolder>();
+    	if ( getWorkspaceWorkspaceFolders() != null ) {
+    		Iterator iter = getWorkspaceWorkspaceFolders().iterator();
+    		while ( iter.hasNext() ) {
+    			WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder) iter.next();
+    			set.add(wwf.getWorkspaceFolder());
+    		}
+    	}
+    	return set;
+    }
+
+    /** Add a folder to workspace. */
+    public void addFolder(WorkspaceFolder folder) {
+    	// check that the folder doesn't already exist
+    	if ( getWorkspaceWorkspaceFolders() != null ) {
+    		Iterator iter = getWorkspaceWorkspaceFolders().iterator();
+    		while ( iter.hasNext() ) {
+    			WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder) iter.next();
+    			WorkspaceFolder wf = wwf.getWorkspaceFolder();
+    			if ( wf.equals(folder) ) 
+    				return;
+    		}
+    	}
+    	
+    	// not found so add it to the set
+    	WorkspaceWorkspaceFolder wwf = new WorkspaceWorkspaceFolder(null, this, folder);
+    	if ( getWorkspaceWorkspaceFolders() == null ) {
+    		setWorkspaceWorkspaceFolders(new HashSet());
+    	}
+    	getWorkspaceWorkspaceFolders().add(wwf);
     }
 
     /** 

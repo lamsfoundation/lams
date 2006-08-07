@@ -67,11 +67,14 @@
     
     <!-- Associations -->
 
-	<!-- bi-directional many-to-many assocation to a WorkspaceFolder -->
-	<set name="workspaces" table="lams_workspace_workspace_folder" cascade="all-delete-orphan">
-        <key column="workspace_folder_id"/>
-        <many-to-many column="workspace_id"
-            class="org.lamsfoundation.lams.usermanagement.Workspace"/>
+	<!-- bi-directional one-to-many assocation to a WorkspaceWorkspaceFolder -->
+	<set name="workspaceWorkspaceFolders" cascade="all-delete-orphan" inverse="false">
+        <meta attribute="field-description">@hibernate.set inverse="false" cascade="all-delete-orphan"
+        								    @hibernate.collection-key column="workspace_folder_id"
+        								    @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"
+        </meta>
+        <key column="workspace_id"/>
+        <one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"/>
     </set>
   
     <!-- bi-directional one-to-many association to WorkspaceFolder -->

@@ -200,8 +200,10 @@ CREATE TABLE lams_workspace (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_workspace_workspace_folder (
-       workspace_id BIGINT(20) NOT NULL
+       id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , workspace_id BIGINT(20) NOT NULL
      , workspace_folder_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (id)
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_workspace_workspace_folder_1 FOREIGN KEY (workspace_id)
                   REFERENCES lams_workspace (workspace_id)
