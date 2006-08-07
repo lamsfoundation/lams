@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.web.util.HttpSessionManager;
  * <!-- Listeners -->
  *	<listener>
  *		<listener-class>
- *		com.webmcq.ld.controller.web.SessionListener
+ *		org.lamsfoundation.lams.web.SessionListener
  *		</listener-class>
  *	</listener>
  */
