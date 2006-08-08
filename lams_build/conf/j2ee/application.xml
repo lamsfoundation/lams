@@ -67,6 +67,12 @@
 	<module>
 		<java>lams-dictionary.jar</java>
 	</module>
+    <module>
+        <web>
+            <web-uri>lams-www.war</web-uri>
+            <context-root>/lams/www</context-root>
+		</web>
+    </module>
 
     <!--  Third Party JAR Files -->
 	<module>

@@ -58,6 +58,7 @@
 		<ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
+		<ant antfile="../${lams_www}/build.xml" target="build-war" inheritAll="false"/>
 	</target>
 
 	<!-- build tool deployment utility -->
@@ -146,6 +147,7 @@
 				<include name="${lams_learning}/${sub.build.lib}/*.war"/>
 				<include name="${lams_admin}/${sub.build.lib}/*.jar"/>
 				<include name="${lams_admin}/${sub.build.lib}/*.war"/>
+				<include name="${lams_www}/${sub.build.lib}/*.war"/>
 			</fileset>
 		</copy> 
 		<!-- Pull out all the language files -->
@@ -169,6 +171,8 @@
 		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
 		<move file="${assembly.lams.ear}/lams-central.war" tofile="${assembly.lams.ear}/temp.war"/>
 		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-central.war"/>
+		<move file="${assembly.lams.ear}/lams-www.war" tofile="${assembly.lams.ear}/temp.war"/>
+		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-www.war"/>
 		<delete file="${assembly.lams.ear}/temp.war"/>
 		<!-- delete temp.ear -->
 		<delete file="${assembly.temp.ear}" />
@@ -288,6 +292,11 @@
 			<fileset dir="${conf.jboss}/tomcat">
 				<include name="server.xml" />
 				<include name="context.xml" />
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/conf">
+			<fileset dir="${conf.jboss}/tomcat">
+				<include name="web.xml" />
 			</fileset>
 		</copy>
 		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
