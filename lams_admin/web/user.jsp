@@ -101,10 +101,7 @@
 			<html-el:select property="localeId">
 				<c:forEach items="${locales}" var="locale">
 					<html-el:option value="${locale.localeId}">
-						<fmt:message key="locale.language.${locale.languageIsoCode}"/>
-						<c:if test="${!empty locale.countryIsoCode}">
-							&nbsp;(<fmt:message key="locale.country.${locale.countryIsoCode}"/>)
-						</c:if>
+						<c:out value="${locale.description}" />
 					</html-el:option>
 				</c:forEach>	
 			</html-el:select>
