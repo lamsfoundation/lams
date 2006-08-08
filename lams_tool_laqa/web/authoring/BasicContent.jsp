@@ -57,14 +57,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  	<tr> 
 							<td colspan=2>							
-								<lams:SetEditor id="instructions" text="${qaGeneralAuthoringDTO.activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
+								<lams:SetEditor id="instructions" text="${qaGeneralAuthoringDTO.activityInstructions}"  key="label.authoring.instructions.col"/>								
 							</td> 
 						</tr>
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 				 		<tr> 
 							<td colspan=2>							
-								<lams:SetEditor id="questionContent0" text="${qaGeneralAuthoringDTO.defaultQuestionContent}" small="true" key="label.question.col"/>								
+								<lams:SetEditor id="questionContent0" text="${qaGeneralAuthoringDTO.defaultQuestionContent}"  key="label.question.col"/>								
 							</td> 
 					  	</tr>
 		
@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  <tr>
 									<td colspan=2>							
 
-										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true" key="label.question.col"/>								
+										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}"  key="label.question.col"/>								
                                 
 	                                	<c:if test="${ (qaGeneralAuthoringDTO.activeModule != 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
