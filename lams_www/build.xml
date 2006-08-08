@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+
+<project name="LAMS WWW (Upload)" basedir="." default="usage">
+
+	<!-- import properties from the specified file -->
+	<property file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
+	<property file="../lams_build/${osPropertiesName}.properties" />
+
+	<path id="all-libs">
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="project.classpath">
+		<path refid="all-libs"/>
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+
+	<target name="usage">
+		<echo message=""/>
+		<echo message="${project} build file"/>
+		<echo message="------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message="Among the available targets are:"/>
+		<echo message=""/>
+		<echo message="build-war  --> Make war archive for deployment"/>
+		<echo message=""/>
+	</target>
+
+	<target name="init">
+	</target>
+
+	<target name="print-classpath">
+		<echo message="java.class.path = ${java.class.path}"/>
+		<property name="path.string" refid="project.classpath"/>
+		<echo message="project.classpath = ${path.string}"/>
+	</target>
+
+	
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build.web}"/>				
+		<mkdir dir="${build.lib}"/>				
+	</target>
+
+	<target name="clean" depends="preparedirs" description="removes all class files">
+		<delete>
+			<fileset dir="${build.web}"/>
+			<fileset dir="${build.lib}"/>
+		</delete>
+		<mkdir dir="${build.web}"/>	
+		<mkdir dir="${build.lib}"/>	
+	</target>
+
+	
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="copyContext">
+		<copy overwrite="yes" todir="${build.web}">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.tld"/>
+				<include name="**/*.tag"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<!-- Make the war archive  for deployment             -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<target name="build-war" depends="clean, copyContext" description="creates war file">
+		<delete file="${build.lib}/${product}.war"/>
+		<war warfile="${build.lib}/${product}.war" manifest="${conf.web.dir}/META-INF/MANIFEST.MF"
+  				webxml="${conf.webinf.dir}/web.xml">
+			<webinf dir="${conf.webinf.dir}">
+				<include name="*.xml"/>
+				<include name="*.tld"/>
+				<include name="tags/**"/>
+				<include name="*.properties"/>
+				<include name="struts/**"/>
+				<include name="jstl/**"/>
+				<include name="tiles/**"/>
+				<exclude name="web.xml"/>
+			</webinf>
+			<fileset dir="${conf.web.dir}">
+				<include name="*.*"/>
+				<include name="secure/*.*"/>
+				<exclude name="web.xml"/>
+			</fileset>
+		</war>
+	</target>
+</project>
+
