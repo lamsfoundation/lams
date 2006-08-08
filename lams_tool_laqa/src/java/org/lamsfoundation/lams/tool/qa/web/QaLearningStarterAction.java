@@ -249,6 +249,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    }
 	    
 	    
+	    /*
 		if (qaContent.getTitle() == null)
 		{
 			generalLearnerFlowDTO.setActivityTitle("Q&A Title");
@@ -264,6 +265,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 			generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
 		}
+		*/
+	    
+	    generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
+		generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
+	    
 
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 	    generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
