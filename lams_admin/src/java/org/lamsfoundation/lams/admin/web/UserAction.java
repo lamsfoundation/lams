@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +73,7 @@ public class UserAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(UserAction.class);
 	private static IUserManagementService service;
-	private List rolelist;
+	private List<Role> rolelist;
 	private static List<SupportedLocale> locales;
 	
 	public ActionForward edit(ActionMapping mapping,
@@ -84,14 +85,11 @@ public class UserAction extends LamsDispatchAction {
 		if(orgId != null) {
 		    request.setAttribute("org",orgId);
 		}
-		OrganisationType orgType = ((Organisation)getService().findById(Organisation.class,orgId)).getOrganisationType();
+		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
+		OrganisationType orgType = org.getOrganisationType();
+		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 		
-		// remove sysadmin from role list for non-sysadmin users
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		Boolean isSysadmin = getService().isUserInRole(requestor.getUserId(),getService().getRootOrganisation().getOrganisationId(),Role.SYSADMIN);
-		rolelist = getService().getRolesForOrgType(orgType,isSysadmin);
-		Collections.sort(rolelist);
-		request.setAttribute("rolelist",rolelist);
+		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin, orgType));
 		// set canEdit for whether user should be able to edit anything other than roles
 		request.setAttribute("canEdit",isSysadmin);
 		request.setAttribute("locales",locales);
@@ -139,7 +137,6 @@ public class UserAction extends LamsDispatchAction {
 			}
 		}
 		
-		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 		Organisation parentOrg = org.getParentOrganisation();
 		if(parentOrg!=null){
 			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
@@ -147,7 +144,7 @@ public class UserAction extends LamsDispatchAction {
 		}
 		request.setAttribute("orgId",orgId);
 		request.setAttribute("orgName",org.getName());
-		request.setAttribute("orgType",org.getOrganisationType().getOrganisationTypeId());
+		request.setAttribute("orgType",orgType.getOrganisationTypeId());
 		return mapping.findForward("user");
 	}
 	
@@ -163,12 +160,32 @@ public class UserAction extends LamsDispatchAction {
 		return mapping.findForward("userlist");
 	}
 	
+	
+	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
+		List<Role> allRoles = new ArrayList<Role>();
+		allRoles.addAll(rolelist);
+		Role role = new Role();
+		if(!isSysadmin) {
+			role.setRoleId(Role.ROLE_SYSADMIN);
+			allRoles.remove(role);
+		}
+		if(orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+			role.setRoleId(Role.ROLE_COURSE_ADMIN);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_COURSE_MANAGER);
+			allRoles.remove(role);
+		}
+		return allRoles;
+	}
+	
 	private IUserManagementService getService(){
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
 			locales = getService().findAll(SupportedLocale.class);
 			Collections.sort(locales);
+			rolelist = getService().findAll(Role.class);
+			Collections.sort(rolelist);
 		}
 		return service;
 	}
