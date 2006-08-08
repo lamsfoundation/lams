@@ -26,7 +26,7 @@
 			<fmt:message key="label.back.to.forum" />
 		</html:button>
 	</p>
-	<%@ include file="/jsps/learning/message/topicview.jsp"%>
+	<%@ include file="message/topicview.jsp"%>
 	<div class="left-buttons">
 		<c:set var="refreshTopicURL">
 			

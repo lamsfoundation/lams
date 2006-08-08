@@ -50,7 +50,29 @@
 					</td>
 				</tr>
 			</c:if>
-
+			<c:if test="${(msgDto.released || mode=='teacher') && (not empty msgDto.mark)}">
+				<tr>
+					<td>
+						<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
+						<BR>
+							${msgDto.mark}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span class="field-name" ><fmt:message key="lable.topic.title.comment"/></span>
+						<BR>
+						<c:choose>
+							<c:when test="${empty msgDto.comment}">
+								<fmt:message key="message.not.avaliable"/>
+							</c:when>
+							<c:otherwise>
+								<c:out value="${msgDto.comment}" escapeXml="false" />
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+			</c:if>
 			<tr>
 				<td>
 					<div class="right-buttons">
@@ -81,7 +103,7 @@
 
 						<!--  Edit Button -->
 						<c:if test="${not hidden}">
-							<c:if test='${(mode == "teacher") || (msgDto.isAuthor && not finishedLock && sessionScope.allowEdit)}'>
+							<c:if test='${(mode == "teacher") || (msgDto.isAuthor && not finishedLock && sessionScope.allowEdit && (empty msgDto.mark))}'>
 								<c:set var="edittopic">
 									<html:rewrite page="/learning/editTopic.do?topicId=${msgDto.message.uid}&rootUid=${rootUid}&create=${msgDto.message.created.time}" />
 								</c:set>
