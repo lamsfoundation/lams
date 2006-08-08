@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumReportDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
@@ -103,6 +104,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private MessageSeqDao messageSeqDao;
 	private ForumUserDao forumUserDao;
 	private ForumToolSessionDao forumToolSessionDao;
+	private ForumReportDAO forumReportDAO;
 	//system level handler and service 
 	private ILamsToolService toolService;
 	private ForumToolContentHandler forumToolContentHandler;
@@ -193,7 +195,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         
         return message;
     }
-     
+
+ 	public void updateReport(ForumReport report) {
+ 		forumReportDAO.saveObject(report);
+ 	}
     public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
     	
     	Message message = getMessage(messageId);
@@ -424,6 +429,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 
 	public void releaseMarksForSession(Long sessionID) {
+		//udate release mark date for each message.
 		List list = messageDao.getBySession(sessionID);
 		Iterator iter = list.iterator();
 		while(iter.hasNext()){
@@ -433,6 +439,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				report.setDateMarksReleased(new Date());
 			messageDao.saveOrUpdate(msg);
 		}
+		//update session to set MarkRelease flag.
+		ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
+		session.setMarkReleased(true);
+		forumToolSessionDao.saveOrUpdate(session);
+		
 	}
 
     //***************************************************************************************************************
@@ -884,7 +895,12 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.userManagementService = userManagementService;
 	}
 
+	public ForumReportDAO getForumReportDAO() {
+		return forumReportDAO;
+	}
 
-
+	public void setForumReportDAO(ForumReportDAO forumReportDAO) {
+		this.forumReportDAO = forumReportDAO;
+	}
 
 }

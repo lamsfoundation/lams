@@ -75,7 +75,7 @@
 					</tr>
 				</c:if>
 				<%-- display mark for teacher --%>
-				<c:if test='${mode == "teacher"}'>
+				<c:if test="${msgDto.released || mode=='teacher'}">
 					<tr>
 						<td>
 							<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>

@@ -1,6 +1,49 @@
 <%@ include file="/includes/taglibs.jsp"%>
-<html:errors />
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+<script type="text/javascript">
+<!--
 
+	var messageTargetDiv = "messageArea";
+	function releaseMarks(sessionId){
+		var url = "<c:url value="/monitoring/releaseMark.do"/>";
+	    var reqIDVar = new Date();
+		var param = "toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		messageLoading();
+	    var myAjax = new Ajax.Updater(
+		    	messageTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:messageComplete,
+		    		evalScripts:true
+		    	}
+	    );
+		
+	}
+	
+	function showBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.show(targetDiv+"_Busy");
+		}
+	}
+	function hideBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.hide(targetDiv+"_Busy");
+		}				
+	}
+	function messageLoading(){
+		showBusy(messageTargetDiv);
+	}
+	function messageComplete(){
+		hideBusy(messageTargetDiv);
+	}
+	
+	
+//-->
+</script>
 
 <c:forEach var="element" items="${sessionUserMap}">
 	<c:set var="toolSessionDto" value="${element.key}" />
@@ -8,6 +51,10 @@
 	<c:set var="toolAccessMode" value="${mode}" />
 
 	<table cellpadding="0">
+		<tr><td colspan="3">
+			<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+			<span id="messageArea"></span>
+		</td></tr>	
 		<tr>
 			<th colspan="3">
 				<fmt:message key="message.session.name" />
@@ -62,6 +109,11 @@
 						<fmt:message key="lable.topic.title.mark" />
 					</html:submit>
 				</html:form>
+			</td>
+			<td align="left">
+				<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
+					<fmt:message key="button.release.mark" />
+				</html:button>
 			</td>
 			<td align="left">
 				<html:form action="/monitoring/downloadMarks">

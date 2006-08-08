@@ -1,33 +1,38 @@
-<%@ include file="/includes/taglibs.jsp"%>
-
+<%@ include file="/common/taglibs.jsp"%>
 <table cellpadding="0">
-	<c:if test="${empty report}">
-		<tr>
-			<td>
-				<div align="center">
-					<b><fmt:message key="message.not.avaliable" /></b>
-				</div>
-			</td>
-		</tr>
-	</c:if>
-	<c:forEach items="${report}" var="userList">
-		<c:set var="user" value="${userList.key}" />
-		<c:set var="markList" value="${userList.value}" />
-		<c:set var="first" value="true" />
-		<c:forEach items="${markList}" var="topic">
-			<c:if test="${first}">
-				<c:set var="first" value="false" />
-				<tr>
-					<td colspan="5">
-						<c:out value="${user.firstName}" />
-						<c:out value="${user.lastName}" />
-						,
-						<c:out value="${user.loginName}" />
-						,
-						<fmt:message key="monitoring.user.post.topic" />
-					</td>
-				<tr>
-			</c:if>
+<c:if test="${empty report}">
+	<tr>
+		<td>
+			<div align="center">
+				<b><fmt:message key="message.not.avaliable" /></b>
+			</div>
+		</td>
+	</tr>
+</c:if>
+<c:forEach items="${report}" var="userList">
+	<c:set var="user" value="${userList.key}" />
+	<c:set var="topicList" value="${userList.value}" />
+		<c:if test="${empty topicList}">
+			<tr>
+				<td>
+					<div align="center">
+						<b><fmt:message key="message.not.avaliable" /></b>
+					</div>
+				</td>
+			</tr>
+		</c:if>
+	
+	
+		<c:forEach items="${topicList}" var="topic" varStatus="status">
+			<tr>
+				<td colspan="5">
+					<c:out value="${user.loginName}" />
+					,
+					<c:out value="${user.firstName}" />
+					<c:out value="${user.lastName}" />
+					<fmt:message key="monitoring.user.post.topic" />
+				</td>
+			</tr>
 			<tr>
 				<td>
 					<c:set var="viewtopic">
@@ -53,7 +58,7 @@
 					<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
 				</td>
 			</tr>
-
+	
 			<tr>
 				<td class="field-name" width="30%">
 					<fmt:message key="lable.topic.title.mark" />
@@ -86,23 +91,22 @@
 					</c:choose>
 				</td>
 			</tr>
-
 			<tr>
 				<td colspan="5">
 					<html:form action="/monitoring/editMark" method="post">
 						<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' />>
 						<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' />>
 						<input type="hidden" name="userID" value=<c:out value='${user.uid}' />>
+						<input type="hidden" name="updateMode" value="${updateMode}" />
 						<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
 					</html:form>
 				</td>
 			</tr>
-
 		</c:forEach>
-	</c:forEach>
-	<tr>
-		<td>
-			<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
-		</td>
-	</tr>
+		<tr>
+			<td>
+				<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
+			</td>
+		</tr>
+</c:forEach>
 </table>

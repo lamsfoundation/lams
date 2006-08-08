@@ -87,6 +87,7 @@ create table tl_lafrum11_tool_session (
    session_end_date datetime,
    session_start_date datetime,
    status integer,
+   mark_released smallint,
    forum_uid bigint,
    session_id bigint,
    session_name varchar(250),

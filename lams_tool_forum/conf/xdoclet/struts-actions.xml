@@ -239,6 +239,11 @@
 		    parameter="statistic" >
 			<forward name="success" path="/jsps/monitoring/statisticpart.jsp"/>	        
 		</action>
+		<action path="/monitoring/releaseMark" 
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+		    scope="request"
+		    parameter="releaseMark" >
+		</action>
 	
 		<action path="/monitoring/downloadMarks"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
@@ -256,7 +261,7 @@
 			scope="request"
 			validate="false"
 			parameter="viewAllMarks" >
-			<forward name="success" path="tiles:/monitoring/forum/viewAllMarks" />
+			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
 		</action>
 		
 		<!--  EDIT MARK		 -->
@@ -266,7 +271,7 @@
 			scope="request"
 			validate="false"
 			parameter="viewUserMark" >
-			<forward name="success" path="tiles:/monitoring/forum/viewUserMark" />
+			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
 		</action>
 		
 		<action path="/monitoring/editMark"
@@ -285,7 +290,7 @@
 			scope="request"
 			validate="false"
 			parameter="updateMark" >
-			<forward name="success" path="tiles:/monitoring/forum/viewUserMark" />
+			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
 		</action>
 	
 		<action path="/monitoring/viewTopic"

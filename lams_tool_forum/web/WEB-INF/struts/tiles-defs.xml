@@ -109,13 +109,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	<put name="body" value="/jsps/authoring/definelaterforbid.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/monitoring/forum/viewAllMarks" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/viewMark" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
-    	<put name="body" value="/jsps/monitoring/viewallmarks.jsp"/>
-	</definition>
-	<definition name="tiles:/monitoring/forum/viewUserMark" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
-    	<put name="body" value="/jsps/monitoring/usermarklist.jsp"/>
+    	<put name="body" value="/jsps/monitoring/viewmarks.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/editUserMark" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.edit.user.mark"/>

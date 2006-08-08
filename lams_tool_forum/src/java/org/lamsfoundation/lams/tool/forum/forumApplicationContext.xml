@@ -4,7 +4,7 @@
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.forum.ApplicationResources</value></property>
 	</bean>
-	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="forumMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
 		<property name="messageSource"><ref local="messageSource"/></property>										
 	</bean>
     <!-- Hibernate SessionFactory -->
@@ -104,7 +104,7 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="auditService"><ref bean="auditService"/></property>
-   		<property name="messageService"><ref bean="messageService"/></property>
+   		<property name="messageService"><ref bean="forumMessageService"/></property>
     </bean>
 
     <bean id="forumService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

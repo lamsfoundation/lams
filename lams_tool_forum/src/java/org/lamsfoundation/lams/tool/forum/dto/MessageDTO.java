@@ -43,8 +43,7 @@ public class MessageDTO {
 	private boolean isAuthor;
 	private Float mark;
 	private String comment;
-
-
+	private boolean released;
 
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
@@ -68,6 +67,7 @@ public class MessageDTO {
 		if(report != null && report.getMark() != null){
 			dto.mark = report.getMark();
 			dto.comment = report.getComment();
+			dto.released = report.getDateMarksReleased() == null?false:true;
 		}
 		
 		return dto;
@@ -98,6 +98,7 @@ public class MessageDTO {
 			if(report != null && report.getMark() != null){
 				msgDto.mark = report.getMark();
 				msgDto.comment = report.getComment();
+				msgDto.released = report.getDateMarksReleased() == null?false:true;
 			}
 
 			retSet.add(msgDto);
@@ -158,4 +159,13 @@ public class MessageDTO {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+
+	public boolean isReleased() {
+		return released;
+	}
+
+	public void setReleased(boolean isReleased) {
+		this.released = isReleased;
+	}
+	
 }

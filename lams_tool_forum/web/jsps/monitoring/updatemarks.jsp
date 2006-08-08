@@ -1,6 +1,10 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
 <html:form action="/monitoring/updateMark" method="post">
+		<input type="hidden" name="toolSessionID" value="<c:out value='${toolSessionID}'/>" />
+		<input type="hidden" name="messageID" value="<c:out value='${topic.message.uid}'/>" />
+		<input type="hidden" name="userID" value="<c:out value='${user.uid}'/>" />
+		<input type="hidden" name="updateMode" value="${updateMode}" />
 
 	<table cellpadding="0">
 		<tr>
@@ -40,9 +44,6 @@
 		</tr>
 	</table>
 	<table>
-		<input type="hidden" name="toolSessionID" value="<c:out value='${toolSessionID}'/>" />
-		<input type="hidden" name="messageID" value="<c:out value='${topic.message.uid}'/>" />
-		<input type="hidden" name="userID" value="<c:out value='${user.uid}'/>" />
 		<tr>
 			<td colspan="2">
 				<%@ include file="/common/messages.jsp"%>

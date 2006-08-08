@@ -45,6 +45,7 @@ public class ForumToolSession implements Cloneable{
 	private Forum forum;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
+	private boolean markReleased;
 	//finish or not
 	private int status;
 	
@@ -149,5 +150,15 @@ public class ForumToolSession implements Cloneable{
 		this.sessionName = sessionName;
 	}
 
+	/**
+	 * @hibernate.property column="mark_released" 
+	 * @return Returns the mark released flag
+	 */
+	public boolean isMarkReleased() {
+		return markReleased;
+	}
+	public void setMarkReleased(boolean markReleased) {
+		this.markReleased = markReleased;
+	}
 
 }
