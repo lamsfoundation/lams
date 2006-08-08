@@ -204,6 +204,38 @@
             column="limited_input_flag"
         />
 
+        <property
+            name="allowNewTopic"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_new_topic"
+        />
+
+        <property
+            name="allowUpload"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_upload"
+        />
+
+        <property
+            name="maximumReply"
+            type="int"
+            update="true"
+            insert="true"
+            column="maximum_reply"
+        />
+
+        <property
+            name="minimumReply"
+            type="int"
+            update="true"
+            insert="true"
+            column="minimum_reply"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Forum.xml

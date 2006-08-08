@@ -137,6 +137,8 @@ public class ForumForm extends ValidatorForm {
     	forum.setAllowRichEditor(false);
     	forum.setLimitedInput(false);
     	forum.setLockWhenFinished(false);
+    	forum.setAllowNewTopic(false);
+    	forum.setAllowUpload(false);
     }
     //-------------------------get/set methods----------------
     public Forum getForum() {

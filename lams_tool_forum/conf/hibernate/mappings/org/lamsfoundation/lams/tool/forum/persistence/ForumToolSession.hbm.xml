@@ -76,6 +76,14 @@
             length="250"
         />
 
+        <property
+            name="markReleased"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="mark_released"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ForumToolSession.xml

@@ -25,19 +25,23 @@ create table tl_lafrum11_forum (
    update_date datetime,
    create_by bigint,
    title varchar(255),
-   allow_anonym bit,
-   run_offline bit,
-   lock_on_finished bit,
+   allow_anonym smallint,
+   run_offline smallint,
+   lock_on_finished smallint,
    instructions text,
    online_instructions text,
    offline_instructions text,
-   content_in_use bit,
-   define_later bit,
+   content_in_use smallint,
+   define_later smallint,
    content_id bigint unique,
-   allow_edit bit,
-   allow_rich_editor bit,
+   allow_edit smallint,
+   allow_rich_editor smallint,
+   allow_new_topic smallint, 
+   allow_upload smallint, 
+   maximum_reply integer, 
+   minimum_reply integer,
    limited_of_chars integer,
-   limited_input_flag bit,
+   limited_input_flag smallint,
    primary key (uid)
 );
 create table tl_lafrum11_forum_user (
@@ -58,13 +62,13 @@ create table tl_lafrum11_message (
    modified_by bigint,
    subject varchar(255),
    body text,
-   is_authored bit,
-   is_anonymous bit,
+   is_authored smallint,
+   is_anonymous smallint,
    forum_session_uid bigint,
    parent_uid bigint,
    forum_uid bigint,
    reply_number integer,
-   hide_flag bit,
+   hide_flag smallint,
    report_id bigint,
    primary key (uid)
 );
@@ -108,5 +112,5 @@ alter table tl_lafrum11_message_seq add index FKD2C71F8845213B4D (root_message_u
 alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 
 
-INSERT INTO tl_lafrum11_forum (title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor,limited_input_flag,limited_of_chars) VALUES("LAMS Forum","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0,0,1,0,1,5000);
+INSERT INTO tl_lafrum11_forum (title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor, allow_new_topic,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars) VALUES("LAMS Forum","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0,0,1,0,1,1,0,0,1,5000);
 SET FOREIGN_KEY_CHECKS=1;

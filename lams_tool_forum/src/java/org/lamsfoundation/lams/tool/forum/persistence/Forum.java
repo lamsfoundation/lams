@@ -57,6 +57,11 @@ public class Forum implements Cloneable{
 	private boolean runOffline;
 	private boolean allowAnonym;
 	private boolean allowEdit;
+	private boolean allowNewTopic;
+	private boolean allowUpload;
+	private int maximumReply;
+	private int minimumReply;
+	
 	private boolean allowRichEditor;
 	private String instructions;
 	private String onlineInstructions;
@@ -490,5 +495,45 @@ public class Forum implements Cloneable{
 	}
 	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
+	}
+	/**
+	 * @hibernate.property column="allow_new_topic"
+	 * @return
+	 */	
+	public boolean isAllowNewTopic() {
+		return allowNewTopic;
+	}
+	public void setAllowNewTopic(boolean allowNewTopic) {
+		this.allowNewTopic = allowNewTopic;
+	}
+	/**
+	 * @hibernate.property column="allow_upload"
+	 * @return
+	 */
+	public boolean isAllowUpload() {
+		return allowUpload;
+	}
+	public void setAllowUpload(boolean allowUpload) {
+		this.allowUpload = allowUpload;
+	}
+	/**
+	 * @hibernate.property column="maximum_reply"
+	 * @return
+	 */	
+	public int getMaximumReply() {
+		return maximumReply;
+	}
+	public void setMaximumReply(int maximumReply) {
+		this.maximumReply = maximumReply;
+	}
+	/**
+	 * @hibernate.property column="minimum_reply"
+	 * @return
+	 */	
+	public int getMinimumReply() {
+		return minimumReply;
+	}
+	public void setMinimumReply(int minimumReply) {
+		this.minimumReply = minimumReply;
 	}
 }
