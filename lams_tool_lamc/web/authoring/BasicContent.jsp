@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	
 					  	<tr> 
 							<td colspan=2 NOWRAP valign=top>
-								<lams:SetEditor id="richTextInstructions" text="${sessionScope.richTextInstructions}" small="true" key="label.authoring.instructions.col"/>																
+								<lams:SetEditor id="richTextInstructions" text="${sessionScope.richTextInstructions}" key="label.authoring.instructions.col"/>																
 							</td>
 						</tr>
 					</c:if> 										

@@ -67,7 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  	<tr> 
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true" key="label.authoring.instructions.col"/>								
+								<lams:SetEditor id="instructions" text="${activityInstructions}" key="label.authoring.instructions.col"/>								
 							</td> 
 						</tr>
 				
@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 		<!--default Option content, this entry can not be deleted but can be updated -->
 						 		<tr> 
 									<td NOWRAP valign=top>
-										<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true" key="label.nomination.col"/>								
+										<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" key="label.nomination.col"/>								
 									</td> 
 									
 									
@@ -96,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
 										  <tr>
 											<td NOWRAP valign=top>
-												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true" key="label.nomination.col"/>								
+												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" key="label.nomination.col"/>								
 			                                	<c:if test="${ activeModule != 'monitoring' }"> 			
 					 		 						<html:submit property="removeContent" 
 			                                                     styleClass="linkbutton"  
