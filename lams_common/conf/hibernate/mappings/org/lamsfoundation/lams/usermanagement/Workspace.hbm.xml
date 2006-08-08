@@ -119,7 +119,7 @@
         								    @hibernate.collection-key column="workspace_id"
         								    @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"
         </meta>
-        <key column="workspace_folder"/>
+        <key column="workspace_id"/>
         <one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"/>
     </set>
 
