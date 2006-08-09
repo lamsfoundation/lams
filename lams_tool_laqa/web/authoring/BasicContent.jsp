@@ -81,18 +81,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}"  key="label.question.col"/>								
                                 
 	                                	<c:if test="${ (qaGeneralAuthoringDTO.activeModule != 'monitoring') }"> 			
-			 		 						<html:submit property="removeContent" 
-	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeQuestion(${queIndex});">
-												<bean:message key="button.removeQuestion"/>
-											</html:submit>
+											<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="removeQuestion(${queIndex});">												
 										</c:if> 			
+										
 	                                	<c:if test="${ (qaGeneralAuthoringDTO.activeModule == 'monitoring') }"> 			
-			 		 						<html:submit property="removeContent" 
-	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeMonitoringQuestion(${queIndex});">
-												<bean:message key="button.removeQuestion"/>
-											</html:submit>
+											<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="removeMonitoringQuestion(${queIndex});">																							
 										</c:if> 													
 										
                                     </td>
@@ -108,26 +101,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                 <html:submit property="addContent" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('addNewQuestion');">
-                                    <bean:message key="button.addNewQuestion"/>
+                                    <bean:message key="label.add.question"/>
                                 </html:submit>
                             </td>
                         </tr>
 					
 					</table>
 
-
-	      	<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
-				<p align="right">
-				    <a href="javascript:submitMethod('submitAllContent')" class="button">
-			        	<bean:message key="label.save"/></a>
-				</p>
-			</c:if> 					
-
-	      	<c:if test="${qaGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
-				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
-				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
-			</c:if> 						      	
+					<table>
+					    <tr> <td> &nbsp </td> </tr>					    
+						<tr> 
+							<td>							
+						      	<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
+									<p align="right">
+									    <a href="javascript:submitMethod('submitAllContent')" class="button">
+								        	<bean:message key="label.save"/></a>
+									</p>
+								</c:if> 					
+					
+					
+						      	<c:if test="${qaGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
+									<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+									<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
+									cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
+								</c:if> 						      	
+							</td> 
+					  	</tr>
+				 </table>
 	      				
 
 <SCRIPT language="JavaScript"> 
