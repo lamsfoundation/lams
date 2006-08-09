@@ -18,6 +18,11 @@
 	</div>
 	
 	<div id="content">
+		<table>
+			<tr><td>
+			<%@ include file="/common/messages.jsp"%>
+			</td></tr>
+		</table>
 		<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
 
 		<!-- Button Row -->

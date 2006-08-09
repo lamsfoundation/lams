@@ -15,10 +15,14 @@
 		</lams:Tabs>
 	</div>
 	<div id="content">
+			<table>
+			<tr><td>
+			<%@ include file="/common/messages.jsp"%>
+			</td></tr>
+			</table>
 			<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
 			<lams:TabBody id="2" titleKey="authoring.tab.advanced" page="advance.jsp" />
 			<lams:TabBody id="3" titleKey="authoring.tab.instructions" page="instructions.jsp" />
-
 			<!-- Button Row -->
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" />
 		<lams:HTMLEditor />

@@ -3,7 +3,8 @@
 <!--   Advance Tab Content    -->
 
 <table cellpadding="0">
-	<!-- Instructions Row -->
+
+	<!-- Advance options Row -->
 	<tr>
 		<td>
 			<html:checkbox property="forum.lockWhenFinished">
@@ -25,13 +26,6 @@
 			</html:checkbox>
 		</td>
 	</tr>
-	<tr>
-		<td>
-			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
-				<fmt:message key="label.authoring.advance.use.richeditor" />
-			</html:checkbox>
-		</td>
-	</tr>	
 	<tr>
 		<td>
 			<html:radio property="forum.allowNewTopic" value="true" onclick="allowNewTopic()">
@@ -61,18 +55,19 @@
 			</html:select>
 		</td>
 	</tr>
-
+	<tr>
+		<td>
+			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
+				<fmt:message key="label.authoring.advance.use.richeditor" />
+			</html:checkbox>
+		</td>
+	</tr>	
 	<tr>
 		<td>
 			<html:checkbox property="forum.limitedInput" styleId="limitedInput">
 				<fmt:message key="label.authoring.advance.limited.input" />
 			</html:checkbox>
 			<html:text property="forum.limitedChar" styleId="limitedChar" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:errors />
 		</td>
 	</tr>
 </table>

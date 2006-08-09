@@ -34,14 +34,17 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.util.UploadFileUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  *
@@ -52,7 +55,7 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  * Date: 10/06/2005
  * Time: 15:44:36
  */
-public class ForumForm extends ValidatorForm {
+public class ForumForm extends ActionForm {
 	private static final long serialVersionUID = -6054354910960460120L;
 	private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
@@ -73,7 +76,7 @@ public class ForumForm extends ValidatorForm {
     	
     	this.toolContentID = new Long(0);
         this.forum = new Forum();
-        this.forum.setTitle("New Forum");
+        this.forum.setTitle("");
         this.currentTab = "";
     }
     /**
@@ -103,34 +106,7 @@ public class ForumForm extends ValidatorForm {
         }
         
     }
-    /**
-     * Forum validation method from STRUCT interface.
-     * 
-     */
-    public ActionErrors validate(ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
-		ActionErrors errors = super.validate(mapping, request);
-		ActionMessage ae;
-		try {
-			if ("".equals(forum.getTitle())) {
-				ActionMessage error = new ActionMessage("error.valueReqd");
-				errors.add("forum.title", error);
-			}
-			if (onlineFile != null && !(onlineFile.getFileName().trim().equals(""))
-					&& convertToMeg(onlineFile.getFileSize()) > UploadFileUtil.getMaxFileSize()) {
-				ae = new ActionMessage("error.inputFileTooLarge");
-				errors.add("onlineFile", ae);
-			}
-			if (offlineFile != null && !(offlineFile.getFileName().trim().equals(""))
-					&& convertToMeg(offlineFile.getFileSize()) > UploadFileUtil.getMaxFileSize()) {
-				ae = new ActionMessage("error.inputFileTooLarge");
-				errors.add("offlineFile", ae);
-			}
-		} catch (Exception e) {
-			logger.error("", e);
-		}
-		return errors;
-	}
-
+  
     public void reset(ActionMapping mapping, HttpServletRequest request){
     	forum.setAllowEdit(false);
     	forum.setAllowAnonym(false);
@@ -160,12 +136,6 @@ public class ForumForm extends ValidatorForm {
     public FormFile getOfflineFile() {
         return offlineFile;
     }
-
-
-    private float convertToMeg( int numBytes ) {
-        return numBytes != 0 ? numBytes / 1024 / 1024 : 0;
-    }
-    
 
 	public String getCurrentTab() {
 		return currentTab;

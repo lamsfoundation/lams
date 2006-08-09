@@ -45,9 +45,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -65,6 +68,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -238,7 +242,16 @@ public class AuthoringAction extends Action {
 		
 		ToolAccessMode mode = getAccessMode(request); 
 		ForumForm forumForm = (ForumForm)(form);
-		
+		//validation
+		ActionMessages errors = validate(forumForm, mapping, request);
+		if(!errors.isEmpty()){
+			saveErrors(request, errors);
+			if(mode.isAuthor())
+	    		return mapping.findForward("author");
+	    	else
+	    		return mapping.findForward("monitor");			
+		}
+			
 		Forum forum = forumForm.getForum();
 		try {
 			forumService = getForumManager();
@@ -944,4 +957,55 @@ public class AuthoringAction extends Action {
 		return mode;
 	}
 	
+	  /**
+     * Forum validation method from STRUCT interface.
+     * 
+     */
+    public ActionMessages validate( ForumForm form,ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
+    	ActionMessages errors = new ActionMessages();
+    	
+		ActionMessage ae;
+		try {
+			if (StringUtils.isBlank(form.getForum().getTitle())) {
+				ActionMessage error = new ActionMessage("error.title.empty");
+				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			}
+			//define it later mode(TEACHER) skip below validation.
+			String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
+				mapping.setInput("/defineLater");
+				return errors;
+			}
+			if(!form.getForum().isAllowRichEditor()){
+				if(form.getForum().getLimitedChar() <=0){
+					ActionMessage error = new ActionMessage("error.limit.char.less.zero");
+					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+				}
+			}
+			if(!form.getForum().isAllowNewTopic()){
+				if(form.getForum().getMaximumReply() < form.getForum().getMinimumReply()){
+					ActionMessage error = new ActionMessage("error.min.less.max");
+					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+				}
+			}
+			if (form.getOnlineFile() != null && !(form.getOnlineFile().getFileName().trim().equals(""))
+					&& convertToMeg(form.getOnlineFile().getFileSize()) > UploadFileUtil.getMaxFileSize()) {
+				ae = new ActionMessage("error.inputFileTooLarge");
+				errors.add(ActionMessages.GLOBAL_MESSAGE, ae);
+			}
+			if (form.getOfflineFile() != null && !(form.getOfflineFile().getFileName().trim().equals(""))
+					&& convertToMeg(form.getOfflineFile().getFileSize()) > UploadFileUtil.getMaxFileSize()) {
+				ae = new ActionMessage("error.inputFileTooLarge");
+				errors.add(ActionMessages.GLOBAL_MESSAGE, ae);
+			}
+		} catch (Exception e) {
+			log.error(e.toString());
+		}
+		return errors;
+	}
+    private float convertToMeg( int numBytes ) {
+        return numBytes != 0 ? numBytes / 1024 / 1024 : 0;
+    }
+    
+
 }
