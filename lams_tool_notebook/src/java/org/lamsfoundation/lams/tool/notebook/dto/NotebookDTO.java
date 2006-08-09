@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.notebook.dto;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -60,7 +59,7 @@ public class NotebookDTO {
 
 	public Set<NotebookAttachmentDTO> offlineInstructionsFiles;
 
-	public Set<NotebookSessionDTO> sessionDTOs = new HashSet<NotebookSessionDTO>();
+	public Set<NotebookSessionDTO> sessionDTOs = new TreeSet<NotebookSessionDTO>();
 	
 	/* Constructors */
 	public NotebookDTO(){}
