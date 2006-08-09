@@ -49,7 +49,6 @@
 		
 		</div>  <!--closes content-->
 	
-	
 		<div id="footer-learner">
 		</div><!--closes footer-->
 	

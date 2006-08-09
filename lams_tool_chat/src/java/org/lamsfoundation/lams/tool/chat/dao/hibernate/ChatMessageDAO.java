@@ -48,7 +48,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	public static final String SQL_QUERY_FIND_USER_MESSAGE_HISTORY = "from "
 			+ ChatMessage.class.getName()
 			+ " as f where "
-			+ "f.chatSession=? and f.hidden='false' and (f.type='groupchat' or (f.type='chat' and (f.fromUser=? or f.toUser=?)))";
+			+ "f.chatSession.uid=? and f.hidden='false' and (f.type='groupchat' or (f.type='chat' and (f.fromUser.uid=? or f.toUser.uid=?)))";
 
 	public static final String SQL_QUERY_FIND_MESSAGE_BY_UID = "from "
 			+ ChatMessage.class.getName() + " where uid=?";
@@ -59,11 +59,11 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 
 	public static final String SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER = "select f.fromUser.uid, count(*) from "
 			+ ChatMessage.class.getName()
-			+ " as f where f.chatSession=? group by f.fromUser";
+			+ " as f where f.chatSession.uid=? group by f.fromUser";
 
 	public static final String SQL_QUERY_FIND_MESSAGE_COUNT_BY_SESSION = "select f.chatSession.uid, count(*) from "
 			+ ChatMessage.class.getName()
-			+ " as f where f.chatSession.chat=? group by f.chatSession";
+			+ " as f where f.chatSession.chat.uid=? group by f.chatSession";
 
 	public void saveOrUpdate(ChatMessage chatMessage) {
 		this.getHibernateTemplate().saveOrUpdate(chatMessage);

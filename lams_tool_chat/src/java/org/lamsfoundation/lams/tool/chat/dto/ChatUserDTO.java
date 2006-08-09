@@ -39,7 +39,15 @@ public class ChatUserDTO implements Comparable{
 	
 	public String lastName;
 	
+	public Long userID;
+	
+	public String notebookEntry;
+	
+	public boolean finishedReflection;
+	
 	public int postCount;
+	
+	public boolean finishedActivity;
 	
 	public ChatUserDTO(ChatUser user) {
 		this.uid = user.getUid();
@@ -47,6 +55,8 @@ public class ChatUserDTO implements Comparable{
 		this.jabberNickname = user.getJabberNickname();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.userID = user.getUserId();
+		this.finishedActivity = user.getFinishedActivity();
 		postCount=0; // this needs to be set manually.
 	}
 
@@ -106,6 +116,38 @@ public class ChatUserDTO implements Comparable{
 
 	public void setUid(Long uid) {
 		this.uid = uid;
+	}
+
+	public Long getUserID() {
+		return userID;
+	}
+
+	public void setUserID(Long userID) {
+		this.userID = userID;
+	}
+
+	public boolean isFinishedActivity() {
+		return finishedActivity;
+	}
+
+	public void setFinishedActivity(boolean finishedActivity) {
+		this.finishedActivity = finishedActivity;
+	}
+
+	public String getNotebookEntry() {
+		return notebookEntry;
+	}
+
+	public void setNotebookEntry(String notebookEntry) {
+		this.notebookEntry = notebookEntry;
+	}
+
+	public boolean isFinishedReflection() {
+		return finishedReflection;
+	}
+
+	public void setFinishedReflection(boolean finishedReflection) {
+		this.finishedReflection = finishedReflection;
 	}
 	
 }

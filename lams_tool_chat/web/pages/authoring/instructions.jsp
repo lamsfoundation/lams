@@ -12,9 +12,6 @@
 			</td>
 		</tr>
 
-
-
-
 		<!-- ==========  Online Attachments ========== -->
 		<c:if test="${not empty requestScope.sessionMap.onlineFiles or not empty requestScope.sessionMap.unsavedOnlineFiles}">
 			<tr>

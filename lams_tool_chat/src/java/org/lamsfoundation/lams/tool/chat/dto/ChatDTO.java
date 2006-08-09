@@ -39,6 +39,32 @@ public class ChatDTO {
 
 	private static Logger logger = Logger.getLogger(ChatDTO.class);
 
+	public Long toolContentId;
+
+	public String title;
+
+	public String instructions;
+
+	public String onlineInstructions;
+
+	public String offlineInstructions;
+	
+	public boolean defineLater;
+	
+	public boolean contentInUse;
+	
+	public boolean reflectOnActivity;
+	
+	public boolean lockOnFinish;
+	
+	public String reflectInstructions;
+	
+	public Set<ChatAttachmentDTO> onlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
+
+	public Set<ChatAttachmentDTO> offlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
+
+	public Set<ChatSessionDTO> sessionDTOs = new HashSet<ChatSessionDTO>();;
+	
 	public ChatDTO(Chat chat) {
 		toolContentId = chat.getToolContentId();
 		title = chat.getTitle();
@@ -46,9 +72,9 @@ public class ChatDTO {
 		onlineInstructions = chat.getOnlineInstructions();
 		offlineInstructions = chat.getOfflineInstructions();
 		contentInUse = chat.getContentInUse();
-
-		onlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
-		offlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
+		reflectInstructions = chat.getReflectInstructions();
+		reflectOnActivity = chat.getReflectOnActivity();
+		lockOnFinish = chat.getLockOnFinished();
 
 		for (Iterator i = chat.getChatAttachments().iterator(); i.hasNext();) {
 			ChatAttachment att = (ChatAttachment) i.next();
@@ -64,30 +90,8 @@ public class ChatDTO {
 				logger.error("File with uid " + att.getFileUuid()
 						+ " contains invalid fileType: " + att.getFileType());
 			}
-		}
-		
-		sessionDTOs = new HashSet<ChatSessionDTO>();
+		} 
 	}
-
-	public Long toolContentId;
-
-	public String title;
-
-	public String instructions;
-
-	public String onlineInstructions;
-
-	public String offlineInstructions;
-	
-	public boolean defineLater;
-	
-	public boolean contentInUse;
-	
-	public Set<ChatAttachmentDTO> onlineInstructionsFiles;
-
-	public Set<ChatAttachmentDTO> offlineInstructionsFiles;
-
-	public Set<ChatSessionDTO> sessionDTOs;
 
 	public Set<ChatSessionDTO> getSessionDTOs() {
 		return sessionDTOs;
@@ -155,11 +159,43 @@ public class ChatDTO {
 		this.toolContentId = toolContentID;
 	}
 
-	public Boolean getContentInUse() {
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+
+	public boolean isContentInUse() {
 		return contentInUse;
 	}
 
-	public void setContentInUse(Boolean contentInUse) {
+	public void setContentInUse(boolean contentInUse) {
 		this.contentInUse = contentInUse;
+	}
+
+	public boolean isDefineLater() {
+		return defineLater;
+	}
+
+	public void setDefineLater(boolean defineLater) {
+		this.defineLater = defineLater;
+	}
+
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	public boolean isLockOnFinish() {
+		return lockOnFinish;
+	}
+
+	public void setLockOnFinish(boolean lockOnFinish) {
+		this.lockOnFinish = lockOnFinish;
 	}
 }

@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import middlegen.Column;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -68,6 +70,10 @@ public class Chat implements java.io.Serializable, Cloneable {
 	private Boolean runOffline;
 
 	private Boolean lockOnFinished;
+	
+	private Boolean reflectOnActivity;
+	
+	private String reflectInstructions;
 
 	private Boolean filteringEnabled;
 
@@ -86,7 +92,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 	private Set chatAttachments;
 
 	private Set chatSessions;
-
+	
 	//*********** NON Persisit fields
 	private IToolContentHandler toolContentHandler;
 
@@ -225,7 +231,29 @@ public class Chat implements java.io.Serializable, Cloneable {
 	public void setLockOnFinished(Boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
 	}
+	
+	/**
+	 * @hibernate.property column="reflect_on_activity" length="1"
+	 */
+	public Boolean getReflectOnActivity() {
+		return reflectOnActivity;
+	}
 
+	public void setReflectOnActivity(Boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+	
+	/**
+	 * @hibernate.property column="reflect_instructions" length="65535"
+	 */
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+	
 	/**
 	 * @hibernate.property column="online_instructions" length="65535"
 	 * 
@@ -404,7 +432,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 			if (chatAttachments != null) {
 				// create a copy of the attachments
 				Iterator iter = chatAttachments.iterator();
-				Set set = new HashSet();
+				Set<ChatAttachment> set = new HashSet<ChatAttachment>();
 				while (iter.hasNext()) {
 					ChatAttachment originalFile = (ChatAttachment) iter.next();
 					ChatAttachment newFile = (ChatAttachment) originalFile

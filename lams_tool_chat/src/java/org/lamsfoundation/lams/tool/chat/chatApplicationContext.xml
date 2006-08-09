@@ -40,6 +40,7 @@
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="chatToolContentHandler"><ref bean="chatToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
+		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">

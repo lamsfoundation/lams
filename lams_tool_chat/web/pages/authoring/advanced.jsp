@@ -15,6 +15,22 @@
 		</tr>
 		<tr>
 			<td align="right">
+				<html:checkbox property="reflectOnActivity" value="1" styleClass="noBorder"></html:checkbox>
+			</td>
+			<td>
+				<fmt:message key="advanced.reflectOnActivity" />
+			</td>
+		</tr>
+				<tr>
+			<td>
+				&nbsp;
+			</td>
+			<td>
+				<html:textarea property="reflectInstructions" cols="30" rows="3" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
 				<html:checkbox property="filteringEnabled" value="1" styleClass="noBorder"></html:checkbox>
 			</td>
 			<td>

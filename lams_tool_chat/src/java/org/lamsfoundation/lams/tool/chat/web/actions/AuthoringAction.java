@@ -126,7 +126,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		chatService.saveOrUpdateChat(chat);
 
 		// Set up sessionMap
-		SessionMap map = new SessionMap();
+		SessionMap<String, Object> map = new SessionMap<String, Object>();
 		initSessionMap(map, request);
 		updateSessionMap(map, chat);
 
@@ -151,7 +151,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		// get authForm and session map.
 		AuthoringForm authForm = (AuthoringForm) form;
-		SessionMap map = getSessionMap(request, authForm);
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		// get chat content.
 		Chat chat = chatService.getChatByContentId(authForm.getToolContentID());
@@ -160,9 +160,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		updateChat(chat, authForm);
 
 		// remove attachments marked for deletion.
-		Set attachments = chat.getChatAttachments();
+		Set<ChatAttachment> attachments = chat.getChatAttachments();
 		if (attachments == null) {
-			attachments = new HashSet();
+			attachments = new HashSet<ChatAttachment>();
 		}
 
 		for (ChatAttachment att : getAttList(KEY_DELETED_FILES, map)) {
@@ -240,7 +240,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	private ActionForward uploadFile(ActionMapping mapping,
 			AuthoringForm authForm, String type, HttpServletRequest request) {
-		SessionMap map = getSessionMap(request, authForm);
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		FormFile file;
 		List<ChatAttachment> unsavedFiles;
@@ -284,7 +284,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	private ActionForward deleteFile(ActionMapping mapping,
 			AuthoringForm authForm, String type, HttpServletRequest request) {
-		SessionMap map = getSessionMap(request, authForm);
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		List fileList;
 		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
@@ -316,7 +316,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	private ActionForward removeUnsaved(ActionMapping mapping,
 			AuthoringForm authForm, String type, HttpServletRequest request) {
-		SessionMap map = getSessionMap(request, authForm);
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		List unsavedFiles;
 
@@ -357,6 +357,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		chat.setOfflineInstructions(authForm.getOnlineInstruction());
 		chat.setOnlineInstructions(authForm.getOfflineInstruction());
 		chat.setLockOnFinished(authForm.isLockOnFinished());
+		chat.setReflectOnActivity(authForm.isReflectOnActivity());
+		chat.setReflectInstructions(authForm.getReflectInstructions());
 		chat.setFilteringEnabled(authForm.isFilteringEnabled());
 		chat.setFilterKeywords(authForm.getFilterKeywords());
 	}
@@ -375,9 +377,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setOnlineInstruction(chat.getOnlineInstructions());
 		authForm.setOfflineInstruction(chat.getOfflineInstructions());
 		authForm.setLockOnFinished(chat.getLockOnFinished());
+		authForm.setReflectOnActivity(chat.getReflectOnActivity());
+		authForm.setReflectInstructions(chat.getReflectInstructions());
 		authForm.setFilteringEnabled(chat.getFilteringEnabled());
 		authForm.setFilterKeywords(chat.getFilterKeywords());
-		// TODO add the rest.
 	}
 
 	/**
@@ -386,7 +389,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param map
 	 * @param chat
 	 */
-	private void updateSessionMap(SessionMap map, Chat chat) {
+	private void updateSessionMap(SessionMap<String, Object> map, Chat chat) {
 
 		getAttList(KEY_UNSAVED_OFFLINE_FILES, map).clear();
 		getAttList(KEY_UNSAVED_ONLINE_FILES, map).clear();
@@ -432,7 +435,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param map
 	 * @param request
 	 */
-	private void initSessionMap(SessionMap map, HttpServletRequest request) {
+	private void initSessionMap(SessionMap<String, Object> map, HttpServletRequest request) {
 		map.put(KEY_MODE, getAccessMode(request));
 		map.put(KEY_ONLINE_FILES, new LinkedList<ChatAttachment>());
 		map.put(KEY_OFFLINE_FILES, new LinkedList<ChatAttachment>());
@@ -448,7 +451,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param map
 	 * @return
 	 */
-	private List<ChatAttachment> getAttList(String key, SessionMap map) {
+	private List<ChatAttachment> getAttList(String key, SessionMap<String, Object> map) {
 		List<ChatAttachment> list = (List<ChatAttachment>) map.get(key);
 		return list;
 	}
@@ -460,9 +463,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param authForm
 	 * @return
 	 */
-	private SessionMap getSessionMap(HttpServletRequest request,
+	private SessionMap<String, Object> getSessionMap(HttpServletRequest request,
 			AuthoringForm authForm) {
-		return (SessionMap) request.getSession().getAttribute(
+		return (SessionMap<String, Object>) request.getSession().getAttribute(
 				authForm.getSessionMapID());
 	}
 }

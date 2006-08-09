@@ -41,6 +41,7 @@ public class LearningForm extends ActionForm {
 	Long chatUserUID;
 	Long toolSessionID;
 	String mode;
+	String entryText;
 
 	public String getMode() {
 		return mode;
@@ -72,5 +73,13 @@ public class LearningForm extends ActionForm {
 
 	public void setToolSessionID(Long toolSessionID) {
 		this.toolSessionID = toolSessionID;
+	}
+
+	public String getEntryText() {
+		return entryText;
+	}
+
+	public void setEntryText(String entryText) {
+		this.entryText = entryText;
 	}
 }

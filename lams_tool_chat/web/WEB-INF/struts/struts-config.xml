@@ -69,6 +69,11 @@
         path="tiles:/learning/defineLater"
         redirect="false"
       />
+      <forward
+        name="notebook"
+        path="tiles:/learning/notebook"
+        redirect="false"
+      />
     </action>
     <action
       path="/monitoring"
@@ -92,6 +97,11 @@
       <forward
         name="chat_history"
         path="tiles:/monitoring/chat_history"
+        redirect="false"
+      />
+      <forward
+        name="notebook"
+        path="tiles:/monitoring/notebook"
         redirect="false"
       />
     </action>

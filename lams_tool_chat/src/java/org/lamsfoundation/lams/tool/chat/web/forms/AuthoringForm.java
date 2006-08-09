@@ -56,6 +56,10 @@ public class AuthoringForm extends ActionForm {
 
 	boolean lockOnFinished;
 	
+	boolean reflectOnActivity;
+	
+	String reflectInstructions;
+	
 	boolean filteringEnabled;
 	
 	String filterKeywords;
@@ -201,5 +205,21 @@ public class AuthoringForm extends ActionForm {
 
 	public void setFilterKeywords(String filterKeywords) {
 		this.filterKeywords = filterKeywords;
+	}
+
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
 	}
 }

@@ -18,7 +18,6 @@
 			<div class="right-buttons">
 				<html:hidden property="dispatch" value="finishActivity" />
 				<html:hidden property="chatUserUID" value="${USER_UID}" />
-				<html:hidden property="toolSessionID" value="${SESSION_ID}" />
 				<html:submit styleClass="button">
 					<fmt:message>button.finish</fmt:message>
 				</html:submit>

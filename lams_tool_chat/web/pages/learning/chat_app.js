@@ -194,6 +194,9 @@ function handleConnected() {
     document.getElementById("chat_pane").style.display = "";
     if (MODE == "learner") {
         if (LEARNER_FINISHED == "true") {
+			
+        	document.getElementById("notebookEntry_pane").style.display = "";
+
             if (LOCK_ON_FINISHED == "true") {
     			// disable sending messages.
                 document.getElementById("msgArea").disabled = "disabled";

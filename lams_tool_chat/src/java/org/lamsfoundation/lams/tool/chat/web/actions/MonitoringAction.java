@@ -35,6 +35,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatSessionDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
@@ -67,6 +69,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                        path="tiles:/monitoring/chat_client"
  * @struts.action-forward name="chat_history"
  *                        path="tiles:/monitoring/chat_history"
+ * 
+ * @struts.action-forward name="notebook" path="tiles:/monitoring/notebook"
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -123,6 +127,18 @@ public class MonitoringAction extends LamsDispatchAction {
 					count = 0;
 				}
 				userDTO.setPostCount(count);
+								
+				// get the notebook entry.
+				NotebookEntry notebookEntry = chatService.getEntry(session.getSessionId(),
+						CoreNotebookConstants.NOTEBOOK_TOOL,
+						ChatConstants.TOOL_SIGNATURE, user.getUserId()
+								.intValue());
+				if (notebookEntry != null) {
+					userDTO.finishedReflection = true;
+				} else {
+					userDTO.finishedReflection = false;
+				}			
+				
 				sessionDTO.getUserDTOs().add(userDTO);
 			}
 
@@ -144,7 +160,24 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("sessionDTO", sessionDTO);
 		return mapping.findForward("chat_history");
 	}
-
+	
+	public ActionForward openNotebook(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		Long uid = WebUtil.readLongParam(request, "uid", false);
+		
+		ChatUser chatUser = chatService.getUserByUID(uid);
+		NotebookEntry notebookEntry = chatService.getEntry(chatUser.getChatSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
+		
+		ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
+		chatUserDTO.setNotebookEntry(notebookEntry.getEntry());
+		
+		request.setAttribute("chatUserDTO", chatUserDTO);
+		
+		return mapping.findForward("notebook");
+	}
+	
 	public ActionForward editMessage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		MonitoringForm monitoringForm = (MonitoringForm) form;

@@ -30,11 +30,16 @@
 
 			<tr>
 				<th>
-					<fmt:message>Learner</fmt:message>
+					<fmt:message>heading.learner</fmt:message>
 				</th>
 				<th>
-					<fmt:message>No of Posts</fmt:message>
+					<fmt:message>heading.numPosts</fmt:message>
 				</th>
+				<c:if test="${dto.reflectOnActivity}">
+					<th>
+						<fmt:message>heading.reflection</fmt:message>
+					</th>
+				</c:if>
 			</tr>
 
 			<c:forEach var="user" items="${session.userDTOs}">
@@ -45,6 +50,20 @@
 					<td>
 						${user.postCount}
 					</td>
+					<c:if test="${dto.reflectOnActivity}">
+						<td>
+							<c:if test="${user.finishedReflection}">
+								<c:url value="monitoring.do" var="openNotebook">
+									<c:param name="dispatch" value="openNotebook" />
+									<c:param name="uid" value="${user.uid}" />
+								</c:url>
+
+								<html:link href="${openNotebook}" target="_blank">
+									<fmt:message key="link.view" />
+								</html:link>
+							</c:if>
+						</td>
+					</c:if>
 				</tr>
 			</c:forEach>
 		</tbody>

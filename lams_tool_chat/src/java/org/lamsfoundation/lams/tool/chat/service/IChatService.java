@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
@@ -51,71 +52,74 @@ public interface IChatService {
 	 * @return
 	 */
 	public Chat copyDefaultContent(Long newContentID);
-	
+
 	/**
 	 * Returns an instance of the Chat tools default content.
+	 * 
 	 * @return
 	 */
 	public Chat getDefaultContent();
-	
+
 	/**
 	 * @param toolSignature
 	 * @return
 	 */
 	public Long getDefaultContentIdBySignature(String toolSignature);
-	
+
 	/**
 	 * @param toolContentID
 	 * @return
 	 */
 	public Chat getChatByContentId(Long toolContentID);
-	
+
 	/**
 	 * @param toolContentId
 	 * @param file
 	 * @param type
 	 * @return
 	 */
-	public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-	
+	public ChatAttachment uploadFileToContent(Long toolContentId,
+			FormFile file, String type);
+
 	/**
 	 * @param uuid
 	 * @param versionID
 	 */
-	public void deleteFromRepository(Long uuid, Long versionID) throws ChatException;
-	
+	public void deleteFromRepository(Long uuid, Long versionID)
+			throws ChatException;
+
 	/**
 	 * @param contentID
 	 * @param uuid
 	 * @param versionID
 	 * @param type
 	 */
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
-	
+	public void deleteInstructionFile(Long contentID, Long uuid,
+			Long versionID, String type);
+
 	/**
 	 * @param chat
 	 */
 	public void saveOrUpdateChat(Chat chat);
-	
 
 	/**
 	 * @param toolSessionId
 	 * @return
 	 */
 	public ChatSession getSessionBySessionId(Long toolSessionId);
-	
+
 	/**
 	 * 
 	 * @param jabberRoom
 	 * @return
 	 */
 	public ChatSession getSessionByJabberRoom(String jabberRoom);
-	
+
 	/**
 	 * @param chatSession
 	 */
 	public void saveOrUpdateChatSession(ChatSession chatSession);
-	
+
 	/**
 	 * 
 	 * @param userId
@@ -130,50 +134,53 @@ public interface IChatService {
 	 * @param sessionID
 	 * @return
 	 */
-	public ChatUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
-	
+	public ChatUser getUserByLoginNameAndSessionId(String loginName,
+			Long sessionId);
+
 	/**
 	 * 
 	 * @param jabberID
 	 * @param jabberRoom
 	 * @return
 	 */
-	public ChatUser getUserByJabberIDAndJabberRoom(String jabberID, String jabberRoom);
-	
+	public ChatUser getUserByJabberIDAndJabberRoom(String jabberID,
+			String jabberRoom);
+
 	/**
 	 * 
 	 * @param uid
 	 * @return
 	 */
 	public ChatUser getUserByUID(Long uid);
-	
+
 	/**
 	 * 
 	 * @param jabberNickname
 	 * @param sessionID
 	 * @return
 	 */
-	public ChatUser getUserByJabberNicknameAndSessionID(String jabberNickname, Long sessionID);
-	
+	public ChatUser getUserByJabberNicknameAndSessionID(String jabberNickname,
+			Long sessionID);
+
 	/**
 	 * 
 	 * @param chatUser
 	 */
 	public void saveOrUpdateChatUser(ChatUser chatUser);
-	
+
 	/**
 	 * 
 	 * @param chatUser
 	 * @return
 	 */
 	public List getMessagesForUser(ChatUser chatUser);
-	
+
 	/**
 	 * 
 	 * @param chatMessage
 	 */
-	public void saveOrUpdateChatMessage(ChatMessage chatMessage);	
-	
+	public void saveOrUpdateChatMessage(ChatMessage chatMessage);
+
 	/**
 	 * 
 	 * @param user
@@ -181,7 +188,7 @@ public interface IChatService {
 	 * @return
 	 */
 	public ChatUser createChatUser(UserDTO user, ChatSession chatSession);
-	
+
 	/**
 	 * 
 	 * @param chatSession
@@ -199,48 +206,55 @@ public interface IChatService {
 	 * @param presenceElems
 	 */
 	public List<Node> processIncomingPresence(Node presence);
-	
+
 	/**
 	 * 
 	 * @param toolContentID
 	 * @param pattern
 	 */
-	public ChatMessageFilter updateMessageFilters(Chat chat); 
-		
+	public ChatMessageFilter updateMessageFilters(Chat chat);
+
 	/**
 	 * 
 	 * @param node
 	 */
 	public void filterMessage(Node message);
-	
+
 	/**
 	 * 
 	 * @param message
 	 * @param chat
 	 */
 	public void filterMessage(Node message, Chat chat);
-	
+
 	/**
 	 * 
 	 * @param messageDTO
 	 * @param chat
 	 */
 	public void filterMessage(ChatMessageDTO messageDTO, Chat chat);
-	
+
 	/**
 	 * 
 	 * @param messageUID
 	 * @return
 	 */
 	public ChatMessage getMessageByUID(Long messageUID);
-	
+
 	public List getLastestMessages(ChatSession chatSession, int max);
 
 	public void auditEditMessage(ChatMessage chatMessage, String messageBody);
 
-	public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden );
-	
+	public void auditHideShowMessage(ChatMessage chatMessage,
+			boolean messageHidden);
+
 	public Map<Long, Integer> getMessageCountBySession(Long chatUID);
-	
+
 	public Map<Long, Integer> getMessageCountByFromUser(Long sessionUID);
+
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry);
+
+	public NotebookEntry getEntry(Long id, Integer idType, String signature,
+			Integer userID);
 }

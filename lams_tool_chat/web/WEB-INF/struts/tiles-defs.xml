@@ -94,6 +94,11 @@
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="/pages/learning/defineLater.jsp" />
 	</definition>
+
+	<definition name="tiles:/learning/notebook" extends="tiles:/layout:learning">
+		<put name="header" value="tiles:/header:default" />
+		<put name="body" value="/pages/learning/notebook.jsp" />
+	</definition>	
 	<!-- End: Learning -->
 
 
@@ -115,6 +120,15 @@
 		<put name="header" value="tiles:/header:default"></put>
 		<put name="body" value="/pages/monitoring/chatHistory.jsp"></put>
 	</definition>
+
+	<definition name="tiles:/monitoring/notebook" extends="tiles:/layout:default">
+		<put name="pageTitleKey" value="pageTitle.monitoring.notebook"></put>
+		<put name="header" value="tiles:/header:default"></put>
+		<put name="body" value="/pages/monitoring/notebook.jsp"></put>
+	</definition>
+		
+	
+	
 
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">
 		<put name="headItems" value="/pages/monitoring/headItems.jsp" />
