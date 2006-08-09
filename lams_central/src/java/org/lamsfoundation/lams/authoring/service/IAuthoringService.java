@@ -146,6 +146,13 @@ public interface IAuthoringService {
 	public String getAllLearningDesignDetails()throws IOException;
 	
 	/**
+	 * Saves the LearningDesign to the database. Will update if already saved.
+	 * Used when a design is run.
+	 * @param learningDesign The LearningDesign to be saved 
+	 * */
+	public void saveLearningDesign(LearningDesign learningDesign);
+
+	/**
 	 * Returns a list of LearningDesign's 
 	 * in WDDX format, belonging to the given user
 	 *  
