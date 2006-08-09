@@ -45,10 +45,10 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -201,6 +201,7 @@ public class UserManagementService implements IUserManagementService {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void getChildOrganisations(User user, Organisation org, List<String> restrictToRoleNames, List<Integer> restrictToClassIds, List<OrganisationDTO> dtolist) {
 		if ( org != null ) {
 			boolean notCheckClassId = restrictToClassIds == null || restrictToClassIds.size() == 0;
@@ -420,7 +421,8 @@ public class UserManagementService implements IUserManagementService {
 		return workspace;
 	}
 	
-    public Organisation saveOrganisation( Organisation organisation, Integer userID ) 	 
+    @SuppressWarnings("unchecked")
+	public Organisation saveOrganisation( Organisation organisation, Integer userID ) 	 
     { 	 
 	 
             if ( organisation.getOrganisationId() == null ) { 	 
@@ -460,6 +462,32 @@ public class UserManagementService implements IUserManagementService {
 		}
 		List results = findByProperties(SupportedLocale.class,properties);
 		return results.isEmpty() ? null : (SupportedLocale)results.get(0);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<UserManageBean> getUserManageBeans(Integer orgId) {
+		String query = "select u.userId,u.login,u.title,u.firstName,u.lastName, r " +
+				"from User u left join u.userOrganisations as uo left join uo.userOrganisationRoles as uor left join uor.role as r where uo.organisation.organisationId=?";
+		List list = baseDAO.find(query, orgId);
+		Map<Integer,UserManageBean> beansMap = new HashMap<Integer,UserManageBean>();
+		for(int i=0; i<list.size(); i++){
+			Object[] data = (Object[])list.get(i);
+			if(beansMap.containsKey(data[0])){
+				beansMap.get(data[0]).getRoles().add((Role)data[5]);
+			}else{
+				UserManageBean bean = new UserManageBean();
+				bean.setUserId((Integer)data[0]);
+				bean.setLogin((String)data[1]);
+				bean.setTitle((String)data[2]);
+				bean.setFirstName((String)data[3]);
+				bean.setLastName((String)data[4]);
+				bean.getRoles().add((Role)data[5]);
+				beansMap.put((Integer)data[0],bean);
+			}
+		}
+		List<UserManageBean> userManageBeans = new ArrayList<UserManageBean>();
+		userManageBeans.addAll(beansMap.values());
+		return userManageBeans;
 	}
 	
 }

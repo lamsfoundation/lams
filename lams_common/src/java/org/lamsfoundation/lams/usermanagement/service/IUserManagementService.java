@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 
 /**
  * @version
@@ -288,5 +289,7 @@ public interface IUserManagementService {
      * @return SupportedLocale
      */
     public SupportedLocale  getSupportedLocale(String language, String country);
+    
+    public List<UserManageBean> getUserManageBeans(Integer orgId);
     
 }
