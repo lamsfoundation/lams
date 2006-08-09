@@ -1252,7 +1252,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("mcLearningForm :" + mcLearningForm);
 		
 		prepareViewAnswersData(mapping, mcLearningForm, request, response);
-		logger.debug("post prepareViewAnswersData f");
+		logger.debug("post prepareViewAnswersData");
 		return (mapping.findForward(VIEW_ANSWERS));
 	}
 

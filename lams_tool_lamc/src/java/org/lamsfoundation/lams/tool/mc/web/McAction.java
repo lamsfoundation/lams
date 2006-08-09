@@ -2155,7 +2155,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
 		logger.debug("richTextInstructions: " + richTextInstructions);
 		
-			
+
+		/*
 		if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
 		{
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
@@ -2167,10 +2168,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
 			logger.debug("add instructions to ActionMessages: ");
 		}
+		*/
 	
 		if (errors.size() > 0)  
 		{
-			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
+			//logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
 			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");

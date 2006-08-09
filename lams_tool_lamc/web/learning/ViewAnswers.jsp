@@ -167,7 +167,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 
 
-				<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}"> 							  
 					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
 					 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
 				  	   		  <tr>
@@ -202,7 +201,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  </tr>
 							</c:if> 																		
 					</c:if> 																								
-				</c:if> 																												
 					
 				  	<html:hidden property="doneLearnerProgress"/>						   
 				</table>

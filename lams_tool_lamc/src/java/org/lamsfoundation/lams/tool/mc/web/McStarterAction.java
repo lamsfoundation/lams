@@ -652,8 +652,25 @@ public class McStarterAction extends Action implements McAppConstants {
 		mcAuthoringForm.resetRadioBoxes();
 		logger.debug("all radioboxes are reset");
 		
-		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
-		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+		if (mcContent.getTitle() == null)
+		{
+			request.getSession().setAttribute(RICHTEXT_TITLE,"MCQ Title");
+		}
+		else
+		{
+		    request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
+		}
+
+		if (mcContent.getInstructions() == null)
+		{
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,"MCQ Instructions");
+		}
+		else
+		{
+		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());    
+		}
+		
+		
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
