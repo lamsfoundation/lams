@@ -66,6 +66,7 @@
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="validate*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
