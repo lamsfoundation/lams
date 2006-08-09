@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
+
 /**
  * @author Jun-Dir Liew
  *
