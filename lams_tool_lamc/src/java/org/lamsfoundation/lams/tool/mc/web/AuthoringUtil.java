@@ -1433,6 +1433,7 @@ public class AuthoringUtil implements McAppConstants {
     		isShowFeedback=true;
     	    	
     	
+    	/*
     	String richTextTitle="";
     	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
     	logger.debug("createContent richTextTitle from session: " + richTextTitle);
@@ -1442,6 +1443,14 @@ public class AuthoringUtil implements McAppConstants {
     	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
     	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
     	if (richTextInstructions == null) richTextInstructions="";
+    	*/
+    	
+		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
+		logger.debug("richTextTitle: " + richTextTitle);
+		
+		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
+		logger.debug("richTextInstructions: " + richTextInstructions);
+
 
     	String richTextOfflineInstructions="";
     	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);

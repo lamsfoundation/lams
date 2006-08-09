@@ -2148,11 +2148,19 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
 				isShowFeedback=true;
 		}
-		    	
+		
+		/*
 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
 		logger.debug("richTextTitle: " + richTextTitle);
 		
 		String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+		logger.debug("richTextInstructions: " + richTextInstructions);
+		*/
+		
+		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
+		logger.debug("richTextTitle: " + richTextTitle);
+		
+		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
 		logger.debug("richTextInstructions: " + richTextInstructions);
 		
 
