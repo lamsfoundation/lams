@@ -275,6 +275,9 @@ function doLogin() {
 	}
 }
 function sendMsg(aForm) {
+	if (aForm.msg.value == "") {
+		return false;  // do not send empty messages.
+	}
 	var aMsg = new JSJaCMessage();
 	var rosterList = document.getElementById("roster_user_selector");
 	var selectedIndex = rosterList.selectedIndex;
