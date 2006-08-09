@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.chat.dto;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -63,7 +62,7 @@ public class ChatDTO {
 
 	public Set<ChatAttachmentDTO> offlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
 
-	public Set<ChatSessionDTO> sessionDTOs = new HashSet<ChatSessionDTO>();;
+	public Set<ChatSessionDTO> sessionDTOs = new TreeSet<ChatSessionDTO>();;
 	
 	public ChatDTO(Chat chat) {
 		toolContentId = chat.getToolContentId();

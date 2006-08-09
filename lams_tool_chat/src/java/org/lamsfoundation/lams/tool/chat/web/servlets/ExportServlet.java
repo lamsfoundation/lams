@@ -35,15 +35,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatSessionDTO;
+import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
+import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -95,46 +99,67 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throws ChatException {
 
 		logger.debug("doExportTeacher: toolContentID:" + toolSessionID);
-		
+
 		// check if toolContentID available
 		if (toolSessionID == null) {
 			String error = "Tool Session ID is missing. Unable to continue";
 			logger.error(error);
 			throw new ChatException(error);
 		}
-		
-		ChatSession chatSession = chatService.getSessionBySessionId(toolSessionID);
-		
+
+		ChatSession chatSession = chatService
+				.getSessionBySessionId(toolSessionID);
+
 		// get all messages for current user and filter.
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
-		
+
 		// get the chat user
-		ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID()), toolSessionID);
-		
+		ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(
+				user.getUserID()), toolSessionID);
+
 		// get messages for this user.
 		List messageList = chatService.getMessagesForUser(chatUser);
-		
+
 		// construct session DTO.
 		ChatSessionDTO sessionDTO = new ChatSessionDTO(chatSession, messageList);
-				
+
+		// if reflectOnActivity is enabled add userDTO.
+		if (chatSession.getChat().getReflectOnActivity()) {
+			ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
+
+			// get the entry.
+			NotebookEntry entry = chatService.getEntry(toolSessionID,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					ChatConstants.TOOL_SIGNATURE, chatUser.getUserId()
+							.intValue());
+
+			if (entry != null) {
+				chatUserDTO.finishedReflection = true;
+				chatUserDTO.notebookEntry = entry.getEntry();
+			} else {
+				chatUserDTO.finishedReflection = false;
+			}
+			sessionDTO.getUserDTOs().add(chatUserDTO);
+		}
+
 		// filter messages
-		for(ChatMessageDTO msg: sessionDTO.getMessageDTOs()) {
+		for (ChatMessageDTO msg : sessionDTO.getMessageDTOs()) {
 			chatService.filterMessage(msg, chatSession.getChat());
 		}
-		
+
 		ChatDTO chatDTO = new ChatDTO(chatSession.getChat());
 		chatDTO.getSessionDTOs().add(sessionDTO);
-		
+
 		request.getSession().setAttribute("chatDTO", chatDTO);
 	}
 
 	public void doTeacherExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
 			throws ChatException {
-		
+
 		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
-		
+
 		// check if toolContentID available
 		if (toolContentID == null) {
 			String error = "Tool Content ID is missing. Unable to continue";
@@ -143,14 +168,36 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 
 		Chat chat = chatService.getChatByContentId(toolContentID);
-		
 		ChatDTO chatDTO = new ChatDTO(chat);
-				
 		for (Iterator iter = chat.getChatSessions().iterator(); iter.hasNext();) {
 			// NB session DTO will contain all messages in session unfiltered.
-			chatDTO.getSessionDTOs().add(new ChatSessionDTO((ChatSession) iter.next()));
-		}
-		request.getSession().setAttribute("chatDTO", chatDTO);	
-	}
 
+			ChatSession session = (ChatSession) iter.next();
+			ChatSessionDTO sessionDTO = new ChatSessionDTO(session);
+
+			// if reflectOnActivity is enabled add all userDTO.
+			if (session.getChat().getReflectOnActivity()) {
+
+				for (Iterator iterator = session.getChatUsers().iterator(); iterator
+						.hasNext();) {
+					ChatUser user = (ChatUser) iterator.next();
+					ChatUserDTO userDTO = new ChatUserDTO(user);
+					// get the entry.
+					NotebookEntry entry = chatService.getEntry(toolSessionID,
+							CoreNotebookConstants.NOTEBOOK_TOOL,
+							ChatConstants.TOOL_SIGNATURE, user.getUserId()
+									.intValue());
+					if (entry != null) {
+						userDTO.finishedReflection = true;
+						userDTO.notebookEntry = entry.getEntry();
+					} else {
+						userDTO.finishedReflection = false;
+					}
+					sessionDTO.getUserDTOs().add(userDTO);
+				}
+			}
+			chatDTO.getSessionDTOs().add(sessionDTO);
+		}
+		request.getSession().setAttribute("chatDTO", chatDTO);
+	}
 }
