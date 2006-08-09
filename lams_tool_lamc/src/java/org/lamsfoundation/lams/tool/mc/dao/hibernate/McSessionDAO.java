@@ -49,7 +49,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     
     private static final String GET_SESSIONS_FROM_CONTENT = "select ms.mcSessionId from McSession ms where ms.mcContent=:mcContent";
     
-    private static final String COUNT_SESSION_COMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='COMPLETE'";
+    private static final String COUNT_SESSION_COMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='COMPLETED'";
     
     private static final String COUNT_SESSION_INCOMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='INCOMPLETE'";
     

@@ -1202,6 +1202,22 @@ public class McServicePOJO implements
         }
 	}
 
+
+    public int countUserComplete(McContent mcContent) throws McApplicationException
+	{
+ 	   try
+       {
+	   		return mcUserDAO.countUserComplete(mcContent);
+       }
+       catch (DataAccessException e)
+       {
+           throw new McApplicationException("Exception occured when lams is retrieving completed user count: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+    
+    
     
     public int getTotalNumberOfUsers(McContent mcContent) throws McApplicationException
 	{

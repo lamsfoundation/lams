@@ -143,6 +143,8 @@ public interface IMcService
 	
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
     
+    public int countUserComplete(McContent mcContent) throws McApplicationException;
+    
     public List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
     
     public void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;

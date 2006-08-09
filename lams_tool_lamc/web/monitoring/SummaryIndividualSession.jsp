@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table class="forms">
 						<tr>
-					 		<td NOWRAP colspan=2 > <b>  <bean:message key="label.groupName"/> </b>
+					 		<td NOWRAP colspan=2 > <b>  <bean:message key="group.label"/>: </b>
 					 		<c:out value="${currentMonitoredToolSessionName}"/>  </td>
 						</tr>
 

@@ -125,7 +125,7 @@ public abstract class McUtils implements McAppConstants {
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
 	
-	public static void persistTimeZone(HttpServletRequest request)
+	public static void saveTimeZone(HttpServletRequest request)
 	{
 		TimeZone timeZone=TimeZone.getDefault();
 	    logger.debug("current timezone: " + timeZone.getDisplayName());

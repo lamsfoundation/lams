@@ -78,15 +78,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 					
-		  	 		<tr>
-					  	<th scope="col" valign=top> 
-						    <bean:message key="label.mcqSummary"/> 
-					  	</th>
-
-		  	 		</tr>
-		  	 		
-				
-					
 		  	 		<c:set var="queIndex" scope="request" value="0"/>
 					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
 					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>

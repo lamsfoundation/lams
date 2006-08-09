@@ -93,5 +93,7 @@ public interface IMcUserDAO {
     public int getTotalNumberOfUsers(McContent mcContent);
     
     public int getTotalNumberOfUsers();
+    
+    public int countUserComplete(McContent mcContent);
    
 }

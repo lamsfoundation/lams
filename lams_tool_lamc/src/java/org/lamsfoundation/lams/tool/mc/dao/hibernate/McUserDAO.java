@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
@@ -158,20 +159,65 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 		List list = getSession().createQuery(strGetUser)
 			.list();
 		logger.debug("strGetUser: " + strGetUser);
+		logger.debug("list: " + list);
+		
 		
 		int totalUserCount=0;
 		if(list != null && list.size() > 0){
-		    McQueUsr usr = (McQueUsr) list.get(0);
-			logger.debug("usr: " + usr);
-			logger.debug("local usr content uid versus incoming content uid: " + 
-			        usr.getMcSession().getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
-			
-			if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
-			{
-			    logger.debug("increasing user count");
-			    ++totalUserCount;
-			}
+			Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    	    McQueUsr usr=(McQueUsr)listIterator.next();
+				logger.debug("usr: " + usr);
+				logger.debug("local usr content uid versus incoming content uid: " + 
+				        usr.getMcSession().getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
+				
+				if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
+				{
+				    logger.debug("increasing user count");
+				    ++totalUserCount;
+				}	    	    
+	    	}
 		}
+
+		logger.debug("final totalUserCount: " + totalUserCount);
+        return totalUserCount;
+    }
+    
+
+    public int countUserComplete(McContent mcContent)
+    {
+        logger.debug("starting countUserComplete: " + mcContent);
+		String strGetUser = "from mcQueUsr in class McQueUsr";
+        HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(strGetUser)
+			.list();
+		logger.debug("strGetUser: " + strGetUser);
+		logger.debug("list: " + list);
+		
+		
+		int totalUserCount=0;
+		if(list != null && list.size() > 0){
+			Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    	    McQueUsr usr=(McQueUsr)listIterator.next();
+				logger.debug("usr: " + usr);
+				logger.debug("local usr content uid versus incoming content uid: " + 
+				        usr.getMcSession().getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
+				
+				if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
+				{
+				    if (usr.getMcSession().getSessionStatus().equals("COMPLETED"))
+				    {
+				        logger.debug("this user's session is COMPLETED,  increasing user count");
+					    ++totalUserCount;    
+				    }
+				    
+				}	    	    
+	    	}
+		}
+
 		logger.debug("final totalUserCount: " + totalUserCount);
         return totalUserCount;
     }
