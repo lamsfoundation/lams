@@ -232,12 +232,12 @@ function checkSaved(){
 </HEAD>
 <BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-<c:set var="authorurl_params">?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&uniqueID=<lams:generateID/></c:set>
-<c:set var="authorurl_nojs">lams_authoring.swf<c:out value="${authorurl_params}"/></c:set>
-<c:set var="authorurl_js">lams_authoring<c:out value="${authorurl_params}"/></c:set>
+<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&uniqueID=<lams:generateID/></c:set>
+<c:set var="authorurl_nojs">lams_preloader.swf<c:out value="${authorurl_params}"/></c:set>
+<c:set var="authorurl_js">lams_preloader<c:out value="${authorurl_params}"/></c:set>
 
 	<script type="text/javascript">
-		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${authorurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','authoring', 'id', 'authoring', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${authorurl_js}" escapeXml="false"/>' );
+		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${authorurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#FFFFFF','name','authoring', 'id', 'authoring', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${authorurl_js}" escapeXml="false"/>' );
 	</script>
 	
 	<noscript>
@@ -252,12 +252,12 @@ function checkSaved(){
 		  <param name="movie" value="${authorurl_nojs}">
 		  <param name="quality" value="high">
 		  <param name="scale" value="noscale">
-		  <param name="bgcolor" value="#B3B7C8">
+		  <param name="bgcolor" value="#FFFFFF">
 		  <embed 	
 		   	  src="${authorurl_nojs}"
 			  quality="high" 
 			  scale="noscale" 
-			  bgcolor="#B3B7C8"  
+			  bgcolor="#FFFFFF"  
 			  width="100%" 
 			  height="100%" 
 			  swliveconnect=true 
