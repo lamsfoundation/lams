@@ -21,15 +21,17 @@
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
-	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.attachment" />
-		</td>
-		<td>
-			<html:file tabindex="3" property="attachmentFile" />
-			<html:errors property="message.attachment" />
-		</td>
-	</tr>
+	<c:if test="${allowUpload}">
+		<tr>
+			<td class="field-name">
+				<bean:message key="message.label.attachment" />
+			</td>
+			<td>
+				<html:file tabindex="3" property="attachmentFile" />
+				<html:errors property="message.attachment" />
+			</td>
+		</tr>
+	</c:if>
 </table>
 
 <div class="right-buttons">

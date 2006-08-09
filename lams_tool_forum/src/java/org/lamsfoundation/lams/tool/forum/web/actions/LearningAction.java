@@ -83,9 +83,6 @@ public class LearningAction extends Action {
 		if (param.equals("viewForum")) {
 			return viewForm(mapping, form, request, response);
 		}
-		if (param.equals("newTopic")) {
-			return newTopic(mapping, form, request, response);
-		}
 		if (param.equals("finish")) {
 			return finish(mapping, form, request, response);
 		}
@@ -93,6 +90,9 @@ public class LearningAction extends Action {
 		// --------------Topic Level ------------------
 		if (param.equals("viewTopic")) {
 			return viewTopic(mapping, form, request, response);
+		}
+		if (param.equals("newTopic")) {
+			return newTopic(mapping, form, request, response);
 		}
 		if (param.equals("createTopic")) {
 			return createTopic(mapping, form, request, response);
@@ -185,12 +185,13 @@ public class LearningAction extends Action {
 		}
 		
 		Long forumId = forum.getUid();
-		Boolean allowEdit = new Boolean(forum.isAllowEdit());
 		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
 		int allowNumber = forum.getLimitedChar();
 		
 		request.getSession().setAttribute(ForumConstants.FORUM_ID, forumId);
-		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, allowEdit);
+		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, forum.isAllowEdit());
+		request.getSession().setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD,forum.isAllowUpload());
+		
 		request.getSession().setAttribute(ForumConstants.ALLOW_RICH_EDITOR,
 				allowRichEditor);
 		request.getSession().setAttribute(ForumConstants.LIMITED_CHARS,
@@ -229,7 +230,8 @@ public class LearningAction extends Action {
 		ForumToolSession session = forumService
 				.getSessionBySessionId(sessionId);
 		
-		request.setAttribute(ForumConstants.FORUM_TITLE,session.getForum().getTitle());
+		Forum forum = session.getForum();
+		request.setAttribute(ForumConstants.FORUM_TITLE,forum.getTitle());
 		return mapping.findForward("success");
 	}
 
@@ -403,7 +405,6 @@ public class LearningAction extends Action {
 		
 		String title = getForumTitle(topic);
 		request.setAttribute(ForumConstants.FORUM_TITLE,title);
-		
 		return mapping.findForward("success");
 	}
 
