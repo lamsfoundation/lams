@@ -183,7 +183,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					ChatUser user = (ChatUser) iterator.next();
 					ChatUserDTO userDTO = new ChatUserDTO(user);
 					// get the entry.
-					NotebookEntry entry = chatService.getEntry(toolSessionID,
+					NotebookEntry entry = chatService.getEntry(session.getSessionId(),
 							CoreNotebookConstants.NOTEBOOK_TOOL,
 							ChatConstants.TOOL_SIGNATURE, user.getUserId()
 									.intValue());

@@ -5,8 +5,7 @@
 
 <html>
 	<head>
-		<title><c:out value="${chatDTO.title}" escapeXml="false" />
-		</title>
+		<title><c:out value="${chatDTO.title}" escapeXml="false" /></title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css localLinkPath="../" />
 	</head>
@@ -52,19 +51,22 @@
 						</p>
 					</div>
 
-					<h3>
-						<fmt:message key="heading.reflection" />
-					</h3>
-					<c:forEach var="user" items="${session.userDTOs}">
-						<c:if test="${user.finishedReflection}">
-							<p>
-								<span style="font-weight: bold">${user.firstName}
-									${user.lastName} </span>
-								<br />
-								${user.notebookEntry}
-							</p>
-						</c:if>
-					</c:forEach>
+					<c:if test="${chatDTO.reflectOnActivity}">
+						<h3>
+							<fmt:message key="heading.reflection" />
+						</h3>
+						<c:forEach var="user" items="${session.userDTOs}">
+							<c:if test="${user.finishedReflection}">
+							
+								<p>
+									<span style="font-weight: bold">${user.firstName}
+										${user.lastName} </span>
+									<br />
+									${user.notebookEntry}
+								</p>
+							</c:if>
+						</c:forEach>
+					</c:if>
 				</c:forEach>
 
 			</div>
