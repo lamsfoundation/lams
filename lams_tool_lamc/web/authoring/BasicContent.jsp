@@ -119,16 +119,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 								  	<td NOWRAP bgcolor="#EEEEEE"   align=center valign=top>			
 									 		<c:if test="${sessionScope.queIndex == 1}"> 		
-				   								  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> 
+												<a title="<bean:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
+			                                                <img src="<c:out value="${tool}"/>images/down.gif" border="0">
+												</a> 
 			   								</c:if> 			
 			   								
 							  				<c:if test="${(sessionScope.maxQuestionIndex == sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-			     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> 
+												<a title="<bean:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
+			                                                <img src="<c:out value="${tool}"/>images/up.gif" border="0">
+												</a> 
 			     							</c:if> 	    
 											
 			 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-				   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
-				       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
+												<a title="<bean:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
+			                                                <img src="<c:out value="${tool}"/>images/down.gif" border="0">
+												</a> 
+												<a title="<bean:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
+			                                                <img src="<c:out value="${tool}"/>images/up.gif" border="0">
+												</a> 
 											</c:if>
 	                                </td>
 	
@@ -143,8 +151,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	                                    </td>
 																						
 	                                   <td NOWRAP bgcolor="#EEEEEE"  valign=top>								
-												<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
-												<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
+												<a title="<bean:message key='label.tip.editOptions'/>" href="javascript:;" onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">
+			                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
+												</a> 
+
+												<a title="<bean:message key='label.tip.removeQuestion'/>" href="javascript:;" onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">
+			                                                <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
+												</a> 
 									  	</td>
 								  </tr>
 							</c:if> 																		  								  

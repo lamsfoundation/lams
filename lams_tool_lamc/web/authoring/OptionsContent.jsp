@@ -99,7 +99,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</td>
 	
 										<td bgcolor="#EEEEEE"  valign=top>
-		       								    <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:deleteOption(1,'removeOption');">
+											<a title="<bean:message key='label.tip.removeCandidateAnswer'/>" href="javascript:;" onclick="javascript:deleteOption(1,'removeOption');">
+		                                                <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
+											</a> 
 									  	</td>
 							 </tr>
 							</c:if> 			
