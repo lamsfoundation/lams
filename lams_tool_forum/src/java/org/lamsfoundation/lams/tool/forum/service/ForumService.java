@@ -356,6 +356,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 	}
 
+	public int getTopicsNum(Long userID, Long sessionId) {
+		return messageDao.getTopicsNum(userID,sessionId);
+	}
+
 	public ForumUser getUserByID(Long userId) {
 		return  forumUserDao.getByUserId(userId);
 	}

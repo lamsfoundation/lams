@@ -54,6 +54,7 @@ public interface ForumConstants {
 	public static final int SESSION_STATUS_FINISHED = 1;
 	public static final String ALLOW_EDIT = "allowEdit";
 	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
+	public static final String ATTR_ALLOW_NEW_TOPICS = "allowNewTopics";
 	public static final String ALLOW_RICH_EDITOR = "allowRichEditor";
 	public static final String LIMITED_CHARS = "limitedChars";
 
@@ -91,6 +92,9 @@ public interface ForumConstants {
 	public static final String ATTR_REPORT = "report";
 	
 	public static final String PARAM_UPDATE_MODE = "updateMode";
+
+	public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
+
 
 	
 	

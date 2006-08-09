@@ -202,6 +202,14 @@ public interface IForumService {
      * @return
      */
     public List getMessagesByUserUid(Long userId, Long sessionId);
+    /**
+     * Get how many post of this user post in a special session. DOES NOT include posts from author.
+     * @param userID
+     * @param sessionId
+     * @return
+     */
+	public int getTopicsNum(Long userID, Long sessionId);
+
 	//************************************************************************************
 	// Session Method
 	//************************************************************************************

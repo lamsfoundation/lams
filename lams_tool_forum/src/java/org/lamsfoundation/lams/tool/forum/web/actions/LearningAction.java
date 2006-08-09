@@ -42,6 +42,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -191,6 +193,7 @@ public class LearningAction extends Action {
 		request.getSession().setAttribute(ForumConstants.FORUM_ID, forumId);
 		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, forum.isAllowEdit());
 		request.getSession().setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD,forum.isAllowUpload());
+		request.getSession().setAttribute(ForumConstants.ATTR_ALLOW_NEW_TOPICS,forum.isAllowNewTopic());
 		
 		request.getSession().setAttribute(ForumConstants.ALLOW_RICH_EDITOR,
 				allowRichEditor);
@@ -252,26 +255,32 @@ public class LearningAction extends Action {
 		ToolAccessMode mode = (ToolAccessMode) request.getSession()
 				.getAttribute(AttributeNames.ATTR_MODE);
 		
-		ForumToolSession session = null;
+		forumService = getForumManager();
+		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 		if (mode == ToolAccessMode.LEARNER || mode==ToolAccessMode.AUTHOR) {
-			// get sessionId from HttpServletRequest
-			forumService = getForumManager();
-			session = forumService
-					.getSessionBySessionId(sessionId);
-			session.setStatus(ForumConstants.SESSION_STATUS_FINISHED);
-			forumService.updateSession(session);
-
-			ToolSessionManager sessionMgrService = ForumServiceProxy
-					.getToolSessionManager(getServlet().getServletContext());
-
-			// get back login user DTO
+			Forum forum = session.getForum();
 			// get session from shared session.
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			Long userID = new Long(user.getUserID().longValue());
+			if(!forum.getRunOffline() && !forum.isAllowNewTopic()){
+				int postNum = forumService.getTopicsNum(userID,sessionId);
+				if(postNum < forum.getMinimumReply()){
+					ActionMessages errors = new ActionMessages();
+					errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.less.mini.post",(forum.getMinimumReply() - postNum)));
+					saveErrors(request, errors);
+					// get all root topic to display on init page
+					request.setAttribute(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
+					request.setAttribute(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
+					List rootTopics = forumService.getRootTopics(sessionId);
+					request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);								
+					return mapping.findForward("success");
+				}
+			}
 
 			String nextActivityUrl;
 			try {
+				ToolSessionManager sessionMgrService = ForumServiceProxy.getToolSessionManager(getServlet().getServletContext());
 				nextActivityUrl = sessionMgrService.leaveToolSession(sessionId,
 						userID);
 				response.sendRedirect(nextActivityUrl);
@@ -440,7 +449,6 @@ public class LearningAction extends Action {
 		forumService.replyTopic(parentId, sessionId, message);
 
 		// echo back this topic thread into page
-		forumService = getForumManager();
 		Long rootTopicId = forumService.getRootTopicId(parentId);
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
 		setAuthorMark(msgDtoList);
@@ -449,7 +457,17 @@ public class LearningAction extends Action {
 		
 		String title = getForumTitle(msgDtoList);
 		request.setAttribute(ForumConstants.FORUM_TITLE,title);
-		
+
+		//check whether allow more posts for this user
+		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+		Forum forum = session.getForum();
+		if(forum != null){
+			if(!forum.isAllowNewTopic()){
+				int posts = forumService.getTopicsNum(forumUser.getUserId(), sessionId);
+				if(posts >= forum.getMaximumReply())
+					request.getSession().setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, Boolean.TRUE);
+			}
+		}
 		return mapping.findForward("success");
 	}
 

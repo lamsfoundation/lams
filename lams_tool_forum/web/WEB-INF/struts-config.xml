@@ -256,6 +256,7 @@
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="finish">
+			<forward name="defineLater" path="tiles:/learning/forum/defineLater" />
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
 		<!-- ========== END: Learning  Definitions ============================== -->

@@ -48,6 +48,10 @@ public class MessageDao extends HibernateDaoSupport {
 	private static final String SQL_QUERY_BY_SESSION = "from " + Message.class.getName() + " m "
 					+ " where m.toolSession.sessionId=?";
 	
+	private static final String SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION = "select count(*) from " + Message.class.getName() + " m "
+	+ " where m.createdBy.userId=? and m.toolSession.sessionId=? and m.isAuthored = false";
+	
+	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
 		this.getHibernateTemplate().saveOrUpdate(message);
@@ -95,12 +99,12 @@ public class MessageDao extends HibernateDaoSupport {
 	}
 	/**
 	 * Get all messages according to special user and session.
-	 * @param userId
+	 * @param userUid
 	 * @param sessionId
 	 * @return
 	 */
-	public List getByUserAndSession(Long userId, Long sessionId) {
-		return this.getHibernateTemplate().find(SQL_QUERY_BY_USER_SESSION, new Object[]{userId,sessionId});
+	public List getByUserAndSession(Long userUid, Long sessionId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_BY_USER_SESSION, new Object[]{userUid,sessionId});
 	}
 	/**
 	 * Get all messages according to special session.
@@ -110,7 +114,18 @@ public class MessageDao extends HibernateDaoSupport {
 	public List getBySession(Long sessionId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION, sessionId);
 	}
-	
-
+	/**
+	 * Return how many post from this user and session. DOES NOT include posts from author.
+	 * @param userID
+	 * @param sessionId
+	 * @return
+	 */
+	public int getTopicsNum(Long userID, Long sessionId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION,new Object[]{userID,sessionId});
+		if(list != null && list.size() > 0)
+			return ((Integer)list.get(0)).intValue();
+		else
+			return 0;
+	}
 
 }

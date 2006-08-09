@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="mode" value="${sessionScope.mode}" />
 
 <h1 class="no-tabs-below">
@@ -16,11 +16,17 @@
 				<c:out value="${instruction}" escapeXml="false" />
 			</td>
 		</tr>
+		<tr>
+			<td>
+				<%@ include file="/common/messages.jsp"%>
+			</td>
+		</tr>
 	</table>
 
 	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
 
 	<table>
+
 		<tr>
 			<td>
 
@@ -36,7 +42,7 @@
 				</c:set>
 
 				<div class="left-buttons">
-					<c:if test='${mode != "teacher"}'>
+					<c:if test='${mode != "teacher" && allowNewTopics}'>
 						<html:button property="newtopic" onclick="javascript:location.href='${newtopic}';" disabled="${finishedLock}" styleClass="button">
 							<fmt:message key="label.newtopic" />
 						</html:button>

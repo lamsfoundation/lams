@@ -114,7 +114,7 @@
 						</c:if>
 
 						<!--  Reply Button -->
-						<c:if test="${not finishedLock}">
+						<c:if test="${(not finishedLock) && (not noMorePosts)}">
 							<c:set var="replytopic">
 								<html:rewrite page="/learning/newReplyTopic.do?parentId=${msgDto.message.uid}&rootUid=${rootUid}" />
 							</c:set>
