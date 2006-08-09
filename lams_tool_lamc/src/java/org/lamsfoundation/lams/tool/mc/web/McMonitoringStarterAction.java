@@ -295,7 +295,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    /*
 	     * persist time zone information to session scope. 
 	     */
-	    McUtils.persistTimeZone(request);
+	    McUtils.saveTimeZone(request);
 
 	    /* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -369,8 +369,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		}
 		
 		/* this section is related to Stats tab. Starts here. */
-		int countSessionComplete=mcService.countSessionComplete(mcContent);
-		logger.debug("countSessionComplete: " + countSessionComplete);
+		//int countSessionComplete=mcService.countSessionComplete(mcContent);
+		int countUserComplete=mcService.countUserComplete(mcContent);
+		logger.debug("countUserComplete: " + countUserComplete);
 		
 		int countMaxAttempt=1;
 		logger.debug("countMaxAttempt: " + countMaxAttempt);
@@ -385,7 +386,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		logger.debug("averageMark: " + averageMark);
 		
 		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
-		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countUserComplete).toString());
 		request.getSession().setAttribute(COUNT_MAX_ATTEMPT, new Integer(countMaxAttempt).toString());
 		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
 		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
