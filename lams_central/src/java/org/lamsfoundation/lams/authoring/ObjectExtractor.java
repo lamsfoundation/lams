@@ -239,13 +239,28 @@ public class ObjectExtractor implements IObjectExtractor {
 		Long learningDesignId = WDDXProcessor.convertToLong(table, "learningDesignID");
 		//if the learningDesignID is not null, load the existing LearningDesign object from the database, otherwise create a new one.
 		learningDesign = learningDesignId!= null ? learningDesignDAO.getLearningDesignById(learningDesignId) : new LearningDesign();
-		
+	
+		// Check the copy type. Can only update it if it is COPY_TYPE_NONE (ie authoring copy)
+		Integer copyTypeID = WDDXProcessor.convertToInteger(table,WDDXTAGS.COPY_TYPE);
+		if ( copyTypeID == null ) {
+			copyTypeID = LearningDesign.COPY_TYPE_NONE;
+		}
+		if ( learningDesign != null && learningDesign.getCopyTypeID() != null && 
+				! learningDesign.getCopyTypeID().equals(copyTypeID) ) {
+			throw new ObjectExtractorException("Unable to save learning design.  Cannot change copy type on existing design.");
+		}
+		if ( ! copyTypeID.equals(LearningDesign.COPY_TYPE_NONE) ) {
+			throw new ObjectExtractorException("Unable to save learning design.  Learning design is read-only");
+		}
+		learningDesign.setCopyTypeID(copyTypeID);
+
 		// Pull out all the existing groups. there isn't an easy way to pull them out of the db requires an outer join across
 		// three objects (learning design -> grouping activity -> grouping) so put both the existing ones and the new ones
 		// here for reference later.
 		initialiseGroupings();
 		
-		//get the core learning design stuff
+		//get the core learning design stuff - default to invalid
+		learningDesign.setValidDesign(Boolean.FALSE);
 		if (keyExists(table, WDDXTAGS.LEARNING_DESIGN_UIID)) 
 		    learningDesign.setLearningDesignUIID(WDDXProcessor.convertToInteger(table,WDDXTAGS.LEARNING_DESIGN_UIID)); 
 		if (keyExists(table, WDDXTAGS.DESCRIPTION)) 
@@ -266,8 +281,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		    learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(table,WDDXTAGS.ONLINE_INSTRUCTIONS));
 		if (keyExists(table, WDDXTAGS.HELP_TEXT))	
 		    learningDesign.setHelpText(WDDXProcessor.convertToString(table,WDDXTAGS.HELP_TEXT));
-		if (keyExists(table, WDDXTAGS.COPY_TYPE))	
-		    learningDesign.setCopyTypeID(WDDXProcessor.convertToInteger(table,WDDXTAGS.COPY_TYPE));
 		if (keyExists(table, WDDXTAGS.CREATION_DATE))	
 		    learningDesign.setCreateDateTime(WDDXProcessor.convertToDate(table,WDDXTAGS.CREATION_DATE));
 		if (keyExists(table, WDDXTAGS.VERSION))	
@@ -485,7 +498,7 @@ public class ObjectExtractor implements IObjectExtractor {
 			}
 		}
 
-		// clear the transitions 
+		// clear the transitions.
 		// clear the old set and reset up the activities set. Done this way to keep the Hibernate cascading happy. 
 		// this means we don't have to manually remove the transition object.
 	    // Note: This will leave orphan content in the tool tables. It can be removed by the tool content cleaning job, 
@@ -526,15 +539,20 @@ public class ObjectExtractor implements IObjectExtractor {
 					Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.PARENT_UIID);
 					if( parentUIID!=null ) {
 						Activity parentActivity = newActivityMap.get(parentUIID);
+						if ( parentActivity == null ) {
+							throw new ObjectExtractorException("Parent activity "+parentUIID+" missing for activity "+existingActivity.getTitle()+": "+existingActivity.getActivityUIID());
+						}
 						existingActivity.setParentActivity(parentActivity);
 						existingActivity.setParentUIID(parentUIID);
 						if(parentActivity.isComplexActivity()){
 							((ComplexActivity) parentActivity).addActivity(existingActivity);
 							activityDAO.update(parentActivity);
 						}
+						
 					} else {
 						existingActivity.setParentActivity(null);
 						existingActivity.setParentUIID(null);
+						existingActivity.setOrderId(null); // top level activities don't have order ids.
 					}
 			    }
 				activityDAO.update(existingActivity);
@@ -705,9 +723,12 @@ public class ObjectExtractor implements IObjectExtractor {
 		else if(activity.isGateActivity())
 			 buildGateActivity(activity,activityDetails);
 		else 			
-			 buildComplexActivity(activity,activityDetails);		
+			 buildComplexActivity((ComplexActivity)activity,activityDetails);		
 	}
-	private void buildComplexActivity(Object activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
+	private void buildComplexActivity(ComplexActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+		// clear all the children - will be built up again by parseActivitiesToMatchUpParentActivityByParentUIID
+		// we don't use all-delete-orphan on the activities relationship so we can do this clear.
+		activity.getActivities().clear();
 		if(activity instanceof OptionsActivity)
 			buildOptionsActivity((OptionsActivity)activity,activityDetails);
 		else if (activity instanceof ParallelActivity)

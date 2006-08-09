@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -94,11 +95,6 @@ public interface IAuthoringService {
 	 * @return List Returns the list of all the available LearningDesign's   
 	 * */
 	public List getAllLearningDesigns();
-	/**
-	 * Saves the LearningDesign to the database. Will update if already saved.
-	 * @param learningDesign The LearningDesign to be saved 
-	 * */
-	public void saveLearningDesign(LearningDesign learningDesign);
 	 
 	/**
 	 * @return List Returns a list of all available Learning Libraries
@@ -115,18 +111,30 @@ public interface IAuthoringService {
 	public String getLearningDesignDetails(Long learningDesignID)throws IOException;
 	
 	/**
-	 * This method saves the information which comes in WDDX format 
-	 * into the database. It returns An acknowledgemnet message 
-	 * telling FLASH the status of the operation, i.e. whether the 
-	 * design has been successfully saved or not. If Yes it returns 
-	 * the learning_design_id of the design just saved. This information
-	 * is sent back in a format understood by FLASH, WDDX.
+	 * This method saves a new Learning Design to the database.
+	 * It received a WDDX packet from flash, deserializes it
+	 * and then finally persists it to the database.
 	 * 
+	 * Note: it does not validate the design - that must be done
+	 * separately.
+	 *
 	 * @param wddxPacket The WDDX packet to be stored in the database
-	 * @return String The acknowledgemnet message 
+	 * @return Long learning design id 
 	 * @throws Exception
 	 */
-	public String storeLearningDesignDetails(String wddxPacket)throws Exception;
+	public Long storeLearningDesignDetails(String wddxPacket) throws Exception;
+	
+	/** 
+	 * Validate the learning design, updating the valid flag appropriately.
+	 * 
+	 * This needs to be run in a separate transaction to storeLearningDesignDetails to 
+	 * ensure the database is fully updated before the validation occurs (due to some
+	 * quirks we are finding using Hibernate)
+	 * 
+	 * @param learningDesignId
+	 * @throws Exception
+	 */
+	public Vector<ValidationErrorDTO> validateLearningDesign(Long learningDesignId);
 	
 	/**
 	 * This method returns a list of all available Learning Designs

@@ -39,8 +39,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
-import org.lamsfoundation.lams.authoring.ObjectExtractorException;
-import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -62,6 +60,7 @@ import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.tool.Tool;
@@ -457,48 +456,41 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * It received a WDDX packet from flash, deserializes it
 	 * and then finally persists it to the database.
 	 * 
+	 * Note: it does not validate the design - that must be done
+	 * separately.
+	 * 
 	 * @param wddxPacket The WDDX packet received from Flash
-	 * @return String The acknowledgement in WDDX format that the design has been
-	 * 				  successfully saved.
+	 * @return Long learning design id 
 	 * @throws Exception
 	 */
-	public String storeLearningDesignDetails(String wddxPacket) throws Exception{
-		Vector listOfValidationErrorDTOs = null;
-		boolean valid = true;
-		
+	public Long storeLearningDesignDetails(String wddxPacket) throws Exception {
+
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 		IObjectExtractor extractor = (IObjectExtractor) beanFactory.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
-		
-		try { 
-			LearningDesign design = extractor.extractSaveLearningDesign(table);	
-			listOfValidationErrorDTOs = (Vector)learningDesignService.validateLearningDesign(design);
-			
-			if (listOfValidationErrorDTOs.size() > 0)
-			{
-				valid = Boolean.FALSE;
-				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs, design.getLearningDesignId()), FlashMessage.OBJECT_MESSAGE);
-			}
-			else
-			{
-				valid = Boolean.TRUE;
-				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid, design.getLearningDesignId()));			
-			}
-
-			if(design.getCopyTypeID() != LearningDesign.COPY_TYPE_NONE)
-				throw new Exception("Unable to save learning design.  Learning design is read-only");
-			
-			design.setValidDesign(valid);
-			learningDesignDAO.insertOrUpdate(design);
-			
-			//flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
-		} catch ( Exception e ) {
-			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
-											messageService.getMessage("invalid.wddx.packet",new Object[]{e.getMessage()}),
-											FlashMessage.ERROR);
-		}
-	
-		return flashMessage.serializeMessage(); 		
+		LearningDesign design = extractor.extractSaveLearningDesign(table);	
+		return design.getLearningDesignId();
 	}
+
+	
+	/** 
+	 * Validate the learning design, updating the valid flag appropriately.
+	 * 
+	 * This needs to be run in a separate transaction to storeLearningDesignDetails to 
+	 * ensure the database is fully updated before the validation occurs (due to some
+	 * quirks we are finding using Hibernate)
+	 * 
+	 * @param learningDesignId
+	 * @throws Exception
+	 */
+	public Vector<ValidationErrorDTO> validateLearningDesign(Long learningDesignId) {
+		LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
+		Vector<ValidationErrorDTO> listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(learningDesign);
+		Boolean valid = listOfValidationErrorDTOs.size() > 0 ? Boolean.FALSE : Boolean.TRUE;
+		learningDesign.setValidDesign(valid);
+		learningDesignDAO.insertOrUpdate(learningDesign);
+		return listOfValidationErrorDTOs;
+	}
+	
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesignDetails()

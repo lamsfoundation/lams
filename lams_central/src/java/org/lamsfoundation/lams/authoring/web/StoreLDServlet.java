@@ -23,10 +23,15 @@
 /* $$Id$$ */ 
 package org.lamsfoundation.lams.authoring.web;
 
+import java.util.Vector;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -41,6 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 
+	private static final long serialVersionUID = -2298959991408815691L;
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 
 	public IAuthoringService getAuthoringService(){
@@ -51,9 +57,31 @@ public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 	protected String process(String designDetails, HttpServletRequest request) 
 		throws Exception
 		{
-				
+			String returnPacket = null;
 			IAuthoringService authoringService = getAuthoringService();
-			return authoringService.storeLearningDesignDetails(designDetails);
+			
+			try {
+				
+				Long learningDesignID = authoringService.storeLearningDesignDetails(designDetails);
+				Vector<ValidationErrorDTO> validationDTOS = authoringService.validateLearningDesign(learningDesignID);
+				FlashMessage flashMessage = null;
+				if ( validationDTOS != null &&validationDTOS.size()>0) {
+					flashMessage = new FlashMessage(getMessageKey(designDetails, request), 
+							new StoreLearningDesignResultsDTO(Boolean.FALSE,validationDTOS, learningDesignID), FlashMessage.OBJECT_MESSAGE);
+				} else {
+					flashMessage = new FlashMessage(getMessageKey(designDetails, request), 
+							new StoreLearningDesignResultsDTO(Boolean.TRUE, learningDesignID));			
+				}
+				returnPacket = flashMessage.serializeMessage();
+				
+			} catch ( Exception e) {
+				log.error("Authoring error. input packet was "+designDetails,e);
+				FlashMessage flashMessage = new FlashMessage(getMessageKey(designDetails, request),
+						authoringService.getMessageService().getMessage("invalid.wddx.packet",new Object[]{e.getMessage()}),
+						FlashMessage.ERROR);
+				returnPacket = flashMessage.serializeMessage();
+			}
+			return returnPacket;
 		}
 	
 	protected String getMessageKey(String designDetails, HttpServletRequest request) {
