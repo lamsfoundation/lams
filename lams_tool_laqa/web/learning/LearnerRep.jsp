@@ -67,19 +67,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content-learner">
 		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}"> 			
 			<c:if test="${ generalLearnerFlowDTO.requestLearningReportViewOnly != 'true'}"> 			
-		     	<table class="forms"> 	  
-					<tr> <th scope="col">
+		     	<table> 	  
+					<tr> <td>
 						 <c:out value="${generalLearnerFlowDTO.reportTitleLearner}" escapeXml="false"/> 
-					 </th>
+					 </td>
 					</tr>
 				</table>		
 			</c:if> 				    
 		
 			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true'}"> 			
-		       	<table class="forms"> 	  
-					<tr> <th scope="col">
+		       	<table> 	  
+					<tr> <td>
 						<bean:message key="label.learning.viewOnly"/>
-					 </th>
+					 </td>
 					</tr>
 				</table>				
 			</c:if> 				    
@@ -97,16 +97,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 			<td> &nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							 </td>
+						</tr>	
+
+						<tr>			
+							<td valign=top align=left>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
+
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td valign=top>
 								<table align=center>
 									<tr> 
 										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
@@ -122,7 +128,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
-														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+														 <td  valign=top>   	  <c:out value="${userData.response}"/>  </td>
 													</tr>															
 											</c:if>														  					 
 	 									</c:forEach>		  	
@@ -153,10 +159,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if> 				    
 		
 		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}"> 			
-		       	<table class="forms"> 	  
-					<tr> <th scope="col">
+		       	<table> 	  
+					<tr> <td>
 						<bean:message key="label.learner.progress"/>
-					 </th>
+					 </td>
 					</tr>
 				</table>						 
 		
@@ -173,16 +179,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 			<td> &nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
+
+						<tr>			
+							<td valign=top align=left>
+								<c:out value="${currentDto.question}" escapeXml="false"/>
+							 </td>
+						</tr>	
+
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td valign=top>
 								<table align=center>
 									<tr> 
 										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
@@ -198,7 +211,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
-														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+														 <td valign=top>   		  <c:out value="${userData.response}"/>  </td>
 													</tr>															
 											</c:if>														  					 
 	 									</c:forEach>		  	

@@ -32,24 +32,38 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 			<tr> <td>
-			<table class="forms">
+			<table>
 				<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 						  <tr>
-						  	<td colspan=2 NOWRAP> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  
+						  	<td colspan=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
+						  	 </td>
+						  </tr>
+
+						  <tr>
+						  	<td colspan=2>  
 						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 						  	 </td>
 						  </tr>
+						  
+
 						  <tr> 
-					 		<td NOWRAP> <b> <bean:message key="label.answer"/> </b> </td>
-							<td NOWRAP>
-					 			<input type="text" name="answer<c:out value="${questionEntry.key}"  escapeXml="false"/>" size="60" maxlength="255" value=""/> 
+					 		<td colspan=2> <b> <bean:message key="label.answer"/> </b> </td>
+					 	  </tr>
+					 	  
+  						  <tr> 
+							<td colspan=2>
+					 			<textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60>
+					 			
+					 			</textarea>
 					 		</td>
 					  	  </tr>
-					  	  <tr><td> &nbsp </td> </tr>
+
+					  	  <tr><td colspan=2> &nbsp </td> </tr>
+
 				</c:forEach>
 			</table>
 			
-			<table class="forms">
+			<table>
 			<tr>
 				 <td align=left> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">

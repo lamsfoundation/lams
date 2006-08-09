@@ -70,7 +70,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="questionIndex"/>		
 		<html:hidden property="totalQuestionCount"/>		
 								
-			<table class="forms">
+			<table>
 
 			<tr> <td>
 				<html:errors/>

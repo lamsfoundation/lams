@@ -79,34 +79,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table align="left">
 							<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 									  <tr>
-										<td colspan=2 NOWRAP>
-										<b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  
+										<td colspan=2>
+											<b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
+									  	 </td>
+									  </tr>
+									  
+  									  <tr>
+										<td colspan=2>
 									  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 									  	 </td>
 									  </tr>
 									  
+									  
 				  			  		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
 										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
 										  <tr>
-											<td colspan=2 NOWRAP> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  
+											<td colspan=2> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  
+										  	</td>
+										  </tr>
+										  
+										  <tr>
+											<td colspan=2> 
 												  <c:out value="${answerEntry.value}" escapeXml="false" />						  																	
 										  	</td>
 										  </tr>
+										  
 									  	</c:if> 				    
 									</c:forEach>
 									
-									  <tr>
-										<td colspan=2 NOWRAP >
-											&nbsp
-									  	 </td>
-									  </tr>
-									
+							  	  <tr><td> &nbsp </td> </tr>
 							</c:forEach>
 						</table>
 					</td></tr>
 					
 	  	   		  <tr>
-						<td colspan=2 NOWRAP>
+						<td colspan=2>
 			                                <html:submit property="viewAllResults" 
                                              styleClass="button" 
                                              onclick="submitMethod('viewAllResults');">
