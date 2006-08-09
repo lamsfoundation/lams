@@ -74,9 +74,12 @@
 						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
 						</span><span id="sendToUser" style="display: none"></span>
 					</h2>
-
-					<textarea name="msg" id="msgArea" rows="3" cols="80"></textarea>
-
+					
+					
+					<span> <textarea name="msg" onKeyPress="return checkEnter(event);"
+							id="msgArea" rows="3" cols="80"></textarea> </span>
+							
+							
 					<div class="left-buttons">
 						<input id="sendButton" class="button" type="submit"
 							value='<fmt:message>button.send</fmt:message>' />
@@ -107,12 +110,16 @@
 				</html:form>
 			</div>
 		</div>
-		
+
 		<div style="height: 65px"></div>
-		
+
 		<div id="notebookEntry_pane" style="width: 100%; display: none;">
-			<h4>${chatDTO.reflectInstructions}</h4>
-			<p>${chatUserDTO.notebookEntry}</p>
+			<h4>
+				${chatDTO.reflectInstructions}
+			</h4>
+			<p>
+				${chatUserDTO.notebookEntry}
+			</p>
 		</div>
 	</div>
 </div>
