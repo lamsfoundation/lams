@@ -104,7 +104,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	}
 
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator"
+	 * @hibernate.set lazy="true" inverse="true" cascade="save-update" sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator"
 	 * @hibernate.collection-key column="parent_activity_id"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
 	 *  

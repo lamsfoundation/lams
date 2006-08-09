@@ -333,22 +333,25 @@ public class LearningDesignService implements ILearningDesignService{
 			OptionsActivity optionsActivity = (OptionsActivity)parentActivity;
 			Set childActivities = optionsActivity.getActivities(); //childActivities should be sorted according to order id (using the activityOrderComparator)
 			Iterator i = childActivities.iterator();
-			while (i.hasNext())
+			while (i.hasNext() && validOrderId)
 			{
 				Activity childActivity = (Activity)i.next();
 				thisActivityOrderId= childActivity.getOrderId();
 				if (previousActivityOrderId != null)
 				{
 					//compare the two numbers
-					if (thisActivityOrderId.longValue() != (previousActivityOrderId.longValue() + 1))
-						validOrderId = validOrderId && false;
+					if (thisActivityOrderId==null ) {
+						validOrderId = false;
+					} else if ( thisActivityOrderId.longValue() != (previousActivityOrderId.longValue() + 1)) {
+						validOrderId = false;
+					}
 					
 				}
 				else
 				{
 					//this is the first activity, since the previousActivityId is null
-					if(thisActivityOrderId.longValue()!= 1)
-						validOrderId = validOrderId && false;
+					if(thisActivityOrderId==null || thisActivityOrderId.longValue()!= 1)
+						validOrderId = false;
 				}
 				previousActivityOrderId = thisActivityOrderId; 
 			}
