@@ -44,9 +44,12 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -115,7 +118,7 @@ public class OrgManageAction extends Action {
 		log.debug("orgType:"+orgManageForm.getType());
 		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
 		//if(getService().isUserSysAdmin(username)){
-		Integer userId = getService().getUserByLogin(request.getRemoteUser()).getUserId();
+		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		if(request.isUserInRole(Role.SYSADMIN) || getService().isUserInRole(userId, orgId, Role.COURSE_ADMIN) || getService().isUserInRole(userId, orgId, Role.COURSE_MANAGER)){
 			Integer type;
 			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){

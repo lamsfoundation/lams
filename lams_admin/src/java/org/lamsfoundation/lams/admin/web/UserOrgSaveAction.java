@@ -40,10 +40,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -72,7 +72,9 @@ public class UserOrgSaveAction extends Action{
 
 	private static Logger log = Logger.getLogger(UserOrgSaveAction.class);
 	private static IUserManagementService service;
+	private List<Role> rolelist;
 	
+	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -137,18 +139,36 @@ public class UserOrgSaveAction extends Action{
 		if(newUserOrganisations.isEmpty()){
 			return mapping.findForward("userlist");
 		}else{  // send user to screen where they can assign roles for the newly added users
-			List roles = getService().getRolesForOrgType(organisation.getOrganisationType(),false);
-			request.setAttribute("roles",roles);
+			request.setAttribute("roles",filterRoles(rolelist,false, organisation.getOrganisationType()));
 			request.setAttribute("newUserOrganisations",newUserOrganisations);
 			request.setAttribute("orgId",orgId);
 			return mapping.findForward("userorgrole");
 		}
 	}
 	
+	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
+		List<Role> allRoles = new ArrayList<Role>();
+		allRoles.addAll(rolelist);
+		Role role = new Role();
+		if(!isSysadmin) {
+			role.setRoleId(Role.ROLE_SYSADMIN);
+			allRoles.remove(role);
+		}
+		if(orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+			role.setRoleId(Role.ROLE_COURSE_ADMIN);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_COURSE_MANAGER);
+			allRoles.remove(role);
+		}
+		return allRoles;
+	}
+	
+	@SuppressWarnings("unchecked")
 	private IUserManagementService getService(){
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			rolelist = getService().findAll(Role.class);
 		}
 		return service;
 	}

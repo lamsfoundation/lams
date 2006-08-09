@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,15 +38,17 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -70,13 +73,13 @@ public class UserManageAction extends Action {
 	private static IUserManagementService service;
 	private static MessageService messageService;
 	
+	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
 		// get id of org to list users for
-		ActionMessages errors = new ActionMessages();
 		Integer orgId = WebUtil.readIntParam(request,"org",true);
 		if(orgId==null){
 			orgId = (Integer)request.getAttribute("org");
@@ -107,7 +110,7 @@ public class UserManageAction extends Action {
 		request.setAttribute("orgType",orgType.getOrganisationTypeId());
 		
 		
-		Integer userId = getService().getUserByLogin(request.getRemoteUser()).getUserId();
+		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		Organisation orgOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg : organisation;
         // check permission
 		if(request.isUserInRole(Role.SYSADMIN)){
@@ -120,33 +123,13 @@ public class UserManageAction extends Action {
 			return mapping.findForward("error");
 		}
 		
-		// get list of users in org
-		List users = getService().getUsersFromOrganisation(orgId);
-		Collections.sort(users);
 		
 		// create form object
 		UserListDTO userManageForm = new UserListDTO();
 		userManageForm.setOrgId(orgId);
 		userManageForm.setOrgName(orgName);
-		
-		// populate form object
-		List<UserManageBean> userManageBeans = new ArrayList<UserManageBean>();
-		for(int i=0; i<users.size(); i++) {
-			User user = (User)users.get(i);
-			UserManageBean userManageBean = new UserManageBean();
-			BeanUtils.copyProperties(userManageBean, user);
-			List roles;
-			try{
-				roles = getService().getRolesForUserByOrganisation(user, orgId);
-				Collections.sort(roles);
-			} catch(NullPointerException e){
-				roles = new ArrayList();
-				log.debug("no roles found for user: "+user);
-			}
-			userManageBean.setRoles(roles);
-			userManageBeans.add(userManageBean);
-		}
-		
+		List<UserManageBean> userManageBeans = getService().getUserManageBeans(orgId);
+		Collections.sort(userManageBeans);
 		userManageForm.setUserManageBeans(userManageBeans);
 		request.setAttribute("UserManageForm", userManageForm);
 		

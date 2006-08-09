@@ -43,9 +43,12 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -99,18 +102,18 @@ public class UserOrgAction extends Action {
 		request.setAttribute("orgType",orgType);
 				
 		// get list of users in org
-		User user = (User)getService().getUserByLogin(request.getRemoteUser());
+		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		List users = new ArrayList<User>();
 		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
 		if(request.isUserInRole(Role.SYSADMIN)){
 			users = getService().findAll(User.class);
-		}else if(getService().isUserInRole(user.getUserId(),orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)){
+		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)){
 			if(orgOfCourseAdmin.getCourseAdminCanAddNewUsers()){
 				if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
 					users = getService().findAll(User.class);
-				}else if(orgType.equals(new Integer(OrganisationType.CLASS_TYPE))){
+				}else if(orgType.equals(OrganisationType.CLASS_TYPE)){
 					users = getService().getUsersFromOrganisation(parentOrg.getOrganisationId());
-				}else if(orgType.equals(new Integer(OrganisationType.COURSE_TYPE))){
+				}else if(orgType.equals(OrganisationType.COURSE_TYPE)){
 					users = getService().getUsersFromOrganisation(orgId);
 				}
 			}else{
