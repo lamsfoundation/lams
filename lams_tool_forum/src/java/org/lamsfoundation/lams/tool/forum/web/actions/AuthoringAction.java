@@ -970,6 +970,13 @@ public class AuthoringAction extends Action {
 				ActionMessage error = new ActionMessage("error.title.empty");
 				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 			}
+			if(!form.getForum().isAllowNewTopic()){
+				List topics = getTopicList(request);
+				if(topics.size() == 0){
+					ActionMessage error = new ActionMessage("error.must.have.topic");
+					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+				}
+			}
 			//define it later mode(TEACHER) skip below validation.
 			String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
