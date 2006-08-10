@@ -22,23 +22,11 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 </head>
     
-<body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<table width="95%" height="95%" border="0" cellspacing="0" cellpadding="0" align="center">
-	<tr>
-		<td>
-			<tiles:insert attribute="header" />
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" height="100%" align="center" valign="middle" bgcolor="#FFFFFF">	
+<body>
+<div id="page">
+	<div id="content">
 			<tiles:insert attribute="content" />
-		</td>
-	</tr>
-	<tr>
-		<td>		
-			<tiles:insert attribute="footer" />
-		</td>
-	</tr>		
-</table>
+	</div>
+</div>
 </body>
 </html:html>
