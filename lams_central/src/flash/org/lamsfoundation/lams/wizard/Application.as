@@ -56,7 +56,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     private static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
     private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
     private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
-	private static var CCURSOR_DEPTH:Number = 101;
+    private static var CCURSOR_DEPTH:Number = 101;
 	 
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
@@ -295,59 +295,11 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         }   
     }
     
-	public function showCustomCM(showCMItem:Boolean, cmItems):Object{
-		
-		var root_cm:ContextMenu = new ContextMenu();  
-		root_cm.hideBuiltInItems();  
-		trace("CM Item label: "+cmItems.cmlabel)
-		for (var i=0; i<cmItems.length; i++){
-			trace("CM Item length: "+cmItems[i].handler)
-			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler);
-			root_cm.customItems.push(menuItem_cmi);
-		}
-		
-		if (showCMItem == false) {
-			for(var i=0; i<root_cm.customItems.length; i++){
-				root_cm.customItems[i].enabled = false;
-			}
-		} else {
-			for(var i=0; i<root_cm.customItems.length; i++){
-				root_cm.customItems[i].enabled = true;
-			}
-		}
-
-		
-		
-		//this.menu = root_cm;  
-		//_root.menu = root_cm;   
-		return root_cm;
-	}
-	
-	
-		
-		
-	
-    /**
+	/**
     * Create all UI Elements
     */
     private function setupUI(){
-		//Make the base context menu hide built in items so we don't have zoom in etc 
-		// Change this to false to remove
-		 var myCopy:Array = new Array();
-		var menuArr:Array = new Array();
-		menuArr[0] =["Copy", copy];
-		menuArr[1] = ["Paste", paste];
-		
-		for (var i=0; i<menuArr.length; i++){
-			var myObj:Object = new Object();
-			myObj.cmlabel = menuArr[i][0];
-			myObj.handler = menuArr[i][1]; 
-			myCopy[i]= myObj;
-			
-		} 
-        var test_cm = showCustomCM(false, myCopy, this)
-		_root.menu = test_cm; 
-        //Create the application root
+		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
