@@ -10,11 +10,11 @@
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
 <h2 align="left">
-    <logic:notEmpty name="parentOrg">
-        <a href="orgmanage.do?org=<bean:write name="parentOrg" property="organisationId" />"><bean:write name="parentOrg" property="name" /></a> ::
+    <logic:notEmpty name="pOrgId">
+        <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
     </logic:notEmpty>
-    <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="org" property="organisationId" />">
-      <bean:write name="org" property="name" /></a> ::
+    <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserForm" property="orgId" />">
+      <bean:write name="orgName"/></a> ::
 	<logic:notEmpty name="UserForm" property="userId">
 		<fmt:message key="admin.edit"/> User
 	</logic:notEmpty>

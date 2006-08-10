@@ -33,7 +33,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
@@ -77,6 +76,7 @@ public class UserSaveAction extends Action {
 	private static Logger log = Logger.getLogger(UserSaveAction.class);
 
 	private static IUserManagementService service;
+	private static List<Role> rolelist;
 
 	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -110,24 +110,21 @@ public class UserSaveAction extends Action {
 					"error.newpassword.mismatch"));
 		}
 		if ((userForm.get("password") == null)
-				|| (((String) userForm.getString("password").trim()).length() == 0)) {
+				|| (userForm.getString("password").trim().length() == 0)) {
 			passwordChanged = false;
 			if (!edit)
 				errors.add("password", new ActionMessage(
 						"error.password.required"));
 		}
 
-		SupportedLocale locale = (SupportedLocale) request.getSession()
-				.getAttribute("locale");
+		SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
 		log.debug("locale: " + locale);
 
 		if (errors.isEmpty()) {
-			List<Role> allRoles = (List<Role>)request.getSession().getAttribute("rolelist");
-			User user;
 			String[] roles = (String[]) userForm.get("roles");
 			if (edit) { // edit user
 				log.debug("editing userId: " + userId);
-				user = (User) request.getSession().getAttribute("user");
+				User user = (User)getService().findById(User.class, userId);
 				if (passwordChanged) {
 					userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
 				} else {
@@ -142,8 +139,8 @@ public class UserSaveAction extends Action {
 				List<String> rolesCopy = new ArrayList<String>();
 				rolesCopy.addAll(rolesList);
 				log.debug("rolesList.size: " + rolesList.size());
-				UserOrganisation uo = (UserOrganisation) request.getSession().getAttribute("uo");
-				Set<UserOrganisationRole> uors = (Set<UserOrganisationRole>) request.getSession().getAttribute("uors");
+				UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
+				Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
 				Set<UserOrganisationRole> uorsCopy = new HashSet<UserOrganisationRole>();
 				uorsCopy.addAll(uors);
 				//remove the common part from the rolesList and uors
@@ -158,7 +155,7 @@ public class UserSaveAction extends Action {
 				}
 				uors.removeAll(uorsCopy);
 				for(String roleId : rolesCopy){
-					UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(allRoles, roleId));
+					UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(rolelist, roleId));
 					getService().save(uor);
 					uors.add(uor);
 				}
@@ -166,9 +163,8 @@ public class UserSaveAction extends Action {
 				getService().save(user);
 			} else { // create user
 				log.debug("creating user...");
-				user = new User();
-				userForm.set("password", HashUtil.sha1((String) userForm
-						.get("password")));
+				User user = new User();
+				userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
 				BeanUtils.copyProperties(user, userForm);
 				log.debug("new login: " + user.getLogin());
 				if (getService().getUserByLogin(user.getLogin()) != null) {
@@ -187,19 +183,18 @@ public class UserSaveAction extends Action {
 					List<Organisation> orgs = new ArrayList<Organisation>();
 					// if user is to be added to a class, make user a member of
 					// parent course also
-					Organisation org = (Organisation)request.getSession().getAttribute("org");
+					Organisation org = (Organisation)getService().findById(Organisation.class, orgId);
 					orgs.add(org);
-					OrganisationType orgType = (OrganisationType)request.getSession().getAttribute("orgType");
+					OrganisationType orgType = org.getOrganisationType();
 					if (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-						Organisation parentOrg = (Organisation)request.getSession().getAttribute("parentOrg");
+						Organisation parentOrg = org.getParentOrganisation();
 						orgs.add(parentOrg);
 					}
 					for (Organisation o : orgs) {
 						UserOrganisation uo = new UserOrganisation(user,o);
 						getService().save(uo);
-						log.debug("created UserOrganisation: " + uo.getUserOrganisationId());
 						for (String roleId : roles) { 
-							UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(allRoles,roleId));
+							UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(rolelist,roleId));
 							getService().save(uor);
 							uo.addUserOrganisationRole(uor);
 						}
@@ -212,7 +207,6 @@ public class UserSaveAction extends Action {
 		if (errors.isEmpty()) {
 			request.setAttribute("org", orgId);
 			log.debug("orgId: " + orgId);
-			clearSessionAttributes(request.getSession());
 			return mapping.findForward("userlist");
 		} else {
 			if (!edit) { // error screen on create user shouldn't show empty roles
@@ -224,14 +218,6 @@ public class UserSaveAction extends Action {
 	}
 
 	
-	private void clearSessionAttributes(HttpSession session) {
-		String[] attributes = {"locales","org","parentOrg","user","orgType","rolelist","uo","uors"};
-		for(String attr : attributes){
-			session.removeAttribute(attr);
-		}
-	}
-
-
 	private Role findRole(List<Role> allRoles, String roleId){
 		for(Role role: allRoles){
 			if(role.getRoleId().toString().equals(roleId))
@@ -240,13 +226,12 @@ public class UserSaveAction extends Action {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private IUserManagementService getService() {
 		if (service == null) {
-			WebApplicationContext ctx = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(getServlet()
-							.getServletContext());
-			service = (IUserManagementService) ctx
-					.getBean("userManagementServiceTarget");
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			rolelist = service.findAll(Role.class);
 		}
 		return service;
 	}

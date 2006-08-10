@@ -73,7 +73,7 @@ public class UserAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(UserAction.class);
 	private static IUserManagementService service;
-	private List<Role> rolelist;
+	private static List<Role> rolelist;
 	private static List<SupportedLocale> locales;
 	
 	public ActionForward edit(ActionMapping mapping,
@@ -86,43 +86,32 @@ public class UserAction extends LamsDispatchAction {
 		OrganisationType orgType = org.getOrganisationType();
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 		
-		request.getSession().setAttribute("rolelist",filterRoles(rolelist,isSysadmin, orgType));
+		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin, orgType));
 		// set canEdit for whether user should be able to edit anything other than roles
 		request.setAttribute("canEdit",isSysadmin);
-		request.getSession().setAttribute("locales",locales);
-		
+		request.setAttribute("locales",locales);
+
 		// editing a user
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		DynaActionForm userForm = (DynaActionForm)form;
 		if(userId != null) {
 			log.debug("got userid to edit: "+userId);
 			User user = (User)getService().findById(User.class,userId);
-			request.getSession().setAttribute("user", user);
 			BeanUtils.copyProperties(userForm, user);
 			userForm.set("password",null);
 			
-			// get user's roles
-			Iterator iter = user.getUserOrganisations().iterator();
-			while(iter.hasNext()){
-			    UserOrganisation uo = (UserOrganisation)iter.next();
-			    if(uo.getOrganisation().getOrganisationId().equals(orgId)){
-			    	request.getSession().setAttribute("uo", uo);
-			    	request.getSession().setAttribute("uors", uo.getUserOrganisationRoles());
-			        Iterator iter2 = uo.getUserOrganisationRoles().iterator();
-			        String[] roles = new String[uo.getUserOrganisationRoles().size()];
-			        int i=0;
-			        while(iter2.hasNext()){
-			            UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
-			            roles[i]=uor.getRole().getRoleId().toString();
-			            log.debug("got roleid: "+roles[i]);
-			            i++;
-			        }
-			        userForm.set("roles",roles);
-			        break;
-			    }
-			}
-			SupportedLocale locale = getService().getSupportedLocale(user.getLocaleLanguage(),user.getLocaleCountry());
-			request.getSession().setAttribute("locale", locale);
+		    UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
+	        Iterator iter2 = uo.getUserOrganisationRoles().iterator();
+	        String[] roles = new String[uo.getUserOrganisationRoles().size()];
+	        int i=0;
+	        while(iter2.hasNext()){
+	            UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
+	            roles[i]=uor.getRole().getRoleId().toString();
+	            log.debug("got roleid: "+roles[i]);
+	            i++;
+	        }
+	        userForm.set("roles",roles);
+	        SupportedLocale locale = getService().getSupportedLocale(user.getLocaleLanguage(),user.getLocaleCountry());
 			userForm.set("localeId",locale.getLocaleId());
 			
 		}else{
@@ -132,7 +121,6 @@ public class UserAction extends LamsDispatchAction {
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 				log.debug("defaultLocale: "+defaultLocale);
 				SupportedLocale locale = getService().getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
-				request.getSession().setAttribute("locale", locale);
 				userForm.set("localeId",locale.getLocaleId());
 			}catch(Exception e){
                 log.debug(e);				
@@ -142,10 +130,11 @@ public class UserAction extends LamsDispatchAction {
 
 		Organisation parentOrg = org.getParentOrganisation();
 		if(parentOrg!=null){
-			request.getSession().setAttribute("parentOrg",parentOrg);
+			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
+			request.setAttribute("pOrgName", parentOrg.getName());
 		}
-		request.getSession().setAttribute("org",org);
-		request.getSession().setAttribute("orgType",orgType);
+		request.setAttribute("orgName",org.getName());
+		request.setAttribute("orgType",orgType.getOrganisationTypeId());
 		return mapping.findForward("user");
 	}
 	
@@ -184,9 +173,9 @@ public class UserAction extends LamsDispatchAction {
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-			locales = getService().findAll(SupportedLocale.class);
+			locales = service.findAll(SupportedLocale.class);
 			Collections.sort(locales);
-			rolelist = getService().findAll(Role.class);
+			rolelist = service.findAll(Role.class);
 			Collections.sort(rolelist);
 		}
 		return service;
