@@ -20,18 +20,18 @@
 		{
 			if(isMac)
 			{
-				pWin = window.open('profile.do?user='+username,'pWindow','width=796,height=570,resizable');
+				pWin = window.open('profile.do?method=view','pWindow','width=796,height=570,resizable,scrollbars');
 			}
 			else
 			{
 				if(pWin && pWin.open && !pWin.closed)
 				{
-					pWin.location='profile.do?user='+username;
+					pWin.location='profile.do?method=view';
 					pWin.focus();
 				}
 				else
 				{
-					pWin = window.open('profile.do?user='+username,'pWindow','width=796,height=570,resizable');
+					pWin = window.open('profile.do?method=view','pWindow','width=796,height=570,resizable,scrollbars');
 					pWin.focus();
 				}
 			}
