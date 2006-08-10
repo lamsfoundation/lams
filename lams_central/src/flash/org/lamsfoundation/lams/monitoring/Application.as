@@ -67,6 +67,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     public static var TOOLTIP_DEPTH:Number = 60;	//depth of the cursors
     public static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
     public static var MENU_DEPTH:Number = 25;   //depth of the menu
+    public static var CCURSOR_DEPTH:Number = 101;
     
     public static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	public static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
@@ -161,6 +162,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _UILoaded = false;
         
 		loader.start(COMPONENT_NO);
+		
+		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);

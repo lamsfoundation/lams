@@ -60,6 +60,9 @@ class Application extends ApplicationParent {
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
 	private static var HEADER_DEPTH:Number = 20;
 	private static var TOOLTIP_DEPTH:Number = 60;	//depth of the cursors
+	
+	private static var CCURSOR_DEPTH:Number = 101;
+	
 	// UI Elements
 	
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
@@ -123,6 +126,8 @@ class Application extends ApplicationParent {
 		
 		_container_mc = container_mc;
         _UILoaded = false;
+		
+		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);

@@ -246,11 +246,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			//Debugger.log("currentCursor:"+currentCursor, Debugger.GEN,'activityReleaseOutside','CanvasController');
 			//strip the last mc off the path as its the click target
 			//_global.breakpoint();
-			//Debugger.log("currentCursor._droptarget:"+currentCursor._droptarget, Debugger.GEN,'activityReleaseOutside','CanvasController');
-			var dt:String = new String(eval(currentCursor._droptarget));
+			Debugger.log("currentCursor._droptarget:"+currentCursor._droptarget, Debugger.GEN,'activityReleaseOutside','CanvasController');
+			var _dt:String = currentCursor._droptarget;
+			var idx:Number = _dt.indexOf("/", 1);
+			var _dt = _dt.substring(idx, _dt.length);
+			
+			var dt:String = new String(eval(_dt));
+			
+			Debugger.log("currentCursor._droptarget eval:"+dt, Debugger.GEN,'activityReleaseOutside','CanvasController');
+			
 			var i:Number = dt.lastIndexOf(".");
+			
 			dt = dt.substring(0,i);
-			//Debugger.log("Subst:"+dt, Debugger.GEN,'activityReleaseOutside','CanvasController');
+			Debugger.log("Subst:"+dt, Debugger.GEN,'activityReleaseOutside','CanvasController');
 			var transitionTarget_mc:MovieClip = eval(dt);
 			Debugger.log("Transition drop target:"+transitionTarget_mc, Debugger.GEN,'activityReleaseOutside','CanvasController');
 			

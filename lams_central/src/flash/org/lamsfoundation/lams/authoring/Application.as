@@ -67,11 +67,12 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     public static var WORKSPACE_W:Number = 300;
     public static var WORKSPACE_H:Number = 200;
     
-	private static var LOADING_ROOT_DEPTH:Number = 1000;	//depth of the loading movie
+	private static var LOADING_ROOT_DEPTH:Number = 100;	//depth of the loading movie
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
     private static var DIALOGUE_DEPTH:Number = 20;	//depth of the dialogue box
     private static var TOOLTIP_DEPTH:Number = 60;	//depth of the tooltip
-    private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
+    private static var CURSOR_DEPTH:Number = 70;   //depth of the cursors
+	private static var CCURSOR_DEPTH:Number = 101;
     private static var MENU_DEPTH:Number = 25;   //depth of the menu
 	private static var PI_DEPTH:Number = 35;   //depth of the menu
     private static var TOOLBAR_DEPTH:Number = 50;   //depth of the menu
@@ -168,6 +169,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _UILoaded = false;
 
 		loader.start(COMPONENT_NO);
+		
+		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
@@ -403,9 +406,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
-        
- 		_cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);			
-		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
+        _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);			
+ 		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
 		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);
 		
 		_tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);

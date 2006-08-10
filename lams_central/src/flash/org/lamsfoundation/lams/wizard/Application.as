@@ -51,12 +51,13 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     private static var WIZARD_W:Number = 584;
     private static var WIZARD_H:Number = 550;
     
-	private static var LOADING_ROOT_DEPTH:Number = 1000;	//depth of the loading movie
+	private static var LOADING_ROOT_DEPTH:Number = 100;	//depth of the loading movie
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
     private static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
     private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
     private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
-    
+	private static var CCURSOR_DEPTH:Number = 101;
+	 
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
@@ -136,6 +137,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         _UILoaded = false;
         
 		loader.start(COMPONENT_NO);
+		
+		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
