@@ -55,12 +55,12 @@ String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage)
 %>
 
 	<%-- courseID and classID are passed in as request parameters by addLesson.jsp in lams_central. --%>
-	<c:set var="wizardurl_params">?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&courseID=<c:out value="${param.courseID}"/>&classID=<c:out value="${param.classID}"/></c:set>
-	<c:set var="wizardurl_nojs">lams_wizard.swf<c:out value="${wizardurl_params}"/></c:set>
-	<c:set var="wizardurl_js">lams_wizard<c:out value="${wizardurl_params}"/></c:set>
+	<c:set var="wizardurl_params">?loadFile=monitoring/lams_wizard.swf&loadLibrary=monitoring/lams_wizard_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&courseID=<c:out value="${param.courseID}"/>&classID=<c:out value="${param.classID}"/></c:set>
+	<c:set var="wizardurl_nojs">../lams_preloader.swf<c:out value="${wizardurl_params}"/></c:set>
+	<c:set var="wizardurl_js">../lams_preloader<c:out value="${wizardurl_params}"/></c:set>
 
 	<script type="text/javascript">
-		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${wizardurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','wizard', 'id', 'wizard', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${wizardurl_js}" escapeXml="false"/>' );
+		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${wizardurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#FFFFFF','name','wizard', 'id', 'wizard', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${wizardurl_js}" escapeXml="false"/>' );
 	</script>
 
 	<noscript>
@@ -75,12 +75,12 @@ String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage)
 		  <param name="movie" value="<c:out value="${wizardurl_nojs}" escapeXml="false"/>"/>
 		  <param name="quality" value="high">
 		  <param name="scale" value="noscale">
-		  <param name="bgcolor" value="#B3B7C8">
+		  <param name="bgcolor" value="#FFFFFF">
 		  <embed 	
 		   	  src="<c:out value="${wizardurl_nojs}" escapeXml="false"/>"
 			  quality="high" 
 			  scale="noscale" 
-			  bgcolor="#B3B7C8"  
+			  bgcolor="#FFFFF"  
 			  width="100%" 
 			  height="100%" 
 			  swliveconnect=true 
