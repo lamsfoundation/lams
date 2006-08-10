@@ -5,11 +5,8 @@
 		<td valign="top">
 			<p class=body><fmt:message key="msg.password.changed"/></p>
 			<p class=body>	
-				<input name="Ok" type="button" class="button" id="Ok" 
-					onClick="javascript:document.location='passwordChangeOk.do';" 		
-					onMouseOver="changeStyle(this,'buttonover')"
-					onMouseOut="changeStyle(this,'button')" 
-					value="Ok" />
+				<input type="submit" class="button" value="Ok"
+					onClick="javascript:document.location='profile.do?method=view';" />
 			</p>
 		</td>
 	</tr>
