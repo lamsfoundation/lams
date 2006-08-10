@@ -68,7 +68,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     public static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
     public static var MENU_DEPTH:Number = 25;   //depth of the menu
     public static var CCURSOR_DEPTH:Number = 101;
-    
+
     public static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	public static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	public static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
@@ -96,6 +96,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
     private var _dictionary:Dictionary;
+	
     private var _config:Config;
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
@@ -370,58 +371,11 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         }   
     }
     
-	public function showCustomCM(showCMItem:Boolean, cmItems):Object{
-		
-		var root_cm:ContextMenu = new ContextMenu();  
-		root_cm.hideBuiltInItems();  
-		trace("CM Item label: "+cmItems.cmlabel)
-		for (var i=0; i<cmItems.length; i++){
-			trace("CM Item length: "+cmItems[i].handler)
-			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler);
-			root_cm.customItems.push(menuItem_cmi);
-		}
-		
-		if (showCMItem == false) {
-			for(var i=0; i<root_cm.customItems.length; i++){
-				root_cm.customItems[i].enabled = false;
-			}
-		} else {
-			for(var i=0; i<root_cm.customItems.length; i++){
-				root_cm.customItems[i].enabled = true;
-			}
-		}
-
-		
-		
-		//this.menu = root_cm;  
-		//_root.menu = root_cm;   
-		return root_cm;
-	}
-	
-	
-		
-		
-	
-    /**
+	/**
     * Create all UI Elements
     */
     private function setupUI(){
-		//Make the base context menu hide built in items so we don't have zoom in etc 
-		// Change this to false to remove
-		 var myCopy:Array = new Array();
-		var menuArr:Array = new Array();
-		menuArr[0] =["Copy", copy];
-		menuArr[1] = ["Paste", paste];
 		
-		for (var i=0; i<menuArr.length; i++){
-			var myObj:Object = new Object();
-			myObj.cmlabel = menuArr[i][0];
-			myObj.handler = menuArr[i][1]; 
-			myCopy[i]= myObj;
-			
-		} 
-        var test_cm = showCustomCM(false, myCopy, this)
-		_root.menu = test_cm; 
         //Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
