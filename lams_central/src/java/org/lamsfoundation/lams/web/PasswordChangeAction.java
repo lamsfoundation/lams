@@ -27,31 +27,30 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.WebApplicationContext;
-
-
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.HashUtil;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang
  * 
  * @struts:action path="/passwordChanged"
  *  			name="PasswordChangeActionForm"
+ *  			scope="request"
  * 				input=".passwordChange"
- * 				validate="true"
+ * 				validate="false"
  * 
  * @struts:action-forward name="okay" path=".passwordChangeOk"
- * @struts:action-forward name="cancelled" path="/index.jsp"
+ * @struts:action-forward name="cancelled" path="/profile.do?method=view"
  */
 public class PasswordChangeAction extends Action {
 
@@ -77,8 +76,8 @@ public class PasswordChangeAction extends Action {
         }
 
 
-        ActionErrors errors = new ActionErrors();
-
+        ActionMessages errors = new ActionMessages();
+        
 		PasswordChangeActionForm passwordChangeForm = (PasswordChangeActionForm) form;
 		
         if (errors.isEmpty()) 
@@ -89,6 +88,7 @@ public class PasswordChangeAction extends Action {
 	        	String login = passwordChangeForm.getLogin();
 	        	String oldPassword = passwordChangeForm.getOldPassword();
 	        	String password = passwordChangeForm.getPassword();
+	        	String passwordConfirm = passwordChangeForm.getPasswordConfirm();
 	        	
 	    	    if ( loggedInUser == null || ! loggedInUser.equals(login) )
 	    	    {
@@ -96,16 +96,26 @@ public class PasswordChangeAction extends Action {
 	    	    }
 	    	    else 
 	    	    {
-
-					WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
+					//WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
+					WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServlet().getServletContext());
 					UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
-					if(!service.getUserByLogin(login).getPassword().equals(oldPassword))
+					
+					User user = service.getUserByLogin(login);
+					if(!user.getPassword().equals(HashUtil.sha1(oldPassword)))
 					{
 						errors.add("oldPassword", new ActionMessage("error.oldpassword.mismatch"));
+						log.debug("old pass wrong");
 					}
-					else
+					if(password == null || password.length() == 0 || !password.equals(passwordConfirm)) 
 					{
-			        	service.updatePassword(login, password );
+						errors.add("password", new ActionMessage("error.newpassword.mismatch"));
+						log.debug("new pass wrong");
+					}
+					if (errors.isEmpty())
+					{
+			        	//service.updatePassword(login, HashUtil.sha1(password));
+						user.setPassword(HashUtil.sha1(password));
+						service.save(user);
 					}
 	    	    }
 		        	
@@ -118,15 +128,17 @@ public class PasswordChangeAction extends Action {
 
         // -- Report any errors
         if (!errors.isEmpty()) {
-            addErrors(request, errors);
+            saveErrors(request,errors);
             if (mapping.getInput()!=null)
             {
             	passwordChangeForm.reset(mapping,request);
-                return (new ActionForward(mapping.getInput()));
+                //return (new ActionForward(mapping.getInput()));
+            	return (mapping.getInputForward());
             }
             // If no input page, use error forwarding
-            return (mapping.findForward("error"));
+            return (mapping.findForward("error.system"));
         }
+        
 		return mapping.findForward("okay");
 
     } 

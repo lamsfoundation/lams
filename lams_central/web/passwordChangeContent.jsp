@@ -8,11 +8,11 @@
 	<tr> 
 		<td valign="top">
 			<H2><fmt:message key="title.password.change.screen"/></H2>
-			<p><html:errors/></p>
+			<p><html:errors /></p>
 			<table>
 				<tr>
 					<td class="body" align="right">
-						<fmt:message key="label.username"/>
+						<fmt:message key="label.username"/>:
 					</td>
 					<td class="body" align="left">
 						<html:hidden name="<%=PasswordChangeActionForm.formName%>" property="login"/>
@@ -21,7 +21,7 @@
 				</tr>
 				<tr>
 					<td class="body" align="right">
-						<fmt:message key="label.password.old.password"/>
+						<fmt:message key="label.password.old.password"/>:
 					</td>
 					<td class="body" align="left">
 						<html:password name="<%=PasswordChangeActionForm.formName%>" property="oldPassword" size="50" maxlength="50"/>
@@ -29,7 +29,7 @@
 				</tr>
 				<tr>
 					<td class="body" align="right">
-						<fmt:message key="label.password.new.password"/>
+						<fmt:message key="label.password.new.password"/>:
 					</td>
 					<td class="body" align="left">
 						<html:password name="<%=PasswordChangeActionForm.formName%>" property="password" size="50" maxlength="50"/>
@@ -37,15 +37,19 @@
 				</tr>
 				<tr>
 					<td class="body" align="right">
-						<fmt:message key="label.password.confirm.new.password"/>
+						<fmt:message key="label.password.confirm.new.password"/>:
 					</td>
 					<td class="body" align="left">
 						<html:password name="<%=PasswordChangeActionForm.formName%>" property="passwordConfirm" size="50" maxlength="50"/>
 					</td>
 				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<html:submit><fmt:message key="button.save"/></html:submit> &nbsp; 	
+						<html:cancel><fmt:message key="button.cancel"/></html:cancel>
+					</td>
+				</tr>
 			</table>
-			<p> <html:submit><fmt:message key="button.save"/></html:submit> &nbsp; 	
-				<html:cancel><fmt:message key="button.cancel"/></html:cancel></p>
 		</td>
 	</tr>
 </table>
