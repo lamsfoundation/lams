@@ -23,21 +23,21 @@
 	</tbody>
 </table>
 
-<p>
-	<c:choose>
-		<c:when test="${not dto.contentInUse}">
-			<c:url value="/authoring.do" var="authoringUrl">
-				<c:param name="toolContentID" value="${dto.toolContentId}" />
-				<c:param name="mode" value="teacher" />
-			</c:url>
-			<html:link href="${fn:escapeXml(authoringUrl)}" styleClass="button right-buttons" target="_blank">
-				<fmt:message key="button.editActivity" />
-			</html:link>
-		</c:when>
-		<c:otherwise>
-			<p>
-				<fmt:message key="message.contentInUseSet" />
-			</p>
-		</c:otherwise>
-	</c:choose>
-</p>
+<c:choose>
+	<c:when test="${not dto.contentInUse}">
+		<c:url value="/authoring.do" var="authoringUrl">
+			<c:param name="toolContentID" value="${dto.toolContentId}" />
+			<c:param name="mode" value="teacher" />
+		</c:url>
+		<html:link href="${fn:escapeXml(authoringUrl)}"
+			styleClass="button right-buttons" target="_blank">
+			<fmt:message key="button.editActivity" />
+		</html:link>
+	</c:when>
+	<c:otherwise>
+		<p>
+			<fmt:message key="message.contentInUseSet" />
+		</p>
+	</c:otherwise>
+</c:choose>
+
