@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import java.util.TreeMap;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,8 +51,10 @@ import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -114,6 +118,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         
 		// get root topic list and its children topics
         List<MessageDTO> msgDtoList = getSessionTopicList(toolSessionID, directoryName, forumService);
+        setAuthorMark(msgDtoList);
+        
         ForumToolSession session = forumService.getSessionBySessionId(toolSessionID);
         
         //put all message into Map. Key is session name, value is list of all topics in this session.
@@ -179,11 +185,25 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 					Iterator iter = topic.getMessage().getAttachments().iterator();
 					while(iter.hasNext()){
 						Attachment att = (Attachment) iter.next();
+						topic.setAttachmentName(att.getFileName());
+						int idx= 1;
+						String userName = topic.getAuthor();
+						String localDir;
+						while(true){
+							localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
+							File local = new File(localDir);
+							if(!local.exists()){
+								local.mkdirs();
+								break;
+							}
+							idx++;
+						}
+						topic.setAttachmentLocalUrl(userName + "/" + idx + "/" + att.getFileName());
 						try {
 							handler = getToolContentHandler();
-							handler.saveFile(att.getFileUuid(), FileUtil.getFullPath(directoryName, att.getFileName()));
+							handler.saveFile(att.getFileUuid(), FileUtil.getFullPath(directoryName, topic.getAttachmentLocalUrl()));
 						} catch (Exception e) {
-							logger.equals("Export forum topic attachment failed: " + e.toString());
+							logger.error("Export forum topic attachment failed: " + e.toString());
 						}
 					}
 				}
@@ -199,4 +219,31 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
     	    }
     	    return handler;
 	}
+    
+	/**
+	 * If this topic is created by current login user, then set Author mark
+	 * true.
+	 * 
+	 * @param msgDtoList
+	 */
+	private void setAuthorMark(List msgDtoList) {
+		// set current user to web page, so that can display "edit" button
+		// correct. Only author alow to edit.
+		HttpSession ss = SessionManager.getSession();
+		// get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+		Long currUserId = new Long(user.getUserID().intValue());
+		Iterator iter = msgDtoList.iterator();
+		while (iter.hasNext()) {
+			MessageDTO dto = (MessageDTO) iter.next();
+			if (dto.getMessage().getCreatedBy() != null
+					&& currUserId.equals(dto.getMessage().getCreatedBy()
+							.getUserId()))
+				dto.setAuthor(true);
+			else
+				dto.setAuthor(false);
+		}
+	}
+
 }

@@ -50,7 +50,7 @@
 					</td>
 				</tr>
 			</c:if>
-			<c:if test="${(msgDto.released || mode=='teacher') && (not empty msgDto.mark)}">
+			<c:if test="${((msgDto.released && msgDto.isAuthor) || mode=='teacher') && (not empty msgDto.mark)}">
 				<tr>
 					<td>
 						<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>

@@ -44,6 +44,10 @@ public class MessageDTO {
 	private Float mark;
 	private String comment;
 	private boolean released;
+	
+	//2 fields use for export portfolio function
+	private String attachmentName;
+	private String attachmentLocalUrl;
 
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
@@ -166,6 +170,22 @@ public class MessageDTO {
 
 	public void setReleased(boolean isReleased) {
 		this.released = isReleased;
+	}
+
+	public String getAttachmentLocalUrl() {
+		return attachmentLocalUrl;
+	}
+
+	public void setAttachmentLocalUrl(String attachmentLocalUrl) {
+		this.attachmentLocalUrl = attachmentLocalUrl;
+	}
+
+	public String getAttachmentName() {
+		return attachmentName;
+	}
+
+	public void setAttachmentName(String attachmentName) {
+		this.attachmentName = attachmentName;
 	}
 	
 }

@@ -69,13 +69,13 @@
 					<tr>
 						<td>
 							<c:forEach var="file" items="${msgDto.message.attachments}">
-								<a href="${file.fileName}"> <c:out value="${file.fileName}" /> </a>
+								<a href="${msgDto.attachmentLocalUrl}"> <c:out value="${msgDto.attachmentName}" /> </a>
 							</c:forEach>
 						</td>
 					</tr>
 				</c:if>
 				<%-- display mark for teacher --%>
-				<c:if test="${msgDto.released || mode=='teacher'}">
+				<c:if test="${(msgDto.released && msgDto.isAuthor)|| mode=='teacher'}">
 					<tr>
 						<td>
 							<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
