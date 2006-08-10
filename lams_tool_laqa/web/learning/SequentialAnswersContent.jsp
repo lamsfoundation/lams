@@ -58,9 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	  
 					  <tr> 
 							<td colspan=2>
-				 			<textarea name="answer" rows=5 cols=60>
-						  		<c:out value="${generalLearnerFlowDTO.currentAnswer}" escapeXml="false"/> 				 			
-				 			</textarea>
+				 			<textarea name="answer" rows=5 cols=60><c:out value="${generalLearnerFlowDTO.currentAnswer}" escapeXml="false"/></textarea>
 				 			<html:hidden property="currentQuestionIndex" value="${questionEntry.key}"/>
 				 		</td>
 				  	  </tr>

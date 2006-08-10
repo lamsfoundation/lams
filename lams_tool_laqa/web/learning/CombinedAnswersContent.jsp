@@ -52,9 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 	  
   						  <tr> 
 							<td colspan=2>
-					 			<textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60>
-					 			
-					 			</textarea>
+					 			<textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60></textarea>
 					 		</td>
 					  	  </tr>
 
