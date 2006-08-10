@@ -10,7 +10,7 @@
 		</tr>
 
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message>heading.totalLearners</fmt:message>
 			</td>
 			<td>
@@ -19,7 +19,7 @@
 		</tr>
 
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message>heading.totalMessages</fmt:message>
 			</td>
 			<td>
@@ -28,7 +28,7 @@
 		</tr>
 
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message>heading.recentMessages</fmt:message>
 			</td>
 			<td>
@@ -46,7 +46,8 @@
 
 							<c:forEach var="message" items="${session.messageDTOs}">
 								<div>
-									<span style="font-weight: bold"> ${message.from}</span> ${message.body}
+									<span style="font-weight: bold"> ${message.from}</span>
+									${message.body}
 									<br />
 								</div>
 							</c:forEach>
@@ -59,20 +60,25 @@
 
 		<tr>
 			<td colspan="2">
-				<html:form action="/monitoring" method="post" target="_blank" style="float:left; margin-right: 4px">
-					<html:hidden property="dispatch" value="openChatHistory" />
-					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:submit styleClass="button">
-						<fmt:message>summary.editMessages</fmt:message>
-					</html:submit>
+				<html:form action="/monitoring" method="post" target="_blank"
+					style="float:left; margin-right: 4px">
+					<div>
+						<html:hidden property="dispatch" value="openChatHistory" />
+						<html:hidden property="toolSessionID" value="${session.sessionID}" />
+						<html:submit styleClass="button">
+							<fmt:message>summary.editMessages</fmt:message>
+						</html:submit>
+					</div>
 				</html:form>
 
 				<html:form action="/learning" method="post" target="_blank">
-					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:hidden property="mode" value="teacher" />
-					<html:submit styleClass="button">
-						<fmt:message>summary.openChat</fmt:message>
-					</html:submit>
+					<div>
+						<html:hidden property="toolSessionID" value="${session.sessionID}" />
+						<html:hidden property="mode" value="teacher" />
+						<html:submit styleClass="button">
+							<fmt:message>summary.openChat</fmt:message>
+						</html:submit>
+					</div>
 				</html:form>
 
 			</td>

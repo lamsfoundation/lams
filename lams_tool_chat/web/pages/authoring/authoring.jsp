@@ -13,34 +13,43 @@
 <!--closes header-->
 
 <div id="content">
-	<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
-		<html:hidden property="toolContentID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch" value="updateContent" />
-		<html:hidden property="sessionMapID" />
+	<html:form action="/authoring" styleId="authoringForm" method="post"
+		enctype="multipart/form-data">
+		<div>
+			<html:hidden property="toolContentID" />
+			<html:hidden property="currentTab" styleId="currentTab" />
+			<html:hidden property="dispatch" value="updateContent" />
+			<html:hidden property="sessionMapID" />
+		</div>
 
-		<div id="message" align="center">
+		<div id="message" style="text-align: center;">
 			<c:if test="${unsavedChanges}">
-				<img src="${tool}images/warning.png" />
-				<bean:message key="message.unsavedChanges" />
+				<fmt:message key="message.unsavedChanges" />
 			</c:if>
 		</div>
 
 		<%-- Page tabs --%>
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
 		<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-		<lams:TabBody id="3" titleKey="button.instructions" page="instructions.jsp" />
+		<lams:TabBody id="3" titleKey="button.instructions"
+			page="instructions.jsp" />
 
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}"/>	
+		<c:set var="formBean"
+			value="<%=request
+										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 
 		<c:set var="defineLater" value="no" />
 		<c:if test="${sessionMap.mode == 'teacher'}">
 			<c:set var="defineLater" value="yes" />
 		</c:if>
-		
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lachat11" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" toolContentID="${formBean.toolContentID}"
-			accessMode="${sessionMap.mode}" defineLater="${defineLater}" customiseSessionID="${sessionMap.sessionID}"/>
+
+		<lams:AuthoringButton formID="authoringForm"
+			clearSessionActionUrl="/clearsession.do" toolSignature="lachat11"
+			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
+			toolContentID="${formBean.toolContentID}"
+			accessMode="${sessionMap.mode}" defineLater="${defineLater}"
+			customiseSessionID="${sessionMap.sessionID}" />
 
 	</html:form>
 </div>

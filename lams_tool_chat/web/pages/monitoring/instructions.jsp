@@ -4,7 +4,7 @@
 <table>
 	<tbody>
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message key="instructions.onlineInstructions" />
 			</td>
 			<td>
@@ -55,7 +55,7 @@
 <table>
 	<tbody>
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message key="instructions.offlineInstructions" />
 			</td>
 			<td>

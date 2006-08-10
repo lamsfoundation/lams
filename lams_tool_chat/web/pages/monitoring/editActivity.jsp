@@ -5,7 +5,7 @@
 <table cellspacing="0">
 	<tbody>
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
@@ -13,7 +13,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" style="width: 30%;">
 				<fmt:message key="label.authoring.basic.instructions" />
 			</td>
 			<td>
@@ -23,14 +23,14 @@
 	</tbody>
 </table>
 
-<p align="right">
+<p>
 	<c:choose>
 		<c:when test="${not dto.contentInUse}">
 			<c:url value="/authoring.do" var="authoringUrl">
 				<c:param name="toolContentID" value="${dto.toolContentId}" />
 				<c:param name="mode" value="teacher" />
 			</c:url>
-			<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+			<html:link href="${fn:escapeXml(authoringUrl)}" styleClass="button right-buttons" target="_blank">
 				<fmt:message key="button.editActivity" />
 			</html:link>
 		</c:when>
@@ -41,5 +41,3 @@
 		</c:otherwise>
 	</c:choose>
 </p>
-
-

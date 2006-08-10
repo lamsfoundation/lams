@@ -11,7 +11,7 @@
 			</tr>
 
 			<tr>
-				<td class="field-name" width="30%">
+				<td class="field-name" style="width: 30%;">
 					<fmt:message>heading.totalLearners</fmt:message>
 				</td>
 				<td>
@@ -20,7 +20,7 @@
 			</tr>
 
 			<tr>
-				<td class="field-name" width="30%">
+				<td class="field-name" style="width: 30%;">
 					<fmt:message>heading.totalMessages</fmt:message>
 				</td>
 				<td>
@@ -57,8 +57,8 @@
 									<c:param name="dispatch" value="openNotebook" />
 									<c:param name="uid" value="${user.uid}" />
 								</c:url>
-
-								<html:link href="${openNotebook}" target="_blank">
+								
+								<html:link href="${fn:escapeXml(openNotebook)}" target="_blank">
 									<fmt:message key="link.view" />
 								</html:link>
 							</c:if>

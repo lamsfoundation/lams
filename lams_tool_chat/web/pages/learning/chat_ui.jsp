@@ -74,12 +74,14 @@
 						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
 						</span><span id="sendToUser" style="display: none"></span>
 					</h2>
-					
-					
-					<span> <textarea name="msg" onKeyPress="return checkEnter(event);"
-							id="msgArea" rows="3" cols="80"></textarea> </span>
-							
-							
+
+
+					<div>
+						<textarea name="msg" onKeyPress="return checkEnter(event);"
+							id="msgArea" rows="3" cols="80"></textarea>
+					</div>
+
+
 					<div class="left-buttons">
 						<input id="sendButton" class="button" type="submit"
 							value='<fmt:message>button.send</fmt:message>' />
