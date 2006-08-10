@@ -166,13 +166,6 @@ public interface WDDXTAGS {
 	/**ComplexActivity specific tags */
 	public static final String CHILD_ACTIVITIES ="childActivities";
 	
-	/** Lesson Specific Tags */
-	public static final String LESSON_ID = "lessonID";
-	public static final String LESSON_ORG_ID = "lessonOrgID";
-	public static final String LESSON_ORG_NAME = "lessonOrgName";
-	public static final String LESSON_NAME = "lessonName";
-	public static final String LESSON_START_DATETIME = "lessonStartDateTime";
-	
 	/** Crash Dump Specific Tags */
 	public static final String CRASH_DUMP_BATCH="crashDataBatch";
 	

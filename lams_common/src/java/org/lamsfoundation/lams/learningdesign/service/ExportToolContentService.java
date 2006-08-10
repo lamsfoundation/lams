@@ -854,12 +854,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			ld.setLicenseText(dto.getLicenseText());
 		}
 		
-		ld.setLessonOrgID(dto.getLessonOrgID());
-		
-		ld.setLessonOrgName(dto.getLessonOrgName());
-		ld.setLessonID(dto.getLessonID());
-		ld.setLessonName(dto.getLessonName());
-		ld.setLessonStartDateTime(dto.getLessonStartDateTime());
 		ld.setLastModifiedDateTime(dto.getLastModifiedDateTime());
 
 		//set learning design to transition.

@@ -290,17 +290,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(table, WDDXTAGS.LAST_MODIFIED_DATE))	
 		    learningDesign.setLastModifiedDateTime(WDDXProcessor.convertToDate(table,WDDXTAGS.LAST_MODIFIED_DATE));
 		
-		// not required at authoring time.
-		if (keyExists(table, WDDXTAGS.LESSON_ORG_NAME))
-		    learningDesign.setLessonOrgName(WDDXProcessor.convertToString(table,WDDXTAGS.LESSON_ORG_NAME));
-		if (keyExists(table, WDDXTAGS.LESSON_NAME))
-		    learningDesign.setLessonName(WDDXProcessor.convertToString(table,WDDXTAGS.LESSON_NAME));					
-		if (keyExists(table, WDDXTAGS.LESSON_START_DATETIME))
-		    learningDesign.setLessonStartDateTime(WDDXProcessor.convertToDate(table,WDDXTAGS.LESSON_START_DATETIME));
-		if (keyExists(table, WDDXTAGS.LESSON_ID))
-		    learningDesign.setLessonID(WDDXProcessor.convertToLong(table,WDDXTAGS.LESSON_ID));
-		if (keyExists(table, WDDXTAGS.LESSON_ORG_ID))
-		    learningDesign.setLessonOrgID(WDDXProcessor.convertToLong(table,WDDXTAGS.LESSON_ORG_ID));
 		if (keyExists(table, WDDXTAGS.DURATION))
 		    learningDesign.setDuration(WDDXProcessor.convertToLong(table,WDDXTAGS.DURATION));
 		

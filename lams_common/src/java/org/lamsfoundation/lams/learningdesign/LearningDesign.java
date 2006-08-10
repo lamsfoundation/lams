@@ -36,7 +36,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
@@ -48,6 +47,8 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
  *  
  */
 public class LearningDesign implements Serializable {
+
+	private static final long serialVersionUID = -5695987114641062118L;
 
 	/** Represents a single LearningDesign object in the WDDXPacket */
 	public static final String DESIGN_OBJECT = "LearningDesign";
@@ -132,21 +133,6 @@ public class LearningDesign implements Serializable {
 	
 	/** nullable persistent field */
 	private License license;
-	
-	/** nullable persistent field*/
-	private Long lessonOrgID;
-	
-	/** nullable persistent field*/
-	private String lessonOrgName;
-	
-	/** nullable persistent field*/
-	private Long lessonID;
-	
-	/** nullable persistent field*/
-	private String lessonName;
-	
-	/** nullable persistent field*/
-	private Date lessonStartDateTime;
 	
 	/** persistent field*/
 	private Date lastModifiedDateTime;
@@ -483,36 +469,6 @@ public class LearningDesign implements Serializable {
 	}
 	public void setLicense(License license) {
 		this.license = license;
-	}
-	public Long getLessonID() {
-		return lessonID;
-	}
-	public void setLessonID(Long lessonID) {
-		this.lessonID = lessonID;
-	}
-	public String getLessonName() {
-		return lessonName;
-	}
-	public void setLessonName(String lessonName) {
-		this.lessonName = lessonName;
-	}
-	public Long getLessonOrgID() {
-		return lessonOrgID;
-	}
-	public void setLessonOrgID(Long lessonOrgID) {
-		this.lessonOrgID = lessonOrgID;
-	}
-	public String getLessonOrgName() {
-		return lessonOrgName;
-	}
-	public void setLessonOrgName(String lessonOrgName) {
-		this.lessonOrgName = lessonOrgName;
-	}
-	public Date getLessonStartDateTime() {
-		return lessonStartDateTime;
-	}
-	public void setLessonStartDateTime(Date lessonStartDateTime) {
-		this.lessonStartDateTime = lessonStartDateTime;
 	}
 	public Date getLastModifiedDateTime() {
 		return lastModifiedDateTime;

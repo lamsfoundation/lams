@@ -515,11 +515,6 @@ public class LD102Importer {
 		ld.setDuration(null);
 		ld.setLicenseText(null);
 		ld.setLicense(null);
-		ld.setLessonOrgID(null);
-		ld.setLessonOrgName(null);
-		ld.setLessonID(null);
-		ld.setLessonName(null);
-		ld.setLessonStartDateTime(null);
 
 		ldInProgress = ld;
 	}

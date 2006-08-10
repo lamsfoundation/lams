@@ -349,14 +349,8 @@ CREATE TABLE lams_learning_design (
      , duration BIGINT(38)
      , license_id BIGINT(20)
      , license_text TEXT
-     , lesson_org_id BIGINT(20)
-     , lesson_org_name VARCHAR(255)
-     , lesson_id BIGINT(20)
-     , lesson_start_date_time DATETIME
-     , lesson_name VARCHAR(255)
      , last_modified_date_time DATETIME
      , PRIMARY KEY (learning_design_id)
-     , INDEX (original_learning_design_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)
@@ -370,6 +364,7 @@ CREATE TABLE lams_learning_design (
      , CONSTRAINT FK_lams_learning_design_6 FOREIGN KEY (copy_type_id)
                   REFERENCES lams_copy_type (copy_type_id)
 )TYPE=InnoDB;
+CREATE INDEX idx_design_parent_id ON lams_learning_design (original_learning_design_id ASC);
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
 CREATE TABLE lams_grouping (

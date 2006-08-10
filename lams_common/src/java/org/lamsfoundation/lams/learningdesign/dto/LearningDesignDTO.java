@@ -65,11 +65,6 @@ public class LearningDesignDTO extends BaseDTO{
 	private Long duration;
 	private String licenseText;
 	private Long licenseID;
-	private Long lessonOrgID;
-	private String lessonOrgName;
-	private Long lessonID;
-	private String lessonName;
-	private Date lessonStartDateTime;
 	private Date lastModifiedDateTime;
 	private String offlineInstructions;
 	private String onlineInstructions;
@@ -103,11 +98,6 @@ public class LearningDesignDTO extends BaseDTO{
 							 Long duration, 
 							 String licenseText,
 							 Long licenseID,
-							 Long lessonOrgID,
-							 String lessonOrgName,
-							 Long lessonID,
-							 String lessonName, 
-							 Date lessonStartDateTime,
 							 Date lastModifiedDateTime,
 							 String offlineInstructions, 
 							 String onlineInstructions) {
@@ -134,11 +124,6 @@ public class LearningDesignDTO extends BaseDTO{
 		this.duration = duration;
 		this.licenseText = licenseText;
 		this.licenseID = licenseID;
-		this.lessonOrgID = lessonOrgID;
-		this.lessonOrgName = lessonOrgName;
-		this.lessonID = lessonID;
-		this.lessonName = lessonName;
-		this.lessonStartDateTime = lessonStartDateTime;
 		this.lastModifiedDateTime = lastModifiedDateTime;
 		this.groupings = new ArrayList();
 		this.activities = new ArrayList();
@@ -187,12 +172,6 @@ public class LearningDesignDTO extends BaseDTO{
 						 learningDesign.getLicense().getLicenseID():
 						 null;
 		
-		this.lessonOrgID = learningDesign.getLessonOrgID();
-		
-		this.lessonOrgName = learningDesign.getLessonOrgName();
-		this.lessonID = learningDesign.getLessonID();
-		this.lessonName = learningDesign.getLessonName();
-		this.lessonStartDateTime = learningDesign.getLessonStartDateTime();
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
 		this.groupings = populateGroupings(learningDesign,activityDAO);
 		this.activities = populateActivities(learningDesign);
@@ -268,41 +247,6 @@ public class LearningDesignDTO extends BaseDTO{
 	public Integer getLearningDesignUIID() {
 		//return learningDesignUIID!=null?learningDesignUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	    return learningDesignUIID;
-	}
-	/**
-	 * @return Returns the lessonID.
-	 */
-	public Long getLessonID() {
-		//return lessonID!=null?lessonID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	    return lessonID;
-	}
-	/**
-	 * @return Returns the lessonName.
-	 */
-	public String getLessonName() {
-		//return lessonName!=null?lessonName:WDDXTAGS.STRING_NULL_VALUE;
-	    return lessonName;
-	}
-	/**
-	 * @return Returns the lessonOrgID.
-	 */
-	public Long getLessonOrgID() {
-		//return lessonOrgID!=null?lessonOrgID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	    return lessonOrgID;
-	}
-	/**
-	 * @return Returns the lessonOrgName.
-	 */
-	public String getLessonOrgName() {
-		//return lessonOrgName!=null?lessonOrgName:WDDXTAGS.STRING_NULL_VALUE;
-	    return lessonOrgName;
-	}
-	/**
-	 * @return Returns the lessonStartDateTime.
-	 */
-	public Date getLessonStartDateTime() {
-		//return lessonStartDateTime!=null?lessonStartDateTime:WDDXTAGS.DATE_NULL_VALUE;
-	    return lessonStartDateTime;
 	}
 	/**
 	 * @return Returns the licenseID.
@@ -510,41 +454,6 @@ public class LearningDesignDTO extends BaseDTO{
 	public void setLearningDesignUIID(Integer learningDesignUIID) {
 		if(!learningDesignUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 			this.learningDesignUIID = learningDesignUIID;
-	}
-	/**
-	 * @param lessonID The lessonID to set.
-	 */
-	public void setLessonID(Long lessonID) {
-		if(!lessonID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-		this.lessonID = lessonID;
-	}
-	/**
-	 * @param lessonName The lessonName to set.
-	 */
-	public void setLessonName(String lessonName) {
-		if(!lessonName.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.lessonName = lessonName;
-	}
-	/**
-	 * @param lessonOrgID The lessonOrgID to set.
-	 */
-	public void setLessonOrgID(Long lessonOrgID) {
-		if(!lessonOrgID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.lessonOrgID = lessonOrgID;
-	}
-	/**
-	 * @param lessonOrgName The lessonOrgName to set.
-	 */
-	public void setLessonOrgName(String lessonOrgName) {
-		if(!lessonOrgName.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.lessonOrgName = lessonOrgName;
-	}
-	/**
-	 * @param lessonStartDateTime The lessonStartDateTime to set.
-	 */
-	public void setLessonStartDateTime(Date lessonStartDateTime) {
-		if(!lessonStartDateTime.equals(WDDXTAGS.DATE_NULL_VALUE))
-			this.lessonStartDateTime = lessonStartDateTime;
 	}
 	/**
 	 * @param licenseID The licenseID to set.
