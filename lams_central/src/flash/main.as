@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.util.StringUtils;
 
 _global.myRoot = this;
+this._lockroot = true;
 
 //Temp values to be removed / repplaced at deployment
 /**/
