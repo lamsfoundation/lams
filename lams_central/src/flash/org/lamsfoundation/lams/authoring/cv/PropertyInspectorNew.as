@@ -109,7 +109,7 @@ class PropertyInspectorNew extends MovieClip{
 	//screen assets:
 	private var body_pnl:Panel;
 	private var bar_pnl:Panel;
-	
+	private var cover_pnl:Panel;
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -119,6 +119,7 @@ class PropertyInspectorNew extends MovieClip{
 	/**
 	 * Constructor
 	 */
+ 
 	public function PropertyInspectorNew(){
 		//register to recive updates form the model
 		Debugger.log('Constructor',Debugger.GEN,'PropertyInspectorNew','PropertyInspectorNew');
@@ -145,6 +146,7 @@ class PropertyInspectorNew extends MovieClip{
 		_canvasModel = _canvasModel;
 		_canvasController = _canvasController;
 		_piIsExpended = false;
+		_canvasModel.selectedItem = null;
 		_canvasModel.setPIHeight(piHeightHide);
 		//_global.breakpoint();
 		_canvasModel.addEventListener('viewUpdate',this);
@@ -227,7 +229,9 @@ class PropertyInspectorNew extends MovieClip{
 		
 		delete this.onEnterFrame; 
 		//hide all the controls at startup
+		
 		delimitLine._visible = false;
+		hideAllSpeppers(false);
 		showGroupingControls(false);
 		showGeneralControls(false);
 		showOptionalControls(false);
@@ -238,7 +242,17 @@ class PropertyInspectorNew extends MovieClip{
 		
 		dispatchEvent({type:'load',target:this});
 	}
-	
+	private function hideAllSpeppers(v):Void{ 
+		hours_stp.visible = v
+		mins_stp.visible = v
+		endHours_stp.visible = v
+		endMins_stp.visible = v
+		numGroups_stp.visible = v
+		numRandomGroups_stp.visible = v
+		numLearners_stp.visible = v
+		minAct_stp.visible = v
+		maxAct_stp.visible = v
+	}
 	
 	public function localOnRelease():Void{
 		
@@ -277,7 +291,7 @@ class PropertyInspectorNew extends MovieClip{
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','PropertyInspectorNew');
 		 //Update view from info object
-       
+      
        var cm:CanvasModel = event.target;
 	   
 	   switch (event.updateType){
@@ -303,6 +317,7 @@ class PropertyInspectorNew extends MovieClip{
 	private function updateItemProperties(cm:CanvasModel):Void{
 		//try to cast the selected item to see what we have (instance of des not seem to work)
 		if(CanvasActivity(cm.selectedItem) != null){
+			cover_pnl.visible = false;
 			// its a Canvas activity then
 			Debugger.log('Its a canvas activity',4,'updateItemProperties','PropertyInspector');
 			var ca = CanvasActivity(cm.selectedItem);
@@ -367,6 +382,7 @@ class PropertyInspectorNew extends MovieClip{
 
 			
 		}else if(CanvasOptionalActivity(cm.selectedItem) != null){
+			cover_pnl.visible = false;
 			var co = CanvasOptionalActivity(cm.selectedItem);
 			var cca:ComplexActivity = ComplexActivity(co.activity);
 				//its an optional activity
@@ -389,6 +405,7 @@ class PropertyInspectorNew extends MovieClip{
 				desc_txt.text = StringUtils.cleanNull(cca.description);
 				//PI_sp.refreshPane();
 		}else if(CanvasParallelActivity(cm.selectedItem) != null){
+			cover_pnl.visible = false;
 			var co = CanvasParallelActivity(cm.selectedItem);
 			var cca:ComplexActivity = ComplexActivity(co.activity);
 				delimitLine._visible = true;
@@ -409,6 +426,7 @@ class PropertyInspectorNew extends MovieClip{
 				title_txt.text = StringUtils.cleanNull(cca.title);
 				desc_txt.text = StringUtils.cleanNull(cca.description);
 		}else if(CanvasTransition(cm.selectedItem) != null){
+			cover_pnl.visible = false;
 			var ct = CanvasTransition(cm.selectedItem);
 			var t:Transition = ct.transition;
 				Debugger.log('Its a canvas transition',4,'updateItemProperties','PropertyInspector');
@@ -425,6 +443,7 @@ class PropertyInspectorNew extends MovieClip{
 				//PI_sp.complete;
 			
 		}else{
+			cover_pnl.visible = false;
 				Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','PropertyInspector');
 				showGeneralInfo(true);
 				delimitLine._visible = false;
@@ -849,6 +868,7 @@ class PropertyInspectorNew extends MovieClip{
         //Size the bkg_pnl
 		clickTarget_mc._width = w;
         body_pnl.setSize(w,h-bar_pnl.height);
+		cover_pnl.setSize(w,h-bar_pnl.height);
         bar_pnl.setSize(w);
 
         
@@ -924,7 +944,7 @@ class PropertyInspectorNew extends MovieClip{
 		
 		styleObj = _tm.getStyleObject('WZPanel');
 		body_pnl.setStyle('styleName',styleObj);
-		
+		cover_pnl.setStyle('styleName',styleObj);
 		
 		
     }
