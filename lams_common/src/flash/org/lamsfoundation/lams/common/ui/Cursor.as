@@ -20,10 +20,10 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
+import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.Authoring.*
+import org.lamsfoundation.lams.authoring.*
 import mx.managers.DepthManager;
 
 
@@ -46,8 +46,12 @@ class Cursor {
 	 
 	public static function addCursor(id:String,aCursor_mc:MovieClip):Void{
 		//Application.cursor.
-
-		var cursor_mc:MovieClip = DepthManager.createObjectAtDepth(id, DepthManager.kCursor);
+		//var _cursor = _root.attachMovie(id,id+'_mc',DepthManager.kCursor);
+		//Debugger.log('Test cursor id:' + id + '(' + _cursor + ')',Debugger.GEN,'addCursor','Cursor');
+		
+		var cursor_mc:MovieClip = ApplicationParent.ccursor.createChildAtDepth(id, DepthManager.kCursor);
+		
+		//var cursor_mc:MovieClip = DepthManager.createObjectAtDepth(id, DepthManager.kCursor);
 		cursor_mc._visible = false;
 		_cursors[id]=cursor_mc;
 		Debugger.log('Adding cursor ID:'+id+'('+cursor_mc+')',Debugger.GEN,'addCursor','Cursor');

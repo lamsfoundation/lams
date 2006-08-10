@@ -258,7 +258,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
                 app.getWorkspace().userSelectItem();
                 break;
 			case eventObj.menu.recoverItem :
-				org.lamsfoundation.lams.authoring.Application(app).getCanvas().recoverDesign();
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().showRecoverMessage();
 				break;
 			case eventObj.menu.saveItem:
 				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');

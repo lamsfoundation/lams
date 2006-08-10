@@ -49,6 +49,9 @@ class ApplicationParent {
     private var _config:Config;
     private var _workspace:Workspace;
 	
+	private var _customCursor_mc:MovieClip;         //Cursor container
+    
+	
 	//Data flags
     private var _dictionaryLoaded:Boolean;             //Dictionary loaded flag
     private var _dictionaryEventDispatched:Boolean     //Event status flag
@@ -151,6 +154,22 @@ class ApplicationParent {
             return _instance._appRoot_mc;
         } else {
             //TODO DI 11/05/05 Raise error if _appRoot hasn't been created
+			
+        }
+    }
+	
+	 /**
+    * Returns the Cursor conatiner mc
+    * 
+    * @usage    Import authoring package and then use
+	* 
+    */
+    static function get ccursor():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._customCursor_mc != undefined) {
+            return _instance._customCursor_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if mc hasn't been created
 			
         }
     }
