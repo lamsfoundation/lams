@@ -5,9 +5,9 @@
 	<table cellspacing="0">
 		<tbody>
 			<tr>
-				<th colspan="2">
-					${session.sessionName}
-				</th>
+				<td colspan="2">
+					<h2>${session.sessionName}</h2>
+				</td>
 			</tr>
 
 			<tr>
@@ -35,11 +35,6 @@
 				<th>
 					<fmt:message>heading.numPosts</fmt:message>
 				</th>
-				<c:if test="${dto.reflectOnActivity}">
-					<th>
-						<fmt:message>heading.reflection</fmt:message>
-					</th>
-				</c:if>
 			</tr>
 
 			<c:forEach var="user" items="${session.userDTOs}">
@@ -50,22 +45,9 @@
 					<td>
 						${user.postCount}
 					</td>
-					<c:if test="${dto.reflectOnActivity}">
-						<td>
-							<c:if test="${user.finishedReflection}">
-								<c:url value="monitoring.do" var="openNotebook">
-									<c:param name="dispatch" value="openNotebook" />
-									<c:param name="uid" value="${user.uid}" />
-								</c:url>
-								
-								<html:link href="${fn:escapeXml(openNotebook)}" target="_blank">
-									<fmt:message key="link.view" />
-								</html:link>
-							</c:if>
-						</td>
-					</c:if>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
+	<hr/>
 </c:forEach>
