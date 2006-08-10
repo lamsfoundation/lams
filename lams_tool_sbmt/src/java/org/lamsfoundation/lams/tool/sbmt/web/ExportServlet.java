@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -69,7 +70,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
 	private final String FILENAME = "sbmt_main.html";
-
+	
+	private class StringComparator implements Comparator<String>{
+		public int compare(String o1, String o2) {
+			if(o1 != null && o2 != null){
+				int c = o1.compareTo(o2);
+				//to ensure String does not overlap even they have duplicated name.
+				return c==0?1:c;
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+	}
 	public String doExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies) {
 		
@@ -233,12 +246,24 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 
-		List fileList = sbmtService.getFilesUploadedByUser(userID,
-				toolSessionID);
+		List fileList = sbmtService.getFilesUploadedByUser(userID,toolSessionID);
+		//if mark not release, then set these message as null.
+		Iterator iter = fileList.iterator();
+		while(iter.hasNext()){
+			FileDetailsDTO filedto = (FileDetailsDTO) iter.next();
+			if(filedto .getDateMarksReleased() == null){
+				filedto .setComments(null);
+				filedto .setMarks(null);
+			}
+		}
+		
 		Map userFilesMap = new HashMap();
-		userFilesMap.put(sbmtService.getUserDetails(learner.getUserID()),
-				fileList);
-		request.getSession().setAttribute("report", userFilesMap);
+		userFilesMap.put(sbmtService.getUserDetails(learner.getUserID()),fileList);
+		
+		//add session name to construct a new map
+		Map report = new TreeMap(this.new StringComparator());
+		report.put(sbmtService.getSessionById(toolSessionID).getSessionName(), userFilesMap);
+		request.getSession().setAttribute("report", report);
 		return userFilesMap;
 	}
 
@@ -263,15 +288,21 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		// return FileDetailsDTO list according to the given sessionID
 		Set sessionList = content.getToolSession();
 		Iterator iter = sessionList.iterator();
-		SortedMap userFilesMap = new TreeMap(new LastNameAlphabeticComparator());
+		Map report = new TreeMap(this.new StringComparator());
+		Map allFileMap = new TreeMap(new LastNameAlphabeticComparator());
 		while (iter.hasNext()) {
+			SortedMap userFilesMap = new TreeMap(new LastNameAlphabeticComparator());
 			SubmitFilesSession session = (SubmitFilesSession) iter.next();
 			userFilesMap.putAll(sbmtService.getFilesUploadedBySession(session
 					.getSessionID()));
+			allFileMap.putAll(userFilesMap);
+			report.put(session.getSessionName(), userFilesMap);
 		}
-		request.getSession().setAttribute("report", userFilesMap);
+		
+//		add session name to construct a new map
+		request.getSession().setAttribute("report", report);
 
-		return userFilesMap;
+		return allFileMap;
 	}
 
 }
