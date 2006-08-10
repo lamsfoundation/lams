@@ -1,20 +1,15 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 
-<HTML>
-<HEAD>
-	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<TITLE>LAMS::Profile</TITLE>
-	<lams:css/>
-</HEAD>
+<h2>My Profile</h2>
 
-<BODY>
-	<div id="page">	
-		<div id="content">
-			<p>In construction</p>
-		</div>
-		<div id="footer"></div>
-	</div>
-</BODY>
-	
-</HTML>
+<p>Name: <bean:write name="fullName" /><br />
+Email: <bean:write name="email" />
+</p>
+
+<p><a href="profile.do?method=edit">Edit My Profile</a><br />
+<a href="password.do">Change my password</a><br />
+<a href="">Update my portrait</a><br />
+[My Courses]
+</p>
