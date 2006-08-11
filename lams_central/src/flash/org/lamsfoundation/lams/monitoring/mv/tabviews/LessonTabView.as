@@ -139,7 +139,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		_tip = new ToolTip();
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
-		MovieClipUtils.doLater(Proxy.create(this,init));
+		//MovieClipUtils.doLater(Proxy.create(this,init));
 	}
 	
 	/**
@@ -150,8 +150,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		super (m, c);
 		
 		btnLabel = Dictionary.getValue('td_goContribute_btn');
+		
+		_monitorController = getController();
+		
+		editClass_btn.addEventListener("click", _monitorController);
+		viewLearners_btn.addEventListener("click", _monitorController);
+		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
+		start_btn.addEventListener("click", _monitorController);
+		statusApply_btn.addEventListener("click", Delegate.create(_monitorController, changeStatus))
+		//this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
+		
+		
 		MovieClipUtils.doLater(Proxy.create(this,setupTab));
-		//MovieClipUtils.doLater(Proxy.create(this,draw));
 	}    
 	
 	/**
@@ -245,16 +255,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	private function setupTab(){
-		
-		_monitorController = getController();
-		
-		editClass_btn.addEventListener("click", _monitorController);
-		viewLearners_btn.addEventListener("click", _monitorController);
-		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
-		start_btn.addEventListener("click", _monitorController);
-		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
-		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
-		
+
 		editClass_btn.onRollOver = Proxy.create(this,this['showToolTip'], editClass_btn, "ls_manage_editclass_btn_tooltip");
 		editClass_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
