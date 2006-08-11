@@ -28,6 +28,8 @@ import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
+import com.polymercode.Draw;
+import mx.controls.*
 import mx.managers.*
 import mx.containers.*;
 import mx.events.*
@@ -47,7 +49,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	private var V_GAP:Number;
 	
 	private var _tm:ThemeManager;
-	
+	private var _cm:CanvasModel;
 	//Canvas clip
 	private var _canvas_mc:MovieClip;
 	private var canvas_scp:ScrollPane;
@@ -59,6 +61,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
     private var _transitionLayer_mc:MovieClip;
 	private var _activityLayerComplex_mc:MovieClip;
 	private var _activityLayer_mc:MovieClip;
+	
+	private var startTransX:Number;
+	private var startTransY:Number;
 	
 	private var _transitionPropertiesOK:Function;
     private var _canvasView:CanvasView;
@@ -91,9 +96,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
+		_cm = CanvasModel(m)
         setupCM();
 	   //register to recive updates form the model
-		CanvasModel(m).addEventListener('viewUpdate',this);
+		_cm.addEventListener('viewUpdate',this);
         
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }    
@@ -116,7 +122,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 			myCopy[i]= myObj;
 			
 		} 
+		
+		//if (_cm.selectedItem == null){
+		//	var this_cm = Application.getInstance().showCustomCM(false, myCopy);
+		//}else {
 		var this_cm = Application.getInstance().showCustomCM(true, myCopy);
+		//}
 		_root.menu = this_cm; 
 	}
 	
@@ -224,7 +235,45 @@ public function viewUpdate(event:Object):Void{
         dispatchEvent({type:'load',target:this});
 	}
    
+	public function initDrawTempTrans(){
+		
+		_activityLayer_mc.createEmptyMovieClip("tempTrans", _activityLayer_mc.getNextHighestDepth());
+		_activityLayer_mc.attachMovie("squareHandle", "h1", _activityLayer_mc.getNextHighestDepth());
+		_activityLayer_mc.attachMovie("squareHandle", "h2", _activityLayer_mc.getNextHighestDepth());
+		_activityLayer_mc.h1._x = _canvas_mc._xmouse
+		_activityLayer_mc.h1._y = _canvas_mc._ymouse
+		trace("startTransX: "+_activityLayer_mc.h1._x)
+		_activityLayer_mc.tempTrans.onEnterFrame = drawTempTrans;
+		trace("startTransY: "+_activityLayer_mc.h1._y)
+		
+	}
 	
+	/**
+	 * used to draw temp dotted transtion.
+	 * @usage   
+	 * @return  
+	 */
+	private function drawTempTrans(){
+	   //var drawLineColor = 
+	   trace("_activityLayer_mc.tempTrans: "+this)
+	   trace("startTransX: "+startTransX)
+	   trace("startTransY: "+startTransY)
+	   trace("_parent._parent: "+_parent._parent);
+	   this.clear();
+	   Draw.dashTo(this, _parent.h1._x, _parent.h1._y, _parent._parent._xmouse - 3, _parent._parent._ymouse - 3, 7, 4);
+	   _parent.h2._x = _parent._parent._xmouse - 3
+	   _parent.h2._y = _parent._parent._ymouse - 3
+   }
+	
+	public function removeTempTrans(){
+		trace("stopped Drawing ")
+		delete _activityLayer_mc.tempTrans.onEnterFrame;
+		_activityLayer_mc.tempTrans.removeMovieClip();
+		_activityLayer_mc.h1.removeMovieClip();
+		_activityLayer_mc.h2.removeMovieClip();
+	}
+	 
+	   
 	/**
 	 * Draws new or replaces existing activity to canvas stage.
 	 * @usage   
@@ -441,8 +490,22 @@ public function viewUpdate(event:Object):Void{
 		
     }
     
+	public function setTTData(tData:Object):Void{
+        
+		//transTargetMC = tData.transTargetMC
+		//tempTrans_mc = tData.tempTrans_mc
+		//startTransX = tData.startTransX
+		//startTransY = tData.startTransY
+	}
 	
-	
+	public function getTTData():Object{
+        var tData:Object = new Object();
+		//tData.transTargetMC = transTargetMC
+		//tData.tempTrans_mc = tempTrans_mc
+		//tData.startTransX = startTransX
+		//tData.startTransY = startTransY
+		return tData
+	}
     /**
     * Sets the position of the canvas on stage, called from update
     * @param cm Canvas model object 
@@ -453,8 +516,17 @@ public function viewUpdate(event:Object):Void{
         this._y = p.y;
 	}
 	
-	public function getViewMc():MovieClip{
+	public function getViewMc(testString:String):MovieClip{
+		trace("passed on argument is "+testString)
 		return _canvas_mc;
+	}
+	
+	public function getTransitionLayer():MovieClip{
+		return _transitionLayer_mc;
+	}
+	
+	public function get activityLayer():MovieClip{
+		return _activityLayer_mc;
 	}
 	
 	public function showReadOnly(b:Boolean){
