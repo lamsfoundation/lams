@@ -4,10 +4,16 @@
 <c:choose>
 	<c:when test="${allowRichEditor}">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		
-		<lams:SetEditor id="message.body" text="${formBean.message.body}" />
-		<lams:HTMLEditor />
-		
+		<fck:editor id="message.body" basePath="/lams/fckeditor/"
+			imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
+			linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+			flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
+			imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
+			linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
+			flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+			toolbarSet="Default-Learner">
+			<c:out value="${formBean.message.body}" escapeXml="false"/>
+		</fck:editor>		
 	</c:when>
 	<c:otherwise>
 		<lams:STRUTS-textarea rows="10" cols="40" tabindex="2" property="message.body" styleId="messageBody" />

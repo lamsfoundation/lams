@@ -2,31 +2,23 @@
 
 <table cellpadding="0">
 	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.subject" />
-			*
-		</td>
 		<td>
+			<span  class="field-name"><bean:message key="message.label.subject" /></span><BR>		
 			<html:text size="30" tabindex="1" property="message.subject" />
 			<br>
 			<html:errors property="message.subject" />
 		</td>
 	</tr>
 	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.body" />
-			*
-		</td>
 		<td>
+			<span  class="field-name"><bean:message key="message.label.body" />*</span><BR>
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
 	<c:if test="${allowUpload}">
 		<tr>
-			<td class="field-name">
-				<bean:message key="message.label.attachment" />
-			</td>
 			<td>
+				<span class="field-name"><bean:message key="message.label.attachment" /></span>
 				<html:file tabindex="3" property="attachmentFile" />
 				<html:errors property="message.attachment" />
 			</td>

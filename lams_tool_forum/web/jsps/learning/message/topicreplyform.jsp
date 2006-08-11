@@ -1,36 +1,28 @@
 <table cellpadding="0">
 	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.subject" />*
-		</td>
 		<td>
+			<span  class="field-name"><bean:message key="message.label.subject" /></span><BR>		
 			<html:text size="30" tabindex="1" property="message.subject" />
 			<html:errors property="message.subject" />
 		</td>
 	</tr>
 	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.body" />*
-		</td>
 		<td>
+			<span  class="field-name"><bean:message key="message.label.body" />*</span><BR>		
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
 	<c:if test="${allowUpload}">
 		<tr>
-			<td class="field-name">
-				<b><bean:message key="message.label.attachment" /></b>
-			</td>
 			<td>
+				<span class="field-name"><bean:message key="message.label.attachment" /></span>
 				<html:file tabindex="3" property="attachmentFile" />
 				<html:errors property="message.attachment" />
 			</td>
 		</tr>
 	</c:if>
-	<tr>
-		<td></td>
-		<td>
-			
+</table>
+<div class="right-buttons">
 			<html:submit styleClass="button">
 				<bean:message key="button.submit" />
 			</html:submit>
@@ -40,6 +32,4 @@
 			<html:button property="goback" onclick="javascript:location.href='${backToTopic}';" styleClass="button">
 				<bean:message key="button.cancel" />
 			</html:button>
-		</td>
-	</tr>
-</table>
+</div>

@@ -1,29 +1,21 @@
 <table cellpadding="0">
 	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.subject" />
-			*
-		</td>
 		<td>
+			<span  class="field-name"><bean:message key="message.label.subject" /></span><BR>
 			<html:text size="30" tabindex="1" property="message.subject" />
 			<html:errors property="message.subject" />
 		</td>
 	</tr>
 	<tr>
-		<td class="field-name">
-			<bean:message key="message.label.body" />
-			*
-		</td>
 		<td>
+			<span  class="field-name"><bean:message key="message.label.body" />*</span><BR>
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
 	<c:if test="${topic.hasAttachment || allowUpload}">
 		<tr>
-			<td class="field-name">
-				<bean:message key="message.label.attachment" />
-			</td>
 			<td>
+				<span class="field-name"><bean:message key="message.label.attachment" /></span>
 				<c:if test="${topic.hasAttachment}">
 					<c:forEach var="file" items="${topic.message.attachments}">
 						<c:set var="downloadURL">
@@ -34,7 +26,7 @@
 							<html:rewrite page="/learning/deleteAttachment.do?uuid=${file.fileUuid}&versionID=${file.fileVersionId}" />
 						</c:set>
 						&nbsp;
-						<a href="<c:out value='${deleteURL}'/>"> <fmt:message key="label.delete" /> </a>
+						<a href="<c:out value='${deleteURL}'/>"  class="button"> <fmt:message key="label.delete" /> </a>
 					</c:forEach>
 				</c:if>
 				<c:if test="${not topic.hasAttachment && allowUpload}">
@@ -44,9 +36,8 @@
 			</td>
 		</tr>
 	</c:if>
-	<tr>
-		<td></td>
-		<td>
+</table>
+<div class="right-buttons">
 			<html:submit styleClass="button">
 				<bean:message key="button.submit" />
 			</html:submit>
@@ -56,6 +47,4 @@
 			<html:button property="goback" onclick="javascript:location.href='${backToTopic}';" styleClass="button">
 				<bean:message key="button.cancel" />
 			</html:button>
-		</td>
-	</tr>
-</table>
+</div>
