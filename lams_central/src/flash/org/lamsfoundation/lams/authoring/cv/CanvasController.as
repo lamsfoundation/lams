@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
+import com.polymercode.Draw;
 import mx.utils.*
 
 
@@ -48,6 +49,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		super (cm);
 		//have to do an upcast
 		_canvasModel = CanvasModel(getModel());
+		_canvasView = CanvasView(getView());
 		_pi = new PropertyInspectorNew();
 		
 	}
@@ -65,7 +67,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				//transitionTarget.showMessageConfirm()
 				//TODO: transitionTarget.showErrorAlertCrashDump(null); 
 		   }else{
+			   //Note Todo, do not delete the next three lines on code we need it later on for drawing transition with dotted line while dragging transition pen tool.
 				_canvasModel.addActivityToTransition(transitionTarget);
+				_canvasModel.getCanvas().view.initDrawTempTrans();
 			}
 			/*
 			_canvasModel.resetTransitionTool();
@@ -95,6 +99,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
    }
    
+	/**
+	 * called when user double click on the activity
+	 * 
+	 * @usage   
+	 * @param   ca 
+	 * @return  
+	 */
 	public function activityDoubleClick(ca:Object):Void{
 	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityDoubleClick','CanvasController');
 	    
@@ -206,7 +217,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			//TODO: refresh the transitions as you drag...
 			var myTransitions = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
 			myTransitions = myTransitions.myTransitions
-			//run in a loop ato support branches, maybe more then 2 transitions.
+			//run in a loop to support branches, maybe more then 2 transitions.
 			for (var i=0; i<myTransitions.length;i++){
 				Debugger.log('removing transition for redraw:'+myTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
 				var t = _canvasModel.transitionsDisplayed.remove(myTransitions[i].transitionUIID);
@@ -236,6 +247,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 * @return  
 	 */
 	public function activityReleaseOutside(ca:Object):Void{
+		
+		_canvasModel.getCanvas().view.removeTempTrans();
+		
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','CanvasController');
 	   Debugger.log('activityReleaseOutside Check if Transition tool active:'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityReleaseOutside','CanvasController');
 	   if(_canvasModel.isTransitionToolActive()){
@@ -256,7 +270,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			Debugger.log("currentCursor._droptarget eval:"+dt, Debugger.GEN,'activityReleaseOutside','CanvasController');
 			
 			var i:Number = dt.lastIndexOf(".");
-			
 			dt = dt.substring(0,i);
 			Debugger.log("Subst:"+dt, Debugger.GEN,'activityReleaseOutside','CanvasController');
 			var transitionTarget_mc:MovieClip = eval(dt);
@@ -269,6 +282,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				LFMessage.showMessageAlert(transitionTarget);
 			}else{
 				var td = _canvasModel.addActivityToTransition(transitionTarget);
+				
 				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
 				if(td instanceof LFError){
@@ -325,13 +339,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 				if (ct.hitTest(_canvasModel.getCanvas().bin)){
 					_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID);
+				}else {
+					var t = _canvasModel.transitionsDisplayed.remove(ct.transition.transitionUIID);
+					t.removeMovieClip();
+					_canvasModel.setDirty();
 				}
 			
 			
 		}
 	
    }
-
+	
+	private function transitionSnapBack(ct:Object){
+		ct.reDraw();
+		
+	}
 	public function transitionReleaseOutside(ct:CanvasTransition):Void{
 		transitionRelease(ct);
 		
