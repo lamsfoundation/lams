@@ -24,6 +24,8 @@ package org.lamsfoundation.testharness;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -185,7 +187,7 @@ public class Call {
 			log.debug(e.getMessage(),e);
 			throw new RuntimeException(e);
 		}finally{
-			TestReporter.addCallRecord(new CallRecord(test.getTestSuite().getSuiteIndex(),test.testName,test.callType,callee,description,end,end-start,httpStatusCode,message));
+			TestReporter.addCallRecord(new CallRecord(test.getTestSuite().getSuiteIndex(),test.testName,test.callType.getName(),callee,description,new SimpleDateFormat("HH:mm:ss SSS").format(new Date(end)),end-start,httpStatusCode,message));
 		}
 	}
 
@@ -248,10 +250,10 @@ public class Call {
 	    
 		private int suiteIndex;
 		private String testName;
-		private CallType type;
+		private String type;
 		private String callee;
 		private String description;
-	    private long snapShotTime;
+	    private String snapShotTime;
 	    private long timeInMillis;
 	    private Integer httpStatusCode;//for Web Call only
 	    private String message;
@@ -261,7 +263,7 @@ public class Call {
 	    	//empty constructor
 	    }
 	    
-	    public CallRecord(int suiteIndex, String testName, CallType type, String callee, String description, long snapShotTime, long timeInMillis, Integer httpStatusCode, String message) {
+	    public CallRecord(int suiteIndex, String testName, String type, String callee, String description, String snapShotTime, long timeInMillis, Integer httpStatusCode, String message) {
 	    	this.suiteIndex = suiteIndex;
 	    	this.testName = testName;
 	    	this.type = type;
@@ -277,7 +279,7 @@ public class Call {
 	        return message;
 	    }
 
-	    public long getSnapShotTime() {
+	    public String getSnapShotTime() {
 	        return snapShotTime;
 	    }
 
@@ -289,7 +291,7 @@ public class Call {
 			return callee;
 		}
 
-		public CallType getType() {
+		public String getType() {
 			return type;
 		}
 
