@@ -88,3 +88,10 @@
 		</td></tr>
 	</c:forEach>			
 </table>
+
+<p align="left">
+<c:if test="${empty orgBeans}">
+	<fmt:message key="msg.groups.empty" />
+</c:if>
+</p>
+

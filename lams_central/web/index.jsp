@@ -25,7 +25,7 @@
 		var i = Math.round(1000*Math.random());
 		function getContent(){
 			i++;
-			var url = "index.do?unique="+i;
+			var url = "index.do?unique="+i+"&state=active";
 			var params = "";
 			var myAjax = new Ajax.Updater(
 				"courselist",
