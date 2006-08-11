@@ -84,7 +84,7 @@ public class LearnerTest extends AbstractTest {
 
 	private String composeEndInfo(){
 		int abortedCounter = countAborted();
-		int finishedCounter = users.length - abortedCounter;
+		int finishedCounter = countFinished();
 		if(finishedCounter == 0){
 			return composeSubject(users.length)+" aborted on the lesson";
 		}
@@ -114,6 +114,10 @@ public class LearnerTest extends AbstractTest {
 				amount++;
 		}
 		return amount;
+	}
+	
+	public int countFinished(){
+		return users.length - countAborted();
 	}
 	
 	public int countLearners(){
