@@ -11,6 +11,7 @@
 		var learnWin = null;
 		var monitorLessonWin = null;
 		var addLessonWin = null;
+		var epWin = null;
 		var dmWin = null;
 		var sysadminWin = null;
 		var omWin = null;
@@ -147,6 +148,26 @@
 				else
 				{
 					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=796,height=570,resizable,status=yes');
+				}
+			}
+		}
+		
+		function openExportPortfolio( lessonId )
+		{
+			if(isMac)
+			{
+				epWin = window.open('learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId,'epWindow','width=796,height=570,resizable,status=yes');
+			}
+			else
+			{
+				if(epWin && epWin.open && !epWin.closed )
+				{
+					epWin.location = 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId;		
+					ep.focus();
+				}
+				else
+				{
+					epWin = window.open('learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId,'epWindow','width=796,height=570,resizable,status=yes');
 				}
 			}
 		}
