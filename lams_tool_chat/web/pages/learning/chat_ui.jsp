@@ -57,37 +57,23 @@
 						<c:out value="${chatDTO.instructions}" escapeXml="false" />
 					</p>
 
-					<div id="presence">
-						<select id="roster_user_selector" size="2"
-							onchange="updateSendDisplay();">
-							<%--  options dynamically updated as users join/leave --%>
-							<option>
-								loading
-							</option>
-						</select>
-					</div>
+					<div id="roster"></div>
 					<div id="iResp"></div>
 
-
-					<h2>
+					<h4>
 						<fmt:message>label.sendMessageTo</fmt:message>
 						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
 						</span><span id="sendToUser" style="display: none"></span>
-					</h2>
+					</h4>
 
 
 					<div>
+						<div class="right-buttons">
+							<input id="sendButton" class="button" type="submit"
+								value='<fmt:message>button.send</fmt:message>' />
+						</div>
 						<textarea name="msg" onKeyPress="return checkEnter(event);"
-							id="msgArea" rows="3" cols="80"></textarea>
-					</div>
-
-
-					<div class="left-buttons">
-						<input id="sendButton" class="button" type="submit"
-							value='<fmt:message>button.send</fmt:message>' />
-						<input id="clearButton" class="button" type="button"
-							onclick="resetInputs();"
-							value='<fmt:message>button.clear</fmt:message>' />
+							id="msgArea" rows="2" cols="60"></textarea>
 					</div>
 				</form>
 			</div>
@@ -123,6 +109,7 @@
 				${chatUserDTO.notebookEntry}
 			</p>
 		</div>
+
 	</div>
 </div>
 <div id="footer-learner"></div>

@@ -1,12 +1,16 @@
-// Constants
+
+/* ******* Constants ******* */
 var GROUPCHAT_MSG = "groupchat_message";
 var PRIVATE_MSG = "private_message";
-var colours = ["#0000FF", "#006699", "#0066FF", "#6633FF", "#00CCFF", "#009900", "#00CC33", "#339900", "#008080", "#66FF66", "#CC6600", "#FF6600", "#FF9900", "#CC6633", "#FF9933", "#990000", "#A50021", "#990033", "#CC3300", "#FF6666", "#330033", "#663399", "#6633CC", "#660099", "#FF00FF", "#999900", "#808000", "#FFFF00", "#666633", "#292929", "#666666"];
-
-// Variables
-var roster = new Roster();
-
-// Helper functions
+var PALETTE = ["#0000FF", "#006699", "#0066FF", "#6633FF", "#00CCFF", "#009900", "#00CC33", "#339900", "#008080", "#66FF66", "#CC6600", "#FF6600", "#FF9900", "#CC6633", "#FF9933", "#990000", "#A50021", "#990033", "#CC3300", "#FF6666", "#330033", "#663399", "#6633CC", "#660099", "#FF00FF", "#999900", "#808000", "#FFFF00", "#666633", "#292929", "#666666"];
+/* ******* Helper Functions ******* */
+function getColour(nick) {
+	var charSum = 0;
+	for (var i = 0; i < nick.length; i++) {
+		charSum += nick.charCodeAt(i);
+	}
+	return PALETTE[charSum % (PALETTE.length)];
+}
 function htmlEnc(str) {
 	if (!str) {
 		return null;
@@ -18,36 +22,10 @@ function htmlEnc(str) {
 	str = str.replace(/\n/g, "<br />");
 	return str;
 }
-function getColour(nick) {
-	var charSum = 0;
-	for (var i = 0; i < nick.length; i++) {
-		charSum += nick.charCodeAt(i);
-	}
-	return colours[charSum % (colours.length)];
-}
-function checkEnter(e) { 			//e is event object passed from function invocation
-	var characterCode; 				//literal character code will be stored in this variable
-	if (e && e.which) { 			//if which property of event object is supported (NN4)
-		e = e;
-		characterCode = e.which; 	//character code is contained in NN4's which property
-	} else {
-		e = event;
-		characterCode = e.keyCode; 	//character code is contained in IE's keyCode property
-	}
-	if (characterCode == 13) { 		//if generated character code is equal to ascii 13 (if enter key)
-		//document.forms[0].submit();	//submit the form
-		sendMsg(document.forms[0]);
-		return false;
-	}  else {
-		return true;
-	}
-}
-
-// creates a new element.
 function createElem(name, attrs, style, text) {
 	var e = document.createElement(name);
 	if (attrs) {
-		for (key in attrs) {
+		for (var key in attrs) {
 			if (key == "attrClass") {
 				e.className = attrs[key];
 			} else {
@@ -69,58 +47,48 @@ function createElem(name, attrs, style, text) {
 	}
 	return e;
 }
-
-// Roster 
+/* ******* Roster ******* */
 function RosterUser(nick) {
 	this.nick = nick;
 	this.status = "unavailable";
 }
 function getRosterUserByNick(nick) {
-	for (var i = 0; i < roster.users.length; i++) {
-		if (roster.users[i].nick == nick) {
-			return roster.users[i];
+	for (var i = 0; i < this.users.length; i++) {
+		if (this.users[i].nick == nick) {
+			return this.users[i];
 		}
 	}
+	return null;
 }
 function AddRosterUser(user) {
-	roster.users[roster.users.length] = user;
+	this.users[this.users.length] = user;
 }
 function UpdateRosterUser(user) {
+	// TODO do we need this.
 }
 function RemoveRosterUser() {
 }
-function updateRosterDisplay() {
-	var oSelect = document.getElementById("roster_user_selector");
-	oSelect.innerHTML = "";
-	var oOption;
-	var nick;
-	for (var i = 0; i < roster.users.length; i++) {
-		if (roster.users[i].status != "unavailable") {
-			nick = roster.users[i].nick;
-			oOption = new Option(nick, nick);
-			oSelect.options[oSelect.options.length] = oOption;
+function UpdateRosterDisplay() {
+	var rosterDiv = document.getElementById("roster");
+	rosterDiv.innerHTML = "";
+	for (var i = 0; i < this.users.length; i++) {
+		if (this.users[i].status != "unavailable") {
+			var className = "unselected";
+			if (i == this.currentIndex) {
+				className = "selected";
+			}
+			var nick = this.users[i].nick;
+			var userDiv = createElem("div", {attrId:"user-" + i, attrClass:className, onClick:"selectUser(this);"}, {width:"100%", color:getColour(this.users[i].nick)}, this.users[i].nick);
+			rosterDiv.appendChild(userDiv);
 		}
 	}
-}
-function Roster() {
-	this.users = [];
-    // objects methods 
-	this.getUserByNick = getRosterUserByNick;
-	this.addUser = AddRosterUser;
-	this.updateUser = UpdateRosterUser;
-	this.removeUser = RemoveRosterUser;
-	this.updateDisplay = updateRosterDisplay;
-}
-function resetInputs() {
-	document.getElementById("roster_user_selector").selectedIndex = -1;
-	updateSendDisplay();
-}
-function updateSendDisplay() {
-	var rosterList = document.getElementById("roster_user_selector");
-	var selectedIndex = rosterList.selectedIndex;
-	if (MODE == "teacher" && !(selectedIndex == -1)) {
-		var userName = rosterList.options[rosterList.selectedIndex].value;
-		document.getElementById("sendToUser").innerHTML = "<span style='color:" + getColour(userName) + "'>" + userName + "</span>";
+	
+	// change the name on the 'Send To' label
+	if (MODE == "teacher" && !(this.currentIndex === null)) {
+		var user = this.users[this.currentIndex];
+		var sendToUserElem = document.getElementById("sendToUser");
+		sendToUserElem.innerHTML = "";
+		sendToUserElem.appendChild(createElem("span", null, {color:getColour(user.nick)}, user.nick));
 		document.getElementById("sendToEveryone").style.display = "none";
 		document.getElementById("sendToUser").style.display = "";
 	} else {
@@ -128,6 +96,29 @@ function updateSendDisplay() {
 		document.getElementById("sendToEveryone").style.display = "";
 	}
 }
+function Roster() {
+	this.users = [];
+	this.currentIndex = null;
+    // objects methods 
+	this.getUserByNick = getRosterUserByNick;
+	this.addUser = AddRosterUser;
+	this.updateUser = UpdateRosterUser;
+	this.removeUser = RemoveRosterUser;
+	this.updateDisplay = UpdateRosterDisplay;
+}
+var roster = new Roster();
+function selectUser(userDiv) {
+	if (MODE == "teacher") {
+		var newIndex = userDiv.id.substring(userDiv.id.indexOf("-") + 1, userDiv.id.length);
+		if (roster.currentIndex == newIndex) {
+			roster.currentIndex = null;
+		} else {
+			roster.currentIndex = newIndex;
+		}
+		roster.updateDisplay();
+	}
+}
+/* ******* Chat functions ******* */
 function generateMessageHTML(nick, message, type) {
 	var colour = getColour(nick);
 	var fromElem = createElem("span", {attrClass:"messageFrom"}, {color:colour}, nick);
@@ -142,7 +133,34 @@ function updateMessageDisplay(htmlMessage) {
 	iRespDiv.appendChild(htmlMessage);
 	iRespDiv.scrollTop = iRespDiv.scrollHeight;
 }
-// Event handlers
+function sendMsg(aForm) {
+	if (aForm.msg.value === "") {
+		return false;  // do not send empty messages.
+	}
+	var aMsg = new JSJaCMessage();
+	if (MODE == "teacher" && !(roster.currentIndex === null)) {
+		var toNick = roster.users[roster.currentIndex].nick;
+		aMsg.setTo(CONFERENCEROOM + "/" + toNick);
+		aMsg.setType("chat");
+  		// apending the private message to the incoming window,
+  		// since the jabber server will not echo sent private messages.
+  		// TODO: need to check if this is correct behaviour
+		if (!(NICK == toNick)) {
+			updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
+		}
+	} else {
+		aMsg.setTo(CONFERENCEROOM);
+		aMsg.setType("groupchat");
+	}
+  		
+  // }
+	aMsg.setFrom(USERNAME + "@" + XMPPDOMAIN + "/" + RESOURCE);
+	aMsg.setBody(aForm.msg.value);
+	con.send(aMsg);
+	aForm.msg.value = "";
+	return false;
+}
+/* ******* Event Handlers ******* */
 function handleEvent(aJSJaCPacket) {
 	document.getElementById("iResp").innerHTML += "IN (raw):<br/>" + htmlEnc(aJSJaCPacket.xml()) + "<hr/>";
 }
@@ -199,9 +217,7 @@ function handlePresence(presence) {
 			user.status = "available";
 		}
 	}
-	roster.updateUser(user);
 	roster.updateDisplay();
-	updateSendDisplay();
 }
 function handleConnected() {
 	document.getElementById("login_pane").style.display = "none";
@@ -241,13 +257,12 @@ function handleError(e) {
 	document.getElementById("login_err").innerHTML = "Couldn't connect. Please try again...<br />" + htmlEnc("Code: " + e.getAttribute("code") + "\nType: " + e.getAttribute("type") + "\nCondition: " + e.firstChild.nodeName);
 	document.getElementById("finishButton_pane").style.display = "";
 }
+/* ******* Init ******* */
 function doLogin() {
 	try {
 
 		// setup args for contructor
-		oArgs = new Object();
-		oArgs.httpbase = HTTPBASE;
-		oArgs.timerval = 2000;
+		var oArgs = {httpbase:HTTPBASE, timerval:2000};
 		if (typeof (oDbg) != "undefined") {
 			oArgs.oDbg = oDbg;
 		}
@@ -259,11 +274,7 @@ function doLogin() {
 		con.registerHandler("onerror", handleError);
 
 		// setup args for connect method
-		oArgs = new Object();
-		oArgs.domain = XMPPDOMAIN;
-		oArgs.username = USERNAME;
-		oArgs.resource = RESOURCE;
-		oArgs.pass = PASSWORD;
+		oArgs = {domain:XMPPDOMAIN, username:USERNAME, resource:RESOURCE, pass:PASSWORD};
 		con.connect(oArgs);
 	}
 	catch (e) {
@@ -274,38 +285,9 @@ function doLogin() {
 		return false;
 	}
 }
-function sendMsg(aForm) {
-	if (aForm.msg.value == "") {
-		return false;  // do not send empty messages.
-	}
-	var aMsg = new JSJaCMessage();
-	var rosterList = document.getElementById("roster_user_selector");
-	var selectedIndex = rosterList.selectedIndex;
-	if (MODE == "teacher" && !(selectedIndex == -1)) {
-		var toNick = rosterList.options[selectedIndex].value;
-		aMsg.setTo(CONFERENCEROOM + "/" + toNick);
-		aMsg.setType("chat");
-  		// apending the private message to the incoming window,
-  		// since the jabber server will not echo sent private messages.
-  		// TODO: need to check if this is correct behaviour
-		if (!(NICK == toNick)) {
-			updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
-		}
-	} else {
-		aMsg.setTo(CONFERENCEROOM);
-		aMsg.setType("groupchat");
-	}
-  		
-  // }
-	aMsg.setFrom(USERNAME + "@" + XMPPDOMAIN + "/" + RESOURCE);
-	aMsg.setBody(aForm.msg.value);
-	con.send(aMsg);
-	aForm.msg.value = "";
-	return false;
-}
 function init() {
 	if (typeof (Debugger) == "function") {
-		oDbg = new Debugger(4, "simpleclient");
+		var oDbg = new Debugger(4, "simpleclient");
 		oDbg.start();
 	}
 	doLogin();
@@ -316,4 +298,22 @@ onunload = function () {
 		con.disconnect();
 	}
 };
+/* ******* Helper functions ******* */
+function checkEnter(e) { 			//e is event object passed from function invocation
+	var characterCode; 				//literal character code will be stored in this variable
+	if (e && e.which) { 			//if which property of event object is supported (NN4)
+		e = e;
+		characterCode = e.which; 	//character code is contained in NN4's which property
+	} else {
+		e = event;
+		characterCode = e.keyCode; 	//character code is contained in IE's keyCode property
+	}
+	if (characterCode == 13) { 		//if generated character code is equal to ascii 13 (if enter key)
+		//document.forms[0].submit();	//submit the form
+		sendMsg(document.forms[0]);
+		return false;
+	} else {
+		return true;
+	}
+}
 

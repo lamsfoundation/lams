@@ -15,9 +15,17 @@
 	margin-right: 12px;
 	margin-left: 12px;
 	overflow: scroll;
+	border: thin solid gray;
+	padding: 2px;
+}
 
-	background-color: white;
-	border: thin solid black;
+#roster {
+	float: right;
+	width: 105px;
+	height: 260px;
+	overflow: hidden;
+	border: thin solid gray;
+	font-weight: bold;
 }
 
 .message {
@@ -33,21 +41,20 @@
 	font-weight: bold;
 }
 
-#presence {
-	float: right;
-	width: 160px;
-	height: 260px;
-	overflow: hidden;
+.selected {
+	background-color: lime;	
+	padding: 2px;
+	cursor: pointer;
 }
 
-#roster_user_selector {
-	width: 100%;
-	height: 100%;
+.unselected {
+	background-color: white;
+	padding: 2px;
+	cursor: pointer;
 }
 
 #msgArea {
 	margin-left: 12px;
 	margin-right: 12px;
-	width: 532px;
-	height: 100%;
+	width: 427px;
 }
