@@ -165,15 +165,15 @@ VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.',
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (1, 'en', 'AU', 'English (Australia) - default');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (2, 'es', null, 'Spanish');
+VALUES (2, 'es', null, 'Español');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (3, 'mi', 'NZ', 'Maori (New Zealand)');
+VALUES (3, 'mi', 'NZ', 'Te Reo Māori (New Zealand)');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (4, 'de', null, 'German');
+VALUES (4, 'de', null, 'Deutsch');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (5, 'zh', null, 'Chinese');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (6, 'fr', null, 'French');
+VALUES (6, 'fr', null, 'Français');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (7, 'it', null, 'Italian');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
