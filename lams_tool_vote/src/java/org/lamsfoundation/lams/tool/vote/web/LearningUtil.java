@@ -59,9 +59,9 @@ public class LearningUtil implements VoteAppConstants {
 	 * @param checkedOptions collection of String display IDs to which to restrict the map (optional)
 	 * @return Map of display id -> nomination text.
 	 */
-    public static Map buildQuestionContentMap(HttpServletRequest request, VoteContent voteContent, Collection<String> checkedOptions)
+    public static Map buildQuestionContentMap(HttpServletRequest request, IVoteService voteService, 
+            VoteContent voteContent, Collection<String> checkedOptions)
     {
-    	IVoteService voteService =VoteUtils.getToolService(request);
     	Map mapQuestionsContent= new TreeMap(new VoteComparator());
     	
         Iterator contentIterator=voteContent.getVoteQueContents().iterator();
@@ -87,10 +87,9 @@ public class LearningUtil implements VoteAppConstants {
      * @param request
      * @return
      */
-    public static boolean doesUserExists(HttpServletRequest request)
+    public static boolean doesUserExists(HttpServletRequest request, IVoteService voteService)
 	{
-		IVoteService voteService =VoteUtils.getToolService(request);
-	    Long queUsrId=VoteUtils.getUserId();
+		Long queUsrId=VoteUtils.getUserId();
 		VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(queUsrId);
 		
 		if (voteQueUsr != null)
@@ -106,15 +105,14 @@ public class LearningUtil implements VoteAppConstants {
      * @param request
      * @return
      */
-    public static VoteQueUsr createUser(HttpServletRequest request)
+    public static VoteQueUsr createUser(HttpServletRequest request, IVoteService voteService, Long toolSessionID)
 	{
-		IVoteService voteService =VoteUtils.getToolService(request);
+        logger.debug("createUser: " + toolSessionID);
+        
 	    Long queUsrId=VoteUtils.getUserId();
 		String username=VoteUtils.getUserName();
 		String fullname=VoteUtils.getUserFullName();
-		Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
-		
-		VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
+		VoteSession voteSession=voteService.retrieveVoteSession(toolSessionID);
 		VoteQueUsr voteQueUsr= new VoteQueUsr(queUsrId, 
 										username, 
 										fullname,  
@@ -126,10 +124,9 @@ public class LearningUtil implements VoteAppConstants {
 	}
 
     
-    public static VoteQueUsr getUser(HttpServletRequest request)
+    public static VoteQueUsr getUser(HttpServletRequest request, IVoteService voteService)
 	{
-		IVoteService voteService =VoteUtils.getToolService(request);
-	    Long queUsrId=VoteUtils.getUserId();
+		Long queUsrId=VoteUtils.getUserId();
 		VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(queUsrId);
 		return voteQueUsr;
 	}
@@ -144,20 +141,19 @@ public class LearningUtil implements VoteAppConstants {
      * @param singleUserEntry
      * @param voteSession
      */
-    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  
-            boolean singleUserEntry, VoteSession voteSession)
+    public static void createAttempt(HttpServletRequest request, IVoteService voteService, 
+            VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  
+            boolean singleUserEntry, VoteSession voteSession, Long toolContentUID)
 	{
         logger.debug("doing voteSession: " + voteSession);
         logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
         logger.debug("userEntry: " + userEntry);
         logger.debug("singleUserEntry: " + singleUserEntry);
         
-		IVoteService voteService =VoteUtils.getToolService(request);
 		Date attempTime=VoteUtils.getGMTDateTime();
 		String timeZone= VoteUtils.getCurrentTimeZone();
 		logger.debug("timeZone: " + timeZone);
 		
-		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
 		logger.debug("toolContentUID: " + toolContentUID);
 		
 		
@@ -166,7 +162,8 @@ public class LearningUtil implements VoteAppConstants {
             logger.debug("mapGeneralCheckedOptionsContent is empty");
             VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
             logger.debug("localVoteQueContent: " + localVoteQueContent);
-            createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, singleUserEntry, voteSession);
+            createIndividualOptions(request, voteService, localVoteQueContent, voteQueUsr, attempTime, 
+                    timeZone, userEntry, singleUserEntry, voteSession);
 		    
 		}
 		else
@@ -187,24 +184,8 @@ public class LearningUtil implements VoteAppConstants {
 		            logger.debug("voteQueContent: " + voteQueContent);
 		            if (voteQueContent != null)
 		            {
-		                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
+		                createIndividualOptions(request, voteService, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
 		            }
-		            /*
-		            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
-		            {
-		                logger.debug("creating user entry record, 101");
-		                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
-		                logger.debug("localVoteQueContent: " + localVoteQueContent);
-		                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, true, voteSession);    
-		            }
-		            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("102")))
-		            {
-		                logger.debug("creating user entry record, 102");
-		                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
-		                logger.debug("localVoteQueContent: " + localVoteQueContent);
-		                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
-		            }
-		            */
 		        }			
 			}		    
 		}
@@ -212,14 +193,13 @@ public class LearningUtil implements VoteAppConstants {
 	 }
 
     
-    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry, VoteSession voteSession)
+    public static void createIndividualOptions(HttpServletRequest request, IVoteService voteService, VoteQueContent voteQueContent, 
+            VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry, VoteSession voteSession)
     {
         logger.debug("doing voteSession: " + voteSession);
         logger.debug("userEntry: " + userEntry);
         logger.debug("singleUserEntry: " + singleUserEntry);
 
-    	IVoteService voteService =VoteUtils.getToolService(request);
-    	
     	logger.debug("voteQueContent: " + voteQueContent);
     	logger.debug("user " + voteQueUsr.getQueUsrId());
     	logger.debug("voteQueContent.getVoteContentId() " +voteQueContent.getVoteContentId());

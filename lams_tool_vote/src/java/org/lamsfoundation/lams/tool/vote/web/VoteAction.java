@@ -117,7 +117,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	VoteUtils.cleanUpUserExceptions(request);
 	 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	 	IVoteService voteService =VoteUtils.getToolService(request);
-	 	VoteUtils.persistInSessionRichText(request);	 	
+	 	VoteUtils.saveInSessionRichText(request);	 	
 	 	voteAuthoringForm.resetUserAction();
 	 	return null;
     }
@@ -136,11 +136,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String richTextTitle = request.getParameter("title");
 	    String richTextInstructions = request.getParameter("instructions");
 	    
-	    VoteUtils.persistInSessionRichText(request);
+	    VoteUtils.saveInSessionRichText(request);
 	    
 	    authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
-	    
-	    logger.debug("richTextInstructions: " + request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS));
 	    
 	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
@@ -219,7 +217,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 		
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	    
 		AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
@@ -329,7 +327,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     		}
     	}
 	    
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	           	
 	    ActionMessages errors= new ActionMessages();
 	    errors=validateSubmit(request, errors, voteAuthoringForm);
@@ -498,7 +496,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 
     	IVoteService voteService =VoteUtils.getToolService(request);
 
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	 	
     	Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
      	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
@@ -619,7 +617,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	 	
     	Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
      	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
@@ -777,7 +775,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	 	
 		logger.debug("will uploadFile for offline file:");
  		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteAuthoringForm, true);
@@ -840,7 +838,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	 	
 		logger.debug("will uploadFile for online file:");
  		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteAuthoringForm, false);
@@ -902,7 +900,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 	 	
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	 	
 	 	String uuid =voteAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
@@ -950,7 +948,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.persistInSessionRichText(request);
+		VoteUtils.saveInSessionRichText(request);
 	 	
 	 	String uuid =voteAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);

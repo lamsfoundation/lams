@@ -87,7 +87,8 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentSessionId));
         		logger.debug("voteSession uid:" + voteSession.getUid());
         		
-                MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), voteSession.getUid());
+                MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
+                        voteSession.getUid().toString(), null);
                 logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);
 
                 logger.debug("post prepareChartData : MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));

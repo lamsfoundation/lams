@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 
 <h1 class="no-tabs-below">
-	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -58,16 +58,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content-learner">
 <html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
 	<html:hidden property="dispatch"/>
-	<html:hidden property="toolContentID"/>
+	<html:hidden property="toolSessionID"/>
+	<html:hidden property="userID"/>	
+	<html:hidden property="revisitingUser"/>	
+	<html:hidden property="previewOnly"/>	
+	<html:hidden property="maxNominationCount"/>	
+	<html:hidden property="allowTextEntry"/>	
+	<html:hidden property="voteChangable"/>	
+	<html:hidden property="lockOnFinish"/>	
 
-				<table  class="forms">
+				<table>
 					  <tr>
 					  	<td NOWRAP align=center  valign=top colspan=2> 
 						  	 <b>  <bean:message key="label.progressiveResults"/> </b> 
 					  	</td>
 					  </tr>
 					  
- 					<c:if test="${VoteLearningForm.nominationsSubmited == 'true'}"> 			
+ 					<c:if test="${voteGeneralLearnerFlowDTO.nominationsSubmited == 'true'}"> 			
 						<tr> <td class="error" align=center>
 								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
 								 <bean:message key="sbmt.learner.nominations.successful"/>  </img>
@@ -109,7 +116,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
 									</tr>
 									
-									<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
+									<c:forEach var="currentNomination" items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
 							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 							  	 		 <tr>
 				  	 						<td NOWRAP valign=top align=left>
@@ -119,17 +126,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			
 											<td NOWRAP valign=top align=left>				  	 		
-									  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+									  	 		<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
 										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
 									  				
 									  					<c:if test="${currentUserCount.value != '0' }"> 	
-												  	 		<c:forEach var="currentQuestionUid" items="${mapStandardQuestionUid}">
+												  	 		<c:forEach var="currentQuestionUid" items="${voteGeneralLearnerFlowDTO.mapStandardQuestionUid}">
 													  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
 												  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
 
 
-														  	 		<c:forEach var="currentSessionUid" items="${mapStandardToolSessionUid}">
+														  	 		<c:forEach var="currentSessionUid" items="${voteGeneralLearnerFlowDTO.mapStandardToolSessionUid}">
 															  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
 														  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
 		
@@ -157,7 +164,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</c:if> 	    
 												</c:forEach>		  
 			
-									  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+									  	 		<c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
 										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
 																 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 

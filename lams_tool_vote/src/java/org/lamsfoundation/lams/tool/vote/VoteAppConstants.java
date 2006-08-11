@@ -62,6 +62,10 @@ public interface VoteAppConstants {
     public static final String LEARNER_PROGRESS							="learnerProgress";
     public static final String VOTE_NOMINATION_VIEWER					="voteNominationViewer";
     public static final String LEARNER_PROGRESS_USERID					="learnerProgressUserId";
+    public static final String MAX_NOMINATION_COUNT						="maxNominationCount";
+    public static final String ALLOW_TEXT_ENTRY							="allowTextEntry";
+    public static final String VOTE_CHANGABLE							="voteChangable";
+    public static final String LOCK_ON_FINISH							="lockOnFinish";
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
@@ -81,6 +85,7 @@ public interface VoteAppConstants {
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
     public static final String IS_REVISITING_USER						="isRevisitingUser";
+    public static final String REVISITING_USER							="revisitingUser";
 	
 	public static final String USER										= "user";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
@@ -128,6 +133,7 @@ public interface VoteAppConstants {
     public static final String MAP_STUDENTS_VOTED						="mapStudentsVoted";
     
     public static final String QUESTIONS_WITHNO_OPTIONS					="questionsWithNoOptions";
+    public static final String VOTE_GENERAL_LEARNER_FLOW_DTO			="voteGeneralLearnerFlowDTO";
     
     public static final String MAP_GENERAL_CHECKED_OPTIONS_CONTENT		="mapGeneralCheckedOptionsContent";
     public static final String MAP_LEARNER_QUESTIONS_CONTENT			="mapLearnerQuestionsContent";

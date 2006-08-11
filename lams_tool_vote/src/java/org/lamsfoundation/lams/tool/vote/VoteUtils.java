@@ -125,7 +125,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
 	
-	public static void persistInSessionTimeZone(HttpServletRequest request)
+	public static void saveTimeZone(HttpServletRequest request)
 	{
 		TimeZone timeZone=TimeZone.getDefault();
 	    logger.debug("current timezone: " + timeZone.getDisplayName());
@@ -235,7 +235,7 @@ public abstract class VoteUtils implements VoteAppConstants {
     }
 
     
-	public static void persistInSessionRichText(HttpServletRequest request)
+	public static void saveInSessionRichText(HttpServletRequest request)
 	{
 	    logger.debug("doing persistRichText: ");
 		String richTextTitle = request.getParameter(TITLE);

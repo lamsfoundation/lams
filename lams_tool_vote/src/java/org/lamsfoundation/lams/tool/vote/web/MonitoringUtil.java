@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.VoteAllSessionsDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteStringComparator;
@@ -872,11 +873,13 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param toolContentId
 	 * @param toolSessionUid
 	 */
-	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
+	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, 
+	        String toolContentId, String toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO)
 	{
+	    logger.debug("starting prepareChartData, voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	    logger.debug("starting prepareChartData, toolContentId: " + toolContentId);
 	    logger.debug("starting prepareChartData, toolSessionUid: " + toolSessionUid);
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
 	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
 	    
 	    logger.debug("starting prepareChartData, voteMonitoringForm: " + voteMonitoringForm);
@@ -896,21 +899,21 @@ public class MonitoringUtil implements VoteAppConstants{
 		if (toolSessionUid != null)
 		{
 		    logger.debug("process for session: " + toolSessionUid);
-		    entriesCount=voteService.getSessionEntriesCount(toolSessionUid);
+		    entriesCount=voteService.getSessionEntriesCount(new Long(toolSessionUid));
 		    logger.debug("entriesCount: " + entriesCount);
-		    userEntries=voteService.getSessionUserEntriesSet(toolSessionUid);
+		    userEntries=voteService.getSessionUserEntriesSet(new Long(toolSessionUid));
 		    logger.debug("sessionUserCount: " + userEntries.size());
 		    
-		    int completedSessionUserCount=voteService.getCompletedVoteUserBySessionUid(toolSessionUid);
+		    int completedSessionUserCount=voteService.getCompletedVoteUserBySessionUid(new Long(toolSessionUid));
 		    logger.debug("completedSessionUserCount: " + completedSessionUserCount);
 		    
 		    
-		    int completedEntriesCount=voteService.getCompletedSessionEntriesCount(toolSessionUid);
+		    int completedEntriesCount=voteService.getCompletedSessionEntriesCount(new Long(toolSessionUid));
 		    logger.debug("completedEntriesCount: " + completedEntriesCount);
 
 		    if (voteMonitoringForm != null)
 		    {
-		        int potentialUserCount=voteService.getVoteSessionPotentialLearnersCount(toolSessionUid);
+		        int potentialUserCount=voteService.getVoteSessionPotentialLearnersCount(new Long(toolSessionUid));
 		        logger.debug("potentialUserCount: " + potentialUserCount);
 		        voteMonitoringForm.setSessionUserCount(Integer.toString(potentialUserCount));
 		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
@@ -962,7 +965,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				if (sessionLevelCharting == true)
 				{
 				    logger.debug("getting votesCount based on session: " + toolSessionUid);
-					votesCount=voteService.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
+					votesCount=voteService.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), new Long(toolSessionUid));
 					
 					mapStandardQuestionUid.put(mapIndex.toString(),voteQueContent.getUid().toString());
 					mapStandardToolSessionUid.put(mapIndex.toString(),toolSessionUid.toString());
@@ -1067,6 +1070,21 @@ public class MonitoringUtil implements VoteAppConstants{
 
 		request.getSession().setAttribute("mapStandardToolSessionUid", mapStandardToolSessionUid);
 		logger.debug("test2: mapStandardToolSessionUid: " + request.getSession().getAttribute("mapStandardToolSessionUid"));
+		
+		
+		if (voteGeneralLearnerFlowDTO !=null)
+		{
+			logger.debug("placing maps within voteGeneralLearnerFlowDTO");
+			voteGeneralLearnerFlowDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
+			voteGeneralLearnerFlowDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
+			voteGeneralLearnerFlowDTO.setMapStandardRatesContent(mapStandardRatesContent);
+			voteGeneralLearnerFlowDTO.setMapStandardUserCount(mapStandardUserCount);
+			voteGeneralLearnerFlowDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
+			voteGeneralLearnerFlowDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
+		}
+
+		logger.debug("end of prepareChartData,  voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
+ 		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
 	}
 	
 	/**

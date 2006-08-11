@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+		<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
 	<div id="header-no-tabs-learner"></div>
@@ -66,7 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content-learner">
 
 
-		<table  class="forms">
+		<table>
 				<tr>
 			 		<th NOWRAP>  <bean:message key="label.learner.progress"/>   </th>
 				</tr>
@@ -79,15 +79,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>	 
 
-				<table  class="forms">
+				<table>
 					<tr>
 						<td NOWRAP valign=top align=left>
 			 			<table align=left>
 			 			
-						<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+						<c:forEach var="currentDto" items="${voteGeneralLearnerFlowDTO.listMonitoredAnswersContainerDto}">
 				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 				  	 		<tr>
-				  	 			<td> &nbsp&nbsp</td>
+				  	 			<td> &nbsp</td>
 				  	 		</tr>
 							<tr>			
 								<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
@@ -109,12 +109,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		  	 									<c:if test="${currentQuestionId == userData.questionUid}">
 			  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
-																<jsp:include page="/monitoring/UserResponses.jsp" />
+														<tr> 
+																 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+														</tr>		
 													</c:if>														  					 									  			
 													
 			  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
 			  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
-																<jsp:include page="/monitoring/UserResponses.jsp" />										
+															<tr> 
+																	 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																	 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+															</tr>		
 														</c:if>														  					 									  													  			
 													</c:if>														  					 									  													  			
 												</c:if>														  					 
@@ -126,7 +132,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:forEach>		  
 							
 						
-					<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+					<c:forEach var="currentDto" items="${listUserEntries.listUserEntries}">
 				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 				  	 		<tr>
 				  	 			<td> &nbsp&nbsp</td>
@@ -147,7 +153,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 									  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
-													<jsp:include page="/monitoring/UserResponses.jsp" />										
+												<tr> 
+														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+												</tr>		
 										</c:forEach>		  	
 							  			
 									</table>

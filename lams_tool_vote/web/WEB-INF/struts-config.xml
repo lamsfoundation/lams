@@ -143,7 +143,7 @@
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteLearningStarterAction" 
    			name="VoteLearningForm" 
-	      	scope="session"
+	      	scope="request"
 	      	validate="false"
 	      	unknown="false"
    			input="/learningIndex.jsp"> 
@@ -223,7 +223,7 @@
 	<action	path="/learning"
 		    type="org.lamsfoundation.lams.tool.vote.web.VoteLearningAction"
 			name="VoteLearningForm"
-      		scope="session"
+      		scope="request"
       		input="/learning/AnswersContent.jsp"
       		parameter="dispatch">
       		

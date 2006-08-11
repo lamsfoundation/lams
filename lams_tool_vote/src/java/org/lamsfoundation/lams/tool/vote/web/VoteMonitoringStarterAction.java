@@ -145,7 +145,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-	    VoteUtils.persistInSessionTimeZone(request);
+	    VoteUtils.saveTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -241,7 +241,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		
 		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
 		logger.debug("refreshing summary data...");
-		voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null, false);
+		voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null, false, null);
 		
 		logger.debug("refreshing stats data...");
 		voteMonitoringAction.refreshStatsData(request);

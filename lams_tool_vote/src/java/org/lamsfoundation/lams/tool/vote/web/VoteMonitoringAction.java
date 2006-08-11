@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
@@ -162,9 +163,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    
 		    VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentMonitoredToolSession));
     		logger.debug("voteSession uid:" + voteSession.getUid());
-		    MonitoringUtil.prepareChartData(request, voteService, voteMonitoringForm, voteContent.getVoteContentId(), voteSession.getUid());
+		    MonitoringUtil.prepareChartData(request, voteService, voteMonitoringForm, voteContent.getVoteContentId().toString(), 
+		            voteSession.getUid().toString(), null);
 
-		    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null);
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
 
 	    }
@@ -186,9 +188,11 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
     
 	public void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, boolean showUserEntriesBySession)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
+			boolean showUserEntriesBySession, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO)
 	{
-	    logger.debug("doing refreshSummaryData.");
+	    logger.debug("doing refreshSummaryData." + voteGeneralLearnerFlowDTO);
+	    
 		if (voteService == null)
 		{
 			logger.debug("will retrieve voteService");
@@ -250,6 +254,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, voteContent, 
 	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId, voteService);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    
+	    
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
 	    
@@ -264,6 +270,15 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	        request.getSession().setAttribute(EXISTS_OPEN_VOTES, new Boolean(true).toString());
 	    }
 	    
+	    
+	    if (voteGeneralLearnerFlowDTO !=null)
+	    {
+	        logger.debug("placing dtos within the voteGeneralLearnerFlowDTO: ");
+	        voteGeneralLearnerFlowDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
+	        voteGeneralLearnerFlowDTO.setListUserEntries(listUserEntries);;
+	    }
+	    
+	    logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	}
 
 
@@ -861,7 +876,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
-		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null);
 		
 		if (currentMonitoredToolSession.equals("All"))
 	    {
@@ -943,7 +958,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
-		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null);
 		
 		if (currentMonitoredToolSession.equals("All"))
 	    {
@@ -1000,7 +1015,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
-		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null);
 		
 		if (currentMonitoredToolSession.equals("All"))
 	    {

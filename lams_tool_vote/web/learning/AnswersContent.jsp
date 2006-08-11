@@ -99,7 +99,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 
 <h1 class="no-tabs-below">
-	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -107,34 +107,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content-learner">
 	<html:form  onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
 	<html:hidden property="dispatch"/>
-	<html:hidden property="toolContentID"/>
-
-			<table class="forms">
-					<c:if test="${VoteLearningForm.activityRunOffline == 'true'}"> 			
+	<html:hidden property="toolSessionID"/>
+	<html:hidden property="userID"/>	
+	<html:hidden property="revisitingUser"/>		
+	<html:hidden property="previewOnly"/>		
+	<html:hidden property="maxNominationCount"/>		
+	<html:hidden property="allowTextEntry"/>		
+	<html:hidden property="voteChangable"/>	
+	<html:hidden property="lockOnFinish"/>	
+	
+	
+			<table>
+					<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}"> 			
 						<tr> <td class="error">
 							<bean:message key="label.learning.forceOfflineMessage"/>
 						</td></tr>
 					</c:if> 		
 					
-					<c:if test="${VoteLearningForm.maxNominationCountReached == 'true'}"> 			
+					<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}"> 			
 						<tr> <td class="error">
 							<bean:message key="error.maxNominationCount.reached"/> 
-								<c:out value="${VoteLearningForm.maxNominationCount}"/>	
+								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}"/>	
 							<bean:message key="label.nominations"/>
 						</td></tr>
 					</c:if> 		
 					
 	
-					<c:if test="${VoteLearningForm.activityRunOffline != 'true'}"> 			
+					<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}"> 			
 						  <tr>
 						  	<td  NOWRAP align=left valign=top colspan=2> 
-								  <c:out value="${VoteLearningForm.activityInstructions}" escapeXml="false" />						  																
+								  <c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />						  																
 						  	</td>
 						  </tr>
 	
 
-						<c:out value="${subEntry.value}" escapeXml="false" />																				
-																								
 							  <tr>						 
 								<td NOWRAP align=left>
 								<table align=left>

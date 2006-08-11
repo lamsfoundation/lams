@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
@@ -88,7 +89,25 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	protected Map mapGeneralCheckedOptionsContent;
 	
+	protected String userID;
+	protected String toolSessionID;
+	protected String  learningMode;
+	protected String  toolContentUID;
+	protected String  previewOnly;
+	
 
+    /**
+     * @return Returns the learningMode.
+     */
+    public String getLearningMode() {
+        return learningMode;
+    }
+    /**
+     * @param learningMode The learningMode to set.
+     */
+    public void setLearningMode(String learningMode) {
+        this.learningMode = learningMode;
+    }
 /** The check boxes selected on the first voting screen */
 	protected String[] checkedVotes;
 	
@@ -658,5 +677,74 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setMapGeneralCheckedOptionsContent(
             Map mapGeneralCheckedOptionsContent) {
         this.mapGeneralCheckedOptionsContent = mapGeneralCheckedOptionsContent;
+    }
+    /**
+     * @return Returns the userID.
+     */
+    public String getUserID() {
+        return userID;
+    }
+    /**
+     * @param userID The userID to set.
+     */
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+    
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("activityInstructions: ", activityInstructions)
+            .append("activityTitle: ", activityTitle)
+            .append("revisitingUser: ", revisitingUser)
+            .append("userEntry: ", userEntry)
+            .append("castVoteCount: ", castVoteCount)
+            .append("maxNominationCountReached: ", maxNominationCountReached)            
+            .append("activityRunOffline: ", activityRunOffline)
+            .append("toolSessionID: ", toolSessionID)
+            .append("learningMode: ", learningMode)
+            .append("toolContentID: ", toolContentID)
+            .append("nominationsSubmited: ", nominationsSubmited)            
+            .append("toolContentUID: ", toolContentUID)
+            .append("previewOnly: ", previewOnly)            
+            .append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)
+            .toString();
+    }
+    
+    /**
+     * @return Returns the toolSessionID.
+     */
+    public String getToolSessionID() {
+        return toolSessionID;
+    }
+    /**
+     * @param toolSessionID The toolSessionID to set.
+     */
+    public void setToolSessionID(String toolSessionID) {
+        this.toolSessionID = toolSessionID;
+    }
+    /**
+     * @return Returns the toolContentUID.
+     */
+    public String getToolContentUID() {
+        return toolContentUID;
+    }
+    /**
+     * @param toolContentUID The toolContentUID to set.
+     */
+    public void setToolContentUID(String toolContentUID) {
+        this.toolContentUID = toolContentUID;
+    }
+    
+    /**
+     * @return Returns the previewOnly.
+     */
+    public String getPreviewOnly() {
+        return previewOnly;
+    }
+    /**
+     * @param previewOnly The previewOnly to set.
+     */
+    public void setPreviewOnly(String previewOnly) {
+        this.previewOnly = previewOnly;
     }
 }

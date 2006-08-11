@@ -154,11 +154,11 @@ public class VoteServicePOJO implements
     }
 	
     
-    public VoteContent retrieveVote(Long toolContentId) throws VoteApplicationException
+    public VoteContent retrieveVote(Long toolContentID) throws VoteApplicationException
     {
         try
         {
-            return voteContentDAO.findVoteContentById(toolContentId);
+            return voteContentDAO.findVoteContentById(toolContentID);
         }
         catch (DataAccessException e)
         {
@@ -538,11 +538,11 @@ public class VoteServicePOJO implements
         }
     }
     
-    public VoteQueUsr retrieveVoteQueUsr(Long userId) throws VoteApplicationException
+    public VoteQueUsr retrieveVoteQueUsr(Long userID) throws VoteApplicationException
     {
 	   try
         {
-	   		VoteQueUsr voteQueUsr=voteUserDAO.findVoteUserById(userId);
+	   		VoteQueUsr voteQueUsr=voteUserDAO.findVoteUserById(userID);
 	   		return voteQueUsr;
         }
         catch (DataAccessException e)
@@ -1174,11 +1174,11 @@ public class VoteServicePOJO implements
         }
 	}
     
-    public int  getLastNominationCount(Long userId) throws VoteApplicationException
+    public int  getLastNominationCount(Long userID) throws VoteApplicationException
     {
 	   try
         {
-	   		int lastNomCount=voteUsrAttemptDAO.getLastNominationCount(userId);
+	   		int lastNomCount=voteUsrAttemptDAO.getLastNominationCount(userID);
 	   		return lastNomCount;
         }
         catch (DataAccessException e)
@@ -1497,23 +1497,23 @@ public class VoteServicePOJO implements
 	
     /**
      * implemented as part of the tool contract. Removes content and uploaded files from the content repository.
-     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+     * removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException
 	 * @param toContentId
 	 * @param removeSessionData 
 	 * @return 
 	 * @throws ToolException 
      */    
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+    public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException
 	{
-    	logger.debug("start of removeToolContent with toolContentId: " + toolContentId + "removeSessionData: " + removeSessionData);
+    	logger.debug("start of removeToolContent with toolContentID: " + toolContentID + "removeSessionData: " + removeSessionData);
     	
-    	if (toolContentId == null)
+    	if (toolContentID == null)
     	{
-    		logger.error("toolContentId is null");
-    		throw new ToolException("toolContentId is missing");
+    		logger.error("toolContentID is null");
+    		throw new ToolException("toolContentID is missing");
     	}
     	
-    	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+    	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
     	logger.debug("retrieving voteContent: " + voteContent);
     	
     	if (voteContent != null)
@@ -1568,15 +1568,15 @@ public class VoteServicePOJO implements
                 	}
             	}
             }
-            logger.debug("removed all existing responses of toolContent with toolContentId:" + 
-            																toolContentId);   
-            voteContentDAO.removeVoteById(toolContentId);        
+            logger.debug("removed all existing responses of toolContent with toolContentID:" + 
+            																toolContentID);   
+            voteContentDAO.removeVoteById(toolContentID);        
             logger.debug("removed voteContent:" + voteContent);
     	}
     	else
     	{
         	logger.error("Warning!!!, We should have not come here. voteContent is null.");
-        	throw new ToolException("toolContentId is missing");
+        	throw new ToolException("toolContentID is missing");
     	}
 	}
 
@@ -1584,18 +1584,18 @@ public class VoteServicePOJO implements
     /**
      * Export the XML fragment for the tool's content, along with any files needed
      * for the content.
-     * @throws DataMissingException if no tool content matches the toolSessionId 
+     * @throws DataMissingException if no tool content matches the toolSessionID 
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
-		VoteContent toolContentObj = voteContentDAO.findVoteContentById(toolContentId);
+	public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
+		VoteContent toolContentObj = voteContentDAO.findVoteContentById(toolContentID);
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentID);
  		
 		try {
 			//set ToolContentHandler as null to avoid copy file node in repository again.
-			toolContentObj = VoteContent.newInstance(null,toolContentObj,toolContentId);
+			toolContentObj = VoteContent.newInstance(null,toolContentObj,toolContentID);
 			
 			//clear unnecessary information attach
 			toolContentObj.setVoteSessions(null);
@@ -1604,7 +1604,7 @@ public class VoteServicePOJO implements
 				que.setMcUsrAttempts(null);
 			}
 			exportContentService.registerFileClassForExport(VoteUploadedFile.class.getName(),"uuid",null);
-			exportContentService.exportToolContent( toolContentId, toolContentObj,voteToolContentHandler, rootPath);
+			exportContentService.exportToolContent( toolContentID, toolContentObj,voteToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
 		} catch (ItemNotFoundException e) {
@@ -1619,7 +1619,7 @@ public class VoteServicePOJO implements
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(VoteUploadedFile.class.getName()
 					,"uuid",null,"filename","fileProperty",null,null);
@@ -1629,8 +1629,8 @@ public class VoteServicePOJO implements
 				throw new ImportToolContentException("Import Vote tool content failed. Deserialized object is " + toolPOJO);
 			VoteContent toolContentObj = (VoteContent) toolPOJO;
 			
-//			reset it to new toolContentId
-			toolContentObj.setVoteContentId(toolContentId);
+//			reset it to new toolContentID
+			toolContentObj.setVoteContentId(toolContentID);
 			toolContentObj.setCreatedBy(newUserUid);
 			
 			voteContentDAO.saveVoteContent(toolContentObj);
@@ -1641,21 +1641,21 @@ public class VoteServicePOJO implements
 
     /**
      * Implemented as part of the tool contract. Sets the defineLater to true on this content.
-     * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
-     * @param toolContentId
+     * setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
+     * @param toolContentID
      * @return 
      * @throws ToolException
      */
-    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
+    public void setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsDefineLater with toolContentId: " + toolContentId);
-    	if  (toolContentId == null)
+    	logger.debug("request for setAsDefineLater with toolContentID: " + toolContentID);
+    	if  (toolContentID == null)
     	{
-    		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
-            throw new DataMissingException("toolContentId is missing");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+            throw new DataMissingException("toolContentID is missing");
     	}
     	
-    	VoteContent voteContent=retrieveVote(toolContentId);
+    	VoteContent voteContent=retrieveVote(toolContentID);
     	if (voteContent == null)
     	{
     		logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
@@ -1663,27 +1663,27 @@ public class VoteServicePOJO implements
     	}
     	voteContent.setDefineLater(true);
     	saveVoteContent(voteContent);
-    	logger.debug("success: end of setAsDefineLater on toolContentId:" + toolContentId);
+    	logger.debug("success: end of setAsDefineLater on toolContentID:" + toolContentID);
     }
     
 
     /**
      * Implemented as part of the tool contract. Sets the runOffline to true on this content.
-     * setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
+     * setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException
      * 
-     * @param toolContentId
+     * @param toolContentID
      * return 
      * @throws ToolException 
      */
-    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
+    public void setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsRunOffline with toolContentId:" + toolContentId);
-    	if  (toolContentId == null)
+    	logger.debug("request for setAsRunOffline with toolContentID:" + toolContentID);
+    	if  (toolContentID == null)
     	{
-    		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
-            throw new DataMissingException("toolContentId is missing");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+            throw new DataMissingException("toolContentID is missing");
     	}
-    	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+    	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
     	if (voteContent == null)
     	{
     		logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
@@ -1691,29 +1691,29 @@ public class VoteServicePOJO implements
     	}
     	voteContent.setRunOffline(true);
     	saveVoteContent(voteContent);
-    	logger.debug("success: end of setAsRunOffline on toolContentId:" + toolContentId);
+    	logger.debug("success: end of setAsRunOffline on toolContentID:" + toolContentID);
     }
     
     
     /**
 	 * it is possible that the tool session id already exists in the tool sessions table
 	 * as the users from the same session are involved.
-	 * existsSession(long toolSessionId)
-	 * @param toolSessionId
+	 * existsSession(long toolSessionID)
+	 * @param toolSessionID
 	 * @return boolean
 	 */
-	public boolean existsSession(Long toolSessionId) 
+	public boolean existsSession(Long toolSessionID) 
 	{
-		VoteSession voteSession= retrieveVoteSession(toolSessionId);
+		VoteSession voteSession= retrieveVoteSession(toolSessionID);
     	
 	    if (voteSession == null) 
 	    {
-	    	logger.error("voteSession does not exist yet: " + toolSessionId);
+	    	logger.error("voteSession does not exist yet: " + toolSessionID);
 	    	return false;
 	    }
 	    else
 	    {
-	    	logger.debug("retrieving an existing voteSession: " + voteSession + " " + toolSessionId);
+	    	logger.debug("retrieving an existing voteSession: " + voteSession + " " + toolSessionID);
 	    }
 		return true;	
 	}
@@ -1721,36 +1721,36 @@ public class VoteServicePOJO implements
     /**
      * Implemented as part of the tool contract.
      * Gets called only in the Learner mode.
-     * All the learners in the same group have the same toolSessionId.
+     * All the learners in the same group have the same toolSessionID.
      * 
-     * @param toolSessionId the generated tool session id.
+     * @param toolSessionID the generated tool session id.
      * @param toolSessionName the tool session name.
-     * @param toolContentId the tool content id specified.
+     * @param toolContentID the tool content id specified.
      * @throws ToolException if an error occurs e.g. defaultContent is missing. 
      * 
      */
-	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
+	public void createToolSession(Long toolSessionID, String toolSessionName, Long toolContentID) throws ToolException
     {
-    	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
+    	logger.debug("start of createToolSession with ids: " + toolSessionID + " and " + toolContentID);
     	logger.debug("toolSessionName: " + toolSessionName);
     	
-    	if (toolSessionId == null)
+    	if (toolSessionID == null)
     	{
-    		logger.error("toolSessionId is null");
-    		throw new ToolException("toolSessionId is missing");
+    		logger.error("toolSessionID is null");
+    		throw new ToolException("toolSessionID is missing");
     	}
     	
     	long defaultContentId=0;
-    	if (toolContentId == null)
+    	if (toolContentID == null)
         {
-        	logger.error("toolContentId is null.");
+        	logger.error("toolContentID is null.");
         	logger.error("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
         
 			try
 			{
 				defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
-				toolContentId=new Long(defaultContentId);
-				logger.debug("updated toolContentId to: " + toolContentId);
+				toolContentID=new Long(defaultContentId);
+				logger.debug("updated toolContentID to: " + toolContentID);
 			}
 			catch(Exception e)
 			{
@@ -1758,9 +1758,9 @@ public class VoteServicePOJO implements
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
         }
-    	logger.debug("final toolSessionId and toolContentId: " +  toolSessionId + " " + toolContentId);
+    	logger.debug("final toolSessionID and toolContentID: " +  toolSessionID + " " + toolContentID);
     	
-        VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+        VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
         logger.debug("retrieved voteContent: " + voteContent);
         
         if (voteContent == null)
@@ -1771,8 +1771,8 @@ public class VoteServicePOJO implements
 			try
 			{
 				defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
-				toolContentId=new Long(defaultContentId);
-				logger.debug("updated toolContentId to: " + toolContentId);
+				toolContentID=new Long(defaultContentId);
+				logger.debug("updated toolContentID to: " + toolContentID);
 			}
 			catch(Exception e)
 			{
@@ -1780,7 +1780,7 @@ public class VoteServicePOJO implements
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
 
-			voteContent = voteContentDAO.findVoteContentById(toolContentId);
+			voteContent = voteContentDAO.findVoteContentById(toolContentID);
         }
         logger.debug("final - retrieved voteContent: " + voteContent);
 
@@ -1788,11 +1788,11 @@ public class VoteServicePOJO implements
         /*
          * create a new a new tool session if it does not already exist in the tool session table
          */
-        if (!existsSession(toolSessionId))
+        if (!existsSession(toolSessionID))
         {
         	try
 			{
-        		VoteSession voteSession = new VoteSession(toolSessionId,
+        		VoteSession voteSession = new VoteSession(toolSessionID,
                         new Date(System.currentTimeMillis()),
                         VoteSession.INCOMPLETE,
                         toolSessionName,
@@ -1815,26 +1815,26 @@ public class VoteServicePOJO implements
 
     /**
      * Implemented as part of the tool contract.
-     * removeToolSession(Long toolSessionId) throws DataMissingException, ToolException
-     * @param toolSessionId
-     * @param toolContentId 
+     * removeToolSession(Long toolSessionID) throws DataMissingException, ToolException
+     * @param toolSessionID
+     * @param toolContentID 
      * return 
      * @throws ToolException
      */
-    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException
+    public void removeToolSession(Long toolSessionID) throws DataMissingException, ToolException
 	{
-    	logger.debug("start of removeToolSession with id: " + toolSessionId);
-    	if (toolSessionId == null)
+    	logger.debug("start of removeToolSession with id: " + toolSessionID);
+    	if (toolSessionID == null)
     	{
-    		logger.error("toolSessionId is null");
-    		throw new DataMissingException("toolSessionId is missing");
+    		logger.error("toolSessionID is null");
+    		throw new DataMissingException("toolSessionID is missing");
     	}
     	
     	
     	VoteSession voteSession=null;
     	try
 		{
-    		voteSession=retrieveVoteSession(toolSessionId);
+    		voteSession=retrieveVoteSession(toolSessionID);
     		logger.debug("retrieved voteSession: " + voteSession);
 		}
     	catch(VoteApplicationException e)
@@ -1866,16 +1866,16 @@ public class VoteServicePOJO implements
 
     /**
      * Implemtented as part of the tool contract.
-     * leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException
-     * @param toolSessionId
+     * leaveToolSession(Long toolSessionID,Long learnerId) throws DataMissingException, ToolException
+     * @param toolSessionID
      * @param learnerId 
      * return String
      * @throws ToolException
      * 
      */
-    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
+    public String leaveToolSession(Long toolSessionID,Long learnerId) throws DataMissingException, ToolException 
     {
-        logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId + " and learnerId:" + learnerId);
+        logger.debug("start of leaveToolSession with toolSessionID:" + toolSessionID + " and learnerId:" + learnerId);
         logger.debug("make sure learnerService is available. Is it?" + learnerService);
         
         if (learnerService == null)
@@ -1887,16 +1887,16 @@ public class VoteServicePOJO implements
     		throw new DataMissingException("learnerId is missing");
     	}
         
-        if (toolSessionId == null)
+        if (toolSessionID == null)
     	{
-    		logger.error("toolSessionId is null");
-    		throw new DataMissingException("toolSessionId is missing");
+    		logger.error("toolSessionID is null");
+    		throw new DataMissingException("toolSessionID is missing");
     	}
         
         VoteSession voteSession=null;
     	try
 		{
-    		voteSession=retrieveVoteSession(toolSessionId);
+    		voteSession=retrieveVoteSession(toolSessionID);
     		logger.debug("retrieved voteSession: " + voteSession);
 		}
     	catch(VoteApplicationException e)
@@ -1911,7 +1911,7 @@ public class VoteServicePOJO implements
     	voteSessionDAO.updateVoteSession(voteSession);
     	logger.debug("updated voteSession to COMPLETED" + voteSession);
     	
-    	String nextUrl= learnerService.completeToolSession(toolSessionId,learnerId);
+    	String nextUrl= learnerService.completeToolSession(toolSessionID,learnerId);
     	logger.debug("nextUrl: " + nextUrl);
     	if (nextUrl == null)
     	{
@@ -1923,24 +1923,24 @@ public class VoteServicePOJO implements
     
 
     /**
-     * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
-     * @param toolSessionId
+     * exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
+     * @param toolSessionID
      * return ToolSessionExportOutputData
      * @throws ToolException
      */
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
     {
         throw new ToolException("not yet implemented");
     }
 
     
     /**
-     * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
-     * @param toolSessionIds
+     * exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
+     * @param toolSessionIDs
      * return ToolSessionExportOutputData
      * @throws ToolException
      */
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIDs) throws DataMissingException, ToolException
     {
         throw new ToolException("not yet implemented");
 

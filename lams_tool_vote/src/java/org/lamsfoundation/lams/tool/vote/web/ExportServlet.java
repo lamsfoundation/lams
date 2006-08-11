@@ -125,7 +125,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
-    	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, toolSessionID.toString(), userID.toString() , true);
+    	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, 
+    	        toolSessionID.toString(), userID.toString() , true, null);
     	
     	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), voteSession.getUid());
     	logger.debug("post prepareChartDataForExport");
@@ -161,7 +162,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		
         VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
         logger.debug("starting refreshSummaryData.");
-        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false);
+        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null);
         
         logger.debug("teacher uses content id: " + content.getVoteContentId());
     	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null);

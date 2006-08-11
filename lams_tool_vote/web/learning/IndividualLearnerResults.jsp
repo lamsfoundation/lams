@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 
 <h1 class="no-tabs-below">
-	<c:out value="${sessionScope.activityTitle}" escapeXml="false" />
+	<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -59,9 +59,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
 	<html:hidden property="dispatch"/>
-	<html:hidden property="toolContentID"/>
-				
-			<table class="forms">
+	<html:hidden property="toolSessionID"/>
+	<html:hidden property="userID"/>	
+	<html:hidden property="revisitingUser"/>			
+	<html:hidden property="previewOnly"/>	
+	<html:hidden property="maxNominationCount"/>		
+	<html:hidden property="allowTextEntry"/>		
+	<html:hidden property="voteChangable"/>	
+	<html:hidden property="lockOnFinish"/>	
+	
+					
+			<table>
 
 					  <tr>
 					  	<td NOWRAP align=left  valign=top  colspan=2> 
