@@ -77,6 +77,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="title" value="Welcome"/>
 		<put name="body" value="/welcome.jsp"/>
 	</definition>
+	<definition name=".close" extends=".layout">
+		<put name="title" value="Close Window"/>
+		<put name="body" value="/close.jsp"/>
+	</definition>
 	<definition name=".previewDefineLater" extends=".layout">
 		<put name="title" value="Define Later"/>
 		<put name="body" value="/previewDefineLater.jsp"/>

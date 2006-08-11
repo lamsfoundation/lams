@@ -358,5 +358,12 @@ public class ActivityMapping implements Serializable
     {
         this.activityMappingStrategy = activityMappingStrategy;
     }
+    
+    public static String getCloseURL() {
+    	String lamsUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + LEARNING;
+    	String closeUrl = lamsUrl + "/close.do";
+    	
+    	return closeUrl;
+    }
 
 }

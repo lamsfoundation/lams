@@ -2,7 +2,9 @@
 <action path="/index"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter="/main.jsp" />
-
+<action path="/close"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".close" />
 <action path="/content"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".welcome" />

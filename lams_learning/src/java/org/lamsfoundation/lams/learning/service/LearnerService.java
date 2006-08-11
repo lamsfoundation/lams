@@ -392,11 +392,18 @@ public class LearnerService implements ICoreLearnerService
     	// being available in the context. Hence it is defined in the ILearnerService interface, not the IFullLearnerService
     	// interface. If it calls any other methods then it mustn't use anything on the ICoreLearnerService interface.
     	
-        ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
+        ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);	
         toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
         lamsCoreToolService.updateToolSession(toolSession);
+       
+        LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), toolSession.getLesson().getLessonId());
         
-        return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
+        if (currentProgress.getCompletedActivities().contains(toolSession.getToolActivity()))
+        	// return close window url
+        	return ActivityMapping.getCloseURL();
+        else
+        	return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
+        
     }
     
     /**
