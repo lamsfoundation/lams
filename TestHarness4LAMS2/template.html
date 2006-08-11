@@ -1,0 +1,80 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+  <head>
+    <title>LAMS::Testharness Report</title>
+    
+    <meta http-equiv="description" content="This is testharness report template">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<style type=text/css>
+		body{ 
+				background-color: #ffffff; 
+				margin-top:3ex;
+				font-size: 11pt;
+				font-family: arial,sans-serif;
+			}
+		table{
+				border: 1px solid #ffcc33;
+				font-size: 10pt;
+			}
+		th{
+				text-align:left;
+				font-weight:bold;
+				background-color: #fff8db;
+			}
+		td{
+				margin:3ex;
+				text-align:left;
+			}
+		.info{
+				color: #008000;
+				text-align:left;
+				font-size: 9pt;
+			}		
+	</style>
+  </head>
+  
+  <body>
+    <h2>Testharness Report</h2> 
+    <div align="right">generated at ${time}</div>
+    <p class="info">Tip: you can modify template.html to beautify me or show the data in more sophiscated ways rather than just list them out</p>
+    <h4>Test Summary</h4>
+    <ul>
+    <#list ${testSuites} as ${testSuite}>
+    	<li>Test Suite ${testSuite.suiteIndex} : <#if ${testSuite.finished}>finished<#else>aborted</#if>
+    	<ul>
+    		<li>${testSuite.adminTest.testName} : <#if ${testSuite.adminTest.finished}>finished<#else>aborted</#if></li>
+    		<li>${testSuite.authorTest.testName} : <#if ${testSuite.authorTest.finished}>finished<#else>aborted</#if></li>
+    		<li>${testSuite.monitorTest.testName} : <#if ${testSuite.monitorTest.finished}>finished<#else>aborted</#if></li>
+    		<li>${testSuite.learnerTest.testName} : <#if ${testSuite.learnerTest.finished}>finished<#else>aborted</#if></li>
+    		<p>${testSuite.learnerTest.users.length} learner(s) attended, 
+    		in which ${testSuite.learnerTest.countFinished} learner(s) finished,
+    		and ${testSuite.learnerTest.countAborted} learner(s) aborted.</p>
+    	</ul>
+    	</li>
+    </#list>
+    </ul>
+    
+    <h4>Call Records</h4>
+    <table>
+    	<tr>
+    	<th>Test Name</th>
+    	<th>Call Target</th>
+    	<th>Description</th>
+    	<th>Snapshot Time</th>
+    	<th>Time Used</th>
+    	<th>Message</th>
+    	</tr>
+	    <#list ${callRecords} as ${callRecord}>
+	    	<tr>
+	    	<td>${callRecord.testName}</td>
+	    	<td>${callRecord.callee}</td>
+	    	<td>${callRecord.description}</td>
+	    	<td>${callRecord.snapShotTime}</td>
+	    	<td>${callRecord.timeInMillis}ms</td>
+	   		<td>${callRecord.message}</td>
+	   		</tr>
+	    </#list>
+    </table>
+  </body>
+</html>
