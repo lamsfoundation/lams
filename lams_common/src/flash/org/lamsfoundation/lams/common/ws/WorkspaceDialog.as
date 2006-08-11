@@ -188,7 +188,7 @@ class WorkspaceDialog extends MovieClip{
 
         treeview = location_dnd.getTree();
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
-        
+        resourceTitle_txi.setFocus();
 		_container.contentLoaded();
     }
 	
