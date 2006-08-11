@@ -43,7 +43,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	var xoffset:Number = 0;
 	var yoffset:Number = 5;	
 	var showAbove:Boolean = false;
-	var ttWidth:Number = 175
+	var ttWidth:Number = 155
 	// Visible features
 	var textFormat:Object;
 	var tiptext:TextFormat;
