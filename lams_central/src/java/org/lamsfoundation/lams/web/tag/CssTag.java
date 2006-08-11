@@ -81,7 +81,7 @@ public class CssTag extends TagSupport {
 					String theme = (String)i.next();
 					if ( theme != null) {
 						if (localLinkPath != null)
-							customStylesheetLink = generateLocalLink(theme,serverURL);
+							customStylesheetLink = generateLocalLink(theme);
 						else	
 							customStylesheetLink = generateLink(theme,serverURL);
 					}
@@ -96,7 +96,7 @@ public class CssTag extends TagSupport {
 			}
 			
 			// Special IE stylesheet for all those IE related formatting issues
-			String ieLink = localLinkPath != null ? generateLocalLink(IE_STYLESHEET_NAME,serverURL) : generateLink(IE_STYLESHEET_NAME,serverURL);
+			String ieLink = localLinkPath != null ? generateLocalURL(IE_STYLESHEET_NAME) : generateURL(IE_STYLESHEET_NAME,serverURL);
 			writer.println("<!--[if IE]>");
 			writer.println("<style type=\"text/css\">");
 			writer.println("@import url("+ieLink+");");
@@ -110,16 +110,37 @@ public class CssTag extends TagSupport {
     	return SKIP_BODY;
 	}
 
-	private String generateLocalLink(String stylesheetName, String serverURL) {
-		return "<link href=\""+localLinkPath+"css/"+stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
+	private String generateLocalLink(String stylesheetName) {
+		if ( localLinkPath.endsWith("/") ) {
+			return "<link href=\""+localLinkPath+"css/"+stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
+		} else { 
+			return "<link href=\""+localLinkPath+"/css/"+stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
+		}
 	}
 	
+	private String generateLocalURL(String stylesheetName) {
+		if ( localLinkPath.endsWith("/") ) {
+			return "\""+localLinkPath+"css/"+stylesheetName + ".css\"";
+		} else { 
+			return "\""+localLinkPath+"/css/"+stylesheetName + ".css\"";
+		}
+	}
+
 	private String generateLink(String stylesheetName, String serverURL)
 	{
 		if ( serverURL.endsWith("/") ) {
 			return "<link href=\""+serverURL+"css/"+stylesheetName+".css\" rel=\"stylesheet\" type=\"text/css\">";
 		} else {
 			return "<link href=\""+serverURL+"/css/"+stylesheetName+".css\" rel=\"stylesheet\" type=\"text/css\">";
+		}
+	}
+
+	private String generateURL(String stylesheetName, String serverURL)
+	{
+		if ( serverURL.endsWith("/") ) {
+			return "\""+serverURL+"css/"+stylesheetName+".css\"";
+		} else {
+			return "\""+serverURL+"/css/"+stylesheetName+".css\"";
 		}
 	}
 
