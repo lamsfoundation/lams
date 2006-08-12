@@ -71,6 +71,8 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     
     protected String previewOnly;
     
+    protected String reportViewOnly;
+    
     protected String requestLearningReport;
     
     protected String requestLearningReportProgress;
@@ -356,11 +358,24 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
 			.append("mapStandardQuestionUid: ", mapStandardQuestionUid)
 			.append("mapStandardToolSessionUid: ", mapStandardToolSessionUid)
 			.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
-			.append("listUserEntries: ", listUserEntries)			
+			.append("listUserEntries: ", listUserEntries)
+			.append("reportViewOnly: ", reportViewOnly)
             .toString();
     }
 	
     
+    /**
+     * @return Returns the reportViewOnly.
+     */
+    public String getReportViewOnly() {
+        return reportViewOnly;
+    }
+    /**
+     * @param reportViewOnly The reportViewOnly to set.
+     */
+    public void setReportViewOnly(String reportViewOnly) {
+        this.reportViewOnly = reportViewOnly;
+    }
     /**
      * @return Returns the nominationsSubmited.
      */

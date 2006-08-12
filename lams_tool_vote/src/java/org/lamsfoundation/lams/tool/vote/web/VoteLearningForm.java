@@ -87,13 +87,14 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String maxNominationCountReached;
 	protected int 	 castVoteCount;
 	
-	protected Map mapGeneralCheckedOptionsContent;
+	protected Map     mapGeneralCheckedOptionsContent;
 	
-	protected String userID;
-	protected String toolSessionID;
+	protected String  userID;
+	protected String  toolSessionID;
 	protected String  learningMode;
 	protected String  toolContentUID;
 	protected String  previewOnly;
+	protected String  reportViewOnly;
 	
 
     /**
@@ -706,11 +707,25 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
             .append("nominationsSubmited: ", nominationsSubmited)            
             .append("toolContentUID: ", toolContentUID)
             .append("previewOnly: ", previewOnly)            
+            .append("reportViewOnly: ", reportViewOnly)
             .append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)
             .toString();
     }
     
+    
+        /**
+     * @return Returns the reportViewOnly.
+     */
+    public String getReportViewOnly() {
+        return reportViewOnly;
+    }
     /**
+     * @param reportViewOnly The reportViewOnly to set.
+     */
+    public void setReportViewOnly(String reportViewOnly) {
+        this.reportViewOnly = reportViewOnly;
+    }
+/**
      * @return Returns the toolSessionID.
      */
     public String getToolSessionID() {

@@ -66,7 +66,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="allowTextEntry"/>	
 	<html:hidden property="voteChangable"/>	
 	<html:hidden property="lockOnFinish"/>	
-	
+	<html:hidden property="reportViewOnly"/>		
+	<html:hidden property="userEntry"/>			
+		
 			<table>
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
@@ -82,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				  <tr>
 				  	<td NOWRAP align=left valign=top colspan=2> 
-					  	 <b>  <bean:message key="label.learning.reportMessage.past"/> </b> 
+					  	 <b>  <bean:message key="label.learning.reportMessage"/> </b> 
 				  	</td>
 				  </tr>
 				

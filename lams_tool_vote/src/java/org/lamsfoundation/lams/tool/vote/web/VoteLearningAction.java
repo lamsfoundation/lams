@@ -191,6 +191,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     {
         VoteLearningForm voteLearningForm = (VoteLearningForm) form;
         voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
+        
+        repopulateRequestParameters(request,voteLearningForm);
     	
         VoteUtils.cleanUpUserExceptions(request);
     	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
@@ -219,38 +221,15 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("retrieving voteService from session: " + voteService);
 
-    	String toolSessionID=request.getParameter(TOOL_SESSION_ID);
-    	logger.debug("toolSessionID: " + toolSessionID);
-    	voteLearningForm.setToolSessionID(toolSessionID);
-
+    	repopulateRequestParameters(request,voteLearningForm);
+    	
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
         String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
-
-    	String revisitingUser=request.getParameter(REVISITING_USER);
-    	logger.debug("revisitingUser: " + revisitingUser);
-    	voteLearningForm.setRevisitingUser(revisitingUser);
-
-    	String previewOnly=request.getParameter(PREVIEW_ONLY);
-    	logger.debug("previewOnly: " + previewOnly);
-    	voteLearningForm.setPreviewOnly(previewOnly);
-
-    	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
-    	logger.debug("maxNominationCount: " + maxNominationCount);
-    	voteLearningForm.setMaxNominationCount(maxNominationCount);
-
-    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
-    	logger.debug("allowTextEntry: " + allowTextEntry);
-    	voteLearningForm.setAllowTextEntry(allowTextEntry);
-    	
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
-    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
-    	logger.debug("lockOnFinish: " + lockOnFinish);
-    	voteLearningForm.setLockOnFinish(lockOnFinish);
-
     	
     	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
         logger.debug("retrieving voteSession: " + voteSession);
@@ -317,10 +296,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("retrieving voteService from session: " + voteService);
 
-    	String toolSessionID=request.getParameter(TOOL_SESSION_ID);
-    	logger.debug("toolSessionID: " + toolSessionID);
-    	voteLearningForm.setToolSessionID(toolSessionID);
+    	repopulateRequestParameters(request,voteLearningForm);
     	
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
         String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
@@ -328,28 +309,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	String revisitingUser=request.getParameter(REVISITING_USER);
     	logger.debug("revisitingUser: " + revisitingUser);
     	voteLearningForm.setRevisitingUser(revisitingUser);
-    	
-    	String previewOnly=request.getParameter(PREVIEW_ONLY);
-    	logger.debug("previewOnly: " + previewOnly);
-    	voteLearningForm.setPreviewOnly(previewOnly);
 
-    	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
-    	logger.debug("maxNominationCount: " + maxNominationCount);
-    	voteLearningForm.setMaxNominationCount(maxNominationCount);
-
-    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
-    	logger.debug("allowTextEntry: " + allowTextEntry);
-    	voteLearningForm.setAllowTextEntry(allowTextEntry);
-
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
-    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
-    	logger.debug("lockOnFinish: " + lockOnFinish);
-    	voteLearningForm.setLockOnFinish(lockOnFinish);
-
-    	
     	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
         logger.debug("retrieving voteSession: " + voteSession);
         
@@ -423,41 +383,21 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 		VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO= new VoteGeneralLearnerFlowDTO();
 
-    	String toolSessionID=request.getParameter(TOOL_SESSION_ID);
-    	logger.debug("toolSessionID: " + toolSessionID);
-    	voteLearningForm.setToolSessionID(toolSessionID);
-
-    	String userID=request.getParameter(USER_ID);
+    	repopulateRequestParameters(request,voteLearningForm);
+    	
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
+        String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
     	
     	String revisitingUser=request.getParameter(REVISITING_USER);
     	logger.debug("revisitingUser: " + revisitingUser);
     	voteLearningForm.setRevisitingUser(revisitingUser);
-    	
-    	String previewOnly=request.getParameter(PREVIEW_ONLY);
-    	logger.debug("previewOnly: " + previewOnly);
-    	voteLearningForm.setPreviewOnly(previewOnly);
 
-    	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
-    	logger.debug("maxNominationCount: " + maxNominationCount);
-    	voteLearningForm.setMaxNominationCount(maxNominationCount);
-
-    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
-    	logger.debug("allowTextEntry: " + allowTextEntry);
-    	voteLearningForm.setAllowTextEntry(allowTextEntry);
-    	
-
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
-    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
-    	logger.debug("lockOnFinish: " + lockOnFinish);
-    	voteLearningForm.setLockOnFinish(lockOnFinish);
-
-    	
-    	
+		
 		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 		voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
 		
@@ -510,38 +450,19 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("retrieving voteService from session: " + voteService);
 
 		
-    	String toolSessionID=request.getParameter(TOOL_SESSION_ID);
-    	logger.debug("toolSessionID: " + toolSessionID);
-    	voteLearningForm.setToolSessionID(toolSessionID);
+    	repopulateRequestParameters(request,voteLearningForm);
     	
-    	String userID=request.getParameter(USER_ID);
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
+        String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
     	
     	String revisitingUser=request.getParameter(REVISITING_USER);
     	logger.debug("revisitingUser: " + revisitingUser);
     	voteLearningForm.setRevisitingUser(revisitingUser);
-    	
-    	String previewOnly=request.getParameter(PREVIEW_ONLY);
-    	logger.debug("previewOnly: " + previewOnly);
-    	voteLearningForm.setPreviewOnly(previewOnly);
-    	
-    	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
-    	logger.debug("maxNominationCount: " + maxNominationCount);
-    	voteLearningForm.setMaxNominationCount(maxNominationCount);
-
-
-    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
-    	logger.debug("allowTextEntry: " + allowTextEntry);
-    	voteLearningForm.setAllowTextEntry(allowTextEntry);
-    	
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
-    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
-    	logger.debug("lockOnFinish: " + lockOnFinish);
-    	voteLearningForm.setLockOnFinish(lockOnFinish);
     	
     	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
         logger.debug("retrieving voteSession: " + voteSession);
@@ -614,41 +535,25 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("retrieving voteService from session: " + voteService);
 
-    	String toolSessionID=request.getParameter(TOOL_SESSION_ID);
-    	logger.debug("toolSessionID: " + toolSessionID);
-    	voteLearningForm.setToolSessionID(toolSessionID);
+    	repopulateRequestParameters(request,voteLearningForm);
     	
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
         String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
     	
-    	String revisitingUser=request.getParameter(REVISITING_USER);
-    	logger.debug("revisitingUser: " + revisitingUser);
-    	voteLearningForm.setRevisitingUser(revisitingUser);
-    	
-
-    	String previewOnly=request.getParameter(PREVIEW_ONLY);
-    	logger.debug("previewOnly: " + previewOnly);
-    	voteLearningForm.setPreviewOnly(previewOnly);
-
-
     	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
     	logger.debug("maxNominationCount: " + maxNominationCount);
     	voteLearningForm.setMaxNominationCount(maxNominationCount);
-
-    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
-    	logger.debug("allowTextEntry: " + allowTextEntry);
-    	voteLearningForm.setAllowTextEntry(allowTextEntry);
-
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
-    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
-    	logger.debug("lockOnFinish: " + lockOnFinish);
-    	voteLearningForm.setLockOnFinish(lockOnFinish);
     	
-    	
+    	String userEntry=request.getParameter(USER_ENTRY);
+    	logger.debug("userEntry: " + userEntry);
+    	voteLearningForm.setUserEntry(userEntry);
+
+
     	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
         logger.debug("retrieving voteSession: " + voteSession);
 
@@ -664,7 +569,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 		// check number of votes
 		int castVoteCount= voteDisplayOrderIds!=null ? voteDisplayOrderIds.size() : 0;
-    	String userEntry=voteLearningForm.getUserEntry();
+    	//String userEntry=voteLearningForm.getUserEntry();
     	logger.debug("userEntry: " + userEntry);
     	
     	if ((userEntry != null) && (userEntry.length() > 0))
@@ -831,40 +736,20 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("retrieving voteService from session: " + voteService);
 
-    	String toolSessionID=request.getParameter(TOOL_SESSION_ID);
-    	logger.debug("toolSessionID: " + toolSessionID);
-    	voteLearningForm.setToolSessionID(toolSessionID);
+    	repopulateRequestParameters(request,voteLearningForm);
     	
-    	String userID=request.getParameter(USER_ID);
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
+        String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
     	
     	String revisitingUser=request.getParameter(REVISITING_USER);
     	logger.debug("revisitingUser: " + revisitingUser);
     	voteLearningForm.setRevisitingUser(revisitingUser);
-    	
-    	String previewOnly=request.getParameter(PREVIEW_ONLY);
-    	logger.debug("previewOnly: " + previewOnly);
-    	voteLearningForm.setPreviewOnly(previewOnly);
-    	
 
-    	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
-    	logger.debug("maxNominationCount: " + maxNominationCount);
-    	voteLearningForm.setMaxNominationCount(maxNominationCount);
-
-
-    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
-    	logger.debug("allowTextEntry: " + allowTextEntry);
-    	voteLearningForm.setAllowTextEntry(allowTextEntry);
-
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
-    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
-    	logger.debug("lockOnFinish: " + lockOnFinish);
-    	voteLearningForm.setLockOnFinish(lockOnFinish);
-    	
     	
     	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
         logger.debug("retrieving voteSession: " + voteSession);
@@ -897,7 +782,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    
 	    voteLearningForm.setUserEntry("");
 	    
-	    logger.debug("previewOnly : " + previewOnly);
 	    logger.debug("fwd'ing to LOAD_LEARNER : " + LOAD_LEARNER);
 	    voteLearningForm.resetCommands();
 	    
@@ -935,5 +819,52 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		saveErrors(request,errors);	    	    
 	}
     
-}
     
+    protected void repopulateRequestParameters(HttpServletRequest request, VoteLearningForm voteLearningForm)
+    {
+        logger.debug("starting repopulateRequestParameters");
+        
+        String toolSessionID=request.getParameter(TOOL_SESSION_ID);
+        logger.debug("toolSessionID: " + toolSessionID);
+        voteLearningForm.setToolSessionID(toolSessionID);
+        
+        String userID=request.getParameter(USER_ID);
+    	logger.debug("userID: " + userID);
+    	voteLearningForm.setUserID(userID);
+
+    	String revisitingUser=request.getParameter(REVISITING_USER);
+    	logger.debug("revisitingUser: " + revisitingUser);
+    	voteLearningForm.setRevisitingUser(revisitingUser);
+
+    	String previewOnly=request.getParameter(PREVIEW_ONLY);
+    	logger.debug("previewOnly: " + previewOnly);
+    	voteLearningForm.setPreviewOnly(previewOnly);
+
+    	String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
+    	logger.debug("maxNominationCount: " + maxNominationCount);
+    	voteLearningForm.setMaxNominationCount(maxNominationCount);
+
+    	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
+    	logger.debug("allowTextEntry: " + allowTextEntry);
+    	voteLearningForm.setAllowTextEntry(allowTextEntry);
+    	
+    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
+    	logger.debug("voteChangable: " + voteChangable);
+    	voteLearningForm.setVoteChangable(voteChangable);
+
+    	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
+    	logger.debug("lockOnFinish: " + lockOnFinish);
+    	voteLearningForm.setLockOnFinish(lockOnFinish);
+
+    	String reportViewOnly=request.getParameter(REPORT_VIEW_ONLY);
+    	logger.debug("reportViewOnly: " + reportViewOnly);
+    	voteLearningForm.setReportViewOnly(reportViewOnly);
+    	
+    	String userEntry=request.getParameter(USER_ENTRY);
+    	logger.debug("userEntry: " + userEntry);
+    	voteLearningForm.setUserEntry(userEntry);
+
+    }
+}
+
+

@@ -150,6 +150,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -337,6 +338,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	
     	voteGeneralLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
     	voteGeneralLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
+    	voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
     	
     	logger.debug("learner progress voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
     	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
@@ -470,6 +472,19 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	    boolean isSessionCompleted=isSessionCompleted(userSessionId, voteService);
     	    logger.debug("isSessionCompleted: " + isSessionCompleted);
     	    
+    	    if (isSessionCompleted)
+    	    {
+    	        logger.debug("since the sessio is completed. present a screen which can not be edited");
+         		voteLearningForm.setReportViewOnly(new Boolean(true).toString());
+         		voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
+    	    }
+    	    
+     		logger.debug("geting user answers for user uid and sessionUid" + voteQueUsr.getUid() + " " + sessionUid);
+     		Set userAttempts=voteService.getAttemptsForUserAndSessionUseOpenAnswer(voteQueUsr.getUid(), sessionUid);
+    		logger.debug("userAttempts: "+ userAttempts);
+    		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+
+    	    
     	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
     	    logger.debug("isContentLockOnFinish: " + isContentLockOnFinish);
     	    if ((isContentLockOnFinish.equals(new Boolean(true).toString()) && (isSessionCompleted == true)))
@@ -479,13 +494,16 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
         	    return (mapping.findForward(EXIT_PAGE));
             }
     	    
-    	    
     		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " voteQueUsr: " + 
     				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
     		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
     		voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(true).toString());
      		logger.debug("preparing chart data for readonly mode");
      		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), toolSessionID, voteGeneralLearnerFlowDTO);
+     		
+     		//voteLearningForm.setReportViewOnly(new Boolean(true).toString());
+     		//voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
+     		
      		
      		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
      		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);

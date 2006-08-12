@@ -81,6 +81,8 @@ public interface IVoteService
  	
  	public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
  	
+ 	public Set getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId,  final Long voteSessionId);
+ 	
  	public int getLastNominationCount(Long userId) throws VoteApplicationException;
  	
  	public Set getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException;

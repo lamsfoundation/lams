@@ -285,6 +285,22 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
+    
+    
+    public Set getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId,  final Long voteSessionId)
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(queUsrId, voteSessionId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting all user entries, standard plus open text"
+                                                         + e.getMessage(),
+														   e);
+        }
+        
+    }
    
 
     public int getCompletedSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException

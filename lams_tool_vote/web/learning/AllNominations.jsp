@@ -66,6 +66,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="allowTextEntry"/>	
 	<html:hidden property="voteChangable"/>	
 	<html:hidden property="lockOnFinish"/>	
+	<html:hidden property="reportViewOnly"/>		
+	<html:hidden property="userEntry"/>		
+	
 
 				<table>
 					  <tr>
@@ -123,8 +126,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:out value="${currentNomination.value}" escapeXml="false"/>
 											 </td>
 			
-			
-			
 											<td NOWRAP valign=top align=left>				  	 		
 									  	 		<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
 										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
@@ -134,7 +135,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												  	 		<c:forEach var="currentQuestionUid" items="${voteGeneralLearnerFlowDTO.mapStandardQuestionUid}">
 													  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
 												  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
-
 
 														  	 		<c:forEach var="currentSessionUid" items="${voteGeneralLearnerFlowDTO.mapStandardToolSessionUid}">
 															  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
@@ -177,8 +177,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  			</table>
 								</td> </tr>					  
 
-					  
-
 					  <tr>
 					  	<td NOWRAP valign=top colspan=2> 
 								&nbsp
@@ -206,6 +204,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	</tr>
 
 
+
+
+				<c:if test="${VoteLearningForm.reportViewOnly != 'true'}"> 				   	
 				  <tr>
 				  	<td NOWRAP valign=top> 
 								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 				   						
@@ -234,6 +235,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                          </div>
 				  	 </td>
 				  </tr>
+				</c:if> 		          				  
 
 	</html:form>
 </div>
