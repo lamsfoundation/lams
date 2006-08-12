@@ -306,7 +306,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		commonContentSetup(request, voteService, voteContent, voteGeneralLearnerFlowDTO);
 		
 		/* PREVIEW_ONLY for jsp*/
-    	//request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
 		voteLearningForm.setPreviewOnly(new Boolean(true).toString());
 		voteGeneralLearnerFlowDTO.setPreviewOnly(new Boolean(true).toString());
 		
@@ -500,10 +499,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(true).toString());
      		logger.debug("preparing chart data for readonly mode");
      		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), toolSessionID, voteGeneralLearnerFlowDTO);
-     		
-     		//voteLearningForm.setReportViewOnly(new Boolean(true).toString());
-     		//voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
-     		
      		
      		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
      		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);

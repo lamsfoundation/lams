@@ -209,7 +209,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${VoteLearningForm.reportViewOnly != 'true'}"> 				   	
 				  <tr>
 				  	<td NOWRAP valign=top> 
-								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 				   						
+								<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   						
 			                                <html:submit property="redoQuestionsOk" 
 			                                             styleClass="button" 
 			                                             onclick="submitMethod('redoQuestionsOk');">
@@ -217,13 +217,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			                                </html:submit>
 								</c:if> 		          
 
-								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish == 'true' && VoteLearningForm.revisitingUser == 'false' }"> 				   						
-				                                <html:submit property="redoQuestionsOk" 
-				                                             styleClass="button" 
-				                                             onclick="submitMethod('redoQuestionsOk');">
-				                                    <bean:message key="label.retake"/>
-				                                </html:submit>
-								</c:if> 		          								                      
 					<td>					
 					<td NOWRAP valign=top> 			
 						<div class="right-buttons">

@@ -569,7 +569,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 		// check number of votes
 		int castVoteCount= voteDisplayOrderIds!=null ? voteDisplayOrderIds.size() : 0;
-    	//String userEntry=voteLearningForm.getUserEntry();
     	logger.debug("userEntry: " + userEntry);
     	
     	if ((userEntry != null) && (userEntry.length() > 0))
@@ -657,7 +656,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         	logger.debug("votes deleted for user: " + voteQueUsr.getUid());
     	}
     	
-    	// To mimize changes to working code, convert the String[] array to the mapGeneralCheckedOptionsContent structure 
+    	/* to mimize changes to working code, convert the String[] array to the mapGeneralCheckedOptionsContent structure */ 
     	Map mapGeneralCheckedOptionsContent = LearningUtil.buildQuestionContentMap(request, voteService, voteContent, voteDisplayOrderIds);
     	logger.debug("mapGeneralCheckedOptionsContent size: " + mapGeneralCheckedOptionsContent.size());
     	
@@ -699,7 +698,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	
     	logger.debug("created user attempt in the db");
     	
-    	// Put the map in the request ready for the next screen
+    	/* put the map in the request ready for the next screen */
     	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	voteLearningForm.setMapGeneralCheckedOptionsContent(mapGeneralCheckedOptionsContent);

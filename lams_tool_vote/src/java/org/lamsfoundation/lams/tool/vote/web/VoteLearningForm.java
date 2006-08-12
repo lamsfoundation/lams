@@ -692,28 +692,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
         this.userID = userID;
     }
     
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("activityInstructions: ", activityInstructions)
-            .append("activityTitle: ", activityTitle)
-            .append("revisitingUser: ", revisitingUser)
-            .append("userEntry: ", userEntry)
-            .append("castVoteCount: ", castVoteCount)
-            .append("maxNominationCountReached: ", maxNominationCountReached)            
-            .append("activityRunOffline: ", activityRunOffline)
-            .append("toolSessionID: ", toolSessionID)
-            .append("learningMode: ", learningMode)
-            .append("toolContentID: ", toolContentID)
-            .append("nominationsSubmited: ", nominationsSubmited)            
-            .append("toolContentUID: ", toolContentUID)
-            .append("previewOnly: ", previewOnly)            
-            .append("reportViewOnly: ", reportViewOnly)
-            .append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)
-            .toString();
-    }
-    
-    
-        /**
+     /**
      * @return Returns the reportViewOnly.
      */
     public String getReportViewOnly() {
@@ -762,4 +741,25 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setPreviewOnly(String previewOnly) {
         this.previewOnly = previewOnly;
     }
+    
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("activityInstructions: ", activityInstructions)
+            .append("activityTitle: ", activityTitle)
+            .append("revisitingUser: ", revisitingUser)
+            .append("userEntry: ", userEntry)
+            .append("castVoteCount: ", castVoteCount)
+            .append("maxNominationCountReached: ", maxNominationCountReached)            
+            .append("activityRunOffline: ", activityRunOffline)
+            .append("toolSessionID: ", toolSessionID)
+            .append("learningMode: ", learningMode)
+            .append("toolContentID: ", toolContentID)
+            .append("nominationsSubmited: ", nominationsSubmited)            
+            .append("toolContentUID: ", toolContentUID)
+            .append("previewOnly: ", previewOnly)            
+            .append("reportViewOnly: ", reportViewOnly)
+            .append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)
+            .toString();
+    }
+    
 }
