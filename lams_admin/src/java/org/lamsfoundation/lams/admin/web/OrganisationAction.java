@@ -78,13 +78,8 @@ public class OrganisationAction extends LamsDispatchAction {
 			orgForm.set("parentName",org.getParentOrganisation().getName());
 			orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
 			orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
-			Map<String, Object> properties = new HashMap<String, Object>();
-			properties.put("languageIsoCode",org.getLocaleLanguage());
-			if(org.getLocaleCountry()!=null){
-				properties.put("countryIsoCode",org.getLocaleCountry());
-			}
-			SupportedLocale locale = (SupportedLocale)getService().findByProperties(SupportedLocale.class,properties).get(0);
-			orgForm.set("localeId",locale.getLocaleId());
+			SupportedLocale locale = org.getLocale();
+			orgForm.set("localeId",locale != null ? locale.getLocaleId() : null);
 		}
 		request.getSession().setAttribute("locales",locales);
 		request.getSession().setAttribute("status",status);

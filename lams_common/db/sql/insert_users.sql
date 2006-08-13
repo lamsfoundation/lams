@@ -67,46 +67,46 @@ insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_
 insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (9, 7,7);
 insert into lams_workspace_workspace_folder (id, workspace_id, workspace_folder_id) values (10, 8,8);
 
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,'en','AU',1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (2, 'Playpen', 'PP101', 'Developers Playpen',1,2,NOW(),2,'en','AU',1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (3, 'Everybody', null, 'All People In Course',2,3,NOW(),null,'en','AU',1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (4, 'Mathematics 1', 'MATH111', 'Mathematics 1',1,2,NOW(),3,'zh',null,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (5, 'Tutorial Group A', 'TUTA', 'Tutorial Group A',4,3,NOW(),null,'zh',null,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
-	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),null,'zh',null,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
+	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
+	VALUES (2, 'Playpen', 'PP101', 'Developers Playpen',1,2,NOW(),2,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
+	VALUES (3, 'Everybody', null, 'All People In Course',2,3,NOW(),null,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
+	VALUES (4, 'Mathematics 1', 'MATH111', 'Mathematics 1',1,2,NOW(),3,2,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
+	VALUES (5, 'Tutorial Group A', 'TUTA', 'Tutorial Group A',4,3,NOW(),null,2,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
+	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),null,2,1);
 
 -- users
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-locale_language, locale_country, flash_theme_id, html_theme_id)
+locale_id, flash_theme_id, html_theme_id)
 VALUES(1, 'sysadmin',SHA1('sysadmin'),'Mr','Fei','Yang',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',
 0,NOW(),1,null,
-'en','au',1,3);
+1,1,3);
 
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-locale_language, locale_country, flash_theme_id, html_theme_id)
+locale_id, flash_theme_id, html_theme_id)
 VALUES(2, 'test',SHA1('test'),'Dr','Testing','LDAP',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'test@xx.xx.xx',
 0,NOW(),3,null,
-'mi','nz',1,3);
+3,1,3);
 
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-locale_language, locale_country, flash_theme_id, html_theme_id)
+locale_id, flash_theme_id, html_theme_id)
 VALUES(3, 'lamskh01',SHA1('dummy'),'Mr','Jacky','Fang',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'jfang@melcoe.mq.edu.au',
 0,NOW(),2,null,
-'en','au',1,3);
+1,1,3);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,

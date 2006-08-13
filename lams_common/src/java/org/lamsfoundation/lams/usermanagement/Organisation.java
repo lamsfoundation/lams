@@ -76,10 +76,8 @@ public class Organisation implements Serializable {
     
     private OrganisationState organisationState;
 
-	private String localeLanguage;
+	private SupportedLocale locale;
 
-	private String localeCountry;
-	
     /** persistent field */
     private Boolean courseAdminCanAddNewUsers;
 
@@ -316,35 +314,7 @@ public class Organisation implements Serializable {
         this.lessons = lessons;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="locale_language"
-     *             length="2"
-     *         
-     */
-    public String getLocaleLanguage() {
-        return this.localeLanguage;
-    }
-
-    public void setLocaleLanguage(String localeLanguage) {
-        this.localeLanguage = localeLanguage;
-    }
-
-    /** 
-     *            @hibernate.property
-     *             column="locale_country"
-     *             length="2"
-     *         
-     */
-    public String getLocaleCountry() {
-        return this.localeCountry;
-    }
-
-    public void setLocaleCountry(String localeCountry) {
-        this.localeCountry = localeCountry;
-    }
-
-    /** 
+     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
      *            @hibernate.column name="organisation_state_id"         
@@ -442,5 +412,19 @@ public class Organisation implements Serializable {
     public OrganisationDTO getOrganisationDTO(){
     	return new OrganisationDTO(this);
     }
+	/**
+	 * @hibernate.many-to-one
+     *       not-null="true"
+     *       lazy="false"
+     * @hibernate.column name="locale_id"         
+	 * @param localeCountry
+	 */
+	public SupportedLocale getLocale() {
+		return locale;
+	}
+
+	public void setLocale(SupportedLocale locale) {
+		this.locale = locale;
+	}
 
 }

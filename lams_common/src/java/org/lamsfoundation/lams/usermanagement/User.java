@@ -100,9 +100,7 @@ public class User implements Serializable,Comparable {
     private Boolean disabledFlag;
 
     /** persistent field */
-    private String localeLanguage;
-    /** persistent field */
-    private String localeCountry;
+    private SupportedLocale locale;
     
     /** persistent field */
     private Date createDate;
@@ -693,8 +691,8 @@ public class User implements Serializable,Comparable {
     						this.firstName,
 							this.lastName,
 							this.login,
-							this.localeLanguage,
-							this.localeCountry,
+							locale != null? locale.getLanguageIsoCode() : null,
+							locale != null? locale.getCountryIsoCode() : null,
 							this.email,
 							new CSSThemeBriefDTO(this.flashTheme),
 							new CSSThemeBriefDTO(this.htmlTheme));
@@ -756,25 +754,17 @@ public class User implements Serializable,Comparable {
 	}
 	
 	/**
-	 * @hibernate.property column="locale_country" length="2"
+	 * @hibernate.many-to-one
+     *       not-null="true"
+     *       lazy="false"
+     * @hibernate.column name="locale_id"         
 	 * @param localeCountry
 	 */
-	public String getLocaleCountry() {
-		return localeCountry;
+	public SupportedLocale getLocale() {
+		return locale;
 	}
 
-	public void setLocaleCountry(String localeCountry) {
-		this.localeCountry = localeCountry;
+	public void setLocale(SupportedLocale locale) {
+		this.locale = locale;
 	}
-	/**
-	 * @hibernate.property column="locale_language" length="2"
-	 * @param localeCountry
-	 */
-	public String getLocaleLanguage() {
-		return localeLanguage;
-	}
-
-	public void setLocaleLanguage(String localeLanguage) {
-		this.localeLanguage = localeLanguage;
-	}	
 }

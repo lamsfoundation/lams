@@ -199,14 +199,6 @@ VALUES (17, 'el', null, 'Greek');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (18, 'nl', null, 'Dutch');
 
--- to be removed when the admin converted over to use lams_supported_locale
-INSERT INTO lams_country VALUES (1, 'AU');
-INSERT INTO lams_country VALUES (2, 'US');
-INSERT INTO lams_country VALUES (3, 'CN');
-
-INSERT INTO lams_language VALUES (1, 'en');
-INSERT INTO lams_language VALUES (2, 'zh');
-
 -- which current tool supports the old 1.0.x tools?
 INSERT INTO lams_tool_import_support VALUES (1, 'lafrum11', 'messageboard');
 INSERT INTO lams_tool_import_support VALUES (2, 'lamc11', 'simpleassessment');

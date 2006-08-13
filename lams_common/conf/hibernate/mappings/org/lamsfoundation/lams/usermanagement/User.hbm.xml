@@ -264,31 +264,6 @@
             not-null="true"
         </meta>    
     </property>
-    <property
-        name="localeLanguage"
-        type="java.lang.String"
-        column="locale_language"
-        length="2"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="locale_language"
-            length="2"
-        </meta>    
-    </property>
-    
-    <property
-        name="localeCountry"
-        type="java.lang.String"
-        column="locale_country"
-        length="2"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="locale_country"
-            length="2"
-        </meta>    
-    </property>
     
     <property
         name="chatId"
@@ -456,5 +431,20 @@
         />
     </set>
 
+    <!-- bi-directional many-to-one association to SupportedLocale -->
+    <many-to-one
+        name="locale"
+        class="org.lamsfoundation.lams.usermanagement.SupportedLocale"
+        lazy="false"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+            lazy="false"
+           @hibernate.column name="locale_id"         
+        </meta>
+        <column name="locale_id" />
+    </many-to-one>
 </class>
 </hibernate-mapping>

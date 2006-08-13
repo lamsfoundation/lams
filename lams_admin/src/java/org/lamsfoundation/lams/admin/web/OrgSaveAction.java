@@ -106,18 +106,16 @@ public class OrgSaveAction extends Action {
 			if(orgId!=0){
 				org = (Organisation)getService().findById(Organisation.class,orgId);
 				BeanUtils.copyProperties(org,orgForm);
-				org.setLocaleCountry(locale.getCountryIsoCode());
-				org.setLocaleLanguage(locale.getLanguageIsoCode());
+				org.setLocale(locale);
 			}else{
 				org = new Organisation();
 				BeanUtils.copyProperties(org,orgForm);
-				org.setLocaleCountry(locale.getCountryIsoCode());
-				org.setLocaleLanguage(locale.getLanguageIsoCode());
+				org.setLocale(locale);
 				org.setParentOrganisation((Organisation)getService().findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)getService().findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 			}
 			
-			log.debug("orgId:"+org.getOrganisationId()+" language:"+org.getLocaleLanguage()+" Country:"+org.getLocaleCountry()+" create date:"+org.getCreateDate());
+			log.debug("orgId:"+org.getOrganisationId()+" locale:"+org.getLocale()+" create date:"+org.getCreateDate());
 			org.setOrganisationState((OrganisationState)getService().findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
 			org = getService().saveOrganisation(org, user.getUserID());
 			

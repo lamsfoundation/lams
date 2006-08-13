@@ -131,10 +131,8 @@ public class UserSaveAction extends Action {
 					userForm.set("password", user.getPassword());
 				}
 				BeanUtils.copyProperties(user, userForm);
-				user.setLocaleCountry(locale.getCountryIsoCode());
-				user.setLocaleLanguage(locale.getLanguageIsoCode());
-				log.debug("country: " + user.getLocaleCountry());
-				log.debug("language: " + user.getLocaleLanguage());
+				user.setLocale(locale);
+				log.debug("locale: " + locale);
 				List<String> rolesList = Arrays.asList(roles);
 				List<String> rolesCopy = new ArrayList<String>();
 				rolesCopy.addAll(rolesList);
@@ -176,8 +174,7 @@ public class UserSaveAction extends Action {
 					user.setAuthenticationMethod((AuthenticationMethod) getService().findByProperty(AuthenticationMethod.class,
 							"authenticationMethodName","LAMS-Database").get(0));
 					user.setUserId(null);
-					user.setLocaleCountry(locale.getCountryIsoCode());
-					user.setLocaleLanguage(locale.getLanguageIsoCode());
+					user.setLocale(locale);
 					getService().save(user);
 					log.debug("user: " + user.toString());
 					List<Organisation> orgs = new ArrayList<Organisation>();

@@ -91,7 +91,7 @@ public class ProfileAction extends LamsDispatchAction {
 		log.debug("editing profile of userId: "+requestor.getUserId());
 		DynaActionForm userForm = (DynaActionForm)form;
 		BeanUtils.copyProperties(userForm, requestor);
-		SupportedLocale locale = getService().getSupportedLocale(requestor.getLocaleLanguage(),requestor.getLocaleCountry());
+		SupportedLocale locale = requestor.getLocale();
 		userForm.set("localeId",locale.getLocaleId());
 		request.setAttribute("locales", locales);
 		return mapping.findForward("edit");

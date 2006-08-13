@@ -111,7 +111,7 @@ public class UserAction extends LamsDispatchAction {
 	            i++;
 	        }
 	        userForm.set("roles",roles);
-	        SupportedLocale locale = getService().getSupportedLocale(user.getLocaleLanguage(),user.getLocaleCountry());
+	        SupportedLocale locale = user.getLocale();
 			userForm.set("localeId",locale.getLocaleId());
 			
 		}else{

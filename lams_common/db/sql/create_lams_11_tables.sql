@@ -221,13 +221,12 @@ CREATE TABLE lams_organisation (
      , organisation_type_id INT(3) NOT NULL DEFAULT 0
      , create_date DATETIME NOT NULL
      , workspace_id BIGINT(20)
-     , locale_language CHAR(2)
-     , locale_country CHAR(2)
      , organisation_state_id INT(3) NOT NULL
      , admin_add_new_users TINYINT(1) NOT NULL DEFAULT 0
      , admin_browse_all_users TINYINT(1) NOT NULL DEFAULT 0
      , admin_change_status TINYINT(1) NOT NULL DEFAULT 0
      , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
+     , locale_id TINYINT(4)
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
      , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
@@ -241,6 +240,15 @@ CREATE TABLE lams_organisation (
      , INDEX (organisation_state_id)
      , CONSTRAINT FK_lams_organisation_4 FOREIGN KEY (organisation_state_id)
                   REFERENCES lams_organisation_state (organisation_state_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (locale_id)
+     , CONSTRAINT FK_lams_organisation_5 FOREIGN KEY (locale_id)
+                  REFERENCES lams_supported_locale (locale_id)
+     , INDEX (organisation_id)
+     , CONSTRAINT FK_lams_organisation_6 FOREIGN KEY (organisation_id)
+                  REFERENCES lams_organisation (organisation_id)
+     , INDEX (organisation_id)
+     , CONSTRAINT FK_lams_organisation_7 FOREIGN KEY (organisation_id)
+                  REFERENCES lams_organisation (organisation_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_css_theme_ve (
@@ -301,11 +309,10 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
-     , locale_language CHAR(2) NOT NULL DEFAULT 'en'
-     , locale_country CHAR(2)
      , flash_theme_id BIGINT(20)
      , html_theme_id BIGINT(20)
      , chat_id VARCHAR(255)
+     , locale_id BIGINT(20)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -320,10 +327,6 @@ CREATE TABLE lams_user (
      , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
-ALTER TABLE lams_user MODIFY COLUMN locale_language CHAR(2) NOT NULL DEFAULT 'en'
-      COMMENT 'ISO 639-1 Language Code (2 letter version) Java only supports 2 letter properly, not the 3 letter codes.';
-ALTER TABLE lams_user MODIFY COLUMN locale_country CHAR(2)
-      COMMENT 'ISO 3166 Country Code';
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 
@@ -848,18 +851,6 @@ CREATE TABLE lams_role_privilege (
                   REFERENCES lams_role (role_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_language (
-	   language_id TINYINT(4) NOT NULL AUTO_INCREMENT
-	 , iso_code VARCHAR(2) NOT NULL UNIQUE
-	 , PRIMARY KEY (language_id)
-)TYPE=InnoDB;
-
-CREATE TABLE lams_country (
-	  country_id TINYINT(4) NOT NULL AUTO_INCREMENT
-	 , iso_code VARCHAR(2) NOT NULL UNIQUE
-	 , PRIMARY KEY (country_id)
- )TYPE=InnoDB;
- 
 CREATE TABLE lams_tool_import_support (
        id BIGINT(20) NOT NULL AUTO_INCREMENT
      , installed_tool_signature VARCHAR(15) NOT NULL
