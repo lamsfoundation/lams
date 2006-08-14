@@ -426,12 +426,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	*/
 	public function removeOptionalCA(ca:Object, parentID){
 		//lets do a test to see if we got the canvas
+		
 		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
 		ca.activity.parentUIID = null;
 		ca.activity.orderID = null;
+		ca.activity.parentActivityID = null;
 		removeActivity(ca.activity.activityUIID);
 		//_cv.ddm.removeActivity(ca.activity.activityUIID);
 		removeActivity(parentID);
+		//_cv.ddm.addActivity(ToolActivity(ca));
 		setDirty();
 		
 	}
