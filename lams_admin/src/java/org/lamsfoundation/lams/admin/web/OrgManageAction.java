@@ -23,9 +23,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,14 +34,9 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -88,7 +81,6 @@ public class OrgManageAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
-		ActionMessages errors = new ActionMessages();
 		Integer orgId = WebUtil.readIntParam(request,"org",true);
 		if(orgId==null){
 			orgId = (Integer)request.getAttribute("org");
@@ -98,7 +90,6 @@ public class OrgManageAction extends Action {
 			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
-		String username = request.getRemoteUser();
 		OrgListDTO orgManageForm = new OrgListDTO();
 		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 		log.debug("orgId:"+orgId);
