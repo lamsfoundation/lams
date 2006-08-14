@@ -250,6 +250,8 @@ a:hover.button {
 	padding-bottom: 25px;
 	text-decoration: none;
 }
+
+
 /*layout of adding a topic button */
 a.button-add-item {
 	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
@@ -587,9 +589,10 @@ padding:0px;
 }
 
 #login-left-col h2 {
-margin:0px; 
+margin:30px 0px 0px 3px; 
 padding:0px;
-
+font-weight:100;
+font-size:1.5em;
 }
 
 #login-left-col h3 {
@@ -615,12 +618,12 @@ width:285px;
 float:left; 
 margin-left:47px; 
 background: url('../images/css/lams_login_bar.jpg') no-repeat 0 0; 
-margin-top:10px;
+margin-top:5px;
 height:450px;
 }
 
 #login-right-col h2 {
-margin-top:45px; 
+margin-top:22px; 
 margin-left:20px;
 color:#239CF7;
 }
@@ -635,6 +638,15 @@ margin-top:35px;
 margin-right:50px; 
 text-align:right; 
 margin-bottom:15px;
+}
+
+#login-right-col p.version {
+color:#47bc23;
+margin-top:5px; 
+margin-right:20px;
+margin-bottom:0px; 
+text-align:right;
+font-size:1.2em;
 }
 #login-right-col a.button {
 background:url('../images/css/btn_off.gif') no-repeat 0px 20px; 
@@ -655,6 +667,20 @@ padding-right:20px;
 padding-top:25px; 
 padding-bottom:25px;
 text-decoration:none;}
+
+#login-page #footer { /*layout of the footer - the bottom of the box */
+	width: 707px;
+	height: 14px;
+	background: url('../images/css/footer_bg.jpg') no-repeat top;
+}
+
+#login-page #footer p{ 
+	padding:20px 0px 0px 10px;
+	text-align:center;
+    font-family: verdana, arial, helvetica, sans-serif;
+	font-size:.9em;
+	color:#999;
+}
 
 .clear { 
 clear:both

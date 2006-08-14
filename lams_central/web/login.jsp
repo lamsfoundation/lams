@@ -29,16 +29,7 @@ j_security_login_page
 	<lams:css/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
-	<!--[if IE]>
-	
-	  <style type="text/css">
-	  
-	    @import url(css/ie-styles.css);
-		
-	  </style>
-	  
-	<![endif]-->
+
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script>
 		function submitForm(){
@@ -62,8 +53,8 @@ j_security_login_page
 	
 	  <div id="login-content">	
 	  
-			  <div id="login-left-col" class="row"><h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
-			 <h2><img src="<lams:LAMSURL/>/images/css/lams_news.gif" alt="LAMS News and Latest Updates" class="news" /></h2>
+			  <div id="login-left-col"><h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
+			 <h2>Latest News &amp; Updates</h2>
 			 
 			  <ul>
 			  	<li>
@@ -76,7 +67,8 @@ LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" ta
 			  </div>
 				<!--closes left col-->
 				
-				<div id="login-right-col" class="row">
+				<div id="login-right-col">
+				<p class="version">Version 2.0</p>
 				 <h2><fmt:message key="button.login"/></h2>
 				 <form action="j_security_check" method="post" name="loginForm" id="loginForm">
 					<c:if test="${!empty param.failed}">
@@ -85,10 +77,10 @@ LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" ta
 						</p>
 					</c:if>	
 				 <p class="first"><fmt:message key="label.username"/>: 
-				   <input name="j_username" type="text" size="16" tabindex="1"/>
+				   <input name="j_username" type="text" size="16" width="130px" tabindex="1"/>
 				  </p>
 				 <p><fmt:message key="label.password"/>: 
-				   <input name="j_password" type="password" size="16" autocomplete="off" tabindex="2"/>
+				   <input name="j_password" type="password" size="16" width="130px" autocomplete="off" tabindex="2"/>
 				  </p>
 					
 					 <p><input type="submit" class="button" value="<fmt:message key="button.login"/>" onClick="javascript:submitForm()" tabindex="3"/></p>
@@ -104,9 +96,13 @@ LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" ta
 		
 		
 		<div id="footer">
-		</div><!--closes footer-->
+		
+		<p>&copy; 2002-2005 LAMS Foundation</p>
+		
+	  </div><!--closes footer-->
 		
 	</div><!--closes page-->
+
 
 </body>
 
