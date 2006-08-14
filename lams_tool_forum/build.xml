@@ -150,7 +150,7 @@
 	<!-- =================================================================== -->
 	<target name="clean-db"	description="clean forum database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
+				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>
@@ -160,7 +160,7 @@
 	
 	<target name="init-db"	description="drop and create forum database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
+				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>
@@ -172,7 +172,7 @@
 	<target name="build-db"	depends="init-db" 
 							description="build qa tool database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
+				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.name}"/>
 			</classpath>

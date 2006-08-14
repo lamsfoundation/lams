@@ -129,7 +129,7 @@ Ant build file.
 	<!-- =================================================================== -->
 		<target name="clean-db"	description="Deletes the Noticeboard Tool Tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-					password="${db.password}">
+					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
 					<pathelement location="${db.driver.jar}"/>
 				</classpath>
@@ -139,7 +139,7 @@ Ant build file.
 		
 		<target name="build-db" depends="" description="Deletes and Creates the Noticeboard Tool tables and inserts default content">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-								password="${db.password}">
+								password="${db.password}"  encoding="${db.encoding}">
 							<classpath>
 								<pathelement location="${db.driver.jar}"/>
 							</classpath>
@@ -149,7 +149,7 @@ Ant build file.
 	
 	<!--	<target name="insert-test-data" depends="build-db" description="Inserts test data for noticeboard tool in order for test cases to run">
 				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-									password="${db.password}">
+									password="${db.password}"  encoding="${db.encoding}">
 								<classpath>
 									<pathelement location="${db.driver.jar}"/>
 								</classpath>
@@ -167,7 +167,7 @@ Ant build file.
 			        </filterset>
 			    </copy>
 				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-					password="${db.password}">
+					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
 					<pathelement location="${db.driver.jar}"/>
 				</classpath>

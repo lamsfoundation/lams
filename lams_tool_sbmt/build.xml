@@ -294,7 +294,7 @@
 		<target name="rebuild-db"
 			description="rebuild Submit Files tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-					password="${db.password}">
+					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
 					<pathelement location="${db.driver.jar}"/>
 				</classpath>
@@ -309,7 +309,7 @@
 	<target name="insert-test-data" depends="rebuild-db"
 		description="Insert some dummy test data. Removes any data that was in the tables first.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
+				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>

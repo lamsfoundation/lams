@@ -265,7 +265,7 @@ Ant build file.
 	<target name="rebuild-db"
 		description="rebuild LAMS database and clean out content repository. Mysql has to be running first">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
+				password="${db.password}" encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>
@@ -273,25 +273,13 @@ Ant build file.
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
-			<transaction src="${db.scripts}/insert_users.sql"/>
+			<transaction src="${db.scripts}/insert_users.sql"/> 
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
 			<!-- Create tables for Core Notebook Service -->
 			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
-			<!-- Test the scripts for shaun 
-            <transaction src="${db.scripts}/shaun/lams_user_swedish.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_french.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_bulgarian.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_chinese.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_german.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_norwegian.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_portbr.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_italian.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_polish.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_korean.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_spanish.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_maori.sql"/>
-            <transaction src="${db.scripts}/shaun/lams_user_hungarian.sql"/>
+			<!-- Test the scripts for translations
+            <transaction src="${db.scripts}/shaun/all.sql"/>
             -->
 		</sql>
 		
@@ -304,7 +292,7 @@ Ant build file.
 	<target name="insert-test-data" depends="rebuild-db"
 		description="insert test data to lams database">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
+				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>

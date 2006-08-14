@@ -278,7 +278,7 @@
 		<target name="rebuild-db"
 			description="rebuild QA tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-					password="${db.password}">
+					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
 					<pathelement location="${db.driver.jar}"/>
 				</classpath>
@@ -294,7 +294,7 @@
 		<target name="clean-tool-db"
 			description="rebuild qa tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-					password="${db.password}">
+					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
 					<pathelement location="${db.driver.jar}"/>
 				</classpath>
