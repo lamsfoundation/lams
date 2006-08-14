@@ -243,12 +243,6 @@ CREATE TABLE lams_organisation (
      , INDEX (locale_id)
      , CONSTRAINT FK_lams_organisation_5 FOREIGN KEY (locale_id)
                   REFERENCES lams_supported_locale (locale_id)
-     , INDEX (organisation_id)
-     , CONSTRAINT FK_lams_organisation_6 FOREIGN KEY (organisation_id)
-                  REFERENCES lams_organisation (organisation_id)
-     , INDEX (organisation_id)
-     , CONSTRAINT FK_lams_organisation_7 FOREIGN KEY (organisation_id)
-                  REFERENCES lams_organisation (organisation_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_css_theme_ve (
@@ -312,7 +306,7 @@ CREATE TABLE lams_user (
      , flash_theme_id BIGINT(20)
      , html_theme_id BIGINT(20)
      , chat_id VARCHAR(255)
-     , locale_id BIGINT(20)
+     , locale_id TINYINT(4)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -326,7 +320,12 @@ CREATE TABLE lams_user (
      , INDEX (html_theme_id)
      , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (locale_id)
+     , CONSTRAINT FK_lams_user_6 FOREIGN KEY (locale_id)
+                  REFERENCES lams_supported_locale (locale_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+ALTER TABLE lams_user MODIFY COLUMN chat_id VARCHAR(255)
+      COMMENT 'ID used for Jabber';
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 

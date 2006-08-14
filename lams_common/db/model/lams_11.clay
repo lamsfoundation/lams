@@ -1634,8 +1634,8 @@
 <column alias="" auto-increment="false" column-size="4" decimal-digits="0" default-value="" mandatory="false" name="locale_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
@@ -1685,20 +1685,6 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="locale_id" referenced-key-column-name="locale_id"/>
-</foreign-key>
-<foreign-key alias="" name="FK_lams_organisation_6" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_organisation" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="organisation_id" referenced-key-column-name="organisation_id"/>
-</foreign-key>
-<foreign-key alias="" name="FK_lams_organisation_7" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_organisation" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="organisation_id" referenced-key-column-name="organisation_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list>
@@ -2082,7 +2068,7 @@
 </foreign-key-figure>
 <foreign-key-column column-name="html_theme_id" referenced-key-column-name="theme_ve_id"/>
 </foreign-key>
-<foreign-key alias="" name="FK_lams_user_6" on-delete="" on-update="" referenced-key="PK_LAMS_SUPPORTED_LOCALE" referenced-table="lams_supported_locale" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key alias="" name="FK_lams_user_6" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PK_LAMS_SUPPORTED_LOCALE" referenced-table="lams_supported_locale" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -5057,7 +5043,7 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 </table>
 <table alias="" name="lams_supported_locale" remarks="Describes the valid language/country combinations. Can't make language_iso_code and country_iso_code a unique key as MySQL considers that &quot;NULL=NULL&quot; is not true.">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1205" y="279"/>
+<table-figure-bounds height="-1" width="-1" x="1152" y="228"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="4" decimal-digits="0" default-value="" mandatory="true" name="locale_id" remarks="">
 <column-description></column-description>
