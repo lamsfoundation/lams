@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	                                     
 		           <h2>  <bean:message key="label.authoring.vote.basic"/> </h2>
-					<table class="forms">
+					<table>
 						<tr>   
 						<td NOWRAP class=error>
 							<c:if test="${voteGeneralAuthoringDTO.sbmtSuccess == 'true' }"> 			
@@ -62,31 +62,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 
 
-					<table class="forms">
-						<tr> 
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
-							</td> 
-					  	</tr>
-
-					  	<tr> 
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
-							</td> 
-						</tr>
+				<table class="forms">
 				
-				
-					<tr> <td NOWRAP valign=top>
+					<tr> <td valign=top>
 						<table width="40%">
+
+								<tr> 
+									<td colspan=2 valign=top>
+										<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
+									</td> 
+							  	</tr>
+		
+							  	<tr> 
+									<td colspan=2 valign=top>
+										<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
+									</td> 
+								</tr>
+
 
 					 		<!--default Option content, this entry can not be deleted but can be updated -->
 						 		<tr> 
-									<td NOWRAP valign=top>
+									<td valign=top>
 										<lams:SetEditor id="optionContent0" text="${voteGeneralAuthoringDTO.defaultOptionContent}" key="label.nomination.col"/>								
 									</td> 
 									
 									
-								  	<td NOWRAP valign=top>			
+								  	<td valign=top>			
 										  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
 									</td> 								
 							  	</tr>
@@ -99,7 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  		<c:if test="${optionEntry.key > 1}"> 			
 										<c:set var="optIndex" scope="request" value="${optIndex +1}"/>
 										  <tr>
-											<td NOWRAP valign=top>
+											<td valign=top>
 												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" key="label.nomination.col"/>								
 			                                	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'monitoring' }"> 			
 					 		 						<html:submit property="removeContent" 
@@ -118,7 +119,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</c:if> 													
 		                                    </td>
 		                                    
-			      						  	<td NOWRAP valign=top>			
+			      						  	<td valign=top>			
 								  				<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex == optIndex}"> 			
 				     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
 				     							</c:if> 	    

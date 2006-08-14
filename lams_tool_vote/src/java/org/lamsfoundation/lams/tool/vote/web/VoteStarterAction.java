@@ -172,9 +172,15 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 		VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 		
-		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-		logger.debug("voteService: " + voteService);
+		logger.debug("getting voteService now: servlet is: " + getServlet());
+		IVoteService voteService=null;
+		if (getServlet() != null)
+		    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		else
+		    voteService=voteAuthoringForm.getVoteService();
 		
+		logger.debug("final voteService: " + voteService);
+		    
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 	    
@@ -487,14 +493,21 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		if (voteContent.getTitle() == null)
 		{
 		    voteGeneralAuthoringDTO.setActivityTitle("Voting Title");
-		    voteGeneralAuthoringDTO.setActivityInstructions("Voting Instructions");
 		}
 		else
 		{
 		    voteGeneralAuthoringDTO.setActivityTitle(voteContent.getTitle());
-			voteGeneralAuthoringDTO.setActivityInstructions(voteContent.getInstructions());
 		}
 
+		
+		if (voteContent.getInstructions() == null)
+		{
+		    voteGeneralAuthoringDTO.setActivityInstructions("Voting Instructions");
+		}
+		else
+		{
+		    voteGeneralAuthoringDTO.setActivityInstructions(voteContent.getInstructions());
+		}
 		
 	    /*
 		 * get the nominations 
@@ -585,12 +598,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		voteAuthoringForm.resetUserAction();
 	}
 	
-	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response, IVoteService voteService) 
+	public ActionForward executeDefineLater(ActionMapping mapping, VoteAuthoringForm voteAuthoringForm, 
+			HttpServletRequest request, HttpServletResponse response) 
 		throws IOException, ServletException, VoteApplicationException {
-		logger.debug("passed voteService: " + voteService);
-		logger.debug("calling execute...");
-		return execute(mapping, form, request, response);
+		logger.debug("calling execute..." + voteAuthoringForm);
+		return execute(mapping, voteAuthoringForm, request, response);
 	}
 	
 

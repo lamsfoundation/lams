@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-				<table class="forms">
+				<table>
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
 						<lams:SetEditor id="richTextOnlineInstructions" text="${voteGeneralAuthoringDTO.richTextOnlineInstructions}" small="true" key="label.onlineInstructions.col"/>					

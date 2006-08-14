@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 		
-			<table class="forms">
+			<table>
 				<tr>
 					<td class="field-name">							
 			      			<bean:message key="label.vote.changable"/>:

@@ -190,7 +190,9 @@ public abstract class VoteUtils implements VoteAppConstants {
 
         //voteAuthoringForm.setTitle(defaultVoteContent.getTitle());
         //voteAuthoringForm.setInstructions(defaultVoteContent.getInstructions());
-
+        
+        voteGeneralAuthoringDTO.setActivityTitle(defaultVoteContent.getTitle());
+        voteGeneralAuthoringDTO.setActivityInstructions(defaultVoteContent.getInstructions());
 
 	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
 	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?ON:OFF);

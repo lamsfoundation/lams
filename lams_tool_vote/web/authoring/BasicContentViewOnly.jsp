@@ -29,34 +29,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 	
 				<tr> <td>
-						<table class="forms">
+						<table>
 							<tr> 
-						 		<td valign="top"><b> <bean:message key="label.authoring.title"/>: </b> </td>
-						 		<td NOWRAP> 
-	                                     <c:out value="${activityTitle}" escapeXml="false"/>
+								<td colspan=2 valign=top>
+									<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
 								</td> 
 						  	</tr>
+	
 						  	<tr> 
-						 		<td valign="top"><b> <bean:message key="label.authoring.instructions"/>:  </b></td>
-						 		<td NOWRAP> 
-	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
-								</td>
+								<td colspan=2 valign=top>
+									<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
+								</td> 
 							</tr>
-					
+
 					 		<tr> 
 							  	<td valign="top"> 
 							 		 <b> <bean:message key="label.nomination1"/>:  </b>
 							 	</td>
 							  	<td>
-										<c:out value="${defaultOptionContent}"  escapeXml="false"/>
+										<c:out value="${voteGeneralAuthoringDTO.defaultOptionContent}"  escapeXml="false"/>
 							  	</td>
 						  	</tr>
 	
 			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="optIndex" scope="session" value="1"/>
-						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
+			  	 		<c:set var="optIndex" scope="request" value="1"/>
+						<c:forEach var="optionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
 					  		<c:if test="${optionEntry.key > 1}"> 			
-								<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+								<c:set var="optIndex" scope="request" value="${optIndex +1}"/>
 								  <tr>
 								  	<td NOWRAP valign="top">   <b> <c:out value="Nomination ${optIndex}"/>:  </b> </td>
 
@@ -66,7 +65,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${VoteAuthoringForm.toolContentId}"/>
 						<html:hidden property="optIndex"/>
                         
 				

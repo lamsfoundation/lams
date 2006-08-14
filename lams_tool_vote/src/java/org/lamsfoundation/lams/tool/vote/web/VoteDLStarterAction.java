@@ -56,10 +56,14 @@ public class VoteDLStarterAction extends Action implements VoteAppConstants {
 		VoteUtils.cleanUpSessionAbsolute(request);
 		logger.debug("init defineLater mode. removed attributes...");
 		
-		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-		request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 		
-	    VoteStarterAction voteStarterAction= new VoteStarterAction();
-	    return voteStarterAction.executeDefineLater(mapping, form, request, response, voteService);
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+		//request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		voteAuthoringForm.setVoteService(voteService);
+		
+		VoteStarterAction voteStarterAction= new VoteStarterAction();
+	    return voteStarterAction.executeDefineLater(mapping, voteAuthoringForm, request, response);
 	}
 }

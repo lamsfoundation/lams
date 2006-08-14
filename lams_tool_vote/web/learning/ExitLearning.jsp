@@ -98,14 +98,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				
 		  	   		  <tr>
-					  	<td NOWRAP colspan=2 valign=top> 
- 							<div class="right-buttons">
+					  	<td NOWRAP colspan=2 valign=top align=right> 
                                 <html:submit property="learnerFinished" 
                                              styleClass="button" 
                                              onclick="submitMethod('learnerFinished');">
                                     <bean:message key="label.finished"/>
                                 </html:submit>
-                            </div>
 					  	 </td>
 					  </tr>
 					

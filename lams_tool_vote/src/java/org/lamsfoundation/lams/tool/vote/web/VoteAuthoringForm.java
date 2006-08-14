@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.vote.web;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * <p> ActionForm for the Authoring environment </p>
@@ -110,6 +111,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String submissionAttempt;
 	protected String defaultOptionContent;
 	protected String httpSessionID;
+	protected IVoteService voteService;
 	
 	public void resetUserAction()
     {
@@ -844,6 +846,19 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
         this.defaultOptionContent = defaultOptionContent;
     }
 
+    /**
+     * @return Returns the voteService.
+     */
+    public IVoteService getVoteService() {
+        return voteService;
+    }
+    /**
+     * @param voteService The voteService to set.
+     */
+    public void setVoteService(IVoteService voteService) {
+        this.voteService = voteService;
+    }
+    
     /**
      * @return Returns the httpSessionID.
      */

@@ -168,18 +168,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if> 			
 		
 		<c:if test="${ (voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 			
-			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
-			<!-- end tab buttons -->
-			
-			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContentViewOnly.jsp"/>
 			<!-- end of content (Basic) -->
 		</c:if> 			
 		
 		<c:if test="${ (voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 			
-			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
-			<!-- end tab buttons -->
-			
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 			<!-- end of content (Basic) -->

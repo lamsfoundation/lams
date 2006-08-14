@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -48,6 +49,7 @@ import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -158,8 +160,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
     	VoteUtils.cleanUpUserExceptions(request);
 	 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
-	 	repopulateRequestParameters(request, voteAuthoringForm);
 	 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
+	 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 	 	VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);	 	
 	 	voteAuthoringForm.resetUserAction();
 	 	return null;
@@ -179,7 +181,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	    
-	    repopulateRequestParameters(request, voteAuthoringForm);
+	    repopulateRequestParameters(request, voteAuthoringForm,voteGeneralAuthoringDTO);
 	    
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -292,7 +294,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
 	    
-	    repopulateRequestParameters(request, voteAuthoringForm);
+	    repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 	    
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -402,7 +404,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
 	    
-	    repopulateRequestParameters(request, voteAuthoringForm);
+	    repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 	    
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -442,8 +444,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	           	
 	    ActionMessages errors= new ActionMessages();
-	    errors=validateSubmit(request, errors, voteAuthoringForm);
-	    
+	    //errors=validateSubmit(request, errors, voteAuthoringForm);
+	    /*
 	    if (errors.size() > 0)  
 	    {
 	        logger.debug("returning back to from to fix errors:");
@@ -452,6 +454,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	        voteGeneralAuthoringDTO.setValidationError(new Boolean(true).toString());
 	        return false;
 	    }
+	    */
 	    
 	    List attachmentList=(List)sessionMap.get(ATTACHMENT_LIST_KEY);
 	    logger.debug("attachmentList :" +attachmentList);
@@ -574,6 +577,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
  		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
  		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
 
+		voteAuthoringForm.setDefineLaterInEditMode(new Boolean(false).toString());
+		voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
+
 		
 		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
 		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
@@ -594,7 +600,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 		
-	    repopulateRequestParameters(request, voteAuthoringForm);
+	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO=new VoteGeneralAuthoringDTO();
+	    repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 	    
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -635,7 +642,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    
 	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
-	    repopulateRequestParameters(request, voteAuthoringForm);
+	    repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 	    
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -784,7 +791,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	repopulateRequestParameters(request, voteAuthoringForm);
+    	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -975,7 +982,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	repopulateRequestParameters(request, voteAuthoringForm);
+    	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
     	
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -1087,7 +1094,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	
     	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
-    	repopulateRequestParameters(request, voteAuthoringForm);
+    	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
     	
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -1199,7 +1206,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	repopulateRequestParameters(request, voteAuthoringForm);
+    	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
     	
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -1288,7 +1295,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	repopulateRequestParameters(request, voteAuthoringForm);
+    	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
     	
 		String httpSessionID=voteAuthoringForm.getHttpSessionID();
 		logger.debug("httpSessionID: " + httpSessionID);
@@ -1377,26 +1384,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	repopulateRequestParameters(request, voteAuthoringForm);
-    	
-		String httpSessionID=voteAuthoringForm.getHttpSessionID();
-		logger.debug("httpSessionID: " + httpSessionID);
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		logger.debug("sessionMap: " + sessionMap);
-		
-	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
-	    logger.debug("mapOptionsContent: " + mapOptionsContent);
-	    voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
-	    
-	    int maxIndex=mapOptionsContent.size();
-	    logger.debug("maxIndex: " + maxIndex);
-    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
-    	
-    	String firstEntry=(String)mapOptionsContent.get("1");
-    	logger.debug("firstEntry: " +  firstEntry);
-    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
-
+    	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
@@ -1408,6 +1396,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
+		voteAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 		voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 		
      	String toolContentID=voteAuthoringForm.getToolContentID();
@@ -1415,7 +1404,44 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
      	
      	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
 		logger.debug("existing voteContent:" + voteContent);
-    	
+
+		VoteUtils.readContentValues(request, voteContent, voteAuthoringForm, voteGeneralAuthoringDTO);
+		logger.debug("form title is: : " + voteAuthoringForm.getTitle());
+		
+	    /*
+		 * get the nominations 
+		 */
+		Map mapOptionsContent= new TreeMap(new VoteComparator());
+		logger.debug("setting existing content data from the db");
+		Iterator queIterator=voteContent.getVoteQueContents().iterator();
+		Long mapIndex=new Long(1);
+		logger.debug("mapOptionsContent: " + mapOptionsContent);
+		while (queIterator.hasNext())
+		{
+			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
+			logger.debug("voteQueContent : " + voteQueContent);
+			if (voteQueContent != null)
+			{
+				logger.debug("question: " + voteQueContent.getQuestion());
+				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+	    		/**
+	    		 * make the first entry the default(first) one for jsp
+	    		 */
+	    		if (mapIndex.longValue() == 1)
+	    		{
+	    		    voteGeneralAuthoringDTO.setDefaultOptionContent(voteQueContent.getQuestion());
+	    		}
+	    		
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+			}
+		}
+		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		
+		int maxIndex=mapOptionsContent.size();
+		logger.debug("maxIndex: " + maxIndex);
+		voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+		
 		boolean isContentInUse=VoteUtils.isContentInUse(voteContent);
 		logger.debug("isContentInUse:" + isContentInUse);
 		
@@ -1438,46 +1464,56 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		return mapping.findForward(destination);
     }
 
-    
-    protected void repopulateRequestParameters(HttpServletRequest request, VoteAuthoringForm voteAuthoringForm)
+
+    protected void repopulateRequestParameters(HttpServletRequest request, VoteAuthoringForm voteAuthoringForm, 
+            VoteGeneralAuthoringDTO voteGeneralAuthoringDTO)
     {
         logger.debug("starting repopulateRequestParameters");
         
         String toolContentID=request.getParameter(TOOL_CONTENT_ID);
         logger.debug("toolContentID: " + toolContentID);
         voteAuthoringForm.setToolContentID(toolContentID);
+        voteGeneralAuthoringDTO.setToolContentID(toolContentID);
         
         String activeModule=request.getParameter(ACTIVE_MODULE);
         logger.debug("activeModule: " + activeModule);
         voteAuthoringForm.setActiveModule(activeModule);
+        voteGeneralAuthoringDTO.setActiveModule(activeModule);
         
         String httpSessionID=request.getParameter(HTTP_SESSION_ID);
         logger.debug("httpSessionID: " + httpSessionID);
         voteAuthoringForm.setHttpSessionID(httpSessionID);
+        voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 
         String defaultContentIdStr=request.getParameter(DEFAULT_CONTENT_ID_STR);
         logger.debug("defaultContentIdStr: " + defaultContentIdStr);
         voteAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+        voteGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
         
         String defineLaterInEditMode=request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
         logger.debug("defineLaterInEditMode: " + defineLaterInEditMode);
         voteAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
+        voteGeneralAuthoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
         
         String voteChangable=request.getParameter(VOTE_CHANGABLE);
         logger.debug("voteChangable: " + voteChangable);
         voteAuthoringForm.setVoteChangable(voteChangable);
+        voteGeneralAuthoringDTO.setVoteChangable(voteChangable);
         
         String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
         logger.debug("lockOnFinish: " + lockOnFinish);
         voteAuthoringForm.setLockOnFinish(lockOnFinish);
+        voteGeneralAuthoringDTO.setLockOnFinish(lockOnFinish);
         
         String allowText=request.getParameter(ALLOW_TEXT);
         logger.debug("allowText: " + allowText);
         voteAuthoringForm.setAllowText(allowText);
+        voteGeneralAuthoringDTO.setAllowText(allowText);
         
         String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
         logger.debug("maxNominationCount: " + maxNominationCount);
         voteAuthoringForm.setMaxNominationCount(maxNominationCount);
+        voteGeneralAuthoringDTO.setMaxNominationCount(maxNominationCount);
     }    
     
             

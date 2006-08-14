@@ -1,8 +1,8 @@
 CREATE TABLE tl_lavote11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
-     , title TEXT NOT NULL
-     , instructions TEXT NOT NULL
+     , title TEXT
+     , instructions TEXT
      , creation_date DATETIME
      , update_date DATETIME
      , maxNominationCount VARCHAR(20) NOT NULL DEFAULT '1'
