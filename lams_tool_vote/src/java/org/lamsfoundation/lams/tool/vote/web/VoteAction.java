@@ -45,12 +45,13 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteAttachmentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * * @author Ozgur Demirtas
@@ -67,6 +68,47 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * identified. No system exception error handling code should appear in the 
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
+ * 
+ * 
+	<!--Authoring Main Action : interacts with the authoring module user-->
+	<action path="/authoring"
+	      	type="org.lamsfoundation.lams.tool.vote.web.VoteAction"
+    	  	name="VoteAuthoringForm"
+	      	scope="request"
+    	  	input="/authoring/AuthoringMaincontent.jsp"
+      		parameter="dispatch">
+
+	      <forward
+	        name="load"
+	        path="/authoring/AuthoringMaincontent.jsp"
+		    redirect="false"
+	      />
+	    
+	      <forward
+	        name="starter"
+	        path="/index.jsp"
+		    redirect="false"
+	      />
+	      
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+	  	
+	     <forward
+	        name="preview"
+	        path="/learning/Preview.jsp"
+		    redirect="false"
+	     />
+	  	
+	  	<forward
+		    name="errorList"
+		    path="/VoteErrorBox.jsp"
+		    redirect="false"
+	  	/>
+    </action>
+
  * 
 */
 public class VoteAction extends LamsDispatchAction implements VoteAppConstants
@@ -105,7 +147,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
                                                             
 	 * main content/question content management and workflow logic
 	 * 
-	 * if the passed toolContentId exists in the db, we need to get the relevant data into the Map 
+	 * if the passed toolContentID exists in the db, we need to get the relevant data into the Map 
 	 * if not, create the default Map 
 	*/
     public ActionForward unspecified(ActionMapping mapping,
@@ -116,65 +158,96 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
     	VoteUtils.cleanUpUserExceptions(request);
 	 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
-	 	IVoteService voteService =VoteUtils.getToolService(request);
-	 	VoteUtils.saveInSessionRichText(request);	 	
+	 	repopulateRequestParameters(request, voteAuthoringForm);
+	 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
+	 	VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);	 	
 	 	voteAuthoringForm.resetUserAction();
 	 	return null;
     }
     
     
-    public boolean isNewNominationAdded(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    public boolean isNewNominationAdded(ActionMapping mapping, ActionForm form, HttpServletRequest request, 
+            HttpServletResponse response)
     {
 		logger.debug("doing isNewNominationAdded");
+		
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+	    
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
+	    
+	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
+	    
+	    repopulateRequestParameters(request, voteAuthoringForm);
+	    
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
 		
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
 	
-		String richTextTitle = request.getParameter("title");
-	    String richTextInstructions = request.getParameter("instructions");
+	    VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	    
-	    VoteUtils.saveInSessionRichText(request);
-	    
-	    authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
-	    
-	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    mapOptionsContent=authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
 	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 
 	    int maxIndex=mapOptionsContent.size();
-    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
-    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+	    logger.debug("maxIndex: " + maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
     	
     	String firstEntry=(String)mapOptionsContent.get("1");
     	logger.debug("firstEntry: " +  firstEntry);
-    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
-    	
-    	
-    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-	    if (voteService == null)        
-	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	    logger.debug("voteService :" +voteService);
-	    
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
 
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    String toolContentID=voteAuthoringForm.getToolContentID();
+	    logger.debug("toolContentID: " + toolContentID);
+	    
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+	    logger.debug("voteContent: " + voteContent);
+	    
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
     		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
-    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    		    	voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
     		}
     		else
     		{
-    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    		    voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
     			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
     		}
     	}
+    	
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		logger.debug("before fwd: mapOptionsContent: " + mapOptionsContent);
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		
+		sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
+		
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
 
 	    return true;
         
@@ -203,9 +276,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
-
 	    return (mapping.findForward(destination));
     }
 
@@ -213,53 +283,83 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     public boolean isNominationRemoved(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
         logger.debug("starting isNominationRemoved");
+        
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    
+	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
+	    
+	    repopulateRequestParameters(request, voteAuthoringForm);
+	    
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
 		
-		VoteUtils.saveInSessionRichText(request);
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
+		
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	    
 		AuthoringUtil authoringUtil= new AuthoringUtil();
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    //Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
 	    logger.debug("mapOptionsContent: " + mapOptionsContent);
 	    
 	    authoringUtil.reconstructOptionContentMapForRemove(mapOptionsContent, request, voteAuthoringForm);
 	    
-	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
-	    
         int maxIndex=mapOptionsContent.size();
-    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
-    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
     	
     	String firstEntry=(String)mapOptionsContent.get("1");
     	logger.debug("firstEntry: " +  firstEntry);
-    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
     	
-    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-	    if (voteService == null)        
-	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	    logger.debug("voteService :" +voteService);
-	    
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	String toolContentID =voteAuthoringForm.getToolContentID();
+	    logger.debug("toolContentID: " + toolContentID);
 
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
     		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
-    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    		    	voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
     		}
     		else
     		{
-    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
     			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
     		}
     	}
 
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		logger.debug("before fwd: mapOptionsContent: " + mapOptionsContent);
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		
+		sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+
+    	
     	return true;
     }
 
@@ -276,9 +376,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
-		
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 		
 	    return (mapping.findForward(destination));
     }
@@ -297,37 +394,52 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
         logger.debug("doing submitContent..");
 
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
-	    request.setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 	    
-	    IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-	    if (voteService == null)        
-	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	    logger.debug("voteService :" +voteService);
+	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
 	    
+	    repopulateRequestParameters(request, voteAuthoringForm);
 	    
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
 
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
+	    voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(true).toString());
+	    
+	    request.setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+	    voteGeneralAuthoringDTO.setValidationError(new Boolean(false).toString());
+	    
+	    String toolContentID=voteAuthoringForm.getToolContentID();
+	    logger.debug("toolContentID: " + toolContentID);
+
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+	    logger.debug("voteContent: " + voteContent);
+	    
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
     		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
-    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+   				voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+   				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
     		}
     		else
     		{
-    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+
+    			voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
     			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
     		}
     	}
 	    
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	           	
 	    ActionMessages errors= new ActionMessages();
 	    errors=validateSubmit(request, errors, voteAuthoringForm);
@@ -335,17 +447,21 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    if (errors.size() > 0)  
 	    {
 	        logger.debug("returning back to from to fix errors:");
-	        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+	        voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	        request.setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
+	        voteGeneralAuthoringDTO.setValidationError(new Boolean(true).toString());
 	        return false;
 	    }
 	    
-	    List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
-	    List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+	    List attachmentList=(List)sessionMap.get(ATTACHMENT_LIST_KEY);
+	    logger.debug("attachmentList :" +attachmentList);
+	    
+	    List deletedAttachmentList = (List)sessionMap.get(DELETED_ATTACHMENT_LIST_KEY);
+	    logger.debug("deletedAttachmentList :" +deletedAttachmentList);
+	    
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
 	
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("mapOptionsContent :" +mapOptionsContent);
-
 	    if (mapOptionsContent == null)
 	        mapOptionsContent= new TreeMap(new VoteComparator());
 
@@ -357,29 +473,29 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    {
 	        logger.debug("back to user, nominationsDuplicate :" +nominationsDuplicate);
 	        request.setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
+	        voteGeneralAuthoringDTO.setUserExceptionOptionsDuplicate(new Boolean(true).toString());
 	        return false;
 	    }
 	    
 
         int maxIndex=mapOptionsContent.size();
-    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
-    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+        logger.debug("maxIndex :" +maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+    	
     	
     	String firstEntry=(String)mapOptionsContent.get("1");
     	logger.debug("firstEntry: " +  firstEntry);
-    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
 
     	AuthoringUtil authoringUtil= new AuthoringUtil();
-	    authoringUtil.reconstructOptionsContentMapForSubmit(mapOptionsContent, request);
-	    logger.debug("before saveOrUpdateVoteContent.");
+    	mapOptionsContent=authoringUtil.reconstructOptionsContentMapForSubmit(mapOptionsContent, request);
+	    logger.debug("before saveOrUpdateVoteContent, mapOptionsContent" + mapOptionsContent);
 	    
-	 	logger.debug("submitting mapOptionsContent:" + mapOptionsContent);
-	    
-	    /*to remove deleted entries in the questions table based on mapQuestionContent */
+	 	/*to remove deleted entries in the questions table based on mapQuestionContent */
 	    authoringUtil.removeRedundantOptions(mapOptionsContent, voteService, voteAuthoringForm, request);
 	    logger.debug("end of removing unused entries... ");
 	    
-	    voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request);
+	    voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request, sessionMap);
 	    logger.debug("voteContent: " + voteContent);
 		
 	    String maxNomCount=voteAuthoringForm.getMaxNominationCount();
@@ -396,7 +512,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 			    {
 				    if (maxNomCount.equals("0"))
 				    {
-				        request.setAttribute(USER_EXCEPTION_MAXNOMINATION_INVALID, new Boolean(true).toString());
+				        voteGeneralAuthoringDTO.setUserExceptionMaxNominationInvalid(new Boolean(true).toString());
 						return false;
 				    }
 				    
@@ -407,44 +523,65 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 					}
 			    	catch(NumberFormatException e)
 					{
-				        request.setAttribute(USER_EXCEPTION_MAXNOMINATION_INVALID, new Boolean(true).toString());
+				        voteGeneralAuthoringDTO.setUserExceptionMaxNominationInvalid(new Boolean(true).toString());
 			    		return false;
 					}
 			    }
 
 			
 				logger.debug("start persisting offline files metadata");
-				AuthoringUtil.persistFilesMetaData(request, true, voteContent);
+				AuthoringUtil.persistFilesMetaData(request, voteService, true, voteContent, sessionMap);
 				logger.debug("start persisting online files metadata");
-				AuthoringUtil.persistFilesMetaData(request, false, voteContent);
+				AuthoringUtil.persistFilesMetaData(request, voteService, false, voteContent, sessionMap );
 		        
 			
 			/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
 			logger.debug("start removing redundant offline files metadata");
-			AuthoringUtil.removeRedundantOfflineFileItems(request, voteContent);
+			AuthoringUtil.removeRedundantOfflineFileItems(request, voteService,  voteContent, sessionMap);
 			
 			logger.debug("start removing redundant online files metadata");
-			AuthoringUtil.removeRedundantOnlineFileItems(request, voteContent);
+			AuthoringUtil.removeRedundantOnlineFileItems(request, voteService, voteContent, sessionMap);
 	 		logger.debug("done removing redundant files");
-	 		
 		    }
 	    }
 	
 	    errors.clear();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));
-        request.setAttribute(SUBMIT_SUCCESS, new Boolean(true).toString());
-	    logger.debug("setting SUBMIT_SUCCESS to 1.");
 	    
-	    Long strToolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    logger.debug("strToolContentId: " + strToolContentId);
-	    VoteUtils.setDefineLater(request, false);
+	    logger.debug("toolContentID: " + toolContentID);
+	    VoteUtils.setDefineLater(request, false, voteService, toolContentID);
 	    
 	    saveErrors(request,errors);
-	    
-	    VoteUtils.setDefineLater(request, false);
 	    logger.debug("define later set to false");
 	    
 	    voteAuthoringForm.resetUserAction();
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
+	    voteGeneralAuthoringDTO.setSbmtSuccess(new Boolean(true).toString());
+	    logger.debug("setting SUBMIT_SUCCESS to 1.");
+	    
+	    
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		logger.debug("before fwd: mapOptionsContent: " + mapOptionsContent);
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		
+		sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	    
 	    return true;
     }
     
@@ -457,6 +594,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 		
+	    repopulateRequestParameters(request, voteAuthoringForm);
+	    
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
@@ -468,15 +607,13 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("isContentSubmitted :" +isContentSubmitted);
 		
 		if (isContentSubmitted == true)
+		{
 		    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
+		}
+		    
 		    
 		logger.debug("final submit status :" +voteAuthoringForm.getSbmtSuccess());
-		logger.debug("final duplicate status :" +request.getAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE));
 		logger.debug("fwding to destination :" +destination);
-		
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
-
 		
         request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
         return (mapping.findForward(destination));	
@@ -489,18 +626,32 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
             HttpServletResponse response) 
     {
     	logger.debug("starting isMoveNominationDown...");
+    	
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
     	VoteUtils.cleanUpUserExceptions(request);
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    
+	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
+	    repopulateRequestParameters(request, voteAuthoringForm);
+	    
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
 
-    	IVoteService voteService =VoteUtils.getToolService(request);
+		voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
 
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	 	
     	Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
      	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
      	logger.debug("mapOptionsContent size move down: " + mapOptionsContent.size());
+     	
 
      	/* perform a move down if there are at least 2 nominations*/
      	if (mapOptionsContent.size() > 1)
@@ -514,42 +665,66 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         	{
         	    mapOptionsContent= AuthoringUtil.shiftMap(mapOptionsContent, optIndex,movableOptionEntry,  "down");
             	logger.debug("mapOptionsContent after move down: " + mapOptionsContent);
-            	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-            	logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+            	//request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+            	sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
+            	//logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
         	}
      	}
     	
     	voteAuthoringForm.resetUserAction();
         
-    	mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+    	mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
     	logger.debug("mapOptionsContent: " + mapOptionsContent);
+    	
         int maxIndex=mapOptionsContent.size();
-    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
-    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
     	
     	String firstEntry=(String)mapOptionsContent.get("1");
     	logger.debug("firstEntry: " +  firstEntry);
-    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
     	
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	String toolContentID=voteAuthoringForm.getToolContentID();
+	    logger.debug("toolContentID: " + toolContentID);
 
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
-		/*true means there is at least 1 response*/
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+    	logger.debug("voteContent: " + voteContent);
+		
+    	/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
     		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
-    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+    		    voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+    			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
     		}
     		else
     		{
-    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
     			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
     		}
     	}
 
+	    
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		logger.debug("before fwd: mapOptionsContent: " + mapOptionsContent);
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		
+		sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+    	
     	return true;
     }
     
@@ -580,9 +755,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		boolean isMoveNominationDown=isMoveNominationDown(mapping, form, request, response);
 		logger.debug("isMoveNominationDown:" + isMoveNominationDown);
 		
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
-
         return (mapping.findForward(destination));	
     }
 
@@ -602,22 +774,35 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
             HttpServletResponse response)
     {
         logger.debug("starting isMoveNominationUp...");
+
+        IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
     	VoteUtils.cleanUpUserExceptions(request);
     	
-    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;    	
-    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	IVoteService voteService =VoteUtils.getToolService(request);
+    	repopulateRequestParameters(request, voteAuthoringForm);
 
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+
+    	
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
+    	
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	 	
     	Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
      	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
@@ -635,41 +820,62 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         	{
         	    mapOptionsContent= AuthoringUtil.shiftMap(mapOptionsContent, optIndex,movableOptionEntry,  "up");
             	logger.debug("mapOptionsContent after move down: " + mapOptionsContent);
-            	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-            	logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+            	sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
         	}
      	}
     	
     	voteAuthoringForm.resetUserAction();
-    	
-    	mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+
+    	mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
     	logger.debug("mapOptionsContent: " + mapOptionsContent);
+    	
         int maxIndex=mapOptionsContent.size();
-    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
-    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+        voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
 
     	String firstEntry=(String)mapOptionsContent.get("1");
     	logger.debug("firstEntry: " +  firstEntry);
-    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
     	
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	String toolContentID=voteAuthoringForm.getToolContentID();
+	    logger.debug("toolContentID: " + toolContentID);
 
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+    	logger.debug("voteContent: " + voteContent);
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
     		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
-    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+   		    	voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+   				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
     		}
     		else
     		{
-    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    		    voteGeneralAuthoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
     			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
     		}
     	}
+
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		logger.debug("before fwd: mapOptionsContent: " + mapOptionsContent);
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		
+		sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
 
         return true;
     }
@@ -690,9 +896,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		boolean isMoveNominationUp=isMoveNominationUp(mapping, form, request, response);
 		logger.debug("isMoveNominationUp:" + isMoveNominationUp);
 		
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
-
         return (mapping.findForward(destination));	
     }
     
@@ -706,6 +909,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
      */
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, VoteAuthoringForm voteAuthoringForm)
     {
+        logger.debug("starting validateSubmit");
         String title = voteAuthoringForm.getTitle();
         logger.debug("title: " + title);
 
@@ -763,11 +967,37 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
     	VoteUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching submitOfflineFile...");
+    	
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-    	IVoteService voteService =VoteUtils.getToolService(request);
+    	repopulateRequestParameters(request, voteAuthoringForm);
+    	
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+		
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
+	    voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+	    
+	    int maxIndex=mapOptionsContent.size();
+	    logger.debug("maxIndex: " + maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
+
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
+    	
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -775,32 +1005,55 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	 	
 		logger.debug("will uploadFile for offline file:");
- 		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteAuthoringForm, true);
+ 		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteService, voteAuthoringForm, true, sessionMap);
  		logger.debug("returned voteAttachmentDTO:" + voteAttachmentDTO);
+ 		logger.debug("returned sessionMap:" + sessionMap);
+
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
  		
+ 		if (voteAttachmentDTO != null)
+ 		{
+ 		   listOfflineFilesMetaData.add(voteAttachmentDTO);    
+ 		}
+ 		
+ 		logger.debug("listOfflineFilesMetaData after add:" + listOfflineFilesMetaData);
+ 		sessionMap.put(LIST_OFFLINEFILES_METADATA_KEY, listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+ 		
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
  		if (voteAttachmentDTO == null)
  		{
  			ActionMessages errors= new ActionMessages();
  			errors= new ActionMessages();
- 			request.getSession().setAttribute(USER_EXCEPTION_FILENAME_EMPTY, new Boolean(true).toString());
+ 			voteGeneralAuthoringDTO.setUserExceptionFilenameEmpty(new Boolean(true).toString());
  			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
  			saveErrors(request,errors);
  			voteAuthoringForm.resetUserAction();
  			persistInRequestError(request,"error.fileName.empty");
- 			
+
+ 			logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+ 			request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+
  	   	    return (mapping.findForward(destination));	
  		}
  		
- 		 		
- 		List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
- 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
- 		listOfflineFilesMetaData.add(voteAttachmentDTO);
- 		logger.debug("listOfflineFilesMetaData after add:" + listOfflineFilesMetaData);
- 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+
+ 		
  		voteAuthoringForm.resetUserAction();
    	    return (mapping.findForward(destination));    
     }
@@ -826,11 +1079,38 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
     	VoteUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching submitOnlineFiles...");
+    	
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	
-	 	IVoteService voteService =VoteUtils.getToolService(request);
+    	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
+    	repopulateRequestParameters(request, voteAuthoringForm);
+    	
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+		
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
+	    voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+
+	    int maxIndex=mapOptionsContent.size();
+	    logger.debug("maxIndex: " + maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
+
+    	
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
+    	
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -838,31 +1118,54 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	 	
 		logger.debug("will uploadFile for online file:");
- 		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteAuthoringForm, false);
+ 		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteService, voteAuthoringForm, false, sessionMap);
  		logger.debug("returned voteAttachmentDTO:" + voteAttachmentDTO);
+ 		logger.debug("returned sessionMap:" + sessionMap);
+
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
  		
+ 		if (voteAttachmentDTO != null)
+ 		{
+ 		   listOnlineFilesMetaData.add(voteAttachmentDTO);    
+ 		}
+ 		logger.debug("listOnlineFilesMetaData after add:" + listOnlineFilesMetaData);
+ 		
+ 		sessionMap.put(LIST_ONLINEFILES_METADATA_KEY, listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+ 		
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+
  		if (voteAttachmentDTO == null)
  		{
  			ActionMessages errors= new ActionMessages();
  			errors= new ActionMessages();
- 			request.getSession().setAttribute(USER_EXCEPTION_FILENAME_EMPTY, new Boolean(true).toString());
+ 			voteGeneralAuthoringDTO.setUserExceptionFilenameEmpty(new Boolean(true).toString());
  			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
  			saveErrors(request,errors);
  			voteAuthoringForm.resetUserAction();
  			persistInRequestError(request,"error.fileName.empty");
- 			
+
+ 			logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+ 			request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+
  		    return (mapping.findForward(destination));	
  		}
- 		 		
- 		List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
- 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
- 		listOnlineFilesMetaData.add(voteAttachmentDTO);
- 		logger.debug("listOnlineFilesMetaData after add:" + listOnlineFilesMetaData);
- 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
- 		
+
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+
         voteAuthoringForm.resetUserAction();
    	    return (mapping.findForward(destination));
     }
@@ -888,11 +1191,37 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
     	VoteUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching deleteOfflineFile...");
+    	
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-	 	IVoteService voteService =VoteUtils.getToolService(request);
+    	repopulateRequestParameters(request, voteAuthoringForm);
+    	
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
+	    voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+	    
+	    int maxIndex=mapOptionsContent.size();
+	    logger.debug("maxIndex: " + maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
+	    
+    	
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
 	 	
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -900,17 +1229,32 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 	 	
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	 	
 	 	String uuid =voteAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
 	 	
-	 	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+	 	List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
  		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
  		listOfflineFilesMetaData=AuthoringUtil.removeFileItem(listOfflineFilesMetaData, uuid);
  		logger.debug("listOfflineFilesMetaData after remove:" + listOfflineFilesMetaData);
- 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
-	 	
+ 		sessionMap.put(LIST_OFFLINEFILES_METADATA_KEY, listOfflineFilesMetaData);
+ 		
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		
+ 		List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+
+ 		
         voteAuthoringForm.resetUserAction();
     	
         return (mapping.findForward(destination));
@@ -936,11 +1280,37 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
     	VoteUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching deleteOnlineFile...");
+    	
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-	 	IVoteService voteService =VoteUtils.getToolService(request);
+    	repopulateRequestParameters(request, voteAuthoringForm);
+    	
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+		
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
+	    voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+	    
+	    int maxIndex=mapOptionsContent.size();
+	    logger.debug("maxIndex: " + maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
+	    
+
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -948,17 +1318,32 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		VoteUtils.saveInSessionRichText(request);
+		VoteUtils.saveRichText(request, voteGeneralAuthoringDTO);
 	 	
 	 	String uuid =voteAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
 	 	
-	 	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+	 	List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
  		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
  		listOnlineFilesMetaData=AuthoringUtil.removeFileItem(listOnlineFilesMetaData, uuid);
  		logger.debug("listOnlineFilesMetaData after remove:" + listOnlineFilesMetaData);
- 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
-	 	
+ 		sessionMap.put(LIST_ONLINEFILES_METADATA_KEY, listOnlineFilesMetaData);
+ 		
+ 		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		
+ 		List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(httpSessionID, sessionMap);
+ 		
         voteAuthoringForm.resetUserAction();
         
         return (mapping.findForward(destination));
@@ -984,59 +1369,116 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
                                          ToolException
     {
     	logger.debug("dispatching editActivityQuestions...");
+
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+    	
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
     	
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-		logger.debug("voteService: " + voteService);
-		if (voteService == null)
-		{
-			logger.debug("will retrieve voteService");
-			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-			logger.debug("retrieving voteService from session: " + voteService);
-		}
+    	repopulateRequestParameters(request, voteAuthoringForm);
+    	
+		String httpSessionID=voteAuthoringForm.getHttpSessionID();
+		logger.debug("httpSessionID: " + httpSessionID);
+		
+		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+		logger.debug("sessionMap: " + sessionMap);
+		
+	    Map mapOptionsContent=(Map)sessionMap.get(MAP_OPTIONS_CONTENT_KEY);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
+	    voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+	    
+	    int maxIndex=mapOptionsContent.size();
+	    logger.debug("maxIndex: " + maxIndex);
+    	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	voteGeneralAuthoringDTO.setDefaultOptionContent(firstEntry);
 
+
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
+    	
+    	
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-     	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-     	String toolContentId=voteAuthoringForm.getToolContentId();
-     	logger.debug("toolContentId: " + toolContentId);
-     	if ((toolContentId== null) || toolContentId.equals(""))
-     	{
-     		logger.debug("getting toolContentId from session.");
-     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-     		toolContentId=longToolContentId.toString();
-     		logger.debug("toolContentId: " + toolContentId);
-     	}
+		voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+		
+     	String toolContentID=voteAuthoringForm.getToolContentID();
+     	logger.debug("toolContentID: " + toolContentID);
      	
-     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
 		logger.debug("existing voteContent:" + voteContent);
     	
 		boolean isContentInUse=VoteUtils.isContentInUse(voteContent);
 		logger.debug("isContentInUse:" + isContentInUse);
 		
-		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		voteGeneralAuthoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
 		if (isContentInUse == true)
 		{
 			logger.debug("monitoring url does not allow editActivity since the content is in use.");
 	    	persistInRequestError(request,"error.content.inUse");
-	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+	    	voteGeneralAuthoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
 		}
      	
-		VoteUtils.setDefineLater(request, true);
+		VoteUtils.setDefineLater(request, true, voteService, toolContentID);
 
-	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
-
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+		
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+		
 		logger.debug("forwarding to : " + destination);
 		return mapping.findForward(destination);
     }
 
+    
+    protected void repopulateRequestParameters(HttpServletRequest request, VoteAuthoringForm voteAuthoringForm)
+    {
+        logger.debug("starting repopulateRequestParameters");
+        
+        String toolContentID=request.getParameter(TOOL_CONTENT_ID);
+        logger.debug("toolContentID: " + toolContentID);
+        voteAuthoringForm.setToolContentID(toolContentID);
+        
+        String activeModule=request.getParameter(ACTIVE_MODULE);
+        logger.debug("activeModule: " + activeModule);
+        voteAuthoringForm.setActiveModule(activeModule);
+        
+        String httpSessionID=request.getParameter(HTTP_SESSION_ID);
+        logger.debug("httpSessionID: " + httpSessionID);
+        voteAuthoringForm.setHttpSessionID(httpSessionID);
+
+        String defaultContentIdStr=request.getParameter(DEFAULT_CONTENT_ID_STR);
+        logger.debug("defaultContentIdStr: " + defaultContentIdStr);
+        voteAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+        
+        String defineLaterInEditMode=request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
+        logger.debug("defineLaterInEditMode: " + defineLaterInEditMode);
+        voteAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
+        
+        String voteChangable=request.getParameter(VOTE_CHANGABLE);
+        logger.debug("voteChangable: " + voteChangable);
+        voteAuthoringForm.setVoteChangable(voteChangable);
+        
+        String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
+        logger.debug("lockOnFinish: " + lockOnFinish);
+        voteAuthoringForm.setLockOnFinish(lockOnFinish);
+        
+        String allowText=request.getParameter(ALLOW_TEXT);
+        logger.debug("allowText: " + allowText);
+        voteAuthoringForm.setAllowText(allowText);
+        
+        String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
+        logger.debug("maxNominationCount: " + maxNominationCount);
+        voteAuthoringForm.setMaxNominationCount(maxNominationCount);
+    }    
     
             
     /**

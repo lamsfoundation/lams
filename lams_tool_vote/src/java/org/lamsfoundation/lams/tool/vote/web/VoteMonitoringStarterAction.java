@@ -99,11 +99,11 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		
 
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 
 	    
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		/*true means there is at least 1 response*/
 		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
@@ -125,7 +125,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(false).toString());
 		voteMonitoringForm.setShowOpenVotesSection(new Boolean(false).toString());
 		
-		logger.debug("calling submitSession:" + toolContentId);
+		logger.debug("calling submitSession:" + toolContentID);
 		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 
@@ -148,10 +148,10 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    VoteUtils.saveTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 		
 		if (voteContent == null)
@@ -272,9 +272,9 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    {
 	    	try
 			{
-	    		long toolContentId=new Long(strToolContentId).longValue();
-		    	logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-		    	request.getSession().setAttribute(TOOL_CONTENT_ID,new Long(toolContentId));	
+	    		long toolContentID=new Long(strToolContentId).longValue();
+		    	logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentID));
+		    	request.getSession().setAttribute(TOOL_CONTENT_ID,new Long(toolContentID));	
 			}
 	    	catch(NumberFormatException e)
 			{

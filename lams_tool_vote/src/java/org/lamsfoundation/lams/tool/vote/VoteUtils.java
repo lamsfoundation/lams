@@ -180,27 +180,37 @@ public abstract class VoteUtils implements VoteAppConstants {
 	}
 	
 	
-    public static void setDefaultSessionAttributes(HttpServletRequest request, VoteContent defaultVoteContent, VoteAuthoringForm voteAuthoringForm)
+    public static void readContentValues(HttpServletRequest request, VoteContent defaultVoteContent, 
+            VoteAuthoringForm voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO)
 	{
+        logger.debug("setting authoring screen properties");
 		/*should never be null anyway as default content MUST exist in the db*/
         if(defaultVoteContent == null)
             throw new NullPointerException("Default VoteContent cannot be null");
 
-        voteAuthoringForm.setTitle(defaultVoteContent.getTitle());
-        voteAuthoringForm.setInstructions(defaultVoteContent.getInstructions());
-	    voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
-	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
+        //voteAuthoringForm.setTitle(defaultVoteContent.getTitle());
+        //voteAuthoringForm.setInstructions(defaultVoteContent.getInstructions());
 
-        //determine the status of radio boxes
+
 	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
+	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?ON:OFF);
 	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
 	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
+        voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
+	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
+	    
+	    voteGeneralAuthoringDTO.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
+	    voteGeneralAuthoringDTO.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
+	    voteGeneralAuthoringDTO.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
+	    voteGeneralAuthoringDTO.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
+	    voteGeneralAuthoringDTO.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
 
 	    String maxNomcount= defaultVoteContent.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);
 	    if (maxNomcount.equals(""))
 	        maxNomcount="0";
 	    voteAuthoringForm.setMaxNominationCount(maxNomcount);
+	    voteGeneralAuthoringDTO.setMaxNominationCount(maxNomcount);
 	}
 
 
@@ -235,7 +245,7 @@ public abstract class VoteUtils implements VoteAppConstants {
     }
 
     
-	public static void saveInSessionRichText(HttpServletRequest request)
+	public static void saveRichText(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO)
 	{
 	    logger.debug("doing persistRichText: ");
 		String richTextTitle = request.getParameter(TITLE);
@@ -247,7 +257,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    
 	    if (richTextTitle != null)
 	    {
-			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+			//request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+			voteGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	    }
 	    String noHTMLTitle = stripHTML(richTextTitle);
 	    logger.debug("noHTMLTitle: " + noHTMLTitle);
@@ -255,22 +266,26 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	    if (richTextInstructions != null)
 	    {
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+			//request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+			voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 	    }
 	    
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
 		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
+
+		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
+		{
+			//request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);
+			voteGeneralAuthoringDTO.setRichTextOfflineInstructions(richTextOfflineInstructions);
+		}
+
 		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
 		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
 		
-		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
-		}
-		
 		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
 		{
-			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
+			//request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);
+			voteGeneralAuthoringDTO.setRichTextOnlineInstructions(richTextOnlineInstructions);
 		}
 	}
 	
@@ -454,20 +469,20 @@ public abstract class VoteUtils implements VoteAppConstants {
 		}
 	}
 
-	public static void setDefineLater(HttpServletRequest request, boolean value)
+	public static void setDefineLater(HttpServletRequest request, boolean value, IVoteService voteService, String toolContentID)
     {
-    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-    	logger.debug("voteService:" + voteService);
+    	//IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+    	//logger.debug("voteService:" + voteService);
     	
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
+    	//Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentID:" + toolContentID);
     	
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
     	logger.debug("voteContent:" + voteContent);
     	if (voteContent != null)
     	{
     		voteContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to true");
+        	logger.debug("defineLater has been set to value: " + value);
         	voteService.updateVote(voteContent);	
     	}
     }

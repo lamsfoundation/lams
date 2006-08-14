@@ -196,7 +196,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	
         VoteUtils.cleanUpUserExceptions(request);
     	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
-    	VoteUtils.saveInSessionRichText(request);	 	
 	 	return null;
     }
 
@@ -862,7 +861,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	String userEntry=request.getParameter(USER_ENTRY);
     	logger.debug("userEntry: " + userEntry);
     	voteLearningForm.setUserEntry(userEntry);
-
     }
 }
 

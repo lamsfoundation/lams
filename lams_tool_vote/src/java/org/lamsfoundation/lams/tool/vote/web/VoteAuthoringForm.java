@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
@@ -80,7 +81,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String instructions;
 	
 	protected String isRemoveContent;
-	protected String toolContentId;
+	protected String toolContentID;
 	
 	
 	/* instructions content */
@@ -92,6 +93,8 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String richTextOfflineInstructions;
 	protected String richTextOnlineInstructions;
 	
+	protected String defineLaterInEditMode;
+	
 	
 	/* proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
@@ -100,10 +103,13 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String statsMonitoring;
 
 	protected String edit;
-	
 	protected String exceptionMaxNominationInvalid;
-	
+	protected String defaultContentIdStr;
+	protected String defaultContentId;
+	protected String isDefineLater;
 	protected String submissionAttempt;
+	protected String defaultOptionContent;
+	protected String httpSessionID;
 	
 	public void resetUserAction()
     {
@@ -162,7 +168,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.selectedIndex=null;
 		this.deletableOptionIndex=null;
 		this.isRemoveContent=null;
-		this.toolContentId=null;
+		this.toolContentID=null;
 		
 		this.onlineInstructions=null;
 		this.offlineInstructions=null;
@@ -193,6 +199,30 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	}
 
 	
+    /**
+     * @return Returns the defaultContentId.
+     */
+    public String getDefaultContentId() {
+        return defaultContentId;
+    }
+    /**
+     * @param defaultContentId The defaultContentId to set.
+     */
+    public void setDefaultContentId(String defaultContentId) {
+        this.defaultContentId = defaultContentId;
+    }
+    /**
+     * @return Returns the defaultContentIdStr.
+     */
+    public String getDefaultContentIdStr() {
+        return defaultContentIdStr;
+    }
+    /**
+     * @param defaultContentIdStr The defaultContentIdStr to set.
+     */
+    public void setDefaultContentIdStr(String defaultContentIdStr) {
+        this.defaultContentIdStr = defaultContentIdStr;
+    }
 	/**
 	 * @return Returns the isRemoveContent.
 	 */
@@ -290,18 +320,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	/**
-	 * @return Returns the toolContentId.
-	 */
-	public String getToolContentId() {
-		return toolContentId;
-	}
-	/**
-	 * @param toolContentId The toolContentId to set.
-	 */
-	public void setToolContentId(String toolContentId) {
-		this.toolContentId = toolContentId;
-	}
+
 	/**
 	 * @return Returns the offlineInstructions.
 	 */
@@ -772,6 +791,95 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setSubmissionAttempt(String submissionAttempt) {
         this.submissionAttempt = submissionAttempt;
+    }
+
+    /**
+     * @return Returns the defineLaterInEditMode.
+     */
+    public String getDefineLaterInEditMode() {
+        return defineLaterInEditMode;
+    }
+    /**
+     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     */
+    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
+        this.defineLaterInEditMode = defineLaterInEditMode;
+    }
+    /**
+     * @return Returns the toolContentID.
+     */
+    public String getToolContentID() {
+        return toolContentID;
+    }
+    /**
+     * @param toolContentID The toolContentID to set.
+     */
+    public void setToolContentID(String toolContentID) {
+        this.toolContentID = toolContentID;
+    }
+    
+    /**
+     * @return Returns the isDefineLater.
+     */
+    public String getIsDefineLater() {
+        return isDefineLater;
+    }
+    /**
+     * @param isDefineLater The isDefineLater to set.
+     */
+    public void setIsDefineLater(String isDefineLater) {
+        this.isDefineLater = isDefineLater;
+    }
+
+    /**
+     * @return Returns the defaultOptionContent.
+     */
+    public String getDefaultOptionContent() {
+        return defaultOptionContent;
+    }
+    /**
+     * @param defaultOptionContent The defaultOptionContent to set.
+     */
+    public void setDefaultOptionContent(String defaultOptionContent) {
+        this.defaultOptionContent = defaultOptionContent;
+    }
+
+    /**
+     * @return Returns the httpSessionID.
+     */
+    public String getHttpSessionID() {
+        return httpSessionID;
+    }
+    /**
+     * @param httpSessionID The httpSessionID to set.
+     */
+    public void setHttpSessionID(String httpSessionID) {
+        this.httpSessionID = httpSessionID;
+    }
+    
+	public String toString() {
+        return new ToStringBuilder(this)
+            .append("activeModule: ", activeModule)
+            .append("defineLaterInEditMode: ", defineLaterInEditMode)
+            .append("submissionAttempt: ", submissionAttempt)
+            .append("sbmtSuccess: ", sbmtSuccess)
+            .append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
+            .append("isDefineLater: ", isDefineLater)
+            .append("toolContentID: ", toolContentID)
+            .append("allowText: ", allowText)
+            .append("voteChangable: ", voteChangable)
+            .append("lockOnFinish: ", lockOnFinish)
+            .append("defaultContentId: ", defaultContentId)
+            .append("defaultContentIdStr: ", defaultContentIdStr)
+            .append("maxNominationCount: ", maxNominationCount)
+            .append("defaultOptionContent: ", defaultOptionContent)
+            .append("activityTitle: ", activityTitle)
+            .append("activityInstructions: ", activityInstructions)
+            .append("richTextOfflineInstructions: ", richTextOfflineInstructions)
+            .append("richTextOnlineInstructions: ", richTextOnlineInstructions)
+            .append("onlineInstructions: ", onlineInstructions)
+            .append("offlineInstructions: ", offlineInstructions)
+            .toString();
     }
 
 }

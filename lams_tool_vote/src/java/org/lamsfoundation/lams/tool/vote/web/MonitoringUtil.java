@@ -666,17 +666,17 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param request
 	 * @param voteService
 	 * @param voteMonitoringForm
-	 * @param toolContentId
+	 * @param toolContentID
 	 * @return 
 	 */
-	public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId)
+	public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentID)
 	{
 	    logger.debug("start preparing ChartDTO with voteMonitoringForm: " + voteMonitoringForm);
-	    logger.debug("start preparing ChartDTO with toolContentId: " + toolContentId);
+	    logger.debug("start preparing ChartDTO with toolContentID: " + toolContentID);
 	    
 	    List listVoteAllSessionsDTO= new LinkedList();
 
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 	    logger.debug("will be building groups question data  for content:..." + voteContent);
     	
@@ -870,16 +870,16 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param request
 	 * @param voteService
 	 * @param voteMonitoringForm
-	 * @param toolContentId
+	 * @param toolContentID
 	 * @param toolSessionUid
 	 */
 	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, 
-	        String toolContentId, String toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO)
+	        String toolContentID, String toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO)
 	{
 	    logger.debug("starting prepareChartData, voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
-	    logger.debug("starting prepareChartData, toolContentId: " + toolContentId);
+	    logger.debug("starting prepareChartData, toolContentID: " + toolContentID);
 	    logger.debug("starting prepareChartData, toolSessionUid: " + toolSessionUid);
-	    VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+	    VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
 	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
 	    
 	    logger.debug("starting prepareChartData, voteMonitoringForm: " + voteMonitoringForm);
@@ -1093,14 +1093,14 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param request
 	 * @param voteService
 	 * @param voteMonitoringForm
-	 * @param toolContentId
+	 * @param toolContentID
 	 * @param toolSessionUid
 	 */
-	public static void prepareChartDataForExportLearner(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
+	public static void prepareChartDataForExportLearner(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentID, Long toolSessionUid)
 	{
-	    logger.debug("starting prepareChartDataForExportLearner, toolContentId: " + toolContentId);
+	    logger.debug("starting prepareChartDataForExportLearner, toolContentID: " + toolContentID);
 	    logger.debug("starting prepareChartDataForExportLearner, toolSessionUid: " + toolSessionUid);
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
 	    
 	    logger.debug("starting prepareChartDataForExport, voteMonitoringForm: " + voteMonitoringForm);
@@ -1321,14 +1321,14 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param request
 	 * @param voteService
 	 * @param voteMonitoringForm
-	 * @param toolContentId
+	 * @param toolContentID
 	 * @param toolSessionUid
 	 */
-	public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
+	public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentID, Long toolSessionUid)
 	{
-	    logger.debug("starting prepareChartDataForExportTeacher, toolContentId: " + toolContentId);
+	    logger.debug("starting prepareChartDataForExportTeacher, toolContentID: " + toolContentID);
 	    logger.debug("starting prepareChartDataForExportTeacher, toolSessionUid: " + toolSessionUid);
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
 	    logger.debug("starting prepareChartDataForExport, voteMonitoringForm: " + voteMonitoringForm);
 		logger.debug("existing voteContent:" + voteContent);

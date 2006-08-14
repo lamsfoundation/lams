@@ -68,11 +68,64 @@
  * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.  
  * 
 
-	The author is given warnings when the content in use by learners OR when the content is being edited in the Monitoring interface.  
+	The author is given warnings when the content in use by learners OR when the content is being edited in the Monitoring interface.
+	
+<!--Authoring Starter Action: initializes the authoring module -->
+   <action path="/authoringStarter" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteStarterAction" 
+   			name="VoteAuthoringForm" 
+	      	scope="request"
+   			input="/index.jsp"> 
+	
+	  	<forward
+		    name="load"
+		    path="/authoring/AuthoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="loadMonitoringEditActivity"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+	  	
+	  	<forward
+		    name="loadLearner"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+	        name="starter"
+	        path="/index.jsp"
+		    redirect="false"
+	     />
+	     
+	     <forward
+	        name="preview"
+	        path="/learning/Preview.jsp"
+		    redirect="false"
+	     />
+	  	
+	  	<forward
+		    name="errorList"
+		    path="/VoteErrorBox.jsp"
+		    redirect="false"
+	  	/>
+	</action>  
+	
+
 */
 
 package org.lamsfoundation.lams.tool.vote.web;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,12 +147,14 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 
 public class VoteStarterAction extends Action implements VoteAppConstants {
@@ -115,38 +170,49 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("init authoring mode. removed attributes...");
 		
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+		VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 		
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("voteService: " + voteService);
 		
-		if (voteService == null)
-		{
-			logger.debug("will retrieve voteService");
-			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-		    logger.debug("retrieving voteService from cache: " + voteService);
-		}
-	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 	    
-		String servletPath=request.getServletPath();
+	    voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
+	    voteGeneralAuthoringDTO.setSbmtSuccess(new Boolean(false).toString());
+	    
+	    String servletPath=request.getServletPath();
 		logger.debug("getServletPath: "+ servletPath);
 		if (servletPath.indexOf("authoringStarter") > 0)
 		{
 			logger.debug("request is for authoring module");
-			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			voteAuthoringForm.setActiveModule(AUTHORING);
-			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+			voteGeneralAuthoringDTO.setActiveModule(AUTHORING);
+			
+			voteAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
+			voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 		}
 		else
 		{
 			logger.debug("request is for define later module. either direct or by monitoring module");
-			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 			voteAuthoringForm.setActiveModule(DEFINE_LATER);
-			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+			voteGeneralAuthoringDTO.setActiveModule(DEFINE_LATER);
+			
+			voteAuthoringForm.setDefineLaterInEditMode(new Boolean(false).toString());
+			voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 		}
 		 
-		initialiseAttributes(request);
+		initialiseAttributes(request, voteGeneralAuthoringDTO);
+		
+		
+	    SessionMap sessionMap = new SessionMap();
+	    sessionMap.put(ATTACHMENT_LIST_KEY, new ArrayList());
+	    sessionMap.put(DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
+	    sessionMap.put(ACTIVITY_TITLE_KEY, "");
+	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, "");
+	    voteAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
+	    voteGeneralAuthoringDTO.setHttpSessionID(sessionMap.getSessionID());
+		
     	/* determine whether the request is from Monitoring url Edit Activity.
 		 * null sourceVoteStarter indicates that the request is from authoring url.
 		 * */
@@ -156,8 +222,9 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 		voteAuthoringForm.resetRadioBoxes();
 		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+		voteGeneralAuthoringDTO.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 		
-		ActionForward validateSignature=readSignature(request,mapping);
+		ActionForward validateSignature=readSignature(request,mapping, voteService, voteAuthoringForm);
 		logger.debug("validateSignature:  " + validateSignature);
 		if (validateSignature != null)
 		{
@@ -172,22 +239,23 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		    logger.debug("strToolContentId: " + strToolContentId);
 		    
+		    /* this will be fixed when making changes to Monitoring module */
 		    if (strToolContentId == null)
 		    {
 		    	/*it is possible that the original request for authoring module is coming from monitoring url which keeps the
 		    	 TOOL_CONTENT_ID in the session*/
-		    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-			    logger.debug("toolContentId: " + toolContentId);
-			    if (toolContentId != null)
+		    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+			    logger.debug("toolContentID: " + toolContentID);
+			    if (toolContentID != null)
 			    {
-			    	strToolContentId= toolContentId.toString();
+			    	strToolContentId= toolContentID.toString();
 				    logger.debug("cached strToolContentId from the session: " + strToolContentId);	
 			    }
 			    else
 			    {
 			    	logger.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.");
 			    	/*use default content instead of giving a warning*/
-			    	String defaultContentId=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID);
+			    	String defaultContentId=voteAuthoringForm.getDefaultContentId(); 
 			    	logger.debug("using Voting defaultContentId: " + defaultContentId);
 			    	strToolContentId=defaultContentId;
 			    }
@@ -197,27 +265,25 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
 		    {
 		    	VoteUtils.cleanUpSessionAbsolute(request);
-		    	request.getSession().setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true).toString());
-		    	persistInRequestError(request,"error.contentId.required");
+		    	saveInRequestError(request,"error.contentId.required");
 		    	VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 		    }
 		    
 		    /* Process incoming tool content id. 
-		     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container */
-		    long toolContentId=0;
+		     * Either exists or not exists in the db yet, a toolContentID must be passed to the tool from the container */
+		    long toolContentID=0;
 	    	try
 			{
-		    	toolContentId=new Long(strToolContentId).longValue();
-		    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-		    	request.getSession().setAttribute(TOOL_CONTENT_ID, new Long(strToolContentId));
+		    	toolContentID=new Long(strToolContentId).longValue();
+		    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentID);
+		    	voteAuthoringForm.setToolContentID(new Long(strToolContentId).toString());
 	    	}
 	    	catch(NumberFormatException e)
 			{
 		    	VoteUtils.cleanUpSessionAbsolute(request);
-		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
-		    	persistInRequestError(request,"error.numberFormatException");
+		    	saveInRequestError(request,"error.numberFormatException");
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 			}
@@ -233,14 +299,15 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    	Map mapOptionsContent= new TreeMap(new VoteComparator());
 			logger.debug("mapOptionsContent: " + mapOptionsContent);
 		
-			if (!existsContent(toolContentId, request))
+			if (!existsContent(toolContentID, request, voteService))
 			{
 				logger.debug("getting default content");
 				/*fetch default content*/
-				String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
-				logger.debug("defaultContentIdStr:" + defaultContentIdStr);
+				String defaultContentIdStr=voteAuthoringForm.getDefaultContentIdStr(); 
 				logger.debug("will get content for defaultContentIdStr:" + defaultContentIdStr);
-	            retrieveContent(request, mapping, voteAuthoringForm, mapOptionsContent, new Long(defaultContentIdStr).longValue());
+	            retrieveContent(request, voteService, voteAuthoringForm, voteGeneralAuthoringDTO, mapOptionsContent, 
+	                    new Long(defaultContentIdStr).longValue(), sessionMap);
+	            
 			}
 			else
 			{
@@ -252,8 +319,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    		{
 	        		VoteUtils.cleanUpSessionAbsolute(request);
 	    			logger.debug("student activity occurred on this content:" + voteContent);
-	    	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());    			
-	    	    	persistInRequestError(request, "error.content.inUse");
+	    	    	saveInRequestError(request, "error.content.inUse");
 					return (mapping.findForward(ERROR_LIST));
 	    		}
 	        	
@@ -265,15 +331,15 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		        	{
 		        		VoteUtils.cleanUpSessionAbsolute(request);
 		    			logger.debug("student activity occurred on this content:" + voteContent);
-		    	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());    			
-		    	    	persistInRequestError(request, "error.content.inUse");
+		    	    	saveInRequestError(request, "error.content.inUse");
 						return (mapping.findForward(ERROR_LIST));
 		        	    
 		        	}
 	        	}
 	        	
 	        	logger.debug("will get content for strToolContentId:" + strToolContentId);
-	            retrieveContent(request, mapping, voteAuthoringForm, mapOptionsContent, new Long(strToolContentId).longValue());
+	            retrieveContent(request, voteService, voteAuthoringForm, voteGeneralAuthoringDTO, mapOptionsContent, 
+	                    new Long(strToolContentId).longValue(), sessionMap);
 			}
 		}
 		    
@@ -285,16 +351,19 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("will return to jsp with: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
-		
 		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
+
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 		
-		logger.debug("final ACTIVITY_TITLE is: " + request.getSession().getAttribute(ACTIVITY_TITLE));
+		logger.debug("persisting sessionMap into session: " + sessionMap);
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		return (mapping.findForward(destination));
 	} 
 	
 	
 	
-	protected void initialiseAttributes(HttpServletRequest request)
+	protected void initialiseAttributes(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO)
 	{
 		logger.debug("starting initialiseAttributes...");
 		
@@ -305,13 +374,14 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		LinkedList listUploadedOfflineFileNames= new LinkedList();
 		LinkedList listUploadedOnlineFileNames= new LinkedList();
 		
-		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
-		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+		voteGeneralAuthoringDTO.setListUploadedOfflineFileNames(listUploadedOfflineFileNames);
+		voteGeneralAuthoringDTO.setListUploadedOnlineFileNames (listUploadedOnlineFileNames);
 		
 		LinkedList listOfflineFilesMetaData= new LinkedList();
 		LinkedList listOnlineFilesMetaData= new LinkedList();
-		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
-		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+		
+		voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+		voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
 	}
 
 	
@@ -319,24 +389,18 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	/**
 	 * each tool has a signature. Voting tool's signature is stored in MY_SIGNATURE. The default tool content id and 
 	 * other depending content ids are obtained in this method.
-	 * if all the default content has been setup properly the method persists DEFAULT_CONTENT_ID in the session.
+	 * if all the default content has been setup properly the method saves DEFAULT_CONTENT_ID in the session.
 	 * 
 	 * readSignature(HttpServletRequest request, ActionMapping mapping)
 	 * @param request
 	 * @param mapping
 	 * @return ActionForward
 	 */
-	public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping)
+	public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping, IVoteService voteService,
+	        VoteAuthoringForm voteAuthoringForm)
 	{
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-		logger.debug("voteService: " + voteService);
-		if (voteService == null)
-		{
-			logger.debug("will retrieve voteService");
-			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-			logger.debug("retrieving voteService from session: " + voteService);
-		}
-	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		logger.debug("start reading tool signature: " + voteService);
+	    //request.getSession().setAttribute(TOOL_SERVICE, voteService);
 		/*
 		 * retrieve the default content id based on tool signature
 		 */
@@ -350,8 +414,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			{
 				VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("default content id has not been setup");
-				persistInRequestError(request,"error.defaultContent.notSetup");
-		    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+				saveInRequestError(request,"error.defaultContent.notSetup");
 				return (mapping.findForward(ERROR_LIST));	
 			}
 		}
@@ -359,8 +422,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("error getting the default content id: " + e.getMessage());
-			persistInRequestError(request,"error.defaultContent.notSetup");
-	    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+			saveInRequestError(request,"error.defaultContent.notSetup");
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 		}
@@ -378,8 +440,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			    logger.debug("voteContent is null: " + voteContent);
 				VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("Exception occured: No default content");
-				persistInRequestError(request,"error.defaultContent.notSetup");
-	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+				saveInRequestError(request,"error.defaultContent.notSetup");
 	    		return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using voteContent: " + voteContent);
@@ -392,75 +453,46 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    logger.debug("other problems: " + e);
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("Exception occured: No default question content");
-			persistInRequestError(request,"error.defaultContent.notSetup");
-    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+			saveInRequestError(request,"error.defaultContent.notSetup");
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 		}
 
 		logger.debug("Voting tool has the default content id: " + defaultContentID);
-		request.getSession().setAttribute(DEFAULT_CONTENT_ID_STR, new Long(defaultContentID).toString());
-		request.getSession().setAttribute(DEFAULT_CONTENT_ID, new Long(defaultContentID).toString());
+		
+		voteAuthoringForm.setDefaultContentId(new Long(defaultContentID).toString());
+		voteAuthoringForm.setDefaultContentIdStr(new Long(defaultContentID).toString());
 		return null;
-
 	}
 
 	
 	
-	protected void retrieveContent(HttpServletRequest request, ActionMapping mapping, VoteAuthoringForm voteAuthoringForm, Map mapOptionsContent, long toolContentId)
+	protected void retrieveContent(HttpServletRequest request, IVoteService voteService, 
+	        VoteAuthoringForm voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO, 
+	        Map mapOptionsContent, long toolContentID, SessionMap sessionMap)
 	{
-		logger.debug("starting retrieve content for toolContentId: " + toolContentId);
-
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("starting retrieve content for toolContentID: " + toolContentID);
 		logger.debug("voteService: " + voteService);
-		if (voteService == null)
-		{
-			logger.debug("will retrieve voteService");
-			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-			logger.debug("retrieving voteService from session: " + voteService);
-		}
-	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
 
-	    logger.debug("getting existing content with id:" + toolContentId);
-	    VoteContent voteContent = voteService.retrieveVote(new Long(toolContentId));
+	    logger.debug("getting existing content with id:" + toolContentID);
+	    VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
 		logger.debug("voteContent: " + voteContent);
 		
-		VoteUtils.setDefaultSessionAttributes(request, voteContent, voteAuthoringForm);
+		VoteUtils.readContentValues(request, voteContent, voteAuthoringForm, voteGeneralAuthoringDTO);
 		logger.debug("form title is: : " + voteAuthoringForm.getTitle());
 		
-        request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(voteContent.isDefineLater()));
-	    
-	    voteAuthoringForm.setTitle(voteContent.getTitle());
-		voteAuthoringForm.setInstructions(voteContent.getInstructions());
-		
+        voteAuthoringForm.setIsDefineLater(new Boolean(voteContent.isDefineLater()).toString());
+        voteGeneralAuthoringDTO.setIsDefineLater(new Boolean(voteContent.isDefineLater()).toString());
+        
 		if (voteContent.getTitle() == null)
 		{
-			request.getSession().setAttribute(ACTIVITY_TITLE, "Voting Title");
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Voting Instructions");
+		    voteGeneralAuthoringDTO.setActivityTitle("Voting Title");
+		    voteGeneralAuthoringDTO.setActivityInstructions("Voting Instructions");
 		}
 		else
 		{
-			request.getSession().setAttribute(ACTIVITY_TITLE, voteContent.getTitle());
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());
-		}
-
-		
-		logger.debug("Title is: " + voteContent.getTitle());
-		logger.debug("Instructions is: " + voteContent.getInstructions());
-		if ((voteAuthoringForm.getTitle() == null) || (voteAuthoringForm.getTitle().equals("")))
-		{
-			logger.debug("resetting title");
-			String activityTitle=(String)request.getSession().getAttribute(ACTIVITY_TITLE);
-			logger.debug("activityTitle: " + activityTitle);
-			voteAuthoringForm.setTitle(activityTitle);
-		}
-	    
-		if ((voteAuthoringForm.getInstructions() == null) || (voteAuthoringForm.getInstructions().equals("")))
-		{
-			logger.debug("resetting instructions");
-			String activityInstructions=(String)request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS);
-			logger.debug("activityInstructions: " + activityInstructions);
-			voteAuthoringForm.setInstructions(activityInstructions);
+		    voteGeneralAuthoringDTO.setActivityTitle(voteContent.getTitle());
+			voteGeneralAuthoringDTO.setActivityInstructions(voteContent.getInstructions());
 		}
 
 		
@@ -484,48 +516,67 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    		 */
 	    		if (mapIndex.longValue() == 1)
 	    		{
-	    		    request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteQueContent.getQuestion());
+	    		    voteGeneralAuthoringDTO.setDefaultOptionContent(voteQueContent.getQuestion());
 	    		}
 	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
-		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
+		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
+		sessionMap.put(MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
 		
 		int maxIndex=mapOptionsContent.size();
-    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
-    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
-    	
-		
-		logger.debug("final title: " + voteAuthoringForm.getTitle());
-		logger.debug("final ins: " + voteAuthoringForm.getInstructions());
-		
-        request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS, voteContent.getOfflineInstructions());
-        request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS, voteContent.getOnlineInstructions());
+		voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
+        
+        voteGeneralAuthoringDTO.setRichTextOfflineInstructions(voteContent.getOfflineInstructions());
+        voteGeneralAuthoringDTO.setRichTextOnlineInstructions(voteContent.getOnlineInstructions());
+        
+        
+	    if ((voteContent.getOnlineInstructions() == null) || (voteContent.getOnlineInstructions().length() == 0))
+	    {
+	        voteGeneralAuthoringDTO.setRichTextOnlineInstructions(DEFAULT_ONLINE_INST);
+	        sessionMap.put(ONLINE_INSTRUCTIONS_KEY, DEFAULT_ONLINE_INST);
+	    }
+	        
+	    if ((voteContent.getOfflineInstructions() == null) || (voteContent.getOfflineInstructions().length() == 0))
+	    {
+	        voteGeneralAuthoringDTO.setRichTextOfflineInstructions(DEFAULT_OFFLINE_INST);
+	        sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, DEFAULT_OFFLINE_INST);
+	    }
+        
         
         /*process offline files metadata*/
 	    List listOfflineFilesMetaData=voteService.getOfflineFilesMetaData(voteContent.getUid());
 	    logger.debug("existing listOfflineFilesMetaData, to be structured as VoteAttachmentDTO: " + listOfflineFilesMetaData);
 	    listOfflineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOfflineFilesMetaData);
 	    logger.debug("populated listOfflineFilesMetaData: " + listOfflineFilesMetaData);
-	    request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	    voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
+	    
+	    sessionMap.put(LIST_OFFLINEFILES_METADATA_KEY, listOfflineFilesMetaData);
 	    
 	    List listUploadedOfflineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOfflineFilesMetaData);
 	    logger.debug("returned from db listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
-	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listUploadedOfflineFileNames);
+	    voteGeneralAuthoringDTO.setListUploadedOfflineFileNames(listUploadedOfflineFileNames);
+	    
+	    sessionMap.put(LIST_UPLOADED_OFFLINE_FILENAMES_KEY, listUploadedOfflineFileNames);
+	    
 	    
 	    /*process online files metadata*/
 	    List listOnlineFilesMetaData=voteService.getOnlineFilesMetaData(voteContent.getUid());
 	    logger.debug("existing listOnlineFilesMetaData, to be structured as VoteAttachmentDTO: " + listOnlineFilesMetaData);
 	    listOnlineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOnlineFilesMetaData);
 	    logger.debug("populated listOnlineFilesMetaData: " + listOnlineFilesMetaData);
-	    request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	    voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
+	    
+	    sessionMap.put(LIST_ONLINEFILES_METADATA_KEY, listOnlineFilesMetaData);
 	    
 	    List listUploadedOnlineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOnlineFilesMetaData);
 	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
-	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
+	    //request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
+	    voteGeneralAuthoringDTO.setListUploadedOnlineFileNames(listUploadedOnlineFileNames);
+	    
+	    sessionMap.put(LIST_UPLOADED_ONLINE_FILENAMES_KEY, listUploadedOnlineFileNames);
 
 		
 		/*
@@ -538,16 +589,14 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			HttpServletRequest request, HttpServletResponse response, IVoteService voteService) 
 		throws IOException, ServletException, VoteApplicationException {
 		logger.debug("passed voteService: " + voteService);
-		request.getSession().setAttribute(TOOL_SERVICE, voteService);
 		logger.debug("calling execute...");
 		return execute(mapping, form, request, response);
 	}
 	
 
-	protected boolean existsContent(long toolContentId, HttpServletRequest request)
+	protected boolean existsContent(long toolContentID, HttpServletRequest request, IVoteService voteService)
 	{
-		IVoteService voteService =VoteUtils.getToolService(request);
-		VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+		VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
 	    if (voteContent == null) 
 	    	return false;
 	    
@@ -556,11 +605,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 	
 	/**
-     * persists error messages to request scope
+     * saves error messages to request scope
      * @param request
      * @param message
      */
-	public void persistInRequestError(HttpServletRequest request, String message)
+	public void saveInRequestError(HttpServletRequest request, String message)
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));

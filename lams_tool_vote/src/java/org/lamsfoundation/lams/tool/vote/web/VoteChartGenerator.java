@@ -78,10 +78,10 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
         		logger.debug("voteService: " + voteService);
         		
-        	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-        	    logger.debug("toolContentId: " + toolContentId);
+        	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        	    logger.debug("toolContentID: " + toolContentID);
         	    
-        	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+        	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
         		logger.debug("existing voteContent:" + voteContent);
 
         		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentSessionId));

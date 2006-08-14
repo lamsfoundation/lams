@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
-						<lams:SetEditor id="richTextOnlineInstructions" text="${sessionScope.richTextOnlineInstructions}" small="true" key="label.onlineInstructions.col"/>					
+						<lams:SetEditor id="richTextOnlineInstructions" text="${voteGeneralAuthoringDTO.richTextOnlineInstructions}" small="true" key="label.onlineInstructions.col"/>					
 					</td> 
 				</tr>
 				
@@ -43,7 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
           			
 					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left" >
-									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
+									<c:forEach var='file' items='${voteGeneralAuthoringDTO.listOnlineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
 													 <c:out value="${file.filename}"/> 
@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 
 				<tr> 
-					<td class="field-name">
+					<td>
     	      				 <bean:message key="label.onlineFiles" /> 
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
@@ -89,7 +89,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
-						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true" key="label.offlineInstructions.col"/>																			
+						<lams:SetEditor id="richTextOfflineInstructions" text="${voteGeneralAuthoringDTO.richTextOfflineInstructions}" small="true" key="label.offlineInstructions.col"/>																			
 					</td> 
 				</tr>
 				
@@ -97,7 +97,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr> 
 					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left">
-									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
+									<c:forEach var='file' items='${voteGeneralAuthoringDTO.listOfflineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
 													 <c:out value="${file.filename}"/> 
@@ -120,7 +120,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</td>
 													<td NOWRAP valign=top>
 
-													 <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> 	
+													 <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> 	
 												</td>
 											</tr>
 				         			</c:forEach>
@@ -129,7 +129,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 
 				<tr> 
-					<td class="field-name">
+					<td>
 							 <bean:message key="label.offlineFiles" />
 	      			</td>
           			<td colspan=3 NOWRAP valign=top> 

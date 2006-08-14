@@ -63,11 +63,17 @@ public interface VoteAppConstants {
     public static final String VOTE_NOMINATION_VIEWER					="voteNominationViewer";
     public static final String LEARNER_PROGRESS_USERID					="learnerProgressUserId";
     public static final String MAX_NOMINATION_COUNT						="maxNominationCount";
+    public static final String ALLOW_TEXT								="allowText";
     public static final String ALLOW_TEXT_ENTRY							="allowTextEntry";
     public static final String VOTE_CHANGABLE							="voteChangable";
     public static final String LOCK_ON_FINISH							="lockOnFinish";
     public static final String REPORT_VIEW_ONLY							="reportViewOnly";
     public static final String USER_ENTRY								="userEntry";
+	
+	public static final String ATTACHMENT_LIST_KEY 						= "attachmentListKey";
+	public static final String DELETED_ATTACHMENT_LIST_KEY				= "deletedAttachmentListKey";
+	public static final String ACTIVITY_TITLE_KEY						= "activityTitleKey";
+	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
@@ -79,6 +85,15 @@ public interface VoteAppConstants {
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String REQUEST_LEARNING_REPORT					="requestLearningReport";
     public static final String REQUEST_LEARNING_REPORT_PROGRESS			="requestLearningReportProgress";
+    public static final String VOTE_GENERAL_AUTHORING_DTO				="voteGeneralAuthoringDTO";
+    public static final String MAP_OPTIONS_CONTENT_KEY					="mapOptionsContentKey";
+    public static final String HTTP_SESSION_ID							="httpSessionID";
+    
+	public static final String DEFAULT_ONLINE_INST						="online instructions";
+	public static final String DEFAULT_OFFLINE_INST						="offline instructions";
+	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
+	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
+
     
     /*
      * authoring mode controllers
@@ -170,9 +185,13 @@ public interface VoteAppConstants {
     public static final String SUBMIT_OFFLINE_FILE						="submitOfflineFile";
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
     public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
+    public static final String LIST_UPLOADED_OFFLINE_FILENAMES_KEY		="listUploadedOfflineFileNamesKey";
     public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
+    public static final String LIST_UPLOADED_ONLINE_FILENAMES_KEY		="listUploadedOnlineFileNamesKey";    
     public static final String LIST_OFFLINEFILES_METADATA				="listOfflineFilesMetadata";
+    public static final String LIST_OFFLINEFILES_METADATA_KEY			="listOfflineFilesMetadataKey";
     public static final String LIST_ONLINEFILES_METADATA				="listOnlineFilesMetadata";
+    public static final String LIST_ONLINEFILES_METADATA_KEY			="listOnlineFilesMetadataKey";
     public static final String LIST_VOTE_ALLSESSIONS_DTO				="listVoteAllSessionsDTO";
     public static final String ATTACHMENT_LIST                          ="attachmentList";
     public static final String DELETED_ATTACHMENT_LIST                  ="deletedAttachmentList";

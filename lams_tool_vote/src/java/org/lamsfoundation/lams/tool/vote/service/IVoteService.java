@@ -55,7 +55,7 @@ public interface IVoteService
         
     public void createVote(VoteContent voteContent) throws VoteApplicationException;
     
-    public VoteContent retrieveVote(Long toolContentId) throws VoteApplicationException;
+    public VoteContent retrieveVote(Long toolContentID) throws VoteApplicationException;
     
     public VoteUsrAttempt getAttemptByUID(Long uid) throws VoteApplicationException;
     
@@ -212,15 +212,15 @@ public interface IVoteService
 	
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
     
-    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException;
+    public void setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException;
     
-    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException;
+    public void setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException;
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException;
+    public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException;
 	
     public boolean existsSession(Long toolSessionId); 
    
-    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException;
     
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 

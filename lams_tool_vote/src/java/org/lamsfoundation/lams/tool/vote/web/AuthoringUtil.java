@@ -40,11 +40,9 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteAttachmentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
@@ -52,6 +50,7 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
@@ -230,9 +229,10 @@ public class AuthoringUtil implements VoteAppConstants {
      * @return VoteAttachmentDTO
      * @throws RepositoryCheckedException
      */
-    public static VoteAttachmentDTO uploadFile(HttpServletRequest request, VoteAuthoringForm voteAuthoringForm, boolean isOfflineFile) throws RepositoryCheckedException 
+    public static VoteAttachmentDTO uploadFile(HttpServletRequest request, IVoteService voteService, VoteAuthoringForm voteAuthoringForm, 
+            boolean isOfflineFile, SessionMap sessionMap) throws RepositoryCheckedException 
 	{
-    	logger.debug("doing uploadFile...");
+    	logger.debug("doing uploadFile...: " + sessionMap);
     	logger.debug("isOfflineFile:" + isOfflineFile);
     	
     	InputStream stream=null; 
@@ -268,7 +268,8 @@ public class AuthoringUtil implements VoteAppConstants {
     		
     		if (fileName.length() > 0)     
     		{
-    			List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    			//List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    		    List listUploadedOfflineFileNames=(List)sessionMap.get(LIST_UPLOADED_OFFLINE_FILENAMES_KEY);
         		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
         		int index=findFileNameIndex(listUploadedOfflineFileNames, fileName);
         		logger.debug("index:" + index);
@@ -276,7 +277,8 @@ public class AuthoringUtil implements VoteAppConstants {
         		{
         			listUploadedOfflineFileNames.add(fileName);
             		logger.debug("listUploadedOfflineFileNames after add :" + listUploadedOfflineFileNames);
-            		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);	
+            		//request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+            		sessionMap.put(LIST_UPLOADED_OFFLINE_FILENAMES_KEY, listUploadedOfflineFileNames);
         		}
     		}
     		
@@ -311,7 +313,8 @@ public class AuthoringUtil implements VoteAppConstants {
 
     		if (fileName.length() > 0)     
     		{
-    			List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    			//List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    		    List listUploadedOnlineFileNames=(List)sessionMap.get(LIST_UPLOADED_ONLINE_FILENAMES_KEY);
         		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
         		int index=findFileNameIndex(listUploadedOnlineFileNames, fileName);
         		logger.debug("index:" + index);
@@ -319,13 +322,13 @@ public class AuthoringUtil implements VoteAppConstants {
         		{
         			listUploadedOnlineFileNames.add(fileName);
             		logger.debug("listUploadedOnlineFileNames after add :" + listUploadedOnlineFileNames);
-            		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);	
+            		//request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+            		sessionMap.put(LIST_UPLOADED_ONLINE_FILENAMES_KEY, listUploadedOnlineFileNames);
         		}
     		}
     	}
     	
-    	IVoteService voteService =VoteUtils.getToolService(request);
-		logger.debug("calling uploadFile with:");
+    	logger.debug("calling uploadFile with:");
 		logger.debug("istream:" + stream);
 		logger.debug("filename:" + fileName);
 		logger.debug("mimeType:" + mimeType);
@@ -350,6 +353,7 @@ public class AuthoringUtil implements VoteAppConstants {
  		voteAttachmentDTO.setFilename(fileName);
  		voteAttachmentDTO.setOfflineFile(isOfflineFile);
  		
+ 		logger.debug("uploadFile ends with sessionMap:" + sessionMap);
 		return voteAttachmentDTO;
 	}
     
@@ -413,32 +417,37 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param filename
      * @param offlineFile
      */
-    public static void removeFileItem(HttpServletRequest request, String filename, String offlineFile)
+    public static void removeFileItem(HttpServletRequest request, String filename, String offlineFile, SessionMap sessionMap)
 	{
+        logger.debug("starting removeFileItem, sessionMap:" + sessionMap);
     	logger.debug("offlineFile:" + offlineFile);
     	if (offlineFile.equals("1"))
     	{
     		logger.debug("will remove an offline file");
-    		List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    		//List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    		List listUploadedOfflineFileNames=(List)sessionMap.get(LIST_UPLOADED_OFFLINE_FILENAMES_KEY);
     		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
     		
     		listUploadedOfflineFileNames.remove(filename);
     		logger.debug("removed offline filename:" + filename);
     		
     		logger.debug("listUploadedOfflineFileNames after remove :" + listUploadedOfflineFileNames);
-    		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+    		//request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+    		sessionMap.put(LIST_UPLOADED_OFFLINE_FILENAMES_KEY, listUploadedOfflineFileNames);
     	}
     	else
     	{
     		logger.debug("will remove an online file");
-    		List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    		//List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    		List listUploadedOnlineFileNames=(List)sessionMap.get(LIST_UPLOADED_ONLINE_FILENAMES_KEY);
     		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
     		
     		listUploadedOnlineFileNames.remove(filename);
     		logger.debug("removed online filename:" + filename);
     		
     		logger.debug("listUploadedOnlineFileNames after remove :" + listUploadedOnlineFileNames);
-    		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+    		//request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+    		sessionMap.put(LIST_UPLOADED_ONLINE_FILENAMES_KEY, listUploadedOnlineFileNames);
     	}
 	}
     
@@ -504,21 +513,23 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param isOfflineFile
      * @param voteContent
      */
-    public static void persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, VoteContent voteContent)
+    public static void persistFilesMetaData(HttpServletRequest request, IVoteService voteService, 
+            boolean isOfflineFile, VoteContent voteContent, SessionMap sessionMap)
     {
-    	IVoteService voteService =VoteUtils.getToolService(request);
-
-    	List listFilesMetaData=null;
-    	logger.debug("doing persistFilesMetaData...");
+    	logger.debug("doing persistFilesMetaData... sessionMap" + sessionMap);
+       	List listFilesMetaData=null;
     	logger.debug("isOfflineFile:" + isOfflineFile);
     	
     	if (isOfflineFile)
     	{
-    		listFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+    		//listFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+    	    listFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
     	}
     	else
     	{
-    		listFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+    		//listFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+    		listFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
+    		
     	}
     	logger.debug("listFilesMetaData:" + listFilesMetaData);
     	
@@ -566,14 +577,15 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param request
      * @param voteContent
      */
-    public static void removeRedundantOfflineFileItems(HttpServletRequest request, VoteContent voteContent)
+    public static void removeRedundantOfflineFileItems(HttpServletRequest request, IVoteService voteService, 
+            VoteContent voteContent, SessionMap sessionMap)
     {
-    	IVoteService voteService =VoteUtils.getToolService(request);
-    	
+        logger.debug("starting removeRedundantOfflineFileItems:" + sessionMap);
     	List allOfflineFilenames=voteService.retrieveVoteUploadedOfflineFilesName(voteContent.getUid());
     	logger.debug("allOfflineFilenames:" + allOfflineFilenames);
     	
-    	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+    	//List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+    	List listOfflineFilesMetaData =(List)sessionMap.get(LIST_OFFLINEFILES_METADATA_KEY);
  		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
  		
  		List listUploadedOfflineFileNames=extractFileNames(listOfflineFilesMetaData);
@@ -617,14 +629,16 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param request
      * @param voteContent
      */
-    public static void removeRedundantOnlineFileItems(HttpServletRequest request, VoteContent voteContent)
+    public static void removeRedundantOnlineFileItems(HttpServletRequest request, IVoteService voteService, 
+            VoteContent voteContent, SessionMap sessionMap)
     {
-    	IVoteService voteService =VoteUtils.getToolService(request);
-    	
+        logger.debug("starting removeRedundantOnlineFileItems:" + sessionMap);
+        
     	List allOnlineFilenames=voteService.retrieveVoteUploadedOnlineFilesName(voteContent.getUid());
     	logger.debug("allOnlineFilenames:" + allOnlineFilenames);
     	
-    	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+    	//List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+    	List listOnlineFilesMetaData =(List)sessionMap.get(LIST_ONLINEFILES_METADATA_KEY);
  		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
  		
  		List listUploadedOnlineFileNames=extractFileNames(listOnlineFilesMetaData);
@@ -663,76 +677,25 @@ public class AuthoringUtil implements VoteAppConstants {
             }
 		}
     }
+
     
-    /**
-     * simulatePropertyInspector_RunOffline(HttpServletRequest request)
-     * @param request
-     */
-    public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
-    {
-    	IVoteService voteService =VoteUtils.getToolService(request);
-    	
-    	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (!toolContentId.equals("")))
-    	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		try
-			{
-    			voteService.setAsRunOffline(new Long(toolContentId));	
-			}
-    		catch(ToolException e)
-			{
-    			logger.debug("we should never come here");
-			}
-    		
-    		logger.debug("post-RunAsOffline");
-		}
-    	logger.debug("end of simulating RunOffline on content id: " + toolContentId);
-    }
-	
-    /**
-     * Normally, a request to set defineLaterproperty of the content comes directly from container through the property inspector.
-     * What we do below is simulate that for development purposes.
-     * @param request
-     */
-    public void simulatePropertyInspector_setAsDefineLater(HttpServletRequest request)
-    {
-    	IVoteService voteService =VoteUtils.getToolService(request);
-    	
-    	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (!toolContentId.equals("")))
-    	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		try
-			{
-    			voteService.setAsDefineLater(new Long(toolContentId));	
-    		}
-    		catch(ToolException e)
-			{
-    			logger.debug("we should never come here");
-			}
-    		
-    		logger.debug("post-setAsDefineLater");
-		}
-    	logger.debug("end of simulating setAsDefineLater on content id: " + toolContentId);
-    }
-    
-    
-    
-    protected void reconstructOptionContentMapForAdd(Map mapOptionsContent, HttpServletRequest request)
+    protected Map reconstructOptionContentMapForAdd(Map mapOptionsContent, HttpServletRequest request)
     {
         logger.debug("doing reconstructOptionContentMapForAdd.");
     	logger.debug("pre-add Map content: " + mapOptionsContent);
     	logger.debug("pre-add Map size: " + mapOptionsContent.size());
     	
-    	repopulateMap(mapOptionsContent, request);
-    	
+    	mapOptionsContent=repopulateMap(mapOptionsContent, request);
+    	logger.debug("mapOptionsContent: " + mapOptionsContent);
     	mapOptionsContent.put(new Long(mapOptionsContent.size()+1).toString(), "");
-    	request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
+    	//request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
 	     
     	logger.debug("post-add Map is: " + mapOptionsContent);    	
 	   	logger.debug("post-add count " + mapOptionsContent.size());
+	   	
+	   	return mapOptionsContent;
     }
+        
     
     
     protected void reconstructOptionContentMapForRemove(Map mapOptionsContent, HttpServletRequest request, VoteAuthoringForm voteAuthoringForm)
@@ -742,11 +705,12 @@ public class AuthoringUtil implements VoteAppConstants {
     	 	logger.debug("pre-delete map content:  " + mapOptionsContent);
     	 	logger.debug("optIndex: " + optIndex);
     	 	
-    	 	String defLater=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+    	 	//String defLater=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+    	 	String defLater=voteAuthoringForm.getActiveModule();
     	 	logger.debug("defLater: " + defLater);
     	 	
     	 	String removableOptIndex=null;
-    	 	if (defLater.equals(MONITORING))
+    	 	if ((defLater != null) && (defLater.equals(MONITORING)))
     	 	{
        	 		removableOptIndex=(String)request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
         	 	logger.debug("removableOptIndex: " + removableOptIndex);
@@ -763,24 +727,29 @@ public class AuthoringUtil implements VoteAppConstants {
         	
         	mapOptionsContent.remove(new Long(longOptIndex).toString());	
 	 		logger.debug("removed the question content with index: " + longOptIndex);
-	 		request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
+	 		//request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
 	    	
 	    	logger.debug("post-delete count " + mapOptionsContent.size());
 	    	logger.debug("post-delete map content:  " + mapOptionsContent);
     }
 
 
-    protected void repopulateMap(Map mapOptionsContent, HttpServletRequest request)
+    protected Map repopulateMap(Map mapOptionsContent, HttpServletRequest request)
     {
-    	logger.debug("optIndex: " + request.getSession().getAttribute("optIndex"));
-    	long optIndex= new Long(request.getSession().getAttribute("optIndex").toString()).longValue();
-    	logger.debug("optIndex: " + optIndex);
+    	//logger.debug("optIndex: " + request.getSession().getAttribute("optIndex"));
+    	//long optIndex= new Long(request.getSession().getAttribute("optIndex").toString()).longValue();
+    	//logger.debug("optIndex: " + optIndex);
+    	
+    	
+    	logger.debug("starting repopulateMap");
+        int intOptionIndex= mapOptionsContent.size();
+        logger.debug("intOptionIndex: " + intOptionIndex);
 
     	/* if there is data in the Map remaining from previous session remove those */
     	mapOptionsContent.clear();
 		logger.debug("Map got initialized: " + mapOptionsContent);
 		
-		for (long i=0; i < optIndex ; i++)
+		for (long i=0; i < intOptionIndex ; i++)
 		{
 			String candidateOptionEntry =request.getParameter("optionContent" + i);
 			if (i==0)
@@ -795,6 +764,7 @@ public class AuthoringUtil implements VoteAppConstants {
 				logger.debug("added new entry.");	
 			}
 		}
+		return mapOptionsContent; 
     }
 
     /**
@@ -802,7 +772,7 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param mapOptionsContent
      * @param request
      */
-    protected  void reconstructOptionsContentMapForSubmit(Map mapOptionsContent, HttpServletRequest request)
+    protected  Map reconstructOptionsContentMapForSubmit(Map mapOptionsContent, HttpServletRequest request)
     {
     	logger.debug("pre-submit Map:" + mapOptionsContent);
     	logger.debug("pre-submit Map size :" + mapOptionsContent.size());
@@ -821,8 +791,9 @@ public class AuthoringUtil implements VoteAppConstants {
 	    }
 	    
 	    mapOptionsContent=(TreeMap)mapFinalOptionsContent;
-	    request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
+	    //request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
 	    logger.debug("final mapOptionsContent:" + mapOptionsContent);
+	    return mapOptionsContent;
     }
 
     
@@ -831,19 +802,21 @@ public class AuthoringUtil implements VoteAppConstants {
     	logger.debug("removing unused entries... ");
     	logger.debug("mapOptionsContent:  " + mapOptionsContent);
     	
-    	String toolContentId=voteAuthoringForm.getToolContentId();
-    	logger.debug("toolContentId:  " + toolContentId);
-     	if ((toolContentId == null) || toolContentId.equals(""))
+    	String toolContentID=voteAuthoringForm.getToolContentID();
+    	logger.debug("toolContentID:  " + toolContentID);
+     	/*
+    	if ((toolContentID == null) || toolContentID.equals(""))
      	{
-     		logger.debug("getting toolContentId from session.");
+     		logger.debug("getting toolContentID from session.");
      		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-     		toolContentId=longToolContentId.toString();
-     		logger.debug("toolContentId: " + toolContentId);
+     		toolContentID=longToolContentId.toString();
+     		logger.debug("toolContentID: " + toolContentID);
      	}
-     	logger.debug("final toolContentId: " + toolContentId);
+     	logger.debug("final toolContentID: " + toolContentID);
+     	*/
     	
     	
-    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
     	logger.debug("voteContent:  " + voteContent);
     	
     	if (voteContent != null)
@@ -915,40 +888,47 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param request
      * @return
      */
-    public VoteContent saveOrUpdateVoteContent(Map mapOptionsContent, IVoteService voteService, VoteAuthoringForm voteAuthoringForm, HttpServletRequest request)
+    public VoteContent saveOrUpdateVoteContent(Map mapOptionsContent, IVoteService voteService, VoteAuthoringForm voteAuthoringForm, 
+            HttpServletRequest request, SessionMap sessionMap)
     {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+        logger.debug("toolUser: " + toolUser);
         
-        String richTextTitle = request.getParameter("title");
-        String richTextInstructions = request.getParameter("instructions");
+        String richTextTitle = request.getParameter(TITLE);
+        String richTextInstructions = request.getParameter(INSTRUCTIONS);
+        
         logger.debug("richTextTitle: " + richTextTitle);
         logger.debug("richTextInstructions: " + richTextInstructions);
         
         String voteChangable = voteAuthoringForm.getVoteChangable();
         logger.debug("voteChangable: " + voteChangable);
         
-        String lockedOnFinish=voteAuthoringForm.getLockOnFinish();
-        logger.debug("lockedOnFinish: " + lockedOnFinish);
+        String lockOnFinish=voteAuthoringForm.getLockOnFinish();
+        logger.debug("lockOnFinish: " + lockOnFinish);
         
-        String allowText=voteAuthoringForm.getAllowText();
-        logger.debug("allowText: " + allowText);
+        String allowTextEntry=voteAuthoringForm.getAllowText();
+        logger.debug("allowTextEntry: " + allowTextEntry);
 
         String maxNomcount= voteAuthoringForm.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);
 	    
-        String richTextOfflineInstructions=(String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+        //String richTextOfflineInstructions=(String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+	    String richTextOfflineInstructions=(String)sessionMap.get(OFFLINE_INSTRUCTIONS_KEY);
         logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
-		String richTextOnlineInstructions=(String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+        
+        //String richTextOnlineInstructions=(String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+        String richTextOnlineInstructions=(String)sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
 		logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
 
         boolean setCommonContent=true; 
-        if ((lockedOnFinish == null) || (voteChangable == null))
+        if ((lockOnFinish == null) || (voteChangable == null))
         {
         	setCommonContent=false;
         }
         logger.debug("setCommonContent: " + setCommonContent);
 		
-        String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+        //String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+        String activeModule=voteAuthoringForm.getActiveModule();
         logger.debug("activeModule: " + activeModule);
 
         boolean voteChangableBoolean=false;
@@ -960,10 +940,10 @@ public class AuthoringUtil implements VoteAppConstants {
             if (voteChangable.equalsIgnoreCase(ON))
                 voteChangableBoolean=true;
             
-            if (lockedOnFinish.equalsIgnoreCase(ON))
+            if (lockOnFinish.equalsIgnoreCase(ON))
                 lockedOnFinishBoolean=true;
 
-            if (allowText.equalsIgnoreCase(ON))
+            if (allowTextEntry.equalsIgnoreCase(ON))
                 allowTextBoolean=true;
         }
         
@@ -992,13 +972,12 @@ public class AuthoringUtil implements VoteAppConstants {
         logger.debug("userId: " + userId);
         
         
-        Long toolContentIdLong =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-        logger.debug("toolContentIdLong: " + toolContentIdLong);
+        //Long toolContentIDLong =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        //logger.debug("toolContentIDLong: " + toolContentIDLong);
+        String toolContentID =voteAuthoringForm.getToolContentID();
+        logger.debug("toolContentID: " + toolContentID);
         
-        String toolContentId=toolContentIdLong.toString();
-    	logger.debug("toolContentId:  " + toolContentId);
-     	
-     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
      	logger.debug("voteContent: " + voteContent);
      	
      	boolean newContent=false;
@@ -1010,7 +989,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
 
     	logger.debug("setting common content values..." + richTextTitle + " " + richTextInstructions);
-    	voteContent.setVoteContentId(new Long(toolContentId));
+    	voteContent.setVoteContentId(new Long(toolContentID));
      	voteContent.setTitle(richTextTitle);
      	voteContent.setInstructions(richTextInstructions);
      	voteContent.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
@@ -1018,6 +997,7 @@ public class AuthoringUtil implements VoteAppConstants {
      	voteContent.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
      	logger.debug("end of setting common content values...");
 
+     	logger.debug("activeModule: " + activeModule);
      	
         if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
 		{
@@ -1042,7 +1022,7 @@ public class AuthoringUtil implements VoteAppConstants {
             voteService.updateVote(voteContent);
         }
         
-        voteContent=voteService.retrieveVote(new Long(toolContentId));
+        voteContent=voteService.retrieveVote(new Long(toolContentID));
      	logger.debug("voteContent: " + voteContent);
         
         voteContent=createOptiosContent(mapOptionsContent, voteService, voteContent);
@@ -1060,6 +1040,7 @@ public class AuthoringUtil implements VoteAppConstants {
      */
     protected VoteContent createOptiosContent(Map mapOptionsContent, IVoteService voteService, VoteContent voteContent)
     {    
+        logger.debug("starting createOptiosContent: " + voteContent);
         logger.debug("content uid is: " + voteContent.getUid());
         List questions=voteService.retrieveVoteQueContentsByToolContentId(voteContent.getUid().longValue());
         logger.debug("questions: " + questions);

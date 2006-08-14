@@ -32,7 +32,7 @@
    <action path="/authoringStarter" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteStarterAction" 
    			name="VoteAuthoringForm" 
-	      	scope="session"
+	      	scope="request"
    			input="/index.jsp"> 
 	
 	  	<forward
@@ -83,7 +83,7 @@
 	<action path="/authoring"
 	      	type="org.lamsfoundation.lams.tool.vote.web.VoteAction"
     	  	name="VoteAuthoringForm"
-	      	scope="session"
+	      	scope="request"
     	  	input="/authoring/AuthoringMaincontent.jsp"
       		parameter="dispatch">
 
@@ -123,6 +123,7 @@
    <action path="/defineLaterStarter" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteDLStarterAction" 
    			name="VoteAuthoringForm" 
+	      	scope="request"   			
    			input="/index.jsp"> 
 	
 	      <forward

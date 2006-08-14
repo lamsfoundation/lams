@@ -140,10 +140,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 
 	    /* SELECTION_CASE == 1 indicates a selected group other than "All" */
@@ -192,6 +192,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			boolean showUserEntriesBySession, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO)
 	{
 	    logger.debug("doing refreshSummaryData." + voteGeneralLearnerFlowDTO);
+	    logger.debug("voteService." + voteService);
 	    
 		if (voteService == null)
 		{
@@ -199,12 +200,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 			logger.debug("retrieving voteService from session: " + voteService);
 		}
-		if (voteService == null)
-		{
-	    	voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-			logger.debug("voteService: " + voteService);
-		}
-
 		logger.debug("voteService: " + voteService);
 		
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
@@ -446,10 +441,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("retrieving voteService from session: " + voteService);
 		}
 		
-    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 		
     	/* this section is related to summary tab. Starts here. */
@@ -494,10 +489,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("retrieving voteService from session: " + voteService);
 		}
 
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 		
 		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
@@ -564,10 +559,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("retrieving voteService from session: " + voteService);
 		}
 
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 		
 		
@@ -625,25 +620,24 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
                                          ToolException
     {
     	logger.debug("dispatching editActivityQuestions...");
-    	
+
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+	    if (voteService == null)        
+	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+
 	    VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
 	    logger.debug("voteMonitoringForm :" +voteMonitoringForm);
 	    
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 		
-		VoteUtils.setDefineLater(request, true);
-		
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+		Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-	    if (voteService == null)        
-	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	    logger.debug("voteService :" +voteService);
-
-
-    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteUtils.setDefineLater(request, true, voteService, toolContentID.toString());
+	    
+    	VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
@@ -867,10 +861,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	
     	logger.debug("showOpen votes set to true: ");
     	
-    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
@@ -949,10 +943,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         logger.debug("hiding the user entry : " + voteUsrAttempt.getUserEntry());
         voteService.hideOpenVote(voteUsrAttempt);
         
-    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
@@ -1006,10 +1000,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         voteService.showOpenVote(voteUsrAttempt);
         logger.debug("voteUsrAttempt: " + voteUsrAttempt);
 
-    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
+    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
 	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
 		logger.debug("existing voteContent:" + voteContent);
 
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 

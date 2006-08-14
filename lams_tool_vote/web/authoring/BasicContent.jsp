@@ -37,20 +37,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<table class="forms">
 						<tr>   
 						<td NOWRAP class=error>
-							<c:if test="${sbmtSuccess == 'true' }"> 			
-								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <bean:message key="sbmt.successful"/>  </img>
+							<c:if test="${voteGeneralAuthoringDTO.sbmtSuccess == 'true' }"> 			
+								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
+								<bean:message key="sbmt.successful"/>  </img>
 							</c:if> 			
 
-							<c:if test="${userExceptionMaxNominationInvalid == 'true'}"> 										
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <bean:message key="error.maxNominationCount.invalid"/>  </img>
+							<c:if test="${voteGeneralAuthoringDTO.userExceptionMaxNominationInvalid == 'true'}"> 										
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  
+									<bean:message key="error.maxNominationCount.invalid"/>  </img>
 							</c:if> 			
 
-							<c:if test="${validationError == 'true'}"> 			
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <bean:message key="error.fields.mandatory"/>  </img>
+							<c:if test="${voteGeneralAuthoringDTO.validationError == 'true'}"> 			
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  
+									<bean:message key="error.fields.mandatory"/>  </img>
 							</c:if> 			
 							
-							<c:if test="${userExceptionOptionsDuplicate == 'true'}"> 			
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>   <bean:message key="error.duplicate.nomination"/>  </img>
+							<c:if test="${voteGeneralAuthoringDTO.userExceptionOptionsDuplicate == 'true'}"> 			
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>   
+									<bean:message key="error.duplicate.nomination"/>  </img>
 							</c:if> 			
 							
 						</td>
@@ -61,13 +65,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<table class="forms">
 						<tr> 
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="title" text="${activityTitle}" small="true" key="label.authoring.title.col"/>								
+								<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
 							</td> 
 					  	</tr>
 
 					  	<tr> 
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="instructions" text="${activityInstructions}" key="label.authoring.instructions.col"/>								
+								<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
 							</td> 
 						</tr>
 				
@@ -78,7 +82,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 		<!--default Option content, this entry can not be deleted but can be updated -->
 						 		<tr> 
 									<td NOWRAP valign=top>
-										<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" key="label.nomination.col"/>								
+										<lams:SetEditor id="optionContent0" text="${voteGeneralAuthoringDTO.defaultOptionContent}" key="label.nomination.col"/>								
 									</td> 
 									
 									
@@ -90,14 +94,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	<!--end of default Option content -->
 						  	
 					  		<!-- if there is more than just the default content start presenting them -->
-					  	 		<c:set var="optIndex" scope="session" value="1"/>
-								<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
+					  	 		<c:set var="optIndex" scope="request" value="1"/>
+								<c:forEach var="optionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
 							  		<c:if test="${optionEntry.key > 1}"> 			
-										<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+										<c:set var="optIndex" scope="request" value="${optIndex +1}"/>
 										  <tr>
 											<td NOWRAP valign=top>
 												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" key="label.nomination.col"/>								
-			                                	<c:if test="${ activeModule != 'monitoring' }"> 			
+			                                	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'monitoring' }"> 			
 					 		 						<html:submit property="removeContent" 
 			                                                     styleClass="linkbutton"  
 			                                                     onclick="removeNomination(${optIndex});">
@@ -105,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</html:submit>
 												</c:if> 			
 												
-			                                	<c:if test="${ activeModule == 'monitoring' }"> 			
+			                                	<c:if test="${voteGeneralAuthoringDTO.activeModule == 'monitoring' }"> 			
 					 		 						<html:submit property="removeContent" 
 			                                                     styleClass="linkbutton"  
 			                                                     onclick="removeMonitoringNomination(${optIndex});">
@@ -115,11 +119,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                                    </td>
 		                                    
 			      						  	<td NOWRAP valign=top>			
-								  				<c:if test="${maxOptionIndex == optIndex}"> 			
+								  				<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex == optIndex}"> 			
 				     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
 				     							</c:if> 	    
 												
-				 				  				<c:if test="${maxOptionIndex != optIndex }"> 			
+				 				  				<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex != optIndex }"> 			
 					   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
 					       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
 												</c:if> 	           								 
@@ -127,7 +131,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  </tr>
 									</c:if> 			
 								</c:forEach>
-								<html:hidden property="toolContentId" value="${VoteAuthoringForm.toolContentId}"/>
 								<html:hidden property="optIndex"/>
 		                        
 		                        <tr>
@@ -146,14 +149,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 					</table>
 
-      	<c:if test="${ activeModule != 'authoring' }"> 					
+      	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring' }"> 					
 			<p align="right">
 		        <a href="javascript:submitMethod('submitAllContent')" class="button">
 		        	<bean:message key="label.save"/></a>
 			</p>
 		</c:if> 				
 		
-      	<c:if test="${activeModule == 'authoring'}"> 					
+      	<c:if test="${voteGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
 			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
 			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />		

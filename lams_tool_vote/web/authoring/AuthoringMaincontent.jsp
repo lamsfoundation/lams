@@ -81,9 +81,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	            initEditor("instructions");
 	            
 	            initEditor("optionContent0");
-	            <c:set var="optIndex" scope="session" value="1"/>
-	            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
-	                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+	            <c:set var="optIndex" scope="request" value="1"/>
+	            <c:forEach var="questionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
+	                <c:set var="optIndex" scope="request" value="${optIndex +1}"/>
 	                initEditor("<c:out value="optionContent${optIndex-1}"/>");
 	            </c:forEach>			
         }     
@@ -132,13 +132,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<h1> <bean:message key="label.authoring.vote"/> </h1>
 	
 	<div id="header">
-		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 		</c:if> 					
-		<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 					
+		<c:if test="${(voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 					
 			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
 		</c:if> 							
-		<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode == 'true') }"> 					
+		<c:if test="${(voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 					
 			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
 		</c:if> 									
 	</div>
@@ -149,8 +149,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="activeModule"/>
+		<html:hidden property="httpSessionID"/>								
+		<html:hidden property="defaultContentIdStr"/>								
+		<html:hidden property="defineLaterInEditMode"/>										
 		
-		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
 			<!-- end of content (Basic) -->
@@ -164,7 +167,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!-- end of content (Instructions) -->
 		</c:if> 			
 		
-		<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
+		<c:if test="${ (voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 			
 			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
 			<!-- end tab buttons -->
 			
@@ -173,7 +176,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!-- end of content (Basic) -->
 		</c:if> 			
 		
-		<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode == 'true') }"> 			
+		<c:if test="${ (voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 			
 			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
 			<!-- end tab buttons -->
 			
