@@ -240,9 +240,6 @@ CREATE TABLE lams_organisation (
      , INDEX (organisation_state_id)
      , CONSTRAINT FK_lams_organisation_4 FOREIGN KEY (organisation_state_id)
                   REFERENCES lams_organisation_state (organisation_state_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (locale_id)
-     , CONSTRAINT FK_lams_organisation_5 FOREIGN KEY (locale_id)
-                  REFERENCES lams_supported_locale (locale_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_css_theme_ve (
@@ -320,9 +317,6 @@ CREATE TABLE lams_user (
      , INDEX (html_theme_id)
      , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (locale_id)
-     , CONSTRAINT FK_lams_user_6 FOREIGN KEY (locale_id)
-                  REFERENCES lams_supported_locale (locale_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 ALTER TABLE lams_user MODIFY COLUMN chat_id VARCHAR(255)
       COMMENT 'ID used for Jabber';
