@@ -21,6 +21,8 @@
         proxy="org.lamsfoundation.lams.usermanagement.OrganisationType"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
+	
+	<cache usage="read-only" />
 
     <id
         name="organisationTypeId"

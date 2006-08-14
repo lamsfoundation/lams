@@ -21,6 +21,8 @@
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
+	<cache usage="transactional" />
+	
     <id
         name="userOrganisationId"
         type="java.lang.Integer"
@@ -57,13 +59,11 @@
     <!-- bi-directional one-to-many association to UserOrganisationRole -->
     <set
         name="userOrganisationRoles"
-        lazy="false"
         inverse="true"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
 
@@ -73,6 +73,9 @@
            @hibernate.collection-one-to-many
             class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
         </meta>
+        
+        <cache usage="transactional" />
+        
         <key>
             <column name="user_organisation_id" />
         </key>

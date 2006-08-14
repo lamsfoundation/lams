@@ -20,6 +20,8 @@
         table="lams_organisation_state"
     </meta>
 
+	<cache usage="read-only" />
+
     <id
         name="organisationStateId"
         type="java.lang.Integer"

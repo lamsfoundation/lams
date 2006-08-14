@@ -21,6 +21,8 @@
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
+	<cache usage="transactional" />
+
     <id
         name="userOrganisationRoleId"
         type="java.lang.Integer"

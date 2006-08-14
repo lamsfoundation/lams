@@ -20,7 +20,9 @@
         table="lams_organisation"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
-
+	
+	<cache usage="transactional" />
+	
     <id
         name="organisationId"
         type="java.lang.Integer"
@@ -214,6 +216,8 @@
            @hibernate.collection-one-to-many
             class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
         </meta>
+        
+        <cache usage="transactional" />
         <key>
             <column name="organisation_id" />
         </key>
@@ -240,6 +244,8 @@
            @hibernate.collection-one-to-many
             class="org.lamsfoundation.lams.usermanagement.Organisation"
         </meta>
+        
+        <cache usage="transactional" />
         <key>
             <column name="parent_organisation_id" />
         </key>
@@ -289,13 +295,11 @@
     <many-to-one
         name="locale"
         class="org.lamsfoundation.lams.usermanagement.SupportedLocale"
-        lazy="false"
         not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-            lazy="false"
            @hibernate.column name="locale_id"         
         </meta>
         <column name="locale_id" />

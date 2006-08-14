@@ -15,11 +15,14 @@
     name="org.lamsfoundation.lams.usermanagement.User" 
     table="lams_user"
 >
+	
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_user"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
+
+	<cache usage="transactional" />
 
     <id
         name="userId"
@@ -283,13 +286,11 @@
     <!-- bi-directional many-to-one association to Workspace -->
     <many-to-one
         name="workspace"
-        lazy="false"
         cascade="all"
         class="org.lamsfoundation.lams.usermanagement.Workspace"     
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
-	         lazy="false"
 	         cascade="all"
            @hibernate.column name="workspace_id"         
         </meta>
@@ -298,13 +299,11 @@
     <!-- bi-directional one-to-many association to UserOrganisation -->
     <set
         name="userOrganisations"
-        lazy="false"
         inverse="true"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
 
@@ -314,6 +313,9 @@
            @hibernate.collection-one-to-many
             class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
         </meta>
+        
+        <cache usage="transactional" />
+
         <key>
             <column name="user_id" />
         </key>
@@ -325,8 +327,8 @@
     <many-to-one
         name="authenticationMethod"
         class="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
-        lazy="false"
         not-null="true"
+        lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
@@ -339,12 +341,13 @@
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
         name="flashTheme"
-        lazy="false"
         class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        lazy="false"
         not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
+	        lazy="false"
             not-null="true"
            @hibernate.column name="flash_theme_id"         
         </meta>
@@ -354,12 +357,13 @@
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
         name="htmlTheme"
-        lazy="false"
         class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        lazy="false"
         not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
+	        lazy="false"
             not-null="true"
            @hibernate.column name="html_theme_id"         
         </meta>
@@ -435,13 +439,13 @@
     <many-to-one
         name="locale"
         class="org.lamsfoundation.lams.usermanagement.SupportedLocale"
-        lazy="false"
         not-null="true"
+        lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-            lazy="false"
+	        lazy="false"
            @hibernate.column name="locale_id"         
         </meta>
         <column name="locale_id" />
