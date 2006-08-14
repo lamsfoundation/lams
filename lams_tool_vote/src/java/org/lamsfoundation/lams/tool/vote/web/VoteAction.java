@@ -395,6 +395,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     public boolean submitContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
         logger.debug("doing submitContent..");
+        boolean validationErrors=false;
 
     	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	    logger.debug("voteService :" +voteService);
@@ -412,11 +413,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
 		logger.debug("sessionMap: " + sessionMap);
 
-	    
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
 	    voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(true).toString());
 	    
-	    request.setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+	    //request.setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 	    voteGeneralAuthoringDTO.setValidationError(new Boolean(false).toString());
 	    
 	    String toolContentID=voteAuthoringForm.getToolContentID();
@@ -450,7 +450,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    {
 	        logger.debug("returning back to from to fix errors:");
 	        voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	        request.setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
+	        //request.setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
 	        voteGeneralAuthoringDTO.setValidationError(new Boolean(true).toString());
 	        return false;
 	    }
@@ -477,7 +477,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	        logger.debug("back to user, nominationsDuplicate :" +nominationsDuplicate);
 	        request.setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
 	        voteGeneralAuthoringDTO.setUserExceptionOptionsDuplicate(new Boolean(true).toString());
-	        return false;
+	        validationErrors=true;
+	       //return false;
 	    }
 	    
 
@@ -494,12 +495,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	mapOptionsContent=authoringUtil.reconstructOptionsContentMapForSubmit(mapOptionsContent, request);
 	    logger.debug("before saveOrUpdateVoteContent, mapOptionsContent" + mapOptionsContent);
 	    
-	 	/*to remove deleted entries in the questions table based on mapQuestionContent */
-	    authoringUtil.removeRedundantOptions(mapOptionsContent, voteService, voteAuthoringForm, request);
-	    logger.debug("end of removing unused entries... ");
-	    
-	    voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request, sessionMap);
-	    logger.debug("voteContent: " + voteContent);
 		
 	    String maxNomCount=voteAuthoringForm.getMaxNominationCount();
 	    logger.debug("maxNomCount:" + maxNomCount);
@@ -516,7 +511,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 				    if (maxNomCount.equals("0"))
 				    {
 				        voteGeneralAuthoringDTO.setUserExceptionMaxNominationInvalid(new Boolean(true).toString());
-						return false;
+				        validationErrors=true;
+						//return false;
 				    }
 				    
 			    	try
@@ -527,41 +523,60 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 			    	catch(NumberFormatException e)
 					{
 				        voteGeneralAuthoringDTO.setUserExceptionMaxNominationInvalid(new Boolean(true).toString());
-			    		return false;
+				        validationErrors=true;
+			    		//return false;
 					}
 			    }
-
-			
-				logger.debug("start persisting offline files metadata");
-				AuthoringUtil.persistFilesMetaData(request, voteService, true, voteContent, sessionMap);
-				logger.debug("start persisting online files metadata");
-				AuthoringUtil.persistFilesMetaData(request, voteService, false, voteContent, sessionMap );
-		        
-			
-			/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
-			logger.debug("start removing redundant offline files metadata");
-			AuthoringUtil.removeRedundantOfflineFileItems(request, voteService,  voteContent, sessionMap);
-			
-			logger.debug("start removing redundant online files metadata");
-			AuthoringUtil.removeRedundantOnlineFileItems(request, voteService, voteContent, sessionMap);
-	 		logger.debug("done removing redundant files");
 		    }
 	    }
-	
-	    errors.clear();
-	    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));
-	    
-	    logger.debug("toolContentID: " + toolContentID);
-	    VoteUtils.setDefineLater(request, false, voteService, toolContentID);
+
+	    logger.debug("final validationErrors:" + validationErrors);
+	    if (validationErrors == false)
+	    {
+		 	/*to remove deleted entries in the questions table based on mapQuestionContent */
+		    authoringUtil.removeRedundantOptions(mapOptionsContent, voteService, voteAuthoringForm, request);
+		    logger.debug("end of removing unused entries... ");
+		    
+		    voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request, sessionMap);
+		    logger.debug("voteContent: " + voteContent);
+		    
+		    
+		    if (activeModule != null)
+		    {
+			    if (activeModule.equals(AUTHORING))
+			    {
+					logger.debug("start persisting offline files metadata");
+					AuthoringUtil.persistFilesMetaData(request, voteService, true, voteContent, sessionMap);
+					logger.debug("start persisting online files metadata");
+					AuthoringUtil.persistFilesMetaData(request, voteService, false, voteContent, sessionMap );
+			        
+				
+				/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
+				logger.debug("start removing redundant offline files metadata");
+				AuthoringUtil.removeRedundantOfflineFileItems(request, voteService,  voteContent, sessionMap);
+				
+				logger.debug("start removing redundant online files metadata");
+				AuthoringUtil.removeRedundantOnlineFileItems(request, voteService, voteContent, sessionMap);
+		 		logger.debug("done removing redundant files");
+			    }
+		    }
+		    
+		
+		    logger.debug("toolContentID: " + toolContentID);
+		    VoteUtils.setDefineLater(request, false, voteService, toolContentID);
+		    logger.debug("define later set to false");
+		    
+		    errors.clear();
+		    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));
+		    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
+		    voteGeneralAuthoringDTO.setSbmtSuccess(new Boolean(true).toString());
+		    logger.debug("setting SUBMIT_SUCCESS to 1.");
+	    }
 	    
 	    saveErrors(request,errors);
-	    logger.debug("define later set to false");
+
 	    
 	    voteAuthoringForm.resetUserAction();
-	    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
-	    voteGeneralAuthoringDTO.setSbmtSuccess(new Boolean(true).toString());
-	    logger.debug("setting SUBMIT_SUCCESS to 1.");
-	    
 	    
 		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
 		logger.debug("before fwd: mapOptionsContent: " + mapOptionsContent);

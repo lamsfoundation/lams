@@ -47,11 +47,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<bean:message key="error.maxNominationCount.invalid"/>  </img>
 							</c:if> 			
 
-							<c:if test="${voteGeneralAuthoringDTO.validationError == 'true'}"> 			
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  
-									<bean:message key="error.fields.mandatory"/>  </img>
-							</c:if> 			
-							
 							<c:if test="${voteGeneralAuthoringDTO.userExceptionOptionsDuplicate == 'true'}"> 			
 									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>   
 									<bean:message key="error.duplicate.nomination"/>  </img>
@@ -65,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 				
 					<tr> <td valign=top>
-						<table width="40%">
+						<table width="100%">
 
 								<tr> 
 									<td colspan=2 valign=top>
