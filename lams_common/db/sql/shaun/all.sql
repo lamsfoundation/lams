@@ -14,13 +14,13 @@ values(11,'bulgarian','bulgarian','Dr','Bulgarian','Test','11','Bulgarian Ave',n
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (34, 2, 11);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (35, 3, 11);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (82,34,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (83,34,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (84,34,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (84,34,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (142,35,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (85,35,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (86,35,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (86,35,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -39,13 +39,13 @@ values(12,'chinese','chinese','Dr','Chinese','Test','12','Chinese Ave',null,'Bei
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (36, 2, 12);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (37, 3, 12);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (87,36,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (88,36,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (89,36,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (89,36,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (143,37,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (90,37,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (91,37,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (91,37,2);
 
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -65,13 +65,13 @@ values(10,'french','french','Dr','French','Test','10','French Ave',null,'Paris',
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (32, 2, 10);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (33, 3, 10);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (77,32,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (78,32,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (79,32,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (79,32,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (144,33,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (80,33,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (81,33,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (81,33,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -90,13 +90,13 @@ values(13,'german','german','Dr','German','Test','13', 'German Ave',null,'Berlin
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (38, 2, 13);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (39, 3, 13);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (92,38,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (93,38,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (94,38,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (94,38,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (145,39,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (95,39,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (96,39,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (96,39,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -115,13 +115,13 @@ values(21,'hungarian','hungarian','Dr','Hungarian','Test','21', 'Hungarian Ave',
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (54, 2, 21);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (55, 3, 21);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (132,54,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (133,54,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (134,54,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (134,54,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (146,55,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (135,55,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (136,55,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (136,55,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -140,13 +140,13 @@ values(16,'italian','italian','Dr','Italian','Test','16', 'Italian Ave',null,'Ro
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (44, 2, 16);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (45, 3, 16);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (107,44,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (108,44,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (109,44,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (109,44,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (147,45,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (110,45,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (111,45,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (111,45,2);
 
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -166,13 +166,13 @@ values(18,'korean','korean','Dr','Korean','Test','18', 'Korean Ave',null,'Seoul'
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (48, 2, 18);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (49, 3, 18);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (117,48,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (118,48,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (119,48,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (119,48,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (148,49,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (120,49,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (121,49,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (121,49,2);
 
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -192,13 +192,13 @@ values(20,'maori','maori','Dr','Maori','Test','20', 'Maori Ave',null,'Auckland',
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (52, 2, 20);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (53, 3, 20);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (127,52,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (128,52,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (129,52,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (129,52,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (149,53,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (130,53,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (131,53,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (131,53,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -217,13 +217,13 @@ values(14,'norwegian','norwegian','Dr','Norwegian','Test','14', 'Norwegian Ave',
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (40, 2, 14);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (41, 3, 14);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (97,40,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (98,40,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (99,40,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (99,40,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (150,41,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (100,41,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (101,41,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (101,41,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -242,13 +242,13 @@ values(17,'polish','polish','Dr','Polish','Test','17', 'Polish Ave',null,'Warsaw
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (46, 2, 17);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (47, 3, 17);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (112,46,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (113,46,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (114,46,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (114,46,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (151,47,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (115,47,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (116,47,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (116,47,2);
 
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -268,13 +268,13 @@ values(15,'portuguese','portuguese','Dr','Portuguese','Test','15', 'Portuguese A
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (42, 5, 15);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (43, 5, 15);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,4,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,4,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (102,42,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (103,42,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (104,42,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (104,42,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (152,43,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (105,43,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (106,43,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (106,43,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=0;
@@ -293,13 +293,13 @@ values(19,'spanish','spanish','Dr','Spanish','Test','19', 'Spanish Ave',null,'Ma
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (50, 2, 19);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (51, 3, 19);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (122,50,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (123,50,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (124,50,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (124,50,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (153,51,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (125,51,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (126,51,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (126,51,2);
 
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -319,13 +319,13 @@ values(9,'swedish','swedish','Dr','Sweden','Test','9','Swedish Ave',null,'Stockh
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (30, 2, 9);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (31, 3, 9);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (72,30,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (73,30,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (74,30,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (74,30,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (154,31,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (75,31,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (76,31,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (76,31,2);
 
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -345,13 +345,13 @@ values(24,'thai','thai','Dr','Thai','Test','24', 'Thai Ave',null,'Bangkok',null,
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (56, 2, 24);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (57, 3, 24);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (137,56,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (138,56,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (139,56,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (139,56,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (155,57,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (140,57,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (141,57,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (141,57,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 
@@ -371,13 +371,13 @@ values(25,'greek','greek','Dr','Greek','Test','25','Greek Ave',null,'Athens',nul
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (58, 2, 25);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (59, 3, 25);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (156,58,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (157,58,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (158,58,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (158,58,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (159,59,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (160,59,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (161,59,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (161,59,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 
@@ -397,13 +397,13 @@ values(26,'welsh','welsh','Dr','Welsh','Test','26','Welsh Ave',null,'Cardiff',nu
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (60, 2, 26);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (61, 3, 26);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (162,60,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (163,60,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (164,60,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (164,60,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (165,61,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (166,61,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (167,61,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (167,61,2);
 
 -- need a new workspace_id and the name changes for each user.
 insert into lams_workspace_folder(workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
@@ -419,13 +419,13 @@ values(27,'dutch','dutch','Dr','Dutch','Test','26','Dutch Ave',null,'Amsterdam',
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (62, 2, 27);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (63, 3, 27);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (168,62,3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (169,62,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (170,62,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (170,62,2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (171,63,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (172,63,5);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (173,63,6);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (173,63,2);
 
 SET FOREIGN_KEY_CHECKS=1;
 
