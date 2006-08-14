@@ -148,7 +148,8 @@ public class IndexAction extends Action {
 				}
 				links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')"));
 			}else{//CLASS_TYPE
-				links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")"));
+				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF))
+					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")"));
 			}
 		}
 		
