@@ -162,14 +162,15 @@ class ToolActivity extends Activity{
 	
 	//to data for serialising:
 	
-	public function toData():Object{
+	public function toData(isCopy:Boolean):Object{
 		var dto = super.toData();
 		dto.authoringURL = (_authoringURL) ?  _authoringURL : Config.STRING_NULL_VALUE;	
 		dto.toolDisplayName = (_toolDisplayName) ?  _toolDisplayName: Config.STRING_NULL_VALUE;	
-		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
-		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
+		if(isCopy) { Application.getInstance().getCanvas().getCanvasModel().setDefaultToolContentID(this); }
 		
-	
+		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
+		
+		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
 		
 		
 		/* THESE are internal flags, not part of the design

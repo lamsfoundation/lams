@@ -396,9 +396,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @usage   
 	 * @return  
 	 */
-	public function getDesignForSaving():Object{
+	public function getDesignForSaving(isCopy:Boolean):Object{
 		prepareDesignForSaving();
-		return toData();
+		return toData(isCopy);
 	}
 	
 	public function getDesignForAutoSave():Object{
@@ -428,9 +428,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @usage   
 	 * @return  
 	 */
-	public function toData():Object{
+	public function toData(isCopy:Boolean):Object{
 		var design:Object = new Object();
-		
 		//if null, use default
 		
 		//TODO: get this sorted - query string
@@ -506,7 +505,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(classActs.length > 0){
 			
 			for(var i=0; i<classActs.length; i++){
-				design.activities[i] = classActs[i].toData();
+				design.activities[i] = classActs[i].toData(isCopy);
 			}
 		}
 		

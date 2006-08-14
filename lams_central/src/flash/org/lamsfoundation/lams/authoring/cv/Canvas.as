@@ -328,6 +328,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//clear the learningDesignID so it will not overwrite the existing one
 		_ddm.learningDesignID = null;
 		
+		
         var onOkCallback:Function = Proxy.create(this, saveDesignToServer);
 		var ws = Application.getInstance().getWorkspace();
         ws.setDesignProperties("LOCATION",onOkCallback);
@@ -349,6 +350,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function saveDesignToServer(workspaceResultDTO:Object):Boolean{
 		_global.breakpoint();
+		var isCopy:Boolean = false;
 		//TODO: Set the results from wsp into design.
 		if(workspaceResultDTO != null){
 			if(workspaceResultDTO.selectedResourceID != null){
@@ -362,8 +364,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.licenseID = workspaceResultDTO.resourceLicenseID;
 		}
 		
-		
-		var dto:Object = _ddm.getDesignForSaving();
+		if(_ddm.learningDesignID == null) { isCopy = true; }
+		var dto:Object = _ddm.getDesignForSaving(isCopy);
 		
 		var callback:Function = Proxy.create(this,onStoreDesignResponse);
 		

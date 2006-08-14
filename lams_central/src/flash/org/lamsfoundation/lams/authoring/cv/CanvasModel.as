@@ -880,6 +880,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		openToolActivityContent(ta);
 	}
 	
+	public function setDefaultToolContentID(ta:ToolActivity):Void{
+		ta.toolContentID = Application.getInstance().getToolkit().getDefaultContentID(ta.toolContentID,ta.toolID);
+		Debugger.log('ta:'+ta.title+',toolContentID:'+ta.toolContentID+', activityUIID:'+ta.activityUIID,Debugger.GEN,'setDefaultToolContentID','CanvasModel');
+	}
+	
 	
 	
 	/**
