@@ -171,7 +171,7 @@ VALUES (3, 'mi', 'NZ', 'Te Reo Māori (New Zealand)');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (4, 'de', null, 'Deutsch');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (5, 'zh', null, 'Chinese');
+VALUES (5, 'zh', null, '中文简体');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
 VALUES (6, 'fr', null, 'Français');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
