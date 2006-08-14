@@ -146,7 +146,8 @@ public class IndexAction extends Action {
 				if((!isSysAdmin)&&(contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER))){
 					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
 				}
-				links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')"));
+				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF))
+					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')"));
 			}else{//CLASS_TYPE
 				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF))
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")"));
