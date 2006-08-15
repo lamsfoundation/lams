@@ -32,8 +32,7 @@
 	<th><fmt:message key="admin.organisation.name"/></th>
 	<th><fmt:message key="admin.organisation.code"/></th>
 	<th><fmt:message key="admin.organisation.description"/></th>
-	<th><fmt:message key="admin.organisation.language"/></th>
-	<th><fmt:message key="admin.organisation.country"/></th>
+	<th><fmt:message key="admin.organisation.locale"/></th>
 	<th><fmt:message key="admin.organisation.status"/></th>
 </tr>
 <logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
@@ -51,12 +50,7 @@
 			<bean:write name="orgManageBean" property="description" />
 		</td>
 		<td>
-			<fmt:message key="locale.language.${orgManageBean.localeLanguage}"/>
-		</td>
-		<td>
-			<c:if test="${!empty orgManageBean.localeCountry}">
-				<fmt:message key="locale.country.${orgManageBean.localeCountry}"/>
-			</c:if>
+			<c:out value="${orgManageBean.locale.description}"/>
 		</td>
 		<td>
 			<fmt:message key="organisation.state.${orgManageBean.status}"/>

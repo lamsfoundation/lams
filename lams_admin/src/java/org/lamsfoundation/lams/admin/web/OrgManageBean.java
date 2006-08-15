@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
 
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+
 /**
  * @version
  *
@@ -53,8 +55,7 @@ public class OrgManageBean {
     private Date createDate;
     private boolean editable;
     private String status;
-	private String localeLanguage;
-	private String localeCountry;
+	private SupportedLocale locale;
 	
 	public String getCode() {
 		return code;
@@ -74,18 +75,13 @@ public class OrgManageBean {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getLocaleCountry() {
-		return localeCountry;
+	public SupportedLocale getLocale() {
+		return locale;
 	}
-	public void setLocaleCountry(String localeCountry) {
-		this.localeCountry = localeCountry;
+	public void setLocale(SupportedLocale locale) {
+		this.locale = locale;
 	}
-	public String getLocaleLanguage() {
-		return localeLanguage;
-	}
-	public void setLocaleLanguage(String localeLanguage) {
-		this.localeLanguage = localeLanguage;
-	}
+
 	public String getName() {
 		return name;
 	}
