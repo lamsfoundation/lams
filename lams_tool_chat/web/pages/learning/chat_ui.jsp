@@ -40,76 +40,72 @@
 <div id="header-no-tabs-learner"></div>
 <div id="content-learner">
 	<div id="chat_content">
-
-		<div id="login_pane">
-			<div id="loading_message">
-				<p>
-					<fmt:message>message.loading</fmt:message>
-				</p>
-			</div>
-			<div id="login_err"></div>
-		</div>
-
-		<div>
-			<div id="chat_pane" style="display:none;">
-				<form name="sendForm" action="" onSubmit="return sendMsg(this);">
+		<div id="chat_pane">
+			<form name="sendForm" action="" onSubmit="return sendMsg(this);">
+				<div>
 					<p>
 						<c:out value="${chatDTO.instructions}" escapeXml="false" />
 					</p>
 
 					<div id="roster"></div>
-					<div id="iResp"></div>
+					<div id="iResp">
+						<fmt:message>message.loading</fmt:message>
+					</div>
 
-					<h4>
+					<br />
+
+					<h4 style="margin-left: 12px;">
 						<fmt:message>label.sendMessageTo</fmt:message>
 						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
 						</span><span id="sendToUser" style="display: none"></span>
 					</h4>
 
 
-					<div>
-						<div class="right-buttons">
-							<input id="sendButton" class="button" type="submit"
-								value='<fmt:message>button.send</fmt:message>' />
-						</div>
+					<div style="margin-left: 12px;">
 						<textarea name="msg" onKeyPress="return checkEnter(event);"
-							id="msgArea" rows="2" cols="60"></textarea>
+							id="msgArea" rows="2" cols="20"></textarea>
+							
+						<input id="sendButton" class="button" type="submit"
+							value='<fmt:message>button.send</fmt:message>' />
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 
-			<div id="finishButton_pane" class="space-bottom"
-				style="display:none;">
-				<c:set var="dispatch" value="finishActivity" />
-				<c:set var="buttonLabel" value="button.finish" />
-				<c:if test="${chatDTO.reflectOnActivity}">
-					<c:set var="dispatch" value="openNotebook" />
-					<c:set var="buttonLabel" value="button.reflect" />
-				</c:if>
+			<br/>
+			<c:if test="${MODE == 'learner' || MODE == 'author'}">
+				<c:choose>
+					<c:when test="${!chatUserDTO.finishedActivity}">
+							<html:form action="/learning" method="post">
+								<c:set var="dispatch" value="finishActivity" />
+								<c:set var="buttonLabel" value="button.finish" />
+								<c:if test="${chatDTO.reflectOnActivity}">
+									<c:set var="dispatch" value="openNotebook" />
+									<c:set var="buttonLabel" value="button.reflect" />
+								</c:if>
+								<html:hidden property="dispatch" value="${dispatch}" />
+								<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
+								<html:submit styleClass="button right-buttons">
+									<fmt:message>${buttonLabel}</fmt:message>
+								</html:submit>
+							</html:form>
+							<br/>
+					</c:when>
 
-				<html:form action="/learning" method="post">
-					<div class="right-buttons">
-						<html:hidden property="dispatch" value="${dispatch}" />
-						<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
-						<html:submit styleClass="button space-bottom">
-							<fmt:message>${buttonLabel}</fmt:message>
-						</html:submit>
-					</div>
-				</html:form>
-			</div>
+					<c:otherwise>
+						<c:if test="${chatDTO.reflectOnActivity }">
+							<div>
+								<h4 style="margin-left: 12px;">
+									${chatDTO.reflectInstructions}
+								</h4>
+								<p>
+									${chatUserDTO.notebookEntry}
+								</p>
+							</div>
+						</c:if>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
 		</div>
-
-		<div style="height: 65px"></div>
-
-		<div id="notebookEntry_pane" style="width: 100%; display: none;">
-			<h4>
-				${chatDTO.reflectInstructions}
-			</h4>
-			<p>
-				${chatUserDTO.notebookEntry}
-			</p>
-		</div>
-
 	</div>
 </div>
 <div id="footer-learner"></div>

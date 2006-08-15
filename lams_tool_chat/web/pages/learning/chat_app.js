@@ -220,25 +220,20 @@ function handlePresence(presence) {
 	roster.updateDisplay();
 }
 function handleConnected() {
-	document.getElementById("login_pane").style.display = "none";
-	document.getElementById("chat_pane").style.display = "";
 	if (MODE == "learner") {
 		if (LEARNER_FINISHED == "true") {
-			document.getElementById("notebookEntry_pane").style.display = "";
+			//document.getElementById("notebookEntry_pane").style.display = "";
 			if (LOCK_ON_FINISHED == "true") {
     			// disable sending messages.
 				document.getElementById("msgArea").disabled = "disabled";
 				document.getElementById("sendButton").disabled = "disabled";
-				document.getElementById("clearButton").disabled = "disabled";
 			}
-		} else {
-			document.getElementById("finishButton_pane").style.display = "";
 		}
 	}
-	if (MODE == "author") {
-		document.getElementById("finishButton_pane").style.display = "";
-	}
-
+	
+	// clear the response window.
+	document.getElementById("iResp").innerHTML = "";
+	
 	// send presence
 	var aPresence = new JSJaCPresence();
 	aPresence.setTo(CONFERENCEROOM + "/" + NICK);
@@ -253,9 +248,10 @@ function handleConnected() {
 	roster = new Roster();
 }
 function handleError(e) {
-	document.getElementById("loading_message").style.display = "none";
-	document.getElementById("login_err").innerHTML = "Couldn't connect. Please try again...<br />" + htmlEnc("Code: " + e.getAttribute("code") + "\nType: " + e.getAttribute("type") + "\nCondition: " + e.firstChild.nodeName);
-	document.getElementById("finishButton_pane").style.display = "";
+	document.getElementById("msgArea").disabled = "disabled";
+	document.getElementById("sendButton").disabled = "disabled";
+	document.getElementById("iResp").innerHTML = "Couldn't connect. Please try again...<br />" + htmlEnc("Code: " + e.getAttribute("code") + "\nType: " + e.getAttribute("type") + "\nCondition: " + e.firstChild.nodeName);
+	document.getElementById("roster").innerHTML = "";
 }
 /* ******* Init ******* */
 function doLogin() {
@@ -278,8 +274,7 @@ function doLogin() {
 		con.connect(oArgs);
 	}
 	catch (e) {
-		document.getElementById("login_err").innerHTML = e.toString();
-		document.getElementById("finishButton_pane").style.display = "";
+		document.getElementById("iResp").innerHTML = e.toString();
 	}
 	finally {
 		return false;
@@ -316,4 +311,3 @@ function checkEnter(e) { 			//e is event object passed from function invocation
 		return true;
 	}
 }
-

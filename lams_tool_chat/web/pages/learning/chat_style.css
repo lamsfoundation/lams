@@ -1,7 +1,6 @@
 #chat_content {
 	width: 560px;
 	padding: 12px;
-
 	/* compensate for content image border */
 	margin-left: 4px;
 }
@@ -15,7 +14,8 @@
 	margin-right: 12px;
 	margin-left: 12px;
 	overflow: scroll;
-	border: thin solid gray;
+	border-width: 1px;
+	border-style: solid;
 	padding: 2px;
 }
 
@@ -24,12 +24,14 @@
 	width: 105px;
 	height: 260px;
 	overflow: hidden;
-	border: thin solid gray;
+	border-width: 1px;
+	border-style: solid;
 	font-weight: bold;
+	padding: 2px;
 }
 
 .message {
-	padding-bottom: 4px;	
+	padding-bottom: 4px;
 }
 
 .private_message {
@@ -42,7 +44,7 @@
 }
 
 .selected {
-	background-color: lime;	
+	background-color: lime;
 	padding: 2px;
 	cursor: pointer;
 }
@@ -54,7 +56,5 @@
 }
 
 #msgArea {
-	margin-left: 12px;
-	margin-right: 12px;
-	width: 427px;
+	width: 410px;
 }
