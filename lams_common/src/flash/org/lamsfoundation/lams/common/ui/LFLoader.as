@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -23,6 +23,7 @@
  
 import org.lamsfoundation.lams.common.util.Proxy;
 import org.lamsfoundation.lams.common.util.Debugger;
+import org.lamsfoundation.lams.common.ui.*;
 
 import mx.controls.*
 import mx.utils.*
@@ -33,10 +34,10 @@ import mx.events.*
 *  
 * @author  MS
 */
-class org.lamsfoundation.lams.common.ui.LFLoader extends MovieClip {
+class LFLoader extends MovieClip {
 	
 	// components
-	private var panel:MovieClip;
+	//private var panel:MovieClip;
 	private var lams_logo:MovieClip;
 	private var pBar:MovieClip;
 	private var pBar_lbl:Label;
@@ -80,7 +81,6 @@ class org.lamsfoundation.lams.common.ui.LFLoader extends MovieClip {
 		delete this.onEnterFrame;
 		
 		resize();
-		setStyles();
 	}
 	
 	/**
@@ -109,10 +109,10 @@ class org.lamsfoundation.lams.common.ui.LFLoader extends MovieClip {
 	 */
 	
 	private function resize(){
-		panel._width = Stage.width;
-		panel._height = Stage.height;
-		pBar._x = (panel._width - pBar._width)/2;
-		pBar._y = (panel._height - pBar._height)/2;
+		//panel._width = Stage.width;
+		//panel._height = Stage.height;
+		pBar._x = (Stage.width - pBar._width)/2;
+		pBar._y = (Stage.height - pBar._height)/2;
 		pBar_lbl._x = pBar._x + LABEL_X_OFFSET;
 		pBar_lbl._y = pBar._y + LABEL_Y_OFFSET;
 		lams_logo._x = pBar._x + LOGO_X_OFFSET;
@@ -127,7 +127,7 @@ class org.lamsfoundation.lams.common.ui.LFLoader extends MovieClip {
 	 */
 	
 	public function start(componentNo:Number){
-		noComponents = componentNo;
+		_noComponents = componentNo;
 		setProgress(_noCompleted, _noComponents);
 	}
 	
@@ -142,16 +142,15 @@ class org.lamsfoundation.lams.common.ui.LFLoader extends MovieClip {
 
 	/**
     * Called on initialisation and themeChanged event handler
-    */
+    /
     private function setStyles(){
 		panel.setStyle('backgroundColor', 0xDBE6FD);
-		pBar.setStyle()
 		pBar.setStyle('themeColor', 'haloBlue');
 		pBar_lbl.setStyle('color', 0x0B333C);
 		pBar_lbl.setStyle('fontFamily', 'Tahoma');
 		pBar_lbl.setStyle('fontSize', 9);
 	}
-	
+	*/
 	public function setProgress(completed:Number, total:Number){
 		if(completed != undefined && total != undefined){
 			pBar.setProgress(completed, total);
