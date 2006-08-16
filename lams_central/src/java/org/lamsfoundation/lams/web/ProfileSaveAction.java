@@ -34,6 +34,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
@@ -70,6 +71,8 @@ public class ProfileSaveAction extends Action {
 		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
 		DynaActionForm userForm = (DynaActionForm)form;
 		BeanUtils.copyProperties(requestor,userForm);
+		SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
+		requestor.setLocale(locale);
 		getService().save(requestor);
 		log.debug("profile edited: "+requestor);
 		
