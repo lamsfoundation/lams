@@ -154,9 +154,10 @@ public class TestReporter {
 		log.info("Generating the formal test report document...");
 		TemplateCompiler.init(manager.testSuites, callRecords);
 		String filename = generateFileName();
+		BufferedWriter out = null;
 		try {
 			String report = TemplateCompiler.compile(TemplateCompiler.load());
-	        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+	        out = new BufferedWriter(new FileWriter(filename));
 	        out.write(report);
 	        out.close();
 			BrowserLauncher launcher = new BrowserLauncher(null);
@@ -171,7 +172,15 @@ public class TestReporter {
 			log.debug(e.getMessage(),e);
 		} catch (BrowserLaunchingExecutionException e) {
 			log.debug(e.getMessage(),e);
-		}        
+		} finally{
+			if( out!=null ){
+				try{
+					out.close();
+				}catch(IOException e){
+					log.debug(e.getMessage(), e);
+				}
+			}
+		}
 	}
 	
 	private static String generateFileName(){
@@ -214,15 +223,23 @@ public class TestReporter {
 			context.put("time", new SimpleDateFormat("HH:mm:ss dd MMM yyyy").format(new Date()));
 		}
 		
-		static String load() throws IOException{
-			StringBuilder source = new StringBuilder();
-			BufferedReader lnReader = new BufferedReader(new FileReader(fileTemplate));
-			String line = lnReader.readLine();
-			while (line != null){
-				source.append(line).append('\n');
-				line = lnReader.readLine();
+		static String load() throws IOException {
+			BufferedReader bReader = null;
+			try {
+				StringBuilder source = new StringBuilder();
+				bReader = new BufferedReader(new FileReader(
+						fileTemplate));
+				String line = bReader.readLine();
+				while (line != null) {
+					source.append(line).append('\n');
+					line = bReader.readLine();
+				}
+				return source.toString();
+			} finally {
+				if (bReader != null) {
+					bReader.close();
+				}
 			}
-			return source.toString();
 		}
 
 		private static String compile(String source) {
