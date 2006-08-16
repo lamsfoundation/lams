@@ -105,6 +105,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _canvas:Canvas;
     private var _workspace:Workspace;
 	private var _PI:PropertyInspectorNew;
+	private var _ccm:CustomContextMenu;
 	private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
     private var _dialogueContainer_mc:MovieClip;       //Dialog container
@@ -147,7 +148,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _toolbarLoaded = false;  
 		_piLoaded = false;
 		_module = Application.MODULE;
-		
+		_PI = new PropertyInspectorNew();
+		_ccm = CustomContextMenu.getInstance();
 		//Mouse.addListener(someListener);
     }
     
@@ -345,63 +347,14 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         }   
     }
     
-	public function showCustomCM(showCMItem:Boolean, cmItems):Object{
 		
-		var root_cm:ContextMenu = new ContextMenu();  
-		root_cm.hideBuiltInItems();  
-		trace("CM Item label: "+cmItems.cmlabel)
-		for (var i=0; i<cmItems.length; i++){
-			trace("CM Item length: "+cmItems[i].handler)
-			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler);
-			if (i == 1){
-				menuItem_cmi.separatorBefore = true;
-			}
-			root_cm.customItems.push(menuItem_cmi);
-		}
-		
-		if (showCMItem == false) {
-			for(var i=0; i<root_cm.customItems.length; i++){
-				root_cm.customItems[i].enabled = false;
-			}
-		} else {
-			for(var i=0; i<root_cm.customItems.length; i++){
-				root_cm.customItems[i].enabled = true;
-			}
-		}
-
-		
-		
-		//this.menu = root_cm;  
-		//_root.menu = root_cm;   
-		return root_cm;
-	}
-	
-	
-		
-		
-	
     /**
     * Create all UI Elements
     */
     private function setupUI(){
 		//Make the base context menu hide built in items so we don't have zoom in etc 
-		// Change this to false to remove
-		 var myCopy:Array = new Array();
-		var menuArr:Array = new Array();
-		menuArr[0] = ["Open/Edit Activity Content", openEditActivtiyContent];
-		menuArr[1] =["Copy", copy];
-		menuArr[2] = ["Paste", paste];
+		_ccm.showCustomCM(_ccm.loadMenu("application"))
 		
-		
-		for (var i=0; i<menuArr.length; i++){
-			var myObj:Object = new Object();
-			myObj.cmlabel = menuArr[i][0];
-			myObj.handler = menuArr[i][1]; 
-			myCopy[i]= myObj;
-			
-		} 
-        var test_cm = showCustomCM(false, myCopy, this)
-		_root.menu = test_cm; 
         //Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
@@ -636,13 +589,21 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	public function cut():Void{
 		trace("testing cut");
-		setClipboardData(_canvas.model.selectedItem, CUT_TYPE);
+		if (CanvasActivity(_canvas.model.selectedItem) != null){
+			setClipboardData(_canvas.model.selectedItem, CUT_TYPE);
+		}else {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_cut_invalid'));
+		}
 		//_canvas.removeActivity(_canvas.model.selectedItem.activity.activityUIID);
 	}
 	
 	public function copy():Void{
 		trace("testing copy");
-		setClipboardData(_canvas.model.selectedItem, COPY_TYPE);
+		if (CanvasActivity(_canvas.model.selectedItem) != null){
+			setClipboardData(_canvas.model.selectedItem, COPY_TYPE);
+		}else{
+			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_copy_invalid'));
+		}
 	}
 	
 	public function openEditActivtiyContent():Void{
@@ -656,7 +617,11 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		_canvas.setPastedItem(getClipboardData());
 	}
 	
-	
+	public function expandPI():Void{
+		if (!_PI.isPIExpanded()){
+			_canvas.model.setPIHeight(_PI.piFullHeight());
+		}
+	}
     
 	/**
 	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
