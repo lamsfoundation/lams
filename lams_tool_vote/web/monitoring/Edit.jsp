@@ -31,17 +31,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<c:if test="${isMonitoredContentInUse != 'true'}"> 			
-			<c:if test="${defineLaterInEditMode != 'true'}"> 			
+		<c:if test="${voteGeneralMonitoringDTO.isMonitoredContentInUse != 'true'}"> 			
+			<c:if test="${voteGeneralMonitoringDTO.defineLaterInEditMode != 'true'}"> 			
 				<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
 			</c:if> 				
-			<c:if test="${defineLaterInEditMode == 'true'}"> 			
+			<c:if test="${voteGeneralMonitoringDTO.defineLaterInEditMode == 'true'}"> 			
 				<jsp:include page="/authoring/BasicContent.jsp" />
 			</c:if> 				
 		</c:if> 											
 
 
-		<c:if test="${isMonitoredContentInUse == 'true'}"> 			
+		<c:if test="${voteGeneralMonitoringDTO.isMonitoredContentInUse == 'true'}"> 			
 					<table border="0" cellspacing="2" cellpadding="2">									
 						<tr> <td NOWRAP valign=top>
 								 <bean:message key="error.content.inUse"/> 

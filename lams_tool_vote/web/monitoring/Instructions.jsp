@@ -32,11 +32,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	
-				<table class="forms">
+				<table>
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
 							<b> <bean:message key="label.onlineInstructions.col" />  </b>
-							<c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	
+							<c:out value="${voteGeneralMonitoringDTO.richTextOnlineInstructions}" escapeXml="false" />	
 					</td> 
 				</tr>
 				
@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left">
-									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
+									<c:forEach var='file' items='${voteGeneralMonitoringDTO.listOnlineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
 													 <c:out value="${file.filename}"/> 
@@ -76,14 +76,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr> 
 					<td NOWRAP colspan=4 valign=top>
 						<b> <bean:message key="label.offlineInstructions.col" /> </b>
-					    <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	
+					    <c:out value="${voteGeneralMonitoringDTO.richTextOfflineInstructions}" escapeXml="false" />	
 					</td> 
 				</tr>
 				
 				<tr> 
 					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left">
-									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
+									<c:forEach var='file' items='${voteGeneralMonitoringDTO.listOfflineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
 													 <c:out value="${file.filename}"/> 

@@ -297,7 +297,7 @@
     <!--Monitoring Starter Action: initializes the Monitoring module -->
    <action 	path="/monitoringStarter" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringStarterAction" 
-	      	scope="session"
+	      	scope="request"
    			name="VoteMonitoringForm" 
       		unknown="false"
       		validate="false"
@@ -328,7 +328,7 @@
    <action 	path="/monitoring" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringAction" 
    			name="VoteMonitoringForm" 
-	      	scope="session"
+	      	scope="request"
    			input="/monitoring/MonitoringMaincontent.jsp"
       		parameter="method"
       		unknown="false"

@@ -33,10 +33,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	                                     
-		           <h2>  <bean:message key="label.authoring.vote.basic"/> </h2>
 					<table>
 						<tr>   
-						<td NOWRAP class=error>
+						<td NOWRAP>
 							<c:if test="${voteGeneralAuthoringDTO.sbmtSuccess == 'true' }"> 			
 								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
 								<bean:message key="sbmt.successful"/>  </img>

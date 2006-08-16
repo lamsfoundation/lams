@@ -30,17 +30,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 				<tr> <td>
 						<table>
+
 							<tr> 
-								<td colspan=2 valign=top>
-									<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
+	 							<td> <b>  <bean:message key="label.authoring.title.col"/> </b> </td>
+						 		<td NOWRAP> 
+	                                     <c:out value="${voteGeneralAuthoringDTO.activityTitle}" escapeXml="false"/>
 								</td> 
 						  	</tr>
-	
-						  	<tr> 
-								<td colspan=2 valign=top>
-									<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
+						
+							<tr> 
+	 							<td> <b>  <bean:message key="label.authoring.instructions.col"/> </b> </td>
+						 		<td NOWRAP> 
+	                                     <c:out value="${voteGeneralAuthoringDTO.activityInstructions}" escapeXml="false"/>
 								</td> 
-							</tr>
+						  	</tr>
 
 					 		<tr> 
 							  	<td valign="top"> 

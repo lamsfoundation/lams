@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 
 /**
  * 
@@ -96,7 +97,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @return
 	 */
 	public static List buildGroupsQuestionData(HttpServletRequest request, VoteContent voteContent, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, IVoteService voteService)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
+			IVoteService voteService)
 	{
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
@@ -232,8 +234,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 	
 	
-	public static Map populateSessionUsersAttempts(HttpServletRequest request, VoteContent voteContent, Long sessionId, List listUsers, String questionUid, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String userId, IVoteService voteService)
+	public static Map populateSessionUsersAttempts(HttpServletRequest request, VoteContent voteContent, Long sessionId, List listUsers, 
+	        String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String userId, IVoteService voteService)
 	{
 	    logger.debug("doing populateSessionUsersAttempts for: " +questionUid);
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
@@ -669,7 +671,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param toolContentID
 	 * @return 
 	 */
-	public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentID)
+	public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, 
+	        Long toolContentID)
 	{
 	    logger.debug("start preparing ChartDTO with voteMonitoringForm: " + voteMonitoringForm);
 	    logger.debug("start preparing ChartDTO with toolContentID: " + toolContentID);
@@ -874,7 +877,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param toolSessionUid
 	 */
 	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, 
-	        String toolContentID, String toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO)
+	        String toolContentID, String toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO, 
+	        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO)
 	{
 	    logger.debug("starting prepareChartData, voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	    logger.debug("starting prepareChartData, toolContentID: " + toolContentID);
@@ -917,16 +921,30 @@ public class MonitoringUtil implements VoteAppConstants{
 		        logger.debug("potentialUserCount: " + potentialUserCount);
 		        voteMonitoringForm.setSessionUserCount(Integer.toString(potentialUserCount));
 		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
-		        
+
+			    if (voteGeneralMonitoringDTO != null)
+			    {
+			        voteGeneralMonitoringDTO.setSessionUserCount(Integer.toString(potentialUserCount));
+			        voteGeneralMonitoringDTO.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
+			    }
+
 		        if (potentialUserCount != 0)
 		        {
 		            double completedPercent=(completedSessionUserCount*100) / potentialUserCount;
 		            logger.debug("completed percent: " + completedPercent);
-		            voteMonitoringForm.setCompletedSessionUserPercent(new Double(completedPercent).toString());    
+		            voteMonitoringForm.setCompletedSessionUserPercent(new Double(completedPercent).toString());
+				    if (voteGeneralMonitoringDTO != null)
+				    {
+				        voteGeneralMonitoringDTO.setCompletedSessionUserPercent(new Double(completedPercent).toString());
+				    }
 		        }
 		        else
 		        {
 		            voteMonitoringForm.setCompletedSessionUserPercent("Not Available");
+				    if (voteGeneralMonitoringDTO != null)
+				    {
+				        voteGeneralMonitoringDTO.setCompletedSessionUserPercent("Not Available");
+				    }
 		        }
 		    }
 		}
@@ -1055,20 +1073,20 @@ public class MonitoringUtil implements VoteAppConstants{
         
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
-		
-		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT, mapStandardNominationsHTMLedContent);
-		logger.debug("test2: MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT));
 
 		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
 		logger.debug("test2: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+
+		//request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT, mapStandardNominationsHTMLedContent);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT));
 		
-		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
+		//request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
 		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
 		
-		request.getSession().setAttribute("mapStandardQuestionUid", mapStandardQuestionUid);
+		//request.getSession().setAttribute("mapStandardQuestionUid", mapStandardQuestionUid);
 		logger.debug("test2: mapStandardQuestionUid: " + request.getSession().getAttribute("mapStandardQuestionUid"));
 
-		request.getSession().setAttribute("mapStandardToolSessionUid", mapStandardToolSessionUid);
+		//request.getSession().setAttribute("mapStandardToolSessionUid", mapStandardToolSessionUid);
 		logger.debug("test2: mapStandardToolSessionUid: " + request.getSession().getAttribute("mapStandardToolSessionUid"));
 		
 		
@@ -1082,9 +1100,22 @@ public class MonitoringUtil implements VoteAppConstants{
 			voteGeneralLearnerFlowDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
 			voteGeneralLearnerFlowDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
 		}
+		
+		if (voteGeneralMonitoringDTO !=null)
+		{
+			voteGeneralMonitoringDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
+			voteGeneralMonitoringDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
+			voteGeneralMonitoringDTO.setMapStandardRatesContent(mapStandardRatesContent);
+			voteGeneralMonitoringDTO.setMapStandardUserCount(mapStandardUserCount);
+			voteGeneralMonitoringDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
+			voteGeneralMonitoringDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
+		}
 
 		logger.debug("end of prepareChartData,  voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
  		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
+ 		
+		logger.debug("end of prepareChartData,  voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
+ 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 	}
 	
 	/**

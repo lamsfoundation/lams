@@ -170,6 +170,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
@@ -331,9 +332,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	logger.debug("currentToolSessionId: " + currentToolSessionId);
     	
     	/* the report should have only this user's entries(with userId)*/
+        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+
     	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
     	voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, true, currentToolSessionId.toString(), 
-    	        learnerProgressUserId, true, voteGeneralLearnerFlowDTO);
+    	        learnerProgressUserId, true, voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
     	
     	voteGeneralLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
     	voteGeneralLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
@@ -498,7 +501,10 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
     		voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(true).toString());
      		logger.debug("preparing chart data for readonly mode");
-     		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), toolSessionID, voteGeneralLearnerFlowDTO);
+     		
+     		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+     		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), toolSessionID, 
+     		        voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
      		
      		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
      		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
@@ -574,9 +580,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	    voteLearningForm.setVoteChangable(new Boolean(voteContent.isVoteChangable()).toString());
 	    
-	    logger.debug("ACTIVITY_TITLE: " + voteContent.getTitle());
-	    logger.debug("ACTIVITY_INSTRUCTIONS: " + voteContent.getInstructions());
-
 	    voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	    voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 	    voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());

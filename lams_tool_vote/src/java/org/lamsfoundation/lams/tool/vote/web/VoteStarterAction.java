@@ -406,7 +406,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	        VoteAuthoringForm voteAuthoringForm)
 	{
 		logger.debug("start reading tool signature: " + voteService);
-	    //request.getSession().setAttribute(TOOL_SERVICE, voteService);
 		/*
 		 * retrieve the default content id based on tool signature
 		 */
@@ -492,7 +491,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
         
 		if (voteContent.getTitle() == null)
 		{
-		    voteGeneralAuthoringDTO.setActivityTitle("Voting Title");
+		    voteGeneralAuthoringDTO.setActivityTitle(DEFAULT_VOTING_TITLE);
 		}
 		else
 		{
@@ -502,7 +501,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		
 		if (voteContent.getInstructions() == null)
 		{
-		    voteGeneralAuthoringDTO.setActivityInstructions("Voting Instructions");
+		    voteGeneralAuthoringDTO.setActivityInstructions(DEFAULT_VOTING_INSTRUCTIONS);
 		}
 		else
 		{
@@ -586,15 +585,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    
 	    List listUploadedOnlineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOnlineFilesMetaData);
 	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
-	    //request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
+
 	    voteGeneralAuthoringDTO.setListUploadedOnlineFileNames(listUploadedOnlineFileNames);
 	    
 	    sessionMap.put(LIST_UPLOADED_ONLINE_FILENAMES_KEY, listUploadedOnlineFileNames);
 
-		
-		/*
-		 * load nominations page
-		 */
 		voteAuthoringForm.resetUserAction();
 	}
 	

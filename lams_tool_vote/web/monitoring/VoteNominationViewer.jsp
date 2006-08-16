@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body>
 <div id="page">
 
-    <table class='forms'>
+    <table>
 	    <tr> <th NOWRAP colspan=2 align=center>  <bean:message key="label.learnersVoted"/> </th> </tr>
 	
 		<tr> 
@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		   <td NOWRAP align=center valign=top><b> <bean:message key="label.attemptTime"/> </b></td>
 	   </tr>
 	    
-		<c:forEach var="userData" items="${mapStudentsVoted}">
+		<c:forEach var="userData" items="${voteGeneralMonitoringDTO.mapStudentsVoted}">
 			<tr>		 
 					 <td NOWRAP valign=top align=center>    <c:out value="${userData.userName}"/>   </td>  
 					 <td NOWRAP valign=top align=center>    <c:out value="${userData.attemptTime}"/>  </td>

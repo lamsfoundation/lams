@@ -41,6 +41,7 @@ import org.jfree.chart.JFreeChart;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
@@ -62,7 +63,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 	    logger.debug("dispathcing doExport");
-	    request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(true).toString());
 	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
@@ -123,10 +123,11 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
             throw new VoteApplicationException(error);
         }
 
+        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
     	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, 
-    	        toolSessionID.toString(), userID.toString() , true, null);
+    	        toolSessionID.toString(), userID.toString() , true, null, voteGeneralMonitoringDTO);
     	
     	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), voteSession.getUid());
     	logger.debug("post prepareChartDataForExport");
@@ -160,9 +161,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
             throw new VoteApplicationException(error);
         }
 		
+        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
         VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
         logger.debug("starting refreshSummaryData.");
-        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null);
+        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null, voteGeneralMonitoringDTO);
         
         logger.debug("teacher uses content id: " + content.getVoteContentId());
     	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null);

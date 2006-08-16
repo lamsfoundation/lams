@@ -32,21 +32,89 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-				<table class="forms">
+				<table>
 				
 						<c:if test="${statsTabActive != 'true'}"> 							
 							<tr> 
-						 		<td NOWRAP> </td>
-								<td NOWRAP align=right>
-									<jsp:include page="/monitoring/PullDownMenu.jsp" />					
+								<td colspan=2 align=center>
+
+						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
+										<table>			
+											<tr> 
+												<td align=right valign=top> <b> <bean:message key="label.group"/> </b>
+														<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
+														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
+															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
+																<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
+															
+																	<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
+																
+																		<c:set var="SELECTED_SESSION" scope="request" value=""/>
+																		<c:if test="${voteGeneralMonitoringDTO.selectionCase == 2}"> 			
+																			<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
+																		</c:if>						
+																		
+																		<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
+																				<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+																		</c:if>						
+																		
+																		<c:if test="${toolSessionId.value != 'All'}"> 		
+																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+																		</c:if>						
+																		
+																		<c:if test="${toolSessionId.value == 'All'}"> 	
+																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+																		</c:if>						
+																</c:if>							
+															</c:forEach>		  	
+														</c:forEach>		  	
+														</select>
+													</td> 
+												<tr>
+											</table>
+									</c:if>		
+	
 								</td> 
 							</tr>
 						</c:if> 
 						<c:if test="${statsTabActive == 'true'}"> 							
 							<tr> 
-						 		<td NOWRAP> </td>
-								<td NOWRAP align=right>
-									<jsp:include page="/monitoring/PullDownMenuStats.jsp" />					
+								<td colspan=2 align=center>
+						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
+										<table>			
+											<tr> 
+												<td align=right valign=top> <b> <bean:message key="label.group"/> </b>
+														<select name="monitoredToolSessionIdStats" onchange="javascript:submitSession(this.value,'submitSession');">
+														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
+															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
+																<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
+															
+																	<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
+																
+																		<c:set var="SELECTED_SESSION" scope="request" value=""/>
+																		<c:if test="${voteGeneralMonitoringDTO.selectionCase == 2}"> 			
+																			<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
+																		</c:if>						
+																		
+																		<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
+																				<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+																		</c:if>						
+																		
+																		<c:if test="${toolSessionId.value != 'All'}"> 		
+																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+																		</c:if>						
+																		
+																		<c:if test="${toolSessionId.value == 'All'}"> 	
+																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+																		</c:if>						
+																</c:if>							
+															</c:forEach>		  	
+														</c:forEach>		  	
+														</select>
+													</td> 
+												<tr>
+											</table>
+									</c:if>		
 								</td> 
 							</tr>
 						</c:if> 
@@ -62,13 +130,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  					<tr>
 					 		<td NOWRAP> <b>  <bean:message key="label.total.students"/> </b> </td>
-					 		<td>  <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </td>
+					 		<td>  <c:out value="${voteGeneralMonitoringDTO.sessionUserCount}"/> </td>
 						</tr>
 
 	  					<tr>
 					 		<td NOWRAP> <b>  <bean:message key="label.total.completed.students"/> </b> </td> 
-					 		<td NOWRAP>  <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> 
-						 		&nbsp(<c:out value="${VoteMonitoringForm.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
+					 		<td NOWRAP>  <c:out value="${voteGeneralMonitoringDTO.completedSessionUserCount}"/> 
+						 		&nbsp(<c:out value="${voteGeneralMonitoringDTO.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
 					 		</td>
 						</tr>
 
@@ -78,7 +146,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  				
 						<tr>
 					 		<td NOWRAP colspan=2> 
-		                            <c:out value="${activityInstructions}" escapeXml="false"/> 
+		                            <c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/> 
 							</td>
 						</tr>
 						
@@ -122,7 +190,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
 									</tr>
 									
-									<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
+									<c:forEach var="currentNomination" items="${voteGeneralMonitoringDTO.mapStandardNominationsHTMLedContent}">
 							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 							  	 		 <tr>
 				  	 						<td NOWRAP valign=top align=left>
@@ -132,17 +200,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			
 											<td NOWRAP valign=top align=left>				  	 		
-									  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+									  	 		<c:forEach var="currentUserCount" items="${voteGeneralMonitoringDTO.mapStandardUserCount}">
 										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
 									  				
 									  					<c:if test="${currentUserCount.value != '0' }"> 	
-												  	 		<c:forEach var="currentQuestionUid" items="${mapStandardQuestionUid}">
+												  	 		<c:forEach var="currentQuestionUid" items="${voteGeneralMonitoringDTO.mapStandardQuestionUid}">
 													  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
 												  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
 
 
-														  	 		<c:forEach var="currentSessionUid" items="${mapStandardToolSessionUid}">
+														  	 		<c:forEach var="currentSessionUid" items="${voteGeneralMonitoringDTO.mapStandardToolSessionUid}">
 															  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
 														  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
 		
@@ -171,7 +239,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</c:if> 	    
 												</c:forEach>		  
 			
-									  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+									  	 		<c:forEach var="currentRate" items="${voteGeneralMonitoringDTO.mapStandardRatesContent}">
 										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
 																 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
@@ -216,7 +284,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  			</tr>				 
 											
 						 			
-											<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+											<c:forEach var="currentDto" items="${voteGeneralMonitoringDTO.listUserEntries}">
 						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>

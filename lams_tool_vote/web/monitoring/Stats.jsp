@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
  		<c:set var="statsTabActive" scope="request" value="true"/>
  		
-		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+		<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
 				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
@@ -43,12 +43,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>			
 
 
-		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
+		<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }"> 	
+			<c:if test="${voteGeneralMonitoringDTO.currentMonitoredToolSession != 'All'}"> 							
 					<jsp:include page="/monitoring/IndividualSessionSummary.jsp" />					
 			</c:if> 	    	  
 
-			<c:if test="${currentMonitoredToolSession == 'All'}"> 							
+			<c:if test="${voteGeneralMonitoringDTO.currentMonitoredToolSession == 'All'}"> 							
 					<jsp:include page="/monitoring/AllSessionsSummary.jsp" />								
 			</c:if> 	    	  
 		</c:if>						

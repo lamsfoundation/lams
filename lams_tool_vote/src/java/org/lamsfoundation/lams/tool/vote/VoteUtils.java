@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 
 /**
@@ -52,19 +53,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public abstract class VoteUtils implements VoteAppConstants {
 
 	static Logger logger = Logger.getLogger(VoteUtils.class.getName());
-
-	/**
-	 * returns the service object from the session cache
-	 * IVoteService getToolService(HttpServletRequest request)
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static IVoteService getToolService(HttpServletRequest request)
-	{
-		IVoteService voteService=(IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-	    return voteService;
-	}
 
 	/**
 	 * 
@@ -129,7 +117,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	{
 		TimeZone timeZone=TimeZone.getDefault();
 	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
 	    logger.debug("current timezone id: " + timeZone.getID());
 	}
 	
@@ -147,9 +134,9 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 * @return boolean
 	 * determine whether a specific toolContentId exists in the db
 	 */
-	public static boolean existsContent(Long toolContentId, HttpServletRequest request)
+	public static boolean existsContent(Long toolContentId, HttpServletRequest request, IVoteService voteService)
 	{
-		IVoteService voteService =VoteUtils.getToolService(request);
+	    logger.debug("voteService: " + voteService);
 
     	VoteContent voteContent=voteService.retrieveVote(toolContentId);
 	    logger.debug("retrieving voteContent: " + voteContent);
@@ -166,10 +153,10 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 * @param toolSessionId
 	 * @return boolean
 	 */
-	public static boolean existsSession(Long toolSessionId, HttpServletRequest request)
+	public static boolean existsSession(Long toolSessionId, HttpServletRequest request, IVoteService voteService)
 	{
-		logger.debug("existsSession");
-    	IVoteService voteService =VoteUtils.getToolService(request);
+	    logger.debug("voteService: " + voteService);
+	    
 	    VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
 	    logger.debug("voteSession:" + voteSession);
     	
@@ -187,9 +174,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 		/*should never be null anyway as default content MUST exist in the db*/
         if(defaultVoteContent == null)
             throw new NullPointerException("Default VoteContent cannot be null");
-
-        //voteAuthoringForm.setTitle(defaultVoteContent.getTitle());
-        //voteAuthoringForm.setInstructions(defaultVoteContent.getInstructions());
         
         voteGeneralAuthoringDTO.setActivityTitle(defaultVoteContent.getTitle());
         voteGeneralAuthoringDTO.setActivityInstructions(defaultVoteContent.getInstructions());
@@ -247,9 +231,10 @@ public abstract class VoteUtils implements VoteAppConstants {
     }
 
     
-	public static void saveRichText(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO)
+	public static void saveRichText(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO, 
+	        SessionMap sessionMap)
 	{
-	    logger.debug("doing persistRichText: ");
+	    logger.debug("doing saveRichText, sessionMap: " + sessionMap);
 		String richTextTitle = request.getParameter(TITLE);
 	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
 	    
@@ -259,7 +244,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    
 	    if (richTextTitle != null)
 	    {
-			//request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
 			voteGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	    }
 	    String noHTMLTitle = stripHTML(richTextTitle);
@@ -268,7 +252,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	    if (richTextInstructions != null)
 	    {
-			//request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
 			voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 	    }
 	    
@@ -277,8 +260,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 
 		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
 		{
-			//request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);
 			voteGeneralAuthoringDTO.setRichTextOfflineInstructions(richTextOfflineInstructions);
+			sessionMap.put(OFFLINE_INSTRUCTIONS_KEY,richTextOfflineInstructions);
 		}
 
 		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
@@ -286,8 +269,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 		
 		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
 		{
-			//request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);
 			voteGeneralAuthoringDTO.setRichTextOnlineInstructions(richTextOnlineInstructions);
+			sessionMap.put(ONLINE_INSTRUCTIONS_KEY,richTextOnlineInstructions);
 		}
 	}
 	
@@ -473,10 +456,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 
 	public static void setDefineLater(HttpServletRequest request, boolean value, IVoteService voteService, String toolContentID)
     {
-    	//IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-    	//logger.debug("voteService:" + voteService);
-    	
-    	//Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentID:" + toolContentID);
     	
     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
@@ -497,9 +476,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
     public static void cleanUpSessionAbsolute(HttpServletRequest request)
     {
-    	request.getSession().removeAttribute(MY_SIGNATURE);
-
-    	
     	cleanUpUserExceptions(request);
     	logger.debug("completely cleaned the session.");
     }

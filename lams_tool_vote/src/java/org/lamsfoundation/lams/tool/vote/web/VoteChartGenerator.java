@@ -40,9 +40,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 
 /**
  * <p> Enables generation of enerates JFreeCharts </p>
@@ -70,25 +72,24 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             
             String currentSessionId=request.getParameter("currentSessionId");
             logger.debug("currentSessionId: " + currentSessionId);
+            logger.debug("getServletContext() is : " + getServletContext());
             
             if (currentSessionId != null)
             {
                 logger.debug("currentSessionId is specified, generating data for all sessions dto: ");
-            	IVoteService voteService=null;
-        	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+
+                IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
         		logger.debug("voteService: " + voteService);
         		
-        	    Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-        	    logger.debug("toolContentID: " + toolContentID);
-        	    
-        	    VoteContent voteContent=voteService.retrieveVote(toolContentID);
-        		logger.debug("existing voteContent:" + voteContent);
-
         		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentSessionId));
         		logger.debug("voteSession uid:" + voteSession.getUid());
         		
+        		VoteContent voteContent=voteSession.getVoteContent(); 
+        		logger.debug("existing voteContent:" + voteContent);
+
+                VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
                 MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-                        voteSession.getUid().toString(), null);
+                        voteSession.getUid().toString(), null, voteGeneralMonitoringDTO);
                 logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);
 
                 logger.debug("post prepareChartData : MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
@@ -159,7 +160,7 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
 		}
         
     	JFreeChart chart=null;
-   	    chart=ChartFactory.createPieChart3D("Session Votes Chart", data, true, true, false);
+   	    chart=ChartFactory.createPieChart3D(SESSION_VOTES_CHART , data, true, true, false);
    	    logger.debug("chart: " + chart) ;
 
    	    return chart;
@@ -188,7 +189,7 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
 		}
         
     	JFreeChart chart=null;
-   	    chart=ChartFactory.createBarChart3D("Session Votes Chart", "Open Vote", "Percentage", 
+   	    chart=ChartFactory.createBarChart3D(SESSION_VOTES_CHART , "Open Vote", "Percentage", 
    	    									data, PlotOrientation.VERTICAL, true, true, false);
    	    logger.debug("chart: " + chart) ;
    	    return chart;

@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
@@ -258,8 +259,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 	    logger.debug("voteSession uid:" + voteSession.getUid());
 	    logger.debug("calling prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
+
+	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
 	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO);
+	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
 	    logger.debug("end of  prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
 		
 		voteLearningForm.resetCommands();
@@ -706,9 +709,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
     	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(true).toString());
     	
-    	
+    	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
     	logger.debug("calling  prepareChartData: " + toolContentID);
-    	MonitoringUtil.prepareChartData(request, voteService, null, toolContentID.toString(), toolSessionUid.toString(), voteGeneralLearnerFlowDTO);
+    	MonitoringUtil.prepareChartData(request, voteService, null, toolContentID.toString(), toolSessionUid.toString(), 
+    	        voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
     	
     	logger.debug("fwding to INDIVIDUAL_REPORT: " + INDIVIDUAL_REPORT);
     	voteLearningForm.resetCommands();

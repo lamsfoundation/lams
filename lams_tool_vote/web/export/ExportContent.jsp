@@ -255,12 +255,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 				  	 									<c:if test="${currentQuestionId == userData.questionUid}">
 					  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
-																		<jsp:include page="/monitoring/UserResponses.jsp" />
+																<tr> 
+																		 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																		 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+																</tr>		
 															</c:if>														  					 									  			
 															
 					  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
 					  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
-																		<jsp:include page="/monitoring/UserResponses.jsp" />										
+																	<tr> 
+																			 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																			 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+																	</tr>		
 																</c:if>														  					 									  													  			
 															</c:if>														  					 									  													  			
 														</c:if>														  					 
@@ -293,7 +299,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 					  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
-															<jsp:include page="/monitoring/UserResponses.jsp" />										
+																<tr> 
+																		 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																		 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+																</tr>		
 												</c:forEach>		  	
 									  			
 											</table>

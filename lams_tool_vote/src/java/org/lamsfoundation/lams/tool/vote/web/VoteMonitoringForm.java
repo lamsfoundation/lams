@@ -58,8 +58,23 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String existsOpenVotes;
 	
+	protected String toolContentID;
+	
+	protected String defineLaterInEditMode;
 	
 	
+    /**
+     * @return Returns the toolContentID.
+     */
+    public String getToolContentID() {
+        return toolContentID;
+    }
+    /**
+     * @param toolContentID The toolContentID to set.
+     */
+    public void setToolContentID(String toolContentID) {
+        this.toolContentID = toolContentID;
+    }
     /**
      * @return Returns the currentUid.
      */
@@ -218,5 +233,17 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
      */
     public void setExistsOpenVotes(String existsOpenVotes) {
         this.existsOpenVotes = existsOpenVotes;
+    }
+    /**
+     * @return Returns the defineLaterInEditMode.
+     */
+    public String getDefineLaterInEditMode() {
+        return defineLaterInEditMode;
+    }
+    /**
+     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     */
+    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
+        this.defineLaterInEditMode = defineLaterInEditMode;
     }
 }

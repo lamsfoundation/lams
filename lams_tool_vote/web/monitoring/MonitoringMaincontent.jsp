@@ -64,9 +64,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             initEditor("instructions");
             
             initEditor("optionContent0");
-            <c:set var="optIndex" scope="session" value="1"/>
-            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
-                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+            <c:set var="optIndex" scope="request" value="1"/>
+            <c:forEach var="questionEntry" items="${voteGeneralMonitoringDTO.mapOptionsContent}">
+                <c:set var="optIndex" scope="request" value="${optIndex +1}"/>
                 initEditor("<c:out value="optionContent${optIndex-1}"/>");
             </c:forEach>
 
@@ -147,14 +147,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body onLoad="init();">
 
-	<c:if test="${(isPortfolioExport != 'true') }"> 	
-		<div id="page">
+
+	<div id="page">
 			<h1> <bean:message key="label.monitoring"/> </h1>
-	</c:if> 				
-	<c:if test="${(isPortfolioExport == 'true') }"> 	
-		<div id="page">
-			<h1>  </h1>
-	</c:if> 				
 
 	<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
@@ -165,12 +160,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="method"/>
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-	
+		<html:hidden property="activeModule"/>
+		<html:hidden property="defineLaterInEditMode"/>
 		<html:hidden property="responseId"/>	 
 		<html:hidden property="currentUid"/>
 		<html:hidden property="selectedToolSessionId"/>							
 		<input type="hidden" name="isToolSessionChanged"/>	
-	
+		
 			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 			<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 			<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />

@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body>
 
-		<table  class="forms">
+		<table>
 				<tr>
 			 		<th NOWRAP>  <bean:message key="label.learner.progress"/>   </th>
 				</tr>
@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>	 
 
-				<table  class="forms">
+				<table>
 					<tr>
 						<td NOWRAP valign=top align=left>
 			 			<table align=left>

@@ -69,11 +69,17 @@ public interface VoteAppConstants {
     public static final String LOCK_ON_FINISH							="lockOnFinish";
     public static final String REPORT_VIEW_ONLY							="reportViewOnly";
     public static final String USER_ENTRY								="userEntry";
+    public static final String RESPONSE_ID								="responseId";
+    public static final String CURRENT_UID								="currentUid";
+    public static final String SELECTED_TOOL_SESSION_ID					="selectedToolSessionId";
+    public static final String DEFAULT_VOTING_TITLE						="Voting Title";
+    public static final String DEFAULT_VOTING_INSTRUCTIONS				="Voting Instructions";
 	
 	public static final String ATTACHMENT_LIST_KEY 						= "attachmentListKey";
 	public static final String DELETED_ATTACHMENT_LIST_KEY				= "deletedAttachmentListKey";
 	public static final String ACTIVITY_TITLE_KEY						= "activityTitleKey";
 	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
+	public static final String VOTE_GENERAL_MONITORING_DTO				= "voteGeneralMonitoringDTO";
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
@@ -274,6 +280,7 @@ public interface VoteAppConstants {
     public static final String MODE										="mode";
     public static final String LEARNING_MODE							="learningMode";
     public static final String EXPORT_USER_ID							="exportUserId";
+    public static final String SESSION_VOTES_CHART						="Session Votes Chart";
     
     /*
      * exception constants
