@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.common.style.*
-
+import mx.controls.*
 import com.polymercode.Draw;
 import mx.managers.*
 import mx.containers.*;
@@ -57,6 +57,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var mm:MonitorModel; // used only when called from Monitor Environment
 	private var _canvasModel:CanvasModel;
 	private var _tm:ThemeManager;
+	private var _ccm:CustomContextMenu;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
 	
@@ -82,12 +83,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
 	private var bgNegative:String = "original";
-	
+	private var authorMenu:ContextMenu
 	
 	
 	function CanvasActivity(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		_tm = ThemeManager.getInstance();
+		_ccm = CustomContextMenu.getInstance();
 		//Get reference to application and design data model
 		app = Application.getInstance();
 		//let it wait one frame to set up the components.
@@ -112,7 +114,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	public function init(initObj):Void{
-		
+		clickTarget_mc.onRollOver = Proxy.create (this, localOnRollOver);
+		clickTarget_mc.onRollOut = Proxy.create (this, localOnRollOut);
 		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
@@ -202,15 +205,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,0x266DEE);
 				Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,0x266DEE);
 				Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,0x266DEE);
-				/*				Draw.dashTo(_base_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,0x266DEE);
-				Draw.dashTo(_base_mc,tr_x,tr_y,br_x,br_y,2,3,2,0x266DEE);
-				Draw.dashTo(_base_mc,br_x,br_y,bl_x,bl_y,2,3,2,0x266DEE);
-				Draw.dashTo(_base_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,0x266DEE);
-				*/
-				
+						
 				_isSelected = isSelected;
-			
-			
+					
 		}else{
 			//hide the selected border
 			_selected_mc.removeMovieClip();
@@ -364,6 +361,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_visible = true;
 	}
 	
+	private function localOnRollOver():Void{
+		_ccm.showCustomCM(_ccm.loadMenu("activity"))
+	}
+	
+	private function localOnRollOut():Void{
+		_ccm.showCustomCM(_ccm.loadMenu("canvas"))
+	}
 	
 	private function localOnPress():Void{
 		
