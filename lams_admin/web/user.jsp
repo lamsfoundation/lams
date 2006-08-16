@@ -96,7 +96,7 @@
 		<td><html-el:text property="email" size="20" maxlength="128" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="admin.organisation.language"/>:</td>
+		<td><fmt:message key="admin.organisation.locale"/>:</td>
 		<td>
 			<html-el:select property="localeId">
 				<c:forEach items="${locales}" var="locale">

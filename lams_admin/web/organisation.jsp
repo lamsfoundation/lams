@@ -50,7 +50,7 @@
 		<td><html-el:textarea property="description" cols="50" rows="3" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="admin.organisation.language"/>:</td>
+		<td><fmt:message key="admin.organisation.locale"/>:</td>
 		<td>
 			<html-el:select property="localeId">
 				<c:forEach items="${locales}" var="locale">
