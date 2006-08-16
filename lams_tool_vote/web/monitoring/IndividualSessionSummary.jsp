@@ -124,7 +124,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 						<tr>
-					 		<td NOWRAP colspan=2 > <b>  <bean:message key="label.groupName"/> </b><c:out value="${groupName}"/>  </td>
+					 		<td NOWRAP colspan=2 > <b>  <bean:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
 						</tr>
 
 

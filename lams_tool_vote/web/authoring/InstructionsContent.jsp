@@ -76,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td>
-    	      				 <bean:message key="label.onlineFiles" /> 
+    	      				<b> <bean:message key="label.onlineFiles" />  </b>
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
 							<html:file  property="theOnlineFile"></html:file>
@@ -130,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td>
-							 <bean:message key="label.offlineFiles" />
+							<b> <bean:message key="label.offlineFiles" /> </b>
 	      			</td>
           			<td colspan=3 NOWRAP valign=top> 
 							<html:file  property="theOfflineFile"></html:file>

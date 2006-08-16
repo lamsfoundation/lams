@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -176,7 +177,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    logger.debug("post prepareChartData, voteGeneralMonitoringDTO:" + voteGeneralMonitoringDTO);
 
 		    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null, 
-		            voteGeneralMonitoringDTO);
+		            voteGeneralMonitoringDTO, null);
+		    logger.debug("session_name: " + voteSession.getSession_name());
+		    voteGeneralMonitoringDTO.setGroupName(voteSession.getSession_name());
 		    logger.debug("post refreshSummaryData, voteGeneralMonitoringDTO:" + voteGeneralMonitoringDTO);
 		    voteGeneralMonitoringDTO.setSelectionCase(new Long(1));
 	    }
@@ -279,10 +282,11 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	public void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
 			boolean showUserEntriesBySession, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO, 
-			VoteGeneralMonitoringDTO voteGeneralMonitoringDTO)
+			VoteGeneralMonitoringDTO voteGeneralMonitoringDTO, ExportPortfolioDTO exportPortfolioDTO)
 	{
 	    logger.debug("doing refreshSummaryData." + voteGeneralLearnerFlowDTO);
 	    logger.debug("voteGeneralMonitoringDTO:" + voteGeneralMonitoringDTO);
+	    logger.debug("exportPortfolioDTO:" + exportPortfolioDTO);
 	    
 		if (voteService == null)
 		{
@@ -312,6 +316,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 		
+		String userExceptionNoToolSessions=voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		logger.debug("userExceptionNoToolSessions: " + userExceptionNoToolSessions);
+		if (exportPortfolioDTO != null)
+		{
+		    exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
+		}
+		
 		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, voteContent, voteService);
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	    logger.debug("currentSessionId: " + currentSessionId);
@@ -322,6 +333,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    logger.debug("voteSession:" + voteSession);
 		    if (voteGeneralMonitoringDTO != null)
 		        voteGeneralMonitoringDTO.setGroupName(voteSession.getSession_name());
+	    }
+	    else
+	    {
+	        voteGeneralMonitoringDTO.setGroupName("All Groups");
 	    }
 	    
 	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
@@ -335,12 +350,21 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    List listUserEntries=processUserEnteredNominations(voteService, voteContent, currentSessionId, showUserEntriesBySession, userId, isLearnerRequest);
 	    logger.debug("listUserEntries: " + listUserEntries);
 	    
-	    if (voteGeneralLearnerFlowDTO !=null)
+	    if (voteGeneralLearnerFlowDTO != null)
 	    {
 	        logger.debug("placing dtos within the voteGeneralLearnerFlowDTO: ");
 	        voteGeneralLearnerFlowDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
 	        voteGeneralLearnerFlowDTO.setListUserEntries(listUserEntries);;
 	    }
+
+	    
+	    if (exportPortfolioDTO != null)
+	    {
+	        logger.debug("placing dtos within the exportPortfolioDTO: ");
+	        exportPortfolioDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
+	        exportPortfolioDTO.setListUserEntries(listUserEntries);;
+	    }
+	    
 	    
 	    if (voteGeneralMonitoringDTO != null)
 	    {
@@ -372,7 +396,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	    logger.debug("end of refreshSummaryData, voteGeneralMonitoringDTO" + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
 	}
 
 
@@ -1187,7 +1210,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
 		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, 
-		        null, true, null,voteGeneralMonitoringDTO);
+		        null, true, null,voteGeneralMonitoringDTO, null);
 		
 		
 		initSummaryContent(toolContentID , request, voteService, voteGeneralMonitoringDTO);
@@ -1325,7 +1348,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
-		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null, voteGeneralMonitoringDTO);
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true, null, 
+		        voteGeneralMonitoringDTO, null);
 		
 		if (currentMonitoredToolSession.equals("All"))
 	    {
@@ -1399,7 +1423,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 
 		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, 
-		        true, null, voteGeneralMonitoringDTO);
+		        true, null, voteGeneralMonitoringDTO, null);
 		
 		if (currentMonitoredToolSession.equals("All"))
 	    {

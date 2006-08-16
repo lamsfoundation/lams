@@ -41,6 +41,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 				
 
+				<tr> 
+					<td NOWRAP colspan=4 valign=top>
+    	      				<b> <bean:message key="label.onlineFiles" />  </b>		
+					</td> 
+				</tr>
+
 				<tr>
 					<td NOWRAP colspan=4 align=left valign=top width="100%">
 						<table align="left">
@@ -77,6 +83,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td NOWRAP colspan=4 valign=top>
 						<b> <bean:message key="label.offlineInstructions.col" /> </b>
 					    <c:out value="${voteGeneralMonitoringDTO.richTextOfflineInstructions}" escapeXml="false" />	
+					</td> 
+				</tr>
+				
+				<tr> 
+					<td NOWRAP colspan=4 valign=top>
+    	      				<b> <bean:message key="label.offlineFiles" />  </b>		
 					</td> 
 				</tr>
 				

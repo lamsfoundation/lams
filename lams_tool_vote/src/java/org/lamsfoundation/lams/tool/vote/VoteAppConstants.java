@@ -48,8 +48,8 @@ public interface VoteAppConstants {
 	public static final String LOAD_LEARNER								="loadLearner";
 	public static final String GENERATE_CHART							="generateChart";
 	public static final String ALL_NOMINATIONS							="allNominations";
-    public static final String LOAD_MONITORING_CONTENT							="loadMonitoring";
-    public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY				="loadMonitoringEditActivity";
+    public static final String LOAD_MONITORING_CONTENT					="loadMonitoring";
+    public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
     public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
     public static final String INDIVIDUAL_REPORT						="individualReport";
     public static final String EXIT_PAGE								="exitPage";
@@ -100,6 +100,7 @@ public interface VoteAppConstants {
 	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
 	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
 
+	public static final String EXPORT_PORTFOLIO_DTO						= "exportPortfolioDto";
     
     /*
      * authoring mode controllers

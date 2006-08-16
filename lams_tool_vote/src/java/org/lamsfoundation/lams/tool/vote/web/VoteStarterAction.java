@@ -248,23 +248,13 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    /* this will be fixed when making changes to Monitoring module */
 		    if (strToolContentId == null)
 		    {
-		    	/*it is possible that the original request for authoring module is coming from monitoring url which keeps the
-		    	 TOOL_CONTENT_ID in the session*/
-		    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-			    logger.debug("toolContentID: " + toolContentID);
-			    if (toolContentID != null)
-			    {
-			    	strToolContentId= toolContentID.toString();
-				    logger.debug("cached strToolContentId from the session: " + strToolContentId);	
-			    }
-			    else
-			    {
-			    	logger.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.");
-			    	/*use default content instead of giving a warning*/
-			    	String defaultContentId=voteAuthoringForm.getDefaultContentId(); 
-			    	logger.debug("using Voting defaultContentId: " + defaultContentId);
-			    	strToolContentId=defaultContentId;
-			    }
+		    	/*watch out for a possibility that the original request for authoring module is coming 
+		    	 * from monitoring url */
+		    	logger.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available.");
+		    	/*use default content instead of giving a warning*/
+		    	String defaultContentId=voteAuthoringForm.getDefaultContentId(); 
+		    	logger.debug("using Voting defaultContentId: " + defaultContentId);
+		    	strToolContentId=defaultContentId;
 		    }
 	    	logger.debug("final strToolContentId: " + strToolContentId);
 		    

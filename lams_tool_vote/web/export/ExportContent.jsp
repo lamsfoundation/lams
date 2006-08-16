@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<td NOWRAP valign=top align=left>
 								<table>
 
-									<c:if test="${(portfolioExportMode == 'learner')}">
+									<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}">
 										<tr>
 									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summary"/>  </th>
 										</tr>
@@ -47,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
 										</tr>
 
-										<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
+										<c:forEach var="currentNomination" items="${exportPortfolioDto.mapStandardNominationsHTMLedContent}">
 								  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 								  	 		 <tr>
 					  	 						<td NOWRAP valign=top align=left>
@@ -55,14 +55,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												 </td>
 				
 												<td NOWRAP valign=top align=left>				  	 		
-										  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+										  	 		<c:forEach var="currentUserCount" items="${exportPortfolioDto.mapStandardUserCount}">
 											  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 										  				<c:if test="${currentNominationKey == currentUserKey}"> 				
 																	 <c:out value="${currentUserCount.value}"/>  
 														</c:if> 	    
 													</c:forEach>		  
 				
-										  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+										  	 		<c:forEach var="currentRate" items="${exportPortfolioDto.mapStandardRatesContent}">
 											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
 																	 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
@@ -86,14 +86,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											  			</tr>				 
 													
 								 			
-													<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+													<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
 								  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 													  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 																<tr> 
 																		<td NOWRAP valign=top align=left> 
 																				<c:out value="${currentDto.question}" escapeXml="false"/> 
 																		</td>
-																		 <td NOWRAP valign=top align=left>    <c:out value="${userData.attemptTime}"/>  </td>
+																		 <td NOWRAP valign=top align=left>   
+																		 	 <c:out value="${userData.attemptTime}"/>  
+																		 </td>
 																</tr>		
 															</c:forEach>		  	
 													</c:forEach>		
@@ -104,7 +106,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:if>											
 
 
-									<c:if test="${(portfolioExportMode != 'learner')}">
+									<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}">
 										<tr>
 									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summaryAll"/>  </th>
 										</tr>
@@ -114,7 +116,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
 										</tr>
 										
-										<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
+										<c:forEach var="currentNomination" items="${exportPortfolioDto.mapStandardNominationsHTMLedContent}">
 								  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 								  	 		 <tr>
 					  	 						<td NOWRAP valign=top align=left>
@@ -122,14 +124,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												 </td>
 				
 												<td NOWRAP valign=top align=left>				  	 		
-										  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+										  	 		<c:forEach var="currentUserCount" items="${exportPortfolioDto.mapStandardUserCount}">
 											  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 										  				<c:if test="${currentNominationKey == currentUserKey}"> 				
 																	 <c:out value="${currentUserCount.value}"/>  
 														</c:if> 	    
 													</c:forEach>		  
 				
-										  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+										  	 		<c:forEach var="currentRate" items="${exportPortfolioDto.mapStandardRatesContent}">
 											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
 																	 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
@@ -154,7 +156,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  			</tr>				 
 											
 						 			
-											<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+											<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
 						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
@@ -215,7 +217,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<td NOWRAP valign=top align=left>
 					 			<table align=left>
 					 			
-									<c:if test="${(portfolioExportMode == 'learner')}">
+									<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}">
 										<tr>
 									 		<th NOWRAP>  <bean:message key="label.individual.learnerVotes"/>  </th>
 										</tr>
@@ -223,14 +225,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 					 			
 					 			
-									<c:if test="${(portfolioExportMode != 'learner')}">
+									<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}">
 										<tr>
 									 		<th NOWRAP>  <bean:message key="label.all.learnerVotes"/>  </th>
 										</tr>
 									</c:if>											
 					 			
 
-								<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+								<c:forEach var="currentDto" items="${exportPortfolioDto.listMonitoredAnswersContainerDto}">
 						  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 						  	 		<tr>
 						  	 			<td> &nbsp&nbsp</td>
@@ -254,21 +256,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 			
 				  	 									<c:if test="${currentQuestionId == userData.questionUid}">
-					  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
 																<tr> 
 																		 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 																		 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
 																</tr>		
-															</c:if>														  					 									  			
-															
-					  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
-					  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
-																	<tr> 
-																			 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-																			 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
-																	</tr>		
-																</c:if>														  					 									  													  			
-															</c:if>														  					 									  													  			
 														</c:if>														  					 
 				 									</c:forEach>		  	
 												</c:forEach>		  	
@@ -278,7 +269,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:forEach>		  
 									
 								
-							<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+							<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
 						  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 						  	 		<tr>
 						  	 			<td> &nbsp&nbsp</td>

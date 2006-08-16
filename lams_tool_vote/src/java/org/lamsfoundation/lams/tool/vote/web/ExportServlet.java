@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
@@ -82,8 +83,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
     
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
+	    ExportPortfolioDTO exportPortfolioDTO= new ExportPortfolioDTO();
+	    
 	    logger.debug("starting learner mode...");
-	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
+	    exportPortfolioDTO.setPortfolioExportMode("learner");
         
     	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
     	logger.debug("voteService:" + voteService);
@@ -125,20 +128,27 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 
         VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
+        
     	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
     	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, 
-    	        toolSessionID.toString(), userID.toString() , true, null, voteGeneralMonitoringDTO);
+    	        toolSessionID.toString(), userID.toString() , true, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
+    	logger.debug("post refreshSummaryData, exportPortfolioDTO now: " + exportPortfolioDTO);
     	
-    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), voteSession.getUid());
-    	logger.debug("post prepareChartDataForExport");
     	
+    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), 
+    	        voteSession.getUid(), exportPortfolioDTO);
+    	    	
+    	logger.debug("final exportPortfolioDTO: " + exportPortfolioDTO);
+    	logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
+    	request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
     	logger.debug("ending learner mode: ");
     }
     
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
         logger.debug("starting teacher mode...");
-        request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
+	    ExportPortfolioDTO exportPortfolioDTO= new ExportPortfolioDTO();
+        exportPortfolioDTO.setPortfolioExportMode("teacher");
         
         IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
         logger.debug("voteService:" + voteService);
@@ -163,13 +173,18 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		
         VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
         VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+        
         logger.debug("starting refreshSummaryData.");
-        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null, voteGeneralMonitoringDTO);
+        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
+        logger.debug("post refreshSummaryData, exportPortfolioDTO now: " + exportPortfolioDTO);
         
         logger.debug("teacher uses content id: " + content.getVoteContentId());
-    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null);
+    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null, exportPortfolioDTO);
     	logger.debug("post prepareChartDataForExportTeacher");
-        
+
+        logger.debug("final exportPortfolioDTO: " + exportPortfolioDTO);
+        logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
+        request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
         logger.debug("ending teacher mode: ");
     }
     

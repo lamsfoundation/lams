@@ -336,7 +336,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
     	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
     	voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, true, currentToolSessionId.toString(), 
-    	        learnerProgressUserId, true, voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+    	        learnerProgressUserId, true, voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, null);
     	
     	voteGeneralLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
     	voteGeneralLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());

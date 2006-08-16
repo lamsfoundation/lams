@@ -470,7 +470,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 
 	
 	/**
-	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and CURRENT_MONITORED_TOOL_SESSION
+	 * 
 	 * cleanUpSessionAbsolute(HttpServletRequest request)
 	 * @param request
 	 */

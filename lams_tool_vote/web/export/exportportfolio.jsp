@@ -38,9 +38,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner"><!--main box 'page'-->
 
 		<h1 class="no-tabs-below">
-		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-			<c:if test="${(portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
-			<c:if test="${(portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
+		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions != 'true') }"> 	
+			<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
+			<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
 		</c:if>
         </h1>
 		<div id="header-no-tabs-learner">
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<div id="content-learner">
 	
-		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions == 'true')}"> 	
 				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
@@ -60,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>			
 
 
-		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions != 'true') }"> 	
 			<jsp:include page="/export/ExportContent.jsp" />
 		</c:if>						
 		
