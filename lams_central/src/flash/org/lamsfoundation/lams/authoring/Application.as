@@ -589,18 +589,28 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	public function cut():Void{
 		trace("testing cut");
-		if (CanvasActivity(_canvas.model.selectedItem) != null){
-			setClipboardData(_canvas.model.selectedItem, CUT_TYPE);
+		var ca = _canvas.model.selectedItem
+		if (CanvasActivity(ca) != null){
+			if (ca.activity.parentUIID == null || ca.activity.parentUIID == undefined){
+				setClipboardData(ca, CUT_TYPE);
+			}else {
+				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_cut_invalid'));
+			}
 		}else {
-			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_cut_invalid'));
+			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_copy_invalid'));
 		}
 		//_canvas.removeActivity(_canvas.model.selectedItem.activity.activityUIID);
 	}
 	
 	public function copy():Void{
 		trace("testing copy");
-		if (CanvasActivity(_canvas.model.selectedItem) != null){
-			setClipboardData(_canvas.model.selectedItem, COPY_TYPE);
+		var ca = _canvas.model.selectedItem
+		if (CanvasActivity(ca) != null){
+			if (ca.activity.parentUIID == null || ca.activity.parentUIID == undefined){
+				setClipboardData(ca, COPY_TYPE);
+			}else {
+				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_copy_invalid'));
+			}
 		}else{
 			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_copy_invalid'));
 		}
