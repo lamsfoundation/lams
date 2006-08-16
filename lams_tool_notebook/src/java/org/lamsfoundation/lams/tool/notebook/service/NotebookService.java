@@ -218,18 +218,18 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 
 	public void exportToolContent(Long toolContentId, String rootPath)
 			throws DataMissingException, ToolException {
-		Notebook toolContentObj = notebookDAO.getByContentId(toolContentId);
-		if (toolContentObj == null)
+		Notebook notebook = notebookDAO.getByContentId(toolContentId);
+		if (notebook == null)
 			throw new DataMissingException(
 					"Unable to find tool content by given id :" + toolContentId);
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.
-		toolContentObj = Notebook.newInstance(toolContentObj, toolContentId,
+		notebook = Notebook.newInstance(notebook, toolContentId,
 				null);
-		toolContentObj.setToolContentHandler(null);
-		toolContentObj.setNotebookSessions(null);
-		Set<NotebookAttachment> atts = toolContentObj.getNotebookAttachments();
+		notebook.setToolContentHandler(null);
+		notebook.setNotebookSessions(null);
+		Set<NotebookAttachment> atts = notebook.getNotebookAttachments();
 		for (NotebookAttachment att : atts) {
 			att.setNotebook(null);
 		}
@@ -238,7 +238,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 					NotebookAttachment.class.getName(), "fileUuid",
 					"fileVersionId");
 			exportContentService.exportToolContent(toolContentId,
-					toolContentObj, notebookToolContentHandler, rootPath);
+					notebook, notebookToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
 		}
