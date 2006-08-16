@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -71,7 +71,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-	//public var menu:ContextMenu;
+	
 
 	
 	/**
@@ -97,50 +97,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 		H_GAP = 10;
 		V_GAP = 10;
 		_cm = CanvasModel(m)
-        setupCM();
+       
 	   //register to recive updates form the model
 		_cm.addEventListener('viewUpdate',this);
         
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }    
     
-	public function setupCM():Void{
-		trace("Value for this: "+this)
-		var myCopy:Array = new Array();
-		var menuArr:Array = new Array();
-		menuArr[0] = ["Open/Edit Activity Content", getOpenEditActivtiyContent];
-		menuArr[1] =["Copy Activity", getCopy];
-		menuArr[2] = ["Paste Activity",getPaste];
-		
-		for (var i=0; i<menuArr.length; i++){
-			var myObj:Object = new Object();
-			myObj.cmlabel = menuArr[i][0];
-			myObj.handler = menuArr[i][1]; 
-			if (menuArr[i][0] == "Copy Activity"){
-				menuArr[i].separatorBefore = true;
-			}
-			myCopy[i]= myObj;
-			
-		} 
-		
-		//if (_cm.selectedItem == null){
-		//	var this_cm = Application.getInstance().showCustomCM(false, myCopy);
-		//}else {
-		var this_cm = Application.getInstance().showCustomCM(true, myCopy);
-		//}
-		_root.menu = this_cm; 
-	}
-	
-	public function getOpenEditActivtiyContent(){
-		Application.getInstance().openEditActivtiyContent();
-	}
-	public function getCopy(){
-		Application.getInstance().copy();
-	}
-	public function getPaste(){
-		Application.getInstance().paste();
-	}
-	
 /**
  * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
  * @usage   
@@ -220,16 +183,7 @@ public function viewUpdate(event:Object):Void{
 		bkg_pnl.useHandCursor = false;
 		
 		setStyles();
-	/*	
-		//var s = canvasModel.getSize();
-        
-		Debugger.log('border?'+this.bkg_pnl,4,'layout','CanvasView');
-		this.bkg_pnl.setSize(w,h);
-		
-		//create the grid
-		Grid.drawGrid(_canvas_mc,w,h,V_GAP,H_GAP);
-		
-		*/
+	
         //Debugger.log('canvas view dispatching load event'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});

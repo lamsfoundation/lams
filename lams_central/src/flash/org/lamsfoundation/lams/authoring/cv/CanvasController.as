@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -433,45 +433,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				targetCA = CanvasOptionalActivity(transitionTargetObj);
 				return targetCA;
 			}
-			//else{
-				//var e = new LFError(Dictionary.getValue('cv_invalid_trans_target'),"createValidTransitionTarget",this,String(transitionTargetObj));
-				//bail
-				//return e;
-			//}
-			
-			/*
-			//if(ca instanceof CanvasActivity){
-			if(ICanvasActivity(ca) != null){
-				Debugger.log("Target implements ICanvasActivity", Debugger.GEN,'activityReleaseOutside','CanvasController');
-				var r:Object = _canvasModel.addActivityToTransition(targetCA);
-				if(r instanceof LFError){
-				//Debugger.error(r);
-					r.showErrorAlert(null);
-				}
-				//TODO: Check on status of try catch bug
-				*//*
-				try{
-					_canvasModel.addActivityToTransition(ca);
-				//}catch(e:org.lamsfoundation.lams.common.util.LFError){
-				}catch(e:LFError){
-					trace('in catch');
-					Debugger.error(e);
-				}
-				*/
-				
-			
-			
-			/*
-			}else{
-				Debugger.log("Target does NOT implement ICanvasActivity", Debugger.CRITICAL,'activityReleaseOutside','CanvasController');
-				//released over something other than a CanvasActivity so reset the t tool
-				
-			}
-			*/
 	}
-	
-	
-   
-
-   
+ 
 }

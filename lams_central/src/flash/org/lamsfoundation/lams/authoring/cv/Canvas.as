@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -964,25 +964,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var learningDesignID = _ddm.learningDesignID;
 		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export', 298, 712, true, true, false, false, false);
 	}
-	/*
-	public function cut():Void{
-		Debugger.log('Cut',Debugger.GEN,'cut','Canvas');
 		
-		
-	}
-
-	public function copy():Void{
-		Debugger.log('Copy',Debugger.GEN,'copy','Canvas');
-		
-	}
-	
-	public function paste():Void{
-		Debugger.log('Paste',Debugger.GEN,'paster','Canvas');
-		
-	}
-	
-	*/
-	
 	/**
 	* Used by application to set the size
 	* @param width The desired width
@@ -992,21 +974,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.setSize(width, height);
 	}
 	
-	/**
-	 * Initialises the property inspector
-	 * @usage   
-	 
-	public function initPropertyInspector():Void{
-		//note the init obnject parameters are passed into the _container object in the embeded class (*in this case PropertyInspector)
-		//we are setting up a vew so we need to pass the model and controller to it
-		var cc:CanvasController = canvasView.getController();
-		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('property_inspector_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
-		//Assign dialog load handler
-        _pi.addEventListener('contentLoaded',Delegate.create(this,piLoaded));
-        //okClickedCallback = callBack;
-    }
-	*/
-
 	/**
 	 * Sts up the bin
 	 * @usage   
@@ -1021,34 +988,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	/**
-	 * Fired whern property inspector's contentLoaded is fired
-	 * Positions the PI
-	 * @usage   
-	 * @param   evt 
-	 * @return  
-	 
-	public function piLoaded(evt:Object) {
-        if(evt.type == 'contentLoaded'){
-			//call a resize to line up the PI
-			Application.getInstance().onResize();
-			
-           
-        }else {
-            //TODO raise wrong event type error 
-        }
-		
-	}
-	*/
-	
-	/**
 	 * recieves event fired after update to the DDM
 	 * @usage   
 	 * @param   evt 
 	 * @return  
 	 */
 	public function onDDMUpdated(evt:Object):Void{
-		//_global.breakpoint();
-		//var _ddm:DesignDataModel = evt.target;
+		
 		Debugger.log('DDM has been updated, _ddm.validDesign:'+_ddm.validDesign,Debugger.GEN,'onDDMUpdated','Canvas');
 		//if its valid, its not anymore!
 		if(_ddm.validDesign){
@@ -1067,8 +1013,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function onDDMBeforeUpdate(evt:Object):Void{
-		//_global.breakpoint();
-		//var _ddm:DesignDataModel = evt.target;
+		
 		Debugger.log('DDM about to be updated',Debugger.GEN,'onDDMBeforeUpdate','Canvas');
 		//take a snapshot of the design and save it in the undoStack
 		var snapshot:Object = _ddm.toData();
@@ -1089,11 +1034,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function undo():Void{
 		
-		
-		//_global.breakpoint();
-		//Debugger.log('Before executing _undoStack.length:'+_undoStack.length,Debugger.GEN,'undo','Canvas');
-		//Debugger.log('Before executing _redoStack.length:'+_redoStack.length,Debugger.GEN,'undo','Canvas');
-		
 		if(_undoStack.length>0){
 			//get the last state off the stack
 			var snapshot = _undoStack.pop();
@@ -1105,9 +1045,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			//set the current design to the snapshot value
 			_ddm.setDesign(snapshot,true);
 			canvasModel.setDirty();
-			
-			//Debugger.log('After executing _undoStack.length:'+_undoStack.length,Debugger.GEN,'undo','Canvas');
-			//Debugger.log('After executing _redoStack.length:'+_redoStack.length,Debugger.GEN,'undo','Canvas');
 			
 		}else{
 			Debugger.log("Cannot Undo! no data on stack!",Debugger.GEN,'redo','Canvas');
@@ -1122,10 +1059,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function redo():Void{
 		
-		//Debugger.log('Before executing _undoStack.length:'+_undoStack.length,Debugger.GEN,'redo','Canvas');
-		//Debugger.log('Before executing _redoStack.length:'+_redoStack.length,Debugger.GEN,'redo','Canvas');
-		//_global.breakpoint();
-		
 		if(_redoStack.length > 0){
 			//get the last state off the stack
 			var snapshot = _redoStack.pop();
@@ -1136,9 +1069,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			
 			_ddm.setDesign(snapshot,true);
 			canvasModel.setDirty();
-			
-			//Debugger.log('After executing _undoStack.length:'+_undoStack.length,Debugger.GEN,'undo','Canvas');
-			//Debugger.log('After executing _redoStack.length:'+_redoStack.length,Debugger.GEN,'undo','Canvas');
 			
 		}else{
 			Debugger.log("Cannot Redo! no data on stack!",Debugger.GEN,'redo','Canvas');
@@ -1175,6 +1105,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function getCanvasModel():CanvasModel{
 			return canvasModel;
 	}
+	
 	public function get view():MovieClip{
 		return getCanvasView();
 	}
