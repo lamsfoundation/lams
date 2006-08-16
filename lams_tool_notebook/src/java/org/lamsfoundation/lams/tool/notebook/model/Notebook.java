@@ -390,7 +390,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 			if (notebookAttachments != null) {
 				// create a copy of the attachments
 				Iterator iter = notebookAttachments.iterator();
-				Set set = new HashSet();
+				Set<NotebookAttachment> set = new HashSet<NotebookAttachment>();
 				while (iter.hasNext()) {
 					NotebookAttachment originalFile = (NotebookAttachment) iter.next();
 					NotebookAttachment newFile = (NotebookAttachment) originalFile
