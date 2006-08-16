@@ -53,8 +53,10 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
@@ -1080,27 +1082,39 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				while (memberships.hasNext()) {
 					UserOrganisation member = (UserOrganisation) memberships.next();
 					
-					// Only courses have folders - classes don't!
-					Workspace workspace = member.getOrganisation().getWorkspace();
+					// Check if the organisation has been removed or hidden
+					// Continue to add folder if organisation is active or archived
+					Organisation org = member.getOrganisation();
 					
-					if ( workspace != null ) {
-						// TODO  get all the folders for the workspace but only return those that are at the "top" of the hierarchy
-						// for this user. Not needed at present but will be needed when we have multiple folders in a user's workspace (ie shared folders)
-						WorkspaceFolder orgFolder = workspace.getDefaultFolder();
-						if ( orgFolder != null ) {
-						
-							// Check if the user has write access, which is available
-						    // only if the user has an AUTHOR, TEACHER or STAFF role. If
-							// user has access add that folder to the list. 
-							Set roles = member.getUserOrganisationRoles();
-							if (hasWriteAccess(roles)) {
-								Integer permission = getPermissions(orgFolder,user);
-								if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) { 
-									folders.add(new FolderContentDTO(orgFolder,permission));
+					if( org != null) {
+						Integer orgStateId = org.getOrganisationState().getOrganisationStateId();
+						if(!(OrganisationState.HIDDEN.equals(orgStateId) || OrganisationState.REMOVED.equals(orgStateId))) {
+							
+							// Only courses have folders - classes don't!
+							Workspace workspace = member.getOrganisation().getWorkspace();
+							
+							if ( workspace != null ) {
+								// TODO  get all the folders for the workspace but only return those that are at the "top" of the hierarchy
+								// for this user. Not needed at present but will be needed when we have multiple folders in a user's workspace (ie shared folders)
+								WorkspaceFolder orgFolder = workspace.getDefaultFolder();
+								if ( orgFolder != null ) {
+								
+									// Check if the user has write access, which is available
+								    // only if the user has an AUTHOR, TEACHER or STAFF role. If
+									// user has access add that folder to the list. 
+									Set roles = member.getUserOrganisationRoles();
+									if (hasWriteAccess(roles)) {
+										Integer permission = getPermissions(orgFolder,user);
+										if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) { 
+											folders.add(new FolderContentDTO(orgFolder,permission));
+										}
+									}
 								}
 							}
 						}
 					}
+					
+					
 				}
 			} else {
 				log.warn("getAccessibleOrganisationWorkspaceFolders: Trying to get user memberships for user "+userID+". User doesn't belong to any organisations. Returning no folders.");
