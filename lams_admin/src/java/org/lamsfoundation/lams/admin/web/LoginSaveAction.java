@@ -31,6 +31,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,19 +51,16 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * <p>
  * <a href="LoginSaveAction.java.html"><i>View Source</i><a>
  * </p>
- *
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 
 /**
  * struts doclet
  * 
- * @struts.action path = "/loginsave"
- *                name = "LoginMaintainForm"
- *                parameter = "method"
- *                scope = "request"
- *                input = ".loginmaintian"
- *                validate = "false"
+ * @struts.action path = "/loginsave" name = "LoginMaintainForm" parameter =
+ *                "method" scope = "request" input = ".loginmaintian" validate =
+ *                "false"
  * 
  * @struts.action-forward name="sysadmin" path=".sysadmin"
  * @struts.action-forward name="loginmaintain" path=".loginmaintain"
@@ -70,122 +68,161 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 public class LoginSaveAction extends LamsDispatchAction {
 
 	private static final String LOGO_TAG = "<img src=\"<lams:LAMSURL/>";
-	
-	public ActionForward save(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
 
-		if(isCancelled(request)){
+	private static final String ALPHABET = "ABCDEFGHIJKLMOPQRSTUWVXYZabcdefghijklmnopqrstuvwxyz_1234567890";
+
+	private static final String IMAGE_FOLDER = Configuration
+			.get(ConfigurationKeys.LAMS_EAR_DIR)
+			+ File.separatorChar
+			+ "lams-www.war"
+			+ File.separatorChar
+			+ "images";
+
+	private static final String LOGIN_PAGE_PATH = Configuration
+			.get(ConfigurationKeys.LAMS_EAR_DIR)
+			+ File.separatorChar
+			+ "lams-central.war"
+			+ File.separatorChar
+			+ "login.jsp";
+
+	private static final String NEWS_PAGE_PATH = Configuration
+			.get(ConfigurationKeys.LAMS_EAR_DIR)
+			+ File.separatorChar
+			+ "lams-central.war"
+			+ File.separatorChar
+			+ "news.html";
+
+	public ActionForward save(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		if (isCancelled(request)) {
 			return mapping.findForward("sysadmin");
 		}
 
-		DynaActionForm loginMaintainForm = (DynaActionForm)form;
+		DynaActionForm loginMaintainForm = (DynaActionForm) form;
 		ActionMessages errors = new ActionMessages();
-		FormFile file = (FormFile)loginMaintainForm.get("logo");
-		if((file!=null)&&(file.getFileSize()!=0)){
+		FormFile file = (FormFile) loginMaintainForm.get("logo");
+		if ((file != null) && (file.getFileSize() != 0)) {
 			checkFile(errors, file);
 		}
-		if(errors.isEmpty()){
-			if((file!=null)&&(file.getFileSize()!=0)){
+		if (errors.isEmpty()) {
+			if ((file != null) && (file.getFileSize() != 0)) {
 				String fileName = fixBuggyFileName(file.getFileName());
 				createImageFile(file, fileName);
 				updateLoginPage(buildURL(fileName));
 			}
 			updateNewsPage(loginMaintainForm.getString("news"));
-			String newsFilePath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
-				+ File.separatorChar + "lams-www.war" + File.separatorChar + "news.html";			
-			BufferedWriter bWriter = new BufferedWriter(new FileWriter(newsFilePath));
+			String newsFilePath = Configuration
+					.get(ConfigurationKeys.LAMS_EAR_DIR)
+					+ File.separatorChar
+					+ "lams-www.war"
+					+ File.separatorChar
+					+ "news.html";
+			BufferedWriter bWriter = new BufferedWriter(new FileWriter(
+					newsFilePath));
 			bWriter.write(loginMaintainForm.getString("news"));
 			bWriter.flush();
 			bWriter.close();
-		}else{
-			saveErrors(request,errors);
+		} else {
+			saveErrors(request, errors);
 			return mapping.findForward("loginmaintain");
 		}
 		return mapping.findForward("sysadmin");
 	}
-	
+
 	private String fixBuggyFileName(String fileName) {
-		int index = fileName.lastIndexOf('.');
-		return fileName.replace(fileName.substring(0, index), "logo");
+		fileName = generateRandomFileName() + fileName.substring(fileName.lastIndexOf('.'));
+		int i=0;
+		while(new File(IMAGE_FOLDER + File.separatorChar + fileName).exists()){
+			fileName = fileName.replace(".", new Integer(i).toString());
+			i++;
+		}
+		log.debug("generated filename " + fileName);
+		return fileName;
+	}
+
+	private String generateRandomFileName() {
+		StringBuilder name = new StringBuilder();
+		int length = 1 + new Random().nextInt(ALPHABET.length());
+		for (int i = 0; i < length; i++) {
+			name.append(ALPHABET.charAt(new Random().nextInt(ALPHABET.length())));
+		}
+		log.debug("generated random name " + name);
+		return name.toString();
 	}
 
 	private void updateNewsPage(String news) throws IOException {
-		String newsFilePath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
-				+ File.separatorChar + "lams-central.war" + File.separatorChar
-				+ "news.html";
 		BufferedWriter bWriter = null;
-		try{
-			bWriter = new BufferedWriter(new FileWriter(newsFilePath));
+		try {
+			bWriter = new BufferedWriter(new FileWriter(NEWS_PAGE_PATH));
 			bWriter.write(news);
 			bWriter.flush();
-		}finally{
-			if(bWriter != null)
-			bWriter.close();
+		} finally {
+			if (bWriter != null)
+				bWriter.close();
 		}
 	}
 
 	private void updateLoginPage(String url) throws IOException {
-		String loginPagePath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
-			+ File.separatorChar + "lams-central.war" + File.separatorChar + "login.jsp";
 		BufferedReader bReader = null;
 		BufferedWriter bWriter = null;
-		try{
-			bReader = new BufferedReader(new FileReader(loginPagePath));
+		try {
+			bReader = new BufferedReader(new FileReader(LOGIN_PAGE_PATH));
 			StringBuilder source = new StringBuilder();
 			String line = bReader.readLine();
-			while(line != null){
+			while (line != null) {
 				source.append(line).append('\n');
 				line = bReader.readLine();
 			}
 			int index = source.indexOf(LOGO_TAG);
-			log.debug("LAMS logo tag index "+index);
-			if(index != -1){
+			log.debug("LAMS logo tag index " + index);
+			if (index != -1) {
 				int startIndex = index + LOGO_TAG.length();
 				int endIndex = source.indexOf("\"", startIndex);
 				source.replace(startIndex, endIndex, url);
-				bWriter = new BufferedWriter(new FileWriter(loginPagePath));
+				bWriter = new BufferedWriter(new FileWriter(LOGIN_PAGE_PATH));
 				bWriter.write(source.toString());
 				bWriter.flush();
 			}
-		}finally{
-			if(bReader!=null) bReader.close();
+		} finally {
+			if (bReader != null)
+				bReader.close();
 		}
 	}
 
-	private static String buildURL(String fileName) throws UnsupportedEncodingException {
+	private static String buildURL(String fileName)
+			throws UnsupportedEncodingException {
 		return "/www/images/" + fileName;
 	}
 
-	private void createImageFile(FormFile file, String fileName) throws IOException {
-		String imagesFolderPath = Configuration
-				.get(ConfigurationKeys.LAMS_EAR_DIR)
-				+ File.separatorChar
-				+ "lams-www.war"
-				+ File.separatorChar
-				+ "images";
-		File imagesFolder = new File(imagesFolderPath);
+	private void createImageFile(FormFile file, String fileName)
+			throws IOException {
+		File imagesFolder = new File(IMAGE_FOLDER);
 		if (!imagesFolder.exists()) {
 			imagesFolder.mkdir();
 		}
-		String imageFilePath = imagesFolderPath + File.separatorChar + fileName;
+		String imageFilePath = IMAGE_FOLDER + File.separatorChar + fileName;
 		FileOutputStream out = null;
-		try{
+		try {
 			out = new FileOutputStream(imageFilePath);
 			out.write(file.getFileData());
 			out.flush();
-		}finally{
-			if(out != null) out.close();
+		} finally {
+			if (out != null)
+				out.close();
 		}
 
 	}
 
-	private void checkFile(ActionMessages errors, FormFile file){
+	private void checkFile(ActionMessages errors, FormFile file) {
 		boolean imgFormat = file.getContentType().contains("image");
-		if(!imgFormat){
+		if (!imgFormat) {
 			errors.add("format", new ActionMessage("error.img.format"));
 		}
-		if(file.getFileSize()>4096*1024){
+		if (file.getFileSize() > 4096 * 1024) {
 			errors.add("size", new ActionMessage("error.img.size"));
 		}
 	}
-	
+
 }
