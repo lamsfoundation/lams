@@ -50,3 +50,8 @@
     <form-property name="lastName" type="java.lang.String" />
     <form-property name="searched" type="java.lang.Boolean" initial="false" />
 </form-bean>
+
+<form-bean name="LoginMaintainForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="logo"  type="org.apache.struts.upload.FormFile" />
+	<form-property name="news" type="java.lang.String" />
+</form-bean>
