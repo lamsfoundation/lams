@@ -29,7 +29,7 @@ import java.util.Date;
  * Resource
  * @author Dapeng Ni
  *
- * @hibernate.class  table="tl_larsrc11_resource_item_visit_log"
+ * @hibernate.class  table="tl_larsrc11_item_log"
  *
  */
 public class ResourceItemVisitLog {
