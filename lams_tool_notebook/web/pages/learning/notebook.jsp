@@ -24,7 +24,7 @@
 							<c:when test="${contentEditable}">
 								<c:choose>
 									<c:when test="${notebookDTO.allowRichEditor}">
-
+										<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 										<fck:editor id="entryText" basePath="/lams/fckeditor/"
 											imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
 											linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
@@ -32,7 +32,7 @@
 											imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
 											linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
 											flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-											toolbarSet="Default-Learner">
+											toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
 												${lrnForm.entryText}
 										</fck:editor>
 									</c:when>
