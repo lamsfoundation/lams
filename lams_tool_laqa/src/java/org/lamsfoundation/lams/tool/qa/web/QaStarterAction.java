@@ -425,7 +425,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    
 		if (qaContent.getTitle() == null)
 		{
-			qaGeneralAuthoringDTO.setActivityTitle("Q&A Title");
+			qaGeneralAuthoringDTO.setActivityTitle(DEFAULT_QA_TITLE);
 		}
 		else
 		{
@@ -435,7 +435,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		if (qaContent.getInstructions() == null)
 		{
-		    qaGeneralAuthoringDTO.setActivityInstructions("Q&A Instructions");
+		    qaGeneralAuthoringDTO.setActivityInstructions(DEFAULT_QA_INSTRUCTIONS);
 		}
 		else
 		{
