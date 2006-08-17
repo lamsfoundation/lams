@@ -3,6 +3,8 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%	
 	if (JspRedirectStrategy.loginPageRedirected(request,response))
 	{
@@ -54,21 +56,13 @@ j_security_login_page
 	  <div id="login-content">	
 	  
 			  <div id="login-left-col"><h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
-			 <h2>Latest News &amp; Updates</h2>
-			 
-			  <ul>
-			  	<li>
-					<h3>LAMS 2.0 Beta1 Released!</h3> 
-					Finally, LAMS 2.0 Beta is ready for testing. Have a look at the <a href="http://wiki.lamsfoundation.org/display/lams/LAMS+2.0+Feature+List" target="_new">cool new features</a> packaged inside.<br>
-Found a bug? Report it in the <a href="http://lamscommunity.org/dotlrn/clubs/technicalcommunity/forums/" target="_new">LAMS Community</a>.<br>
-LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" target="_new">17 languages</a> by more than 25 volunteers. Want to <a href="http://lamscommunity.org/i18n" target="_new">help out</a>? 
-				</li>
-			  </ul>
+			  	<c:set var="url"><lams:LAMSURL/>www/news.html</c:set>
+		  		<c:import url="${url}" />
 			  </div>
 				<!--closes left col-->
 				
 				<div id="login-right-col">
-				<p class="version">Version 2.0</p>
+				<p class="version"><fmt:message key="msg.LAMS.version"/> <%= Configuration.get(ConfigurationKeys.VERSION) %></p>
 				 <h2><fmt:message key="button.login"/></h2>
 				 <form action="j_security_check" method="post" name="loginForm" id="loginForm">
 					<c:if test="${!empty param.failed}">
@@ -97,7 +91,7 @@ LAMS is currently being translated to <a href="http://lamscommunity.org/i18n" ta
 		
 		<div id="footer">
 		
-		<p>&copy; 2002-2005 LAMS Foundation</p>
+		<p>&copy; <fmt:message key="msg.LAMS.copyright.short"/></p>
 		
 	  </div><!--closes footer-->
 		
