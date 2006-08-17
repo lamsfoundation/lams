@@ -618,7 +618,12 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	public function openEditActivtiyContent():Void{
 		trace("testing openEditActivtiyContent");
-		_canvas.view.getController().activityDoubleClick(_canvas.model.selectedItem);
+		var ca = _canvas.model.selectedItem
+		if (CanvasActivity(ca) != null){ 
+			_canvas.view.getController().activityDoubleClick(ca);
+		}else {
+			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_openContent_invalid'));
+		}
 	}
 	
 	public function paste():Void{
