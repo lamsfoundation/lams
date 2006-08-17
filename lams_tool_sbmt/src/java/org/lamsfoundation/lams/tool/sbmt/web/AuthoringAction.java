@@ -42,14 +42,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
+import org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
@@ -57,6 +56,7 @@ import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * @author Manpreet Minhas
@@ -66,15 +66,79 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 				  name="SbmtAuthoringForm" 
  * 				  parameter="dispatch"
  *                input="/authoring/authoring.jsp" 
- *                scope="session" 
- *                validate="true"
+ *                scope="request" 
+ *                validate="false"
  * 
  * @struts.action-forward name="success" path="/authoring/authoring.jsp"
+ * @struts.action-forward name="onlineFileList" path="/authoring/parts/onlinefilelist.jsp"
+ * @struts.action-forward name="offlineFileList" path="/authoring/parts/offlinefilelist.jsp"
  */
 public class AuthoringAction extends LamsDispatchAction {
 	private Logger log = Logger.getLogger(AuthoringAction.class);
 
 	public ISubmitFilesService submitFilesService;
+	
+	/**
+	 * This page will display initial submit tool content. Or just a blank page if the toolContentID does not
+	 * exist before.
+	 *  
+	 * <BR>
+	 * Define later will use this method to initial page as well. 
+	 * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
+	 *      org.apache.struts.action.ActionForm,
+	 *      javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
+	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		//get back the upload file list and display them on page
+		submitFilesService = getService();
+		
+		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+		
+		if(mode.isTeacher()){
+			boolean isForumEditable = SbmtWebUtils.isSbmtEditable(persistContent);
+			if(!isForumEditable){
+				request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
+				return mapping.findForward("forbidden");
+			}
+			
+			if(!persistContent.isContentInUse()){
+				persistContent.setDefineLater(true);
+				submitFilesService.saveOrUpdateContent(persistContent);
+			}
+		}
+		
+		//if this content does not exist(empty without id), create a content by default content record.
+		if(persistContent == null){
+			persistContent = submitFilesService.createDefaultContent(contentID);
+		}
+
+		//initialize attachmentList
+		List attachmentList = getAttachmentList(sessionMap);
+		attachmentList.clear();
+		attachmentList.addAll(persistContent.getInstructionFiles());
+		List delAttachmentList = getDeletedAttachmentList(sessionMap);
+		delAttachmentList.clear();
+		
+		//set back STRUTS component value
+		AuthoringForm authForm = (AuthoringForm) form;
+		authForm.initContentValue(persistContent);
+		//session map
+		authForm.setSessionMapID(sessionMap.getSessionID());
+		//current tab
+		authForm.setCurrentTab(request.getParameter("currentTab"));
+		
+		return mapping.findForward("success");
+	}
+
+	
 	/**
 	 * Update all content for submit tool except online/offline instruction files list. 
 	 *  
@@ -87,12 +151,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ToolAccessMode mode = getAccessMode(request);
+		AuthoringForm authForm = (AuthoringForm) form;
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
 		
+		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
 		SubmitFilesContent content = getContent(form);
 		
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
+		submitFilesService = getService();
 		try {
 			SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
 			
@@ -107,8 +172,8 @@ public class AuthoringAction extends LamsDispatchAction {
 			Set attPOSet = persistContent.getInstructionFiles();
 			if(attPOSet == null)
 				attPOSet = new HashSet();
-			List attachmentList = getAttachmentList(request);
-			List deleteAttachmentList = getDeletedAttachmentList(request);
+			List attachmentList = getAttachmentList(sessionMap);
+			List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 			Iterator iter = attachmentList.iterator();
 			while(iter.hasNext()){
 				InstructionFiles newAtt = (InstructionFiles) iter.next();
@@ -155,12 +220,11 @@ public class AuthoringAction extends LamsDispatchAction {
 			}
 			
 			submitFilesService.saveOrUpdateContent(persistContent);
-			request.setAttribute("sbmtSuccess", new Boolean(true));
-			setUp(request, persistContent);
 		} catch (Exception e) {
 			log.error(e);
 		}
 		
+		//to jump to common success page in lams_central
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
 		return mapping.findForward("success");
 	}
@@ -202,24 +266,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	private ActionForward uploadFile(ActionMapping mapping, ActionForm form,
 			String type,HttpServletRequest request) {
 
-		DynaActionForm authForm = (DynaActionForm) form;
+		AuthoringForm authForm = (AuthoringForm) form;
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
 		
 		FormFile file;
 		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type))
-			file = (FormFile) authForm.get("offlineFile");
+			file = (FormFile) authForm.getOfflineFile();
 		else
-			file = (FormFile) authForm.get("onlineFile");
+			file = (FormFile) authForm.getOnlineFile();
 		
-		SubmitFilesContent content = getContent(form);
-		//Call setUp() as early as possible , so never loss the screen value if any exception happen.
-		setUp(request,content);
-
 		//upload to repository
-		InstructionFiles att = submitFilesService.uploadFileToContent(content.getContentID(), file, type);
+		InstructionFiles att = submitFilesService.uploadFileToContent(authForm.getToolContentID(), file, type);
 		
 		//handle session value
-		List attachmentList = getAttachmentList(request);
-		List deleteAttachmentList = getDeletedAttachmentList(request);
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		InstructionFiles existAtt;
@@ -234,95 +296,78 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 		//add to attachmentList
 		attachmentList.add(att);
+
+		//update Html FORM, this will echo back to web page for display
+		List onlineFileList = new ArrayList();
+		List offlineFileList = new ArrayList();
+		iter = attachmentList.iterator();
+		while(iter.hasNext()){
+			InstructionFiles attFile = (InstructionFiles) iter.next();
+			if(StringUtils.equalsIgnoreCase(attFile.getType(),IToolContentHandler.TYPE_OFFLINE))
+				offlineFileList.add(attFile);
+			else
+				onlineFileList.add(attFile);
+		}
+		authForm.setOnlineFileList(onlineFileList);
+		authForm.setOfflineFileList(offlineFileList);
 		
-		//add new uploaded file into DTO becuase content instruction file list comes from persistCotent.
-		//so it is not need refresh content again.
-		//content change, so call setup again.
-		content.setInstructionFiles(new HashSet(attachmentList));
-		setUp(request,content);
 		return mapping.getInputForward();
 
 	}
 
-	/**
-	 * This page will display initial submit tool content. Or just a blank page if the toolContentID does not
-	 * exist before.
-	 *  
-	 * <BR>
-	 * Define later will use this method to initial page as well. 
-	 * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
-	 *      org.apache.struts.action.ActionForm,
-	 *      javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
-	 */
-	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
+	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
+		return deleteFile(mapping, form,request, response,IToolContentHandler.TYPE_OFFLINE);
+	}
+	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		return deleteFile(mapping, form,request, response,IToolContentHandler.TYPE_ONLINE);
+	}
 
-		ToolAccessMode mode = getAccessMode(request);
+	/**
+	 * @param request
+	 * @param response
+	 * @param type 
+	 * @return
+	 */
+	private ActionForward deleteFile(ActionMapping mapping,ActionForm form,HttpServletRequest request, HttpServletResponse response, String type) {
+		Long versionID = new Long(WebUtil.readLongParam(request,"fileVersionId"));
+		Long uuID = new Long(WebUtil.readLongParam(request,"fileUuid"));
+		String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
 		
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
-		//get back the upload file list and display them on page
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		
-		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
-		
-		if(mode.isTeacher()){
-			boolean isForumEditable = SbmtWebUtils.isSbmtEditable(persistContent);
-			if(!isForumEditable){
-				request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
-				return mapping.findForward("forbidden");
+		//handle session value
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
+		Iterator iter = attachmentList.iterator();
+		InstructionFiles existAtt;
+		List leftAttachments = new ArrayList();
+		while(iter.hasNext()){
+			existAtt = (InstructionFiles) iter.next();
+			if(existAtt.getUuID().equals(uuID) && existAtt.getVersionID().equals(versionID)){
+				//if there is same name attachment, delete old one
+				deleteAttachmentList.add(existAtt);
+				iter.remove();
+			}else if(StringUtils.equals(existAtt.getType(),type) ){
+				leftAttachments.add(existAtt);
 			}
-			
-			if(!persistContent.isContentInUse()){
-				persistContent.setDefineLater(true);
-				submitFilesService.saveOrUpdateContent(persistContent);
-			}
+				
 		}
-		
-		//if this content does not exist(empty without id), create a content by default content record.
-		if(persistContent == null){
-			persistContent = submitFilesService.createDefaultContent(contentID);
-		}
-		//if find out wrong content(id not match),  
-		//then reset the contentID to current value in order to keep it on HTML page.
-		if(!contentID.equals(persistContent.getContentID())){
-			persistContent = new SubmitFilesContent();
-			persistContent.setContentID(contentID);
-		}
-		setUp(request,persistContent);
 
-		//initialize attachmentList
-		List attachmentList = getAttachmentList(request);
-		attachmentList.clear();
-		attachmentList.addAll(persistContent.getInstructionFiles());
-		List delAttachmentList = getDeletedAttachmentList(request);
-		delAttachmentList.clear();
-		
-		//set back STRUTS component value
-		DynaActionForm authForm = (DynaActionForm) form;
-		authForm.set(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
-		authForm.set("title",persistContent.getTitle());
-		authForm.set("lockOnFinished",persistContent.isLockOnFinished()?"1":null);
-		return mapping.findForward("success");
+		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
+			request.setAttribute("offlineFileList",leftAttachments);
+			return mapping.findForward("offlineFileList");
+		}else{
+			request.setAttribute("onlineFileList",leftAttachments);
+			return mapping.findForward("onlineFileList");
+		}
 	}
 
 	//***********************************************************
 	//  Private/protected methods
 	//***********************************************************
-	/**
-	 * Depreciated: Just for STRUTS LookupDispatchAction mapping function.
-	 */
-	protected Map getKeyMethodMap() {
-		Map map = new HashMap();
-		map.put("label.authoring.upload.online.button", "uploadOnline");
-		map.put("label.authoring.upload.offline.button", "uploadOffline");
-		map.put("label.authoring.save.button", "updateContent");
-		
-		return map;
-	}
-
 	/**
 	 * The private method to get content from ActionForm parameters (web page).
 	 * 
@@ -330,23 +375,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @return
 	 */
 	private SubmitFilesContent getContent(ActionForm form) {
-		DynaActionForm authForm = (DynaActionForm) form;
-		Long contentID = (Long) authForm.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String title = (String) authForm.get("title");
-		String instructions = (String) authForm.get("instructions");
-		String online_instruction = (String) authForm.get("onlineInstruction");
-		String offline_instruction = (String) authForm.get("offlineInstruction");
-		String value = (String) authForm.get("lockOnFinished");
-		boolean lock_on_finished = StringUtils.isEmpty(value)?false:true;
+		AuthoringForm authForm = (AuthoringForm) form;
+		Long contentID = authForm.getToolContentID();
+		String title = authForm.getTitle();
+		String instructions = authForm.getInstructions();
+		String online_instruction = authForm.getOnlineInstruction();
+		String offline_instruction = authForm.getOfflineInstruction();
+		boolean lock_on_finished = authForm.isLockOnFinished();
+		
 		SubmitFilesContent content = new SubmitFilesContent();
 		content.setContentID(contentID);
-		content.setContentInUse(false);
-		content.setDefineLater(false);
-		content.setRunOffline(false);
 		content.setInstruction(instructions);
 		content.setOfflineInstruction(offline_instruction);
 		content.setOnlineInstruction(online_instruction);
-		content.setRunOfflineInstruction("");
 		content.setTitle(title);
 		content.setLockOnFinished(lock_on_finished);
 		// content.setInstrctionFiles()
@@ -354,30 +395,18 @@ public class AuthoringAction extends LamsDispatchAction {
 		return content;
 	}
 	/**
-	 * This method will set initial values in authroing web page. Any method which handle request/response
-	 * will call setUp() as early as possible , so never loss the screen value if any exception happen. 
 	 * @param request
-	 * @param content
+	 * @return
 	 */
-	private void setUp(HttpServletRequest request, SubmitFilesContent content) {
-		String currTab = request.getParameter("currentTab");
-		request.setAttribute("currentTab",currTab);
-		AuthoringDTO authorDto = new AuthoringDTO(content);
-		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
+	private List getAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,SbmtConstants.ATTACHMENT_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,SbmtConstants.ATTACHMENT_LIST);
-	}
-	/**
-	 * @param request
-	 * @return
-	 */
-	private List getDeletedAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,SbmtConstants.DELETED_ATTACHMENT_LIST);
+	private List getDeletedAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,SbmtConstants.DELETED_ATTACHMENT_LIST);
 	}
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
@@ -386,29 +415,25 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param name
 	 * @return
 	 */
-	private List getListFromSession(HttpServletRequest request,String name) {
-		List list = (List) request.getSession().getAttribute(name);
+	private List getListFromSession(SessionMap sessionMap,String name) {
+		List list = (List) sessionMap.get(name);
 		if(list == null){
 			list = new ArrayList();
-			request.getSession().setAttribute(name,list);
+			sessionMap.put(name,list);
 		}
 		return list;
 	}
 	
 
 	/**
-	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-	 * @param request
+	 * Get submit file service bean.
 	 * @return
 	 */
-	private ToolAccessMode getAccessMode(HttpServletRequest request) {
-		ToolAccessMode mode;
-		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-		if(StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.TEACHER.toString()))
-			mode = ToolAccessMode.TEACHER;
+	private ISubmitFilesService getService() {
+		if(submitFilesService == null)
+			return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		else
-			mode = ToolAccessMode.AUTHOR;
-		return mode;
+			return submitFilesService;
 	}
-	
+		
 }

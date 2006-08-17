@@ -5,7 +5,7 @@
 	<!-- Instructions Row -->
 	<tr>
 		<td>
-			<html:checkbox property="lockOnFinished" value="1">
+			<html:checkbox property="lockOnFinished">
 				<fmt:message key="label.authoring.advance.lock.on.finished" />
 			</html:checkbox>
 		</td>

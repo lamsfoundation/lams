@@ -275,7 +275,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesContent(java.lang.Long)
 	 */
 	public SubmitFilesContent getSubmitFilesContent(Long contentID) {
-		SubmitFilesContent content = new SubmitFilesContent();
+		SubmitFilesContent content = null;
 		try {
 			content = submitFilesContentDAO.getContentByID(contentID);
 		} catch (Exception e) {
@@ -750,10 +750,8 @@ public class SubmitFilesService implements ToolContentManager,
     	
     	//save default content by given ID.
     	SubmitFilesContent content = new SubmitFilesContent();
-    	
     	content = SubmitFilesContent.newInstance(defaultContent,contentID,sbmtToolContentHandler); 
 		content.setContentID(contentID);
-//		saveSubmitFilesContent(content);
     	
 		return content;
 	}

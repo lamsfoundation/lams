@@ -7,13 +7,6 @@
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
 <%@ page import="java.util.HashSet"%>
 <%@ page import="java.util.Set"%>
-
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
 <%Set tabs = new HashSet();
 			tabs.add("label.authoring.heading.basic");
 			pageContext.setAttribute("tabs", tabs);
@@ -73,7 +66,9 @@
 				</tr>
 			</table>
 			<html:form action="definelater" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 				<html:hidden property="mode" value="teacher" />
+				<html:hidden property="sessionMapID" />				
 				<html:hidden property="toolContentID" />
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:hidden property="dispatch" value="updateContent" />
@@ -81,7 +76,9 @@
 				<!-- tab content 1 (Basic) -->
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 
-				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" defineLater="true" />
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher" 
+					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" defineLater="true" 
+					customiseSessionID="${formBean.sessionMapID}" />
 
 				<lams:HTMLEditor />
 

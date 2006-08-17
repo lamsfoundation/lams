@@ -99,14 +99,6 @@
         />
 
         <property
-            name="runOfflineInstruction"
-            type="text"
-            update="true"
-            insert="true"
-            column="run_offline_instruction"
-        />
-
-        <property
             name="contentInUse"
             type="boolean"
             update="true"

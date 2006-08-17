@@ -15,7 +15,6 @@ create table tl_lasbmt11_content (
    run_offline bit not null,
    offline_instruction text,
    online_instruction text,
-   run_offline_instruction text,
    content_in_use bit,
    lock_on_finished bit,
    primary key (content_id)

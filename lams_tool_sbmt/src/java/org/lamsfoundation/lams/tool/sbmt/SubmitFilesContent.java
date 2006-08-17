@@ -52,36 +52,26 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	private Long contentID;
 
 	/** persistent field */
+	//basic tab fields
 	private String title;
-
-	/** nullable persistent field */
 	private String instruction;
 	
-	/** persistent field */
-	private Set toolSession;
-
-	/** persistent field */
-	private boolean defineLater;
-	/** persistent field */
-	private boolean runOffline;
-
-	/** persistent field */
-	private String runOfflineInstruction;
+	// advance tab fields
+	private boolean lockOnFinished;
 	
-	/** persistent field */
-	private boolean contentInUse;
-	
-	/** persistent field */
+	//instruction tab fields
 	private String offlineInstruction;
-
-	/** persistent field */
 	private String onlineInstruction;
-
 	private Set instructionFiles;
 	
-	/** persistent field */
-	private boolean lockOnFinished;
+	//system level fields
+	private boolean defineLater;
+	private boolean runOffline;
+	private boolean contentInUse;
 
+	//relationship fields
+	private Set toolSession;
+	//temporary fields
 	private IToolContentHandler toolContentHandler;
 	
 	/** full constructor */
@@ -260,21 +250,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 */
 	public void setOnlineInstruction(String onlineInstruction) {
 		this.onlineInstruction = onlineInstruction;
-	}
-
-	/**
-	 * @hibernate.property column="run_offline_instruction" type="text"
-	 * @return Returns the runOfflineInstruction.
-	 */
-	public String getRunOfflineInstruction() {
-		return runOfflineInstruction;
-	}
-
-	/**
-	 * @param runOfflineInstruction The runOfflineInstruction to set.
-	 */
-	public void setRunOfflineInstruction(String runOfflineInstruction) {
-		this.runOfflineInstruction = runOfflineInstruction;
 	}
 
 	/**

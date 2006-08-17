@@ -12,10 +12,5 @@
 	<field property="filePath.fileSize" depends="maxFileSize" />
 </form>
 
-<form name="SbmtAuthoringForm">
-	<field property="offlineFile.fileSize" depends="maxFileSize" />
-	<field property="onlineFile.fileSize" depends="maxFileSize" />
-</form>
-
   </formset>
 </form-validation>

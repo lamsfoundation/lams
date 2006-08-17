@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -94,8 +95,6 @@ public class LearnerAction extends DispatchAction {
         
         //set the mode into http session 
         ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
-        request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
-                
         if(mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR) ){
         	request.setAttribute(AttributeNames.ATTR_MODE,mode);
             return listFiles(mapping, form, request, response);
@@ -104,7 +103,9 @@ public class LearnerAction extends DispatchAction {
         	request.setAttribute(AttributeNames.ATTR_MODE,mode);
         	return listFiles(mapping, form, request, response);
         }
+        
         logger.error("Requested mode + '" + mode.toString() + "' not supported");
+        
         return returnErrors(mapping,request,"submit.modenotsupported","upload");
     }
     
@@ -172,6 +173,10 @@ public class LearnerAction extends DispatchAction {
 									HttpServletRequest request,
 									HttpServletResponse response){
 		
+		 //set the mode into http session 
+        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
+       	request.setAttribute(AttributeNames.ATTR_MODE,mode);
+       	
 		DynaActionForm authForm= (DynaActionForm)form;
 		if(!isTokenValid(request,true)){
 			Long sessionID =(Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -235,7 +240,8 @@ public class LearnerAction extends DispatchAction {
 			HttpServletResponse response){
 		
 		DynaActionForm authForm = (DynaActionForm) form;
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
+		
 		if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR) ) {
 			ToolSessionManager sessionMgrService = SubmitFilesServiceProxy.getToolSessionManager(getServlet().getServletContext());
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
@@ -262,7 +268,6 @@ public class LearnerAction extends DispatchAction {
 			return null;
 		}
 		
-		request.getSession().setAttribute(SbmtConstants.READ_ONLY_MODE, "true");
 		return returnErrors(mapping,request,"error.read.only.mode","upload");
 		
 	}

@@ -2,9 +2,6 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
-
-<%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
-
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -12,11 +9,15 @@
 	<lams:WebAppURL />
 </c:set>
 
+<%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
 <html:html>
 <head>
 	<lams:headItems />
+	
 	<title><fmt:message key="activity.title" /></title>
-
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
+	
 	<script type="text/javascript">
     
     	var imgRoot="${lams}images/";
@@ -71,6 +72,10 @@
 
 		<div id="content">
 			<html:form action="authoring" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+			
+				<input type="hidden" name="mode" value="author">
+				<html:hidden property="sessionMapID" />
 				<html:hidden property="toolContentID" />
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:hidden property="dispatch" value="updateContent" />
@@ -88,7 +93,9 @@
 				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
 				<!-- end of content (Instructions) -->
 
-				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" />
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
+					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" 
+					customiseSessionID="${formBean.sessionMapID}" />
 
 				<lams:HTMLEditor />
 			</html:form>
