@@ -40,8 +40,8 @@ public interface ToolContentManager
     /**
      * Make a copy of requested tool content. It will be needed by LAMS to 
      * create a copy of learning design and start a new tool session. If 
-     * no content exists with the given tool content id, then use the 
-     * default content id.
+     * no content exists with the given fromToolContentId or if fromToolContent is 
+     * null, then use the default content id.
      * 
      * @param fromContentId the original tool content id.
      * @param toContentId the destination tool content id.
