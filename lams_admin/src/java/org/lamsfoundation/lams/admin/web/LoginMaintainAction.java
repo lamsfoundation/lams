@@ -49,32 +49,34 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 /**
  * struts doclets
  * 
- * @struts:action path="/loginmaintain" 
- *                name = "LoginMaintainForm" 
- *                scope = "request" 
- *                validate="false"
+ * @struts:action path="/loginmaintain" name = "LoginMaintainForm" scope =
+ *                "request" validate="false"
  * 
  * @struts:action-forward name="loginmaintain" path=".loginmaintain"
  * 
  */
 public class LoginMaintainAction extends Action {
-	
+
+	private static final String NEWS_PAGE_PATH = Configuration
+			.get(ConfigurationKeys.LAMS_EAR_DIR)
+			+ File.separatorChar
+			+ "lams-www.war"
+			+ File.separatorChar
+			+ "news.html";
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
 		DynaActionForm loginMaintainForm = (DynaActionForm) form;
-		loginMaintainForm.set("news",loadNews());
+		loginMaintainForm.set("news", loadNews());
 		return mapping.findForward("loginmaintain");
 	}
 
 	private String loadNews() throws IOException {
-		String filePath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
-				+ File.separatorChar + "lams-www.war" + File.separatorChar + "news.html";
 		BufferedReader bReader = null;
-		try{
-			bReader = new BufferedReader(new FileReader(filePath));
+		try {
+			bReader = new BufferedReader(new FileReader(NEWS_PAGE_PATH));
 			StringBuilder news = new StringBuilder();
 			String line = bReader.readLine();
 			while (line != null) {
@@ -82,8 +84,8 @@ public class LoginMaintainAction extends Action {
 				line = bReader.readLine();
 			}
 			return news.toString();
-		}finally{
-			if(bReader!=null){
+		} finally {
+			if (bReader != null) {
 				bReader.close();
 			}
 		}

@@ -88,7 +88,7 @@ public class LoginSaveAction extends LamsDispatchAction {
 	private static final String NEWS_PAGE_PATH = Configuration
 			.get(ConfigurationKeys.LAMS_EAR_DIR)
 			+ File.separatorChar
-			+ "lams-central.war"
+			+ "lams-www.war"
 			+ File.separatorChar
 			+ "news.html";
 
@@ -113,14 +113,7 @@ public class LoginSaveAction extends LamsDispatchAction {
 				updateLoginPage(buildURL(fileName));
 			}
 			updateNewsPage(loginMaintainForm.getString("news"));
-			String newsFilePath = Configuration
-					.get(ConfigurationKeys.LAMS_EAR_DIR)
-					+ File.separatorChar
-					+ "lams-www.war"
-					+ File.separatorChar
-					+ "news.html";
-			BufferedWriter bWriter = new BufferedWriter(new FileWriter(
-					newsFilePath));
+			BufferedWriter bWriter = new BufferedWriter(new FileWriter(NEWS_PAGE_PATH));
 			bWriter.write(loginMaintainForm.getString("news"));
 			bWriter.flush();
 			bWriter.close();
