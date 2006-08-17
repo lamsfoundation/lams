@@ -3,13 +3,17 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<H1 class=no-tabs-below><fmt:message key="sysadmin.headline"/></H1>
+<h1 class=no-tabs-below><fmt:message key="sysadmin.headline"/></h1>
+<br />
+<p><a href="cache.do"><fmt:message key="cache.title"/></a></p>
 
-<p><A HREF="cache.do"><fmt:message key="cache.title"/></A></p>
+<p><a href="<lams:LAMSURL/>/admin/loginmaintain.do"><fmt:message key="sysadmin.maintain.loginpage"/></a>
+
 <p><fmt:message key="sysadmin.manage.config.file"/></p>
 
-<H2><fmt:message key="sysadmin.batch.heading"/></H2>
-<P><fmt:message key="sysadmin.batch.description"/>.</P>
+<h2><fmt:message key="sysadmin.batch.heading"/></h2>
+<p><fmt:message key="sysadmin.batch.description"/>.</p>
 
 <p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
-<p><A HREF="<lams:LAMSURL/>/monitoring/monitoring.do?method=deleteOldPreviewLessons"><fmt:message key="sysadmin.batch.preview.delete"/></a></p>
+<p><a href="<lams:LAMSURL/>/monitoring/monitoring.do?method=deleteOldPreviewLessons"><fmt:message key="sysadmin.batch.preview.delete"/></a></p>
+
