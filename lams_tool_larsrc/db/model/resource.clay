@@ -19,8 +19,8 @@
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -32,8 +32,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_version_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -59,8 +59,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_uuid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -78,8 +78,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="resource_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -121,8 +121,8 @@
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -141,8 +141,8 @@
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="sequence_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
@@ -154,8 +154,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="item_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -197,8 +197,8 @@
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -222,8 +222,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -284,8 +284,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="content_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -309,8 +309,8 @@
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="min_view_resource_number" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
@@ -362,8 +362,8 @@
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -375,8 +375,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_uuid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -388,8 +388,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_version_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -441,8 +441,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -472,8 +472,8 @@
 <column alias="" auto-increment="false" column-size="6" decimal-digits="0" default-value="" mandatory="false" name="item_type" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="5" name="SMALLINT" selected-variant-pattern="SMALLINT(%n)">
-<variant type-name-pattern="SMALLINT"/>
 <variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n)"/>
+<variant type-name-pattern="SMALLINT"/>
 <variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n) UNSIGNED"/>
 <variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n) ZEROFILL"/>
@@ -499,8 +499,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="resource_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -512,8 +512,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="session_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -570,15 +570,15 @@
 </index>
 </index-list>
 </table>
-<table alias="" name="tl_larsrc11_resource_item_visit_log" remarks="">
+<table alias="" name="tl_larsrc11_item_log" remarks="">
 <table-description></table-description>
 <table-figure-bounds height="-1" width="-1" x="820" y="424"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -596,8 +596,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="resource_item_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -609,8 +609,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="user_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -669,8 +669,8 @@
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -694,8 +694,8 @@
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="status" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
@@ -707,8 +707,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="resource_uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -720,8 +720,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="session_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -770,8 +770,8 @@
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -783,8 +783,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="user_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -817,8 +817,8 @@
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="session_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>

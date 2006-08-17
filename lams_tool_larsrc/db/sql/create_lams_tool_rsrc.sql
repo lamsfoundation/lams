@@ -65,7 +65,7 @@ create table tl_larsrc11_resource_item (
    session_uid bigint,
    primary key (uid)
 );
-create table tl_larsrc11_resource_item_visit_log (
+create table tl_larsrc11_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
    resource_item_uid bigint,
@@ -99,8 +99,8 @@ alter table tl_larsrc11_resource add index FK89093BF758092FB (create_by), add co
 alter table tl_larsrc11_resource_item add index FKF52D1F93758092FB (create_by), add constraint FKF52D1F93758092FB foreign key (create_by) references tl_larsrc11_user (uid);
 alter table tl_larsrc11_resource_item add index FKF52D1F9330E79035 (resource_uid), add constraint FKF52D1F9330E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
 alter table tl_larsrc11_resource_item add index FKF52D1F93EC0D3147 (session_uid), add constraint FKF52D1F93EC0D3147 foreign key (session_uid) references tl_larsrc11_session (uid);
-alter table tl_larsrc11_resource_item_visit_log add index FK693580A438BF8DFE (resource_item_uid), add constraint FK693580A438BF8DFE foreign key (resource_item_uid) references tl_larsrc11_resource_item (uid);
-alter table tl_larsrc11_resource_item_visit_log add index FK693580A441F9365D (user_uid), add constraint FK693580A441F9365D foreign key (user_uid) references tl_larsrc11_user (uid);
+alter table tl_larsrc11_item_log add index FK693580A438BF8DFE (resource_item_uid), add constraint FK693580A438BF8DFE foreign key (resource_item_uid) references tl_larsrc11_resource_item (uid);
+alter table tl_larsrc11_item_log add index FK693580A441F9365D (user_uid), add constraint FK693580A441F9365D foreign key (user_uid) references tl_larsrc11_user (uid);
 alter table tl_larsrc11_session add index FK24AA78C530E79035 (resource_uid), add constraint FK24AA78C530E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
 alter table tl_larsrc11_user add index FK30113BFC506CD584 (session_id), add constraint FK30113BFC506CD584 foreign key (session_id) references tl_larsrc11_session (uid);
 
