@@ -169,7 +169,6 @@ public class LoginSaveAction extends LamsDispatchAction {
 				line = bReader.readLine();
 			}
 			int index = source.indexOf(LOGO_TAG);
-			log.debug("LAMS logo tag index " + index);
 			if (index != -1) {
 				int startIndex = index + LOGO_TAG.length();
 				int endIndex = source.indexOf("\"", startIndex);
@@ -181,6 +180,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 		} finally {
 			if (bReader != null)
 				bReader.close();
+			if(bWriter != null)
+				bWriter.close();
 		}
 	}
 
