@@ -319,7 +319,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
 	}
    
-   public function transitionDoubleClick(ct:CanvasTransition):Void{
+    public function transitionDoubleClick(ct:CanvasTransition):Void{
 	   Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.transitionUIID,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
 	   _canvasModel.getCanvas().stopActiveTool();
@@ -331,30 +331,37 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	  
 		
 	    _canvasModel.selectedItem = ct;
-   }
+    }
    
-   public function transitionRelease(ct:CanvasTransition):Void{
-	if(_canvasModel.isDragging){
+    public function transitionRelease(ct:CanvasTransition):Void{
+	_canvasModel.getCanvas().stopActiveTool();
+		if(_canvasModel.isDragging){
 			ct.stopDrag();
 			
-				if (ct.hitTest(_canvasModel.getCanvas().bin)){
-					_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID);
-				}else {
+			if (ct.hitTest(_canvasModel.getCanvas().bin)){
+				_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID);
+			}
+			else {
+				trace("transitions x position:"+ct._x)
+				if (ct._x != ct.xPosition){
+					
 					var t = _canvasModel.transitionsDisplayed.remove(ct.transition.transitionUIID);
 					t.removeMovieClip();
 					_canvasModel.setDirty();
 				}
+			}
 			
 			
 		}
 	
-   }
+    }
 	
 	private function transitionSnapBack(ct:Object){
 		ct.reDraw();
 		
 	}
 	public function transitionReleaseOutside(ct:CanvasTransition):Void{
+		trace("transitionrelease outside")
 		transitionRelease(ct);
 		
 	}
