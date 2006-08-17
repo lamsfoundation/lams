@@ -24,9 +24,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -102,6 +100,7 @@ public class OrganisationAction extends LamsDispatchAction {
 		return service;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void initLocalesAndStatus(){
 		if((locales==null)||(status==null)){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
