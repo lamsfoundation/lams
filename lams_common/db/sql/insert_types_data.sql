@@ -43,9 +43,9 @@ INSERT INTO lams_role_privilege VALUES (20,6,12);
 INSERT INTO lams_role_privilege VALUES (21,6,13);
 
 
-INSERT INTO lams_authentication_method_type VALUES(1, 'LAMS');
-INSERT INTO lams_authentication_method_type VALUES(2, 'WEB_AUTH');
-INSERT INTO lams_authentication_method_type VALUES(3, 'LDAP');
+INSERT INTO lams_auth_method_type VALUES(1, 'LAMS');
+INSERT INTO lams_auth_method_type VALUES(2, 'WEB_AUTH');
+INSERT INTO lams_auth_method_type VALUES(3, 'LDAP');
 
 INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION', 'root all other organisations: controlled by Sysadmin');
 INSERT INTO lams_organisation_type VALUES(2, 'COURSE ORGANISATION', 'main organisation level - equivalent to an entire course.');
@@ -124,8 +124,8 @@ INSERT INTO lams_log_event_type VALUES (4, 'LEARNER_LESSON_RESUME');
 INSERT INTO lams_log_event_type VALUES (5, 'LEARNER_ACTIVITY_START');
 INSERT INTO lams_log_event_type VALUES (6, 'LEARNER_ACTIVITY_FINISH');
 
-INSERT INTO lams_workspace_folder_content_type VALUES (1,'FILE');
-INSERT INTO lams_workspace_folder_content_type VALUES (2,'PACKAGE');
+INSERT INTO lams_wkspc_fld_content_type VALUES (1,'FILE');
+INSERT INTO lams_wkspc_fld_content_type VALUES (2,'PACKAGE');
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
 	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 

@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Join table that maps workspace to workspace folders. Was having trouble getting Hibernate 
  * to persist the join table.
  * 
- * @hibernate.class table="lams_workspace_workspace_folder"
+ * @hibernate.class table="lams_wkspc_wkspc_folder"
  * 
  * @author Fiona Malikoff
  *     

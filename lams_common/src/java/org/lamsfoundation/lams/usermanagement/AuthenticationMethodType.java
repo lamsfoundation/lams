@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 /** 
  *        @hibernate.class
- *         table="lams_authentication_method_type"
+ *         table="lams_auth_method_type"
  *     
 */
 public class AuthenticationMethodType implements Serializable {

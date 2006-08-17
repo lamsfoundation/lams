@@ -117,7 +117,7 @@ CREATE TABLE lams_log_event_type (
      , PRIMARY KEY (log_event_type_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_workspace_folder_content_type (
+CREATE TABLE lams_wkspc_fld_content_type (
        content_type_id INT(3) NOT NULL AUTO_INCREMENT
      , description VARCHAR(64) NOT NULL
      , PRIMARY KEY (content_type_id)
@@ -151,7 +151,7 @@ ALTER TABLE lams_supported_locale MODIFY COLUMN country_iso_code VARCHAR(2)
       COMMENT 'ISO 3166 Country Code';
 
 
-CREATE TABLE lams_authentication_method_type (
+CREATE TABLE lams_auth_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
      , PRIMARY KEY (authentication_method_type_id)
@@ -165,7 +165,7 @@ CREATE TABLE lams_authentication_method (
      , PRIMARY KEY (authentication_method_id)
      , INDEX (authentication_method_type_id)
      , CONSTRAINT FK_lams_authorization_method_1 FOREIGN KEY (authentication_method_type_id)
-                  REFERENCES lams_authentication_method_type (authentication_method_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+                  REFERENCES lams_auth_method_type (authentication_method_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
 CREATE TABLE lams_workspace_folder (
@@ -199,16 +199,16 @@ CREATE TABLE lams_workspace (
                   REFERENCES lams_workspace_folder (workspace_folder_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_workspace_workspace_folder (
+CREATE TABLE lams_wkspc_wkspc_folder (
        id BIGINT(20) NOT NULL AUTO_INCREMENT
      , workspace_id BIGINT(20) NOT NULL
      , workspace_folder_id BIGINT(20) NOT NULL
      , PRIMARY KEY (id)
      , INDEX (workspace_id)
-     , CONSTRAINT FK_lams_workspace_workspace_folder_1 FOREIGN KEY (workspace_id)
+     , CONSTRAINT FK_lams_ww_folder_1 FOREIGN KEY (workspace_id)
                   REFERENCES lams_workspace (workspace_id)
      , INDEX (workspace_folder_id)
-     , CONSTRAINT FK_lams_workspace_workspace_folder_2 FOREIGN KEY (workspace_folder_id)
+     , CONSTRAINT FK_lams_ww_folder_2 FOREIGN KEY (workspace_folder_id)
                   REFERENCES lams_workspace_folder (workspace_folder_id)
 )TYPE=InnoDB;
 
@@ -805,7 +805,7 @@ CREATE TABLE lams_workspace_folder_content (
                   REFERENCES lams_workspace_folder (workspace_folder_id)
      , INDEX (content_type_id)
      , CONSTRAINT FK_lams_workspace_folder_content_2 FOREIGN KEY (content_type_id)
-                  REFERENCES lams_workspace_folder_content_type (content_type_id)
+                  REFERENCES lams_wkspc_fld_content_type (content_type_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_transition (

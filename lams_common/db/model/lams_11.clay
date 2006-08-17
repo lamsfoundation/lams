@@ -56,7 +56,7 @@
 </unique-key>
 </unique-key-list>
 <foreign-key-list>
-<foreign-key alias="" name="FK_lams_authorization_method_1" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="lams_authentication_method_type" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key alias="" name="FK_lams_authorization_method_1" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="lams_auth_method_type" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -75,7 +75,7 @@
 </index>
 </index-list>
 </table>
-<table alias="" name="lams_authentication_method_type" remarks="">
+<table alias="" name="lams_auth_method_type" remarks="">
 <table-description></table-description>
 <table-figure-bounds height="-1" width="-1" x="940" y="10"/>
 <column-list>
@@ -4469,7 +4469,7 @@ It is the node_id and version_id combination that is the "real" key for this tab
 </foreign-key-figure>
 <foreign-key-column column-name="workspace_folder_id" referenced-key-column-name="workspace_folder_id"/>
 </foreign-key>
-<foreign-key alias="" name="FK_lams_workspace_folder_content_2" on-delete="" on-update="" referenced-key="PK_LAMS_WORKSPACE_FOLDER_CONTENT_TYPE" referenced-table="lams_workspace_folder_content_type" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key alias="" name="FK_lams_workspace_folder_content_2" on-delete="" on-update="" referenced-key="PK_LAMS_WKSPC_FLD_CONTENT_TYPE" referenced-table="lams_wkspc_fld_content_type" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -4479,7 +4479,7 @@ It is the node_id and version_id combination that is the "real" key for this tab
 </foreign-key-list>
 <index-list/>
 </table>
-<table alias="" name="lams_workspace_folder_content_type" remarks="">
+<table alias="" name="lams_wkspc_fld_content_type" remarks="">
 <table-description></table-description>
 <table-figure-bounds height="-1" width="-1" x="165" y="1069"/>
 <column-list>
@@ -4504,7 +4504,7 @@ It is the node_id and version_id combination that is the "real" key for this tab
 </data-type>
 </column>
 </column-list>
-<primary-key alias="" name="PK_LAMS_WORKSPACE_FOLDER_CONTENT_TYPE" remarks="">
+<primary-key alias="" name="PK_LAMS_WKSPC_FLD_CONTENT_TYPE" remarks="">
 <primary-key-description></primary-key-description>
 <primary-key-column name="content_type_id"/>
 </primary-key>
@@ -4974,7 +4974,7 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <foreign-key-list/>
 <index-list/>
 </table>
-<table alias="" name="lams_workspace_workspace_folder" remarks="">
+<table alias="" name="lams_wkspc_wkspc_folder" remarks="">
 <table-description></table-description>
 <table-figure-bounds height="-1" width="-1" x="390" y="566"/>
 <column-list>
@@ -5018,25 +5018,25 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 </data-type>
 </column>
 </column-list>
-<primary-key alias="" name="PK_LAMS_WORKSPACE_WORKSPACE_FOLDER" remarks="">
+<primary-key alias="" name="PK_LAMS_WKSPC_WKSPC_FOLDER" remarks="">
 <primary-key-description></primary-key-description>
 <primary-key-column name="id"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK_lams_workspace_workspace_folder_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_workspace" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="workspace_id" referenced-key-column-name="workspace_id"/>
-</foreign-key>
-<foreign-key alias="" name="FK_lams_workspace_workspace_folder_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_workspace_folder" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key alias="" name="FK_lams_ww_folder_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_workspace_folder" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="workspace_folder_id" referenced-key-column-name="workspace_folder_id"/>
+</foreign-key>
+<foreign-key alias="" name="FK_lams_ww_folder_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_workspace" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="workspace_id" referenced-key-column-name="workspace_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list/>

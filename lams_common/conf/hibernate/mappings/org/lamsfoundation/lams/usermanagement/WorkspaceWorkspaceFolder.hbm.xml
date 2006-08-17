@@ -13,11 +13,11 @@
 
 <class 
     name="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder" 
-    table="lams_workspace_workspace_folder"
+    table="lams_wkspc_wkspc_folder"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_workspace_workspace_folder"
+        table="lams_wkspc_wkspc_folder"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 

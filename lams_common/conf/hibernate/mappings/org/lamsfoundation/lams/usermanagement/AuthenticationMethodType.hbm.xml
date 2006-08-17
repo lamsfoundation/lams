@@ -13,11 +13,11 @@
 
 <class 
     name="org.lamsfoundation.lams.usermanagement.AuthenticationMethodType" 
-    table="lams_authentication_method_type"
+    table="lams_auth_method_type"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_authentication_method_type"
+        table="lams_auth_method_type"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
