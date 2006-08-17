@@ -35,6 +35,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /** 
  *        @hibernate.class
@@ -687,11 +689,26 @@ public class User implements Serializable,Comparable {
             .toHashCode();
     }
     public UserDTO getUserDTO(){
+    	String languageIsoCode = null;
+    	if (locale != null) {
+    		languageIsoCode = locale.getLanguageIsoCode();
+    	} else {
+    		// get the server language
+    		String serverLang = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE); 
+    		
+    		if ( serverLang != null) {
+    			languageIsoCode = serverLang;
+    		} else {
+    			// fallback to english
+    			languageIsoCode = "en";
+    		}
+    	}
+    	
     	return new UserDTO(this.userId,
     						this.firstName,
 							this.lastName,
 							this.login,
-							locale != null? locale.getLanguageIsoCode() : null,
+							languageIsoCode,
 							locale != null? locale.getCountryIsoCode() : null,
 							this.email,
 							new CSSThemeBriefDTO(this.flashTheme),
