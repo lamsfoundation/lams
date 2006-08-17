@@ -47,7 +47,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	private var _startPoint:Point;
 	private var _midPoint:Point;
 	private var _endPoint:Point;
-	
+	private var xPos:Number;
 	
 	
 	private var _dcStartTime:Number = 0;
@@ -143,7 +143,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		var degs:Number = Math.round(angle*180/Math.PI);
 		arrow_mc._rotation = degs;
 		arrow_mc._visible = true;
-		
+		xPos = this._x
+		trace("x position of start point: "+xPos)
 		/*
 		stopArrow_mc._rotation = degs;
 			
@@ -169,7 +170,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	}
 */
 
-	
+	public function get xPosition():Number{
+		return xPos;
+	}
 	private function onPress():Void{
 			// check double-click
 			var now:Number = new Date().getTime();
