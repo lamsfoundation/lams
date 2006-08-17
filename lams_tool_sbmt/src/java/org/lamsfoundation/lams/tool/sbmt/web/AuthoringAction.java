@@ -93,6 +93,10 @@ public class AuthoringAction extends LamsDispatchAction {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
+		//when first time open flash icon on authoring page: mode will be null 
+		if(mode == null)
+			mode = ToolAccessMode.AUTHOR;
+		
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		

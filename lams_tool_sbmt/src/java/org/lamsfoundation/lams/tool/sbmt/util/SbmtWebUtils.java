@@ -61,7 +61,7 @@ public class SbmtWebUtils {
 	 * @return
 	 */
 	public static ToolAccessMode getAccessMode(HttpServletRequest request) {
-		ToolAccessMode mode = ToolAccessMode.TEACHER;
+		ToolAccessMode mode = null;
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if(StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.TEACHER.toString()))
 			mode = ToolAccessMode.TEACHER;
