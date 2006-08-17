@@ -174,9 +174,17 @@
 		
 		function openSysadmin()
 		{
+			var height = 650;
+			var width = 850;
+			var left = 0;
+			var top = 0;
+			if(self.screen){
+				top = self.screen.height/2-height/2;
+				left = self.screen.width/2-width/2;
+			}
 			if(isMac)
 			{
-				sysadminWin = window.open('admin/sysadminstart.do','saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+				sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 			}
 			else
 			{
@@ -187,7 +195,7 @@
 				}
 				else
 				{
-					sysadminWin = window.open('admin/sysadminstart.do','saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					sysadminWin.focus();
 				}
 			}
