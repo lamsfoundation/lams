@@ -5,6 +5,7 @@
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 
 <h1 class=no-tabs-below><fmt:message key="sysadmin.maintain.loginpage"/></h1>
 <br />
@@ -14,6 +15,7 @@
 <p><fmt:message key="sysadmin.login.logo"/></p>
 <p><html:file property="logo" size="40" styleClass="button" /></p>
 <br />
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <p><fmt:message key="sysadmin.login.text"/></p>
 <div align="center">
 <fck:editor id="news" basePath="/lams/fckeditor/"
@@ -24,6 +26,8 @@
 	imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
 	linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
 	flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+	defaultLanguage="${language}" 
+	autoDetectLanguage="false"
 	toolbarSet="Default-Learner"> 
 	<bean:write name="LoginMaintainForm" property="news" filter="false" />
 </fck:editor>
