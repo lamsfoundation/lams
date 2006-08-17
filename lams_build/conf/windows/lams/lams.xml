@@ -2,6 +2,7 @@
 <!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///C:/lamsconf/lams.dtd">
 <Lams>
 	<ServerURL>http://localhost:8080/lams/</ServerURL>
+	<Version>2.0</Version>
 	<LamsHome>C:\lams</LamsHome>
 	<TempDir>C:\lams\temp</TempDir>
 	<DumpDir>C:\lams\dump</DumpDir>
