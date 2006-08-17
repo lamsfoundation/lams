@@ -1,4 +1,4 @@
-<!ELEMENT Lams (ServerURL,LamsHome,TempDir,DumpDir,EARDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener,CleanupPreviewOlderThanDays,AuthoringClientVersion,MonitorClientVersion,LearnerClientVersion,ServerVersionNumber,ServerLanguage, DictionaryDates,XmppDomain, XmppConference, XmppAdmin, XmppPassword)>
+<!ELEMENT Lams (ServerURL,Version,LamsHome,TempDir,DumpDir,EARDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener,CleanupPreviewOlderThanDays,AuthoringClientVersion,MonitorClientVersion,LearnerClientVersion,ServerVersionNumber,ServerLanguage, DictionaryDates,XmppDomain, XmppConference, XmppAdmin, XmppPassword)>
 <!ELEMENT ServerURL (#PCDATA)>
 <!ELEMENT Version (#PCDATA)>
 <!ELEMENT LamsHome (#PCDATA)>
