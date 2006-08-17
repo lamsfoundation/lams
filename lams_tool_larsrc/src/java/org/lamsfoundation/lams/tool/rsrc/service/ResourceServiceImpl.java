@@ -805,18 +805,22 @@ public class ResourceServiceImpl implements
 	}
 
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-		if (fromContentId == null || toContentId == null)
+		if (toContentId == null)
 			throw new ToolException(
 					"Failed to create the SharedResourceFiles tool seession");
 
-		Resource resource = resourceDao.getByContentId(fromContentId);
+		Resource resource = null;
+		if ( fromContentId != null ) {
+			resource = 	resourceDao.getByContentId(fromContentId);
+		}
 		if ( resource == null ) {
 			try {
-				resource = getDefaultContent(fromContentId);
+				resource = getDefaultResource();
 			} catch (ResourceApplicationException e) {
 				throw new ToolException(e);
 			}
 		}
+
 		Resource toContent = Resource.newInstance(resource,toContentId,resourceToolContentHandler);
 		resourceDao.saveObject(toContent);
 		

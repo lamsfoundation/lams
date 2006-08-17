@@ -117,13 +117,16 @@ public class SubmitFilesService implements ToolContentManager,
 	 *      java.lang.Long)
 	 */
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-		if (fromContentId == null || toContentId == null)
+		if (toContentId == null)
 			throw new ToolException(
 					"Failed to create the SubmitFiles tool seession");
 
-		SubmitFilesContent fromContent = submitFilesContentDAO.getContentByID(fromContentId);
+		SubmitFilesContent fromContent = null;
+		if ( fromContentId != null ) {
+			fromContent = submitFilesContentDAO.getContentByID(fromContentId);
+		}
 		if ( fromContent == null ) {
-			fromContent = createDefaultContent(fromContentId);
+			fromContent = getDefaultSubmit();
 		}
 		SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent,toContentId,sbmtToolContentHandler);
 		//clear ToolSession
@@ -739,14 +742,7 @@ public class SubmitFilesService implements ToolContentManager,
     	    log.error(error);
     	    throw new SubmitFilesException(error);
     	}
-    	Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
-    	SubmitFilesContent defaultContent = getSubmitFilesContent(defaultToolContentId);
-    	if(defaultContent == null)
-    	{
-    	    String error="Could not retrieve default content record for this tool";
-    	    log.error(error);
-    	    throw new SubmitFilesException(error);
-    	}
+    	SubmitFilesContent defaultContent = getDefaultSubmit();
     	
     	//save default content by given ID.
     	SubmitFilesContent content = new SubmitFilesContent();
@@ -754,6 +750,17 @@ public class SubmitFilesService implements ToolContentManager,
 		content.setContentID(contentID);
     	
 		return content;
+	}
+	private SubmitFilesContent getDefaultSubmit() {
+		Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
+    	SubmitFilesContent defaultContent = getSubmitFilesContent(defaultToolContentId);
+    	if(defaultContent == null)
+    	{
+    	    String error="Could not retrieve default content record for this tool";
+    	    log.error(error);
+    	    throw new SubmitFilesException(error);
+    	}
+		return defaultContent;
 	}
 
     public List getSubmitFilesSessionByContentID(Long contentID) {

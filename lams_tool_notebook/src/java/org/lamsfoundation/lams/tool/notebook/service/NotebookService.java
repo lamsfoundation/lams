@@ -163,16 +163,18 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 					+ fromContentId + " toContentId=" + toContentId);
 		}
 
-		if (fromContentId == null || toContentId == null) {
-			String error = "Failed to copy tool content: "
-					+ " fromContentID or toContentID is null";
+		if (toContentId == null) {
+			String error = "Failed to copy tool content: toContentID is null";
 			throw new ToolException(error);
 		}
 
-		Notebook fromContent = notebookDAO.getByContentId(fromContentId);
+		Notebook fromContent = null;
+		if ( fromContentId != null ) 		{
+			fromContent = notebookDAO.getByContentId(fromContentId);
+		}
 		if (fromContent == null) {
 			// create the fromContent using the default tool content
-			fromContent = copyDefaultContent(fromContentId);
+			fromContent = getDefaultContent();
 		}
 		Notebook toContent = Notebook.newInstance(fromContent, toContentId,
 				notebookToolContentHandler);

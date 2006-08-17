@@ -547,14 +547,18 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     // ToolContentManager and ToolSessionManager methods
     //***************************************************************************************************************
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-		if (fromContentId == null || toContentId == null)
+		if (toContentId == null)
 			throw new ToolException(
 					"Failed to create the ForumFiles tool seession");
 
-		Forum fromContent = forumDao.getByContentId(fromContentId);
+		Forum fromContent = null;
+		if ( fromContentId == null ) {
+			fromContent = forumDao.getByContentId(fromContentId);
+		}
 		if ( fromContent == null ) {
 			fromContent = getDefaultContent(fromContentId);
 		}
+		
 		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
 		forumDao.saveOrUpdate(toContent);
 		
