@@ -43,11 +43,13 @@
 	<!--  Testing by Anthony, please delete this comment -->
 	<div id="wyswygEditor">
 		<div>
+			<c:set var="language"><lams:user property="localeLanguage"/></c:set>
+		
 			<FCK:editor id="FCKeditor1" basePath="/lams/fckeditor/" imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector" 
 				linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector" 
 				flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector" 
 				imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image" linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File" 
-				flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash">
+				flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash" defaultLanguage="${language}" autoDetectLanguage="false">
 			</FCK:editor>
 		</div>
 		<div style="text-align: center">

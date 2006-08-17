@@ -31,7 +31,7 @@
 		%>
 <%@ tag body-content="empty"%>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <c:set var="lams">
@@ -43,14 +43,18 @@
 	<!--  Testing by Anthony, please delete this comment -->
 	<div id="wyswygEditor">
 		<div>
-			<FCK:editor id="FCKeditor1" basePath="/lams/fckeditor/" imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-				linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector" flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-				imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image" linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File" flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash">
+			<c:set var="language"><lams:user property="localeLanguage"/></c:set>
+		
+			<FCK:editor id="FCKeditor1" basePath="/lams/fckeditor/" imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector" 
+				linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector" 
+				flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector" 
+				imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image" linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File" 
+				flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash" defaultLanguage="${language}" autoDetectLanguage="false">
 			</FCK:editor>
 		</div>
 		<div style="text-align: center">
-			<a href="#" onClick="saveWYSWYGEdittedText(activeEditorIndex); doPreview(activeEditorIndex)"><img src="${lams}images/tick.gif" border="0" alt="<fmt:message key="label.save"/>" /></a>
-			<a href="#" onClick="doPreview(activeEditorIndex)"><img	src="${lams}images/cross.gif" border="0" alt="<fmt:message key="label.cancel"/>" /></a>
+			<a href="#" onClick="saveWYSWYGEdittedText(activeEditorIndex); doPreview(activeEditorIndex)"><img src="${lams}images/tick.gif" border="0" alt="<bean:message key="label.save"/>" /></a> &nbsp;&nbsp;&nbsp;&nbsp; <a href="#"
+				onClick="doPreview(activeEditorIndex)"><img src="${lams}images/cross.gif" border="0" alt="<bean:message key="label.cancel"/>" /></a>
 		</div>
 	</div>
 </div>
