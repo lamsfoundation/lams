@@ -2,11 +2,6 @@
 
 <tiles-definitions>
 
-	<definition name=".profile" path="/template.jsp">
-		<put name="title" value="admin.user.management"/>
-		<put name="content" value="profile.jsp" />	
-	</definition>
-
 	<definition name=".usersearchlist" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="usersearchlist.jsp" />	
@@ -55,6 +50,11 @@
 	<definition name=".cache" path="/template.jsp">
 		<put name="title" value="cache.maintain"/>
 		<put name="content" value="cache.jsp" />	
+	</definition>
+
+	<definition name=".loginmaintain" path="/template.jsp">
+		<put name="title" value="sysadmin.maintain.loginpage"/>
+		<put name="content" value="loginmaintain.jsp" />	
 	</definition>
 
 	<definition name=".error" path="/template.jsp">
