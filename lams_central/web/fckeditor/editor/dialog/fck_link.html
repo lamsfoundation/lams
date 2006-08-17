@@ -113,10 +113,10 @@
 					<td nowrap="nowrap">
 						<span fckLang="DlgLnkTarget">Target</span><br />
 						<select id="cmbTarget" onchange="SetTarget(this.value);">
-							<option value="" fckLang="DlgGenNotSet" selected="selected">&lt;not set&gt;</option>
+							<option value="" fckLang="DlgGenNotSet">&lt;not set&gt;</option>
 							<option value="frame" fckLang="DlgLnkTargetFrame">&lt;frame&gt;</option>
 							<option value="popup" fckLang="DlgLnkTargetPopup">&lt;popup window&gt;</option>
-							<option value="_blank" fckLang="DlgLnkTargetBlank">New Window (_blank)</option>
+							<option value="_blank" fckLang="DlgLnkTargetBlank" selected="selected">New Window (_blank)</option>
 							<option value="_top" fckLang="DlgLnkTargetTop">Topmost Window (_top)</option>
 							<option value="_self" fckLang="DlgLnkTargetSelf">Same Window (_self)</option>
 							<option value="_parent" fckLang="DlgLnkTargetParent">Parent Window (_parent)</option>
@@ -126,7 +126,7 @@
 					<td id="tdTargetFrame" nowrap="nowrap" width="100%">
 						<span fckLang="DlgLnkTargetFrameName">Target Frame Name</span><br />
 						<input id="txtTargetFrame" style="WIDTH: 100%" type="text" onkeyup="OnTargetNameChange();"
-							onchange="OnTargetNameChange();" />
+							onchange="OnTargetNameChange();" value="_blank"/>
 					</td>
 					<td id="tdPopupName" style="DISPLAY: none" nowrap="nowrap" width="100%">
 						<span fckLang="DlgLnkPopWinName">Popup Window Name</span><br />
