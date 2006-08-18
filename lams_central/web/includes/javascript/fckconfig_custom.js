@@ -23,3 +23,4 @@ FCKConfig.ToolbarSets["Default-Learner"] = [
 	['FontFormat','FontName','FontSize']
 ] ;
 
+FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../css/default.css' ;
