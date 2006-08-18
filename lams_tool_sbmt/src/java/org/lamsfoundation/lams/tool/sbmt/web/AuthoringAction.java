@@ -42,6 +42,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -279,6 +281,13 @@ public class AuthoringAction extends LamsDispatchAction {
 		else
 			file = (FormFile) authForm.getOnlineFile();
 		
+		if(file == null || StringUtils.isBlank(file.getFileName())){
+			ActionMessages msg = new ActionMessages();
+			msg.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("sbmt.web.action.upload.exception"));
+			saveErrors(request, msg);
+			return mapping.getInputForward();
+		}
+			
 		//upload to repository
 		InstructionFiles att = submitFilesService.uploadFileToContent(authForm.getToolContentID(), file, type);
 		
