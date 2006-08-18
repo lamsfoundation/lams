@@ -36,4 +36,8 @@ public class AuthoringConstants {
 	
 	//used by all tool authoring action class to mark the success flag.
 	public static final String LAMS_AUTHORING_SUCCESS_FLAG = "LAMS_AUTHORING_SUCCESS_FLAG";
+	
+	// used for tool content folder creation.
+	public static final String LAMS_WWW_DIR = "lams-www.war";
+	public static final String LAMS_WWW_SECURE_DIR = "secure";
 }

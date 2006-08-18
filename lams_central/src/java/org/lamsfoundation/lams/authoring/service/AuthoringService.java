@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -78,10 +80,18 @@ import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+
+import org.hibernate.id.UUIDHexGenerator;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.Configurable;
+import org.hibernate.Hibernate;
+import java.util.Properties;
 
 
 /**
@@ -652,6 +662,33 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			
 		// remove the learning design 
 		learningDesignDAO.delete(design);
+	}
+	
+	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateUniqueContentFolder() */
+	public String generateUniqueContentFolder() throws FileUtilException, IOException {
+		
+		String newUniqueContentFolderID = null;
+		FlashMessage flashMessag = null;
+		
+		Properties props = new Properties();
+		
+		IdentifierGenerator uuidGen = new UUIDHexGenerator();
+		( (Configurable) uuidGen).configure(Hibernate.STRING, props, null);
+		
+		// lowercase to resolve OS issues
+		newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
+		
+		// directory pathname
+		String dirPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + AuthoringConstants.LAMS_WWW_SECURE_DIR +  File.separator + newUniqueContentFolderID;
+		
+		// create new directory
+		if(FileUtil.createDirectory(dirPath)){
+			flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
+		} else {
+			throw new FileUtilException();
+		}
+		
+		return flashMessage.serializeMessage();
 	}
 
 	public MessageService getMessageService() {

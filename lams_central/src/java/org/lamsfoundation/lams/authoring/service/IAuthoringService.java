@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 /**
  * @author Manpreet Minhas 
@@ -212,6 +213,13 @@ public interface IAuthoringService {
 	 * that is done by the LamsCoreToolService */
 	public void deleteLearningDesign(LearningDesign design);
 
+	/**
+	 * Generates a unique content folder for the newly created design to store 
+	 * 
+	 * @return String The unique content folder id in WDDX Format
+	 */
+	public String generateUniqueContentFolder()  throws FileUtilException, IOException;
+		
 
 	/** Get the message service, which gives access to the I18N text */
 	public MessageService getMessageService();

@@ -81,6 +81,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _lastModifiedDateTime:Date;
 	private var _dateReadOnly:Date;
 	
+	private var _contentFolderID:String;
+	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
 	public var addEventListener:Function;
@@ -954,6 +956,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function get parentLearningDesignID ():Number {
 		return _parentLearningDesignID;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newparentLearningDesignID 
+	 * @return  
+	 */
+	public function set contentFolderID (newcontentFolderID:String):Void {
+		_contentFolderID = newcontentFolderID;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get contentFolderID ():String {
+		return _contentFolderID;
 	}
 
 	

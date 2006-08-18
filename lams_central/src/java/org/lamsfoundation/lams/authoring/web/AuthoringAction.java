@@ -36,6 +36,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -227,6 +228,26 @@ public class AuthoringAction extends LamsDispatchAction{
         return null;
 	}	
 	
+	public ActionForward createUniqueContentFolder(ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response)throws ServletException, Exception{
+
+		String wddxPacket;
+		IAuthoringService authoringService = getAuthoringService();
+    	
+		try {
+			wddxPacket = authoringService.generateUniqueContentFolder();
+		} catch (FileUtilException fue) {
+			wddxPacket = handleException(fue, "createUniqueContentFolder", authoringService).serializeMessage();
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "createUniqueContentFolder", authoringService).serializeMessage();
+		} 
+    	 
+    	PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+ 	}	
 	/**
 	 * Handle flash error.
 	 * @param e

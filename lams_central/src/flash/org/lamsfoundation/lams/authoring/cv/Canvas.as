@@ -168,6 +168,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 					canvasModel.autoSaveWait = true;
 				}
 				setInterval(Proxy.create(this,autoSave), autosave_config_interval);
+				
 			}
 			
             dispatchEvent({type:'load',target:this});
@@ -657,6 +658,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			checkReadOnlyDesign();
 			canvasModel.setDirty();
 			
+			createContentFolder();
+			
 			return true;
 		}else{
 			var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
@@ -965,6 +968,22 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var serverUrl = Config.getInstance().serverUrl;
 		var learningDesignID = _ddm.learningDesignID;
 		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export', 298, 712, true, true, false, false, false);
+	}
+	
+	private function createContentFolder():Void{
+		Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
+		var callback:Function = Proxy.create(this,setNewContentFolderID);
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=createUniqueContentFolder&userID='+_root.userID,callback, false);
+		
+	}
+	
+	private function setNewContentFolderID(o:Object) {
+		if(o instanceof LFError){
+			o.showMessageConfirm();
+		}else{
+			_ddm.contentFolderID = String(o);
+		}
+		
 	}
 		
 	/**
