@@ -185,7 +185,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McUtils.cleanUpUserExceptions(request);
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
+	 	AuthoringUtil.readData(request, mcAuthoringForm, false);	 	
 	 	mcAuthoringForm.resetUserAction();
 	 	
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -225,7 +225,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 		
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
     	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
@@ -372,7 +372,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
  		Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
@@ -497,7 +497,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    logger.debug("mcService : " + mcService);
 
 		
-        boolean performEditOptions=performEditOptions(mapping, form, request, response, false);
+        boolean performEditOptions=performEditOptions(mapping, form, request, response, false, false);
         logger.debug("performEditOptions: " + performEditOptions);
 
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -526,11 +526,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     public boolean performEditOptions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
-            HttpServletResponse response, boolean defaultStarter) throws IOException,
+            HttpServletResponse response, boolean defaultStarter, boolean requestByStarter) throws IOException,
                                          ServletException
     {
     	McUtils.cleanUpUserExceptions(request);
-    	logger.debug("starting performEditOptions...");
+    	logger.debug("starting performEditOptions...requestByStarter : " + requestByStarter);
     	logger.debug("defaultStarter:" + defaultStarter);
     	McUtils.debugMaps(request);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -544,7 +544,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	AuthoringUtil.readData(request, mcAuthoringForm, requestByStarter);
 	 	
     	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
     	logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
@@ -971,7 +971,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
@@ -1119,7 +1119,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
@@ -1256,7 +1256,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
     	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
@@ -1415,7 +1415,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
@@ -1566,7 +1566,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    logger.debug("mcService : " + mcService);
         
 		
-        boolean performDoneOptions=performDoneOptions(mapping, form, request, response, false);
+        boolean performDoneOptions=performDoneOptions(mapping, form, request, response, false, false);
         logger.debug("performDoneOptions: " + performDoneOptions);
 
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -1595,10 +1595,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     public boolean performDoneOptions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
-            HttpServletResponse response, boolean defaultStarter) throws IOException,
+            HttpServletResponse response, boolean defaultStarter, boolean requestByStarter) throws IOException,
                                          ServletException
     {
-    	logger.debug("starting performDoneOptions...");
+    	logger.debug("starting performDoneOptions.., requestByStarter:" + requestByStarter);
     	logger.debug("using defaultStarter: " + defaultStarter);
     	McUtils.cleanUpUserExceptions(request);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -1613,7 +1613,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	AuthoringUtil.readData(request, mcAuthoringForm, requestByStarter);
 
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
@@ -1875,7 +1875,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
@@ -2413,7 +2413,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 	 	String uuid =mcAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
@@ -2475,7 +2475,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 	 	String uuid =mcAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
@@ -2536,7 +2536,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 		logger.debug("will uploadFile for offline file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, true);
@@ -2620,7 +2620,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 		logger.debug("will uploadFile for online file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, false);
@@ -2701,7 +2701,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 
         mcAuthoringForm.resetUserAction();
         
@@ -2752,7 +2752,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
+		AuthoringUtil.readData(request, mcAuthoringForm, false);
 	 	
 		mcAuthoringForm.resetUserAction();
 		

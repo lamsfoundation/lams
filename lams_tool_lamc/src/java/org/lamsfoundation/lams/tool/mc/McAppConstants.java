@@ -83,6 +83,9 @@ public interface McAppConstants {
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
     
+    public static final String DEFAULT_MCQ_TITLE 						= "MCQ Title";
+    public static final String DEFAULT_MCQ_INSTRUCTIONS					= "MCQ Instructions";
+    
     /*
      * refers to number of questions presented initially, we have a single record for default content
      */

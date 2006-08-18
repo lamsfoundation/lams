@@ -205,8 +205,11 @@ public abstract class McUtils implements McAppConstants {
 	}
 
 	
-	public static void persistInSessionRichText(HttpServletRequest request)
+	//consider adding if (!requestByStarter) to other properties as well
+	public static void saveInSessionRichText(HttpServletRequest request, boolean requestByStarter)
 	{
+	    logger.debug("saveInSessionRichText, requestByStarter: " + requestByStarter);
+	    
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
 		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
 		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
@@ -229,15 +232,19 @@ public abstract class McUtils implements McAppConstants {
 		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
 		
 		
-		if ((richTextTitle != null) && (richTextTitle.length() > 0))
+		if (!requestByStarter)
 		{
-			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
+			//if ((richTextTitle != null) && (richTextTitle.length() > 0))
+			//{
+				request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
+			//}
+			
+			//if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
+			//{
+				request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
+			//}
 		}
 		
-		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
-		}
 		
 		String richTextIncorrectFeedback=request.getParameter(RICHTEXT_INCORRECT_FEEDBACK);
 		logger.debug("read parameter richTextIncorrectFeedback: " + richTextIncorrectFeedback);

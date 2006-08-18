@@ -296,9 +296,9 @@ public class McStarterAction extends Action implements McAppConstants {
 				logger.debug("retrieving default content");
 				retrieveDefaultContent(request, mcAuthoringForm);
 				McAction mcAction= new McAction();
-				boolean performEditOptions=mcAction.performEditOptions(mapping, form, request, response, true);
+				boolean performEditOptions=mcAction.performEditOptions(mapping, form, request, response, true, true);
 				logger.debug("performEditOptions: " + performEditOptions);
-				boolean performDoneOptions=mcAction.performDoneOptions(mapping, form, request, response, true);
+				boolean performDoneOptions=mcAction.performDoneOptions(mapping, form, request, response, true, true);
 				logger.debug("performDoneOptions: " + performDoneOptions);
 			}
 			else
@@ -654,7 +654,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		if (mcContent.getTitle() == null)
 		{
-			request.getSession().setAttribute(RICHTEXT_TITLE,"MCQ Title");
+			request.getSession().setAttribute(RICHTEXT_TITLE,DEFAULT_MCQ_TITLE);
 		}
 		else
 		{
@@ -663,7 +663,7 @@ public class McStarterAction extends Action implements McAppConstants {
 
 		if (mcContent.getInstructions() == null)
 		{
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,"MCQ Instructions");
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,DEFAULT_MCQ_INSTRUCTIONS);
 		}
 		else
 		{

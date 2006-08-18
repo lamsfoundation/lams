@@ -72,13 +72,14 @@ public class AuthoringUtil implements McAppConstants {
 	 * @param request
 	 * @param mcAuthoringForm
 	 */
-    public static void readData(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    public static void readData(HttpServletRequest request, McAuthoringForm mcAuthoringForm, boolean requestByStarter)
     {
+        logger.debug("readData requestByStarter: " + requestByStarter);
     	/** define the next tab as Basic tab by default*/
         mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
      	
-     	McUtils.persistInSessionRichText(request);
+     	McUtils.saveInSessionRichText(request, requestByStarter);
      	AuthoringUtil.populateParameters(request, mcAuthoringForm);
     }
  	

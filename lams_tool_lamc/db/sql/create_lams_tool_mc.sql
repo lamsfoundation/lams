@@ -115,7 +115,7 @@ CREATE TABLE tl_lamc11_uploadedfile (
 )TYPE=InnoDB;
 
 
-INSERT INTO tl_lamc11_content(uid, content_id , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report, pass_mark) VALUES (1, ${default_content_id} , NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0, 50);
+INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ Title', 'MCQ Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0, 50);
 
 INSERT INTO tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id, feedbackIncorrect, feedbackCorrect) VALUES (1, 'A Sample question?', 100, 0, 1,1, 'Your answer is incorrect', 'Correct');
 	
