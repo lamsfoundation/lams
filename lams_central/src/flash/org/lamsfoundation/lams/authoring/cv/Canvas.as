@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.ws.Workspace
 import org.lamsfoundation.lams.common.* 
 import mx.managers.*
 import mx.utils.*
@@ -308,10 +309,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				var msg:String = Dictionary.getValue('al_empty_design');
 				LFMessage.showMessageAlert(msg);
 			}else {
-				saveDesignToServerAs();
+				saveDesignToServerAs(Workspace.MODE_SAVE);
 			}
 		}else if(_ddm.readOnly){
-			saveDesignToServerAs();
+			saveDesignToServerAs(Workspace.MODE_SAVEAS);
 		}else{
 			saveDesignToServer();
 		}
@@ -324,14 +325,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @param	tabToShow	The tab to be selected when the dialogue opens.
 	 * @return  
 	 */
-	public function saveDesignToServerAs(){
+	public function saveDesignToServerAs(mode:String){
 		//clear the learningDesignID so it will not overwrite the existing one
 		_ddm.learningDesignID = null;
 		
 		
         var onOkCallback:Function = Proxy.create(this, saveDesignToServer);
 		var ws = Application.getInstance().getWorkspace();
-        ws.setDesignProperties("LOCATION",onOkCallback);
+        ws.setDesignProperties("LOCATION", mode, onOkCallback);
 		
 
 	}
@@ -363,8 +364,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.licenseText = workspaceResultDTO.resourceLicenseText;
 			_ddm.licenseID = workspaceResultDTO.resourceLicenseID;
 		}
+		var mode:String = Application.getInstance().getWorkspace().getWorkspaceModel().currentMode;
 		
-		if(_ddm.learningDesignID == null) { isCopy = true; }
+		if(_ddm.learningDesignID == null && mode == Workspace.MODE_SAVEAS) { isCopy = true; }
 		var dto:Object = _ddm.getDesignForSaving(isCopy);
 		
 		var callback:Function = Proxy.create(this,onStoreDesignResponse);
