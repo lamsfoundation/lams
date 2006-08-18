@@ -1,4 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <!--  Basic Tab Content -->
 
@@ -25,23 +26,24 @@
 <table >
 	<tr>
 		<td  colspan="2">
-			<lams:SetEditor id="forum.title" text="${forumForm.forum.title}" small="true" key="label.authoring.basic.title" />
+			<lams:SetEditor id="forum.title" text="${formBean.forum.title}" small="true" key="label.authoring.basic.title" />
 		</td>
 	</tr>
 	<tr>
 		<td  colspan="2">
-			<lams:SetEditor id="forum.instructions" text="${forumForm.forum.instructions}" key="label.authoring.basic.instruction"/>
+			<lams:SetEditor id="forum.instructions" text="${formBean.forum.instructions}" key="label.authoring.basic.instruction"/>
 		</td>
 	</tr>
 </table>
 	<!-- Topics List Row -->
 	<div id="messageListArea">
+		<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 		<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
 	</div>
 <table >
 	<tr>
 		<td colspan="2" align="left">
-			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');" style="float:left;width:150px"  class="button">
+			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" style="float:left;width:150px"  class="button">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
 		</td>

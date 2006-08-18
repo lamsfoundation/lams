@@ -5,6 +5,8 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+
 <script type="text/javascript">
      //<![CDATA[
 	var imgRoot="${lams}images/";
@@ -31,11 +33,9 @@
 		selectTab(tabId);
 	}
 
-	function doSubmit(method, tabId) {
+	function doSubmit(method) {
 		var authorForm = document.getElementById("authoringForm");
-		if(tabId != null)
-			authorForm.currentTab.value=tabId;
-		authorForm.action=method;
+		authorForm.action="<c:url value='/authoring/'/>"+method+".do";
 		authorForm.submit();
 	}
 	

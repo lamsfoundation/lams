@@ -45,6 +45,7 @@
 <%@ attribute name="saveButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="cancelConfirmMsgKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="defineLater" required="false" rtexprvalue="true" %>
+<%@ attribute name="customiseSessionID" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty cancelButtonLabelKey}">
@@ -63,14 +64,14 @@
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}'/>";
+       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}'/>";
 	}
     function doSubmit_Form_Only() {
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}'/>";
+        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}'/>";
         	//just for depress alert window when call window.close()
         	//only available for IE browser
         	var userAgent=navigator.userAgent;

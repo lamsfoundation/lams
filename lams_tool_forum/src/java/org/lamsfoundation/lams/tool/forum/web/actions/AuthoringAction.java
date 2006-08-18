@@ -26,7 +26,6 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,7 +44,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -72,6 +70,7 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -89,14 +88,14 @@ public class AuthoringAction extends Action {
 		String param = mapping.getParameter();
 		//-----------------------Forum Author function ---------------------------
 	  	if (param.equals("initPage")) {
-	  		request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
+	  		request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
        		return initPage(mapping, form, request, response);
         }
 
 		// ***************** Monitoring define later screen ********************
 		if (param.equals("defineLater")){
 			//update define later flag to true
-			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
+			request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
 			forumService = getForumManager();
 			Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 			Forum forum = forumService.getForumByContentId(contentId);
@@ -151,12 +150,6 @@ public class AuthoringAction extends Action {
         if (param.equals("deleteAttachment")) {
         	return deleteAttachment(mapping, form, request, response);
         }
-        if (param.equals("refreshTopic")) {
-        	return refreshTopic(mapping, form, request, response);
-        }
-        if (param.equals("finishTopic")) {
-       		return finishTopic(mapping, form, request, response);
-        }
         return mapping.findForward("error");
 	}
 	//******************************************************************************************************************
@@ -174,10 +167,14 @@ public class AuthoringAction extends Action {
 	 */
 	protected ActionForward initPage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		//initial Session Map 
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		ForumForm forumForm = (ForumForm)form;
+		forumForm.setSessionMapID(sessionMap.getSessionID());
+		
 		//get back the topic list and display them on page
 		forumService = getForumManager();
 
@@ -203,7 +200,7 @@ public class AuthoringAction extends Action {
 				topics = forumService.getAuthoredTopics(forum.getUid());
 			}
 			//initialize attachmentList
-			List attachmentList = getAttachmentList(request);
+			List attachmentList = getAttachmentList(sessionMap);
 			attachmentList.addAll(forum.getAttachments());
 
 			//tear down PO to normal object using clone() method
@@ -217,7 +214,8 @@ public class AuthoringAction extends Action {
 		//init it to avoid null exception in following handling
 		if(topics == null)
 			topics = new ArrayList();
-		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+		
+		sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
 	/**
@@ -242,6 +240,7 @@ public class AuthoringAction extends Action {
 		
 		ToolAccessMode mode = getAccessMode(request); 
 		ForumForm forumForm = (ForumForm)(form);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(forumForm.getSessionMapID());
 		//validation
 		ActionMessages errors = validate(forumForm, mapping, request);
 		if(!errors.isEmpty()){
@@ -293,8 +292,8 @@ public class AuthoringAction extends Action {
 			Set attPOSet = forumPO.getAttachments();
 			if(attPOSet == null)
 				attPOSet = new HashSet();
-			List attachmentList = getAttachmentList(request);
-			List deleteAttachmentList = getDeletedAttachmentList(request);
+			List attachmentList = getAttachmentList(sessionMap);
+			List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 			Iterator iter = attachmentList.iterator();
 			while(iter.hasNext()){
 				Attachment newAtt = (Attachment) iter.next();
@@ -330,7 +329,7 @@ public class AuthoringAction extends Action {
 			
 			//********************************Handle topic*******************
 			//delete message attachment
-			List topicDeleteAttachmentList = getTopicDeletedAttachmentList(request);
+			List topicDeleteAttachmentList = getTopicDeletedAttachmentList(sessionMap);
 			iter = topicDeleteAttachmentList.iterator();
 			while(iter.hasNext()){
 				Attachment delAtt = (Attachment) iter.next();
@@ -340,7 +339,7 @@ public class AuthoringAction extends Action {
 			}
 			
 			//Handle message
-			List topics = getTopicList(request);
+			List topics = getTopicList(sessionMap);
 	    	iter = topics.iterator();
 	    	while(iter.hasNext()){
 	    		MessageDTO dto = (MessageDTO) iter.next();
@@ -352,7 +351,7 @@ public class AuthoringAction extends Action {
 	    		}
 	    	}
 	    	//delete them from database.
-	    	List delTopics = getDeletedTopicList(request);
+	    	List delTopics = getDeletedTopicList(sessionMap);
 	    	iter = delTopics.iterator();
 	    	while(iter.hasNext()){
 	    		MessageDTO dto = (MessageDTO) iter.next();
@@ -362,7 +361,7 @@ public class AuthoringAction extends Action {
 	    	}
 
 			//initialize attachmentList again
-			attachmentList = getAttachmentList(request);
+			attachmentList = getAttachmentList(sessionMap);
 			attachmentList.addAll(forum.getAttachments());
 		} catch (Exception e) {
 			log.error(e);
@@ -412,6 +411,7 @@ public class AuthoringAction extends Action {
 			String type,HttpServletRequest request) {
 
 		ForumForm forumForm = (ForumForm) form;
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(forumForm.getSessionMapID());
 		
 		FormFile file;
 		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type))
@@ -424,8 +424,8 @@ public class AuthoringAction extends Action {
 		Attachment att = forumService.uploadInstructionFile(file, type);
 		
 		//handle session value
-		List attachmentList = getAttachmentList(request);
-		List deleteAttachmentList = getDeletedAttachmentList(request);
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		Attachment existAtt;
@@ -442,21 +442,18 @@ public class AuthoringAction extends Action {
 		attachmentList.add(att);
 		
 		//update Html FORM, this will echo back to web page for display
-		List list;
-		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
-			list = forumForm.getOfflineFileList();
-			if(list == null){
-				list = new ArrayList();
-				forumForm.setOfflineFileList(list);
-			}
-		}else{
-			list = forumForm.getOnlineFileList();
-			if(list == null){
-				list = new ArrayList();
-				forumForm.setOnlineFileList(list);
-			}
+		List onlineFileList = new ArrayList();
+		List offlineFileList = new ArrayList();
+		iter = attachmentList.iterator();
+		while(iter.hasNext()){
+			Attachment attFile = (Attachment) iter.next();
+			if(StringUtils.equalsIgnoreCase(attFile.getFileType(),IToolContentHandler.TYPE_OFFLINE))
+				offlineFileList.add(attFile);
+			else
+				onlineFileList.add(attFile);
 		}
-		list.add(att);
+		forumForm.setOnlineFileList(onlineFileList);
+		forumForm.setOfflineFileList(offlineFileList);
 		
 		return mapping.findForward("success");
 
@@ -473,7 +470,7 @@ public class AuthoringAction extends Action {
 	 */
 	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(request, response,form, IToolContentHandler.TYPE_OFFLINE);
+		return deleteFile(mapping, form,request, response, IToolContentHandler.TYPE_OFFLINE);
 	}
 	/**
 	 * Delete online instruction file from current Forum authoring page.
@@ -485,7 +482,7 @@ public class AuthoringAction extends Action {
 	 */
 	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(request, response,form, IToolContentHandler.TYPE_ONLINE);
+		return deleteFile(mapping, form,request, response, IToolContentHandler.TYPE_ONLINE);
 	}
 
 	/**
@@ -495,91 +492,38 @@ public class AuthoringAction extends Action {
 	 * @param type 
 	 * @return
 	 */
-	private ActionForward deleteFile(HttpServletRequest request, HttpServletResponse response, ActionForm form, String type) {
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+	private ActionForward deleteFile(ActionMapping mapping,ActionForm form,HttpServletRequest request, HttpServletResponse response, String type){
 		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
 		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
+		//get sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		
 		//handle session value
-		List attachmentList = getAttachmentList(request);
-		List deleteAttachmentList = getDeletedAttachmentList(request);
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		Attachment existAtt;
+		List leftAttachments = new ArrayList();
 		while(iter.hasNext()){
 			existAtt = (Attachment) iter.next();
 			if(existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();
-				break;
+			}else if(StringUtils.equals(existAtt.getFileType(),type) ){
+				leftAttachments.add(existAtt);
 			}
+				
 		}
-		
-		//handle web page display
-		List leftAttachments;
+
 		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
-			leftAttachments = ((ForumForm)form).getOfflineFileList();
+			request.setAttribute("offlineFileList",leftAttachments);
 		}else{
-			leftAttachments = ((ForumForm)form).getOnlineFileList();
+			request.setAttribute("onlineFileList",leftAttachments);
 		}
-		iter = leftAttachments.iterator();
-		while(iter.hasNext()){
-			Attachment att = (Attachment) iter.next();
-			if(versionID.equals(att.getFileVersionId()) && uuID.equals(att.getFileUuid())){
-				iter.remove();
-				break;
-			}
-		}
-		StringBuffer sb = new StringBuffer();
-		iter = leftAttachments.iterator();
-		
-		boolean hasAtts = iter.hasNext();
-		
-		if (hasAtts) {
-			sb.append("<ul>");
-		}		
-		while(iter.hasNext()){
-			Attachment file = (Attachment) iter.next();
-			sb.append("<li>").append(file.getFileName()).append("\r\n");
-			sb.append(" <a href=\"javascript:launchInstructionsPopup('download/?uuid=").append(file.getFileUuid()).append("&preferDownload=false')\">");
-			sb.append(this.getResources(request).getMessage("label.view"));
-			sb.append("</a>\r\n");
-			sb.append(" <a href=\"../download/?uuid=").append(file.getFileUuid()).append("&preferDownload=true\">");
-			sb.append(this.getResources(request).getMessage("label.download"));
-			sb.append("</a>\r\n");
-			sb.append("<a href=\"javascript:loadDoc('");
-			sb.append(ForumConstants.TOOL_URL_BASE);
-			sb.append("deletefile.do?method=");
-			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-				sb.append("deleteOffline");
-			else
-				sb.append("deleteOnline");
-			sb.append("File&toolContentID=").append(contentID);
-			sb.append("&uuID=").append(file.getFileUuid()).append("&versionID=").append(file.getFileVersionId()).append("','");
-			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-				sb.append("offlinefile");
-			else
-				sb.append("onlinefile");
-			sb.append("')\">");
-			
-			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-				sb.append(this.getResources(request).getMessage("label.authoring.offline.delete"));
-			else
-				sb.append(this.getResources(request).getMessage("label.authoring.online.delete"));
-			sb.append("</a></li>\r\n");
-		}
-		if (hasAtts) {
-			sb.append("<ul>");
-		}		
-		try {
-			PrintWriter out = response.getWriter();
-			out.print(sb.toString());
-			out.flush();
-		} catch (IOException e) {
-			log.error(e);
-		}
-		return null;
+		return mapping.findForward("success");
 	}
 	
 	//******************************************************************************************************************
@@ -597,6 +541,8 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionForward newTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID );
+		((MessageForm)form).setSessionMapID(sessionMapID);
 		
 		return mapping.findForward("success");
 	}
@@ -614,15 +560,17 @@ public class AuthoringAction extends Action {
 	 */
 	public ActionForward createTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException, PersistenceException {
+		MessageForm messageForm = (MessageForm) form;
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 		
-		List topics = getTopicList(request);
+		List topics = getTopicList(sessionMap);
 		//get login user (author)
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		
 		//get message info from web page
-		MessageForm messageForm = (MessageForm) form;
 		Message message = messageForm.getMessage();
 		//init some basic variables for first time create
 		message.setIsAuthored(true);
@@ -655,34 +603,7 @@ public class AuthoringAction extends Action {
 		//save the new message into HttpSession
 		topics.add(0,MessageDTO.getMessageDTO(message));
 		
-		//echo back to web page
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
-		return mapping.findForward("success");
-	}
-	/**
-	 * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring 
-	 * page. 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws PersistenceException
-	 */
-    public ActionForward deleteTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	
-    	List topics = getTopicList(request);
-		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-
-		if(topicIdx != -1){
-			Object obj = topics.remove(topicIdx);
-			List delList = getDeletedTopicList(request);
-			delList.add(obj);
-    	}
 		
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"DELETE_SUCCESS");
 		return mapping.findForward("success");
 	}
     /**
@@ -699,7 +620,12 @@ public class AuthoringAction extends Action {
     public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
     	
-    	List topics = getTopicList(request);
+    	//get SessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID );
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		
+    	List topics = getTopicList(sessionMap);
     	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
 		
@@ -719,6 +645,35 @@ public class AuthoringAction extends Action {
     	return mapping.findForward("success");
     	
     }
+	/**
+	 * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring 
+	 * page. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws PersistenceException
+	 */
+    public ActionForward deleteTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+		//get SessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID );
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,sessionMapID);
+    	List topics = getTopicList(sessionMap);
+		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+
+		if(topicIdx != -1){
+			Object obj = topics.remove(topicIdx);
+			List delList = getDeletedTopicList(sessionMap);
+			delList.add(obj);
+    	}
+		
+		return mapping.findForward("success");
+	}
+
     /**
      * Display a HTML FORM which contains subject, body and attachment information from a special topic. This page
      * is ready for user update this topic.
@@ -733,8 +688,14 @@ public class AuthoringAction extends Action {
     public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
     	
-    	MessageForm msgForm = (MessageForm)form;
-    	List topics = getTopicList(request);
+//    	get SessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID );
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		
+		MessageForm msgForm = (MessageForm)form;
+		msgForm.setSessionMapID(sessionMapID);
+		
+    	List topics = getTopicList(sessionMap);
     	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
 		if(topicIdx != -1){
@@ -774,14 +735,17 @@ public class AuthoringAction extends Action {
      */
     public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
+    	MessageForm messageForm = (MessageForm) form;
+    	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
+    	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+    	
     	//get value from HttpSession
-    	List topics = getTopicList(request);
+    	List topics = getTopicList(sessionMap);
 		//get param from HttpServletRequest
 		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
 		
 		if(topicIdx != -1){
-			MessageForm messageForm = (MessageForm) form;
 			Message message = messageForm.getMessage();
 			
 			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
@@ -801,85 +765,27 @@ public class AuthoringAction extends Action {
 				attSet.add(att);
 				newMsg.setHasAttachment(true);
 				newMsg.getMessage().setAttachments(attSet);
+			}else if(!messageForm.isHasAttachment()){
+				newMsg.setHasAttachment(false);
+				newMsg.getMessage().setAttachments(null);
 			}
 		}
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"EDIT_SUCCESS");
 		return mapping.findForward("success");
     }
-    /**
-     * Delete a topic's attachment file. This update will be submit to database only when user
-     * save whole authoring page.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
-     */
-    public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-
-//		get value from HttpSession
-    	List topics = getTopicList(request);
-    	//get param from HttpServletRequest
-		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-		
-		if(topicIdx != -1){
-			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
-			if(newMsg.getMessage()== null)
-				newMsg.setMessage(new Message());
-			//add delete topic attachment to HTTPSession
-			Set attSet = newMsg.getMessage().getAttachments();
-			if(attSet != null){
-				//only one attachment for topic
-				Attachment att = (Attachment) attSet.iterator().next();
-				if(att != null){
-					List topicDeletedAttachmentList = getTopicDeletedAttachmentList(request);
-					topicDeletedAttachmentList.add(att);
-				}
-			}
-			//set other infor about attachment
-			newMsg.getMessage().setUpdated(new Date());
-			newMsg.setHasAttachment(false);
-			newMsg.getMessage().setAttachments(null);
-		}
-		
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
+	/**
+	 * Remove message attachment.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		request.setAttribute("itemAttachment", null);
     	return mapping.findForward("success");
-    }
-    
-    public ActionForward refreshTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-    		HttpServletResponse response) throws PersistenceException {
-
-   		return mapping.findForward("success");
-    	
-    }
-    
-    public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	List topics = getTopicList(request);
-    	
-    	ForumForm forumForm = (ForumForm)form;
-    	Forum forum = forumForm.getForum();
-    	Set msgSet = new HashSet();
-		Iterator iter = topics.iterator();
-		while(iter.hasNext()){
-			MessageDTO dto = (MessageDTO) iter.next();
-			msgSet.add(dto.getMessage());
-		}
-    	forum.setMessages(msgSet);
-    	
-    	ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
-    	if(mode.isAuthor())
-    		return mapping.findForward("author");
-    	else
-    		return mapping.findForward("monitor");
-    	
     }
 
 	//******************************************************************************************************************
@@ -896,36 +802,36 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ForumConstants.ATTACHMENT_LIST);
+	private List getAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ForumConstants.ATTACHMENT_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ForumConstants.DELETED_ATTACHMENT_LIST);
+	private List getDeletedAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ForumConstants.DELETED_ATTACHMENT_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getTopicList(HttpServletRequest request) {
-		return getListFromSession(request,ForumConstants.AUTHORING_TOPICS_LIST);
+	private List getTopicList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ForumConstants.AUTHORING_TOPICS_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getTopicDeletedAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ForumConstants.DELETED_ATTACHMENT_LIST);
+	private List getTopicDeletedAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ForumConstants.DELETED_ATTACHMENT_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedTopicList(HttpServletRequest request) {
-		return getListFromSession(request,ForumConstants.DELETED_AUTHORING_TOPICS_LIST);
+	private List getDeletedTopicList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ForumConstants.DELETED_AUTHORING_TOPICS_LIST);
 	}
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
@@ -934,14 +840,15 @@ public class AuthoringAction extends Action {
 	 * @param name
 	 * @return
 	 */
-	private List getListFromSession(HttpServletRequest request,String name) {
-		List list = (List) request.getSession().getAttribute(name);
+	private List getListFromSession(SessionMap sessionMap,String name) {
+		List list = (List) sessionMap.get(name);
 		if(list == null){
 			list = new ArrayList();
-			request.getSession().setAttribute(name,list);
+			sessionMap.put(name,list);
 		}
 		return list;
 	}
+	
 	/**
 	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
 	 * @param request
@@ -964,6 +871,7 @@ public class AuthoringAction extends Action {
     public ActionMessages validate( ForumForm form,ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
     	ActionMessages errors = new ActionMessages();
     	
+    	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
 		ActionMessage ae;
 		try {
 			if (StringUtils.isBlank(form.getForum().getTitle())) {
@@ -971,7 +879,7 @@ public class AuthoringAction extends Action {
 				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 			}
 			if(!form.getForum().isAllowNewTopic()){
-				List topics = getTopicList(request);
+				List topics = getTopicList(sessionMap);
 				if(topics.size() == 0){
 					ActionMessage error = new ActionMessage("error.must.have.topic");
 					errors.add(ActionMessages.GLOBAL_MESSAGE, error);

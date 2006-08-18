@@ -5,14 +5,12 @@
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-		<style type="text/css">
-		<!--
-		td { 
-			padding:4px; 
-			font-size:12px;
-		}
-		-->
-		</style>		
+		<script type="text/javascript">
+			var removeItemAttachmentUrl = "<c:url value="/authoring/deleteAttachment.do"/>";
+		</script>
+		
+		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
+		
 	</head>
 	<body>
 		<table cellpadding="3">
@@ -20,6 +18,7 @@
 			<%@ include file="/common/messages.jsp"%>
 			<html:form action="/authoring/updateTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
 				<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
+				<html:hidden property="sessionMapID"/>
 
 				<tr>
 					<td>
@@ -41,7 +40,7 @@
 							imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
 							linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
 							flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-							toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
+								toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
 							<c:out value="${formBean.message.body}" escapeXml="false" />
 						</fck:editor>							
 						
@@ -51,23 +50,10 @@
 				<tr>
 					<td>
 						<b><bean:message key="message.label.attachment" /></b>
-						<c:if test="${topic.hasAttachment}">
-							<c:forEach var="file" items="${topic.message.attachments}">
-								<c:set var="downloadURL">
-									<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
-								</c:set>
-								<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
-								<c:set var="deleteURL">
-									<html:rewrite page="/authoring/deleteAttachment.do?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&topicIndex=${topicIndex}" />
-								</c:set>
-								&nbsp;&nbsp;
-								<a href="<c:out value='${deleteURL}'/>" class="button" style="float: none"> <fmt:message key="label.delete" /> </a>
-							</c:forEach>
-						</c:if>
-						<c:if test="${not topic.hasAttachment}">
-							<html:file tabindex="3" property="attachmentFile" />
-						</c:if>
-						<BR>
+						<c:set var="itemAttachment" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+							<div id="itemAttachmentArea">
+								<%@ include file="/jsps/authoring/parts/msgattachment.jsp"%>
+							</div>						
 					</td>
 				</tr>
 				<tr>

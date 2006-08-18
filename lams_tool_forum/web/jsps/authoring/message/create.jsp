@@ -2,37 +2,17 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-		<script type="text/javascript">
-			function success(){
-				var flag = "<c:out value="${SUCCESS_FLAG}"/>";
-				if(flag == "CREATE_SUCCESS"){
-					var d = new Date()
-					var t = d.getTime()
-					loadDoc("<html:rewrite page='/authoring/refreshTopic.do'/>"+"?reqID="+escape(t),window.parent.document.getElementById("messageListArea"));
-					window.parent.hideMessage();
-				}
-			}
-		</script>
-		<style type="text/css">
-		<!--
-		td { 
-			padding:4px; 
-			font-size:12px;
-		}
-		-->
-		</style>
 	</head>
 	<body>
-		<script type="text/javascript">
-			success();
-		</script>
 		<table cellpadding="3">
 			<!-- Basic Info Form-->
 			<%@ include file="/common/messages.jsp"%>
 			<html:form action="/authoring/createTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
+				<html:hidden property="sessionMapID"/>
 				<tr>
 					<td>
 						<b><bean:message key="message.label.subject" />*</b><BR>
@@ -43,7 +23,6 @@
 				<tr>
 					<td>
 						<b><bean:message key="message.label.body" />*</b><BR>
-						
 						<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 						<fck:editor id="message.body" basePath="/lams/fckeditor/"
 							imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"

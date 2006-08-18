@@ -62,6 +62,8 @@ public class ForumForm extends ActionForm {
 	//Forum fields
 	private Long toolContentID;
 	private String currentTab;
+	private String sessionMapID;
+	
     private FormFile offlineFile;
     private FormFile onlineFile;
     private List onlineFileList;
@@ -167,6 +169,12 @@ public class ForumForm extends ActionForm {
 
 	public void setOnlineFileList(List onlineFileList) {
 		this.onlineFileList = onlineFileList;
+	}
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
 	}
 
 }

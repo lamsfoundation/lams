@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.validator.ValidatorForm;
+import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 /**
@@ -48,10 +49,12 @@ public class MessageForm extends ValidatorForm {
 	private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 	
     protected Message message;
+    protected String sessionMapID;
     protected Long forumId;
     protected Long parentId;
     protected Long topicId;
     
+    private boolean hasAttachment;
     //attachment file name
     private String attachmentName;
     //Message attachment file
@@ -85,6 +88,16 @@ public class MessageForm extends ValidatorForm {
     //-------------------------get/set methods----------------
     public void setMessage(Message message) {
     	this.message = message;
+    	if(message != null){
+    		if(message.getAttachments() != null
+    				&& message.getAttachments().size() > 0){
+    			hasAttachment = true;
+    			attachmentName = ((Attachment)message.getAttachments().iterator().next()).getFileName();
+    		}else{ 
+    			hasAttachment = false;
+    			attachmentName = null;
+    		}
+    	}
     }
 
     public Message getMessage() {
@@ -130,5 +143,17 @@ public class MessageForm extends ValidatorForm {
 
 	public void setAttachmentFile(FormFile attachmentFile) {
 		this.attachmentFile = attachmentFile;
+	}
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
+	}
+	public boolean isHasAttachment() {
+		return hasAttachment;
+	}
+	public void setHasAttachment(boolean hasAttachment) {
+		this.hasAttachment = hasAttachment;
 	}
 }

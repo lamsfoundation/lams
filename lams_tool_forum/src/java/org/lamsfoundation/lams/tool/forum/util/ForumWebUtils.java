@@ -24,8 +24,13 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.forum.util;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -48,6 +53,24 @@ public class ForumWebUtils {
             return true;
         else //  (content.isContentInUse()==true && content.isDefineLater() == false)
             return false;
+	}
+
+	/**
+	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
+	 * @param request
+	 * @return
+	 */
+	public static ToolAccessMode getAccessMode(HttpServletRequest request) {
+		ToolAccessMode mode = null;
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+		if(StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.TEACHER.toString()))
+			mode = ToolAccessMode.TEACHER;
+		else if (StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.AUTHOR.toString()))
+			mode = ToolAccessMode.AUTHOR;
+		else if (StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.LEARNER.toString()))
+			mode = ToolAccessMode.LEARNER;
+		
+		return mode;
 	}
 	
 }

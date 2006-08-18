@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
 <div id="topiclist">
 	<table class="alternative-color">
 		<tr>
@@ -6,11 +6,12 @@
 			<th scope="col" width="20%" align="center"><fmt:message key="lable.topic.title.startedby"/></th>
 			<th scope="col" width="30%" align="center"><fmt:message key="lable.topic.title.update"/></th>
 		</tr>
-		<c:forEach items="${topicList}" var="topic" varStatus="status">
+		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+		<c:forEach items="${sessionMap.topicList}" var="topic" varStatus="status">
 			<tr>
 				<td align="left" width="48%">
 					<c:set var="viewtopic">
-						<html:rewrite page="/authoring/viewTopic.do?topicIndex=${status.index}&create=${topic.message.updated.time}" />
+						<html:rewrite page="/authoring/viewTopic.do?sessionMapID=${sessionMapID}&topicIndex=${status.index}&create=${topic.message.updated.time}" />
 					</c:set> 
 					<html:link href="javascript:showMessage('${viewtopic}')">
 						<c:out value="${topic.message.subject}" />
@@ -32,3 +33,12 @@
 		</c:forEach>
 	</table>
 </div>
+<%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
+<script lang="javascript">
+ 
+	if(window.top != null){
+		window.top.hideMessage();
+		var obj = window.top.document.getElementById('messageListArea');
+		obj.innerHTML= document.getElementById("topiclist").innerHTML;
+	}
+</script>

@@ -6,35 +6,21 @@
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-		<script type="text/javascript">
-			function success(){
-				var flag = "<c:out value="${SUCCESS_FLAG}"/>";
-				if(flag == "EDIT_SUCCESS"){
-					var d = new Date()
-					var t = d.getTime()
-					loadDoc("<html:rewrite page='/authoring/refreshTopic.do'/>"+"?="+escape(t),window.parent.document.getElementById("messageListArea"));
-					window.parent.hideMessage();
-				}
+		<style type="text/css">
+			<!--
+			table.forum { 
+			width:98%; 
+			margin-left:7px; 
+			padding-top:5px; 
+			margin-bottom:10px;
+			background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 49px; 
+			text-align:left; 
+			border-bottom:1px solid #efefef;
 			}
-		</script>
-	<style type="text/css">
-	<!--
-	table.forum { 
-	width:98%; 
-	margin-left:7px; 
-	padding-top:5px; 
-	margin-bottom:10px;
-	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 49px; 
-	text-align:left; 
-	border-bottom:1px solid #efefef;
-	}
-	-->
-	</style>
+			-->
+		</style>
 	</head>
 	<body>
-		<script type="text/javascript">
-			success();
-		</script>
 		<!--closes header-->
 		<table class="forum" >
 			<!-- Basic Info Form-->
@@ -73,13 +59,13 @@
 						<b><fmt:message key="button.cancel" /></b>
 					</html:link>
 					<c:set var="deletetopic">
-						<html:rewrite page="/authoring/deleteTopic.do?topicIndex=${topicIndex}" />
+						<html:rewrite page="/authoring/deleteTopic.do?sessionMapID=${sessionMapID}&topicIndex=${topicIndex}" />
 					</c:set>
 					<html:link href="${deletetopic}" styleClass="button space-left">
 						<b><fmt:message key="label.delete" /></b>
 					</html:link>
 					<c:set var="edittopic">
-						<html:rewrite page="/authoring/editTopic.do?topicIndex=${topicIndex}&create=${topic.message.created.time}" />
+						<html:rewrite page="/authoring/editTopic.do?sessionMapID=${sessionMapID}&topicIndex=${topicIndex}&create=${topic.message.created.time}" />
 					</c:set>
 					<html:link href="${edittopic}" styleClass="button space-left">
 						<b><fmt:message key="label.edit" /></b>

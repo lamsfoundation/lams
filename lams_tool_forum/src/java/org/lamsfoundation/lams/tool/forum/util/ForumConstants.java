@@ -48,7 +48,6 @@ public interface ForumConstants {
 	public static final String DEFAULT_TITLE = "Forum";
 	//TODO:hard code!!! need to read from config
 	public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
-	public static final String SUCCESS_FLAG = "SUCCESS_FLAG";
 	public static final String FORUM_ID = "forum_id";
 
 	public static final int SESSION_STATUS_FINISHED = 1;
@@ -94,6 +93,8 @@ public interface ForumConstants {
 	public static final String PARAM_UPDATE_MODE = "updateMode";
 
 	public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
+
+	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 
 
 	

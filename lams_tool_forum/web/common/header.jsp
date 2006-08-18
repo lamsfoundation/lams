@@ -35,6 +35,5 @@
 <script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/forum.js"></script>
 
-
 <%@ include file="/common/fckeditorheader.jsp"%>
 
