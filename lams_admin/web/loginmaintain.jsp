@@ -9,7 +9,7 @@
 
 <h1 class=no-tabs-below><fmt:message key="sysadmin.maintain.loginpage"/></h1>
 <br />
-<p style="font-color:red"><html:errors /></p>
+<html:errors />
 <br />
 <html:form action="/loginsave.do?method=save" enctype="multipart/form-data" method="post">
 <p><fmt:message key="sysadmin.login.logo"/></p>
