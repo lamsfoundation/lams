@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.util.*
 //import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.ws.Workspace
 import mx.controls.*
 import mx.utils.*
 
@@ -159,7 +160,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
         help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
-        //help_menu.addMenuItem({label:_root.build, instanceName:"versionItem"});
         
 		
         //set up listeners
@@ -167,6 +167,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         file_menu.addEventListener("change", Delegate.create(this,fileMenuClicked));
         edit_menu.addEventListener("change", Delegate.create(this,editMenuClicked));
         tools_menu.addEventListener("change", Delegate.create(this,toolsMenuClicked));
+		help_menu.addEventListener("change", Delegate.create(this, helpMenuClicked));
 		
 		//Now that menu items have been set up make the menu bar visible
 		this._visible = true;
@@ -270,7 +271,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.saveItemAs:
 			//TODO: go through workspace to save design in location
 				Debugger.log('Clicked File > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
-                org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesignToServerAs();
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesignToServerAs(Workspace.MODE_SAVEAS);
                 break;
 			case eventObj.menu.importItem:
 				Debugger.log('Clicked File > Import',Debugger.GEN,'fileMenuClicked','LFMenuBar');
@@ -387,6 +388,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.helpItem :
 				break;
 			case eventObj.menu.aboutItem :
+				LFMessage.showMessageAlert("build version: " + _root.build);
 				break;
 		}
 	}

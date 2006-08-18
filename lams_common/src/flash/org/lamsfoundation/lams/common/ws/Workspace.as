@@ -33,6 +33,13 @@ import mx.utils.*
 * @author   DI
 */
 class org.lamsfoundation.lams.common.ws.Workspace {
+	
+	// static variables
+	public static var MODE_SAVE:String = "SAVE";
+	public static var MODE_SAVEAS:String = "SAVEAS";
+	public static var MODE_OPEN:String = "OPEN";
+	public static var MODE_READONLY:String = "READONLY";
+	
 	//Model
 	private var workspaceModel:WorkspaceModel;
 	//View
@@ -285,9 +292,9 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	 * @param   onOkCallback The function to call when the user clicks OK.
 	 * @return  
 	 */
-	public function setDesignProperties(tabToSelect:String,onOKCallback):Void{
+	public function setDesignProperties(tabToSelect:String, mode:String, onOKCallback):Void{
 		_onOKCallBack = onOKCallback;
-		workspaceModel.currentMode = "SAVEAS";
+		workspaceModel.currentMode = mode;
 		workspaceModel.userSetDesignProperties(tabToSelect,onOKCallback);
 		
 	}

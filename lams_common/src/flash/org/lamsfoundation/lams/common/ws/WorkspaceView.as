@@ -91,7 +91,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		var mode:String = m.currentMode
 		trace('mode returned: ' + mode);
 		var classRoot:MovieClip;
-		if(mode == "READONLY"){
+		if(mode == Workspace.MODE_READONLY){
 			classRoot = org.lamsfoundation.lams.monitoring.Application.root;
 		} else {
 			classRoot = org.lamsfoundation.lams.authoring.Application.root;

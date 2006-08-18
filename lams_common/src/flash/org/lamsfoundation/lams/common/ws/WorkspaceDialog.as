@@ -405,7 +405,7 @@ class WorkspaceDialog extends MovieClip{
 			
 			resourceTitle_txi.text = "";
 			
-			if(wm.currentMode != 'SAVEAS'){	
+			if(wm.currentMode != Workspace.MODE_SAVEAS || wm.currentMode != Workspace.MODE_SAVE){	
 				resourceDesc_txa.text = "";
 				license_txa.text = "";
 				licenseID_cmb.selectedIndex = 0;
@@ -751,7 +751,7 @@ class WorkspaceDialog extends MovieClip{
 				var _filename:String = cnode.attributes.data.name;
 				var _filetype:String = cnode.attributes.data.resourceType;
 				if(_filename == filename && _filetype == _workspaceModel.RT_LD){
-					if(_workspaceModel.currentMode=='OPEN'){
+					if(_workspaceModel.currentMode == Workspace.MODE_OPEN){
 						treeview.selectedNode = null;
 						_resultDTO.file = cnode;
 						doWorkspaceDispatch(true);
@@ -764,7 +764,7 @@ class WorkspaceDialog extends MovieClip{
 			
 			} while(cnode != null);
 			
-			if(_workspaceModel.currentMode == 'SAVE' || _workspaceModel.currentMode == 'SAVEAS'){
+			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
 				doWorkspaceDispatch(false);
 			}
 			return false;
@@ -777,7 +777,7 @@ class WorkspaceDialog extends MovieClip{
 			var callback:Function = Proxy.create(this,receivedFolderContents);
 			_workspaceModel.getWorkspace().requestFolderContents(snode.attributes.data.resourceID, callback);
 			
-			if(_workspaceModel.currentMode == 'SAVE' || _workspaceModel.currentMode == 'SAVEAS'){
+			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
 				return false;
 			} else {
 				return true;
@@ -790,7 +790,7 @@ class WorkspaceDialog extends MovieClip{
 		_workspaceModel.setFolderContents(dto, false);
 		
 		if(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
-			if(_workspaceModel.currentMode == 'SAVE' || _workspaceModel.currentMode == 'SAVEAS'){
+			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
 				if(searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
 					//run a alert dialogue as user is using the same name as an existing design!
 					LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [_resultDTO.resourceName]), null);
