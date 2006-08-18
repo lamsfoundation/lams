@@ -139,7 +139,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_undo'), instanceName:"undoItem"});
         edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_redo'), instanceName:"redoItem"});
         edit_menu.addMenuItem({type:"separator"});
-		edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem"});
+		//edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem"});
         edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_copy'), instanceName:"copyItem"});
         edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_paste'), instanceName:"pasteItem"});
        
