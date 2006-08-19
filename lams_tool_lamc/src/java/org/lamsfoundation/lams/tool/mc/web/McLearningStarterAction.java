@@ -436,15 +436,24 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    		
 	    		boolean isRetries=mcContent.isRetries();
 	    		logger.debug("isRetries: " + isRetries);
-	    		if (isRetries == true)
-	    		    return (mapping.findForward(REDO_QUESTIONS));
-	    		else
-	    		{
-		    		McLearningAction mcLearningAction= new McLearningAction();
-			    	logger.debug("present to learner with previous attempts data");
-			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());
-			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
-	    		}
+	    		McLearningAction mcLearningAction= new McLearningAction();
+		    	logger.debug("present to learner with previous attempts data");
+		    	
+		    	String sessionStatus=mcUserSession.getSessionStatus(); 
+		    	logger.debug("sessionStatus: " +sessionStatus);
+		    	/*one limitation by design here is that once a user finishes the activity, subsequent users in the same group are also assumed finished
+		    	 * since they belong to the same ungrouped activity and these users have the same tool session id*/
+		    	if (sessionStatus.equals(COMPLETED))
+		    	{
+			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
+		    	}
+		    	else
+		    	{
+		    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
+		    	}
+		    	
+
+		    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	    	}
 	    }
 	    else if (mode.equals("teacher"))

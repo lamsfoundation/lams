@@ -803,8 +803,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("learnerMarkAtLeast:" + learnerMarkAtLeast);
         mcGeneralLearnerFlowDTO.setLearnerMarkAtLeast (new Integer(learnerMarkAtLeast).toString());
 		
-        logger.debug("user over passmark:" + mcLearningForm.getUserOverPassMark());
-        logger.debug("is passmark applicable:" + mcLearningForm.getPassMarkApplicable());
+        logger.debug("user over passmark:" + mcGeneralLearnerFlowDTO.getUserOverPassMark());
+        logger.debug("is passmark applicable:" + mcGeneralLearnerFlowDTO.getPassMarkApplicable());
 		
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
