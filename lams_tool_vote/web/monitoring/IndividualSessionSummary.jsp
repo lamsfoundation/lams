@@ -28,8 +28,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
+<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 
 				<table>
@@ -164,7 +164,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr> 
 									<td> </td>
 									<td NOWRAP valign=top align=left >
-										<c:set var="viewURL">
+										<c:set scope="request" var="viewURL">
 											<html:rewrite page="/chartGenerator?type=pie"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
@@ -175,7 +175,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr> 
 									<td> </td>
 									<td NOWRAP valign=top align=left >
-										<c:set var="viewURL">
+										<c:set scope="request" var="viewURL">
 											<html:rewrite page="/chartGenerator?type=bar"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
@@ -215,7 +215,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
 		
 																  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
-																					<c:set var="viewURL">
+																					<c:set scope="request" var="viewURL">
 																						<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
 																					</c:set>
 																  																					

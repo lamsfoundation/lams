@@ -24,10 +24,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams">
+<c:set scope="request" var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="tool">
+<c:set scope="request" var="tool">
 	<lams:WebAppURL />
 </c:set>
 
@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 		</table>
 
-		<c:set var="monitoringURL">
+		<c:set scope="request" var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />
 		</c:set>
 

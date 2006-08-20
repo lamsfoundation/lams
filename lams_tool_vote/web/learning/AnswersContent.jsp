@@ -24,10 +24,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams">
+<c:set scope="request"  var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="tool">
+<c:set scope="request" var="tool">
 	<lams:WebAppURL />
 </c:set>
 
@@ -117,7 +117,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="lockOnFinish"/>	
 	<html:hidden property="reportViewOnly"/>			
 	
-			<table>
+	
+			<table cellpadding="0">
 					<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}"> 			
 						<tr> <td class="error">
 							<bean:message key="label.learning.forceOfflineMessage"/>

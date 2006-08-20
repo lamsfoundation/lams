@@ -29,8 +29,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
+<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 				<table>
 				<tr> 
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													 <c:out value="${file.filename}"/> 
 													</td>
 													<td NOWRAP valign=top>												
-													<c:set var="viewURL">
+													<c:set scope="request" var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</a>
 													</td>
 													<td NOWRAP valign=top>													
-													<c:set var="downloadURL">
+													<c:set scope="request" var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
@@ -103,7 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													 <c:out value="${file.filename}"/> 
 													</td>
 													<td NOWRAP valign=top>												
-													<c:set var="viewURL">
+													<c:set scope="request" var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
@@ -111,7 +111,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</a>
 													</td>
 													<td NOWRAP valign=top>													
-													<c:set var="downloadURL">
+													<c:set scope="request" var="downloadURL">
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">

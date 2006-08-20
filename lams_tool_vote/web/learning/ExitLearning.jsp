@@ -24,10 +24,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams">
+<c:set scope="request" var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="tool">
+<c:set scope="request" var="tool">
 	<lams:WebAppURL />
 </c:set>
 
@@ -69,7 +69,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="reportViewOnly"/>		
 	<html:hidden property="userEntry"/>			
 		
-			<table>
+			<table cellpadding="0" class="alternative-color">
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
 						  	 <b>  <bean:message key="label.learning.forceFinishMessage"/> </b> 

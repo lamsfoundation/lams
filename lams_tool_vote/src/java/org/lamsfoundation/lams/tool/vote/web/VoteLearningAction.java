@@ -369,7 +369,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		return (mapping.findForward(VIEW_ANSWERS));
     }
     
-
+    
     public ActionForward redoQuestionsOk(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,

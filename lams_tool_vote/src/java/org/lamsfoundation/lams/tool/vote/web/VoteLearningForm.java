@@ -81,6 +81,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String getNextQuestion;
 	protected String getPreviousQuestion;
 	protected String endLearning;
+	protected String refreshVotes;
 	
 	protected String nominationsSubmited;
 	protected String revisitingUser;
@@ -223,6 +224,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 		this.setLearnerFinished(null);
 		this.setDonePreview(null);
 		this.setDoneLearnerProgress(null);
+		this.setRefreshVotes(null);
 	}
 
 	public void resetParameters()
@@ -271,7 +273,19 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	public void setOptionCheckBoxSelected(String optionCheckBoxSelected) {
 		this.optionCheckBoxSelected = optionCheckBoxSelected;
 	}
-	/**
+	    /**
+     * @return Returns the refreshVotes.
+     */
+    public String getRefreshVotes() {
+        return refreshVotes;
+    }
+    /**
+     * @param refreshVotes The refreshVotes to set.
+     */
+    public void setRefreshVotes(String refreshVotes) {
+        this.refreshVotes = refreshVotes;
+    }
+/**
 	 * @return Returns the optionIndex.
 	 */
 	public String getOptionIndex() {

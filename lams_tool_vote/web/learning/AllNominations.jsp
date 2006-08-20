@@ -24,10 +24,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams">
+<c:set scope="request" var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="tool">
+<c:set scope="request" var="tool">
 	<lams:WebAppURL />
 </c:set>
 
@@ -56,7 +56,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="header-no-tabs-learner"></div>
 
 <div id="content-learner">
-<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+
+<html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolSessionID"/>
 	<html:hidden property="userID"/>	
@@ -69,113 +70,99 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="reportViewOnly"/>		
 	<html:hidden property="userEntry"/>		
 	
+		<table cellpadding="0">
+		
+			  <tr>
+			  	<td NOWRAP valign=top align=center colspan=2> 
+					<b> <bean:message key="label.progressiveResults"/>  </b>
+			  	</td>
+			  </tr>	
 
-				<table>
-					  <tr>
-					  	<td NOWRAP align=center  valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.progressiveResults"/> </b> 
-					  	</td>
-					  </tr>
-					  
- 					<c:if test="${voteGeneralLearnerFlowDTO.nominationsSubmited == 'true'}"> 			
-						<tr> <td class="error" align=center>
-								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
-								 <bean:message key="sbmt.learner.nominations.successful"/>  </img>
-						</td></tr>
-					</c:if> 		
-					  
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-							<c:set var="viewURL">
-								<html:rewrite page="/chartGenerator?type=pie"/>
-							</c:set>
-							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								 	<bean:message key="label.view.piechart"/>  
-							</a>
-								
-					  	</td>
-					  </tr>	
-					  
-					  
-			  			<tr> 
-						  	<td NOWRAP align=center  valign=top colspan=2> 
-								<c:set var="viewURL">
-									<html:rewrite page="/chartGenerator?type=bar"/>
-								</c:set>
-								<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									 	<bean:message key="label.view.barchart"/>  
-								</a>
-							</td>
-						</tr>
-					  
-					  
-					  
 				  		<!--present  a mini summary table here -->
 			  			<tr> 
-						  	<td NOWRAP align=center  valign=top colspan=2> <table>
-					  
-					  				<tr>
-								 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
-										<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
-									</tr>
-									
-									<c:forEach var="currentNomination" items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
-							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
-							  	 		 <tr>
-				  	 						<td NOWRAP valign=top align=left>
-												<c:out value="${currentNomination.value}" escapeXml="false"/>
-											 </td>
+						  	<td NOWRAP align=center  valign=top> 
+							  	<table cellpadding="0" class="alternative-color">
+						  				<tr>
+									 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
+											<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
+										</tr>
+										
+										<c:forEach var="currentNomination" items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
+								  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
+								  	 		 <tr>
+					  	 						<td NOWRAP valign=top align=left>
+													<c:out value="${currentNomination.value}" escapeXml="false"/>
+												 </td>
+				
+												<td NOWRAP valign=top align=left>				  	 		
+										  	 		<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
+											  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
+										  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+										  				
+										  					<c:if test="${currentUserCount.value != '0' }"> 	
+													  	 		<c:forEach var="currentQuestionUid" items="${voteGeneralLearnerFlowDTO.mapStandardQuestionUid}">
+														  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
+													  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
+	
+															  	 		<c:forEach var="currentSessionUid" items="${voteGeneralLearnerFlowDTO.mapStandardToolSessionUid}">
+																  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
+															  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
 			
-											<td NOWRAP valign=top align=left>				  	 		
-									  	 		<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
-										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
-									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
-									  				
-									  					<c:if test="${currentUserCount.value != '0' }"> 	
-												  	 		<c:forEach var="currentQuestionUid" items="${voteGeneralLearnerFlowDTO.mapStandardQuestionUid}">
-													  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
-												  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
-
-														  	 		<c:forEach var="currentSessionUid" items="${voteGeneralLearnerFlowDTO.mapStandardToolSessionUid}">
-															  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
-														  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
-		
-																  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
-																					<c:set var="viewURL">
-																						<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
-																					</c:set>
-
-																					 <c:out value="${currentUserCount.value}"/>  
-
-																				</c:if> 	    
-																  				<c:if test="${currentNomination.value == 'Open Vote'}"> 				
+																	  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
+																						<c:set scope="request" var="viewURL">
+																							<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
+																						</c:set>
+	
 																						 <c:out value="${currentUserCount.value}"/>  
-																				</c:if> 	    
-																		</c:if> 	    
-																	</c:forEach>		  
+	
+																					</c:if> 	    
+																	  				<c:if test="${currentNomination.value == 'Open Vote'}"> 				
+																							 <c:out value="${currentUserCount.value}"/>  
+																					</c:if> 	    
+																			</c:if> 	    
+																		</c:forEach>		  
+	
+																	</c:if> 	    
+																</c:forEach>		  
+															</c:if> 	    								
+											  				<c:if test="${currentUserCount.value == '0' }"> 		  				
+																	<c:out value="${currentUserCount.value}"/>  
+															</c:if> 	
+															    																								
+														</c:if> 	    
+													</c:forEach>		  
+				
+										  	 		<c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
+											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+																	 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
+														</c:if> 	    
+													</c:forEach>		  
+												</td>						
+											</tr>	
+										</c:forEach>	
+						  
+						  			</table>
+								</td> 
 
-																</c:if> 	    
-															</c:forEach>		  
-														</c:if> 	    								
-										  				<c:if test="${currentUserCount.value == '0' }"> 		  				
-																<c:out value="${currentUserCount.value}"/>  
-														</c:if> 	
-														    																								
-													</c:if> 	    
-												</c:forEach>		  
-			
-									  	 		<c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
-										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
-									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-																 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
-													</c:if> 	    
-												</c:forEach>		  
-											</td>								
-										</tr>	
-									</c:forEach>	
-					  
-					  			</table>
-								</td> </tr>					  
+							  	<td NOWRAP align=center valign=top> 
+									<c:set scope="request" var="viewURL">
+										<html:rewrite page="/chartGenerator?type=pie"/>
+									</c:set>
+									<a title="<bean:message key='label.tip.displayPieChart'/>" href="javascript:;" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+			                                    <img src="<c:out value="${tool}"/>images/piechart.gif" width=30 height=30 border="0">
+									</a> 
+									&nbsp
+									<c:set scope="request" var="viewURL">
+										<html:rewrite page="/chartGenerator?type=bar"/>
+									</c:set>
+		
+									<a title="<bean:message key='label.tip.displayBarChart'/>" href="javascript:;" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+			                                    <img src="<c:out value="${tool}"/>images/columnchart.gif" width=30 height=30 border="0">
+									</a> 
+								</td>
+
+							</tr>					  
 
 					  <tr>
 					  	<td NOWRAP valign=top colspan=2> 
@@ -197,27 +184,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  </tr>
 					</c:forEach>
 
-						<tr> 
-							<td NOWRAP align=center  valign=top colspan=2> 
-						 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
-					 		</td>
-					  	</tr>
-
-
+					<tr> 
+						<td NOWRAP align=center  valign=top colspan=2> 
+					 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
+				 		</td>
+				  	</tr>
 
 
 				<c:if test="${VoteLearningForm.reportViewOnly != 'true'}"> 				   	
 				  <tr>
 				  	<td NOWRAP valign=top> 
-								<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   						
-			                                <html:submit property="redoQuestionsOk" 
-			                                             styleClass="button" 
-			                                             onclick="submitMethod('redoQuestionsOk');">
-			                                    <bean:message key="label.retake"/>
-			                                </html:submit>
-								</c:if> 		          
-
-					<td>					
+	                                <html:submit property="refreshVotes" 
+	                                             styleClass="button" 
+	                                             onclick="submitMethod('viewAllResults');">
+	                                    <bean:message key="label.refresh"/>
+	                                </html:submit>
+	                                
+						<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   										  
+									&nbsp&nbsp	
+	                                <html:submit property="redoQuestionsOk" 
+	                                             styleClass="button" 
+	                                             onclick="submitMethod('redoQuestionsOk');">
+	                                    <bean:message key="label.retake"/>
+	                                </html:submit>
+						</c:if> 		          					
+	                                
+	                                
+					</td>					
 					<td NOWRAP valign=top align=right> 			
                                 <html:submit property="learnerFinished" 
                                              styleClass="button" 
@@ -228,7 +221,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  </tr>
 				</c:if> 		          				  
 
-	</html:form>
+		
+		</table>
+	
+</html:form>
+
 </div>
 
 <div id="footer-learner"></div>
@@ -236,4 +233,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 </body>
 </html:html>
+
+
+
+
+
+
 

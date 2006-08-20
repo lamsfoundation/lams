@@ -58,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 		</table>
 
-		<c:set var="monitoringURL">
+		<c:set scope="request" var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />
 		</c:set>
 
