@@ -1,0 +1,188 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool;
+
+/** 
+ * Tools that support this interface can import data from a LAMS 1.0.2.
+ * 
+ * Tool do *not* need to implement this interface as part of the tool contract however
+ * many of the initial tools build for LAMS 2.0 do support this interface to 
+ * allow 1.0.2 designs to be imported into 2.0.
+ *  
+ * Any tool implementing a signature listed in the lams_tool_import_support table
+ * as supporting one of the 1.0.2 tool must implement this interface otherwise 
+ * an exception will be thrown.
+ */
+import java.util.Map;
+
+import org.lamsfoundation.lams.tool.exception.ToolException;
+
+public interface ToolContentImport102Manager {
+
+	public static final String TAGS_TYPE_AUTHORING = "authoring";
+	public static final String TAGS_JOURNAL = "journal";
+	public static final String TAGS_NOTICEBOARD = "noticeboard";
+	public static final String TAGS_MESSAGEBOARD = "messageboard";
+	public static final String TAGS_LOMS = "loms";
+	public static final String TAGS_CHAT = "chat";
+	public static final String TAGS_RPT_SUBMIT= "reportsubmission";
+	public static final String TAGS_RPT_MARK= "reportmarking";
+	public static final String TAGS_GROUPING = "group";
+	public static final String TAGS_GROUPREPORTING = "groupreporting";
+	public static final String TAGS_RANKING = "ranking";
+	public static final String TAGS_QUESTIONANSWER = "qa";
+	public static final String TAGS_SIMPLE_ASSESSMENT = "simpleassessment";
+	public static final String TAGS_URLCONTENT = "urlcontent";
+	public static final String TAGS_FILECONTENT = "filecontent"; 
+	public static final String TAGS_HTMLNOTICBOARD = "htmlnb";
+	public static final String TAGS_SINGLE_RESOURCE = "singleresource";	
+	public static final String TAGS_IMAGEGALLERY = "imagegallery"; 
+	public static final String TAGS_IMAGERANKING = "imageranking";
+	
+	public static final String CONTENT_BODY = "body"; // used
+	public static final String CONTENT_SHOW_USER = "contentShowUser"; // boolean
+	public static final String CONTENT_DEFINE_LATER = "contentDefineLater"; // boolean // used
+	public static final String CONTENT_TITLE = "title"; // used
+	public static final String CONTENT_ID = "id"; // used
+	
+	// contentType is based on the content class used - doesn't persist
+	public static final String CONTENT_TYPE = "contentType";
+	public static final String CONTENT_NUMGROUPS = "number_groups";
+	public static final String CONTENT_MINNUM_GROUP = "min_number_in_group";
+	public static final String CONTENT_MAXNUM_GROUP = "max_number_in_group";
+	
+	// Ranking tool tags
+	public static final String CONTENT_VOTE_MAXCHOOSE = "maxChoose";
+	public static final String CONTENT_VOTE_METHOD = "voteMethod"; // equal vote or preferential
+	public static final String CONTENT_VOTE_NOMINATIONS = "nominations";
+	public static final String CONTENT_VOTE_ALLOW_POLL_NOMINATIONS = "nominatePollTime";  // allow nomination or not (Boolean)
+	public static final String CONTENT_VOTE_PROGRESSIVE_DISPLAY = "progressive_display";
+	
+	// url content
+	public static final String CONTENT_URL_MIN_NUMBER_COMPLETE = "minNumberComplete";
+	public static final String CONTENT_URL_RUNTIME_STAFF_SUBMIT_URL = "runtimeSubmissionStaffURL";
+	public static final String CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL = "runtimeSubmissionLearnerURL";
+	public static final String CONTENT_URL_RUNTIME_STAFF_SUBMIT_FILE = "runtimeSubmissionStaffFile";
+	public static final String CONTENT_URL_RUNTIME_LEARNER_SUBMIT_FILE = "runtimeSubmissionLearnerFile";
+	public static final String CONTENT_URL_URLS = "urls";
+	
+	public static final String CONTENT_URL_URL_SHOWBUTTONS = "showbuttons";
+	public static final String CONTENT_URL_URL_VIEW_ORDER = "order";
+	public static final String CONTENT_URL_URL_URL = "url";
+	public static final String CONTENT_URL_URL_DOWNLOAD  = "download"; // boolean: Author prefers that the content is downloaded. Only applicable to file content.
+	public static final String CONTENT_URL_URL_TYPE= "resourcetype"; // see URLContent TYPE_* fields
+	public static final String CONTENT_URL_URL_INSTRUCTION_ARRAY = "instructions";
+	public static final String CONTENT_URL_INSTRUCTION = "instruction";
+
+	// message content
+	public static final String CONTENT_MB_TERMINATION_TYPE = "terminationType"; // type string
+	public static final String CONTENT_MB_DURATION_DAYS = "durationInDays"; // type string
+	public static final String CONTENT_MB_POSTING_NOTIFIED = "isPostingNotified"; // type boolean
+	public static final String CONTENT_MB_POSTING_MODERATED = "isPostingModerated"; // type boolean
+	public static final String CONTENT_MB_NEW_TOPIC_ALLOWED = "isNewTopicAllowed"; //type boolean
+	public static final String CONTENT_MB_REUSABLE = "isReusable"; //type boolean
+	public static final String CONTENT_MB_TOPICS = "topics"; // array
+	
+	public static final String CONTENT_MB_TOPIC_SUBJECT = "subject"; // string
+	public static final String CONTENT_MB_TOPIC_MESSAGE = "message"; // string 
+	public static final String CONTENT_MB_TOPIC_NUMBER = "number"; // number
+	
+	// Simple Questions content
+	public static final String CONTENT_Q_SHOW_FEEDBACK = "showfeedback"; // boolean
+	public static final String CONTENT_Q_ALLOW_REDO = "allowredo"; // integer
+	public static final String CONTENT_Q_MIN_PASSMARK = "minpassmark"; // integer
+	public static final String CONTENT_Q_SHOW_TOP_USERNAMES= "showtopusernames"; // boolean
+	public static final String CONTENT_Q_ORDER = "order"; // integer
+	public static final String CONTENT_Q_QUESTION_INFO = "questionanswers"; // string
+	public static final String CONTENT_Q_QUESTION = "question"; // string
+	public static final String CONTENT_Q_FEEDBACK = "feedback"; // string
+	public static final String CONTENT_Q_CANDIDATES = "candidates"; // array of string 
+	public static final String CONTENT_Q_ANSWER = "answer"; // string 
+	
+	// for file upload - SingleResource, HTMLNoticeboard, Image tools
+	public static final String DIRECTORY_NAME = "directoryName";
+
+	// ImageGallery task tags (extended from Content.java)
+	public static final String CONTENT_IMGG_DIRECTORY = DIRECTORY_NAME;
+	public static final String CONTENT_IMGG_BODY = CONTENT_BODY;
+	public static final String CONTENT_IMGG_DEFINE_LATER = CONTENT_DEFINE_LATER;  //Bolean
+	public static final String CONTENT_IMGG_GROUPING = "grouping";
+	public static final String CONTENT_IMGG_SHOW_USER = CONTENT_SHOW_USER;
+	public static final String CONTENT_IMGG_MAX_IMAGES = "maxImages";
+	public static final String CONTENT_IMGG_ALLOW_SEARCH = "allowSearch"; // Boolean
+	public static final String CONTENT_IMGG_SEARCH_URL = "searchURL"; 
+	public static final String CONTENT_IMGG_ALLOW_URL = "allowURL"; // Boolean
+	public static final String CONTENT_IMGG_ALLOW_UPLOAD = "allowUpload";
+	public static final String CONTENT_IMGG_IMAGES = CONTENT_URL_URLS;
+	
+	// ImageGallery images array (also used by ImageRanking)
+	public static final String CONTENT_IMGG_IMAGE_SID = "sid";
+	public static final String CONTENT_IMGG_IMAGE_COMMENTS = "comments";
+	public static final String CONTENT_IMGG_IMAGE_VIEW_ORDER = "order";
+	public static final String CONTENT_IMGG_IMAGE_DATECREATED = "dateCreated";
+	public static final String CONTENT_IMGG_IMAGE_DATEUPDATED = "dateUpdated";
+	public static final String CONTENT_IMGG_IMAGE_TYPE = "type"; // "resourceType", values are "externalurl" or "file"
+	public static final String CONTENT_IMGG_IMAGE_URL = "url";
+	public static final String CONTENT_IMGG_IMAGE_FILENAME = "filename";
+	public static final String CONTENT_IMGG_IMAGE_PATH = "path";
+	public static final String CONTENT_IMGG_IMAGE_OWNERID = "ownerId";
+	public static final String CONTENT_IMGG_IMAGE_OWNERNAME = "owerName";
+	// Additional field to use the image array for ImageRanking (runtime only)
+	public static final String CONTENT_IMGR_IMAGE_IS_SELECTED = "isSelected";
+
+	// ImageRanking task tags (extended from Content.java)
+	public static final String CONTENT_IMGR_DIRECTORY = DIRECTORY_NAME;
+	public static final String CONTENT_IMGR_BODY = CONTENT_BODY; // this is the description
+	public static final String CONTENT_IMGR_DEFINE_LATER = CONTENT_DEFINE_LATER;  //Bolean
+	public static final String CONTENT_IMGR_GROUPING = "grouping";
+	public static final String CONTENT_IMGR_SHOW_USER = CONTENT_SHOW_USER;
+	public static final String CONTENT_IMGR_MAX_VOTE = CONTENT_VOTE_MAXCHOOSE;
+	public static final String CONTENT_IMGR_PROGRESSIVE_DISPLAY = CONTENT_VOTE_PROGRESSIVE_DISPLAY; // Boolean
+	public static final String CONTENT_IMGR_IMAGES = CONTENT_URL_URLS;
+	// ImageRanking images array - same as the ImageGallery images array
+
+    /**
+     * Import some 1.0.2 data, where the importValues is a map of the fields from the 
+     * 1.0.2 content record. The keys are WDDX tags, values are the WDDX values as strings.
+     * The tools should call WDDXProcessor.convertToInteger(identifier, value) and similar
+     * methods to convert the values to a valid type.
+     * 
+     * Tools should always set defineLater to false, even if the content indicates
+     * that defineLater is true. In 2.0, define later in the tool content is set up 
+     * by the LAMS engine when the design is copied for a lesson, not during authoring.
+     * So setting it in the tool data now will wreck preview as the workflow engine doesn't
+     * set define later on the tools for preview.
+     * 
+     * @param toolContentId new tool content id
+     * @param newUserId user id of the person importing the data
+     * @param importValues map of values to import. 
+     * @throws ToolException if any other error occurs
+     */
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Map importValues) 
+    	throws ToolException;
+    
+    
+
+}

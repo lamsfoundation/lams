@@ -175,6 +175,21 @@
 			</props>
 		</property>
 	</bean>
+	
+    <!--  Processes a LAMS 1.0.2 import file. Called by exportToolContentService -->
+	<bean id="ld102Importer" class="org.lamsfoundation.lams.learningdesign.service.LD102Importer"  singleton="false">
+		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="toolImportSupportDAO"><ref bean="toolImportSupportDAO"/></property>
+		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
+		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
+	</bean>
+	
 	<!--  Access a message service related to a programatically loaded message file. -->
 	<!--  Can be used to arbitrarily access any message file that is on the classpath -->
 	<!--  as long as you know the file's name and full path.                          -->

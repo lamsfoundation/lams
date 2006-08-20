@@ -102,7 +102,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -120,7 +119,7 @@ import com.thoughtworks.xstream.converters.Converter;
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
 	public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
-	public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
+	public static final String LD102IMPORTER_BEAN_NAME = "ld102Importer";
 	
 	//export tool content zip file prefix
 	public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
@@ -457,10 +456,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
 			, List<String> toolsErrorMsgs) throws ImportToolContentException {
 		WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
-    	LD102Importer oldImporter = new LD102Importer(getLearningDesignService(), getMessageService(),
-    			baseDAO, learningDesignDAO, learningLibraryDAO, activityDAO, toolDAO, 
-    			toolImportSupportDAO, toolContentDAO, systemToolDAO, toolsErrorMsgs);
-    	return oldImporter.storeLDDataWDDX(ldWddxPacket, importer, folder);
+    	LD102Importer oldImporter = getLD102Importer();
+    	return oldImporter.storeLDDataWDDX(ldWddxPacket, importer, folder, toolsErrorMsgs);
 	}
 	
 
@@ -696,9 +693,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private ILearningDesignService getLearningDesignService(){
 		return (ILearningDesignService) applicationContext.getBean(LEARNING_DESIGN_SERVICE_BEAN_NAME);		
 	}
-	private MessageService getMessageService(){
-		return (MessageService) applicationContext.getBean(MESSAGE_SERVICE_BEAN_NAME);		
+	private LD102Importer getLD102Importer(){
+		return (LD102Importer) applicationContext.getBean(LD102IMPORTER_BEAN_NAME);		
 	}
+	
 	
 	private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException
     {

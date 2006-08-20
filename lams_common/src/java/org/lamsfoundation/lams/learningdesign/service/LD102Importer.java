@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolImportSupport;
 import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
@@ -67,14 +68,24 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-/** Create a learning design from the LAMS 1.0.x WDDX packet. Used by the Import action. */
-public class LD102Importer {
+/** 
+ * Create a learning design from the LAMS 1.0.x WDDX packet. Used by the Import action.
+ * 
+ * To be created using Spring, but it must not be a singleton as it has instance data.
+ * Requires a Spring context so that it can communicate with the tools to create the
+ * tool data.
+ */
+public class LD102Importer implements ApplicationContextAware{
 
 	private static final String MSG_KEY_PERM_GATE = "imported.permission.gate.title";
 	private static final String MSG_KEY_SYNC_GATE = "imported.synchronise.gate.title";
 			
 	private Logger log = Logger.getLogger(LD102Importer.class);
+	private ApplicationContext context;
 	private ILearningDesignService learningDesignService = null;
 	private MessageService messageService = null;
 	private IBaseDAO baseDAO = null;
@@ -131,49 +142,14 @@ public class LD102Importer {
 	private static final String OPTIONAL_OBJECT_TYPE = "optionalactivity";
 	private static final String CONTENT_OBJECT_TYPE = "content";
 
-	private static final String TOOLDATA_TAGS_TYPE_AUTHORING = "authoring";
-	private static final String TOOLDATA_TAGS_JOURNAL = "journal";
-	private static final String TOOLDATA_TAGS_NOTICEBOARD = "noticeboard";
-	private static final String TOOLDATA_TAGS_MESSAGEBOARD = "messageboard";
-	private static final String TOOLDATA_TAGS_LOMS = "loms";
-	private static final String TOOLDATA_TAGS_CHAT = "chat";
-	private static final String TOOLDATA_TAGS_RPT_SUBMIT= "reportsubmission";
-	private static final String TOOLDATA_TAGS_RPT_MARK= "reportmarking";
-	private static final String TOOLDATA_TAGS_GROUPING = "group";
-	private static final String TOOLDATA_TAGS_GROUPREPORTING = "groupreporting";
-	private static final String TOOLDATA_TAGS_RANKING = "ranking";
-	private static final String TOOLDATA_TAGS_QUESTIONANSWER = "qa";
-	private static final String TOOLDATA_TAGS_SIMPLE_ASSESSMENT = "simpleassessment";
-	private static final String TOOLDATA_TAGS_URLCONTENT = "urlcontent";
-	private static final String TOOLDATA_TAGS_FILECONTENT = "filecontent"; 
-	private static final String TOOLDATA_TAGS_HTMLNOTICBOARD = "htmlnb";
-	private static final String TOOLDATA_TAGS_SINGLE_RESOURCE = "singleresource";	
-	private static final String TOOLDATA_TAGS_IMAGEGALLERY = "imagegallery"; 
-	private static final String TOOLDATA_TAGS_IMAGERANKING = "imageranking";
-	
-	public LD102Importer(ILearningDesignService learningDesignService, MessageService messageService,IBaseDAO baseDAO, 
-			ILearningDesignDAO learningDesignDAO, ILearningLibraryDAO learningLibraryDAO, IActivityDAO activityDAO, IToolDAO toolDAO, 
-			IToolImportSupportDAO toolImportSupportDAO, IToolContentDAO toolContentDAO, ISystemToolDAO systemToolDAO, List<String> toolsErrorMsgs) {
-		this.learningDesignService = learningDesignService;
-		this.messageService = messageService;
-		this.baseDAO = baseDAO;
-		this.learningLibraryDAO = learningLibraryDAO;
-		this.learningDesignDAO = learningDesignDAO;
-		this.activityDAO = activityDAO;
-		this.toolDAO = toolDAO;
-		this.systemToolDAO = systemToolDAO;
-		this.toolImportSupportDAO = toolImportSupportDAO;
-		this.toolContentDAO = toolContentDAO;
-		this.toolsErrorMsgs = toolsErrorMsgs;
-		if ( toolsErrorMsgs == null ) {
-			log.warn("The list toolsErrorMsgs supplied is null so any warnings will be logged but won't appear in the user's screen.");
-			toolsErrorMsgs = new ArrayList<String>();
-		}
-		
-		this.libraryActivityUiImages = getLibraryActivityUiImages();
-		this.toolImportSupport = getToolImportSupport();
-	}
-	
+   /**
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext context) throws BeansException
+    {
+        this.context = context;
+    }
+
 	public void setLearningDesignService(ILearningDesignService learningDesignService) {
 		this.learningDesignService = learningDesignService;
 	}
@@ -236,7 +212,7 @@ public class LD102Importer {
 	protected static boolean isSimpleTask(String objectType, String toolType) {
 		if ( objectType!=null && toolType!=null 
 				&& objectType.equalsIgnoreCase(ABSTRACT_TASK_OBJECT_TYPE)
-				&& ! toolType.equalsIgnoreCase(TOOLDATA_TAGS_GROUPING) )
+				&& ! toolType.equalsIgnoreCase(ToolContentImport102Manager.TAGS_GROUPING) )
 			return true;
 		else
 			return false;
@@ -249,7 +225,7 @@ public class LD102Importer {
 	protected static boolean isGroupingToolTask(String objectType, String toolType) {
 		if ( objectType!=null && toolType!=null 
 				&& objectType.equalsIgnoreCase(ABSTRACT_TASK_OBJECT_TYPE)
-				&& toolType.equalsIgnoreCase(TOOLDATA_TAGS_GROUPING) )
+				&& toolType.equalsIgnoreCase(ToolContentImport102Manager.TAGS_GROUPING) )
 			return true;
 		else
 			return false;
@@ -336,8 +312,16 @@ public class LD102Importer {
 	}
 
 	
-	public Long storeLDDataWDDX(String ldWddxPacket, User importer, WorkspaceFolder folder) throws ImportToolContentException
+	public Long storeLDDataWDDX(String ldWddxPacket, User importer, WorkspaceFolder folder, List<String> toolsErrorMsgs) throws ImportToolContentException
 	{
+		this.libraryActivityUiImages = getLibraryActivityUiImages();
+		this.toolImportSupport = getToolImportSupport();
+		this.toolsErrorMsgs = toolsErrorMsgs;
+		if ( toolsErrorMsgs == null ) {
+			log.warn("The list toolsErrorMsgs supplied is null so any warnings will be logged but won't appear in the user's screen.");
+			toolsErrorMsgs = new ArrayList<String>();
+		}
+		
 		originalPacket = ldWddxPacket;
 		
 		if (importer == null)
@@ -457,9 +441,7 @@ public class LD102Importer {
 		// now set up the activity -> grouping defn links. Can't be done earlier as there
 		// are the groupings are set up as the activities are processed.
 		assignGroupings();
-		
-		// finally set all the dummy output tasks to be replaced with dynamic content
-//		setOutputTasksAsReplaceWithDynamic();
+
 		baseDAO.update(ldInProgress);
 
 	}
@@ -676,7 +658,7 @@ public class LD102Importer {
 						Iterator subTaskIterator = subTasks.iterator();
 						while (subTaskIterator.hasNext()) {
 							Hashtable subTask = (Hashtable) subTaskIterator.next();
-							if ( TOOLDATA_TAGS_JOURNAL.equals(subTask.get(WDDXTAGS102.TASK_TOOLTYPE)) ) {
+							if ( ToolContentImport102Manager.TAGS_JOURNAL.equals(subTask.get(WDDXTAGS102.TASK_TOOLTYPE)) ) {
 								journalTaskInputContentId = WDDXProcessor.convertToInteger(subTask, WDDXTAGS102.TASK_INPUT_CONTENT);
 							}
 						}
@@ -775,7 +757,6 @@ public class LD102Importer {
 		
 		activity.setOrderId(null); // if needed, will be set when the parent activity is created.
 		
-		activity.setDefineLater(Boolean.FALSE);
 		activity.setLearningDesign(ldInProgress);
 		activity.setCreateDateTime(createDate);
 		activity.setRunOffline(Boolean.FALSE);
@@ -871,7 +852,7 @@ public class LD102Importer {
 		return groupingActivity;
 	}
 
-	private ToolActivity setupToolActivity(Hashtable taskDetails, Integer contentId, Integer taskUIID) {
+	private ToolActivity setupToolActivity(Hashtable taskDetails, Integer wddxContentId, Integer taskUIID) {
 		ToolActivity activity = new ToolActivity();
 		
 	    activity.setActivityUIID(taskUIID);
@@ -880,9 +861,10 @@ public class LD102Importer {
 		
 	    // first, find the matching new tool and set up the tool, tool content details.  
 	    String toolType = (String) taskDetails.get(WDDXTAGS102.TASK_TOOLTYPE);
+	    String title = (String) taskDetails.get(WDDXTAGS102.TITLE);
 	    Tool tool = toolType != null ? toolImportSupport.get(toolType) : null;
 	    if ( tool == null ) {
-			String message = "Unable to find a tool that supports the activity "+taskDetails.get(WDDXTAGS102.TITLE)+". This activity will be skipped. Activity is "+taskDetails;
+			String message = "Unable to find a tool that supports the activity "+title+". This activity will be skipped. Activity is "+taskDetails;
 			log.warn(message);
 			toolsErrorMsgs.add(message);
 	    	return null;
@@ -890,15 +872,38 @@ public class LD102Importer {
 
 	    ToolContent newContent = new ToolContent(tool);
 	    toolContentDAO.saveToolContent(newContent);
-
+	    Long toolContentId = newContent.getToolContentId();
+	    
 	    activity.setTool(tool);	
-	    activity.setToolContentId(newContent.getToolContentId());
+	    activity.setToolContentId(toolContentId);
+	    
+		// Get the tool to create the "real" content */
+	    Hashtable content = contentMap.get(wddxContentId);
+	    if ( content != null ) {
+	    	try {
+	    		Boolean defineLater = WDDXProcessor.convertToBoolean(content, ToolContentImport102Manager.CONTENT_DEFINE_LATER);
+	    		defineLater = defineLater != null ? defineLater : Boolean.FALSE;
+	    		activity.setDefineLater(defineLater);
+	    		
+			    ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(tool.getServiceName());
+		    	toolService.import102ToolContent(toolContentId, ldInProgress.getUser().getUserId(), content);
+	    	} catch ( Exception e ) {
+		    	String message = "Tool content for activity "+title+" cannot be set up due to an error. Activity will be use the default content. Activity is "+taskDetails; 
+				log.warn(message,e);
+				toolsErrorMsgs.add(message);
+	    	}
+	    } else {
+	    	String message = "Tool content for activity "+title+" is missing. Activity will be set up with default content. Activity is "+taskDetails; 
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+	    }
 
 	    // Now find an icon for the activity. The icon is in the activity tables so look for a library activity that matches this tool.
 	    // It may not always find the right icon if there is more than one possible match but its a start!
 	    activity.setLibraryActivityUiImage(libraryActivityUiImages.get(tool.getToolId()));
 		return activity;
 	}
+
 
 	/** 
 	 * Get the grouping value for a particular task. Could be "c" for class or a number 
@@ -987,14 +992,7 @@ public class LD102Importer {
 				}
 		
 				contentMap.put(objId, clientObj);
-				// TODO convert the content object to something we can use.
-	/*			ContentConverter converter = new ContentConverter();
-				aContent = converter.createNewContentObject((String) clientObj.get(WDDXTAGS102.CONTENT_TYPE));
-				// create the content object in the database, get updated version
-				aContent = m_contentUtil.insertContent(aContent);
-				converter.convertToDBData(clientObj, aContent, objId);
-				m_contentUtil.updateContent(aContent);
-	*/
+				
 			} catch ( WDDXProcessorConversionException e) {
 				handleWDDXProcessorConversionException(e);
 			}
