@@ -19,10 +19,9 @@
 		<html:hidden property="dispatch" value="updateContent" />
 		<html:hidden property="sessionMapID" />
 
-		<div id="message" align="center">
+		<div id="message" style="text-align: center;">
 			<c:if test="${unsavedChanges}">
-				<img src="${tool}images/warning.png" />
-				<bean:message key="message.unsavedChanges" />
+				<fmt:message key="message.unsavedChanges" />
 			</c:if>
 		</div>
 
