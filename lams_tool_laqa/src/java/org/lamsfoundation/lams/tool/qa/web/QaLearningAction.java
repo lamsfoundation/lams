@@ -87,6 +87,8 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -104,6 +106,7 @@ import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -224,7 +227,147 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		return (mapping.findForward(INDIVIDUAL_LEARNER_RESULTS));
 	}
     
-	
+    
+    public ActionForward redoQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching redoQuestions...");
+    	QaLearningForm qaLearningForm = (QaLearningForm) form;
+    	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		logger.debug("qaService: " + qaService);
+
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	qaLearningForm.setToolSessionID(toolSessionID);
+	 	
+	 	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
+	    logger.debug("retrieving qaSession: " + qaSession);
+	 	
+	    String toolContentID=qaSession.getQaContent().getQaContentId().toString();
+	    logger.debug("toolContentID: " + toolContentID);
+	    
+	    QaContent qaContent=qaSession.getQaContent();
+	    logger.debug("using qaContent: " + qaContent);
+	    
+    	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
+	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	    
+	    LearningUtil.saveFormRequestData(request,  qaLearningForm);
+
+	    Map mapQuestions= new TreeMap(new QaComparator());
+		Map mapAnswers= new TreeMap(new QaComparator());
+		
+	    generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
+	    qaLearningForm.setCurrentQuestionIndex(new Integer(1).toString());
+	    
+	    //SessionMap sessionMap = new SessionMap();
+	    
+ 	    String httpSessionID=qaLearningForm.getHttpSessionID();
+ 	    logger.debug("httpSessionID: " + httpSessionID);
+ 	    
+	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	    logger.debug("sessionMap: " + sessionMap);
+	    
+	    Map mapSequentialAnswers= new HashMap();
+	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+		
+	    generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
+		generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
+	    
+
+	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
+	    generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
+	    
+	    	    
+	    /*
+	     * The content we retrieved above must have been created before in Authoring time. 
+	     * And the passed tool session id refers to it.
+	     */
+	    
+	    
+		logger.debug("REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
+		generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
+	    
+		generalLearnerFlowDTO.setEndLearningMessage(qaContent.getEndLearningMessage());
+	    logger.debug("END_LEARNING_MESSAGE: " + qaContent.getEndLearningMessage());
+	    /*
+	     * Is the tool activity been checked as Run Offline in the property inspector?
+	     */
+	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + qaContent.isRunOffline());
+	    generalLearnerFlowDTO.setActivityOffline(new Boolean(qaContent.isRunOffline()).toString());
+	    
+	    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
+	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
+
+
+	    /*
+	     * Learning mode requires this setting for jsp to generate the user's report 
+	     */
+	    logger.debug("IS_QUESTIONS_SEQUENCED: " + qaContent.isQuestionsSequenced());
+	    String feedBackType="";
+    	if (qaContent.isQuestionsSequenced())
+    	{
+    		generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
+    		feedBackType=FEEDBACK_TYPE_SEQUENTIAL;
+    	}
+	    else
+	    {
+	        generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
+    		feedBackType=FEEDBACK_TYPE_COMBINED;
+	    }
+	    logger.debug("QUESTION_LISTING_MODE: " + generalLearnerFlowDTO.getQuestionListingMode());
+
+	    
+    	/*
+    	 * fetch question content from content
+    	 */
+    	Iterator contentIterator=qaContent.getQaQueContents().iterator();
+    	while (contentIterator.hasNext())
+    	{
+    		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
+    		if (qaQueContent != null)
+    		{
+    			int displayOrder=qaQueContent.getDisplayOrder();
+        		if (displayOrder != 0)
+        		{
+        			/*
+    	    		 *  add the question to the questions Map in the displayOrder
+    	    		 */
+            		mapQuestions.put(new Integer(displayOrder).toString(),qaQueContent.getQuestion());
+        		}
+    		}
+    	}
+		
+    	
+    	mapAnswers=(Map)sessionMap.get(MAP_ALL_RESULTS_KEY);
+    	logger.debug("mapAnswers: " + mapAnswers);
+    	
+	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+    	
+    	logger.debug("mapQuestions: " + mapQuestions);
+    	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
+    	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
+    	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
+    	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
+
+    	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
+    	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
+    	
+	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+		logger.debug("GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
+        logger.debug("forwarding to: " + LOAD_LEARNER);
+		return (mapping.findForward(LOAD_LEARNER));	
+	}
+    
+
+    
     /**
 	 * returns Learner Report for a session
 	 * ActionForward viewAllResults(ActionMapping mapping,

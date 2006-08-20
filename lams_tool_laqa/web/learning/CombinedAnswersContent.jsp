@@ -34,30 +34,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr> <td>
 			<table>
 				<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-						  <tr>
-						  	<td colspan=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
-						  	 </td>
-						  </tr>
-
-						  <tr>
-						  	<td colspan=2>  
-						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
-						  	 </td>
-						  </tr>
-						  
-
-						  <tr> 
-					 		<td colspan=2> <b> <bean:message key="label.answer"/> </b> </td>
-					 	  </tr>
-					 	  
-  						  <tr> 
-							<td colspan=2>
-					 			<textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60></textarea>
-					 		</td>
-					  	  </tr>
-
-					  	  <tr><td colspan=2> &nbsp </td> </tr>
-
+						<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+					  		<c:if test="${questionEntry.key == answerEntry.key}"> 			
+							  <tr>
+							  	<td colspan=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
+							  	 </td>
+							  </tr>
+	
+							  <tr>
+							  	<td colspan=2>  
+							  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
+							  	 </td>
+							  </tr>
+							  
+	
+							  <tr> 
+						 		<td colspan=2> <b> <bean:message key="label.answer"/> </b> </td>
+						 	  </tr>
+						 	  
+	  						  <tr> 
+								<td colspan=2>
+						 			<textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60>
+								 			<c:out value="${answerEntry.value}" escapeXml="false"/> 
+						 			</textarea>
+						 		</td>
+						  	  </tr>
+	
+						  	  <tr><td colspan=2> &nbsp </td> </tr>
+	  	   					</c:if> 			
+						</c:forEach>
 				</c:forEach>
 			</table>
 			

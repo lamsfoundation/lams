@@ -69,13 +69,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="totalQuestionCount"/>				
 
 				<table class="forms">
-				  <tr><th scope="col">
-					  	 <bean:message key="label.learning.reportMessage"/> 
+				  <tr><td align=center colspan=2>
+					  	<b> <bean:message key="label.learning.reportMessage"/> </b>
 		    	  	</th>
 				  </tr>
 
 			
-					<tr> <td align=left>		
+					<tr> <td align=left colspan=2>		
 						<table align="left">
 							<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 									  <tr>
@@ -113,12 +113,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td></tr>
 					
 	  	   		  <tr>
-						<td colspan=2>
-			                                <html:submit property="viewAllResults" 
+	  	   		  		<td>
+                               <html:submit property="redoQuestions" 
                                              styleClass="button" 
-                                             onclick="submitMethod('viewAllResults');">
-                                    <bean:message key="label.allResponses"/>
+                                             onclick="submitMethod('redoQuestions');">
+                                    <bean:message key="label.redo"/>
                                 </html:submit>
+					  	 </td>
+	  	   		  
+						<td>
+                              <html:submit property="viewAllResults" 
+                                         styleClass="button" 
+                                         onclick="submitMethod('viewAllResults');">
+                                <bean:message key="label.allResponses"/>
+                            </html:submit>
 					  	 </td>
 				  </tr>
 				  

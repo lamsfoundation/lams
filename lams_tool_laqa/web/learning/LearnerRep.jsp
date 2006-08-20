@@ -78,15 +78,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true'}"> 			
 		       	<table> 	  
 					<tr> <td>
-						<bean:message key="label.learning.viewOnly"/>
+						<b> <bean:message key="label.learnerReport"/> </b>
 					 </td>
 					</tr>
 				</table>				
 			</c:if> 				    
-		
-				<c:set var="monitoringURL">
-					<html:rewrite page="/monitoring.do" />
-				</c:set>
 		
 			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		  		<html:hidden property="method"/>	 
@@ -161,14 +157,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}"> 			
 		       	<table> 	  
 					<tr> <td>
-						<bean:message key="label.learner.progress"/>
+						<bean:message key="label.learnerReport"/>
 					 </td>
 					</tr>
 				</table>						 
-		
-				<c:set var="monitoringURL">
-					<html:rewrite page="/monitoring.do" />
-				</c:set>
 		
 			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		  		<html:hidden property="method"/>	 
@@ -220,6 +212,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td>  
 			  			</tr>
 					</c:forEach>		  	
+
+
+
+			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true'}"> 			
+			       	<table> 	  
+						<tr> 
+							<td>
+								<div class="right-buttons">
+
+									<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
+										<bean:message key="button.endLearning"/>
+									</html:submit>	 				
+								</div> 		  															 		  					
+								</td> 
+							</tr>
+					</table>
+			</c:if> 				    
+
 
 			</html:form>
 		</c:if> 				    

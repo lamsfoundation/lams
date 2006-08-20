@@ -47,6 +47,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
     protected String questionIndex;		
 	protected String userID;
 	protected String viewAllResults;
+	protected String redoQuestions;
 	protected String responseId;
 	
 	protected String requestLearningReport;
@@ -294,4 +295,16 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
         this.requestLearningReportViewOnly = requestLearningReportViewOnly;
     }
     
+    /**
+     * @return Returns the redoQuestions.
+     */
+    public String getRedoQuestions() {
+        return redoQuestions;
+    }
+    /**
+     * @param redoQuestions The redoQuestions to set.
+     */
+    public void setRedoQuestions(String redoQuestions) {
+        this.redoQuestions = redoQuestions;
+    }
 }

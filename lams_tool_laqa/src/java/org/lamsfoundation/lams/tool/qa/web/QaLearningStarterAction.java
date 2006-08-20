@@ -248,25 +248,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    
-	    
-	    /*
-		if (qaContent.getTitle() == null)
-		{
-			generalLearnerFlowDTO.setActivityTitle("Q&A Title");
-			generalLearnerFlowDTO.setActivityInstructions("Q&A Instructions");
-		}
-		else if (qaContent.getTitle().equals(""))
-		{
-		    generalLearnerFlowDTO.setActivityTitle("Q&A Title");
-			generalLearnerFlowDTO.setActivityInstructions("Q&A Instructions");
-		}
-		else
-		{
-		    generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
-			generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
-		}
-		*/
-	    
 	    generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 		generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
 	    
@@ -342,6 +323,17 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     		}
     	}
 		
+    	mapAnswers=mapQuestions;
+    	Iterator itMap = mapAnswers.entrySet().iterator();
+    	
+    	while (itMap.hasNext()) 
+    	{
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            pairs.setValue("");
+    	}
+    	logger.debug("mapAnswers : " + mapAnswers);
+    	
+    	
     	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
     	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
     	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
@@ -455,13 +447,31 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    		    	 * the report should have only the current session's entries*/
 		    		    	
 		    		    	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
-		    		    	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
+
 
 		    		    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
 		    		    	        currentToolSessionID.toString(), null, generalLearnerFlowDTO, false);
 		    		    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		    	    		
+		    		    	
+		    	    	    boolean isSessionCompleted=isSessionCompleted(currentToolSessionID.toString(), qaService);
+		    	    	    logger.debug("isSessionCompleted: " + isSessionCompleted);
+		    	    	    
+		    	    	    if (isSessionCompleted)
+		    	    	    {
+		    	    	        logger.debug("since the session is completed present a screen which can not be edited");
+			    		    	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
+		    	    	    }
+		    	    	    else
+		    	    	    {
+			    		    	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
+		    	    	    }
+
+		    	    	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+		    	    		logger.debug("before fwd, GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
+
+		    		    	
 		    	    		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_REPORT);
 		    	    		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 		    			}
@@ -561,6 +571,21 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    return null;
 	}
 	
+	
+	boolean isSessionCompleted(String userSessionId, IQaService qaService)
+	{
+		logger.debug("userSessionId:" + userSessionId);
+		QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(userSessionId).longValue());
+	    logger.debug("retrieving qaSession: " + qaSession);
+	    logger.debug("voteSession status : " + qaSession.getSession_status());
+	    if  ((qaSession.getSession_status() != null) &&  (qaSession.getSession_status().equals(COMPLETED)))
+	    {
+	        logger.debug("this session is COMPLETED voteSession status : " + userSessionId);
+	        return true;
+	    }
+	    return false;
+	}
+
 	
 	/**
      * persists error messages to request scope
