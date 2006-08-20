@@ -157,7 +157,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}"> 			
 		       	<table> 	  
 					<tr> <td>
-						<bean:message key="label.learnerReport"/>
+						<b> <bean:message key="label.learnerReport"/> </b>
 					 </td>
 					</tr>
 				</table>						 
