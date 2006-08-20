@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -56,6 +58,8 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
 
 
@@ -67,7 +71,7 @@ import org.springframework.dao.DataAccessException;
  * @author mtruong
  *
  */
-public class NoticeboardServicePOJO implements INoticeboardService, ToolContentManager, ToolSessionManager {
+public class NoticeboardServicePOJO implements INoticeboardService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
 
 	private NoticeboardContent nbContent;
 	private INoticeboardContentDAO nbContentDAO=null;
@@ -1022,7 +1026,33 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
         removeSession(session);
     }
 	
+	/* ===============Methods implemented from ToolContentManager =============== */
+	
 
+    /**
+     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
+     */
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Map importValues)
+    {
+    	Date now = new Date();
+    	NoticeboardContent toolContentObj = new NoticeboardContent();
+    	toolContentObj.setContent((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setContentInUse(false);
+    	toolContentObj.setCreatorUserId(newUserId != null ? new Long(newUserId.longValue()) : null);
+    	toolContentObj.setDateCreated(now);
+    	toolContentObj.setDateUpdated(now);
+    	toolContentObj.setDefineLater(false);
+    	toolContentObj.setForceOffline(false);
+    	toolContentObj.setNbContentId(toolContentId);
+    	toolContentObj.setOfflineInstructions(null);
+    	toolContentObj.setOnlineInstructions(null);
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	// leave as empty, no need to set them to anything.
+    	//toolContentObj.setNbSessions(nbSessions);
+    	//toolContentObj.setNbAttachments(nbAttachments);
+    	nbContentDAO.saveNbContent(toolContentObj);
+    }
+  
     //=========================================================================================
     
     public Long getToolDefaultContentIdBySignature(String toolSignature)
@@ -1037,7 +1067,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     	}
 	    return contentId;
     }
-  
+
 	/* getter setter methods to obtain the service bean */
 	/*public INoticeboardContentDAO getNbContentDAO()
 	{
