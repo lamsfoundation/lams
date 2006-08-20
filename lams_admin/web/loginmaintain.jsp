@@ -28,7 +28,7 @@
 	flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
 	defaultLanguage="${language}" 
 	autoDetectLanguage="false"
-	toolbarSet="Default-Learner"> 
+	> 
 	<bean:write name="LoginMaintainForm" property="news" filter="false" />
 </fck:editor>
 </div>
