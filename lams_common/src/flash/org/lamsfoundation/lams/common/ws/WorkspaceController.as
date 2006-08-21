@@ -320,7 +320,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 				//check if we can write to this folder
 				if(_workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID)){
 					_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
-					_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType);	
+					_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType, false);	
 				}else{
 					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
 				}
