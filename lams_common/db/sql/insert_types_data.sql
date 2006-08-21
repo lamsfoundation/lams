@@ -162,44 +162,44 @@ VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.',
 	'monitoring/gate.do?method=viewGate', now()	);
 
 -- Supported Locales
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (1, 'en', 'AU', 'English (Australia) - default');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (2, 'es', null, 'Español');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (3, 'mi', 'NZ', 'Māori');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (4, 'de', null, 'Deutsch');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (5, 'zh', null, '简体中文');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (6, 'fr', null, 'Français');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (7, 'it', null, 'Italiano');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (8, 'no', null, 'Norsk');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (9, 'sw', null, 'Svenska');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (10, 'ko', null, '한국어');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (11, 'pl', null, 'Polski');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (12, 'pt', 'BR', 'Português (Brasil)');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (13, 'hu', null, 'Magyar');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (14, 'bg', null, 'Български');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (15, 'cy', 'GB', 'Welsh (United Kingdom)');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (16, 'th', null, 'Thai');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (17, 'el', null, 'Ελληνικά');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (18, 'nl', null, 'Nederlands');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description) 
-VALUES (19, 'ar', 'JO', 'عربي');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (1, 'en', 'AU', 'English (Australia)', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (2, 'es', 'ES', 'Español', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (3, 'mi', 'NZ', 'Māori', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (4, 'de', 'DE', 'Deutsch', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (5, 'zh', 'CN', '简体中文', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (6, 'fr', 'FR', 'Français', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (7, 'it', 'IT', 'Italiano', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (8, 'no', 'NO', 'Norsk', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (9, 'sv', 'SE', 'Svenska', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (10, 'ko', 'KR', '한국어', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (11, 'pl', 'PL', 'Polski', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (12, 'pt', 'BR', 'Português (Brasil)', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (13, 'hu', 'HU', 'Magyar', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (14, 'bg', 'BG', 'Български', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (15, 'cy', 'GB', 'Welsh (United Kingdom)', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (16, 'th', 'TH', 'Thai', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (17, 'el', 'GR', 'Ελληνικά', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (18, 'nl', 'BE', 'Nederlands (België)', 'RTL');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (19, 'ar', 'JO', 'عربي', 'LTR');
 
 -- which current tool supports the old 1.0.x tools?
 INSERT INTO lams_tool_import_support VALUES (1, 'lafrum11', 'messageboard');

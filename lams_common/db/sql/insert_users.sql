@@ -112,56 +112,56 @@ insert into lams_user (user_id,login,password,title,first_name,last_name,address
 city,state,country,day_phone,evening_phone,mobile_phone,
 fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-flash_theme_id, html_theme_id)
+locale_id, flash_theme_id, html_theme_id)
 values
 (4,'mmm',SHA1('mmm'),'Ms','Mary','Morgan','99','First Ave',null,
 'Parramatta','NSW','Australia','0295099999','0298939999','0499999999',
 '0299999999','mmmmmmm@xx.os',
-0,'20041223',1,4,1,3);
+0,'20041223',1,4,1,1,3);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
 fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-flash_theme_id, html_theme_id)
+locale_id,flash_theme_id, html_theme_id)
 values
 (5,'test1',SHA1('test1'),'Dr','One','Test','1','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test1@xx.os',
-0,'20041223',1,5,1,3);
+0,'20041223',1,5,1,1,3);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
 fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-flash_theme_id, html_theme_id)
+locale_id,flash_theme_id, html_theme_id)
 values
 (6,'test2',SHA1('test2'),'Dr','Two','Test','2','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test2@xx.os',
-0,'20041223',1,6,1,3);
+0,'20041223',1,6,1,1,3);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
 fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-flash_theme_id, html_theme_id)
+locale_id,flash_theme_id, html_theme_id)
 values
 (7,'test3',SHA1('test3'),'Dr','Three','Test','3','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test3@xx.os',
-0,'20041223',1,7,1,3);
+0,'20041223',1,7,1,1,3);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
 fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
-flash_theme_id, html_theme_id)
+locale_id,flash_theme_id, html_theme_id)
 values
 (8,'test4',SHA1('test4'),'Dr','Four','Test','4','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test4@xx.os',
-0,'20041223',1,8,1,3);
+0,'20041223',1,8,1,1,3);
 
 --- sysadmin only belongs to root
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (1, 1, 1);
