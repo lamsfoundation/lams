@@ -168,8 +168,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 					canvasModel.autoSaveWait = true;
 				}
 				setInterval(Proxy.create(this,autoSave), autosave_config_interval);
-				
 			}
+			
+			clearCanvas(true);
 			
             dispatchEvent({type:'load',target:this});
         }else {

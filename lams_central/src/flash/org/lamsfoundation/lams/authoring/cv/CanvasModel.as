@@ -843,13 +843,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			if(ta.toolContentID > 0){
 				var url:String;
 				var cfg = Config.getInstance();
+				var ddm = _cv.ddm;
 				if(ta.authoringURL.indexOf("?") != -1){
 					//09-11-05 Change to toolContentID and remove userID.
 					//url = cfg.serverUrl+ta.authoringURL + '&toolContentId='+ta.toolContentID+'&userID='+cfg.userID;
-					url = cfg.serverUrl+ta.authoringURL + '&toolContentID='+ta.toolContentID;
+					url = cfg.serverUrl+ta.authoringURL + '&toolContentID='+ta.toolContentID+'&contentFolderID='+ddm.contentFolderID;
 				}else{
 					//url = cfg.serverUrl+ta.authoringURL + '?toolContentId='+ta.toolContentID+'&userID='+cfg.userID;
-					url = cfg.serverUrl+ta.authoringURL + '?toolContentID='+ta.toolContentID;
+					url = cfg.serverUrl+ta.authoringURL + '?toolContentID='+ta.toolContentID+'&contentFolderID='+ddm.contentFolderID;
 				}
 			
 				Debugger.log('Opening url:'+url,Debugger.GEN,'openToolActivityContent','CanvasModel');

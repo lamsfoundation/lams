@@ -297,6 +297,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		_licenseID = design.licenseID;
 		_licenseText = design.licenseText;
+			
+		_contentFolderID = design.contentFolderID;
 		
 		//set the activities in the hash table
 		for(var i=0; i<design.activities.length;i++){
@@ -499,6 +501,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(_createDateTime){	design.createDateTime 	= _createDateTime;		}
 		if(_lastModifiedDateTime){ design.lastModifiedDateTime = _lastModifiedDateTime;	}
 		if(_dateReadOnly){		design.dateReadOnly		= _dateReadOnly;		}
+		if(_contentFolderID){	design.contentFolderID 	= _contentFolderID;		}
 		
 		if(_autoSaved) { 		design.autoSaved 		= _autoSaved 					}
 		
