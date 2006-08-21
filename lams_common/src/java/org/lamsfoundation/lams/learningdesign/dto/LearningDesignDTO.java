@@ -66,6 +66,7 @@ public class LearningDesignDTO extends BaseDTO{
 	private String licenseText;
 	private Long licenseID;
 	private Date lastModifiedDateTime;
+	private String contentFolderID;
 	private String offlineInstructions;
 	private String onlineInstructions;
 	
@@ -154,6 +155,7 @@ public class LearningDesignDTO extends BaseDTO{
 		
 					  this.helpText = learningDesign.getHelpText();
 		this.copyTypeID = learningDesign.getCopyTypeID();
+		this.contentFolderID = learningDesign.getContentFolderID();
 		this.createDateTime = learningDesign.getCreateDateTime();
 		this.version = learningDesign.getVersion();
 		
@@ -176,6 +178,15 @@ public class LearningDesignDTO extends BaseDTO{
 		this.groupings = populateGroupings(learningDesign,activityDAO);
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
+		
+	}
+	
+	/**
+	 * 
+	 * @return Returns the contentFolderID
+	 */
+	public String getContentFolderID() {
+		return contentFolderID;
 	}
 
 	/**
@@ -386,6 +397,15 @@ public class LearningDesignDTO extends BaseDTO{
 	public void setActivities(ArrayList activities) {
 		this.activities = activities;
 	}
+	
+	/**
+	 * 
+	 * @param contentFolderID The contentFolderID to set.
+	 */
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
+	}
+	
 	/**
 	 * @param copyTypeID The copyTypeID to set.
 	 */

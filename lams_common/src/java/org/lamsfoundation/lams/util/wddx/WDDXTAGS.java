@@ -162,6 +162,7 @@ public interface WDDXTAGS {
 	public static final String DURATION ="duration";
 	public static final String LICENCE_ID ="licenseID";
 	public static final String LICENSE_TEXT ="licenseText";
+	public static final String CONTENT_FOLDER_ID = "contentFolderID";
 	
 	/**ComplexActivity specific tags */
 	public static final String CHILD_ACTIVITIES ="childActivities";

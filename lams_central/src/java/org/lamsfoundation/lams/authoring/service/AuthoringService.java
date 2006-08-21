@@ -679,14 +679,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
 		
 		// directory pathname
-		String dirPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + AuthoringConstants.LAMS_WWW_SECURE_DIR +  File.separator + newUniqueContentFolderID;
+		//String dirPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + AuthoringConstants.LAMS_WWW_SECURE_DIR +  File.separator + newUniqueContentFolderID;
 		
 		// create new directory
-		if(FileUtil.createDirectory(dirPath)){
+		//if(FileUtil.createDirectory(dirPath)){
 			flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
-		} else {
-			throw new FileUtilException();
-		}
+		//} else {
+		//	throw new FileUtilException();
+		//}
 		
 		return flashMessage.serializeMessage();
 	}

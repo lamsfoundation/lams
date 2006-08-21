@@ -47,6 +47,7 @@ public class DesignDetailDTO extends BaseDTO {
 	private String version;	
 	private Long parentLearningDesignID;
 	private Integer workspaceFolderID;
+	private String contentFolderID;
 	
 	public DesignDetailDTO(){
 		
@@ -91,6 +92,7 @@ public class DesignDetailDTO extends BaseDTO {
 									  learningDesign.getOriginalLearningDesign().getLearningDesignId():
 									  null;
 		this.workspaceFolderID = learningDesign.getWorkspaceFolder().getWorkspaceFolderId();
+		this.contentFolderID = learningDesign.getContentFolderID();
 	}
 	/**
 	 * @return Returns the copyTypeID.
@@ -175,5 +177,12 @@ public class DesignDetailDTO extends BaseDTO {
 	 */
 	public Integer getWorkspaceFolderID() {
 		return workspaceFolderID;
+	}
+	/**
+	 * 
+	 * @return Returns the contentFolderID
+	 */
+	public String getContentFolderID() {
+		return contentFolderID;
 	}
 }

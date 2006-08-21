@@ -128,6 +128,9 @@ public class LearningDesign implements Serializable {
 	/** persistent field */
 	private Long duration;
 	
+	/** persistent field */
+	private String contentFolderID;
+	
 	/** nullable persistent field */
 	private String licenseText;
 	
@@ -263,7 +266,8 @@ public class LearningDesign implements Serializable {
 		if ( setOriginalDesign ) 
 			newDesign.setOriginalLearningDesign(design);
 		
-		newDesign.setCopyTypeID(designCopyType);		
+		newDesign.setCopyTypeID(designCopyType);
+		newDesign.setContentFolderID(design.getContentFolderID());
 		return newDesign;
 	}	
 
@@ -489,7 +493,13 @@ public class LearningDesign implements Serializable {
 	public void setOnlineInstructions(String onlineInstructions) {
 		this.onlineInstructions = onlineInstructions;
 	}
-
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	public void setContentFolderID(String contentFolderID){
+		this.contentFolderID = contentFolderID;
+	}
+	
 	public DesignDetailDTO getDesignDetailDTO(){
 		return new DesignDetailDTO(this);
 	}

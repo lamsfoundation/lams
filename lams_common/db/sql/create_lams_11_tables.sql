@@ -346,6 +346,7 @@ CREATE TABLE lams_learning_design (
      , license_id BIGINT(20)
      , license_text TEXT
      , last_modified_date_time DATETIME
+     , content_folder_id VARCHAR(32)
      , PRIMARY KEY (learning_design_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)

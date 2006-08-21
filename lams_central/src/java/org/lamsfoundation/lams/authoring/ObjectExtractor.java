@@ -293,6 +293,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(table, WDDXTAGS.DURATION))
 		    learningDesign.setDuration(WDDXProcessor.convertToLong(table,WDDXTAGS.DURATION));
 		
+		if (keyExists(table, WDDXTAGS.CONTENT_FOLDER_ID))
+			learningDesign.setContentFolderID(WDDXProcessor.convertToString(table, WDDXTAGS.CONTENT_FOLDER_ID));
+		
 		if (keyExists(table, WDDXTAGS.USER_ID))
 		{
 		    Integer userId = WDDXProcessor.convertToInteger(table,WDDXTAGS.USER_ID);

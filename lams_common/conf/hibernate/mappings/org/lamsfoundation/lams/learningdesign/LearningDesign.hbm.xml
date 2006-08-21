@@ -146,6 +146,9 @@
 		<meta attribute="field-description">@hibernate.property column="online_instructions" length="65535"</meta>    
 	</property>
 
+	<property name="contentFolderID" type="java.lang.String" column="content_folder_id" length="32">
+		<meta attribute="field-description">@hibernate.property column="content_folder_id" length="32"</meta>
+	</property>
 
     <!-- Associations -->
     
