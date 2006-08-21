@@ -23,6 +23,8 @@
 
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*
 import mx.utils.*
 
@@ -165,13 +167,34 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		
 	}
 	
-	public function requestDeleteResource(resourceID:Number,resourceType:String){
-		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType,Debugger.GEN,'copyResourceResponse','Workspace');			
-		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
-        var uid:Number = Config.getInstance().userID;
-		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=deleteResource&resourceID='+resourceID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
+	public function requestDeleteResource(resourceID:Number,resourceType:String, noWarn:Boolean){
+		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType,Debugger.GEN,'copyResourceResponse','Workspace');		
+		var s = false;
+		var ref = this;
+		Debugger.log('noWarn:'+noWarn,4,'clearCanvas','Canvas');
+		if(noWarn){
+			var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
+			var uid:Number = Config.getInstance().userID;
+			ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=deleteResource&resourceID='+resourceID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
+		}else {
+			var fn:Function = Proxy.create(ref,confirmedDeleteResource, ref, resourceID, resourceType);
+			LFMessage.showMessageConfirm(Dictionary.getValue('ws_del_confirm_msg'), fn,null);
+			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
+		}
 		
 	}
+	
+	/**
+	 * Called when a user confirms its ok to clear the design
+	 * @usage   
+	 * @param   ref 
+	 * @return  
+	 */
+	public function confirmedDeleteResource(ref, resourceID, resourceType):Void{
+		var fn:Function = Proxy.create(ref,requestDeleteResource,resourceID,resourceType,true);
+		fn.apply();
+	}
+	
 
 	public function requestNewFolder(parentFolderID:Number,folderName:String){
 		Debugger.log('parentFolderID:'+parentFolderID+', folderName'+folderName,Debugger.GEN,'requestNewFolder','Workspace');			
