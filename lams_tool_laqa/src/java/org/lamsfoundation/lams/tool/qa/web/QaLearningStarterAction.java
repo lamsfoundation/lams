@@ -362,11 +362,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	if ((mode != null) && (mode.equals("author")))
     	{
     		logger.debug("Author requests for a preview of the content.");
-			logger.debug("existing qaContent:" + qaContent);
-			
-			/* overwrite questionListing mode for preview*/
-			logger.debug("forwarding to for preview: " + LOAD_LEARNER);
-			return (mapping.findForward(LOAD_LEARNER));	
     	}
     	
     	/* by now, we know that the mode is either teacher or learner
