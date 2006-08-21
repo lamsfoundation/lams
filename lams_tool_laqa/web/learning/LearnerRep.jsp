@@ -109,11 +109,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						<tr> 
 							<td valign=top>
-								<table align=center>
+								<table cellpadding="0" class="alternative-color">
 									<tr> 
 										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
 				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>				  						 
 						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
@@ -138,7 +138,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 
 			       	<table> 	  
-							<tr> <td  valign=top>
+							<tr> 
+	  	   		  		<td>
+                               <html:submit property="refreshAnswers" 
+                                             styleClass="button" 
+                                             onclick="submitMethod('viewAllResults');">
+                                    <bean:message key="label.refresh"/>
+                                </html:submit>
+					  	 </td>
+
+							
+							<td  valign=top>
 								<div class="right-buttons">
 
 									<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
@@ -188,11 +198,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						<tr> 
 							<td valign=top>
-								<table align=center>
+								<table cellpadding="0" class="alternative-color">
 									<tr> 
 										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
 				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
+				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>				  						 
 						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
@@ -218,6 +228,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true'}"> 			
 			       	<table> 	  
 						<tr> 
+	  	   		  		<td>
+                               <html:submit property="refreshAnswers" 
+                                             styleClass="button" 
+                                             onclick="submitMethod('viewAllResults');">
+                                    <bean:message key="label.refresh"/>
+                                </html:submit>
+					  	 </td>
+						
 							<td>
 								<div class="right-buttons">
 

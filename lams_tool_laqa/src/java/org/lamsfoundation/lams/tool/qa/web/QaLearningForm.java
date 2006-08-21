@@ -40,6 +40,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String getNextQuestion;
 	protected String getPreviousQuestion;
 	protected String endLearning;
+	protected String refreshAnswers;
 	
 	protected String totalQuestionCount;
 	protected String httpSessionID;
@@ -306,5 +307,17 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
      */
     public void setRedoQuestions(String redoQuestions) {
         this.redoQuestions = redoQuestions;
+    }
+    /**
+     * @return Returns the refreshAnswers.
+     */
+    public String getRefreshAnswers() {
+        return refreshAnswers;
+    }
+    /**
+     * @param refreshAnswers The refreshAnswers to set.
+     */
+    public void setRefreshAnswers(String refreshAnswers) {
+        this.refreshAnswers = refreshAnswers;
     }
 }
