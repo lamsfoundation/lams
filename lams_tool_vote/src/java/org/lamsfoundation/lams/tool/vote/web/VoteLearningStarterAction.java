@@ -305,17 +305,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		logger.debug("existing voteContent:" + voteContent);
 		
 		commonContentSetup(request, voteService, voteContent, voteGeneralLearnerFlowDTO);
-		
-		/* PREVIEW_ONLY for jsp*/
-		voteLearningForm.setPreviewOnly(new Boolean(true).toString());
-		voteGeneralLearnerFlowDTO.setPreviewOnly(new Boolean(true).toString());
-		
-    	VoteLearningAction voteLearningAction= new VoteLearningAction();
-    	logger.debug("presenting standard learner screen for preview mode...");
     	
     	logger.debug("preview voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
     	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
-        return (mapping.findForward(LOAD_LEARNER));	
 	}
     
 	/* by now, we know that the mode is either teacher or learner
@@ -415,7 +407,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     logger.debug("users learning mode is: " + learningMode);
     
     /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
-    if ((voteQueUsr != null) && learningMode.equals("learner"))
+    if (voteQueUsr != null)
     {
     	Long sessionUid=voteQueUsr.getVoteSessionId();
     	logger.debug("users sessionUid: " + sessionUid);
@@ -476,7 +468,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	    
     	    if (isSessionCompleted)
     	    {
-    	        logger.debug("since the sessio is completed. present a screen which can not be edited");
+    	        logger.debug("since the session is completed present a screen which can not be edited");
          		voteLearningForm.setReportViewOnly(new Boolean(true).toString());
          		voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
     	    }
