@@ -174,7 +174,9 @@ public class LearningDesign implements Serializable {
 			String licenseText,
 			License license,
 			String offlineInstructions,
-			String onlineInstructions) {
+			String onlineInstructions,
+			String contentFolderID
+			) {
 		this.learningDesignId = learningDesignId;
 		this.learningDesignUIID = ui_id;
 		this.description = description;
@@ -199,6 +201,7 @@ public class LearningDesign implements Serializable {
 		this.license = license;
 		this.offlineInstructions = offlineInstructions;
 		this.onlineInstructions = onlineInstructions;
+		this.contentFolderID = contentFolderID;
 		this.lastModifiedDateTime = new Date();
 	}
 
