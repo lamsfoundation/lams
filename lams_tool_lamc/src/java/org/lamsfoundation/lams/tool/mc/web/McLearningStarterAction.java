@@ -293,7 +293,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			logger.debug("existing mcContent:" + mcContent);
 
 	    	/* PREVIEW_ONLY for jsp*/
-    		return (mapping.findForward(LOAD_LEARNER));
+    		//return (mapping.findForward(LOAD_LEARNER));
     	}
 	    
     	/* by now, we know that the mode is either teacher or learner
@@ -417,7 +417,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
 	    /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
-	    if ((mcQueUsr != null) && mode.equals("learner"))
+	    if (mcQueUsr != null)
 	    {
 	    	Long sessionUid=mcQueUsr.getMcSessionId();
 	    	logger.debug("users sessionUid: " + sessionUid);
