@@ -552,11 +552,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 					"Failed to create the ForumFiles tool seession");
 
 		Forum fromContent = null;
-		if ( fromContentId == null ) {
+		if ( fromContentId != null ) {
 			fromContent = forumDao.getByContentId(fromContentId);
 		}
 		if ( fromContent == null ) {
-			fromContent = getDefaultContent(fromContentId);
+			fromContent = getDefaultForum();
 		}
 		
 		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
