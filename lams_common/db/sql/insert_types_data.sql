@@ -191,7 +191,7 @@ VALUES (13, 'hu', 'HU', 'Magyar', 'RTL');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (14, 'bg', 'BG', 'Български', 'RTL');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (15, 'cy', 'GB', 'Cymraeg (United Kingdom)', 'RTL');
+VALUES (15, 'cy', 'GB', 'Cymraeg', 'RTL');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (16, 'th', 'TH', 'Thai', 'RTL');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
