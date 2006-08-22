@@ -458,16 +458,24 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         logger.debug("toolSessionID: " + toolSessionID);
         voteLearningForm.setToolSessionID(toolSessionID);
         
+        VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
+        logger.debug("retrieving voteSession: " + voteSession);
+        
         String userID=request.getParameter(USER_ID);
     	logger.debug("userID: " + userID);
     	voteLearningForm.setUserID(userID);
+    	
+    	VoteQueUsr voteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
+        logger.debug("voteQueUsr:" + voteQueUsr);
+        
+        voteQueUsr.setResponseFinalised(true);
+        voteService.updateVoteUser(voteQueUsr);
+        logger.debug("user's response is finalised:" + voteQueUsr);
     	
     	String revisitingUser=request.getParameter(REVISITING_USER);
     	logger.debug("revisitingUser: " + revisitingUser);
     	voteLearningForm.setRevisitingUser(revisitingUser);
     	
-    	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
-        logger.debug("retrieving voteSession: " + voteSession);
         
         VoteContent voteContent=voteSession.getVoteContent();
         logger.debug("retrieving voteContent: " + voteContent);

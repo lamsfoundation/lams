@@ -463,12 +463,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
     		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
     
-    	    boolean isSessionCompleted=isSessionCompleted(userSessionId, voteService);
-    	    logger.debug("isSessionCompleted: " + isSessionCompleted);
-    	    
-    	    if (isSessionCompleted)
+    	    boolean isResponseFinalised=voteQueUsr.isResponseFinalised();
+    	    logger.debug("isResponseFinalised: " + isResponseFinalised);
+    	    if (isResponseFinalised)
     	    {
-    	        logger.debug("since the session is completed present a screen which can not be edited");
+    	        logger.debug("since the response is finalised present a screen which can not be edited");
          		voteLearningForm.setReportViewOnly(new Boolean(true).toString());
          		voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
     	    }
@@ -481,7 +480,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	    
     	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
     	    logger.debug("isContentLockOnFinish: " + isContentLockOnFinish);
-    	    if ((isContentLockOnFinish.equals(new Boolean(true).toString()) && (isSessionCompleted == true)))
+    	    if ((isContentLockOnFinish.equals(new Boolean(true).toString()) && (isResponseFinalised == true)))
             {
         	    logger.debug("user with session id: "  + userSessionId + " should not redo votes. session  is locked.");
         	    logger.debug("fwd'ing to: " + EXIT_PAGE);
@@ -495,8 +494,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      		logger.debug("preparing chart data for readonly mode");
      		
      		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
-     		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), toolSessionID, 
-     		        voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+    	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
+    	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+
      		
      		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
      		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);

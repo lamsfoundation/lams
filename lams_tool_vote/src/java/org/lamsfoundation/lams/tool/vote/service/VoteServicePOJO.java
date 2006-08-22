@@ -553,6 +553,20 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
+   
+    public void updateVoteUser(VoteQueUsr voteUser) throws VoteApplicationException
+    {
+ 	   try
+       {
+	   		voteUserDAO.updateVoteUser(voteUser);
+       }
+       catch (DataAccessException e)
+       {
+           throw new VoteApplicationException("Exception occured when lams is updating VoteQueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }        
+    }
     
     public VoteQueUsr retrieveVoteQueUsr(Long userID) throws VoteApplicationException
     {

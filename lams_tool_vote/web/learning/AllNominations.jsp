@@ -191,36 +191,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	</tr>
 
 
-				<c:if test="${VoteLearningForm.reportViewOnly != 'true'}"> 				   	
-				  <tr>
-				  	<td NOWRAP valign=top> 
-	                                <html:submit property="refreshVotes" 
+				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }"> 			
+					  <tr>
+					  	<td NOWRAP valign=top> 
+		                                <html:submit property="refreshVotes" 
+		                                             styleClass="button" 
+		                                             onclick="submitMethod('viewAllResults');">
+		                                    <bean:message key="label.refresh"/>
+		                                </html:submit>
+		                                
+							<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   										  
+										&nbsp&nbsp	
+		                                <html:submit property="redoQuestionsOk" 
+		                                             styleClass="button" 
+		                                             onclick="submitMethod('redoQuestionsOk');">
+		                                    <bean:message key="label.retake"/>
+		                                </html:submit>
+							</c:if> 		          					
+		                                
+		                                
+						</td>					
+						<td NOWRAP valign=top align=right> 			
+	                                <html:submit property="learnerFinished" 
 	                                             styleClass="button" 
-	                                             onclick="submitMethod('viewAllResults');">
-	                                    <bean:message key="label.refresh"/>
+	                                             onclick="submitMethod('learnerFinished');">
+	                                    <bean:message key="label.finished"/>
 	                                </html:submit>
-	                                
-						<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   										  
-									&nbsp&nbsp	
-	                                <html:submit property="redoQuestionsOk" 
-	                                             styleClass="button" 
-	                                             onclick="submitMethod('redoQuestionsOk');">
-	                                    <bean:message key="label.retake"/>
-	                                </html:submit>
-						</c:if> 		          					
-	                                
-	                                
-					</td>					
-					<td NOWRAP valign=top align=right> 			
-                                <html:submit property="learnerFinished" 
-                                             styleClass="button" 
-                                             onclick="submitMethod('learnerFinished');">
-                                    <bean:message key="label.finished"/>
-                                </html:submit>
-				  	 </td>
-				  </tr>
-				</c:if> 		          				  
-
+					  	 </td>
+					  </tr>
+				</c:if> 							  
 		
 		</table>
 	

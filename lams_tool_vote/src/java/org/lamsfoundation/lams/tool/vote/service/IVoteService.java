@@ -157,6 +157,8 @@ public interface IVoteService
     
     public VoteQueUsr getVoteUserByUID(Long uid) throws VoteApplicationException;
     
+    public void updateVoteUser(VoteQueUsr voteUser) throws VoteApplicationException;
+    
     public void removeAttemptsForUser(final Long queUsrId) throws VoteApplicationException;
     
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId) throws VoteApplicationException;
