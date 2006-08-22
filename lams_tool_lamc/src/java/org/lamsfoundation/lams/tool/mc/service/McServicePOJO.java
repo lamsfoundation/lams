@@ -345,7 +345,21 @@ public class McServicePOJO implements
 														   e);
         }
     }
-    
+
+    public void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException
+    {
+	   try
+        {
+	   		mcUserDAO.updateMcUser(mcQueUsr);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is updating mc QueUsr: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
     
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) throws McApplicationException
 	{

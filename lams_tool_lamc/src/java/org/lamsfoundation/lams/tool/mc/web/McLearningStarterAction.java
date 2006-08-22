@@ -443,6 +443,21 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    	logger.debug("sessionStatus: " +sessionStatus);
 		    	/*one limitation by design here is that once a user finishes the activity, subsequent users in the same group are also assumed finished
 		    	 * since they belong to the same ungrouped activity and these users have the same tool session id*/
+		    	
+		    	boolean isResponseFinalised=mcQueUsr.isResponseFinalised();
+		    	logger.debug("isResponseFinalised: " +isResponseFinalised);
+		    	
+		    	if (isResponseFinalised)
+		    	{
+			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
+		    	}
+		    	else
+		    	{
+		    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
+		    	}
+
+		    	
+		    	/*
 		    	if (sessionStatus.equals(COMPLETED))
 		    	{
 			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
@@ -451,6 +466,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    	{
 		    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
 		    	}
+		    	*/
+		    	
 		    	
 
 		    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);

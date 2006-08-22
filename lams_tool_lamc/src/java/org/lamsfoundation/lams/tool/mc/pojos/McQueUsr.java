@@ -50,6 +50,8 @@ public class McQueUsr implements Serializable {
 
     /** nullable persistent field */
     private String fullname;
+    
+    private boolean responseFinalised;
 
     private Long mcSessionId;
     
@@ -68,6 +70,18 @@ public class McQueUsr implements Serializable {
         this.mcUsrAttempts = mcUsrAttempts;
     }
 
+    /**
+     * @return Returns the responseFinalised.
+     */
+    public boolean isResponseFinalised() {
+        return responseFinalised;
+    }
+    /**
+     * @param responseFinalised The responseFinalised to set.
+     */
+    public void setResponseFinalised(boolean responseFinalised) {
+        this.responseFinalised = responseFinalised;
+    }
     /** default constructor */
     public McQueUsr() {
     }

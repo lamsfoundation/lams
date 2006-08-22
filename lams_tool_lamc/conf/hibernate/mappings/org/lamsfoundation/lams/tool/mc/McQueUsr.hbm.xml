@@ -42,6 +42,14 @@
     >
     </property>
 
+   <property
+        name="responseFinalised"
+        type="boolean"
+        access="property"
+        column="responseFinalised"
+        length="1"        
+   />
+
     <property
         name="mcSessionId"
         type="java.lang.Long"

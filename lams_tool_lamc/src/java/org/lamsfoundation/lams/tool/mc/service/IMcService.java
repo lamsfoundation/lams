@@ -125,6 +125,8 @@ public interface IMcService
     
     public void updateMcSession(McSession mcSession) throws McApplicationException;
     
+    public void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
+    
     public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException;
     
     public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;

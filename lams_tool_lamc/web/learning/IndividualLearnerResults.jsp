@@ -187,24 +187,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</html:submit>	 				 		  					
 						</td>
 
-						<c:if test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
-			  	   		    <td NOWRAP valign=top>
-		  						<div class="right-buttons">						
-							  	   <html:submit property="learnerFinished" styleClass="button">
-										<bean:message key="label.finished"/>
-								   </html:submit>
-	 							</div>
-							</td> 							
-				  	   </c:if>	
-						<c:if test="${(mcGeneralLearnerFlowDTO.passMarkApplicable != 'true')}">
-			  	   		    <td NOWRAP valign=top>						
-		  						<div class="right-buttons">												
-							  	   <html:submit property="learnerFinished" styleClass="button">
-										<bean:message key="label.finished"/>
-								   </html:submit>
-	 							</div>						   
-							</td> 							 							
-				  	   </c:if>	
+
+		  	   		    <td NOWRAP valign=top>						
+	  						<div class="right-buttons">												
+						  	   <html:submit property="learnerFinished" styleClass="button">
+									<bean:message key="label.finished"/>
+							   </html:submit>
+ 							</div>						   
+						</td> 							 							
+
 					  	 
 					  </tr>
 					</c:if> 																		
