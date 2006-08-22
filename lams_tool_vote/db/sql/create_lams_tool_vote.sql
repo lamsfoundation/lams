@@ -41,6 +41,7 @@ CREATE TABLE tl_lavote11_usr (
      , username VARCHAR(100)
      , fullname VARCHAR(20)
      , responseFinalised TINYINT(1) NOT NULL DEFAULT 0
+     , finalScreenRequested TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (vote_session_id)
      , CONSTRAINT FK_tl_lavote11_usr_1 FOREIGN KEY (vote_session_id)
@@ -88,8 +89,8 @@ CREATE TABLE tl_lavote11_uploadedfile (
                   REFERENCES tl_lavote11_content (uid)
 )TYPE=InnoDB;
 
-
 INSERT INTO tl_lavote11_content(uid, content_id , title , instructions , creation_date , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', NOW(), 1,0, 0, 'offline instructions','online instructions', 0, 0);
 
 INSERT INTO tl_lavote11_nomination_content  (uid,nomination, display_order, vote_content_id) VALUES (1, 'Sample Nomination 1', 1, 1);
 INSERT INTO tl_lavote11_nomination_content  (uid,nomination, display_order, vote_content_id) VALUES (2, 'Sample Nomination 2', 2, 1);
+
