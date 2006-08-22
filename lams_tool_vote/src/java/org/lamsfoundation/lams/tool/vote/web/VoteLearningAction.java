@@ -251,6 +251,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         
     	VoteQueUsr existingVoteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
     	logger.debug("existingVoteQueUsr: " + existingVoteQueUsr);
+    	
+    	existingVoteQueUsr.setFinalScreenRequested(true);
+    	voteService.updateVoteUser(existingVoteQueUsr);
+    	logger.debug("final screen requested by: " + existingVoteQueUsr);
 
 
 		Set userAttempts=voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);

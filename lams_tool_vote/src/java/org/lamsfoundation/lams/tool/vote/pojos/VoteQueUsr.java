@@ -52,6 +52,8 @@ public class VoteQueUsr implements Serializable {
     private String fullname;
     
     private boolean responseFinalised;
+    
+    private boolean finalScreenRequested;
 
     private Long voteSessionId;
     
@@ -172,4 +174,16 @@ public class VoteQueUsr implements Serializable {
     public void setResponseFinalised(boolean responseFinalised) {
         this.responseFinalised = responseFinalised;
     }    
+    /**
+     * @return Returns the finalScreenRequested.
+     */
+    public boolean isFinalScreenRequested() {
+        return finalScreenRequested;
+    }
+    /**
+     * @param finalScreenRequested The finalScreenRequested to set.
+     */
+    public void setFinalScreenRequested(boolean finalScreenRequested) {
+        this.finalScreenRequested = finalScreenRequested;
+    }
 }

@@ -52,6 +52,15 @@
         length="1"        
    />
 
+   <property
+        name="finalScreenRequested"
+        type="boolean"
+        access="property"
+        column="finalScreenRequested"
+        length="1"        
+   />
+
+
 
     <property
         name="voteSessionId"
