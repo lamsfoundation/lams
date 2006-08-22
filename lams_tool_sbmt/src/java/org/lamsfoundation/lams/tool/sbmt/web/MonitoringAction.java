@@ -94,9 +94,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	private class SessionComparator implements Comparator<SessionDTO>{
 		public int compare(SessionDTO o1, SessionDTO o2) {
 			if(o1 != null && o2 != null){
-				int c = o1.getSessionName().compareTo(o2.getSessionName());
-				//to ensure session can be put into map even they have duplicated name.
-				return c==0?1:c;
+				return o1.getSessionName().compareTo(o2.getSessionName());
 			}else if(o1 != null)
 				return 1;
 			else

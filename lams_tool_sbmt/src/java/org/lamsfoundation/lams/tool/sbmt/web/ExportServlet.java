@@ -74,9 +74,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private class StringComparator implements Comparator<String>{
 		public int compare(String o1, String o2) {
 			if(o1 != null && o2 != null){
-				int c = o1.compareTo(o2);
-				//to ensure String does not overlap even they have duplicated name.
-				return c==0?1:c;
+				return o1.compareTo(o2);
 			}else if(o1 != null)
 				return 1;
 			else
