@@ -1026,7 +1026,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
         removeSession(session);
     }
 	
-	/* ===============Methods implemented from ToolContentManager =============== */
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
 	
 
     /**
