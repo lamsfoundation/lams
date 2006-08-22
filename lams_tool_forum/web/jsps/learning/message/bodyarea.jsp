@@ -2,7 +2,7 @@
 
 <div>
 <c:choose>
-	<c:when test="${allowRichEditor}">
+	<c:when test="${sessionMap.allowRichEditor}">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 		<fck:editor id="message.body" basePath="/lams/fckeditor/"
@@ -24,7 +24,7 @@
 		<input type="hidden" name="limitCount" id="limitCount" />
 		<script type="text/javascript">
 					<!--
-					var limit = <c:out value="${limitedChars}"/>;
+					var limit = <c:out value="${sessionMap.limitedChars}"/>;
 					var bodyTxt = document.getElementById("messageBody");
 					var limitCount = document.getElementById("limitCount");
 					

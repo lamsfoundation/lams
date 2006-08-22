@@ -180,6 +180,8 @@
 		</action>
 		<action path="/learning/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			name="messageForm" 
+			validate="false" 
 			parameter="newTopic" scope="request">
 			<forward name="success" path="tiles:/learning/forum/newTopic" />
 		</action>
@@ -226,20 +228,17 @@
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>
+		<action path="/learning/deleteAttachment"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="deleteAttachment">
+			<forward name="success" path="/jsps/learning/message/msgattachment.jsp" />
+		</action>
 		<action path="/learning/updateMessageHideFlag"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="updateMessageHideFlag" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>	
-		<action path="/learning/deleteAttachment"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm" 
-			validate="false"
-			parameter="deleteAttachment"
-			scope="request">
-			<forward name="success" path="tiles:/learning/forum/editTopic" />
-		</action>
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="finish">

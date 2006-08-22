@@ -129,7 +129,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 		request.getSession().setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
 		
 		//set forum title 
-		request.setAttribute(ForumConstants.FORUM_TITLE, session.getForum().getTitle());
+		request.setAttribute(ForumConstants.ATTR_FORUM_TITLE, session.getForum().getTitle());
 		
     }
 

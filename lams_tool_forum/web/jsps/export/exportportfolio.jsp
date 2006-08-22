@@ -9,7 +9,7 @@
 
 <body>
 <h1 class="no-tabs-below">
-	${forum_title}
+	${title}
 </h1>
 
 <div id="header-no-tabs-learner"></div>

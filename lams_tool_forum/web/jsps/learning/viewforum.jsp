@@ -1,8 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="mode" value="${sessionScope.mode}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <h1 class="no-tabs-below">
-	<c:out value="${title}" escapeXml="false" />
+	<c:out value="${sessionMap.title}" escapeXml="false" />
 </h1>
 
 <div id="header-no-tabs-learner"></div>
@@ -13,7 +13,7 @@
 	<table>
 		<tr>
 			<td>
-				<c:out value="${instruction}" escapeXml="false" />
+				<c:out value="${sessionMap.instruction}" escapeXml="false" />
 			</td>
 		</tr>
 		<tr>
@@ -30,32 +30,31 @@
 		<tr>
 			<td>
 
-
 				<c:set var="newtopic">
-					<html:rewrite page="/learning/newTopic.do" />
+					<html:rewrite page="/learning/newTopic.do?sessionMapID=${sessionMapID}" />
 				</c:set>
 				<c:set var="refresh">
-					<html:rewrite page="/learning/viewForum.do?toolSessionID=${param.toolSessionID}" />
+					<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}" />
 				</c:set>
 				<c:set var="finish">
-					<html:rewrite page="/learning/finish.do?toolSessionID=${param.toolSessionID}" />
+					<html:rewrite page="/learning/finish.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}" />
 				</c:set>
 
 				<div class="left-buttons">
-					<c:if test='${mode != "teacher" && allowNewTopics}'>
-						<html:button property="newtopic" onclick="javascript:location.href='${newtopic}';" disabled="${finishedLock}" styleClass="button">
+					<c:if test='${sessionMap.mode != "teacher" && sessionMap.allowNewTopics}'>
+						<html:button property="newtopic" onclick="javascript:location.href='${newtopic}';" disabled="${sessionMap.finishedLock}" styleClass="button">
 							<fmt:message key="label.newtopic" />
 						</html:button>
 					</c:if>
-					<html:button property="refresh" onclick="javascript:location.href='${refresh}';" disabled="${finishedLock}" styleClass="button">
+					<html:button property="refresh" onclick="javascript:location.href='${refresh}';" disabled="${sessionMap.finishedLock}" styleClass="button">
 						<fmt:message key="label.refresh" />
 					</html:button>
 				</div>
 
 				<div class="right-buttons">
 
-					<c:if test='${mode != "teacher"}'>
-						<html:button property="finish" onclick="javascript:location.href='${finish}';" disabled="${finishedLock}" styleClass="button">
+					<c:if test='${sessionMap.mode != "teacher"}'>
+						<html:button property="finish" onclick="javascript:location.href='${finish}';" disabled="${sessionMap.finishedLock}" styleClass="button">
 							<fmt:message key="label.finish" />
 						</html:button>
 					</c:if>

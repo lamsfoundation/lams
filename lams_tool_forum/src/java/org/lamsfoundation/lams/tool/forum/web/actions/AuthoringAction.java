@@ -252,6 +252,8 @@ public class AuthoringAction extends Action {
 		}
 			
 		Forum forum = forumForm.getForum();
+		//get back tool content ID
+		forum.setContentId(forumForm.getToolContentID());
 		try {
 			forumService = getForumManager();
 			
@@ -268,7 +270,7 @@ public class AuthoringAction extends Action {
 			
 			//**********************************Get Forum PO*********************
 			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
-			if(forumPO == null || !forumForm.getToolContentID().equals(forum.getContentId()) ){
+			if(forumPO == null){
 				//new Forum, create it.
 				forumPO = forum;
 				forumPO.setContentId(forumForm.getToolContentID());
@@ -773,6 +775,11 @@ public class AuthoringAction extends Action {
 				newMsg.setHasAttachment(true);
 				newMsg.getMessage().setAttachments(attSet);
 			}else if(!messageForm.isHasAttachment()){
+				Set att = newMsg.getMessage().getAttachments();
+				if(att != null && att.size() > 0){
+					List delTopicAtt = getTopicDeletedAttachmentList(sessionMap);
+					delTopicAtt.add(att.iterator().next());
+				}
 				newMsg.setHasAttachment(false);
 				newMsg.getMessage().setAttachments(null);
 			}

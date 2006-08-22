@@ -51,11 +51,11 @@ public interface ForumConstants {
 	public static final String FORUM_ID = "forum_id";
 
 	public static final int SESSION_STATUS_FINISHED = 1;
-	public static final String ALLOW_EDIT = "allowEdit";
+	public static final String ATTR_ALLOW_EDIT = "allowEdit";
 	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
 	public static final String ATTR_ALLOW_NEW_TOPICS = "allowNewTopics";
-	public static final String ALLOW_RICH_EDITOR = "allowRichEditor";
-	public static final String LIMITED_CHARS = "limitedChars";
+	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
+	public static final String ATTR_LIMITED_CHARS = "limitedChars";
 
 	public static final String ONLINE_ATTACHMENT = "online_att";
 	public static final String OFFLINE_ATTACHMENT = "offline_att";
@@ -71,19 +71,17 @@ public interface ForumConstants {
 
 	public static final String MESSAGE_UID = "messageID";
 
-	public static final String FINISHEDLOCK = "finishedLock";
+	public static final String ATTR_FINISHED_LOCK = "finishedLock";
 	
 	// used in monitoring 
 	public static final String TITLE = "title";
 	public static final String INSTRUCTIONS = "instructions";
 	public static final String PAGE_EDITABLE = "isPageEditable";
 
-	public static final String ROOT_TOPIC_UID = "rootUid";
+	public static final String ATTR_ROOT_TOPIC_UID = "rootUid";
 
 	public static final String ATTR_FORUM_TITLE = "title";
 	public static final String ATTR_FORUM_INSTRCUTION = "instruction";
-
-	public static final String FORUM_TITLE = "forum_title";
 
 	public static final String ATTR_TOOL_CONTENT_TOPICS = "ToolContentTopicList";
 	public static final String ATTR_TOPIC = "topic";
@@ -95,6 +93,10 @@ public interface ForumConstants {
 	public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
 
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
+
+	public static final String ATTR_PARENT_TOPIC_ID = "parentID";
+
+	public static final String ATTR_TOPIC_ID = "topicID";
 
 
 	

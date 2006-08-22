@@ -2,8 +2,9 @@
 	 This is Resource Item instrcution area.
 	 */
     var itemAttachmentTargetDiv = "itemAttachmentArea";
-// Please set these 2 variables in JSP file for using tag reason:
-	function removeItemAttachment(idx){
+// Please set these 1 variables in JSP file for using tag reason:
+//removeItemAttachmentUrl
+	function removeItemAttachment(){
 		//var id = "instructionItem" + idx;
 		//Element.remove(id);
  		var url= removeItemAttachmentUrl;

@@ -1,4 +1,3 @@
-<c_rt:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <table cellpadding="0">
 	<tr>
@@ -15,7 +14,7 @@
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
-	<c:if test="${allowUpload}">
+	<c:if test="${sessionMap.allowUpload}">
 		<tr>
 			<td>
 				<span class="field-name"><bean:message key="message.label.attachment" /></span>
@@ -31,7 +30,7 @@
 		<bean:message key="button.submit" />
 	</html:submit>
 	<c:set var="backToForum">
-		<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionScope.toolSessionID}" />
+		<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}" />
 	</c:set>
 	<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="button">
 		<bean:message key="button.cancel" />

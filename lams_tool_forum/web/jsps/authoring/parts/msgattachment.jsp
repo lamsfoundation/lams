@@ -8,7 +8,7 @@
 			<c:out value="${itemAttachment.attachmentName}" />
 		</td>
 		<td>
-			<a href="#" onclick="removeItemAttachment(${topicIndex})" class="button">
+			<a href="#" onclick="removeItemAttachment()" class="button">
 				<fmt:message key="label.delete" />
 			</a>	
 		</td>

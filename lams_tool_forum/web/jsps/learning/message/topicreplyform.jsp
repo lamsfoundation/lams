@@ -12,7 +12,7 @@
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
-	<c:if test="${allowUpload}">
+	<c:if test="${sessionMap.allowUpload}">
 		<tr>
 			<td>
 				<span class="field-name"><bean:message key="message.label.attachment" /></span>
@@ -27,7 +27,7 @@
 				<bean:message key="button.submit" />
 			</html:submit>
 			<c:set var="backToTopic">
-				<html:rewrite page="/learning/viewTopic.do?topicId=${rootUid}&create=${message.created.time}" />
+				<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${message.created.time}" />
 			</c:set>
 			<html:button property="goback" onclick="javascript:location.href='${backToTopic}';" styleClass="button">
 				<bean:message key="button.cancel" />

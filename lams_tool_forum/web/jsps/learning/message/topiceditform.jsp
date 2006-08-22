@@ -12,27 +12,14 @@
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
-	<c:if test="${topic.hasAttachment || allowUpload}">
+	<c:if test="${topic.hasAttachment || sessionMap.allowUpload}">
 		<tr>
 			<td>
 				<span class="field-name"><bean:message key="message.label.attachment" /></span>
-				<c:if test="${topic.hasAttachment}">
-					<c:forEach var="file" items="${topic.message.attachments}">
-						<c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
-						</c:set>
-						<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
-						<c:set var="deleteURL">
-							<html:rewrite page="/learning/deleteAttachment.do?uuid=${file.fileUuid}&versionID=${file.fileVersionId}" />
-						</c:set>
-						&nbsp;
-						<a href="<c:out value='${deleteURL}'/>"  class="button"> <fmt:message key="label.delete" /> </a>
-					</c:forEach>
-				</c:if>
-				<c:if test="${not topic.hasAttachment && allowUpload}">
-					<html:file tabindex="3" property="attachmentFile" />
-					<html:errors property="message.attachment" />
-				</c:if>
+				<c:set var="allowUpload" value="${sessionMap.allowUpload}" />
+				<div id="itemAttachmentArea">
+					<%@ include file="/jsps/learning/message/msgattachment.jsp"%>
+				</div>		
 			</td>
 		</tr>
 	</c:if>
@@ -42,7 +29,7 @@
 				<bean:message key="button.submit" />
 			</html:submit>
 			<c:set var="backToTopic">
-				<html:rewrite page="/learning/viewTopic.do?topicId=${rootUid}&create=${topic.message.created.time}" />
+				<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}" />
 			</c:set>
 			<html:button property="goback" onclick="javascript:location.href='${backToTopic}';" styleClass="button">
 				<bean:message key="button.cancel" />

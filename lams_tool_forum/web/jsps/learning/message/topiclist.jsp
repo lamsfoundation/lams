@@ -19,7 +19,7 @@
 			<tr>
 				<td class="first">
 					<c:set var="viewtopic">
-						<html:rewrite page="/learning/viewTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
+						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}" />
 					</c:set>
 					<html:link href="${viewtopic}">
 						<c:out value="${topic.message.subject}" />

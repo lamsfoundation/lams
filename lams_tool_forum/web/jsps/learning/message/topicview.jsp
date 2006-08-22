@@ -1,4 +1,4 @@
-<c:set var="mode" value="${sessionScope.mode}" />
+
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level*3}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
@@ -7,7 +7,7 @@
 			<tr>
 				<th class="first">
 					<c:choose>
-						<c:when test='${(mode == "teacher") || (not hidden)}'>
+						<c:when test='${(sessionMap.mode == "teacher") || (not sessionMap.hidden)}'>
 							<b> <c:out value="${msgDto.message.subject}" /> </b>
 						</c:when>
 						<c:otherwise>
@@ -18,7 +18,7 @@
 			</tr>
 			<tr>
 				<td class="first posted-by">
-					<c:if test='${(mode == "teacher") || (not hidden)}'>
+					<c:if test='${(sessionMap.mode == "teacher") || (not sessionMap.hidden)}'>
 						<fmt:message key="lable.topic.subject.by" />
 						<c:out value="${msgDto.author}" />
 								-
@@ -29,10 +29,10 @@
 			</tr>
 			<tr>
 				<td>
-					<c:if test='${(not hidden) || (hidden && mode == "teacher")}'>
+					<c:if test='${(not sessionMap.hidden) || (sessionMap.hidden && sessionMap.mode == "teacher")}'>
 						<c:out value="${msgDto.message.body}" escapeXml="false" />
 					</c:if>
-					<c:if test='${hidden}'>
+					<c:if test='${sessionMap.hidden}'>
 						<fmt:message key="topic.message.body.hidden" />
 					</c:if>
 				</td>
@@ -50,7 +50,7 @@
 					</td>
 				</tr>
 			</c:if>
-			<c:if test="${((msgDto.released && msgDto.isAuthor) || mode=='teacher') && (not empty msgDto.mark)}">
+			<c:if test="${((msgDto.released && msgDto.isAuthor) || sessionMap.mode=='teacher') && (not empty msgDto.mark)}">
 				<tr>
 					<td>
 						<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
@@ -77,13 +77,13 @@
 				<td>
 					<div class="right-buttons">
 						<!--  Hide/Unhide Button -->
-						<c:if test='${mode == "teacher"}'>
+						<c:if test='${sessionMap.mode == "teacher"}'>
 							<!--  call the hide action -->
 							<c:choose>
-								<c:when test="${hidden}">
+								<c:when test="${sessionMap.hidden}">
 									<!--  display a show link  -->
 									<c:set var="hidetopic">
-										<html:rewrite page="/learning/updateMessageHideFlag.do?msgId=${msgDto.message.uid}&hideFlag=false" />
+										<html:rewrite page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&msgId=${msgDto.message.uid}&hideFlag=false" />
 									</c:set>
 									<html:link href="${hidetopic}" styleClass="button">
 										<b> <fmt:message key="label.show" /> </b>
@@ -92,7 +92,7 @@
 								<c:otherwise>
 									<!--  display a hide link -->
 									<c:set var="hidetopic">
-										<html:rewrite page="/learning/updateMessageHideFlag.do?msgId=${msgDto.message.uid}&hideFlag=true" />
+										<html:rewrite page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=true" />
 									</c:set>
 									<html:link href="${hidetopic}" styleClass="button">
 										<b> <fmt:message key="label.hide" /> </b>
@@ -102,10 +102,10 @@
 						</c:if>
 
 						<!--  Edit Button -->
-						<c:if test="${not hidden}">
-							<c:if test='${(mode == "teacher") || (msgDto.isAuthor && not finishedLock && sessionScope.allowEdit && (empty msgDto.mark))}'>
+						<c:if test="${not sessionMap.hidden}">
+							<c:if test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
 								<c:set var="edittopic">
-									<html:rewrite page="/learning/editTopic.do?topicId=${msgDto.message.uid}&rootUid=${rootUid}&create=${msgDto.message.created.time}" />
+									<html:rewrite page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />
 								</c:set>
 								<html:link href="${edittopic}" styleClass="button">
 									<fmt:message key="label.edit" />
@@ -114,9 +114,9 @@
 						</c:if>
 
 						<!--  Reply Button -->
-						<c:if test="${(not finishedLock) && (not noMorePosts)}">
+						<c:if test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
 							<c:set var="replytopic">
-								<html:rewrite page="/learning/newReplyTopic.do?parentId=${msgDto.message.uid}&rootUid=${rootUid}" />
+								<html:rewrite page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
 							</c:set>
 							<html:link href="${replytopic}" styleClass="button">
 								<fmt:message key="label.reply" />

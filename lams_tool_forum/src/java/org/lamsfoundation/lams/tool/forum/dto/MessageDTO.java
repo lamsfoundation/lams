@@ -187,5 +187,6 @@ public class MessageDTO {
 	public void setAttachmentName(String attachmentName) {
 		this.attachmentName = attachmentName;
 	}
+
 	
 }
