@@ -214,4 +214,9 @@
 	    <name>ExportPortOutput</name>
 		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
+   	<tag-file>
+	    <name>Date</name>
+		<path>/WEB-INF/tags/Date.tag</path>
+   	</tag-file>  
+   	
    	
