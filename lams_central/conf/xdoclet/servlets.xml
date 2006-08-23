@@ -24,14 +24,14 @@
 
 <servlet>
 		<servlet-name>Connector</servlet-name>
-		<servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.authoring.web.LAMSConnectorServlet</servlet-class>
 		<init-param>
 			<param-name>baseDir</param-name>
-			<param-value>/UserFiles/</param-value>
+			<param-value>secure</param-value>
 		</init-param>
 		<init-param>
 			<param-name>debug</param-name>
-			<param-value>false</param-value>
+			<param-value>true</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 </servlet>
@@ -39,10 +39,10 @@
 <!--  FCKEditor SimpleUploader Configuration -->
 <servlet>
         <servlet-name>SimpleUploader</servlet-name>
-        <servlet-class>com.fredck.FCKeditor.uploader.SimpleUploaderServlet</servlet-class>
+        <servlet-class>org.lamsfoundation.lams.authoring.web.LAMSUploadServlet</servlet-class>
         <init-param>
                 <param-name>baseDir</param-name>
-                <param-value>/UserFiles/</param-value>
+                <param-value>secure</param-value>
         </init-param>
         <init-param>
                 <param-name>debug</param-name>
@@ -50,7 +50,7 @@
         </init-param>
         <init-param>
                 <param-name>enabled</param-name>
-                <param-value>false</param-value>
+                <param-value>true</param-value>
         </init-param>
         <init-param>
                 <param-name>AllowedExtensionsFile</param-name>
