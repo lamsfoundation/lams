@@ -38,6 +38,6 @@
 			property="submit" styleClass="button">
 			<bean:message key="label.monitoring.updateMarks.button" />
 		</html:link>
-		<hr>
+		<hr size="1" style="width:500px"/>
 	</td>
 </tr>

@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
 
@@ -7,7 +6,8 @@
 <head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:headItems />
-
+	<!-- ********************  CSS ********************** -->
+	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
 	<script type="text/javascript">
 		var imgRoot="${lams}images/";
 	    var themeName="aqua";

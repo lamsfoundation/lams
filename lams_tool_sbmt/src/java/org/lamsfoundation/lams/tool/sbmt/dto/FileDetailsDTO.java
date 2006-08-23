@@ -50,7 +50,7 @@ public class FileDetailsDTO implements Serializable{
 	private Date dateMarksReleased;
 	private boolean finished;
 	private String comments;	
-	private Long marks;
+	private String marks;
 	private Long uuID;
 	private Long versionID;
 	private String exportedURL;  // the location of this file saved by the export function.      	
@@ -80,7 +80,7 @@ public class FileDetailsDTO implements Serializable{
 			this.reportID = report.getReportID();
 			this.dateMarksReleased = report.getDateMarksReleased();		
 			this.comments = report.getComments();
-			this.marks = report.getMarks();
+			this.marks = report.getMarks() != null? report.getMarks().toString():"";
 		}
 		this.userDTO = userDTO;
 	}
@@ -155,13 +155,13 @@ public class FileDetailsDTO implements Serializable{
 	/**
 	 * @return Returns the marks.
 	 */
-	public Long getMarks() {
+	public String getMarks() {
 		return marks;
 	}
 	/**
 	 * @param marks The marks to set.
 	 */
-	public void setMarks(Long marks) {
+	public void setMarks(String marks) {
 		this.marks = marks;
 	}	
 	

@@ -39,12 +39,12 @@
 		</div>
 
 		<div id="content-learner">
-			<table cellpadding="0">
+			<table cellpadding="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td colspan="2">
-						<p>
+						<h2>
 							<c:out value="${learner.contentInstruction}" escapeXml="false" />
-						</p>
+						</h2xs>
 					</td>
 				</tr>
 
@@ -123,6 +123,11 @@
 											<c:out value="${file.marks}" escapeXml="false" />
 										</c:otherwise>
 									</c:choose>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<hr size="1" style="width:500px;"/>
 								</td>
 							</tr>
 						</c:forEach>

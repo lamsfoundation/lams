@@ -332,7 +332,15 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
 		String updateMode = request.getParameter("updateMode");
 		
-		setMarkPage(request, sessionID, userID, detailID, updateMode);
+		submitFilesService = getSubmitFilesService();
+		
+		List report = new ArrayList<FileDetailsDTO>();
+		report.add(submitFilesService.getFileDetails(detailID));
+		
+		request.setAttribute("report",report);
+		request.setAttribute("updateMode", updateMode);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		
 		return mapping.findForward("updateMark");
 	}
 
@@ -356,25 +364,31 @@ public class MonitoringAction extends LamsDispatchAction {
 		String updateMode = request.getParameter("updateMode");
 		Long reportID= new Long(WebUtil.readLongParam(request,"reportID"));
 		
-		//check whether the mark is validate
-		Long marks = null;
 		ActionMessages errors = new ActionMessages();  
+		//check whether the mark is validate
+		String markStr = request.getParameter("marks");
+		Long marks = null;
 		try {
-			marks = new Long(WebUtil.readLongParam(request,"marks"));
-		} catch (IllegalArgumentException e) {
+			marks = Long.parseLong(markStr);
+		} catch (Exception e) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
 		}
-		//if marks is invalid long, then throw error message directly.
+		
 		String comments = WebUtil.readStrParam(request,"comments",true);
 		if(!errors.isEmpty()){
-			setMarkPage(request, sessionID, userID, detailID, updateMode);
-			//to echo back to error page.
-			List<FileDetailsDTO> list = (List<FileDetailsDTO>) request.getAttribute("report");
-			if(list != null){
-				FileDetailsDTO details = list.get(0);
-				if(details != null)
-					details.setComments(comments);
-			}
+			submitFilesService = getSubmitFilesService();
+			List report = new ArrayList<FileDetailsDTO>();
+			FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID);
+			//echo back the input, even they are wrong.
+			fileDetail.setComments(comments);
+			fileDetail.setMarks(markStr);
+			report.add(fileDetail);
+			
+			request.setAttribute("report",report);
+			request.setAttribute("updateMode", updateMode);
+			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+			
+			
 			saveErrors(request,errors);
 			return mapping.findForward("updateMark");
 		}
@@ -445,13 +459,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	 * @param updateMode
 	 */
 	private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID, String updateMode) {
-		submitFilesService = getSubmitFilesService();
-		
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		List report = new ArrayList<FileDetailsDTO>();
-		report.add(submitFilesService.getFileDetails(detailID));
-		request.setAttribute("report",report);
-		request.setAttribute("updateMode", updateMode);
+
 	}
 	/**
 	 * Save statistic information into request

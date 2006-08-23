@@ -13,20 +13,29 @@
 		}
 	</script>
 </head>
-
 <body>
-
-<table cellpadding="0">
-	<c:forEach var="fileInfo" items="${report}" varStatus="status">
-		<%@include file="filelist.jsp"%>
-	</c:forEach>
-	<tr>
-		<td colspan="2">
-			<html:link href="javascript:window.close();" property="submit" styleClass="button">
-				<bean:message key="label.monitoring.done.button" />
-			</html:link>
-		</td>
-	</tr>
-</table>
+	<div id="page-learner">
+		<h1 class="no-tabs-below">
+			<fmt:message key="label.monitoring.heading.marking"/>
+		</h1>
+		<div id="header-no-tabs-learner">
+		</div>
+		<div id="content-learner">
+				<table cellpadding="0">
+					<c:forEach var="fileInfo" items="${report}" varStatus="status">
+						<%@include file="filelist.jsp"%>
+					</c:forEach>
+					<tr>
+						<td colspan="2">
+							<html:link href="javascript:window.close();" property="submit" styleClass="button">
+								<bean:message key="label.monitoring.done.button" />
+							</html:link>
+						</td>
+					</tr>
+				</table>
+			</div>
+		<div id="footer-learner"></div>
+		</div>
+	</div>
 </body>
 </html>

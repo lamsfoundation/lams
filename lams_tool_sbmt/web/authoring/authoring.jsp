@@ -12,9 +12,11 @@
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
 <html:html>
 <head>
-	<lams:headItems />
 	
+	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
+	<!-- ********************  CSS ********************** -->
+	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 	
