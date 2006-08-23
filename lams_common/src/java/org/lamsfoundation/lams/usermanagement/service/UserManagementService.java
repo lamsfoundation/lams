@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -435,23 +436,34 @@ public class UserManagementService implements IUserManagementService {
                             organisation.setWorkspace(workspace); 	 
                     }
                     
+                    save(organisation);
+                    
                     if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){ 	 
                     		// get course managers and give them staff role in this new class
                     		Vector<UserDTO> managers = getUsersFromOrganisationByRole(organisation.getParentOrganisation().getOrganisationId(),Role.COURSE_MANAGER);
-                    		HashSet uos = new HashSet();
                     		for(UserDTO m: managers){
-                    				UserOrganisation uo = new UserOrganisation((User)findById(User.class,m.getUserID()),organisation);
+                    				User user = (User)findById(User.class,m.getUserID());
+                    				UserOrganisation uo = new UserOrganisation(user,organisation);
+                    				log.debug("adding course manager: "+user.getUserId()+" as staff");
                     				UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)findById(Role.class,Role.ROLE_STAFF));
                     				HashSet uors = new HashSet();
                     				uors.add(uor);
                     				uo.setUserOrganisationRoles(uors);
+                    				
+                    				// attach new UserOrganisation to the Organisation, then save the UserOrganisation.
+                    				// this way the Set Organisations.userOrganisations contains persisted objects,
+                    				// and we can safely add new UserOrganisations if necessary (i.e. if there are
+                    				// several course managers).
+                    				Set uos = organisation.getUserOrganisations();
+                    				if(uos==null) uos = new HashSet();
                     				uos.add(uo);
+                    				organisation.setUserOrganisations(uos);
+                    				                    				
+                    				save(uo);
                     		}
-                    		organisation.setUserOrganisations(uos);
                     } 
             } 	 
-	 
-            save(organisation); 	 
+	 	 
             return organisation; 	 
     } 	 
 
