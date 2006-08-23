@@ -747,6 +747,11 @@ public class LD102Importer implements ApplicationContextAware{
 		if ( activity.getTitle() == null && keyExists(taskDetails, WDDXTAGS102.TITLE))
 		    activity.setTitle(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.TITLE));
 
+		// define later will have already been set up for tool activities
+		if ( activity.getDefineLater() == null )  {
+			activity.setDefineLater(Boolean.FALSE);
+		}
+		
 		activity.setXcoord(xCoOrd);
 		activity.setYcoord(yCoOrd);
 		activity.setHelpText(null);

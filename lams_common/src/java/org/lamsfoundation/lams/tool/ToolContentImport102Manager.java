@@ -35,8 +35,9 @@ package org.lamsfoundation.lams.tool;
  * as supporting one of the 1.0.2 tool must implement this interface otherwise 
  * an exception will be thrown.
  */
-import java.util.Map;
+import java.util.Hashtable;
 
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
 public interface ToolContentImport102Manager {
@@ -95,7 +96,11 @@ public interface ToolContentImport102Manager {
 	public static final String CONTENT_URL_URL_TYPE= "resourcetype"; // see URLContent TYPE_* fields
 	public static final String CONTENT_URL_URL_INSTRUCTION_ARRAY = "instructions";
 	public static final String CONTENT_URL_INSTRUCTION = "instruction";
-
+	
+	public static final String URL_RESOURCE_TYPE_WEBSITE = "internalurl"; // Uploaded website - will be missing its files.
+	public static final String URL_RESOURCE_TYPE_FILE = "file"; // Uploaded file - will be missing its files.
+	public static final String URL_RESOURCE_TYPE_URL = "externalurl"; // URL - will be okay
+	
 	// message content
 	public static final String CONTENT_MB_TERMINATION_TYPE = "terminationType"; // type string
 	public static final String CONTENT_MB_DURATION_DAYS = "durationInDays"; // type string
@@ -175,14 +180,26 @@ public interface ToolContentImport102Manager {
      * So setting it in the tool data now will wreck preview as the workflow engine doesn't
      * set define later on the tools for preview.
      * 
+     * Does not set the "reflective" fields.
+     * 
      * @param toolContentId new tool content id
      * @param newUserId user id of the person importing the data
      * @param importValues map of values to import. 
-     * @throws ToolException if any other error occurs
+     * @throws ToolException an error occurs
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Map importValues) 
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues) 
     	throws ToolException;
     
+    /** 
+     * Set the "reflective" fields on an existing piece of content. Note: Most / All of LAMS 2.0 tools
+     * do not support the title entry for reflection, so any text in that field will be
+     * lost during the import. Only the description is kept.
+     * 
+     * @param title heading to use above reflective entry box
+     * @param description default contents for the reflective entry box.
+    */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+		throws ToolException, DataMissingException; 
     
 
 }
