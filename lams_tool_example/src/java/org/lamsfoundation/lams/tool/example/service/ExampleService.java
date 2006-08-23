@@ -127,9 +127,8 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
      * @throws DataMissingException if no tool content matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */
- 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
     /**
@@ -137,11 +136,9 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public String importToolContent(Long toolContentId, String reference, String directory) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
 		// TODO Auto-generated method stub
-		return null;
 	}
-
 
 	/* ******************* Used by Spring to "inject" the linked objects **************************/
 	public IExampleAttachmentDAO getExampleAttachmentDAO() {
@@ -207,4 +204,5 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 	public void setAuditService(IAuditService auditService) {
 		this.auditService = auditService;
 	}
+
 }
