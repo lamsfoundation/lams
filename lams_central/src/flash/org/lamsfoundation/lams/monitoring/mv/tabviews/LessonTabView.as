@@ -88,6 +88,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var manageStatus_lbl:Label;
 	private var manageStart_lbl:Label;
 	private var manageDate_lbl:Label;
+	private var manageTime_lbl:Label;
 	private var start_date_lbl:Label;
 	private var schedule_date_lbl:Label;
 	private var btnLabel:String;
@@ -419,28 +420,32 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		// is started?
 		if(s.isStarted){
+			
 			start_date_lbl.text = s.getStartDateTime();
 			start_date_lbl.visible = true;
+			schedule_date_lbl.text = "";
 		} else {
+			// is scheduled to start?
+			if(s.isScheduled){
+				schedule_date_lbl.text = s.getScheduleDateTime();
+				schedule_date_lbl.visible = true;
+			} else {
+				schedule_date_lbl.visible = false;
+			}
 			start_date_lbl.visible = false;
 		}
 		
 		start_btn.visible = a;
 		
 		
-		// is scheduled to start?
-		if(s.isScheduled){
-			schedule_date_lbl.text = s.getScheduleDateTime();
-			schedule_date_lbl.visible = true;
-		} else {
-			schedule_date_lbl.visible = false;
-		}
+		
 		
 		
 		scheduleTime._visible = b;
 		scheduleDate_dt.visible = b;
 		schedule_btn.visible = b;
 		manageDate_lbl.visible = b;
+		manageTime_lbl.visible = b;
 		
 		/**	
 			if(seq.isStarted()){
@@ -491,8 +496,14 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	public function scheduleLessonStart(evt:Object):Void{
-		var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
-		mm.getMonitor().startLesson(true, _root.lessonID, datetime);
+		 Debugger.log('setting Schedule Date :' + scheduleDate_dt.selectedDate,Debugger.CRITICAL,'scheduleLessonStart','org.lamsfoundation.lams.LessonTabView');
+		if (scheduleDate_dt.selectedDate == null || scheduleDate_dt.selectedDate == undefined){
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+		}else {
+			var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
+			mm.getMonitor().startLesson(true, _root.lessonID, datetime);
+		}
+		
 	}
 
 	private function populateContributeActivities():Void{
@@ -677,8 +688,8 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.text = "<b>"+Dictionary.getValue('ls_manage_class_lbl')+"</b>";
 		manageStatus_lbl.text = "<b>"+Dictionary.getValue('ls_manage_status_lbl')+"</b>";
 		manageStart_lbl.text = "<b>"+Dictionary.getValue('ls_manage_start_lbl')+"</b>";
-		manageDate_lbl.text = "<b>"+Dictionary.getValue('ls_manage_date_lbl')+"</b>";
-			
+		manageDate_lbl.text = Dictionary.getValue('ls_manage_date_lbl');
+		manageTime_lbl.text = Dictionary.getValue('ls_manage_time_lbl');
 		//Button
 		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
 		editClass_btn.label = Dictionary.getValue('ls_manage_editclass_btn');
@@ -722,11 +733,16 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.setStyle('styleName',styleObj);
 		manageStatus_lbl.setStyle('styleName',styleObj);
 		manageStart_lbl.setStyle('styleName',styleObj);
-		manageDate_lbl.setStyle('styleName',styleObj);
+		
 		schedule_date_lbl.setStyle('styleName', styleObj);
 		sessionStatus_txt.setStyle('styleName', styleObj);
 		numLearners_txt.setStyle('styleName', styleObj);
 		class_txt.setStyle('styleName', styleObj);
+		
+		//SMALL LABELS
+		styleObj = _tm.getStyleObject('PIlabel');
+		manageDate_lbl.setStyle('styleName',styleObj);
+		manageTime_lbl.setStyle('styleName',styleObj);
 		
 		
 		//BUTTONS
@@ -781,7 +797,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			dayStr=day.toString();
 		}
 		
-		var month = date.getMonth()+1;
+		var month = date.getMonth();   //+1;
 		if(month<10){
 			monthStr=String(0)+month;
 		} else {
