@@ -30,14 +30,16 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -55,6 +57,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -76,6 +79,7 @@ import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -86,6 +90,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -916,8 +922,137 @@ public class ResourceServiceImpl implements
 		resourceSessionDao.deleteBySessionId(toolSessionId);
 	}
 
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
 
-	public IExportToolContentService getExportContentService() {
+    /**
+     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
+     */
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	Resource toolContentObj = new Resource();
+
+    	try {
+	    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+	    	toolContentObj.setContentId(toolContentId);
+	    	toolContentObj.setContentInUse(Boolean.FALSE);
+	    	toolContentObj.setCreated(now);
+	    	toolContentObj.setDefineLater(Boolean.FALSE);
+	    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+	    	toolContentObj.setOfflineInstructions(null);
+	    	toolContentObj.setOnlineInstructions(null);
+	    	toolContentObj.setRunOffline(Boolean.FALSE);
+	    	toolContentObj.setUpdated(now);
+
+	    	toolContentObj.setRunAuto(Boolean.FALSE);
+	    	Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_FILE);
+	    	toolContentObj.setAllowAddFiles(bool != null ? bool : Boolean.TRUE); 
+	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
+	    	toolContentObj.setAllowAddUrls(bool != null ? bool : Boolean.TRUE); 
+	    	Integer minToComplete = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_URL_MIN_NUMBER_COMPLETE);
+	    	toolContentObj.setMiniViewResourceNumber(minToComplete != null ? minToComplete.intValue() : 0); 
+	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
+	    	toolContentObj.setLockWhenFinished(Boolean.FALSE);
+	    	toolContentObj.setRunAuto(Boolean.FALSE);
+	    	
+	    	// leave as empty, no need to set them to anything.
+	    	//toolContentObj.setAttachments(attachments);
+    	
+/*	    	 unused entries from 1.0.2
+             [directoryName=]  no equivalent in 2.0
+             [runtimeSubmissionStaffFile=true] no equivalent in 2.0
+             [contentShowUser=false]  no equivalent in 2.0
+             [isHTML=false]  no equivalent in 2.0
+             [showbuttons=false]  no equivalent in 2.0
+             [isReusable=false]   not used in 1.0.2 (would be lock when finished)
+*/
+	    	ResourceUser user = null;
+	    	if ( newUserId != null ) {
+	    		user = new ResourceUser();
+	    		user.setUserId(new Long(newUserId.longValue()));
+				createUser(user);
+		    	toolContentObj.setCreatedBy(user);
+	    	}
+	
+	    	//resource Items
+	    	Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
+	    	if ( urls != null ) {
+	    		Iterator iter = urls.iterator();
+	    		while ( iter.hasNext() ) {
+	    			Hashtable urlMap = (Hashtable) iter.next();
+	    			
+	    			ResourceItem item = new ResourceItem();
+	    			item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
+	    			item.setCreateDate(now);
+	    			item.setCreateBy(user);
+	    			item.setCreateByAuthor(true);
+	    			item.setHide(false);
+	
+	    			Vector instructions = (Vector) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
+	    			if ( instructions != null && instructions.size() > 0 ) {
+	    				item.setItemInstructions(new HashSet());
+	    				Iterator insIter = instructions.iterator();
+	    				while (insIter.hasNext()) {
+	    					Hashtable instructionEntry = (Hashtable) insIter.next();
+							String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
+							Integer order = WDDXProcessor.convertToInteger(instructionEntry, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+							ResourceItemInstruction instruction = new ResourceItemInstruction();
+							instruction.setDescription(instructionText);
+							instruction.setSequenceId(order);
+							item.getItemInstructions().add(instruction);
+						}
+	    			}
+	
+	    			String resourceType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
+	    			if ( ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(resourceType) ) {
+	    				item.setType(ResourceConstants.RESOURCE_TYPE_URL);
+	    				item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
+	    				item.setOpenUrlNewWindow(false);
+	    			} else if ( ToolContentImport102Manager.URL_RESOURCE_TYPE_WEBSITE.equals(resourceType) ) {
+	    				item.setType(ResourceConstants.RESOURCE_TYPE_WEBSITE);
+	    			} else if ( ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(resourceType) ) {
+	    				item.setType(ResourceConstants.RESOURCE_TYPE_FILE);
+	    			} else {
+	    				throw new ToolException("Invalid shared resources type. Type was "+resourceType);
+	    			}
+	
+	    			// TODO add the order field - no support for it in forum at present.
+	    			// public static final String CONTENT_URL_URL_VIEW_ORDER = "order";
+	    			toolContentObj.getResourceItems().add(item);
+	    		}
+	    	}
+	    	
+    	} catch (WDDXProcessorConversionException e) {
+    		log.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
+    		throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+    	}
+
+    	resourceDao.saveObject(toolContentObj);
+
+
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+    	
+    	Resource toolContentObj = getResourceByContentId(toolContentId);
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+
+    	// TODO Share Resources doesn't support reflection yet!
+    	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
+    	// toolContentObj.setReflectInstructions(description);
+    }
+
+    
+	/* =================================================================================== */
+
+    public IExportToolContentService getExportContentService() {
 		return exportContentService;
 	}
 

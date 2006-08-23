@@ -26,9 +26,9 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -58,8 +58,6 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
 
 
@@ -1032,7 +1030,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Map importValues)
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
     {
     	Date now = new Date();
     	NoticeboardContent toolContentObj = new NoticeboardContent();
@@ -1052,7 +1050,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     	//toolContentObj.setNbAttachments(nbAttachments);
     	nbContentDAO.saveNbContent(toolContentObj);
     }
-  
+
+    /** Set the reflective title - does nothing as Noticeboard is not reflective */
+    public void  setReflectiveData(Long toolContentId, String title, String defaultInputValues) 
+    		throws ToolException, DataMissingException {
+    	log.error("Was asked to set reflective data "+title+" to activity toolContentId "+toolContentId
+    			+". Noticeboard does not support reflection");
+    }
+    
     //=========================================================================================
     
     public Long getToolDefaultContentIdBySignature(String toolSignature)

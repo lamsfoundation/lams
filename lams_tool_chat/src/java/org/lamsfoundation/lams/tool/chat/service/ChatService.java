@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -107,7 +109,7 @@ import org.w3c.dom.Text;
  * ToolContentManager and ToolSessionManager.
  */
 
-public class ChatService implements ToolSessionManager, ToolContentManager,
+public class ChatService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager,
 		IChatService {
 
 	static Logger logger = Logger.getLogger(ChatService.class.getName());
@@ -1083,4 +1085,53 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			return list.get(0);
 		}
 	}
+	
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
+
+    /**
+     * Import the data for a 1.0.2 Chat
+     */
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	Chat toolContentObj = new Chat();
+    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	toolContentObj.setCreateBy(newUserId != null ? new Long(newUserId.longValue()) : null);
+    	toolContentObj.setCreateDate(now);
+    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setFilterKeywords(null);
+    	toolContentObj.setFilteringEnabled(null);
+    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setLockOnFinished(Boolean.FALSE);
+    	toolContentObj.setOfflineInstructions(null);
+    	toolContentObj.setOnlineInstructions(null);
+    	toolContentObj.setReflectInstructions(null);
+    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
+    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	toolContentObj.setToolContentId(toolContentId);
+    	toolContentObj.setUpdateDate(now);
+    	// leave as empty, no need to set them to anything.
+    	//setChatAttachments(Set chatAttachments);
+    	//setChatSessions(Set chatSessions);
+    	chatDAO.saveOrUpdate(toolContentObj);
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+    	
+    	Chat chat = getChatByContentId(toolContentId);
+    	if ( chat == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+    	
+    	chat.setReflectOnActivity(Boolean.TRUE);
+    	chat.setReflectInstructions(description);
+    }
+    
+    //=========================================================================================
 }

@@ -30,11 +30,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -57,10 +56,12 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -84,7 +85,6 @@ import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -770,6 +770,53 @@ public class SubmitFilesService implements ToolContentManager,
         return learners;
     }
     
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
+
+    /**
+     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
+     */
+    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	SubmitFilesContent toolContentObj = new SubmitFilesContent();
+
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	toolContentObj.setContentID(toolContentId);
+    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	// toolContentObj.setCreated(now);
+    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setInstruction((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setOfflineInstruction(null);
+    	toolContentObj.setOnlineInstruction(null);
+    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	// toolContentObj.setUpdated(now);
+    	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
+    	toolContentObj.setLockOnFinished(Boolean.TRUE);  
+    	// toolContentObj.setCreatedBy(user);
+    	
+    	// leave as empty, no need to set them to anything.
+    	//toolContentObj.setInstructionFiles(attachments);
+	
+    	submitFilesContentDAO.saveOrUpdate(toolContentObj);
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+    	
+    	SubmitFilesContent toolContentObj = getSubmitFilesContent(toolContentId);
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+
+    	// TODO Share Resources doesn't support reflection yet!
+    	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
+    	// toolContentObj.setReflectInstructions(description);
+    }
+
 	/***************************************************************************
 	 * Property Injection Methods
 	 **************************************************************************/
