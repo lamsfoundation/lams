@@ -1098,6 +1098,11 @@ class WizardView extends AbstractView {
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg2'), null, null);
 		}
+		
+		if(schedule_cb.selected && (scheduleDate_dt.selectedDate == null || scheduleDate_dt.selectedDate == undefined)){
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+			valid = false;
+		}
 		return valid;
 	}
 	
