@@ -73,7 +73,7 @@
 		</div>
 
 		<div id="content">
-			<html:form action="authoring" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+			<html:form action="authoring" method="post" styleId="authoringForm" enctype="multipart/form-data">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 			
 				<input type="hidden" name="mode" value="author">
