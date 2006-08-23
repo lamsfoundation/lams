@@ -123,7 +123,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td  valign=top>   	  <c:out value="${userData.response}"/>  </td>
+														 <td  valign=top>   	  <c:out value="${userData.response}"/>  </td>														 
 														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
 													</tr>															
 											</c:if>														  					 
@@ -212,8 +212,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+														 <td valign=top>   		  <c:out value="${userData.response}"/>  </td>														 
 														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
-														 <td valign=top>   		  <c:out value="${userData.response}"/>  </td>
 													</tr>															
 											</c:if>														  					 
 	 									</c:forEach>		  	
@@ -225,7 +225,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true'}"> 			
 			       	<table> 	  
 						<tr> 
 	  	   		  		<td>
@@ -246,7 +245,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</td> 
 							</tr>
 					</table>
-			</c:if> 				    
 
 
 			</html:form>
