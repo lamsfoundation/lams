@@ -450,6 +450,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 	}
 
+	public void finishUserSession(ForumUser currentUser) {
+		currentUser.setSessionFinished(true);
+		forumUserDao.save(currentUser);
+	}
+
     //***************************************************************************************************************
     // Private methods
     //***************************************************************************************************************

@@ -31,6 +31,7 @@ package org.lamsfoundation.lams.tool.forum.util;
  */
 public interface ForumConstants {
 	public static final int COMPLETED = 1;
+	public static final int SESSION_STATUS_FINISHED = 1;
 	
 	public static final String TOOL_SIGNATURE = "lafrum11";
 	
@@ -50,7 +51,6 @@ public interface ForumConstants {
 	public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
 	public static final String FORUM_ID = "forum_id";
 
-	public static final int SESSION_STATUS_FINISHED = 1;
 	public static final String ATTR_ALLOW_EDIT = "allowEdit";
 	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
 	public static final String ATTR_ALLOW_NEW_TOPICS = "allowNewTopics";

@@ -128,6 +128,7 @@
                 <prop key="deleteFromRepository">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="updateSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <!--  Tool Content Manager and Tool Session Manager calls -->
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="removeToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

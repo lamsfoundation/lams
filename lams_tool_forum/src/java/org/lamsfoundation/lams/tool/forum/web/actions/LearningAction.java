@@ -166,8 +166,8 @@ public class LearningAction extends Action {
 			return mapping.findForward("error");
 		}
 		
-		boolean lock = session.getForum().getLockWhenFinished();
-		lock = lock && (session.getStatus() == ForumConstants.SESSION_STATUS_FINISHED ? true : false);
+		ForumUser forumUser = getCurrentUser(request,sessionId);
+		boolean lock = forumUser.isSessionFinished();
 		
 		Forum forum = session.getForum();
 		//add define later support
@@ -222,9 +222,11 @@ public class LearningAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
 		Long sessionId = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID);
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, MODE_OPTIONAL);
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+		
+		forumService = getForumManager();
 		
 		if (mode == ToolAccessMode.LEARNER || mode==ToolAccessMode.AUTHOR) {
-			forumService = getForumManager();
 			ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 			Forum forum = session.getForum();
 			// get session from shared session.
@@ -239,13 +241,15 @@ public class LearningAction extends Action {
 					saveErrors(request, errors);
 					// get all root topic to display on init page
 					List rootTopics = forumService.getRootTopics(sessionId);
-					request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);								
+					request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+					request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID );
 					return mapping.findForward("success");
 				}
 			}
 
 			String nextActivityUrl;
 			try {
+				forumService.finishUserSession(getCurrentUser(request, sessionId));
 				ToolSessionManager sessionMgrService = ForumServiceProxy.getToolSessionManager(getServlet().getServletContext());
 				nextActivityUrl = sessionMgrService.leaveToolSession(sessionId,
 						userID);

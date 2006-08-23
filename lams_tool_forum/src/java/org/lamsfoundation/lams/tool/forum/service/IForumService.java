@@ -284,5 +284,9 @@ public interface IForumService {
 	
 	/** The topic updates (for monitoring) are done in the web layer, so need the audit service to log the updates */
 	public IAuditService getAuditService( );
-
+	/**
+	 * Mark user completing a session.  
+	 * @param currentUser
+	 */
+	public void finishUserSession(ForumUser currentUser);
 }

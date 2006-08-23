@@ -51,6 +51,7 @@ create table tl_lafrum11_forum_user (
    first_name varchar(255),
    session_id bigint,
    login_name varchar(255),
+   session_finished smallint,
    primary key (uid)
 );
 create table tl_lafrum11_message (

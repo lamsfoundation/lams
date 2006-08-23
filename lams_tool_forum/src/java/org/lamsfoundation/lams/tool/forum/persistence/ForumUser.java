@@ -49,6 +49,8 @@ public class ForumUser implements Serializable,Cloneable{
 	private String firstName;
 	private String lastName;
 	private String loginName;
+	private boolean sessionFinished;
+	
 	private ForumToolSession session;
 	
 	public ForumUser(){
@@ -60,6 +62,7 @@ public class ForumUser implements Serializable,Cloneable{
 		this.lastName = user.getLastName();
 		this.loginName = user.getLogin();
 		this.session = session;
+		this.sessionFinished = false;
 	}
 	
 
@@ -158,7 +161,18 @@ public class ForumUser implements Serializable,Cloneable{
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
+	/**
+	 * @hibernate.property column="session_finished"
+	 * @return
+	 */
+	public boolean isSessionFinished() {
+		return sessionFinished;
+	}
 
+	public void setSessionFinished(boolean sessionFinished) {
+		this.sessionFinished = sessionFinished;
+	}
+	
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -177,5 +191,6 @@ public class ForumUser implements Serializable,Cloneable{
 		.append(lastName).append(loginName)
 		.toHashCode();
 	}
+
 
 }

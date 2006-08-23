@@ -70,6 +70,14 @@
             column="login_name"
         />
 
+        <property
+            name="sessionFinished"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="session_finished"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ForumUser.xml
