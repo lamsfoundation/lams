@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.web.filter;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -98,17 +99,20 @@ public class LocaleFilter extends OncePerRequestFilter {
 
     	HttpSession session = request.getSession(false);
         //set locale for STURTS and JSTL
+        // set the time zone - must be set for dates to display the time zone
         if (session != null) {
             if (preferredLocale != null) {
                 session.setAttribute(PREFERRED_LOCALE_KEY, preferredLocale);
                 Config.set(session, Config.FMT_LOCALE, preferredLocale);
             }
+            Config.set(session, Config.FMT_TIME_ZONE, TimeZone.getDefault());
         }
         if (preferredLocale != null && !(request instanceof LocaleRequestWrapper)) {
             request = new LocaleRequestWrapper(request, preferredLocale);
             LocaleContextHolder.setLocale(preferredLocale);
         }
 
+        
         chain.doFilter(request, response);
         
         // Reset thread-bound LocaleContext.
