@@ -283,13 +283,14 @@ CREATE TABLE lams_user (
      , login VARCHAR(20) NOT NULL
      , password VARCHAR(50) NOT NULL
      , title VARCHAR(32)
-     , first_name VARCHAR(64)
+     , first_name VARCHAR(128)
      , last_name VARCHAR(128)
      , address_line_1 VARCHAR(64)
      , address_line_2 VARCHAR(64)
      , address_line_3 VARCHAR(64)
      , city VARCHAR(64)
      , state VARCHAR(64)
+     , postcode VARCHAR(10)
      , country VARCHAR(64)
      , day_phone VARCHAR(64)
      , evening_phone VARCHAR(64)
@@ -304,6 +305,7 @@ CREATE TABLE lams_user (
      , html_theme_id BIGINT(20)
      , chat_id VARCHAR(255)
      , locale_id TINYINT(4)
+     , portrait_uuid BIGINT(20)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -317,6 +319,9 @@ CREATE TABLE lams_user (
      , INDEX (html_theme_id)
      , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (locale_id)
+     , CONSTRAINT FK_lams_user_6 FOREIGN KEY (locale_id)
+                  REFERENCES lams_supported_locale (locale_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 ALTER TABLE lams_user MODIFY COLUMN chat_id VARCHAR(255)
       COMMENT 'ID used for Jabber';
