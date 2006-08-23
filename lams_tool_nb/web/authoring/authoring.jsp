@@ -100,7 +100,7 @@
 					saveButtonLabelKey="button.save" customiseSessionID="${sessionMap.sessionID}"/>
 			</div>
 			<div id="footer" />
-				<lams:HTMLEditor />
+				<lams:HTMLEditor contentFolderID="${NbAuthoringForm.contentFolderID}" />
 		</html:form>
 	</div>
 </body>
