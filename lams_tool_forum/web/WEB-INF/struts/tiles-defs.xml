@@ -119,7 +119,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
-    	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>
+    	<put name="body" value="/jsps/monitoring/message/viewtopic.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/viewTopicTree" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
+    	<put name="body" value="/jsps/monitoring/message/viewtopictree.jsp"/>
 	</definition>
 	
 	<!-- E: Monitoring -->

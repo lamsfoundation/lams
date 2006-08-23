@@ -40,7 +40,7 @@
 						<tr>
 							<td valign="MIDDLE" width="48%">
 								<c:set var="viewtopic">
-									<html:rewrite page="/monitoring/viewTopic.do?messageID=${topic.message.uid}&amp;create=${topic.message.created.time}" />
+									<html:rewrite page="/monitoring/viewTopicTree.do?topicID=${topic.message.uid}&create=${topic.message.created.time}" />
 								</c:set>
 								<html:link href="javascript:launchPopup('${viewtopic}');">
 									<c:out value="${topic.message.subject}" />

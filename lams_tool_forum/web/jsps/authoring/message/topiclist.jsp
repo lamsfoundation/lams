@@ -1,4 +1,7 @@
 <%@ include file="/common/taglibs.jsp" %>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 <div id="topiclist">
 	<table class="alternative-color">
 		<tr>

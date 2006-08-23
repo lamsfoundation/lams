@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <table class="forum" cellspacing="0">
 	<tbody>
 		<tr>
@@ -34,3 +36,14 @@
 		</tr>
 	</tbody>
 </table>
+
+
+<table cellpadding="0">
+	<tr>
+		<td>
+			<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
+		</td>
+	</tr>
+</table>
+
+

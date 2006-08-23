@@ -142,6 +142,9 @@ public class MonitoringAction extends Action {
 		if (param.equals("viewTopic")) {
 			return viewTopic(mapping, form, request, response);
 		}
+		if (param.equals("viewTopicTree")) {
+			return viewTopicTree(mapping, form, request, response);
+		}
 		return mapping.findForward("error");
 	}
 	
@@ -619,6 +622,27 @@ public class MonitoringAction extends Action {
 		request.setAttribute("topicList", sessionTopicsMap);
 		request.setAttribute("markAverage", sessionAvaMarkMap);
 		request.setAttribute("totalMessage", sessionTotalMsgMap);
+		return mapping.findForward("success");
+	}
+
+	/**
+	 * View all messages under one topic.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward viewTopicTree(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
+		forumService = getForumService();
+		// get root topic list
+		List<MessageDTO> msgDtoList = forumService.getTopicThread(rootTopicId);
+		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
+		
 		return mapping.findForward("success");
 	}
 

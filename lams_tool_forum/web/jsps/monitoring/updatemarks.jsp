@@ -49,7 +49,7 @@
 				<%@ include file="/common/messages.jsp"%>
 			</td>
 		<tr>
-			<td class="field-name" width="100" >
+			<td class="field-name" width="100" style="text-align: left;">
 				<fmt:message key="lable.topic.title.mark" />* 
 			</td>
 			<td>
@@ -58,8 +58,19 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />					
-				<lams:SetEditor id="comment" small="true" text="${formBean.comment}" key="lable.topic.title.comment" />
+				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />		
+				<c:set var="language"><lams:user property="localeLanguage"/></c:set>
+				<span  class="field-name"><fmt:message key="lable.topic.title.comment" /><BR></span>
+				<fck:editor id="comment" basePath="/lams/fckeditor/"
+							imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
+							linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+							flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
+							imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
+							linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
+							flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+							toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
+							<c:out value="${formBean.comment}" escapeXml="false"/>
+				</fck:editor>									
 			</td>
 		</tr>
 		<tr>
@@ -71,5 +82,3 @@
 		</tr>
 	</table>
 </html:form>
-
-<lams:HTMLEditor />

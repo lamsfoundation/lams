@@ -312,6 +312,11 @@
 			parameter="viewTopic">
 			<forward name="success" path="tiles:/monitoring/forum/viewTopic" />
 		</action>
+		<action path="/monitoring/viewTopicTree"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="viewTopicTree">
+			<forward name="success" path="tiles:/monitoring/forum/viewTopicTree" />
+		</action>
 
 		<!-- ========== END: Monitoring  Definitions ============================== -->
 		<!-- System level actions -->
