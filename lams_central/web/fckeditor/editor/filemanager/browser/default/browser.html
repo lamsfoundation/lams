@@ -36,7 +36,7 @@ function GetUrlParam( paramName )
 }
 
 var oConnector = new Object() ;
-oConnector.CurrentFolder	= '/' ;
+oConnector.CurrentFolder	= GetUrlParam( 'CurrentFolder' ) ;
 
 var sConnUrl = GetUrlParam( 'Connector' ) ;
 
@@ -60,9 +60,10 @@ oConnector.SendCommand = function( command, params, callBackFunction )
 {
 	var sUrl = this.ConnectorUrl + 'Command=' + command ;
 	sUrl += '&Type=' + this.ResourceType ;
-	sUrl += '&CurrentFolder=' + escape( this.CurrentFolder ) ;
+	sUrl += '&CurrentFolder=' + escape( GetUrlParam( 'CurrentFolder' ) ) ;	// NOTE: Modified change
 	
 	if ( params ) sUrl += '&' + params ;
+	
 
 	var oXML = new FCKXml() ;
 	
