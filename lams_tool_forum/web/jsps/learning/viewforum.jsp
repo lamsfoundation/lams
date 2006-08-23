@@ -34,7 +34,7 @@
 					<html:rewrite page="/learning/newTopic.do?sessionMapID=${sessionMapID}" />
 				</c:set>
 				<c:set var="refresh">
-					<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}" />
+					<html:rewrite page="/learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}" />
 				</c:set>
 				<c:set var="finish">
 					<html:rewrite page="/learning/finish.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}" />

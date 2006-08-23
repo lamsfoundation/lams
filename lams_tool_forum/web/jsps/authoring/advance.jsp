@@ -28,6 +28,26 @@
 	</tr>
 	<tr>
 		<td>
+			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
+				<fmt:message key="label.authoring.advance.use.richeditor" />
+			</html:checkbox>
+		</td>
+	</tr>	
+	<tr>
+		<td>
+			<html:checkbox property="forum.limitedInput" styleId="limitedInput">
+				<fmt:message key="label.authoring.advance.limited.input" />
+			</html:checkbox>
+			<html:text property="forum.limitedChar" styleId="limitedChar" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<h1><fmt:message key="message.posting.limiting"/></h1>
+		</td>
+	</tr>	
+	<tr>
+		<td>
 			<html:radio property="forum.allowNewTopic" value="true" onclick="allowNewTopic()">
 				<fmt:message key="label.authoring.advance.allow.new.topics" />
 			</html:radio>
@@ -68,22 +88,7 @@
 				<html:option value="10">10</html:option>				
 			</html:select>
 		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
-				<fmt:message key="label.authoring.advance.use.richeditor" />
-			</html:checkbox>
-		</td>
 	</tr>	
-	<tr>
-		<td>
-			<html:checkbox property="forum.limitedInput" styleId="limitedInput">
-				<fmt:message key="label.authoring.advance.limited.input" />
-			</html:checkbox>
-			<html:text property="forum.limitedChar" styleId="limitedChar" />
-		</td>
-	</tr>
 </table>
 
 <script type="text/javascript">

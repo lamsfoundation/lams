@@ -22,7 +22,7 @@
 
 	<p>
 		<c:set var="backToForum">
-			<html:rewrite page="/learning/viewForum.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
+			<html:rewrite page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
 		</c:set>
 		<html:button property="backToForum" onclick="javascript:location.href='${backToForum}';" styleClass="button">
 			<fmt:message key="label.back.to.forum" />

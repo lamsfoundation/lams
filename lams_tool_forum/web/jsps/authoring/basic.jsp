@@ -10,16 +10,20 @@
 	 */
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
-		area.style.width="670px";
-		area.style.height="100%";
-		area.src=url;
-		area.style.display="block";
+		if(area != null){
+			area.style.width="670px";
+			area.style.height="100%";
+			area.src=url;
+			area.style.display="block";
+		}
 	}
 	function hideMessage(){
 		var area=document.getElementById("messageArea");
-		area.style.width="0px";
-		area.style.height="0px";
-		area.style.display="none";
+		if(area != null){
+			area.style.width="0px";
+			area.style.height="0px";
+			area.style.display="none";
+		}
 	}
 </script>
 

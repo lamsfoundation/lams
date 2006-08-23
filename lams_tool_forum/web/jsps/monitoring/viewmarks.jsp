@@ -24,15 +24,17 @@
 	
 	
 		<c:forEach items="${topicList}" var="topic" varStatus="status">
-			<tr>
-				<td colspan="5">
-					<c:out value="${user.loginName}" />
-					,
-					<c:out value="${user.firstName}" />
-					<c:out value="${user.lastName}" />
-					<fmt:message key="monitoring.user.post.topic" />
-				</td>
-			</tr>
+			<c:if test="${status.first}">
+				<tr>
+					<td colspan="5">
+						<c:out value="${user.loginName}" />
+						,
+						<c:out value="${user.firstName}" />
+						<c:out value="${user.lastName}" />
+						<fmt:message key="monitoring.user.post.topic" />
+					</td>
+				</tr>
+			</c:if>
 			<tr>
 				<td>
 					<c:set var="viewtopic">

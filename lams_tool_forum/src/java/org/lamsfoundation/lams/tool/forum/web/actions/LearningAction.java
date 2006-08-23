@@ -149,11 +149,10 @@ public class LearningAction extends Action {
 		try {
 			mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, MODE_OPTIONAL);
 		} catch (Exception exp) {
-			//set it as default mode
-			mode = ToolAccessMode.LEARNER;
 		}
 		if (mode == null) {
-			throw new ForumException("Mode is required.");
+			//set it as default mode
+			mode = ToolAccessMode.LEARNER;
 		}
 
 		// get sessionId from HttpServletRequest
@@ -603,7 +602,7 @@ public class LearningAction extends Action {
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
 		updateMesssageFlag(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
-		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,WebUtil.readLongParam(request,ForumConstants.ATTR_SESSION_MAP_ID));
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,WebUtil.readStrParam(request,ForumConstants.ATTR_SESSION_MAP_ID));
 
 		return mapping.findForward("success");
 	}

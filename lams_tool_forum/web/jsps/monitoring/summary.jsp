@@ -48,7 +48,6 @@
 <c:forEach var="element" items="${sessionUserMap}">
 	<c:set var="toolSessionDto" value="${element.key}" />
 	<c:set var="userlist" value="${element.value}" />
-	<c:set var="toolAccessMode" value="${mode}" />
 
 	<table cellpadding="0">
 		<tr><td colspan="3">
@@ -94,7 +93,7 @@
 		<tr>
 			<td align="right">
 				<html:form action="/learning/viewForum.do" target="_blank">
-					<html:hidden property="mode" value="${toolAccessMode}" />
+					<html:hidden property="mode" value="teacher"/>
 					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
 					<html:submit property="viewForum" styleClass="button">
 						<fmt:message key="label.monitoring.summary.view.forum" />

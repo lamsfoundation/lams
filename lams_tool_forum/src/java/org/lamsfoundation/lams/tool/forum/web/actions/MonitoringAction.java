@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -84,9 +85,7 @@ public class MonitoringAction extends Action {
 	private class SessionDTOComparator implements Comparator<SessionDTO>{
 		public int compare(SessionDTO o1, SessionDTO o2) {
 			if(o1 != null && o2 != null){
-				int c = o1.getSessionName().compareTo(o2.getSessionName());
-				//to ensure session can be put into map even they have duplicated name.
-				return c==0?1:c;
+				return o1.getSessionName().compareTo(o2.getSessionName());
 			}else if(o1 != null)
 				return 1;
 			else
@@ -97,16 +96,16 @@ public class MonitoringAction extends Action {
 	private class ForumUserComparator implements Comparator<ForumUser>{
 		public int compare(ForumUser o1, ForumUser o2) {
 			if(o1 != null && o2 != null){
-				int c = o1.getLoginName().compareTo(o2.getLoginName());
-				//to ensure ForumUser can be put into map even they have duplicated name.
-				return c==0?1:c;
+				return o1.getLoginName().compareTo(o2.getLoginName());
 			}else if(o1 != null)
 				return 1;
 			else
 				return -1;
 		}
 	}
-	
+	/**
+	 * Action method entry.
+	 */
 	public final ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -138,6 +137,7 @@ public class MonitoringAction extends Action {
 		
 		if(param.equals("releaseMark"))
 			return releaseMark(mapping, form, request, response); 
+		
 		// ***************** Miscellaneous ********************
 		if (param.equals("viewTopic")) {
 			return viewTopic(mapping, form, request, response);
@@ -152,13 +152,6 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward init(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		// read in parameters and set session attributes.
-		Long toolContentID = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_CONTENT_ID));
-		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,
-				toolContentID);
-		request.getSession().setAttribute(AttributeNames.PARAM_MODE,
-				ToolAccessMode.TEACHER);
 		
 		// perform the actions for all the tabs.
 		doTabs(mapping, form, request, response);
@@ -509,10 +502,9 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward viewActivity(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		Long contentId = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_CONTENT_ID);
+		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		forumService = getForumService();
-		Forum forum = forumService.getForumByContentId(contentId);
+		Forum forum = forumService.getForumByContentId(toolContentID);
 		// if can not find out forum, echo back error message
 		if (forum == null) {
 			ActionErrors errors = new ActionErrors();
@@ -543,11 +535,10 @@ public class MonitoringAction extends Action {
 	private ActionForward viewInstructions(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long contentId = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_CONTENT_ID);
-
+		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		
 		forumService = getForumService();
-		Forum forum = forumService.getForumByContentId(contentId);
+		Forum forum = forumService.getForumByContentId(toolContentID);
 		// if can not find out forum, echo back error message
 		if (forum == null) {
 			ActionErrors errors = new ActionErrors();
@@ -575,15 +566,14 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward statistic(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		Long contentID = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_CONTENT_ID);
-
+		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		
 		forumService = getForumService();
 		Map sessionTopicsMap = new TreeMap<SessionDTO, List<MessageDTO>>(this.new SessionDTOComparator());
 		Map sessionAvaMarkMap = new HashMap();
 		Map sessionTotalMsgMap = new HashMap();
 
-		List sessList = forumService.getSessionsByContentId(contentID);
+		List sessList = forumService.getSessionsByContentId(toolContentID);
 		Iterator sessIter = sessList.iterator();
 		while (sessIter.hasNext()) {
 			ForumToolSession session = (ForumToolSession) sessIter.next();
@@ -689,11 +679,10 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward userList(ActionMapping mapping,
 			HttpServletRequest request) {
-		Long contentID = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_CONTENT_ID);
+		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 		forumService = getForumService();
-		List sessionsList = forumService.getSessionsByContentId(contentID);
+		List sessionsList = forumService.getSessionsByContentId(toolContentID);
 
 		Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
 		// build a map with all users in the submitFilesSessionList
@@ -736,14 +725,15 @@ public class MonitoringAction extends Action {
 	private Map getTopicsSortedByAuthor(List topicList) {
 		Map<ForumUser,List<MessageDTO>> topicsByUser = new TreeMap(this.new ForumUserComparator());
 		Iterator iter = topicList.iterator();
+		forumService = getForumService();
 		while (iter.hasNext()) {
 			MessageDTO dto = (MessageDTO) iter.next();
 			dto.getMessage().getReport();
-			List<MessageDTO> list = (List) topicsByUser
-					.get(dto.getMessage().getCreatedBy());
+			ForumUser user = (ForumUser) dto.getMessage().getCreatedBy().clone();
+			List<MessageDTO> list = (List) topicsByUser.get(user);
 			if (list == null) {
 				list = new ArrayList<MessageDTO>();
-				topicsByUser.put(dto.getMessage().getCreatedBy(), list);
+				topicsByUser.put(user, list);
 			}
 			list.add(dto);
 		}
