@@ -76,6 +76,7 @@ public class NbAuthoringForm extends ActionForm {
 	
 	private String method;
 	private String toolContentID;
+	private String contentFolderID;
 	private String defineLater;
 	
 	private FormFile onlineFile;
@@ -201,6 +202,22 @@ public class NbAuthoringForm extends ActionForm {
 	 */
 	public void setToolContentID(String toolContentID) {
 		this.toolContentID = toolContentID;
+	}
+
+	/**
+	 * 
+	 * @return Returns the contentFolderID
+	 */
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	
+	/**
+	 * 
+	 * @param contentFolderID The contentFolderID is set
+	 */
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 
 	public void reset(ActionMapping mapping, HttpServletRequest request)

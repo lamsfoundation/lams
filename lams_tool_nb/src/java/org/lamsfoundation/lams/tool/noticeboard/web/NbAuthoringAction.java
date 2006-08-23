@@ -124,7 +124,10 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		NbAuthoringForm nbForm = new NbAuthoringForm();		
 		
 		Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
+		String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
+		
 		nbForm.setToolContentID(contentId.toString());
+		nbForm.setContentFolderID(contentFolderId);
 		
 		/* DefineLater is used in the basic screen. If defineLater is set, then in the authoring page,
 		 * the two tabs {Advanced, Instructions} are not visible.

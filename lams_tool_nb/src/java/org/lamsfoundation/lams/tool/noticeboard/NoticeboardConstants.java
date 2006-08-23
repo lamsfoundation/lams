@@ -88,6 +88,7 @@ public class NoticeboardConstants
     
     //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentID";  //request + session variable
+    public static final String CONTENT_FOLDER_ID = "contentFolderID"; //request variable
     public static final String RICH_TEXT_TITLE = "richTextTitle";
     public static final String RICH_TEXT_CONTENT = "richTextContent";
     public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
