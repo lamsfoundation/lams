@@ -73,6 +73,7 @@ CREATE TABLE tl_lamc11_que_usr (
      , username VARCHAR(100)
      , fullname VARCHAR(100)
      , responseFinalised TINYINT(1) NOT NULL DEFAULT 0
+     , viewSummaryRequested TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (mc_session_id)
      , CONSTRAINT FK_tl_lamc11_que_usr_1 FOREIGN KEY (mc_session_id)

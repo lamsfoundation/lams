@@ -1285,11 +1285,21 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 		logger.debug("mcService: " + mcService);
 		
+	 	String userID=request.getParameter(AttributeNames.PARAM_USER_ID);
+	 	logger.debug("userID: " + userID);
+		
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	 	logger.debug("toolSessionID: " + toolSessionID);
 	 	
 	 	McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
 	    logger.debug("retrieving mcSession: " + mcSession);
+	    
+	    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	    logger.debug("mcQueUsr: " + mcQueUsr);
+	    
+	    mcQueUsr.setViewSummaryRequested(true);
+	    mcService.updateMcQueUsr(mcQueUsr);
+	    logger.debug("view summary requested by mcQueUsr: " + mcQueUsr);
 	 	
 	    String toolContentId=mcSession.getMcContent().getMcContentId().toString();
 	    logger.debug("toolContentId: " + toolContentId);

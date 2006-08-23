@@ -290,10 +290,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	if ((mode != null) && (mode.equals("author")))
     	{
     		logger.debug("Author requests for a preview of the content.");
-			logger.debug("existing mcContent:" + mcContent);
-
-	    	/* PREVIEW_ONLY for jsp*/
-    		//return (mapping.findForward(LOAD_LEARNER));
     	}
 	    
     	/* by now, we know that the mode is either teacher or learner
@@ -301,6 +297,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	 */
 		String userId=request.getParameter(USER_ID);
 		logger.debug("userId: " + userId);
+		
+		
 		if ((userId != null) && (mode.equals("teacher")))
 		{
 			logger.debug("request is for learner progress");
@@ -367,8 +365,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return (mapping.findForward(DEFINE_LATER));
 	    }
 
-		/*also prepare data into mapGeneralOptionsContent for combined answers view */
-    	
     	/*
 	     * verify that userId does not already exist in the db.
 	     * If it does exist, that means, that user already responded to the content and 
@@ -390,6 +386,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    }
 	    }
 
+	    
     	McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
 	    logger.debug("mcQueUsr:" + mcQueUsr);
 	    
@@ -415,63 +412,57 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 	    logger.debug("users learning mode is: " + mode);
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-	    
+
+	    boolean viewSummaryRequested=false;
 	    /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
 	    if (mcQueUsr != null)
 	    {
-	    	Long sessionUid=mcQueUsr.getMcSessionId();
-	    	logger.debug("users sessionUid: " + sessionUid);
-	    	McSession mcUserSession= mcService.getMcSessionByUID(sessionUid);
-	    	logger.debug("mcUserSession: " + mcUserSession);
-	    	String userSessionId=mcUserSession.getMcSessionId().toString();
-	    	logger.debug("userSessionId: " + userSessionId);
-	    	
-	    	logger.debug("current toolSessionID: " + toolSessionID);
-	    	
-	    	if (toolSessionID.equals(userSessionId))
-	    	{
-	    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " mcQueUsr: " + 
-	    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
-	    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
-	    		
-	    		boolean isRetries=mcContent.isRetries();
-	    		logger.debug("isRetries: " + isRetries);
-	    		McLearningAction mcLearningAction= new McLearningAction();
-		    	logger.debug("present to learner with previous attempts data");
+	        viewSummaryRequested=mcQueUsr.isViewSummaryRequested();
+	        logger.debug("viewSummaryRequested: " + viewSummaryRequested);
+	        
+	        if (viewSummaryRequested)
+	        {
+		    	Long sessionUid=mcQueUsr.getMcSessionId();
+		    	logger.debug("users sessionUid: " + sessionUid);
+		    	McSession mcUserSession= mcService.getMcSessionByUID(sessionUid);
+		    	logger.debug("mcUserSession: " + mcUserSession);
+		    	String userSessionId=mcUserSession.getMcSessionId().toString();
+		    	logger.debug("userSessionId: " + userSessionId);
 		    	
-		    	String sessionStatus=mcUserSession.getSessionStatus(); 
-		    	logger.debug("sessionStatus: " +sessionStatus);
-		    	/*one limitation by design here is that once a user finishes the activity, subsequent users in the same group are also assumed finished
-		    	 * since they belong to the same ungrouped activity and these users have the same tool session id*/
+		    	logger.debug("current toolSessionID: " + toolSessionID);
 		    	
-		    	boolean isResponseFinalised=mcQueUsr.isResponseFinalised();
-		    	logger.debug("isResponseFinalised: " +isResponseFinalised);
-		    	
-		    	if (isResponseFinalised)
+		    	if (toolSessionID.equals(userSessionId))
 		    	{
-			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
-		    	}
-		    	else
-		    	{
-		    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
-		    	}
+		    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " mcQueUsr: " + 
+		    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
+		    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+		    		
+		    		boolean isRetries=mcContent.isRetries();
+		    		logger.debug("isRetries: " + isRetries);
+		    		McLearningAction mcLearningAction= new McLearningAction();
+			    	logger.debug("present to learner with previous attempts data");
+			    	
+			    	String sessionStatus=mcUserSession.getSessionStatus(); 
+			    	logger.debug("sessionStatus: " +sessionStatus);
+			    	/*one limitation by design here is that once a user finishes the activity, subsequent users in the same group are also assumed finished
+			    	 * since they belong to the same ungrouped activity and these users have the same tool session id*/
+			    	
+			    	boolean isResponseFinalised=mcQueUsr.isResponseFinalised();
+			    	logger.debug("isResponseFinalised: " +isResponseFinalised);
+			    	
+			    	if (isResponseFinalised)
+			    	{
+				    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
+			    	}
+			    	else
+			    	{
+			    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
+			    	}
 
-		    	
-		    	/*
-		    	if (sessionStatus.equals(COMPLETED))
-		    	{
-			    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
-		    	}
-		    	else
-		    	{
-		    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
-		    	}
-		    	*/
-		    	
-		    	
 
-		    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
-	    	}
+			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
+		    	}
+	        }
 	    }
 	    else if (mode.equals("teacher"))
 	    {
@@ -533,6 +524,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    }
 	    }
 		
+	    mcLearningForm.setUserID(userID);
 	    
 	    /*
 	     * process incoming tool session id and later derive toolContentId from it. 

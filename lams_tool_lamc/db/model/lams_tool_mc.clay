@@ -746,7 +746,7 @@
 </table>
 <table alias="" name="tl_lamc11_que_usr" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="110" width="167" x="495" y="99"/>
+<table-figure-bounds height="117" width="213" x="495" y="99"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -802,6 +802,19 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="responseFinalised" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant type-name-pattern="TINYINT"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="viewSummaryRequested" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant type-name-pattern="TINYINT"/>

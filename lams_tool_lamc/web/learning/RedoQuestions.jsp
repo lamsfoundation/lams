@@ -52,6 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="toolContentID"/>						
 			<html:hidden property="toolSessionID"/>								
 			<html:hidden property="httpSessionID"/>											
+			<html:hidden property="userID"/>											
 			<html:hidden property="userOverPassMark"/>						
 			<html:hidden property="passMarkApplicable"/>										
 			<html:hidden property="learnerProgress"/>										

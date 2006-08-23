@@ -49,6 +49,14 @@
         column="responseFinalised"
         length="1"        
    />
+   
+   <property
+        name="viewSummaryRequested"
+        type="boolean"
+        access="property"
+        column="viewSummaryRequested"
+        length="1"        
+   />   
 
     <property
         name="mcSessionId"

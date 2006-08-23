@@ -49,7 +49,8 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	
 	protected String[] checkedCa;
 	protected String[] sequentialCheckedCa;
-	
+
+	protected String userID;
     protected String toolContentID;
 	protected String toolContentUID;
 	protected String toolSessionID;
@@ -435,5 +436,17 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setReportViewOnly(String reportViewOnly) {
         this.reportViewOnly = reportViewOnly;
+    }
+    /**
+     * @return Returns the userID.
+     */
+    public String getUserID() {
+        return userID;
+    }
+    /**
+     * @param userID The userID to set.
+     */
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 }

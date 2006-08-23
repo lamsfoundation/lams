@@ -60,7 +60,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
 		<html:hidden property="toolSessionID"/>						
-		<html:hidden property="httpSessionID"/>								
+		<html:hidden property="httpSessionID"/>			
+		<html:hidden property="userID"/>								
 		<html:hidden property="userOverPassMark"/>						
 		<html:hidden property="passMarkApplicable"/>										
 		<html:hidden property="learnerProgress"/>										
