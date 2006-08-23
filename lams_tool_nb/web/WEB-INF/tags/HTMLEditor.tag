@@ -30,6 +30,7 @@
 	 */
 %>
 <%@ tag body-content="empty"%>
+<%@ attribute name="contentFolderID" required="true" rtexprvalue="true" %>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
@@ -46,14 +47,16 @@
 			<c:set var="language">
 				<lams:user property="localeLanguage" />
 			</c:set>
-
-			<FCK:editor id="FCKeditor1" basePath="/lams/fckeditor/"
-				imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-				linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-				flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-				imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-				linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-				flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+			
+			<c:set var="basePath" value="/lams/fckeditor/"/>
+			
+			<FCK:editor id="FCKeditor1" basePath="${basePath}"
+				imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
+				linkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
+				flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
+				imageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/"
+				linkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/"
+				flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/"
 				defaultLanguage="${language}" autoDetectLanguage="false">
 			</FCK:editor>
 		</div>
