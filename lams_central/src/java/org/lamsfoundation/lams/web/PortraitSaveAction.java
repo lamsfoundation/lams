@@ -89,6 +89,7 @@ public class PortraitSaveAction extends Action {
 		String mediaType = file.getContentType().split("/",2)[0];
 		if (!mediaType.equals("image")) {
 			errors.add("file",new ActionMessage("error.portrait.not.image"));
+			saveErrors(request, errors);
 			return mapping.getInputForward();
 		}
 		
@@ -99,6 +100,7 @@ public class PortraitSaveAction extends Action {
 		ByteArrayInputStream is = PortraitUtils.resizePicture(file.getInputStream(), THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, fileType);
 		if (is==null) {
 			errors.add("file",new ActionMessage("error.general.1"));
+			saveErrors(request, errors);
 			return mapping.getInputForward();
 		}
     	
