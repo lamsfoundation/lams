@@ -41,4 +41,5 @@ public class AuthoringConstants {
 	public static final String LAMS_WWW_DIR = "lams-www.war";
 	public static final String LAMS_WWW_FOLDER = "www/";
 	public static final String LAMS_WWW_SECURE_DIR = "secure";
+	public static final String LAMS_LAMS_FOLDER = "lams/";
 }

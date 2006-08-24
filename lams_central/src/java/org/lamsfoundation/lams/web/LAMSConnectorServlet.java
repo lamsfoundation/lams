@@ -126,7 +126,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String currentDirPath=realBaseDir + currentFolderStr;
 		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		String currentWebPath= Configuration.get(ConfigurationKeys.SERVER_URL) + AuthoringConstants.LAMS_WWW_FOLDER + AuthoringConstants.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
+		String currentWebPath= "/" + AuthoringConstants.LAMS_LAMS_FOLDER + AuthoringConstants.LAMS_WWW_FOLDER + AuthoringConstants.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
 		
 		File currentContentDir=new File(validCurrentDirPath);
 		if(!currentContentDir.exists()){
