@@ -13,7 +13,9 @@
 <html:hidden property="login" />
 <html:hidden property="password" />
 
-<div align="center"><html:errors/></div>
+<logic:messagesPresent> 
+	<p class="warning"><html:errors/></p>
+</logic:messagesPresent>
 <table>
   <col align="right" /><col align="left" />
     <tr>

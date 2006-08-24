@@ -1,5 +1,7 @@
 <%@page import="org.lamsfoundation.lams.web.PasswordChangeActionForm" %>
+<%@page import="org.apache.struts.action.ActionMessages" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
@@ -8,7 +10,13 @@
 	<tr> 
 		<td valign="top">
 			<H2><fmt:message key="title.password.change.screen"/></H2>
-			<p><html:errors /></p>
+			<logic:messagesPresent message="true"> 
+				<p class="warning">
+				<html:messages message="true" id="errMsg" >
+					<bean:write name="errMsg"/><BR>
+				</html:messages>
+				</p>
+			</logic:messagesPresent>
 			<table>
 				<tr>
 					<td class="body" align="right">

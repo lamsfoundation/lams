@@ -9,7 +9,9 @@
 	<tr> 
 		<td valign="top">
 			<H2><fmt:message key="title.portrait.change.screen"/></H2>
-			<p><html:errors /></p>
+			<logic:messagesPresent> 
+				<p class="warning"><html:errors /></p>
+			</logic:messagesPresent>
 			<table>
 				<tr>
 					<td><fmt:message key="label.portrait.current" />:</td>

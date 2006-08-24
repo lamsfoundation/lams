@@ -128,7 +128,7 @@ public class PasswordChangeAction extends Action {
 
         // -- Report any errors
         if (!errors.isEmpty()) {
-            saveErrors(request,errors);
+            saveMessages(request,errors);
             if (mapping.getInput()!=null)
             {
             	passwordChangeForm.reset(mapping,request);
