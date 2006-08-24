@@ -201,10 +201,10 @@ public class LAMSUploadServlet extends HttpServlet {
 				if(extIsAllowed(typeStr,ext)) {
 					int counter=1;
 					while(pathToSave.exists()){
-						newName=nameWithoutExt+"("+counter+")"+"."+ext;
+						newName=nameWithoutExt+"_"+counter+"."+ext;
 						fileUrl=currentWebPath+'/'+newName;
 						retVal="201";
-						pathToSave=new File(currentDirPath,newName);
+						pathToSave=new File(validCurrentDirPath,newName);
 						counter++;
 						}
 					uplFile.write(pathToSave);

@@ -269,7 +269,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 				File pathToSave=new File(validCurrentDirPath,fileName);
 				int counter=1;
 				while(pathToSave.exists()){
-					newName=nameWithoutExt+"("+counter+")"+"."+ext;
+					newName=nameWithoutExt+"_"+counter+"."+ext;
 					retVal="201";
 					pathToSave=new File(validCurrentDirPath,newName);
 					counter++;
