@@ -68,6 +68,10 @@
 		<td><html-el:text property="city" size="20" maxlength="64" /></td>
 	</tr>
 	<tr>
+		<td><fmt:message key="admin.user.postcode"/>:</td>
+		<td><html-el:text property="postcode" size="20" maxlength="10" /></td>
+	</tr>
+	<tr>
 		<td><fmt:message key="admin.user.state"/>:</td>
 		<td><html-el:text property="state" size="20" maxlength="64" /></td>
 	</tr>

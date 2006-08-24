@@ -53,6 +53,10 @@
 		<td><html:text property="state" size="20" maxlength="64" /></td>
 	</tr>
 	<tr>
+		<td><fmt:message key="label.postcode"/>:</td>
+		<td><html:text property="postcode" size="20" maxlength="10" /></td>
+	</tr>
+	<tr>
 		<td><fmt:message key="label.country"/>:</td>
 		<td><html:text property="country" size="20" maxlength="64" /></td>
 	</tr>

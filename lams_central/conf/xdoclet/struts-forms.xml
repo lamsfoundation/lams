@@ -10,6 +10,7 @@
 	<form-property name="addressLine3" type="java.lang.String" />
 	<form-property name="city" type="java.lang.String" />
 	<form-property name="state" type="java.lang.String" />
+	<form-property name="postcode" type="java.lang.String" />
 	<form-property name="country" type="java.lang.String" />
 	<form-property name="dayPhone" type="java.lang.String" />
 	<form-property name="eveningPhone" type="java.lang.String" />
