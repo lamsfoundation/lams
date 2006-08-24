@@ -258,7 +258,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
                 org.lamsfoundation.lams.authoring.Application(app).getCanvas().clearCanvas(false);
                 break;
             case eventObj.menu.openItem :
-                app.getWorkspace().userSelectItem();
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().openDesignBySelection();
                 break;
 			case eventObj.menu.recoverItem :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().showRecoverMessage();
