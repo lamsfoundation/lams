@@ -797,7 +797,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			dayStr=day.toString();
 		}
 		
-		var month = date.getMonth();   //+1;
+		var month = date.getMonth()+1;
 		if(month<10){
 			monthStr=String(0)+month;
 		} else {
