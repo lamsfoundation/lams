@@ -22,6 +22,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 -->
 <tiles-definitions>
 
+	<definition name=".portrait" path="/template.jsp">
+		<put name="titleKey" value="title.change.portrait.window"/>
+		<put name="content" value="portrait.jsp"/>	
+	</definition>
+
 	<definition name=".profile" path="/template.jsp">
 		<put name="titleKey" value="title.profile.window"/>
 		<put name="content" value="profile.jsp"/>	
