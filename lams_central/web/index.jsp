@@ -89,7 +89,7 @@
 		<div id="content">
 			<p align="right"><fmt:message key="msg.LAMS.version"/> <%= Configuration.get(ConfigurationKeys.VERSION) %></p>
 			<p align="right"><a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
-					<a href="home.do?method=logout"><fmt:message key="index.logout"/></a>
+					<a href="home.do?method=logout" onClick="closeAllChildren()"><fmt:message key="index.logout"/></a>
 				</p>
 			<div id="courselist" align="center">
 					<img src="images/loading.gif" /> <font color="gray" size="4"><fmt:message key="msg.loading"/></font>

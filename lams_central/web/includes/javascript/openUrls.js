@@ -12,10 +12,21 @@
 		var monitorLessonWin = null;
 		var addLessonWin = null;
 		var epWin = null;
-		var dmWin = null;
 		var sysadminWin = null;
 		var omWin = null;
 		var pWin = null
+		
+		function closeAllChildren(){
+			if (authorWin && authorWin.open && !authorWin.closed) authorWin.close();
+			if (learnWin && learnWin.open && !learnWin.closed) learnWin.close();
+			if (monitorLessonWin && monitorLessonWin.open && !monitorLessonWin.closed) monitorLessonWin.close();
+			if (addLessonWin && addLessonWin.open && !addLessonWin.closed) addLessonWin.close();
+			if (epWin && epWin.open && !epWin.closed) epWin.close();
+			if (sysadminWin && sysadminWin.open && !sysadminWin.closed) sysadminWin.close();
+			if (omWin && omWin.open && !omWin.closed) omWin.close();
+			if (pWin && pWin.open && !pWin.closed) pWin.close();
+			
+		}
 		
 		function openProfile(username)
 		{
@@ -59,27 +70,6 @@
 			}
 		}
 
-		function openDummyMonitor()
-		{
-			if(isMac)
-			{
-				dmWin = window.open('monitoring/dummy.jsp','dmWindow','width=796,height=570,resizable');
-			}
-			else
-			{
-				if(dmWin && dmWin.open && !dmWin.closed)
-				{
-					dmWin.location = 'monitoring/dummy.jsp';
-					dmWin.focus();
-				}
-				else
-				{
-					dmWin = window.open('monitoring/dummy.jsp','dmWindow','width=796,height=570,resizable');
-					dmWin.focus();
-				}
-			}
-		}
-		
 		function openMonitorLesson( lessonID )
 		{
 			if(isMac)
