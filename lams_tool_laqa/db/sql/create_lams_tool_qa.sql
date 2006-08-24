@@ -41,6 +41,7 @@ CREATE TABLE tl_laqa11_que_usr (
      , responseFinalized TINYINT(1) NOT NULL DEFAULT 0
      , qa_session_id BIGINT(20) NOT NULL
      , fullname VARCHAR(100)
+     , learnerFinished TINYINT(1) NOT NULL
      , PRIMARY KEY (uid)
      , INDEX (qa_session_id)
      , CONSTRAINT FK_tl_laqa11_que_usr_1 FOREIGN KEY (qa_session_id)
@@ -61,7 +62,7 @@ CREATE TABLE tl_laqa11_que_content (
 CREATE TABLE tl_laqa11_usr_resp (
        response_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , hidden TINYINT(1) DEFAULT 0
-     , answer VARCHAR(255)
+     , answer TEXT
      , time_zone VARCHAR(255)
      , attempt_time DATETIME
      , que_usr_id BIGINT(20) NOT NULL
@@ -87,6 +88,7 @@ CREATE TABLE tl_laqa11_uploadedfile (
      , CONSTRAINT FK_tl_laqa11_uploadedfile_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
 )TYPE=InnoDB;
+
 
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date)  VALUES (${default_content_id}, 'Q&A Title', 'Q&A Instructions', NOW());

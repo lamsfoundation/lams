@@ -66,6 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
 		<html:hidden property="toolSessionID"/>						
+		<html:hidden property="userID"/>						
 		<html:hidden property="httpSessionID"/>		
 		<html:hidden property="questionIndex"/>		
 		<html:hidden property="totalQuestionCount"/>		

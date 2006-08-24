@@ -107,6 +107,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -151,8 +152,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
                                          ServletException
 	{
     	logger.debug("dispatching submitAnswersContent..." + request);
-    	
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
+    	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	
     	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
 
@@ -172,7 +175,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
-	    LearningUtil.saveFormRequestData(request,  qaLearningForm);
+	    
    	
  	    String totalQuestionCount=generalLearnerFlowDTO.getTotalQuestionCount().toString();
  	    logger.debug("totalQuestionCount: " + totalQuestionCount);
@@ -236,6 +239,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	{
     	logger.debug("dispatching redoQuestions...");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
+    	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	
     	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
 
@@ -255,9 +261,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
-	    LearningUtil.saveFormRequestData(request,  qaLearningForm);
-
-	    Map mapQuestions= new TreeMap(new QaComparator());
+	    	    Map mapQuestions= new TreeMap(new QaComparator());
 		Map mapAnswers= new TreeMap(new QaComparator());
 		
 	    generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
@@ -392,6 +396,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	{
     	logger.debug("dispatching viewAllResults...");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
+    	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	
     	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
 
@@ -411,9 +418,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
-	    LearningUtil.saveFormRequestData(request,  qaLearningForm);
-		
-		String isUserNamesVisibleBoolean=generalLearnerFlowDTO.getUserNameVisible();
+	    String isUserNamesVisibleBoolean=generalLearnerFlowDTO.getUserNameVisible();
     	boolean isUserNamesVisible=new Boolean(isUserNamesVisibleBoolean).booleanValue();
     	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 
@@ -476,6 +481,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	logger.debug("dispatching getNextQuestion...");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
     	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
 
@@ -496,7 +503,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
     	
-    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
     	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, true, false);
     	
         return (mapping.findForward(LOAD_LEARNER));
@@ -601,6 +607,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	logger.debug("dispatching getPreviousQuestion...");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
     	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
 
@@ -620,7 +628,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
-    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
     	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, false, false);
     	
         return (mapping.findForward(LOAD_LEARNER));
@@ -643,7 +650,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	{ 
         logger.debug("dispatching endLearning...");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;        
-
+    	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
     	
     	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("qaService: " + qaService);
@@ -651,18 +659,29 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	 	logger.debug("toolSessionID: " + toolSessionID);
 	 	qaLearningForm.setToolSessionID(toolSessionID);
+
+	 	String userID=request.getParameter("userID");
+	 	logger.debug("userID: " + userID);	 	
+	 	qaLearningForm.setUserID(userID);
+
 	 	
 	 	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
 	    logger.debug("retrieving qaSession: " + qaSession);
-	 	
+	
+	    QaQueUsr qaQueUsr=qaService.getQaUserBySession(new Long(userID), qaSession.getUid());
+	    logger.debug("QaQueUsr:" + qaQueUsr);
+	    
+	    qaQueUsr.setLearnerFinished(true);
+	    logger.debug("learner is finished:" + qaQueUsr);
+	    qaService.updateQaQueUsr(qaQueUsr);	    
+
+	    
 	    String toolContentID=qaSession.getQaContent().getQaContentId().toString();
 	    logger.debug("toolContentID: " + toolContentID);
 	    
 	    QaContent qaContent=qaSession.getQaContent();
 	    logger.debug("using qaContent: " + qaContent);
     	
-	    LearningUtil.saveFormRequestData(request,  qaLearningForm);
-	    
 	    /*
 	     * The learner is done with the tool session. The tool needs to clean-up.
 	     */

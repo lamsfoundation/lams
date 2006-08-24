@@ -86,7 +86,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		  		<html:hidden property="method"/>	 
-				<html:hidden property="toolSessionID"/>						
+				<html:hidden property="toolSessionID"/>		
+				<html:hidden property="userID"/>										
 				<html:hidden property="httpSessionID"/>		
 				<html:hidden property="totalQuestionCount"/>		
 
@@ -95,13 +96,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		<tr>
 			  	 			<td> &nbsp</td>
 			  	 		</tr>
+	
 						<tr>			
 							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
-							 </td>
-						</tr>	
-
-						<tr>			
-							<td valign=top align=left>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -137,6 +134,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		
 
+				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
 			       	<table> 	  
 							<tr> 
 	  	   		  		<td>
@@ -158,7 +156,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</td> 
 							</tr>
 					</table>
-
+			  	</c:if> 				    				  
 		
 		
 			</html:form>
@@ -175,6 +173,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		  		<html:hidden property="method"/>	 
 				<html:hidden property="toolSessionID"/>						
+				<html:hidden property="userID"/>														
 				<html:hidden property="httpSessionID"/>		
 				<html:hidden property="totalQuestionCount"/>		
 						
@@ -185,12 +184,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		</tr>
 						<tr>			
 							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
-								<c:out value="${currentDto.question}" escapeXml="false"/>
-							 </td>
-						</tr>	
-
-						<tr>			
-							<td valign=top align=left>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -224,7 +217,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>		  	
 
 
-
+				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
 			       	<table> 	  
 						<tr> 
 	  	   		  		<td>
@@ -245,7 +238,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</td> 
 							</tr>
 					</table>
-
+				</c:if> 				    
 
 			</html:form>
 		</c:if> 				    

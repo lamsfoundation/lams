@@ -49,6 +49,13 @@
             column="responseFinalized"
    />
 
+   <property
+            name="learnerFinished"
+            type="boolean"
+            access="property"
+            column="learnerFinished"
+   />
+
     <property
         name="qaSessionId"
         type="java.lang.Long"

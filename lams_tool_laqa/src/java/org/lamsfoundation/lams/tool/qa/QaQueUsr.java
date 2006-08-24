@@ -68,6 +68,8 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     
     private boolean responseFinalized;
     
+    private boolean learnerFinished;
+    
     /** persistent field */
     private QaSession qaSession;
     
@@ -479,5 +481,17 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
      */
     public void setResponseFinalized(boolean responseFinalized) {
         this.responseFinalized = responseFinalized;
+    }
+    /**
+     * @return Returns the learnerFinished.
+     */
+    public boolean isLearnerFinished() {
+        return learnerFinished;
+    }
+    /**
+     * @param learnerFinished The learnerFinished to set.
+     */
+    public void setLearnerFinished(boolean learnerFinished) {
+        this.learnerFinished = learnerFinished;
     }
 }

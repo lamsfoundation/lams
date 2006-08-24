@@ -448,12 +448,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
 		    		    	        currentToolSessionID.toString(), null, generalLearnerFlowDTO, false);
 		    		    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
-		    	    		
+	
 		    		    	
-		    	    	    boolean isSessionCompleted=isSessionCompleted(currentToolSessionID.toString(), qaService);
-		    	    	    logger.debug("isSessionCompleted: " + isSessionCompleted);
-		    	    	    
-		    	    	    if (isSessionCompleted)
+		    		    	boolean isLearnerFinished=qaQueUsr.isLearnerFinished();
+		    	    	    logger.debug("isLearnerFinished: " + isLearnerFinished);
+
+		    	    	    if (isLearnerFinished)
 		    	    	    {
 		    	    	        logger.debug("since the session is completed present a screen which can not be edited");
 			    		    	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
