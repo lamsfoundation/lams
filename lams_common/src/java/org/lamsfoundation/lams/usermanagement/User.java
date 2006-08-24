@@ -81,6 +81,9 @@ public class User implements Serializable,Comparable {
     private String state;
 
     /** nullable persistent field */
+    private String postcode;
+    
+    /** nullable persistent field */
     private String country;
 
     /** nullable persistent field */
@@ -140,8 +143,11 @@ public class User implements Serializable,Comparable {
     /** persistent field */
     private Set lessons;
     
+    /** persistent field */
+    private Long portraitUuid;
+    
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String postcode, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons, Long portraitUuid) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -152,6 +158,7 @@ public class User implements Serializable,Comparable {
         this.addressLine3 = addressLine3;
         this.city = city;
         this.state = state;
+        this.postcode = postcode;
         this.country = country;
         this.dayPhone = dayPhone;
         this.eveningPhone = eveningPhone;
@@ -171,6 +178,7 @@ public class User implements Serializable,Comparable {
         this.userGroups = userGroups;
         this.learningDesigns = learningDesigns;
         this.lessons = lessons;
+        this.portraitUuid = portraitUuid;
     }
 
     /** default constructor */
@@ -353,6 +361,20 @@ public class User implements Serializable,Comparable {
 
     public void setState(String state) {
         this.state = state;
+    }
+    
+    /** 
+     *            @hibernate.property
+     *             column="postcode"
+     *             length="10"
+     *         
+     */
+    public String getPostcode() {
+        return this.postcode;
+    }
+
+    public void setPostcode(String postcode) {
+        this.postcode = postcode;
     }
 
     /** 
@@ -784,4 +806,18 @@ public class User implements Serializable,Comparable {
 	public void setLocale(SupportedLocale locale) {
 		this.locale = locale;
 	}
+	
+	/** 
+     *            @hibernate.property
+     *             column="portrait_uuid"
+     *             length="20"
+     *         
+     */
+    public Long getPortraitUuid() {
+        return this.portraitUuid;
+    }
+
+    public void setPortraitUuid(Long portraitUuid) {
+        this.portraitUuid = portraitUuid;
+    }
 }

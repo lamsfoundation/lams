@@ -168,6 +168,18 @@
         </meta>    
     </property>
     <property
+        name="postcode"
+        type="java.lang.String"
+        column="postcode"
+        length="10"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="postcode"
+            length="10"
+        </meta>    
+    </property>
+    <property
         name="country"
         type="java.lang.String"
         column="country"
@@ -450,5 +462,18 @@
         </meta>
         <column name="locale_id" />
     </many-to-one>
+    
+    <property
+        name="portraitUuid"
+        type="java.lang.Long"
+        column="portrait_uuid"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="portrait_uuid"
+            length="20"
+        </meta>    
+    </property>
 </class>
 </hibernate-mapping>
