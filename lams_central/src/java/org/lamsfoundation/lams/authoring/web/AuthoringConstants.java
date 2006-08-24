@@ -39,5 +39,6 @@ public class AuthoringConstants {
 	
 	// used for tool content folder creation.
 	public static final String LAMS_WWW_DIR = "lams-www.war";
+	public static final String LAMS_WWW_FOLDER = "www/";
 	public static final String LAMS_WWW_SECURE_DIR = "secure";
 }

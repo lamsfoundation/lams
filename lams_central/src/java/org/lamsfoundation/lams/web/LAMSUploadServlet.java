@@ -1,4 +1,24 @@
-package org.lamsfoundation.lams.authoring.web;
+/*
+ * FCKeditor - The text editor for internet
+ * Copyright (C) 2003-2005 Frederico Caldeira Knabben
+ * 
+ * Licensed under the terms of the GNU Lesser General Public License:
+ * 		http://www.opensource.org/licenses/lgpl-license.php
+ * 
+ * For further information visit:
+ * 		http://www.fckeditor.net/
+ * 
+ * File Name: ConnectorServlet.java
+ * 	Java Connector for Resource Manager class.
+ * 
+ * Version:  2.3
+ * Modified: 2005-08-11 16:29:00
+ * 
+ * File Authors:
+ * 		Simone Chiaretta (simo@users.sourceforge.net)
+ */ 
+ 
+package org.lamsfoundation.lams.web;
 
 import java.io.*;
 
@@ -8,6 +28,7 @@ import java.util.*;
 
 
 import org.apache.commons.fileupload.*;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
@@ -18,13 +39,35 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource; 
 import javax.xml.transform.stream.StreamResult; 
 
-
 /**
  * Servlet to upload files.<br>
  *
  * This servlet accepts just file uploads, eventually with a parameter specifying file type
  *
  * @author Simone Chiaretta (simo@users.sourceforge.net)
+ * @author Mitchell Seaton
+ * 
+ * @web:servlet name="SimpleUploader" load-on-startup = "1"
+ * @web.servlet-init-param name = "baseDir"
+ *                         value = "secure"
+ * @web.servlet-init-param name = "debug"
+ *                         value = "true"
+ * @web.servlet-init-param name = "enabled"
+ *                         value = "true"
+ * @web.servlet-init-param name = "AllowedExtensionsFile"
+ *                         value = ""
+ * @web.servlet-init-param name = "DeniedExtensionsFile"
+ *                         value = "php|php3|php5|phtml|asp|aspx|ascx|jsp|cfm|cfc|pl|bat|exe|dll|reg|cg" 
+ * @web.servlet-init-param name = "AllowedExtensionsImage"
+ *                         value = "jpg|gif|jpeg|png|bmp" 
+ * @web.servlet-init-param name = "DeniedExtensionsImage"
+ *                         value = ""  
+ * @web.servlet-init-param name = "AllowedExtensionsFlash"
+ *                         value = "swf|fla"    
+ * @web.servlet-init-param name = "DeniedExtensionsFlash"
+ *                         value = "" 
+ * @web:servlet-mapping url-pattern="/fckeditor/editor/filemanager/upload/simpleuploader"
+ * 
  */
 
 public class LAMSUploadServlet extends HttpServlet {
@@ -55,7 +98,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		if(baseDir==null)
 			baseDir="secure";
 		
-		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + "/" + AuthoringConstants.LAMS_WWW_DIR + "/" + baseDir;
+		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + baseDir;
 		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
@@ -99,23 +142,26 @@ public class LAMSUploadServlet extends HttpServlet {
 
 		String typeStr=request.getParameter("Type");
 		String currentFolderStr=request.getParameter("CurrentFolder");
+		
 		//String currentPath=baseDir+typeStr;
 		//String currentDirPath=getServletContext().getRealPath(currentPath);
 		//currentPath=request.getContextPath()+currentPath;
 		
 		//	create content directory if non-existant
 		String currentDirPath=realBaseDir + currentFolderStr;
-		String currentPath= Configuration.get(ConfigurationKeys.SERVER_URL) + "www" + "/" + "secure" + currentFolderStr + typeStr;
+		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		File currentContentDir=new File(currentDirPath);
+		String currentWebPath= Configuration.get(ConfigurationKeys.SERVER_URL) + AuthoringConstants.LAMS_WWW_FOLDER + AuthoringConstants.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr;
+		
+		File currentContentDir=new File(validCurrentDirPath);
 		if(!currentContentDir.exists()){
 			currentContentDir.mkdir();
 		}
 		
 		// create content type directory if non-existant
-		currentDirPath += typeStr;
+		validCurrentDirPath += typeStr;
 		
-		File currentDir=new File(currentDirPath);
+		File currentDir=new File(validCurrentDirPath);
 		if(!currentDir.exists()){
 			currentDir.mkdir();
 		}
@@ -150,13 +196,13 @@ public class LAMSUploadServlet extends HttpServlet {
 				
 				String nameWithoutExt=getNameWithoutExtension(fileName);
 				String ext=getExtension(fileName);
-				File pathToSave=new File(currentDirPath,fileName);
-				fileUrl=currentPath+'/'+fileName;
+				File pathToSave=new File(validCurrentDirPath,fileName);
+				fileUrl=currentWebPath+'/'+fileName;
 				if(extIsAllowed(typeStr,ext)) {
 					int counter=1;
 					while(pathToSave.exists()){
 						newName=nameWithoutExt+"("+counter+")"+"."+ext;
-						fileUrl=currentPath+'/'+newName;
+						fileUrl=currentWebPath+'/'+newName;
 						retVal="201";
 						pathToSave=new File(currentDirPath,newName);
 						counter++;

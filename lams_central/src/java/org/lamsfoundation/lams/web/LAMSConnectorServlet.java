@@ -1,4 +1,24 @@
-package org.lamsfoundation.lams.authoring.web;
+/*
+ * FCKeditor - The text editor for internet
+ * Copyright (C) 2003-2005 Frederico Caldeira Knabben
+ * 
+ * Licensed under the terms of the GNU Lesser General Public License:
+ * 		http://www.opensource.org/licenses/lgpl-license.php
+ * 
+ * For further information visit:
+ * 		http://www.fckeditor.net/
+ * 
+ * File Name: ConnectorServlet.java
+ * 	Java Connector for Resource Manager class.
+ * 
+ * Version:  2.3
+ * Modified: 2005-08-11 16:29:00
+ * 
+ * File Authors:
+ * 		Simone Chiaretta (simo@users.sourceforge.net)
+ */ 
+ 
+package org.lamsfoundation.lams.web;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
@@ -29,7 +50,30 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+/**
+ * Servlet to upload and browse files.<br>
+ *
+ * This servlet accepts 4 commands used to retrieve and create files and folders from a server directory.
+ * The allowed commands are:
+ * <ul>
+ * <li>GetFolders: Retrive the list of directory under the current folder
+ * <li>GetFoldersAndFiles: Retrive the list of files and directory under the current folder
+ * <li>CreateFolder: Create a new directory under the current folder
+ * <li>FileUpload: Send a new file to the server (must be sent with a POST)
+ * </ul>
+ *
+ * @author Simone Chiaretta (simo@users.sourceforge.net) 
+ * @author Mitchell Seaton
+ * 
+ * @web:servlet name="Connector" load-on-startup = "1"
+ * @web.servlet-init-param name = "baseDir"
+ *                         value = "secure"
+ * @web.servlet-init-param name = "debug"
+ *                         value = "true"
+ *                                                 
+ * @web:servlet-mapping url-pattern="/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector"
 
+ */
 
 public class LAMSConnectorServlet extends HttpServlet {
 	
@@ -50,7 +94,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		if(baseDir==null)
 			baseDir="secure";
 		
-		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + "/" + AuthoringConstants.LAMS_WWW_DIR + "/" + baseDir;
+		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + baseDir;
 		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
@@ -80,16 +124,19 @@ public class LAMSConnectorServlet extends HttpServlet {
 		
 		// create content directory if non-existant
 		String currentDirPath=realBaseDir + currentFolderStr;
+		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		File currentContentDir=new File(currentDirPath);
+		String currentWebPath= Configuration.get(ConfigurationKeys.SERVER_URL) + AuthoringConstants.LAMS_WWW_FOLDER + AuthoringConstants.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
+		
+		File currentContentDir=new File(validCurrentDirPath);
 		if(!currentContentDir.exists()){
 			currentContentDir.mkdir();
 		}
 		
 		// create content type directory if non-existant
-		currentDirPath += typeStr;
+		validCurrentDirPath += typeStr;
 		
-		File currentDir=new File(currentDirPath);
+		File currentDir=new File(validCurrentDirPath);
 		if(!currentDir.exists()){
 			currentDir.mkdir();
 		}
@@ -103,7 +150,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 			pce.printStackTrace();
 		}
 		
-		Node root=CreateCommonXml(document,commandStr,typeStr,currentFolderStr,currentDirPath);
+		Node root=CreateCommonXml(document,commandStr,typeStr,currentFolderStr,currentWebPath);
 		
 		if (debug) System.out.println("Command = " + commandStr);
 		
@@ -186,7 +233,8 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String typeStr=request.getParameter("Type");
 		String currentFolderStr=request.getParameter("CurrentFolder");
 		
-		String currentDirPath=realBaseDir + "/" + currentFolderStr + "/" + typeStr;
+		String currentDirPath=realBaseDir + currentFolderStr + typeStr;
+		String validCurrentDirPath = currentDirPath.replace("/", File.separator);
 		
 		if (debug) System.out.println(currentDirPath);
 		
@@ -218,12 +266,12 @@ public class LAMSConnectorServlet extends HttpServlet {
 				
 				String nameWithoutExt=getNameWithoutExtension(fileName);
 				String ext=getExtension(fileName);
-				File pathToSave=new File(currentDirPath,fileName);
+				File pathToSave=new File(validCurrentDirPath,fileName);
 				int counter=1;
 				while(pathToSave.exists()){
 					newName=nameWithoutExt+"("+counter+")"+"."+ext;
 					retVal="201";
-					pathToSave=new File(currentDirPath,newName);
+					pathToSave=new File(validCurrentDirPath,newName);
 					counter++;
 					}
 				uplFile.write(pathToSave);

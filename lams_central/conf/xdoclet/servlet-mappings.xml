@@ -3,18 +3,6 @@
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
-<!--  FCKEditor Connector Configuration -->
-<servlet-mapping>
-    <servlet-name>Connector</servlet-name>
-    <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
-</servlet-mapping>
-
-<!--  FCKEditor SimpleUploader Configuration -->
-<servlet-mapping>
-  <servlet-name>SimpleUploader</servlet-name>
-  <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
-</servlet-mapping>
-
 <servlet-mapping>
   <servlet-name>download</servlet-name>
   <url-pattern>/download/*</url-pattern>
