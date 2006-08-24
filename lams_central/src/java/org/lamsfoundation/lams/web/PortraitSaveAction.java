@@ -119,7 +119,7 @@ public class PortraitSaveAction extends Action {
 		
 		User user = (User)getService().getUserByLogin(request.getRemoteUser());
 		// delete old portrait file (we only want to keep the user's current portrait)
-		if (user.getPortraitUuid()>0) centralToolContentHandler.deleteFile(user.getPortraitUuid());
+		if (user.getPortraitUuid()!=null) centralToolContentHandler.deleteFile(user.getPortraitUuid());
 		user.setPortraitUuid(node.getUuid());
 		getService().save(user);
 		
