@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
 <%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
 <%@ page import="org.lamsfoundation.lams.web.util.HttpSessionManager" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
@@ -85,7 +87,7 @@
 		<H1 class="no-tabs-below"><fmt:message key="index.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/></H1>
 		<div id="header-no-tabs"></div>
 		<div id="content">
-			<p align="right"><fmt:message key="msg.LAMS.version"/></p>
+			<p align="right"><fmt:message key="msg.LAMS.version"/> <%= Configuration.get(ConfigurationKeys.VERSION) %></p>
 			<p align="right"><a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
 					<a href="home.do?method=logout"><fmt:message key="index.logout"/></a>
 				</p>
