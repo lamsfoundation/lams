@@ -99,8 +99,11 @@ class WizardView extends AbstractView {
 	// step 4 UI elements
 	private var schedule_cb:CheckBox;
 	private var start_btn:Button;
+	private var schedule_btn:Button;
 	private var schedule_time:MovieClip;
 	private var summery_lbl:Label;
+	private var date_lbl:Label;
+	private var time_lbl:Label;
 	private var summery_scp:MovieClip;
 	private var _summery_mc:MovieClip;
 	private var _summeryList:Array;
@@ -121,6 +124,7 @@ class WizardView extends AbstractView {
 	
 	private var lastStageHeight:Number;
 	private var header_pnl:MovieClip;		  // top panel base
+	private var footer_pnl:MovieClip;
 	
 	private var panel:MovieClip;       //The underlaying panel base
 	
@@ -290,6 +294,7 @@ class WizardView extends AbstractView {
 		cancel_btn.addEventListener('click',Delegate.create(this, cancel));
 		close_btn.addEventListener('click', Delegate.create(this, close));
 		start_btn.addEventListener('click', Delegate.create(this, start));
+		schedule_btn.addEventListener('click', Delegate.create(this, scheduleNow));
 		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
 
 		//Set up the treeview
@@ -310,6 +315,7 @@ class WizardView extends AbstractView {
 		finish_btn.label = Dictionary.getValue('finish_btn');
 		close_btn.label = Dictionary.getValue('close_btn');
 		start_btn.label = Dictionary.getValue('start_btn');
+		schedule_btn.label = Dictionary.getValue('schedule_cb_lbl');
 		
 		//labels
 		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
@@ -321,8 +327,10 @@ class WizardView extends AbstractView {
 		summery_lbl.text = Dictionary.getValue('summery_lbl');
 		
 		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
+		date_lbl.text = Dictionary.getValue('date_lbl');
+		time_lbl.text = Dictionary.getValue('time_lbl');
 		
-		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn]);
+		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn, schedule_btn]);
 		positionButtons();
 	}
 	
@@ -355,19 +363,21 @@ class WizardView extends AbstractView {
 			start_btn._x = panel._width - start_btn._width - X_BUTTON_OFFSET;
 			close_btn._x = panel._width - close_btn._width - X_BUTTON_OFFSET;
 			finish_btn._x = panel._width - finish_btn._width - X_BUTTON_OFFSET;
+			schedule_btn._x = panel._width - schedule_btn._width - X_BUTTON_OFFSET;
 			
 			if(a){ prev_btn._x = start_btn._x - prev_btn._width - X_BUTTON_OFFSET; }
 			else { prev_btn._x = next_btn._x - prev_btn._width - X_BUTTON_OFFSET; }
 			cancel_btn._x = prev_btn._x - cancel_btn._width - (2*X_BUTTON_OFFSET);
 			
 			// set button y position
-			next_btn._y = panel._y + panel._height - next_btn._height - Y_BUTTON_OFFSET;
-			prev_btn._y = next_btn._y;
-			close_btn._y = next_btn._y;
-			start_btn._y = next_btn._y;
-			cancel_btn._y = next_btn._y;
+			//next_btn._y = panel._y + panel._height - next_btn._height - Y_BUTTON_OFFSET;
+			//prev_btn._y = next_btn._y;
+			//close_btn._y = next_btn._y;
+			//start_btn._y = next_btn._y;
+			//cancel_btn._y = next_btn._y;
+			//schedule_btn._y = next_btn._y;
 			
-			finish_btn._y = next_btn._y - finish_btn._height - Y_BUTTON_OFFSET;
+			//finish_btn._y = next_btn._y - finish_btn._height - Y_BUTTON_OFFSET;
 	}
 	
 	/**
@@ -381,9 +391,11 @@ class WizardView extends AbstractView {
 		cancel_btn.setStyle('styleName',styleObj);
 		close_btn.setStyle('styleName',styleObj);
 		start_btn.setStyle('styleName',styleObj);
+		schedule_btn.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('BGPanel');
 		header_pnl.setStyle('styleName',styleObj);
+		footer_pnl.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('WZPanel');
 		panel.setStyle('styleName',styleObj);
@@ -397,6 +409,8 @@ class WizardView extends AbstractView {
 		summery_lbl.setStyle('styleName',styleObj);
 		staff_lbl.setStyle('styleName',styleObj);
 		schedule_cb.setStyle('styleName', styleObj);
+		date_lbl.setStyle('styleName', styleObj);
+		time_lbl.setStyle('styleName', styleObj);
 		
 		//styleObj = _tm.getStyleObject('treeview');
         //org_treeview.setStyle('styleName',styleObj);
@@ -662,8 +676,8 @@ class WizardView extends AbstractView {
 		trace('FINISH CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
 		if(validateStep(wm)){
-			disableButtons();
 			resultDTO.mode = FINISH_MODE;
+			disableButtons();
 			_wizardController.initializeLesson(resultDTO);
 		}
 	}
@@ -672,20 +686,26 @@ class WizardView extends AbstractView {
 		trace('START CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
 		if(validateStep(wm)){
-			if(schedule_cb.selected){
-				resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+			resultDTO.mode = START_MODE;
+			disableButtons();
+			_wizardController.initializeLesson(resultDTO);
+		}
+	}
+	
+	private function scheduleNow(evt:Object){
+		trace('SCHEDULE CLICKED');
+		var wm:WizardModel = WizardModel(getModel());
+		if(validateStep(wm)){
+			resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+					
+			if(resultDTO.scheduleDateTime == null || resultDTO.scheduleDateTime == undefined){
+				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+				return;
 				
-				if(resultDTO.scheduleDateTime != null){
-					trace(resultDTO.scheduleDateTime);
-					resultDTO.mode = START_SCH_MODE;
-				} else {
-					LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
-					return;
-				}
 			} else {
-				resultDTO.mode = START_MODE;
+				trace(resultDTO.scheduleDateTime);
+				resultDTO.mode = START_SCH_MODE;
 			}
-			
 			disableButtons();
 			_wizardController.initializeLesson(resultDTO);
 		}
@@ -708,10 +728,18 @@ class WizardView extends AbstractView {
 		var isSelected:Boolean = schedule_cb.selected;
 		if(isSelected){
 			schedule_time.f_enableTimeSelect(true);
+			finish_btn.enabled = false;
+			schedule_btn.enabled = true;
+			start_btn.visible = false;
+			schedule_btn.visible = true;
 			scheduleDate_dt.enabled = true;
 		} else {
 			schedule_time.f_enableTimeSelect(false);
 			scheduleDate_dt.enabled = false;
+			schedule_btn.visible = false;
+			start_btn.visible = true;
+			finish_btn.enabled = true;
+
 		}
 	}
 	
@@ -786,6 +814,7 @@ class WizardView extends AbstractView {
 		location_treeview.visible = true;
 		
 		finish_btn.visible = false;
+		
 		prev_btn.enabled = false;
 		next_btn.enabled = true;
 		close_btn.visible = false;
@@ -805,7 +834,10 @@ class WizardView extends AbstractView {
 		learner_scp.visible = false;
 		
 		// hide step 4 (Startup)
+		date_lbl.visible = false;
+		time_lbl.visible = false;
 		start_btn.visible = false;
+		schedule_btn.visible = false;
 		summery_scp.visible = false;
 		summery_lbl.visible = false;
 		schedule_cb.visible = false;
@@ -1015,16 +1047,23 @@ class WizardView extends AbstractView {
 		
 		summery_lbl.visible = true;
 		schedule_cb.visible = true;
-		start_btn.visible = true;
+		//start_btn.visible = true;
 		
 		if(schedule_cb.selected){
 			schedule_time.f_enableTimeSelect(true);
 			scheduleDate_dt.enabled = true;
+			finish_btn.enabled = false;
+			start_btn.visible = false;
+			schedule_btn.visible = true;
 		} else {
 			schedule_time.f_enableTimeSelect(false);
 			scheduleDate_dt.enabled = false;
+			schedule_btn.visible = false;
+			start_btn.visible = true;
+			finish_btn.enabled = true;
 		}
-		
+		date_lbl.visible = true;
+		time_lbl.visible = true;
 		schedule_time._visible = true;
 		scheduleDate_dt.visible = true;
 		next_btn.visible = false;
@@ -1074,10 +1113,12 @@ class WizardView extends AbstractView {
 		resourceTitle_txi.visible = false;
 		desc_lbl.visible = false;
 		resourceDesc_txa.visible = false;
-		
+		date_lbl.visible = false;
+		time_lbl.visible = false;
 		summery_lbl.visible = false;
 		schedule_cb.visible = false;
 		start_btn.visible = false;
+		schedule_btn.visible = false;
 		schedule_time._visible = false;
 		scheduleDate_dt.visible = false;
 		next_btn.visible = true;
@@ -1147,6 +1188,7 @@ class WizardView extends AbstractView {
 		cancel_btn.enabled = false;
 		finish_btn.enabled = false;
 		start_btn.enabled = false;
+		schedule_btn.enabled = false;
 	}
 	
 	public function enableButtons():Void{
