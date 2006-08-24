@@ -321,7 +321,7 @@ class Sequence {
 			}
 			
 			timeFormated = hours + ":" + mins_str;
-			dateFormated = (_seqScheduleStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqScheduleStartDate.getMonth()+1))+" "+_seqScheduleStartDate.getFullYear());;
+			dateFormated = (_seqScheduleStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqScheduleStartDate.getMonth()))+" "+_seqScheduleStartDate.getFullYear());;
 		}
 		return timeFormated + " " + dateFormated;
 	}
