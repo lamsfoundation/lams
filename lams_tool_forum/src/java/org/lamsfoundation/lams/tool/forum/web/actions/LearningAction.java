@@ -166,10 +166,11 @@ public class LearningAction extends Action {
 			return mapping.findForward("error");
 		}
 		
-		ForumUser forumUser = getCurrentUser(request,sessionId);
-		boolean lock = forumUser.isSessionFinished();
-		
 		Forum forum = session.getForum();
+		//lock on finish
+		ForumUser forumUser = getCurrentUser(request,sessionId);
+		boolean lock =  forum.getLockWhenFinished() && forumUser.isSessionFinished();
+		
 		//add define later support
 		if(forum.isDefineLater()){
 			return mapping.findForward("defineLater");
