@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <div align="center" id="jobList">
 	<div id="datatablecontainer">
@@ -22,7 +23,7 @@
 					<c:out value="${job.name}"/>
 				</td>
 				<td>
-					<fmt:formatDate value="${job.startDate}"/>
+					<lams:Date value="${job.startDate}"/>
 				</td>
 				<td>
 					<c:out value="${job.description}"/>

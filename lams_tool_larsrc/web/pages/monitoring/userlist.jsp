@@ -22,7 +22,7 @@
 					${user.loginName}
 				</td>
 				<td>
-					<fmt:formatDate value="${user.accessDate}" pattern="hh:mm:ss dd/MM/yy"/>
+					<lams:Date value="${user.accessDate}"/>
 				</td>
 				<td>
 					${user.firstName},${user.lastName}

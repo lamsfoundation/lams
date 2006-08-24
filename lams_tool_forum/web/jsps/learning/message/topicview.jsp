@@ -22,8 +22,7 @@
 						<fmt:message key="lable.topic.subject.by" />
 						<c:out value="${msgDto.author}" />
 								-
-								<fmt:formatDate value="${msgDto.message.created}" type="time" timeStyle="short" />
-						<fmt:formatDate value="${msgDto.message.created}" type="date" dateStyle="full" />
+						<lams:Date  value="${msgDto.message.created}" />
 					</c:if>
 				</td>
 			</tr>

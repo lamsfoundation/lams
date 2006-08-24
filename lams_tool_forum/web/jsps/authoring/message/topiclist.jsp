@@ -29,8 +29,7 @@
 					<c:out value="${topic.author}"/>
 				</td>
 				<td align="center">
-					<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />
-					<fmt:formatDate value="${topic.message.updated}" type="date" pattern="MMM dd"/>
+					<lams:Date value="${topic.message.updated}"/>
 				</td>
 			</tr>
 		</c:forEach>

@@ -67,10 +67,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>
 
 		<p><fmt:message key="export.portfolio.lesson.started.date.label"/> 
-			<fmt:formatDate value="${portfolio.lessonStartDate}" type="both" timeStyle="long"/></p>
+			<lams:Date value="${portfolio.lessonStartDate}"/></p>
 
 		<p><fmt:message key="export.portfolio.generated.date.label"/> 
-			<fmt:formatDate value="${portfolio.portfolioCreatedDate}" type="both" timeStyle="long"/></p>
+			<lams:Date value="${portfolio.portfolioCreatedDate}"/></p>
 
 		<c:if test="${empty portfolio.activityPortfolios}">
 			<p><fmt:message key="export.portfolio.noneAttempted.message"/></p>

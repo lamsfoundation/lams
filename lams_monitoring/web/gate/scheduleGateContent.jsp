@@ -24,6 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 	<h1 class="no-tabs-below"><fmt:message key="label.schedule.gate.title"/></h1>
 	<div id="login-header">
@@ -33,10 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<p>&nbsp;</p> 
 		<%@ include file="gateInfo.jsp" %>
-		<p><fmt:message key="label.schedule.gate.open.message"/> <fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
+		<p><fmt:message key="label.schedule.gate.open.message"/> <lams:Date value="${GateForm.map.startingTime}"/></p>
 
 		<c:if test="${GateForm.map.endingTime!=null}">
-			<p><fmt:message key="label.schedule.gate.close.message"/> <fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/></p>
+			<p><fmt:message key="label.schedule.gate.close.message"/> <lams:Date value="${GateForm.map.endingTime}"/></p>
 		</c:if>
 
 		<%@ include file="gateStatus.jsp" %>

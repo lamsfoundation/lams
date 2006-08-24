@@ -35,8 +35,7 @@
 					<c:out value="${topic.message.replyNumber}" />
 				</td>
 				<td>
-					<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />
-					<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
+					<lams:Date value="${topic.message.updated}"/>
 				</td>
 			</tr>
 		</c:forEach>
