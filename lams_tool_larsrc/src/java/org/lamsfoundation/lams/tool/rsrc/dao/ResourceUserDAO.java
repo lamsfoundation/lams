@@ -27,6 +27,8 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 public interface ResourceUserDAO extends DAO {
 
-	ResourceUser getUserByUserID( Long userUid);
+	ResourceUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
+
+	ResourceUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
 }

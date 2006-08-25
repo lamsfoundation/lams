@@ -52,7 +52,7 @@ public class ResourceForm extends ValidatorForm {
 	private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
 
 	//Forum fields
-	private Long toolContentID;
+	private String sessionMapID;
 	private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
@@ -62,7 +62,6 @@ public class ResourceForm extends ValidatorForm {
     private Resource resource;
     
     public ResourceForm(){
-    	this.toolContentID = new Long(0);
     	resource = new Resource();
     	resource.setTitle("Shared Resource");
     	currentTab = 1;
@@ -72,7 +71,6 @@ public class ResourceForm extends ValidatorForm {
         this.resource = resource;
         //set Form special varaible from given forum
         if(resource != null){
-        	this.toolContentID = resource.getContentId();
     		onlineFileList = new ArrayList();
     		offlineFileList = new ArrayList();
     		Set fileSet = resource.getAttachments();
@@ -154,17 +152,16 @@ public class ResourceForm extends ValidatorForm {
 	}
 
 
-	public Long getToolContentID() {
-		return toolContentID;
-	}
-
-
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
-
 	public Resource getResource() {
 		return resource;
+	}
+
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
 	}
 
 

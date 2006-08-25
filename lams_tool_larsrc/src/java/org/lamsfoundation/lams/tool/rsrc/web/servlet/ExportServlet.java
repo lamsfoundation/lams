@@ -91,7 +91,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new ResourceApplicationException(error);
 		}
 
-		ResourceUser learner = service.getUserByID(userID);
+		ResourceUser learner = service.getUserByIDAndSession(userID,toolSessionID);
 
 		if (learner == null) {
 			String error = "The user with user id " + userID + " does not exist.";

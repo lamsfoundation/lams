@@ -95,11 +95,20 @@ public interface IResourceService
 	 */
 	void createUser(ResourceUser resourceUser);
 	/**
-	 * Get user by given userID.
+	 * Get user by given userID and toolContentID.
 	 * @param long1
 	 * @return
 	 */
-	ResourceUser getUserByID(Long userID);
+	ResourceUser getUserByIDAndContent(Long userID, Long contentId); 
+
+	/**
+	 * Get user by sessionID and UserID
+	 * @param long1
+	 * @param sessionId
+	 * @return
+	 */
+	ResourceUser getUserByIDAndSession(Long long1, Long sessionId); 
+
 
 	//********** Repository methods ***********************
 	/**
@@ -194,6 +203,7 @@ public interface IResourceService
 	 * @return
 	 */
 	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-	public List<List<Summary>> exportByContentId(Long contentId); 
+	public List<List<Summary>> exportByContentId(Long contentId);
+
 }
 

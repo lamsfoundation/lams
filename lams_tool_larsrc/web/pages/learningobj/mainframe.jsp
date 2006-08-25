@@ -21,7 +21,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 <frameset cols="25%,75%" rows="*">
-	<frame src="navigatortree.jsp" name="navigatorFrame" marginheight="0"  scrolling="YES">
+	<frame src="navigatortree.jsp?sessionMapID=${sessionMapID}" name="navigatorFrame" marginheight="0"  scrolling="YES">
 	<frame src="defaultcontent.jsp" name="contentFrame" marginheight="0" scrolling="YES">
 </frameset>
 

@@ -3,7 +3,7 @@
 		<action path="/authoring/start"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			parameter="start" 
 			validate="false">
 			<forward name="success" path="/pages/authoring/start.jsp" />
@@ -11,7 +11,7 @@
 		<action path="/definelater"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			parameter="definelater" 
 			validate="false">
 			<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
@@ -20,7 +20,7 @@
 		<action path="/authoring/init"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			parameter="initPage" 
 			validate="false">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
@@ -30,7 +30,7 @@
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			parameter="updateContent" 
 			validate="false">
 			<forward name="author" path="/pages/authoring/authoring.jsp" />
@@ -40,7 +40,7 @@
 		<action path="/authoring/uploadOnlineFile"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			validate="false"
 			parameter="uploadOnlineFile">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
@@ -48,7 +48,7 @@
 		<action path="/authoring/uploadOfflineFile"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			validate="false"
 			parameter="uploadOfflineFile">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
@@ -56,7 +56,7 @@
 		<action path="/authoring/deleteOnlineFile"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			validate="false"
 			parameter="deleteOnlineFile">
 			<forward name="success" path="/pages/authoring/parts/onlinefilelist.jsp" />
@@ -64,7 +64,7 @@
 		<action path="/authoring/deleteOfflineFile"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
-			scope="session" 
+			scope="request" 
 			validate="false"
 			parameter="deleteOfflineFile">
 			<forward name="success" path="/pages/authoring/parts/offlinefilelist.jsp" />
@@ -72,6 +72,9 @@
 		<!-- ==========  Resource Item : URL ========== -->
 		<action path="/authoring/newItemInit"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			name="resourceItemForm" 
+			scope="request" 
+			validate="false"			
 			parameter="newItemInit">
 			<forward name="url" path="/pages/authoring/parts/addurl.jsp" />
 			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />

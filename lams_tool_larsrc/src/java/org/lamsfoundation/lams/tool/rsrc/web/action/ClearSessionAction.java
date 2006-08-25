@@ -42,13 +42,7 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	@Override
 	public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
-			session.removeAttribute(AttributeNames.ATTR_MODE);
-			session.removeAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID);
-			session.removeAttribute(ResourceConstants.ATT_ATTACHMENT_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
+			session.removeAttribute(customiseSessionID);
 		}
 	}
 

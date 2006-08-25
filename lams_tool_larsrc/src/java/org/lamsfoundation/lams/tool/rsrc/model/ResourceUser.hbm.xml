@@ -67,7 +67,25 @@
             outer-join="auto"
             update="true"
             insert="true"
-            column="session_id"
+            column="session_uid"
+        />
+
+        <many-to-one
+            name="content"
+            class="org.lamsfoundation.lams.tool.rsrc.model.Resource"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="content_uid"
+        />
+
+        <property
+            name="sessionFinished"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="session_finished"
         />
 
         <!--

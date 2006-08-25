@@ -97,9 +97,9 @@
 
 						<td>
 							<c:if test="${mode != 'teacher'}">
-								<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
+								<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" disabled="${finishedLock}"/></a>
 							</c:if>
-							<a href="javascript:;" class="button" onclick="viewItem(${item.uid})"><fmt:message key="label.view" /></a>
+							<a href="javascript:;" class="button" onclick="viewItem(${item.uid})"><fmt:message key="label.view"  disabled="${finishedLock}"/></a>
 						</td>
 					</tr>
 				</c:forEach>
@@ -128,17 +128,17 @@
 								<fmt:message key="label.suggest.new" />
 								<c:choose>
 									<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()">
+										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()" disabled="${finishedLock}">
 										<fmt:message key="label.authoring.basic.resource.url.input" /> |
 								<input type="radio" name="suggest" value="file" onclick="gotoFile()">
 										<fmt:message key="label.authoring.basic.resource.file.input" />
 									</c:when>
 									<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-										<input type="radio" name="suggest" value="file" checked="true" onclick="gotoFile()">
+										<input type="radio" name="suggest" value="file" checked="true" onclick="gotoFile()" disabled="${finishedLock}">
 										<fmt:message key="label.authoring.basic.resource.file.input" />
 									</c:when>
 									<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()">
+										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()" disabled="${finishedLock}">
 										<fmt:message key="label.authoring.basic.resource.url.input" />
 									</c:when>
 								</c:choose>

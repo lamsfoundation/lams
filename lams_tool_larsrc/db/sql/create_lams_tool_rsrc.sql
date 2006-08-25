@@ -90,7 +90,9 @@ create table tl_larsrc11_user (
    last_name varchar(255),
    first_name varchar(255),
    login_name varchar(255),
-   session_id bigint,
+   session_finished smallint,
+   session_uid bigint,
+   resource_uid bigint,
    primary key (uid)
 );
 alter table tl_larsrc11_attachment add index FK1E7009430E79035 (resource_uid), add constraint FK1E7009430E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
@@ -102,7 +104,8 @@ alter table tl_larsrc11_resource_item add index FKF52D1F93EC0D3147 (session_uid)
 alter table tl_larsrc11_item_log add index FK693580A438BF8DFE (resource_item_uid), add constraint FK693580A438BF8DFE foreign key (resource_item_uid) references tl_larsrc11_resource_item (uid);
 alter table tl_larsrc11_item_log add index FK693580A441F9365D (user_uid), add constraint FK693580A441F9365D foreign key (user_uid) references tl_larsrc11_user (uid);
 alter table tl_larsrc11_session add index FK24AA78C530E79035 (resource_uid), add constraint FK24AA78C530E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
-alter table tl_larsrc11_user add index FK30113BFC506CD584 (session_id), add constraint FK30113BFC506CD584 foreign key (session_id) references tl_larsrc11_session (uid);
+alter table tl_larsrc11_user add index FK30113BFCEC0D3147 (session_uid), add constraint FK30113BFCEC0D3147 foreign key (session_uid) references tl_larsrc11_session (uid);
+alter table tl_larsrc11_user add index FK30113BFC309ED320 (resource_uid), add constraint FK30113BFC309ED320 foreign key (resource_uid) references tl_larsrc11_resource (uid);
 
 
 

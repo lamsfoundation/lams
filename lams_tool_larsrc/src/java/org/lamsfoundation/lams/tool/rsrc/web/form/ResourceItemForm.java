@@ -34,6 +34,8 @@ import org.apache.struts.upload.FormFile;
  */
 public class ResourceItemForm extends ActionForm {
 	private String itemIndex;
+	private String sessionMapID;
+	
 	private String title;
 	private short itemType;
 	private String description;
@@ -111,5 +113,11 @@ public class ResourceItemForm extends ActionForm {
 	}
 	public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
 		this.openUrlNewWindow = openUrlNewWindow;
+	}
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
 	}
 }

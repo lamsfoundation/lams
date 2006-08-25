@@ -49,8 +49,10 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -104,7 +106,11 @@ public class ViewItemAction extends Action {
 	 */
 	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		ResourceItem item = getResourceItem(request, mode);
+		
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sesionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+
+		ResourceItem item = getResourceItem(request, sesionMap, mode);
 		if(item == null){
 			return mapping.findForward(ResourceConstants.ERROR);
 		}
@@ -136,7 +142,8 @@ public class ViewItemAction extends Action {
 			navDto.setCurrent(0);
 			navDto.setInstruction(null);
 		}
-			
+		
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID,sessionMapID);
 		request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION,navDto);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
@@ -151,7 +158,11 @@ public class ViewItemAction extends Action {
 	 */
 	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		ResourceItem item = getResourceItem(request, mode);
+		
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
+		ResourceItem item = getResourceItem(request,sessionMap, mode);
 
 		String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
 		Long sessionId = NumberUtils.createLong(idStr);
@@ -167,8 +178,9 @@ public class ViewItemAction extends Action {
 		if(item == null){
 			return mapping.findForward(ResourceConstants.ERROR);
 		}
-		if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
-			request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
+		if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+			sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT,item);
+		}
 		//set url to content frame
 		request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item));
 		
@@ -179,6 +191,7 @@ public class ViewItemAction extends Action {
 		Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 		request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
 		request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID,sessionId);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID,sessionMapID);
 		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 		
@@ -189,15 +202,16 @@ public class ViewItemAction extends Action {
 	/**
 	 * Return resoruce item according to ToolAccessMode.
 	 * @param request
+	 * @param sessionMap 
 	 * @param mode
 	 * @return
 	 */
-	private ResourceItem getResourceItem(HttpServletRequest request, String mode) {
+	private ResourceItem getResourceItem(HttpServletRequest request, SessionMap sessionMap, String mode) {
 		ResourceItem item = null;		
 		if(ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)){
 			int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),0);
 			//authoring: does not save item yet, so only has ItemList from session and identity by Index
-			List<ResourceItem> resourceList = getResourceItemList(request);
+			List<ResourceItem> resourceList = getResourceItemList(sessionMap);
 			item = resourceList.get(itemIdx);
 		}else{
 			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
@@ -262,8 +276,8 @@ public class ViewItemAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getResourceItemList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	private List getResourceItemList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	}	
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
@@ -272,11 +286,11 @@ public class ViewItemAction extends Action {
 	 * @param name
 	 * @return
 	 */
-	private List getListFromSession(HttpServletRequest request,String name) {
-		List list = (List) request.getSession().getAttribute(name);
+	private List getListFromSession(SessionMap sessionMap,String name) {
+		List list = (List) sessionMap.get(name);
 		if(list == null){
 			list = new ArrayList();
-			request.getSession().setAttribute(name,list);
+			sessionMap.put(name,list);
 		}
 		return list;
 	}

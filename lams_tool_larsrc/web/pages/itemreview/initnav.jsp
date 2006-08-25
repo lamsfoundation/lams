@@ -6,7 +6,6 @@ request using this page as target
 --%>
 
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%= session.getAttribute("instructionNavForm") %>" />
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -18,6 +17,7 @@ request using this page as target
 			<c:param name="itemIndex" value="${param.itemIndex}"/>
 			<c:param name="itemUid" value="${param.itemUid}"/>
 			<c:param name="toolSessionID" value="${param.toolSessionID}"/>
+			<c:param name="sessionMapID" value="${param.sessionMapID}"/>
 		</c:redirect>
 	</body>
 </html>

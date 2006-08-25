@@ -256,9 +256,14 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public ResourceUser getUserByID(Long userUid) {
+	public ResourceUser getUserByIDAndContent(Long userId, Long contentId) {
 		
-		return (ResourceUser) resourceUserDao.getUserByUserID(userUid);
+		return (ResourceUser) resourceUserDao.getUserByUserIDAndContentID(userId,contentId);
+		
+	}
+	public ResourceUser getUserByIDAndSession(Long userId, Long sessionId)  {
+		
+		return (ResourceUser) resourceUserDao.getUserByUserIDAndSessionID(userId,sessionId);
 		
 	}
 
@@ -419,7 +424,7 @@ public class ResourceServiceImpl implements
 			log = new ResourceItemVisitLog();
 			ResourceItem item = resourceItemDao.getByUid(resourceItemUid);
 			log.setResourceItem(item);
-			ResourceUser user = resourceUserDao.getUserByUserID(userId); 
+			ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 			log.setUser(user);
 			log.setSessionId(sessionId);
 			log.setAccessDate(new Timestamp(new Date().getTime()));
@@ -435,7 +440,7 @@ public class ResourceServiceImpl implements
 			log = new ResourceItemVisitLog();
 			ResourceItem item = resourceItemDao.getByUid(resourceItemUid);
 			log.setResourceItem(item);
-			ResourceUser user = resourceUserDao.getUserByUserID(userId); 
+			ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 			log.setUser(user);
 			log.setComplete(false);
 			log.setSessionId(sessionId);
@@ -446,9 +451,13 @@ public class ResourceServiceImpl implements
 
 
 	public String finishToolSession(Long toolSessionId, Long userId) throws ResourceApplicationException {
-		ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
-		session.setStatus(ResourceConstants.COMPLETED);
-		resourceSessionDao.saveObject(session);
+		ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
+		user.setSessionFinished(true);
+		resourceUserDao.saveObject(user);
+		
+//		ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
+//		session.setStatus(ResourceConstants.COMPLETED);
+//		resourceSessionDao.saveObject(session);
 		
 		String nextUrl = null;
 		try {
@@ -788,7 +797,7 @@ public class ResourceServiceImpl implements
 			
 //			reset it to new toolContentId
 			toolContentObj.setContentId(toolContentId);
-			ResourceUser user = resourceUserDao.getUserByUserID(new Long(newUserUid.longValue()));
+			ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(new Long(newUserUid.longValue()), toolContentId);
 			if(user == null){
 				user = new ResourceUser();
 				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
@@ -796,6 +805,7 @@ public class ResourceServiceImpl implements
 				user.setLastName(sysUser.getLastName());
 				user.setLoginName(sysUser.getLogin());
 				user.setUserId(new Long(newUserUid.longValue()));
+				user.setResource(toolContentObj);
 			}
 			toolContentObj.setCreatedBy(user);
 			

@@ -45,7 +45,10 @@ public class ResourceUser implements Cloneable{
 	private String firstName;
 	private String lastName;
 	private String loginName;
+	private boolean sessionFinished;
+	
 	private ResourceSession session;
+	private Resource resource;
 	
 	//=============== NON Persisit value: for display use ===========
 	//the user access some reousrce item date time. Use in monitoring summary page
@@ -59,6 +62,17 @@ public class ResourceUser implements Cloneable{
 		this.lastName = user.getLastName();
 		this.loginName = user.getLogin();
 		this.session = session;
+		this.resource = null;
+		this.sessionFinished = false;
+	}
+	public ResourceUser(UserDTO user, Resource content){
+		this.userId = new Long(user.getUserID().intValue());
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.loginName = user.getLogin();
+		this.session = null;
+		this.resource = content;
+		this.sessionFinished = false;
 	}
 	/**
 	 * Clone method from <code>java.lang.Object</code>
@@ -143,7 +157,7 @@ public class ResourceUser implements Cloneable{
 		this.loginName = loginName;
 	}
 	/**
-	 * @hibernate.many-to-one column="session_id"
+	 * @hibernate.many-to-one column="session_uid"
 	 * 			cascade="none"
 	 * @return
 	 */
@@ -153,6 +167,28 @@ public class ResourceUser implements Cloneable{
 
 	public void setSession(ResourceSession session) {
 		this.session = session;
+	}
+	/**
+	 * @hibernate.many-to-one column="resource_uid"
+	 * 			cascade="none"
+	 * @return
+	 */
+	public Resource getResource() {
+		return resource;
+	}
+	public void setResource(Resource content) {
+		this.resource = content;
+	}
+	/**
+	 * @hibernate.property column="session_finished"
+	 * @return
+	 */
+	public boolean isSessionFinished() {
+		return sessionFinished;
+	}
+
+	public void setSessionFinished(boolean sessionFinished) {
+		this.sessionFinished = sessionFinished;
 	}
 	
 	public boolean equals(Object obj) {
@@ -179,5 +215,6 @@ public class ResourceUser implements Cloneable{
 	public void setAccessDate(Date accessDate) {
 		this.accessDate = accessDate;
 	}
+
 
 }

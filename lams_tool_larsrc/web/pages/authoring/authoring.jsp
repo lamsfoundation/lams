@@ -117,9 +117,10 @@
 					</td>
 				</tr>
 			</table>
-	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
+	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="toolContentID" />
+		<html:hidden property="resource.contentId" />
+		<html:hidden property="sessionMapID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 
 			<!-- tab content 1 (Basic) -->
@@ -142,7 +143,9 @@
 				cancelConfirmMsgKey="authoring.msg.cancel.save"
 				accessMode="author"
 			--%>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
+				toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.resource.contentId}" 
+				 customiseSessionID="${formBean.sessionMapID}" />
 	</html:form>
 
 </div>

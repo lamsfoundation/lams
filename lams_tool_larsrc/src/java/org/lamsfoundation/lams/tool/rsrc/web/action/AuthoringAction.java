@@ -23,7 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -73,6 +72,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -90,7 +90,7 @@ public class AuthoringAction extends Action {
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+			HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
@@ -194,13 +194,20 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+//		get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceItemList(request);
+			List<ResourceItem> resourceList = getResourceItemList(sessionMap);
 			ResourceItem item = resourceList.remove(itemIdx);
-			List delList = getDeletedResourceItemList(request);
+			List delList = getDeletedResourceItemList(sessionMap);
 			delList.add(item);
-		}		
+		}	
+		
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	
@@ -213,10 +220,15 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+//		get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		ResourceItem item = null;
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceItemList(request);
+			List<ResourceItem> resourceList = getResourceItemList(sessionMap);
 			item = resourceList.get(itemIdx);
 			if(item != null){
 				populateItemToForm(itemIdx, item,(ResourceItemForm) form,request);
@@ -233,6 +245,9 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		((ResourceItemForm)form).setSessionMapID(sessionMapID);
+		
 		short type = (short) NumberUtils.stringToInt(request.getParameter(ITEM_TYPE));
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
@@ -279,7 +294,8 @@ public class AuthoringAction extends Action {
 				return findForward(itemForm.getItemType(),mapping);
 			}
 		}
-		
+		//set session map ID so that itemlist.jsp can get sessionMAP
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
 		//return null to close this window
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
@@ -335,12 +351,13 @@ public class AuthoringAction extends Action {
 	 * method run successfully. 
 	 *  
 	 * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+	 * @throws ServletException 
 	 * 
 	 */
-	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		
 		//save toolContentID into HTTPSession
 		Long contentId = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_TOOL_CONTENT_ID));
-		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID,contentId);
 		
 //		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
@@ -348,6 +365,12 @@ public class AuthoringAction extends Action {
 		List items = null;
 		Resource resource = null;
 		ResourceForm resourceForm = (ResourceForm)form;
+
+		//initial Session Map 
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		resourceForm.setSessionMapID(sessionMap.getSessionID());
+		
 		try {
 			resource = service.getResourceByContentId(contentId);
 			//if resource does not exist, try to use default content instead.
@@ -363,12 +386,12 @@ public class AuthoringAction extends Action {
 			resourceForm.setResource(resource);
 
 			//initialize instruction attachment list
-			List attachmentList = getAttachmentList(request);
+			List attachmentList = getAttachmentList(sessionMap);
 			attachmentList.clear();
 			attachmentList.addAll(resource.getAttachments());
 		} catch (Exception e) {
 			log.error(e);
-			return mapping.findForward(ResourceConstants.ERROR);
+			throw new ServletException(e);
 		}
 		
 		//init it to avoid null exception in following handling
@@ -376,10 +399,11 @@ public class AuthoringAction extends Action {
 			items = new ArrayList();
 		
 		//init resource item list
-		List resourceItemList = getResourceItemList(request);
+		List resourceItemList = getResourceItemList(sessionMap);
 		resourceItemList.clear();
 		resourceItemList.addAll(items);
 		
+		sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, resourceForm);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
@@ -391,9 +415,21 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @param response
 	 * @return
+	 * @throws ServletException 
 	 */
 	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws ServletException {
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		ResourceForm existForm = (ResourceForm) sessionMap.get(ResourceConstants.ATTR_RESOURCE_FORM);
+		
+		ResourceForm resourceForm = (ResourceForm )form;
+		try {
+			PropertyUtils.copyProperties(resourceForm, existForm);
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+		
 		ToolAccessMode mode = getAccessMode(request);
 		if(mode.isAuthor())
 			return mapping.findForward(ResourceConstants.SUCCESS);
@@ -408,143 +444,141 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @param response
 	 * @return
+	 * @throws ServletException 
 	 */
 	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws Exception {
 		ResourceForm resourceForm = (ResourceForm)(form);
+		
+		//get back sessionMAP
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(resourceForm.getSessionMapID());
+		
 		ToolAccessMode mode = getAccessMode(request);
     	
 		Resource resource = resourceForm.getResource();
-		try {
-			IResourceService service = getResourceService();
-			
-			//*******************************Handle user*******************
-			//try to get form system session
-			HttpSession ss = SessionManager.getSession();
-			//get back login user DTO
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			ResourceUser resourceUser = service.getUserByID(new Long(user.getUserID().intValue()));
-			if(resourceUser == null){
-				resourceUser = new ResourceUser(user,null);
-				service.createUser(resourceUser);
+		IResourceService service = getResourceService();
+		
+		//**********************************Get Resource PO*********************
+		Resource resourcePO = service.getResourceByContentId(resourceForm.getResource().getContentId());
+		if(resourcePO == null){
+			//new Resource, create it.
+			resourcePO = resource;
+			resourcePO.setCreated(new Timestamp(new Date().getTime()));
+			resourcePO.setUpdated(new Timestamp(new Date().getTime()));
+		}else{
+			if(mode.isAuthor()){
+				Long uid = resourcePO.getUid();
+				PropertyUtils.copyProperties(resourcePO,resource);
+				//get back UID
+				resourcePO.setUid(uid);
+			}else{ //if it is Teacher, then just update basic tab content (definelater)
+				resourcePO.setInstructions(resource.getInstructions());
+				resourcePO.setTitle(resource.getTitle());
+				resourcePO.setDefineLater(false);
 			}
-			
-			//**********************************Get Resource PO*********************
-			Resource resourcePO = service.getResourceByContentId(resourceForm.getToolContentID());
-			if(resourcePO == null || !resourceForm.getToolContentID().equals(resource.getContentId()) ){
-				//new Resource, create it.
-				resourcePO = resource;
-				resourcePO.setContentId(resourceForm.getToolContentID());
-				resourcePO.setCreated(new Timestamp(new Date().getTime()));
-				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
-			}else{
-				if(mode.isAuthor()){
-					Long uid = resourcePO.getUid();
-					PropertyUtils.copyProperties(resourcePO,resource);
-					//get back UID
-					resourcePO.setUid(uid);
-				}else{ //if it is Teacher, then just update basic tab content (definelater)
-					resourcePO.setInstructions(resource.getInstructions());
-					resourcePO.setTitle(resource.getTitle());
-					resourcePO.setDefineLater(false);
-				}
-				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
-			}
-			resourcePO.setCreatedBy(resourceUser);
-			
-			//**********************************Handle Authoring Instruction Attachement *********************
-	    	//merge attachment info
-			Set attPOSet = resourcePO.getAttachments();
-			if(attPOSet == null)
-				attPOSet = new HashSet();
-			List attachmentList = getAttachmentList(request);
-			List deleteAttachmentList = getDeletedAttachmentList(request);
-			
-			//current attachemnt in authoring instruction tab.
-			Iterator iter = attachmentList.iterator();
-			while(iter.hasNext()){
-				ResourceAttachment newAtt = (ResourceAttachment) iter.next();
-				//add new attachment if UID is not null
-				if(newAtt.getUid() == null)
-					attPOSet.add(newAtt);
-			}
-			attachmentList.clear();
-			
-			//deleted attachment. 2 possible types: one is persist another is non-persist before.
-			iter = deleteAttachmentList.iterator();
-			while(iter.hasNext()){
-				ResourceAttachment delAtt = (ResourceAttachment) iter.next();
-				iter.remove();
-				//delete from repository
-				service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
-				//it is an existed att, then delete it from current attachmentPO
-				if(delAtt.getUid() != null){
-					Iterator attIter = attPOSet.iterator();
-					while(attIter.hasNext()){
-						ResourceAttachment att = (ResourceAttachment) attIter.next();
-						if(delAtt.getUid().equals(att.getUid())){
-							attIter.remove();
-							break;
-						}
-					}
-					service.deleteResourceAttachment(delAtt.getUid());
-				}//end remove from persist value
-			}
-			
-			//copy back
-			resourcePO.setAttachments(attPOSet);
-			//************************* Handle resource items *******************
-			//Handle resource items
-			Set itemList = new LinkedHashSet();
-			List topics = getResourceItemList(request);
-	    	iter = topics.iterator();
-	    	while(iter.hasNext()){
-	    		ResourceItem item = (ResourceItem) iter.next();
-	    		if(item != null){
-    				//This flushs user UID info to message if this user is a new user. 
-    				item.setCreateBy(resourceUser);
-    				item.setCreateDate(new Timestamp(new Date().getTime()));
-    				itemList.add(item);
-	    		}
-	    	}
-	    	resourcePO.setResourceItems(itemList);
-	    	//delete them from database.
-	    	List delResourceItemList = getDeletedResourceItemList(request);
-	    	iter = delResourceItemList.iterator();
-	    	while(iter.hasNext()){
-	    		ResourceItem item = (ResourceItem) iter.next();
-	    		iter.remove();
-	    		if(item.getUid() != null)
-	    			service.deleteResourceItem(item.getUid());
-	    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
-	    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
-	    	}
-	    	//handle resource item attachment file:
-	    	List delItemAttList = getDeletedItemAttachmentList(request);
-			iter = delItemAttList.iterator();
-			while(iter.hasNext()){
-				ResourceItem delAtt = (ResourceItem) iter.next();
-				iter.remove();
-				//delete from repository
-				service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
-			}
-			
-			//if miniview number is bigger than available items, then force it to 1
-			if(resourcePO.getMiniViewResourceNumber() > topics.size())
-				resourcePO.setMiniViewResourceNumber((topics.size()==0?0:1));
-			//**********************************************
-			//finally persist resourcePO again
-			service.saveOrUpdateResource(resourcePO);
-			
-			//initialize attachmentList again
-			attachmentList = getAttachmentList(request);
-			attachmentList.addAll(resource.getAttachments());
-			resourceForm.setResource(resourcePO);
-			
-		} catch (Exception e) {
-			log.error(e);
+			resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 		}
-
+		
+		//*******************************Handle user*******************
+		//try to get form system session
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		ResourceUser resourceUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue())
+						,resourceForm.getResource().getContentId());
+		if(resourceUser == null){
+			resourceUser = new ResourceUser(user,resourcePO);
+		}
+		
+		resourcePO.setCreatedBy(resourceUser);
+		
+		//**********************************Handle Authoring Instruction Attachement *********************
+    	//merge attachment info
+		Set attPOSet = resourcePO.getAttachments();
+		if(attPOSet == null)
+			attPOSet = new HashSet();
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		
+		//current attachemnt in authoring instruction tab.
+		Iterator iter = attachmentList.iterator();
+		while(iter.hasNext()){
+			ResourceAttachment newAtt = (ResourceAttachment) iter.next();
+			attPOSet.add(newAtt);
+		}
+		attachmentList.clear();
+		
+		//deleted attachment. 2 possible types: one is persist another is non-persist before.
+		iter = deleteAttachmentList.iterator();
+		while(iter.hasNext()){
+			ResourceAttachment delAtt = (ResourceAttachment) iter.next();
+			iter.remove();
+			//delete from repository
+			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+			//it is an existed att, then delete it from current attachmentPO
+			if(delAtt.getUid() != null){
+				Iterator attIter = attPOSet.iterator();
+				while(attIter.hasNext()){
+					ResourceAttachment att = (ResourceAttachment) attIter.next();
+					if(delAtt.getUid().equals(att.getUid())){
+						attIter.remove();
+						break;
+					}
+				}
+				service.deleteResourceAttachment(delAtt.getUid());
+			}//end remove from persist value
+		}
+		
+		//copy back
+		resourcePO.setAttachments(attPOSet);
+		//************************* Handle resource items *******************
+		//Handle resource items
+		Set itemList = new LinkedHashSet();
+		List topics = getResourceItemList(sessionMap);
+    	iter = topics.iterator();
+    	while(iter.hasNext()){
+    		ResourceItem item = (ResourceItem) iter.next();
+    		if(item != null){
+				//This flushs user UID info to message if this user is a new user. 
+				item.setCreateBy(resourceUser);
+				item.setCreateDate(new Timestamp(new Date().getTime()));
+				itemList.add(item);
+    		}
+    	}
+    	resourcePO.setResourceItems(itemList);
+    	//delete them from database.
+    	List delResourceItemList = getDeletedResourceItemList(sessionMap);
+    	iter = delResourceItemList.iterator();
+    	while(iter.hasNext()){
+    		ResourceItem item = (ResourceItem) iter.next();
+    		iter.remove();
+    		if(item.getUid() != null)
+    			service.deleteResourceItem(item.getUid());
+    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
+    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
+    	}
+    	//handle resource item attachment file:
+    	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
+		iter = delItemAttList.iterator();
+		while(iter.hasNext()){
+			ResourceItem delAtt = (ResourceItem) iter.next();
+			iter.remove();
+			//delete from repository
+			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+		}
+		
+		//if miniview number is bigger than available items, then force it to 1
+		if(resourcePO.getMiniViewResourceNumber() > topics.size())
+			resourcePO.setMiniViewResourceNumber((topics.size()==0?0:1));
+		//**********************************************
+		//finally persist resourcePO again
+		service.saveOrUpdateResource(resourcePO);
+		
+		//initialize attachmentList again
+		attachmentList = getAttachmentList(sessionMap);
+		attachmentList.addAll(resource.getAttachments());
+		resourceForm.setResource(resourcePO);
+		
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
     	if(mode.isAuthor())
     		return mapping.findForward("author");
@@ -559,9 +593,10 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @param response
 	 * @return
+	 * @throws UploadResourceFileException 
 	 */
 	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws UploadResourceFileException {
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE,request);
 	}
 	/**
@@ -571,9 +606,10 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @param response
 	 * @return
+	 * @throws UploadResourceFileException 
 	 */
 	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws UploadResourceFileException {
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE,request);
 	}
 	/**
@@ -583,64 +619,56 @@ public class AuthoringAction extends Action {
 	 * @param type
 	 * @param request
 	 * @return
+	 * @throws UploadResourceFileException 
 	 */
 	private ActionForward uploadFile(ActionMapping mapping, ActionForm form,
-			String type,HttpServletRequest request) {
+			String type,HttpServletRequest request) throws UploadResourceFileException {
 
 		ResourceForm resourceForm = (ResourceForm) form;
-		
+		//get back sessionMAP
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(resourceForm.getSessionMapID());
+
 		FormFile file;
 		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type))
 			file = (FormFile) resourceForm.getOfflineFile();
 		else
 			file = (FormFile) resourceForm.getOnlineFile();
 		
-		ActionErrors errors = new ActionErrors();
-		try {
-			IResourceService service = getResourceService();
-			//upload to repository
-			ResourceAttachment  att = service.uploadInstructionFile(file, type);
-			//handle session value
-			List attachmentList = getAttachmentList(request);
-			List deleteAttachmentList = getDeletedAttachmentList(request);
-			//first check exist attachment and delete old one (if exist) to deletedAttachmentList
-			Iterator iter = attachmentList.iterator();
-			ResourceAttachment existAtt;
-			while(iter.hasNext()){
-				existAtt = (ResourceAttachment) iter.next();
-				if(StringUtils.equals(existAtt.getFileName(),att.getFileName())){
-					//if there is same name attachment, delete old one
-					deleteAttachmentList.add(existAtt);
-					iter.remove();
-					break;
-				}
+		IResourceService service = getResourceService();
+		//upload to repository
+		ResourceAttachment  att = service.uploadInstructionFile(file, type);
+		//handle session value
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
+		Iterator iter = attachmentList.iterator();
+		ResourceAttachment existAtt;
+		while(iter.hasNext()){
+			existAtt = (ResourceAttachment) iter.next();
+			if(StringUtils.equals(existAtt.getFileName(),att.getFileName())){
+				//if there is same name attachment, delete old one
+				deleteAttachmentList.add(existAtt);
+				iter.remove();
+				break;
 			}
-			//add to attachmentList
-			attachmentList.add(att);
-			
-			//update Html FORM, this will echo back to web page for display
-			List list;
-			if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
-				list = resourceForm.getOfflineFileList();
-				if(list == null){
-					list = new ArrayList();
-					resourceForm.setOfflineFileList(list);
-				}
-			}else{
-				list = resourceForm.getOnlineFileList();
-				if(list == null){
-					list = new ArrayList();
-					resourceForm.setOnlineFileList(list);
-				}
-			}
-			list.add(att);
-		} catch (UploadResourceFileException e) {
-			log.error("Upload instruction attachment failed:" + e.getMessage());
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
 		}
+		//add to attachmentList
+		attachmentList.add(att);
 		
-		if(!errors.isEmpty())
-			this.addErrors(request,errors);
+		//update Html FORM, this will echo back to web page for display
+		List onlineFileList = new ArrayList();
+		List offlineFileList = new ArrayList();
+		iter = attachmentList.iterator();
+		while(iter.hasNext()){
+			ResourceAttachment attFile = (ResourceAttachment) iter.next();
+			if(StringUtils.equalsIgnoreCase(attFile.getFileType(),IToolContentHandler.TYPE_OFFLINE))
+				offlineFileList.add(attFile);
+			else
+				onlineFileList.add(attFile);
+		}
+		resourceForm.setOnlineFileList(onlineFileList);
+		resourceForm.setOfflineFileList(offlineFileList);
+		
 		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 
@@ -683,38 +711,29 @@ public class AuthoringAction extends Action {
 		Long versionID = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_FILE_VERSION_ID));
 		Long uuID = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_FILE_UUID));
 		
+		//get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
 		//handle session value
-		List attachmentList = getAttachmentList(request);
-		List deleteAttachmentList = getDeletedAttachmentList(request);
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		ResourceAttachment existAtt;
+		List leftAttachments = new ArrayList();
 		while(iter.hasNext()){
 			existAtt = (ResourceAttachment) iter.next();
 			if(existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
-				//remove from attachemnt
 				iter.remove();
-				break;
+			}else if(StringUtils.equals(existAtt.getFileType(),type) ){
+				leftAttachments.add(existAtt);
 			}
+				
 		}
-		
-		//handle web page display
-		List leftAttachments;
-		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
-			leftAttachments = ((ResourceForm)form).getOfflineFileList();
-		}else{
-			leftAttachments = ((ResourceForm)form).getOnlineFileList();
-		}
-		iter = leftAttachments.iterator();
-		while(iter.hasNext()){
-			ResourceAttachment att = (ResourceAttachment) iter.next();
-			if(versionID.equals(att.getFileVersionId()) && uuID.equals(att.getFileUuid())){
-				iter.remove();
-				break;
-			}
-		}
+
 		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
 			request.setAttribute("offlineFileList",leftAttachments);
 		}else{
@@ -737,31 +756,31 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATT_ATTACHMENT_LIST);
+	private List getAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATT_ATTACHMENT_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
+	private List getDeletedAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
 	}
 	/**
 	 * List save current resource items.
 	 * @param request
 	 * @return
 	 */
-	private List getResourceItemList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	private List getResourceItemList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	}	
 	/**
 	 * List save deleted resource items, which could be persisted or non-persisted items. 
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedResourceItemList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
+	private List getDeletedResourceItemList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
 	}
 	/**
 	 * If a resource item has attahment file, and the user edit this item and change the attachment
@@ -770,8 +789,8 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedItemAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
+	private List getDeletedItemAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
 	}
 
 
@@ -782,14 +801,15 @@ public class AuthoringAction extends Action {
 	 * @param name
 	 * @return
 	 */
-	private List getListFromSession(HttpServletRequest request,String name) {
-		List list = (List) request.getSession().getAttribute(name);
+	private List getListFromSession(SessionMap sessionMap,String name) {
+		List list = (List) sessionMap.get(name);
 		if(list == null){
 			list = new ArrayList();
-			request.getSession().setAttribute(name,list);
+			sessionMap.put(name,list);
 		}
 		return list;
 	}
+	
 	
 	
 	/**
@@ -900,8 +920,9 @@ public class AuthoringAction extends Action {
 		 * this resource item.
 		 */
 		
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(itemForm.getSessionMapID());
 		//check whether it is "edit(old item)" or "add(new item)"
-		List resourceList = getResourceItemList(request);
+		List resourceList = getResourceItemList(sessionMap);
 		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
 		ResourceItem item;
 		
@@ -951,7 +972,7 @@ public class AuthoringAction extends Action {
 				}
 				//put it after "upload" to ensure deleted file added into list only no exception happens during upload 
 				if(hasOld){
-					List delAtt = getDeletedItemAttachmentList(request);
+					List delAtt = getDeletedItemAttachmentList(sessionMap);
 					delAtt.add(delAttItem);
 				}
 			}

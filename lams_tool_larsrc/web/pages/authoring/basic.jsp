@@ -8,36 +8,40 @@
 	 */
 	function showMessage(url) {
 		var area=document.getElementById("reourceInputArea");
-		area.style.width="670px";
-		area.style.height="100%";
-		area.src=url;
-		area.style.display="block";
+		if(area != null){
+			area.style.width="670px";
+			area.style.height="100%";
+			area.src=url;
+			area.style.display="block";
+		}
 	}
 	function hideMessage(){
 		var area=document.getElementById("reourceInputArea");
-		area.style.width="0px";
-		area.style.height="0px";
-		area.style.display="none";
+		if(area != null){
+			area.style.width="0px";
+			area.style.height="0px";
+			area.style.display="none";
+		}
 	}
 
-	function previewItem(type,idx){
+	function previewItem(type,idx,sessionMapID){
 		//1:url, 2:file, 3:website,4:learning object
 		//This mode is special for unsaved author page. It is different with the author mode in preview 
-		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx;
+		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
 		launchPopup(myUrl,"Review");
 	}
 	
-	function editItem(idx){
+	function editItem(idx,sessionMapID){
 		 var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime();
+		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		showMessage(url);
 	}
 	//The panel of resource list panel
 	var resourceListTargetDiv = "resourceListArea";
-	function deleteItem(idx){
+	function deleteItem(idx,sessionMapID){
 		var url = "<c:url value="/authoring/removeItem.do"/>";
 	    var reqIDVar = new Date();
-		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime();
+		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		deleteItemLoading();
 	    var myAjax = new Ajax.Updater(
 		    	resourceListTargetDiv,
@@ -71,6 +75,7 @@
 		<tr>
 			<td colspan="2">
 				<div id="resourceListArea">
+						<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 						<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 				</div>
 			</td>
@@ -80,22 +85,22 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');">
 								<fmt:message key="label.authoring.basic.add.url" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=2"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>');">
 								<fmt:message key="label.authoring.basic.add.file" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=3"/>');">
 								<fmt:message key="label.authoring.basic.add.website" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=4"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');">
 								<fmt:message key="label.authoring.basic.add.learning.object"/>
 							</a>
 						</td>

@@ -17,7 +17,7 @@
 				//learner and author(preview mode) will mark the finish
 					if(${mode == "learner"} || ${mode == "author"}){
 					   var reqIDVar = new Date();
-					   //if auto run mode, the opener will be null
+					   //if auto run mode, the opener will be null. 
 					   if(window.parent.opener != null) 
 						    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
 					   else{
@@ -31,7 +31,7 @@
 					}
 				}
 				function nextIns(currIns){
-					document.location.href="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
+					document.location.href="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
 				}
 		//-->
 		</script>

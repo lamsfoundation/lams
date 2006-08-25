@@ -151,6 +151,7 @@ public class LearningAction extends Action {
 	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
+		Long sessionId = (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		ResourceItemForm itemForm = (ResourceItemForm)form;
 		ActionErrors errors = validateResourceItem(itemForm);
@@ -164,15 +165,7 @@ public class LearningAction extends Action {
 		//create a new ResourceItem
 		ResourceItem item = new ResourceItem(); 
 		IResourceService service = getResourceService();
-		//try to get form system session
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		ResourceUser resourceUser = service.getUserByID(new Long(user.getUserID().intValue()));
-		if(resourceUser == null){
-			resourceUser = new ResourceUser(user,null);
-			service.createUser(resourceUser);
-		}
+		ResourceUser resourceUser = getCurrentUser(service,sessionId);
 		item.setType(type);
 		item.setTitle(itemForm.getTitle());
 		item.setDescription(itemForm.getDescription());
@@ -193,7 +186,7 @@ public class LearningAction extends Action {
 			item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
 		}
 		//save and update session
-		Long sessionId = (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		
 		ResourceSession resSession = service.getResourceSessionBySessionId(sessionId);
 		if(resSession == null){
 			log.error("Failed update ResourceSession by ID[" + sessionId + "]");
@@ -232,15 +225,7 @@ public class LearningAction extends Action {
 		
 //		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
-		//try to get form system session
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		ResourceUser resourceUser = service.getUserByID(new Long(user.getUserID().intValue()));
-		if(resourceUser == null){
-			resourceUser = new ResourceUser(user,null);
-			service.createUser(resourceUser);
-		}
+		ResourceUser resourceUser = getCurrentUser(service,sessionId);
 
 		List<ResourceItem> items = null;
 		Resource resource;
@@ -251,6 +236,7 @@ public class LearningAction extends Action {
 			log.error(e);
 			return mapping.findForward(ResourceConstants.ERROR);
 		}
+		
 		
 		//add define later support
 		if(resource.isDefineLater()){
@@ -294,6 +280,10 @@ public class LearningAction extends Action {
 		}
 		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
 		
+		//check whehter finish lock is on/off
+		boolean lock = resource.getLockWhenFinished() && resourceUser.isSessionFinished();
+		request.getSession().setAttribute(ResourceConstants.ATTR_FINISH_LOCK,lock);
+		
 		//set contentInUse flag to true!
 		resource.setContentInUse(true);
 		resource.setDefineLater(false);
@@ -302,6 +292,7 @@ public class LearningAction extends Action {
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
+
 	//*************************************************************************************
 	// Private method 
 	//*************************************************************************************
@@ -358,6 +349,21 @@ public class LearningAction extends Action {
 			break;
 		}
 		return forward;
+	}
+
+	private ResourceUser getCurrentUser(IResourceService service, Long sessionId) {
+		//try to get form system session
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		ResourceUser resourceUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+		
+		if(resourceUser == null){
+			ResourceSession session = service.getResourceSessionBySessionId(sessionId);
+			resourceUser = new ResourceUser(user,session);
+			service.createUser(resourceUser);
+		}
+		return resourceUser;
 	}
 	/**
 	 * @param itemForm

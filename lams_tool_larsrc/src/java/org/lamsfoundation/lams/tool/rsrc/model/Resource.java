@@ -102,6 +102,15 @@ public class Resource implements Cloneable{
 		defaultContent.toolContentHandler = resourceToolContentHandler;
 		toContent = (Resource) defaultContent.clone();
 		toContent.setContentId(contentId);
+		
+		//reset user info as well
+		if(toContent.getCreatedBy() != null){
+			toContent.getCreatedBy().setResource(toContent);
+			Set<ResourceItem> items = toContent.getResourceItems();
+			for(ResourceItem item:items){
+				item.setCreateBy(toContent.getCreatedBy());
+			}
+		}
 		return toContent;
 	}
   	public Object clone(){
@@ -146,9 +155,9 @@ public class Resource implements Cloneable{
   				resource.attachments = set;
   			}
   			//clone ReourceUser as well
-  			if(this.createdBy != null)
+  			if(this.createdBy != null){
   				resource.setCreatedBy((ResourceUser) this.createdBy.clone());
-  			
+  			}
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + Resource.class + " failed");
 		} catch (ItemNotFoundException e) {
@@ -389,7 +398,7 @@ public class Resource implements Cloneable{
 	/**
      *
      * @hibernate.set   lazy="true"
-     * 					cascade="all"
+     * 					cascade="all-delete-orphan"
      * 					inverse="false"
      * 					order-by="create_date desc"
      * @hibernate.collection-key column="resource_uid"

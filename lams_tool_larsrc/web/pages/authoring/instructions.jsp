@@ -8,7 +8,7 @@
 	function deleteOfflineFile(fileUuid,fileVersionId){
 		var url = "<c:url value="/authoring/deleteOfflineFile.do"/>";
 	    var reqIDVar = new Date();
-		var param = "fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
+		var param = "sessionMapID=${formBean.sessionMapID}&fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
 		offlineLoading();
 	    var myAjax = new Ajax.Updater(
 		    	offlineArea,
@@ -24,7 +24,7 @@
 	function deleteOnlineFile(fileUuid,fileVersionId){
 		var url = "<c:url value="/authoring/deleteOnlineFile.do"/>";
 	    var reqIDVar = new Date();
-		var param = "fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
+		var param = "sessionMapID=${formBean.sessionMapID}&fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
 		onlineLoading();
 	    var myAjax = new Ajax.Updater(
 		    	onlineArea,

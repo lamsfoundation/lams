@@ -38,6 +38,7 @@
 				<td>
 					<%@ include file="/common/messages.jsp"%>
 					<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm">
+						<html:hidden property="sessionMapID" />
 						<input type="hidden" name="instructionList" id="instructionList" />
 						<input type="hidden" name="itemType" id="itemType" value="1" />
 						<html:hidden property="itemIndex" />
@@ -89,7 +90,7 @@
 			</tr>
 			<tr>
 				<td align="center" valign="bottom">
-					<a href="javascript:;" onclick="cancelResourceItem()" class="button"><fmt:message key="label.cancel" /></a> <a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message key="label.authoring.basic.add.url" /></a>
+					 <a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message key="label.authoring.basic.add.url" /></a>  <a href="javascript:;" onclick="cancelResourceItem()" class="button"><fmt:message key="label.cancel" /></a>
 				</td>
 			</tr>
 			<tr>

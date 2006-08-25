@@ -31,10 +31,18 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 public class ResourceUserDAOHibernate extends BaseDAOHibernate implements ResourceUserDAO{
 	
-	private static final String FIND_BY_USER_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =?";
+	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.content.contentId=?";
+	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
 
-	public ResourceUser getUserByUserID(Long userID) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID,userID);
+	public ResourceUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
+		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
+		if(list == null || list.size() == 0)
+			return null;
+		return (ResourceUser) list.get(0);
+	}
+
+	public ResourceUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (ResourceUser) list.get(0);
