@@ -184,12 +184,13 @@ class Monitor {
 	}
 	
 	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
-		trace('starting lesson...');
+		Debugger.log('populating seq object for start date:'+datetime,Debugger.CRITICAL,'startLesson','Monitor');
 		var callback:Function = Proxy.create(this, onStartLesson);
 		
 		if(isScheduled){
 			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startOnScheduleLesson&lessonStartDate=' + datetime + '&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
 		} else {
+			//getMV.
 			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startLesson&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
 		}
 	}
