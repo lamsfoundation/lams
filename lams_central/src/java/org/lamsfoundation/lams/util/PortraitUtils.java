@@ -72,6 +72,9 @@ public class PortraitUtils {
 		
 			// write new picture into a buffer usable by content repository
 			os = new ByteArrayOutputStream();
+			// As at Java 1.5, ImageIO does not support writing gif
+			if (formatName.equals("gif")) formatName = "jpg";
+			log.debug("using format: "+formatName);
 			ImageIO.write(bdest,formatName,os);
 			// alternative may be to use a File on disk as the buffer
 		} catch (IOException e) {
