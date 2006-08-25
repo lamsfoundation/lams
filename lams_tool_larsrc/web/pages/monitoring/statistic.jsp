@@ -1,4 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+
 
 <table cellspacing="3">
 	<c:if test="${empty summaryList}">

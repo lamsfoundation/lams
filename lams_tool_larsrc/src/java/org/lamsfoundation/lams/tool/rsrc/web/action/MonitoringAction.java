@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -57,9 +58,6 @@ public class MonitoringAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 		String param = mapping.getParameter();
-		// -----------------------Resource Author function
-		// ---------------------------
-		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
 
 		if (param.equals("summary")) {
 			return summary(mapping, form, request, response);
@@ -86,8 +84,13 @@ public class MonitoringAction extends Action {
 		IResourceService service = getResourceService();
 		service.setItemVisible(itemUid,false);
 		
+		//get back SessionMap
+		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		
 		//update session value
-		List<List> groupList = (List<List>) request.getSession().getAttribute(ResourceConstants.ATTR_SUMMARY_LIST);
+		List<List> groupList = (List<List>) sessionMap.get(ResourceConstants.ATTR_SUMMARY_LIST);
 		if(groupList != null)
 			for(List<Summary> group : groupList){
 				for(Summary sum: group){
@@ -107,8 +110,13 @@ public class MonitoringAction extends Action {
 		IResourceService service = getResourceService();
 		service.setItemVisible(itemUid,true);
 		
+		//get back SessionMap
+		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		
 		//update session value
-		List<List> groupList = (List<List>) request.getSession().getAttribute(ResourceConstants.ATTR_SUMMARY_LIST);
+		List<List> groupList = (List<List>) sessionMap.get(ResourceConstants.ATTR_SUMMARY_LIST);
 		if(groupList != null)
 			for(List<Summary> group : groupList){
 				for(Summary sum: group){
@@ -123,18 +131,24 @@ public class MonitoringAction extends Action {
 
 	private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		//initial Session Map 
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		IResourceService service = getResourceService();
 		List<List<Summary>> groupList = service.getSummary(contentId);
 		
-		//put it into HTTPSession
-		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
-		
 		Resource resource = service.getResourceByContentId(contentId);
 		resource.toDTO();
-		request.getSession().setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(ResourceWebUtils.isResourceEditable(resource)));
-		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE, resource);
-		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
+
+		//cache into sessionMap
+		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(ResourceConstants.PAGE_EDITABLE, new Boolean(ResourceWebUtils.isResourceEditable(resource)));
+		sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
+		sessionMap.put(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
+		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 

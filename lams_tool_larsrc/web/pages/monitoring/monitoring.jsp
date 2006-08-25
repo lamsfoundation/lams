@@ -20,8 +20,8 @@
 		    	selectTab(tabId);
 	        } 
 	        
-		    function viewItem(itemUid){
-				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid;
+		    function viewItem(itemUid,sessionMapID){
+				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID="+sessionMapID;
 				launchPopup(myUrl,"MonitoringReview");
 			}
 	    </script>		 

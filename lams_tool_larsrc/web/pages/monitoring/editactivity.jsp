@@ -1,4 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="resource" value="${sessionMap.resource}"/>
 
 <table cellpadding="0">
 	<tr>
@@ -23,11 +25,11 @@
 
 	<tr>
 		<td colspan="2">
-			<c:set var="isPageEditable" value="${isPageEditable}" />
+			<c:set var="isPageEditable" value="${sessionMap.isPageEditable}" />
 			<c:choose>
 				<c:when test='${isPageEditable == "true"}'>
-					<c:url value="/definelater.do" var="authoringUrl">
-						<c:param name="toolContentID" value="${toolContentID}" />
+					<c:url  var="authoringUrl" value="/definelater.do">
+						<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 					</c:url>
 					<html:link href="${authoringUrl}" styleClass="button" target="_blank">
 						<fmt:message key="label.monitoring.edit.activity.edit" />

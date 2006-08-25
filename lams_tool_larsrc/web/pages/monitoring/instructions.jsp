@@ -1,4 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="resource" value="${sessionMap.resource}"/>
 
 
 <table cellpadding="0">

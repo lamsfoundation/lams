@@ -1,9 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 	</div>
 </c:if>
+
 <table cellpadding="0">
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 		<c:set var="groupSize" value="${fn:length(group)}" />
@@ -64,7 +68,7 @@
 						</c:choose>
 					</td>
 					<td>
-						<a href="javascript:;" onclick="viewItem(${item.itemUid})">${item.itemTitle}</a>
+						<a href="javascript:;" onclick="viewItem(${item.itemUid},'${sessionMapID}')">${item.itemTitle}</a>
 					</td>
 					<td>
 						<c:if test="${!item.itemCreateByAuthor}">
@@ -87,10 +91,10 @@
 					<td align="center">
 						<c:choose>
 							<c:when test="${item.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
+								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
 							</c:when>
 							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
+								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
 							</c:otherwise>
 						</c:choose>
 					</td>
