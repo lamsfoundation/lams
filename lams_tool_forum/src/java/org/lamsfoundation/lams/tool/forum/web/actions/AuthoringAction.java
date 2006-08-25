@@ -299,9 +299,7 @@ public class AuthoringAction extends Action {
 			Iterator iter = attachmentList.iterator();
 			while(iter.hasNext()){
 				Attachment newAtt = (Attachment) iter.next();
-				//add new attachment, UID is not null
-				if(newAtt.getUid() == null)
-					attPOSet.add(newAtt);
+				attPOSet.add(newAtt);
 			}
 			attachmentList.clear();
 			
