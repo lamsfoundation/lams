@@ -335,6 +335,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
 	public function serializeObj(dto:Object):XML{
 		var sXML:XML = new XML();
 		sXML = wddx.serialize(dto);
+		Debugger.log('monitor data send to Server:'+sXML.toString(),Debugger.GEN,' serializeObj ','Communication');
 		return sXML;
 	}
     
@@ -346,6 +347,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
 	 */
 	public function deserializeObj(xmlObj:XML):Object{
         var dto:Object = wddx.deserialize(xmlObj);
+		Debugger.log('monitor data recieved from Server:'+xmlObj.toString(),Debugger.GEN,' deserializeObj ','Communication');
 		return dto;
 	}
 	

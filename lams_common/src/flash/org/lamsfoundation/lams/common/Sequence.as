@@ -106,7 +106,9 @@ class Sequence {
 	}
 	
 	public function populateFromDTO(dto:Object){
-		trace('populating seq object for seq:' + dto.lessonID);
+		trace('populating seq object for start date:' + dto.scheduleStartDate);
+		Debugger.log('populating seq schedule date:'+dto.scheduleStartDate,Debugger.CRITICAL,'populateFromDTO','Sequence');
+		Debugger.log('populating seq start date:'+dto.startDateTime,Debugger.CRITICAL,'populateFromDTO','Sequence');
 		_seqID = dto.lessonID;
 		_seqName = dto.lessonName;
 		_seqDescription = dto.lessonDescription;
