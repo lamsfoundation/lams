@@ -167,6 +167,25 @@
 			<forward name="finish" path="/pages/learning/finish.jsp" />
 		</action>
 		
+		
+		<action path="/learning/addfile"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="addfile"
+			name="resourceItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/learning/addfile.jsp" />
+		</action>
+		
+		<action path="/learning/addurl"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="addurl"
+			name="resourceItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/learning/addurl.jsp" />
+		</action>
+		
 		<action path="/learning/saveOrUpdateItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			parameter="saveOrUpdateItem"

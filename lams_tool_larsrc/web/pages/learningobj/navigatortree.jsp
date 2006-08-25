@@ -28,9 +28,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
 	
-	<c:set var="sessionMap" value="${sessionScope[param.sessionMapID]}"/>
-	<c:set var="crPackage" value="${sessionMap.crPackage}"/>
-	
+	<c:set var="sessionMapID" value="${param.sessionMapID}"/>
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+	<c:set var="cpPackage" value="${sessionMap.cpPackage}"/>
+	 
 	<style type="text/css">
 	<!--
 	table { 

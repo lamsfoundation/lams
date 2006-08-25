@@ -36,6 +36,9 @@ public class ResourceItemForm extends ActionForm {
 	private String itemIndex;
 	private String sessionMapID;
 	
+	//tool access mode;
+	private String mode;
+	
 	private String title;
 	private short itemType;
 	private String description;
@@ -119,5 +122,11 @@ public class ResourceItemForm extends ActionForm {
 	}
 	public void setSessionMapID(String sessionMapID) {
 		this.sessionMapID = sessionMapID;
+	}
+	public String getMode() {
+		return mode;
+	}
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 }

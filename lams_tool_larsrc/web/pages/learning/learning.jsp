@@ -24,13 +24,13 @@
 	<!--
 		function gotoURL(){
  		    var reqIDVar = new Date();
-			var gurl = "<c:url value="/pages/learning/addurl.jsp"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+			var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
 	      	showMessage(gurl);
 	      	return false;
 		}
 		function gotoFile(){
  		    var reqIDVar = new Date();
- 		    var gurl = "<c:url value="/pages/learning/addfile.jsp"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+ 		    var gurl = "<c:url value="/learning/addfile.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
 	      	showMessage(gurl);
 	      	return false;
 		}
@@ -71,9 +71,9 @@
 		<!--closes header-->
 
 		<div id="content-learner">
-			<p>
+			<h2>
 				${resource.instructions}
-			</p>
+			</h2>
 
 			<%@ include file="/common/messages.jsp"%>
 			<table cellpadding="0" cellspacing="0" class="alternative-color">
@@ -175,21 +175,21 @@
 					<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
 						<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?sessionMapID=${sessionMapID}&mode=${mode}");
+						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
 					-->
 				</script>
 					</c:when>
 					<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
 						<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addfile.jsp'/>?sessionMapID=${sessionMapID}&mode=${mode}");
+						showMessage("<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
 					-->
 				</script>
 					</c:when>
 					<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
 						<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?sessionMapID=${sessionMapID}&mode=${mode}");
+						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
 					-->
 				</script>
 					</c:when>

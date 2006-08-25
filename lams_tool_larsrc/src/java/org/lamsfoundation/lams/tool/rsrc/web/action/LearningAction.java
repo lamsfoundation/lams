@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -86,10 +87,30 @@ public class LearningAction extends Action {
 		if(param.equals("finish")){
 			return finish(mapping, form, request, response);
 		}
+		if (param.equals("addfile")) {
+			return addItem(mapping, form, request, response);
+		}
+		if (param.equals("addurl")) {
+			return addItem(mapping, form, request, response);
+		}
         if (param.equals("saveOrUpdateItem")) {
         	return saveOrUpdateItem(mapping, form, request, response);
         }
 		return  mapping.findForward(ResourceConstants.ERROR);
+	}
+	/**
+	 * Initial page for add resource item (single file or URL).
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward addItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		ResourceItemForm itemForm = (ResourceItemForm) form;
+		itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
+		itemForm.setSessionMapID(WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID));
+		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
 	 * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
