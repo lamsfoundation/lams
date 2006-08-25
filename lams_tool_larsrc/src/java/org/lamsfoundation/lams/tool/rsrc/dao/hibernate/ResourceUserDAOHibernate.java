@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 public class ResourceUserDAOHibernate extends BaseDAOHibernate implements ResourceUserDAO{
 	
-	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.content.contentId=?";
+	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.resource.contentId=?";
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
 
 	public ResourceUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
