@@ -9,6 +9,7 @@
 		<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm">
 			<input type="hidden" name="itemType" id="itemType" value="1" />
 			<input type="hidden" name="mode" value="${param.mode}" />
+			<input type="hidden" name="sessionMapID" value="${param.sessionMapID}" />
 			<table width="100%" border="0" align="left" cellpadding="0" cellspacing="0">
 				<tr>
 					<td  colspan="2">

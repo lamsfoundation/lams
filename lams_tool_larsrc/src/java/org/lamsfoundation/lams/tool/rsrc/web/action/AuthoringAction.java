@@ -811,7 +811,6 @@ public class AuthoringAction extends Action {
 	}
 	
 	
-	
 	/**
 	 * Get resource items instruction from <code>HttpRequest</code>
 	 * @param request

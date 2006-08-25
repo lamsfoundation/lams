@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
@@ -90,20 +91,137 @@ public class LearningAction extends Action {
         }
 		return  mapping.findForward(ResourceConstants.ERROR);
 	}
-	
+	/**
+	 * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
+	 * method run successfully. 
+	 *  
+	 * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+	 * 
+	 */
+	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		//initial Session Map 
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
+		//save toolContentID into HTTPSession
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		
+		Long sessionId =  new Long(request.getParameter(ResourceConstants.PARAM_TOOL_SESSION_ID));
+		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
+		
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
+		
+//		get back the resource and item list and display them on page
+		IResourceService service = getResourceService();
+		ResourceUser resourceUser = getCurrentUser(service,sessionId);
+
+		List<ResourceItem> items = null;
+		Resource resource;
+		items = service.getResourceItemsBySessionId(sessionId);
+		resource = service.getResourceBySessionId(sessionId);
+		
+		
+		//add define later support
+		if(resource.isDefineLater()){
+			return mapping.findForward("defineLater");
+		}
+		//add run offline support
+		if(resource.getRunOffline()){
+			return mapping.findForward("runOffline");
+		}
+				
+		//init resource item list
+		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+		resourceItemList.clear();
+		if(items != null){
+			//remove hidden items.
+			for(ResourceItem item : items){
+				if(!item.isHide()){
+					resourceItemList.add(item);
+				}
+			}
+		}
+		
+		//set complete flag for display purpose
+		service.retrieveComplete(resourceItemList, resourceUser);
+		
+		sessionMap.put(ResourceConstants.ATTR_RESOURCE,resource);
+		
+		//check whether there is only one resource item and run auto flag is true or not.
+		boolean runAuto = false;
+		int itemsNumber = 0;
+		if(resource.getResourceItems() != null){
+			itemsNumber = resource.getResourceItems().size();
+			if(resource.isRunAuto() && itemsNumber == 1){
+				ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
+				//only visible item can be run auto.
+				if(!item.isHide()){
+					runAuto = true;
+					request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
+				}
+			}
+		}
+		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
+		
+		//check whehter finish lock is on/off
+		boolean lock = resource.getLockWhenFinished() && resourceUser.isSessionFinished();
+		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK,lock);
+		
+		//set contentInUse flag to true!
+		resource.setContentInUse(true);
+		resource.setDefineLater(false);
+		service.saveOrUpdateResource(resource);
+
+		
+		return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	/**
+	 * Mark resource item as complete status. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+		
+		doComplete(request);
+		
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID,sessionMapID);
+		return  mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	/**
+	 * Finish learning session. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 		String runOffline = request.getParameter(ResourceConstants.PARAM_RUN_OFFLINE);
+		
+		//get back SessionMap
+		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		
+		Long sessionId =  (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		
 		if(resourceItemUid != null){
 			doComplete(request);
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,true);
 		}else
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,false);
 		
-		Long sessionId = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_SESSION_ID);
 		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Long userID = new Long(user.getUserID().longValue());
@@ -132,13 +250,6 @@ public class LearningAction extends Action {
 		return mapping.findForward("finish");
 	}
 
-	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		doComplete(request);
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		return  mapping.findForward(ResourceConstants.SUCCESS);
-	}
-
 	
 	/**
 	 * Save file or url resource item into database.
@@ -150,8 +261,13 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		//get back SessionMap
+		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		
-		Long sessionId = (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		ResourceItemForm itemForm = (ResourceItemForm)form;
 		ActionErrors errors = validateResourceItem(itemForm);
@@ -201,98 +317,15 @@ public class LearningAction extends Action {
 		service.saveOrUpdateResourceSession(resSession);
 		
 		//update session value
-		List<ResourceItem> resourceItemList = getResourceItemList(request);
+		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		resourceItemList.add(item);
 		
 		//URL or file upload
-		request.setAttribute("addType",new Short(type));
+		request.setAttribute(ResourceConstants.ATTR_ADD_RESOURCE_TYPE,new Short(type));
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
-	/**
-	 * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
-	 * method run successfully. 
-	 *  
-	 * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-	 * 
-	 */
-	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		//save toolContentID into HTTPSession
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		
-		Long sessionId =  new Long(request.getParameter(ResourceConstants.PARAM_TOOL_SESSION_ID));
-		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID,sessionId);
-		
-//		get back the resource and item list and display them on page
-		IResourceService service = getResourceService();
-		ResourceUser resourceUser = getCurrentUser(service,sessionId);
-
-		List<ResourceItem> items = null;
-		Resource resource;
-		try {
-			items = service.getResourceItemsBySessionId(sessionId);
-			resource = service.getResourceBySessionId(sessionId);
-		} catch (Exception e) {
-			log.error(e);
-			return mapping.findForward(ResourceConstants.ERROR);
-		}
-		
-		
-		//add define later support
-		if(resource.isDefineLater()){
-			return mapping.findForward("defineLater");
-		}
-		//add run offline support
-		if(resource.getRunOffline()){
-			return mapping.findForward("runOffline");
-		}
-				
-		//init resource item list
-		List<ResourceItem> resourceItemList = getResourceItemList(request);
-		resourceItemList.clear();
-		if(items != null){
-			//remove hidden items.
-			for(ResourceItem item : items){
-				if(!item.isHide()){
-					resourceItemList.add(item);
-				}
-			}
-		}
-		
-		//set complete flag for display purpose
-		service.retrieveComplete(resourceItemList, resourceUser);
-		
-		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE,resource);
-		
-		//check whether there is only one resource item and run auto flag is true or not.
-		boolean runAuto = false;
-		int itemsNumber = 0;
-		if(resource.getResourceItems() != null){
-			itemsNumber = resource.getResourceItems().size();
-			if(resource.isRunAuto() && itemsNumber == 1){
-				ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
-				//only visible item can be run auto.
-				if(!item.isHide()){
-					runAuto = true;
-					request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
-				}
-			}
-		}
-		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
-		
-		//check whehter finish lock is on/off
-		boolean lock = resource.getLockWhenFinished() && resourceUser.isSessionFinished();
-		request.getSession().setAttribute(ResourceConstants.ATTR_FINISH_LOCK,lock);
-		
-		//set contentInUse flag to true!
-		resource.setContentInUse(true);
-		resource.setDefineLater(false);
-		service.saveOrUpdateResource(resource);
-		
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		return mapping.findForward(ResourceConstants.SUCCESS);
-	}
-
+	
 	//*************************************************************************************
 	// Private method 
 	//*************************************************************************************
@@ -305,8 +338,8 @@ public class LearningAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getResourceItemList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	private List getResourceItemList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	}	
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
@@ -315,14 +348,15 @@ public class LearningAction extends Action {
 	 * @param name
 	 * @return
 	 */
-	private List getListFromSession(HttpServletRequest request,String name) {
-		List list = (List) request.getSession().getAttribute(name);
+	private List getListFromSession(SessionMap sessionMap,String name) {
+		List list = (List) sessionMap.get(name);
 		if(list == null){
 			list = new ArrayList();
-			request.getSession().setAttribute(name,list);
+			sessionMap.put(name,list);
 		}
 		return list;
 	}
+
 	/**
 	 * Return <code>ActionForward</code> according to resource item type.
 	 * @param type
@@ -400,18 +434,24 @@ public class LearningAction extends Action {
 	/**
 	 * Set complete flag for given resource item.
 	 * @param request
+	 * @param sessionId 
 	 */
 	private void doComplete(HttpServletRequest request) {
+		//get back sessionMap
+		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		
 		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 		IResourceService service = getResourceService();
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Long sessionId =  (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		
+		Long sessionId =  (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
 		service.setItemComplete(resourceItemUid,new Long(user.getUserID().intValue()),sessionId);
 		
 		//set resource item complete tag
-		List<ResourceItem> resourceItemList = getResourceItemList(request);
+		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		for(ResourceItem item:resourceItemList){
 			if(item.getUid().equals(resourceItemUid)){
 				item.setComplete(true);

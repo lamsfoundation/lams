@@ -19,10 +19,10 @@
 					   var reqIDVar = new Date();
 					   //if auto run mode, the opener will be null. 
 					   if(window.parent.opener != null) 
-						    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
+						    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
 					   else{
 					  		//set complete flag and finish this activity as well.
-					        window.parent.location.href='<c:url value="/learning/finish.do?mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
+					        window.parent.location.href='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
 					   }
 					}
 				   if(window.parent.opener != null) {

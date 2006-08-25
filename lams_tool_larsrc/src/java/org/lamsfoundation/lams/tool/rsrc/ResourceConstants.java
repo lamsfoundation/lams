@@ -70,9 +70,10 @@ public class ResourceConstants {
 	public static final String ATTR_SUMMARY_LIST = "summaryList";
 	public static final String ATTR_USER_LIST = "userList";
 	public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
-	public static final String ATTR_FINISH_LOCK = "finishLock";
+	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final Object ATTR_RESOURCE_FORM = "resourceForm";
+	public static final String ATTR_ADD_RESOURCE_TYPE = "addType";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

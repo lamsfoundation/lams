@@ -398,7 +398,7 @@ public class Resource implements Cloneable{
 	/**
      *
      * @hibernate.set   lazy="true"
-     * 					cascade="all-delete-orphan"
+     * 					cascade="all"
      * 					inverse="false"
      * 					order-by="create_date desc"
      * @hibernate.collection-key column="resource_uid"

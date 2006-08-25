@@ -11,36 +11,44 @@
 	<c:if test="${not empty param.mode}">
 		<c:set var="mode" value="${param.mode}" />
 	</c:if>
+	<c:if test="${not empty param.sessionMapID}">
+		<c:set var="sessionMapID" value="${param.sessionMapID}" />
+	</c:if>
 
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}"/>
+	<c:set var="resource" value="${sessionMap.resource}"/>
+	<c:set var="finishedLock" value="${sessionMap.finishedLock}"/>
+	
 	<script type="text/javascript">
 	<!--
 		function gotoURL(){
  		    var reqIDVar = new Date();
-			var gurl = "<c:url value="/pages/learning/addurl.jsp"/>?mode=${mode}&reqID="+reqIDVar.getTime();
+			var gurl = "<c:url value="/pages/learning/addurl.jsp"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
 	      	showMessage(gurl);
 	      	return false;
 		}
 		function gotoFile(){
  		    var reqIDVar = new Date();
- 		    var gurl = "<c:url value="/pages/learning/addfile.jsp"/>?mode=${mode}&reqID="+reqIDVar.getTime();
+ 		    var gurl = "<c:url value="/pages/learning/addfile.jsp"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
 	      	showMessage(gurl);
 	      	return false;
 		}
 		function checkNew(){
  		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
  		    return false;
 		}
 		function viewItem(itemUid){
-			var myUrl = "<c:url value="/reviewItem.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
+			var myUrl = "<c:url value="/reviewItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
 			launchPopup(myUrl,"LearnerView");
 		}
 		function completeItem(itemUid){
-			document.location.href = "<c:url value="/learning/completeItem.do"/>?mode=${mode}&itemUid=" + itemUid;
+			document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=" + itemUid;
 			return false;
 		}
 		function finishSession(){
-			document.location.href ='<c:url value="/learning/finish.do?mode=${mode}&toolSessionID=${toolSessionID}"/>';
+			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 		function showMessage(url) {
@@ -80,7 +88,7 @@
 
 					</th>
 				</tr>
-				<c:forEach var="item" items="${resourceList}">
+				<c:forEach var="item" items="${sessionMap.resourceList}">
 					<tr>
 						<td align="center">
 							${item.title}
@@ -96,10 +104,17 @@
 						</td>
 
 						<td>
-							<c:if test="${mode != 'teacher'}">
-								<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" disabled="${finishedLock}"/></a>
+							<c:if test="${mode != 'teacher' && (not finishedLock)}">
+								<a href="javascript:;" onclick="return completeItem(${item.uid})" class="button">
+									<fmt:message key="label.completed"/>
+								</a>
 							</c:if>
-							<a href="javascript:;" class="button" onclick="viewItem(${item.uid})"><fmt:message key="label.view"  disabled="${finishedLock}"/></a>
+							&nbsp;
+							<c:if test="${not finishedLock}">
+								<a href="javascript:;"  onclick="viewItem(${item.uid})" class="button">
+									<fmt:message key="label.view"/>
+								</a>
+							</c:if>
 						</td>
 					</tr>
 				</c:forEach>
@@ -112,15 +127,19 @@
 				</c:if>
 			</table>
 			<div class="left-buttons">
-				<a href="#" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
+				<html:button property="checkNewButton" onclick="return checkNew()" disabled="${finishedLock}" styleClass="button">
+					<fmt:message key="label.check.for.new" />
+				</html:button>
 			</div>
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons">
-					<a href="#" class="button space-left" onclick="return finishSession()"> <fmt:message key="label.finished" /> </a>
+					<html:button property="FinishButton"  onclick="return finishSession()" disabled="${finishedLock}"  styleClass="button">
+						<fmt:message key="label.finished" />
+					</html:button>
 				</div>
 			</c:if>
 			<P>&nbsp;</P>
-			<c:if test="${mode != 'teacher'}">
+			<c:if test="${mode != 'teacher' && (not finishedLock)}">
 				<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
 					<table border="0" align="center" width="100%">
 						<tr>
@@ -128,17 +147,17 @@
 								<fmt:message key="label.suggest.new" />
 								<c:choose>
 									<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()" disabled="${finishedLock}">
+										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()" >
 										<fmt:message key="label.authoring.basic.resource.url.input" /> |
-								<input type="radio" name="suggest" value="file" onclick="gotoFile()">
+										<input type="radio" name="suggest" value="file" onclick="gotoFile()">
 										<fmt:message key="label.authoring.basic.resource.file.input" />
 									</c:when>
 									<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-										<input type="radio" name="suggest" value="file" checked="true" onclick="gotoFile()" disabled="${finishedLock}">
+										<input type="radio" name="suggest" value="file" checked="true" onclick="gotoFile()">
 										<fmt:message key="label.authoring.basic.resource.file.input" />
 									</c:when>
 									<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()" disabled="${finishedLock}">
+										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()">
 										<fmt:message key="label.authoring.basic.resource.url.input" />
 									</c:when>
 								</c:choose>
@@ -156,21 +175,21 @@
 					<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
 						<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?mode=${mode}");
+						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?sessionMapID=${sessionMapID}&mode=${mode}");
 					-->
 				</script>
 					</c:when>
 					<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
 						<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addfile.jsp'/>?mode=${mode}");
+						showMessage("<c:url value='/pages/learning/addfile.jsp'/>?sessionMapID=${sessionMapID}&mode=${mode}");
 					-->
 				</script>
 					</c:when>
 					<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
 						<script type="text/javascript">
 					<!--
-						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?mode=${mode}");
+						showMessage("<c:url value='/pages/learning/addurl.jsp'/>?sessionMapID=${sessionMapID}&mode=${mode}");
 					-->
 				</script>
 					</c:when>
