@@ -280,7 +280,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    	    		if (voteUsrResp != null)
 		    	    		{
 		    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
-		    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
+		    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 		    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 		    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 		    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
@@ -356,7 +356,7 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    		if (voteUsrResp != null)
 			    	    		{
 			    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
-			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
+			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 			    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 			    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 			    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
@@ -431,7 +431,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				    	    		if (voteUsrResp != null)
 				    	    		{
 				    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
-				    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
+				    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 				    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 				    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 				    	    			
@@ -520,7 +520,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    	    			{
 		    	    				logger.debug("this is the user requested , include his name for learner progress.");
 			    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
-			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
+			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 			    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 			    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 		    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());	

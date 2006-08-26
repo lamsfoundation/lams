@@ -21,6 +21,7 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.vote;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -37,7 +38,9 @@ public class VoteMonitoredUserDTO implements Comparable
 
     private String uid;
 	
-	private String attemptTime;
+	//private String attemptTime;
+	
+    private Date attemptTime;
 	
 	private String timeZone;
 	
@@ -97,18 +100,6 @@ public class VoteMonitoredUserDTO implements Comparable
 		else
 			return (int) (new Long(queUsrId).longValue() - new Long(VoteMonitoredUserDTO.queUsrId).longValue());
     }
-	/**
-	 * @return Returns the attemptTime.
-	 */
-	public String getAttemptTime() {
-		return attemptTime;
-	}
-	/**
-	 * @param attemptTime The attemptTime to set.
-	 */
-	public void setAttemptTime(String attemptTime) {
-		this.attemptTime = attemptTime;
-	}
 	/**
 	 * @return Returns the isCorrect.
 	 */
@@ -217,4 +208,16 @@ public class VoteMonitoredUserDTO implements Comparable
     public void setVisible(String visible) {
         this.visible = visible;
     }
+    /**
+     * @return Returns the attemptTime.
+     */
+    public Date getAttemptTime() {
+        return attemptTime;
+    }
+    /**
+     * @param attemptTime The attemptTime to set.
+     */
+    public void setAttemptTime(Date attemptTime) {
+        this.attemptTime = attemptTime;
+    }    
 }

@@ -452,7 +452,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	    	    logger.debug("show user  entries  by same content only");
 	    	    	    if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString()))
 	    	    	    {
-			    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+			    			//voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+	    	    	        voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
 			    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
 			    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 			    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
@@ -480,7 +481,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			    	    	        if (userId.equals(localUserId))
 				    	    	    {
 				    	    	        logger.debug("this is requested by user id: "  + userId);
-						    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+						    			//voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+				    	    	        voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
 						    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
 						    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 						    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
@@ -511,7 +513,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			    	    	    if (userSessionId.equals(currentSessionId))
 			    	    	    {
 			    	    	        logger.debug("this is requested by session id: "  + currentSessionId);
-					    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+					    			//voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+			    	    	        voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
 					    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
 					    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 					    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
@@ -1474,7 +1477,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	    VoteUsrAttempt voteUsrAttempt=(VoteUsrAttempt)userIterator.next();
     	    VoteMonitoredUserDTO voteMonitoredUserDTO= new VoteMonitoredUserDTO();
     	    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-    	    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+    	    //voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+    	    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
     	    listVotedLearnersDTO.add(voteMonitoredUserDTO);
     	}
 		logger.debug("listVoteAllSessionsDTO: " + listVotedLearnersDTO);

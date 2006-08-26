@@ -47,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:forEach var="userData" items="${voteGeneralMonitoringDTO.mapStudentsVoted}">
 			<tr>		 
 					 <td NOWRAP valign=top align=center>    <c:out value="${userData.userName}"/>   </td>  
-					 <td NOWRAP valign=top align=center>    <c:out value="${userData.attemptTime}"/>  </td>
+					 <td NOWRAP valign=top align=center>    <lams:Date value="${userData.attemptTime}"/>  </td>					 
 			</tr>				 
 		</c:forEach>		  	
     </table>

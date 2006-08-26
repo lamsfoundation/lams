@@ -297,7 +297,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																</td>
 																 
 																 <td NOWRAP valign=top align=left>    <c:out value="${userData.userName}"/>   </td>  
-																 <td NOWRAP valign=top align=left>    <c:out value="${userData.attemptTime}"/>  </td>
+																 <td NOWRAP valign=top align=left>    <lams:Date value="${userData.attemptTime}"/>  </td>																 
+																 
 																 
 										 						<c:if test="${statsTabActive != 'true'}"> 							
 																	 <td NOWRAP valign=top align=left>

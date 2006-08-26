@@ -94,7 +94,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																				<c:out value="${currentDto.question}" escapeXml="false"/> 
 																		</td>
 																		 <td NOWRAP valign=top align=left>   
-																		 	 <c:out value="${userData.attemptTime}"/>  
+																			<lams:Date value="${userData.attemptTime}"/> 
 																		 </td>
 																</tr>		
 															</c:forEach>		  	
@@ -169,7 +169,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																</td>
 																 
 																 <td NOWRAP valign=top align=left>    <c:out value="${userData.userName}"/>   </td>  
-																 <td NOWRAP valign=top align=left>    <c:out value="${userData.attemptTime}"/>  </td>
+																 <td NOWRAP valign=top align=left>    <lams:Date value="${userData.attemptTime}"/>  </td>																 
+																 
 														</tr>		
 													</c:forEach>		  	
 											</c:forEach>		
@@ -291,8 +292,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 																<tr> 
-																		 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-																		 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+																	 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																	 <td NOWRAP valign=top >    <lams:Date value="${userData.attemptTime}"/>  </td>																		 
 																</tr>		
 												</c:forEach>		  	
 									  			
