@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<tr> 
 		<c:if test="${qaGeneralMonitoringDTO.editResponse != 'true'}">	  	 									 			
 			 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-			 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/> </td>
+			 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
 			 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
 
 			<c:if test="${userData.visible != 'true' }"> 			
@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${qaGeneralMonitoringDTO.editResponse == 'true'}">	  	
 			<c:if test="${editableResponseId == responseUid}">	  	 									 			
 				 <td NOWRAP valign=top>  <c:out value="${userData.userName}"/>   </td>  
-				 <td NOWRAP valign=top>  <c:out value="${userData.attemptTime}"/>  </td>
+				 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
 				 <td NOWRAP valign=top>  <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 
 
 				<c:if test="${userData.visible != 'true' }"> 			
@@ -87,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<c:if test="${editableResponseId != responseUid}">	  	 									 			
 				 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-				 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+				 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>	
 				 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
 					<c:if test="${userData.visible != 'true' }"> 			
 		                         <i><bean:message key="label.response.hidden"/> </i> 

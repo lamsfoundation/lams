@@ -373,7 +373,8 @@ public class MonitoringUtil implements QaAppConstants{
 		    	    		if (qaUsrResp != null)
 		    	    		{
 		    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
-		    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+		    	    			//qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+		    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime());		    	    			
 		    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
 		    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
 		    	    			qaMonitoredUserDTO.setUserName(qaQueUsr.getFullname());
@@ -418,7 +419,8 @@ public class MonitoringUtil implements QaAppConstants{
 			    	    		if (qaUsrResp != null)
 			    	    		{
 			    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
-			    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+			    	    			//qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+			    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime());			    	    			
 			    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
 			    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
 			    	    			qaMonitoredUserDTO.setUserName(qaQueUsr.getFullname());
@@ -462,7 +464,8 @@ public class MonitoringUtil implements QaAppConstants{
 				    	    		if (qaUsrResp != null)
 				    	    		{
 				    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
-				    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+				    	    			//qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+				    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime());
 				    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
 				    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
 				    	    			
@@ -517,7 +520,8 @@ public class MonitoringUtil implements QaAppConstants{
 		    	    			{
 		    	    				logger.debug("this is the user requested , include his name for learner progress.");
 			    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
-			    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+			    	    			//qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+			    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime());
 			    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
 			    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
 		    	    				qaMonitoredUserDTO.setUserName(qaQueUsr.getFullname());	

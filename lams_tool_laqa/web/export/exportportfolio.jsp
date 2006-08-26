@@ -90,7 +90,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 			  	 									<tr>
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td NOWRAP valign=top>   <c:out value="${userData.attemptTime}"/>  </td>
+														 <td NOWRAP valign=top>    <lams:Date value="${userData.attemptTime}"/>  </td>														 
 														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
 													</tr>
 											</c:if>														  					 
