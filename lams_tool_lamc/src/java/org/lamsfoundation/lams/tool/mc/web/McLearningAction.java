@@ -359,6 +359,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	    mcService.updateMcQueUsr(mcQueUsr);
     	    logger.debug("response finalised for user:" + mcQueUsr);
     	    
+    	    mcQueUsr.setViewSummaryRequested(true);
+    	    mcService.updateMcQueUsr(mcQueUsr);
+    	    logger.debug("view summary requested by mcQueUsr: " + mcQueUsr);
+
+    	    
     	    McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), mcSession.getUid());
         	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
         	String highestAttemptOrder="";
