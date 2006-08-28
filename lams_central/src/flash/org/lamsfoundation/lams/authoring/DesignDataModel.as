@@ -62,6 +62,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _duration:Number;
 	private var _readOnly:Boolean;
 	private var _autoSaved:Boolean
+	private var _saveMode:Number;
 	private var _validDesign:Boolean;
 	private var _modified:Boolean;
 	private var _maxID:Number;
@@ -400,9 +401,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @usage   
 	 * @return  
 	 */
-	public function getDesignForSaving(isCopy:Boolean):Object{
+	public function getDesignForSaving():Object{
 		prepareDesignForSaving();
-		return toData(isCopy);
+		return toData();
 	}
 	
 	public function getDesignForAutoSave():Object{
@@ -432,7 +433,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @usage   
 	 * @return  
 	 */
-	public function toData(isCopy:Boolean):Object{
+	public function toData():Object{
 		var design:Object = new Object();
 		//if null, use default
 		
@@ -491,6 +492,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//valid design must be in the DTO, so if its null, then give a false
 		design.validDesign = (_validDesign==null) ? false : _validDesign;
 		
+		design.saveMode =  (_saveMode!=null) ? _saveMode : Config.NUMERIC_NULL_VALUE;
+		
+		
 		if(_maxID){				design.maxID			= _maxID;				}
 		if(_firstActivityID){	design.firstActivityID	= _firstActivityID;		}
 		if(_firstActivityUIID){	design.firstActivityUIID= _firstActivityID;		}
@@ -510,7 +514,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(classActs.length > 0){
 			
 			for(var i=0; i<classActs.length; i++){
-				design.activities[i] = classActs[i].toData(isCopy);
+				design.activities[i] = classActs[i].toData();
 			}
 		}
 		
@@ -964,7 +968,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	/**
 	 * 
 	 * @usage   
-	 * @param   newparentLearningDesignID 
+	 * @param  
 	 * @return  
 	 */
 	public function set contentFolderID (newcontentFolderID:String):Void {
@@ -977,6 +981,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function get contentFolderID ():String {
 		return _contentFolderID;
+	}
+	
+		/**
+	 * 
+	 * @usage   
+	 * @param 
+	 * @return  
+	 */
+	public function set saveMode (newSaveMode:Number):Void {
+		_saveMode = newSaveMode;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get saveMode ():Number {
+		return _saveMode;
 	}
 
 	

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -92,6 +93,18 @@ public interface IAuthoringService {
 	public LearningDesign copyLearningDesign(Long originalLearningDesignID,Integer copyType,
 											 Integer userID, Integer workspaceFolder, boolean setOriginalDesign)throws UserException, LearningDesignException,
 											 										 WorkspaceFolderException, IOException;
+	
+	/**
+	 * 
+	 * @param design
+	 * @param originalLearningDesign
+	 * @param copyType
+	 * @return
+	 * @throws LearningDesignException
+	 */
+	public LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign, Integer copyType ) throws LearningDesignException;
+	    
+	
 	/**
 	 * @return List Returns the list of all the available LearningDesign's   
 	 * */
@@ -136,6 +149,13 @@ public interface IAuthoringService {
 	 * @throws Exception
 	 */
 	public Vector<ValidationErrorDTO> validateLearningDesign(Long learningDesignId);
+	
+	/**
+	 * 
+	 * @param learningDesignId
+	 * @return
+	 */
+	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId);
 	
 	/**
 	 * This method returns a list of all available Learning Designs

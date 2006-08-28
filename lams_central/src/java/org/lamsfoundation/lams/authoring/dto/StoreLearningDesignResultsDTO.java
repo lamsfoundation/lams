@@ -44,13 +44,23 @@ public class StoreLearningDesignResultsDTO {
 	 */
 	private Vector messages; 
 	
+	private Vector activities;
+	
 	public StoreLearningDesignResultsDTO()
 	{}
 	
-	public StoreLearningDesignResultsDTO(boolean valid, Vector messages, Long learningDesignID)
+	public StoreLearningDesignResultsDTO(boolean valid, Vector activities, Long learningDesignID)
+	{
+		this.valid = valid;
+		this.activities = activities;
+		this.learningDesignID = learningDesignID;
+	}
+	
+	public StoreLearningDesignResultsDTO(boolean valid, Vector messages, Vector activities, Long learningDesignID)
 	{
 		this.valid = valid;
 		this.messages = messages;
+		this.activities = activities;
 		this.learningDesignID = learningDesignID;
 	}
 
@@ -72,5 +82,9 @@ public class StoreLearningDesignResultsDTO {
 	
 	public Vector getMessages() {
 		return messages;
+	}
+	
+	public Vector getActivities() {
+		return activities;
 	}
 }

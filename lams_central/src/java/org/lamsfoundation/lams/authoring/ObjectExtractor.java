@@ -102,6 +102,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected SystemToolDAO systemToolDAO = null;
 	protected GroupDAO groupDAO = null;
 
+	private Integer mode = null;
+	
 	/** The newActivityMap is a local copy of all the current activities. This will include
 	 * the "top level" activities and subactivities. It is used to "crossreference" activities
 	 * as we go, without having to repull them from the database. The keys are the UIIDs
@@ -295,6 +297,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 		if (keyExists(table, WDDXTAGS.CONTENT_FOLDER_ID))
 			learningDesign.setContentFolderID(WDDXProcessor.convertToString(table, WDDXTAGS.CONTENT_FOLDER_ID));
+		
+		if (keyExists(table, WDDXTAGS.SAVE_MODE))
+			mode = WDDXProcessor.convertToInteger(table, WDDXTAGS.SAVE_MODE);
 		
 		if (keyExists(table, WDDXTAGS.USER_ID))
 		{
@@ -981,6 +986,14 @@ public class ObjectExtractor implements IObjectExtractor {
 		//This will leave orphan content in the tool tables. It will be removed by the tool content cleaning job, 
 		//which may be run from the admin screen or via a cron job
 		learningDesign.getTransitions().remove(transition);
+	}
+	
+	public void setMode(Integer mode) {
+		this.mode = mode;
+	}
+	
+	public Integer getMode() {
+		return mode;
 	}
 }
 	

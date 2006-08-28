@@ -36,4 +36,7 @@ public interface IObjectExtractor {
 	public abstract LearningDesign extractSaveLearningDesign(Hashtable table)
 			throws WDDXProcessorConversionException, ObjectExtractorException;
 
+	public void setMode(Integer mode);
+	
+	public Integer getMode();
 }

@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
+
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.springframework.web.context.WebApplicationContext;
@@ -63,14 +65,15 @@ public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 			try {
 				
 				Long learningDesignID = authoringService.storeLearningDesignDetails(designDetails);
+				Vector<AuthoringActivityDTO> activityDTOS = authoringService.getToolActivities(learningDesignID);
 				Vector<ValidationErrorDTO> validationDTOS = authoringService.validateLearningDesign(learningDesignID);
 				FlashMessage flashMessage = null;
 				if ( validationDTOS != null &&validationDTOS.size()>0) {
 					flashMessage = new FlashMessage(getMessageKey(designDetails, request), 
-							new StoreLearningDesignResultsDTO(Boolean.FALSE,validationDTOS, learningDesignID), FlashMessage.OBJECT_MESSAGE);
+							new StoreLearningDesignResultsDTO(Boolean.FALSE,validationDTOS, activityDTOS, learningDesignID), FlashMessage.OBJECT_MESSAGE);
 				} else {
 					flashMessage = new FlashMessage(getMessageKey(designDetails, request), 
-							new StoreLearningDesignResultsDTO(Boolean.TRUE, learningDesignID));			
+							new StoreLearningDesignResultsDTO(Boolean.TRUE, activityDTOS, learningDesignID));			
 				}
 				returnPacket = flashMessage.serializeMessage();
 				

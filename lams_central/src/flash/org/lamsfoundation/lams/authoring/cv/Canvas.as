@@ -325,9 +325,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * E.g. Title, Desc, Folder etc... also license if required?
 	 * @usage   
 	 * @param	tabToShow	The tab to be selected when the dialogue opens.
+	 * @param 	mode		save mode
 	 * @return  
 	 */
 	public function saveDesignToServerAs(mode:String){
+		// if design as not been previously saved then we should use SAVE mode
+		if(_ddm.learningDesignID == null) { mode = Workspace.MODE_SAVE }
+		
 		//clear the learningDesignID so it will not overwrite the existing one
 		_ddm.learningDesignID = null;
 		
@@ -353,7 +357,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function saveDesignToServer(workspaceResultDTO:Object):Boolean{
 		_global.breakpoint();
-		var isCopy:Boolean = false;
+		
 		//TODO: Set the results from wsp into design.
 		if(workspaceResultDTO != null){
 			if(workspaceResultDTO.selectedResourceID != null){
@@ -368,8 +372,12 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 		var mode:String = Application.getInstance().getWorkspace().getWorkspaceModel().currentMode;
 		
-		if(_ddm.learningDesignID == null && mode == Workspace.MODE_SAVEAS) { isCopy = true; }
-		var dto:Object = _ddm.getDesignForSaving(isCopy);
+		_ddm.saveMode = (mode == Workspace.MODE_SAVEAS) ? 1 : 0;
+		
+		Debugger.log('SAVE MODE:'+_ddm.saveMode,Debugger.CRITICAL,'saveDesignToServer','Canvas');
+		
+		
+		var dto:Object = _ddm.getDesignForSaving();
 		
 		var callback:Function = Proxy.create(this,onStoreDesignResponse);
 		
@@ -399,8 +407,21 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 			_ddm.learningDesignID = r.learningDesignID;
 			_ddm.validDesign = r.valid;
+			
+			if(_ddm.saveMode == 1){
+				Debugger.log('save mode: ' +_ddm.saveMode,Debugger.GEN,'onStoreDesignResponse','Canvas');		
+				Debugger.log('updating activities.... ',Debugger.GEN,'onStoreDesignResponse','Canvas');		
+			
+				updateToolActivities(r.activities);
+			} else {
+				Debugger.log('save mode: ' +_ddm.saveMode,Debugger.GEN,'onStoreDesignResponse','Canvas');		
+			
+			}
+			
+			// ??
 			_ddm.readOnly = r.readOnly;
 			_ddm.copyTypeID = r.copyTypeID;
+			
 			_ddm.modified = false;
 			LFMenuBar.getInstance().enableExport(true);
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
@@ -439,6 +460,26 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//show the window, on load, populate it
 		var cc:CanvasController = canvasView.getController();
 		var validationIssuesDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('ld_val_title'),closeButton:true,scrollContentPath:"ValidationIssuesDialog",validationIssues:dp, canvasModel:canvasModel,canvasController:cc});
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @usage   
+	 * @param   acts 
+	 * @return  
+	 */
+	
+	public function updateToolActivities(acts:Array){
+		Debugger.log(acts.length+' activities to be updated...',Debugger.GEN,'updateToolActivities','Canvas');
+		for(var i=0; i<acts.length; i++){
+			var ta:ToolActivity = ToolActivity(_ddm.getActivityByUIID(acts[i].activityUIID));
+			ta.toolContentID = acts[i].toolContentID;
+			Debugger.log('setting new tool content ID for activity ' + ta.activityID + ' (toolContentID:' + ta.toolContentID + ')',Debugger.GEN,'updateToolActivities','Canvas');
+		
+		}
+		
+		canvasModel.setDirty();
 	}
 	
 	public function checkValidDesign(){

@@ -63,11 +63,14 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -306,6 +309,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder)
      */
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, boolean setOriginalDesign)
+    	throws LearningDesignException
     {
     	LearningDesign newLearningDesign  = LearningDesign.createLearningDesignCopy(originalLearningDesign,copyType, setOriginalDesign);
     	newLearningDesign.setUser(user);    	
@@ -316,7 +320,52 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	// set first activity assumes that the transitions are all set up correctly.
     	newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
     	newLearningDesign.setLearningDesignUIID(originalLearningDesign.getLearningDesignUIID());
+    	
+    	copyLearningDesignToolContent(newLearningDesign, originalLearningDesign, copyType);
+    	
         return newLearningDesign;
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign, org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
+     */
+    public LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign, Integer copyType ) throws LearningDesignException {
+    	
+    	// copy the tool content
+        // unfortuanately, we have to reaccess the activities to make sure we get the
+        // subclass, not a hibernate proxy.
+        for (Iterator i = design.getActivities().iterator(); i.hasNext();)
+        {
+            Activity currentActivity = (Activity) i.next();
+            if (currentActivity.isToolActivity())
+            {
+                try {
+                	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
+                	// copy the content, but don't set the define later flags if it is preview
+                    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, copyType.intValue() != LearningDesign.COPY_TYPE_PREVIEW);
+                    toolActivity.setToolContentId(newContentId);
+                    
+                } catch (DataMissingException e) {
+                    String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
+                            +" in learning design "+originalLearningDesign.getLearningDesignId()
+                            +" default content may be missing for the tool. Error was "
+                            +e.getMessage();
+                    log.error(error,e);
+                    throw new LearningDesignException(error,e);
+                } catch (ToolException e) {
+                    String error = "Unable to initialise the lesson. Tool encountered an error copying the data is missing for activity "
+                            +currentActivity.getActivityUIID()
+                            +" in learning design "+originalLearningDesign.getLearningDesignId()
+                            +" default content may be missing for the tool. Error was "
+                            +e.getMessage();
+                    log.error(error,e);
+                    throw new LearningDesignException(error,e);
+                }
+
+            }
+        }
+        
+        return design;
     }
     
     /**
@@ -478,6 +527,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 		IObjectExtractor extractor = (IObjectExtractor) beanFactory.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
 		LearningDesign design = extractor.extractSaveLearningDesign(table);	
+		
+		if(extractor.getMode().intValue() == 1)
+			copyLearningDesignToolContent(design, design, design.getCopyTypeID());
+		
 		return design.getLearningDesignId();
 	}
 
@@ -499,6 +552,31 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		learningDesign.setValidDesign(valid);
 		learningDesignDAO.insertOrUpdate(learningDesign);
 		return listOfValidationErrorDTOs;
+	}
+	
+	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId) {
+		LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
+		Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<AuthoringActivityDTO>();
+		
+		for (Iterator i = learningDesign.getActivities().iterator(); i.hasNext();)
+        {
+            Activity currentActivity = (Activity) i.next();
+            if (currentActivity.isToolActivity())
+            {
+            	try {
+            		ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
+            		AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity);
+            		listOfAuthoringActivityDTOs.add(activityDTO);
+            	} catch (ToolException e) {
+                        String error = ""
+                                +e.getMessage();
+                        log.error(error,e);
+                        throw new LearningDesignException(error,e);
+                }
+            }
+        }
+		
+		return listOfAuthoringActivityDTOs;
 	}
 	
 	/**
@@ -678,15 +756,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		// lowercase to resolve OS issues
 		newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
 		
-		// directory pathname
-		//String dirPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + AuthoringConstants.LAMS_WWW_SECURE_DIR +  File.separator + newUniqueContentFolderID;
-		
-		// create new directory
-		//if(FileUtil.createDirectory(dirPath)){
-			flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
-		//} else {
-		//	throw new FileUtilException();
-		//}
+		flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
 		
 		return flashMessage.serializeMessage();
 	}
