@@ -473,8 +473,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function updateToolActivities(responsePacket){
 		Debugger.log(responsePacket.activities.length+' activities to be updated...',Debugger.GEN,'updateToolActivities','Canvas');
 		for(var i=0; i<responsePacket.activities.length; i++){
-			var ta:ToolActivity = ToolActivity(_ddm.getActivityByUIID(responsePacket.activities.activityUIID));
-			ta.toolContentID = responsePacket.activities.toolContentID;
+			var ta:ToolActivity = ToolActivity(_ddm.getActivityByUIID(responsePacket.activities[i].activityUIID));
+			ta.toolContentID = responsePacket.activities[i].toolContentID;
 			Debugger.log('setting new tool content ID for activity ' + ta.activityID + ' (toolContentID:' + ta.toolContentID + ')',Debugger.GEN,'updateToolActivities','Canvas');
 		
 		}
