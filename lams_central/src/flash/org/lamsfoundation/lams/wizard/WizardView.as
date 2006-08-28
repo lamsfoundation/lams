@@ -697,15 +697,21 @@ class WizardView extends AbstractView {
 		trace('SCHEDULE CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
 		if(validateStep(wm)){
-			resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+			var schDT = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+			resultDTO.scheduleDateTime = schDT.dateTime
 					
 			if(resultDTO.scheduleDateTime == null || resultDTO.scheduleDateTime == undefined){
 				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
 				return;
 				
 			} else {
-				trace(resultDTO.scheduleDateTime);
-				resultDTO.mode = START_SCH_MODE;
+				if (!schDT.validTime){
+					LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schtime'), null, null);
+					return;
+				}else {
+					trace(resultDTO.scheduleDateTime);
+					resultDTO.mode = START_SCH_MODE;
+				}
 			}
 			disableButtons();
 			_wizardController.initializeLesson(resultDTO);
@@ -1317,11 +1323,12 @@ class WizardView extends AbstractView {
 		staff_scp.redraw(true);
 	}
 	
-	public function getScheduleDateTime(date:Date, timeStr:String):String{
+	public function getScheduleDateTime(date:Date, timeStr:String):Object{
 		var bs:String = "%2F";		// backslash char
 		var dayStr:String;
 		var monthStr:String;
-		
+		var mydate = new Date();
+		var dtObj = new Object();
 		if(date==null){
 			return null;
 		}
@@ -1335,9 +1342,38 @@ class WizardView extends AbstractView {
 		
 		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
 		trace('selected date: ' + dateStr);
-		return dateStr + '+' + timeStr;
+		Debugger.log('schedule time to starts :'+timeStr,Debugger.CRITICAL,'getScheduleDateTime','org.lamsfoundation.lams.WizardView');
+		if (day == mydate.getDate()){
+			dtObj.validTime = validateTime()
+		}else {
+			dtObj.validTime = true
+		}
+		dtObj.dateTime = dateStr + '+' + timeStr;
+		return dtObj;
 	}
 	
+	private function validateTime():Boolean{
+		var mydate = new Date();
+		var checkHours:Number;
+		var hours = mydate.getHours();
+		var minutes = mydate.getMinutes();
+		var selectedHours = Number(schedule_time.tHour.text);
+		var selectedMinutes = Number(schedule_time.tMinute.text);
+		if (schedule_time.tMeridian.selectedIndex == 0){
+			checkHours = 0
+		}else{
+			checkHours = 12
+		}
+		if (hours > (selectedHours+checkHours)){
+			return false;
+		}else {
+			if (minutes > selectedMinutes){
+				return false;
+			}else {
+				return true;
+			}
+		}
+	}
 	/**
     * Sets the size of the canvas on stage, called from update
     */
