@@ -412,7 +412,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				Debugger.log('save mode: ' +_ddm.saveMode,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 				Debugger.log('updating activities.... ',Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
-				updateToolActivities(r.activities);
+				updateToolActivities(r);
 			} else {
 				Debugger.log('save mode: ' +_ddm.saveMode,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
@@ -470,11 +470,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	
-	public function updateToolActivities(acts:Array){
-		Debugger.log(acts.length+' activities to be updated...',Debugger.GEN,'updateToolActivities','Canvas');
-		for(var i=0; i<acts.length; i++){
-			var ta:ToolActivity = ToolActivity(_ddm.getActivityByUIID(acts[i].activityUIID));
-			ta.toolContentID = acts[i].toolContentID;
+	public function updateToolActivities(responsePacket){
+		Debugger.log(responsePacket.activities.length+' activities to be updated...',Debugger.GEN,'updateToolActivities','Canvas');
+		for(var i=0; i<responsePacket.activities.length; i++){
+			var ta:ToolActivity = ToolActivity(_ddm.getActivityByUIID(responsePacket.activities.activityUIID));
+			ta.toolContentID = responsePacket.activities.toolContentID;
 			Debugger.log('setting new tool content ID for activity ' + ta.activityID + ' (toolContentID:' + ta.toolContentID + ')',Debugger.GEN,'updateToolActivities','Canvas');
 		
 		}
