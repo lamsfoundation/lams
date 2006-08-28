@@ -63,7 +63,7 @@
 
     <property
         name="creationDate"
-        type="java.lang.String"
+        type="java.util.Date"
         access="property"        
         column="creation_date"
         length="10"
@@ -133,7 +133,7 @@
         name="contentLocked"
         type="boolean"
         access="property"        
-        column="content_locked"
+        column="content_inUse"
         length="1"
     />
     
@@ -152,14 +152,6 @@
         type="java.lang.String"
         access="property"        
         column="online_instructions"
-        length="65535"
-    />
-    
-    <property
-        name="endLearningMessage"
-        type="java.lang.String"
-        access="property"        
-        column="end_learning_message"
         length="65535"
     />
     

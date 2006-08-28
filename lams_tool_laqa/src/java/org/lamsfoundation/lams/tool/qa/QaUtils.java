@@ -69,7 +69,6 @@ public abstract class QaUtils implements QaAppConstants {
 		
 	    qaGeneralAuthoringDTO.setReportTitle(defaultQaContent.getReportTitle());
 	    qaGeneralAuthoringDTO.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
-	    qaGeneralAuthoringDTO.setEndLearningMessage(defaultQaContent.getEndLearningMessage());
 	    qaGeneralAuthoringDTO.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
 	    qaGeneralAuthoringDTO.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
 		
@@ -137,7 +136,6 @@ public abstract class QaUtils implements QaAppConstants {
 		
 		qaGeneralAuthoringDTO.setReportTitle(qaContent.getReportTitle());
 	    qaGeneralAuthoringDTO.setMonitoringReportTitle(qaContent.getMonitoringReportTitle());
-	    qaGeneralAuthoringDTO.setEndLearningMessage(qaContent.getEndLearningMessage());
 	    qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
 	    qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 	    

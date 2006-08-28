@@ -63,7 +63,7 @@
 
     <property
         name="creationDate"
-        type="java.lang.String"
+        type="java.util.Date"
         access="property"        
         column="creation_date"
         length="10"

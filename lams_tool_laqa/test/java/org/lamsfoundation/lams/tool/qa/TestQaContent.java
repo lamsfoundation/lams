@@ -22,11 +22,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.TreeSet;
-
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
 
@@ -200,8 +195,6 @@ public class TestQaContent extends QaDataAccessTestCase
     /*
     public void testRemoveQaContent()
     {
-    //	qaQueContentDAO.removeQueContent(TEST_EXISTING_QUE_CONTENT_ID);
-    //	System.out.println(this.getClass().getName() + " TEST_EXISTING_QUE_CONTENT_ID removed");
     	
     	qaContentDAO.removeQa(new Long(DEFAULT_CONTENT_ID));
     	System.out.println(this.getClass().getName() + " DEFAULT_CONTENT_ID removed");

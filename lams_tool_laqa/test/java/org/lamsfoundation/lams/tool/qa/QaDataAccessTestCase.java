@@ -103,22 +103,6 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     }
     
     /*
-    protected QaQueUsr getExistingUser2(String username, String fullname)
-    {
-    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_NEW_QUE_CONTENT_ID);
-		QaSession qaSession = qaSessionDAO.getQaSessionById(TEST_NEW_SESSION_ID);
-    	
-        QaQueUsr qaQueUsr= new QaQueUsr(new Long(TEST_NEW_USER_ID),
-    									username,
-										fullname,
-										qaQueContent, 
-										qaSession, 
-										new TreeSet());
-    	qaQueUsrDAO.createUsr(qaQueUsr);
-    	return qaQueUsr;
-    }
-    
-    
     protected QaQueUsr getExistingUser(String username, String fullname)
     {
     	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
@@ -145,19 +129,6 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
 		qaUsrRespDAO.createUserResponse(qaUsrResp);
 		return qaUsrResp;
     }
-    
-    protected QaUsrResp getExistingResponse(String response)
-    {
-    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
-    	
-		QaUsrResp qaUsrResp= new QaUsrResp(response, false,
-											new Date(System.currentTimeMillis()),
-											"",
-											qaQueContent,
-											getExistingUser("randomstriker","Michael Random"));
-		qaUsrRespDAO.createUserResponse(qaUsrResp);
-		return qaUsrResp;
-    }
     */
     
     
@@ -167,7 +138,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     	qa.setQaContentId(new Long(TEST_NEW_CONTENT_ID+1));
     	qa.setTitle("New - Put Title Here");
     	qa.setInstructions("New - Put instructions here.");
-    	qa.setCreationDate(new Date(System.currentTimeMillis()).toString() );
+    	qa.setCreationDate(new Date(System.currentTimeMillis()));
     	qa.setCreatedBy(0);
         qa.setUsernameVisible(false);
         qa.setDefineLater(false);

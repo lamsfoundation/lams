@@ -104,10 +104,7 @@ public class QaContent implements Serializable {
     private boolean contentLocked;
     
     /** nullable persistent field */
-    private String endLearningMessage;
-    
-    /** nullable persistent field */
-    private String creationDate;
+    private Date creationDate;
 	
     /** nullable persistent field */
     private Date updateDate;
@@ -133,7 +130,6 @@ public class QaContent implements Serializable {
 	                 String 	monitoringReportTitle,
 	                 String 	offlineInstructions,
 	                 String 	onlineInstructions,
-	                 String 	endLearningMessage,
 	                 long		createdBy,
 	                 boolean 	defineLater,
 					 boolean	runOffline,
@@ -141,7 +137,7 @@ public class QaContent implements Serializable {
 	                 boolean 	usernameVisible,
 	                 boolean 	synchInMonitor,
 	                 boolean 	contentLocked,
-	                 String		creationDate,
+	                 Date		creationDate,
 	                 Date 		updateDate,
 	                 Set 		qaQueContents,
 	                 Set 		qaSessions,
@@ -155,7 +151,6 @@ public class QaContent implements Serializable {
         this.monitoringReportTitle=monitoringReportTitle;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions  = onlineInstructions;
-        this.endLearningMessage	 = endLearningMessage;
         this.createdBy 			 = createdBy;
         this.defineLater 		 = defineLater;
         this.runOffline 		 = runOffline;
@@ -191,7 +186,6 @@ public class QaContent implements Serializable {
 					 qa.getMonitoringReportTitle(),
                      qa.getOfflineInstructions(),
                      qa.getOnlineInstructions(),
-					 qa.getEndLearningMessage(),
                      qa.getCreatedBy(),
                      qa.isDefineLater(),
 					 qa.isRunOffline(),
@@ -312,10 +306,6 @@ public class QaContent implements Serializable {
                                         .append("qa title:", getTitle())
                                         .append("qa instructions:",
                                                 getInstructions())
-                                        .append("date created:",
-                                        		getCreationDate())
-										.append("update date:",
-												getUpdateDate())												
                                         .append("creator user id",
                                         		getCreatedBy())
                                         .append("username_visible:", isUsernameVisible())
@@ -356,18 +346,6 @@ public class QaContent implements Serializable {
 	 */
 	public void setCreatedBy(long createdBy) {
 		this.createdBy = createdBy;
-	}
-	/**
-	 * @return Returns the creationDate.
-	 */
-	public String getCreationDate() {
-		return creationDate;
-	}
-	/**
-	 * @param creationDate The creationDate to set.
-	 */
-	public void setCreationDate(String creationDate) {
-		this.creationDate = creationDate;
 	}
 	/**
 	 * @return Returns the defineLater.
@@ -479,18 +457,6 @@ public class QaContent implements Serializable {
 		this.questionsSequenced = questionsSequenced;
 	}
 	/**
-	 * @return Returns the endLearningMessage.
-	 */
-	public String getEndLearningMessage() {
-		return endLearningMessage;
-	}
-	/**
-	 * @param endLearningMessage The endLearningMessage to set.
-	 */
-	public void setEndLearningMessage(String endLearningMessage) {
-		this.endLearningMessage = endLearningMessage;
-	}
-	/**
 	 * @return Returns the runOffline.
 	 */
 	public boolean isRunOffline() {
@@ -564,4 +530,28 @@ public class QaContent implements Serializable {
 	public void setContent(String content) {
 		this.content = content;
 	}
+    /**
+     * @return Returns the logger.
+     */
+    public static Logger getLogger() {
+        return logger;
+    }
+    /**
+     * @param logger The logger to set.
+     */
+    public static void setLogger(Logger logger) {
+        QaContent.logger = logger;
+    }
+    /**
+     * @return Returns the creationDate.
+     */
+    public Date getCreationDate() {
+        return creationDate;
+    }
+    /**
+     * @param creationDate The creationDate to set.
+     */
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
 }

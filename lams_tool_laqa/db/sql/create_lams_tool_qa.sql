@@ -3,7 +3,7 @@ CREATE TABLE tl_laqa11_content (
      , qa_content_id BIGINT(20) NOT NULL
      , title TEXT
      , instructions TEXT
-     , creation_date VARCHAR(100)
+     , creation_date DATETIME
      , update_date DATETIME
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
@@ -87,6 +87,7 @@ CREATE TABLE tl_laqa11_uploadedfile (
      , CONSTRAINT FK_tl_laqa11_uploadedfile_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
 )TYPE=InnoDB;
+
 
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date)  VALUES (${default_content_id}, 'Q&A Title', 'Q&A Instructions', NOW());
