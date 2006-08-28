@@ -406,38 +406,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         
 		copiedLearningDesign.setTitle(newName);
 		
-        // copy the tool content
-        // unfortuanately, we have to reaccess the activities to make sure we get the
-        // subclass, not a hibernate proxy.
-        for (Iterator i = copiedLearningDesign.getActivities().iterator(); i.hasNext();)
-        {
-            Activity currentActivity = (Activity) i.next();
-            if (currentActivity.isToolActivity())
-            {
-                try {
-                	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
-                	// copy the content, but don't set the define later flags if it is preview
-                    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, copyType != LearningDesign.COPY_TYPE_PREVIEW);
-                    toolActivity.setToolContentId(newContentId);
-                } catch (DataMissingException e) {
-                    String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
-                            +" in learning design "+originalLearningDesign.getLearningDesignId()
-                            +" default content may be missing for the tool. Error was "
-                            +e.getMessage();
-                    log.error(error,e);
-                    throw new MonitoringServiceException(error,e);
-                } catch (ToolException e) {
-                    String error = "Unable to initialise the lesson. Tool encountered an error copying the data is missing for activity "
-                            +currentActivity.getActivityUIID()
-                            +" in learning design "+originalLearningDesign.getLearningDesignId()
-                            +" default content may be missing for the tool. Error was "
-                            +e.getMessage();
-                    log.error(error,e);
-                    throw new MonitoringServiceException(error,e);
-                }
-
-            }
-        }
         authoringService.saveLearningDesign(copiedLearningDesign);
         
         return createNewLesson(lessonName,lessonDescription,user,copiedLearningDesign);
