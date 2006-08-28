@@ -1,6 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <html:errors />
-
 <table cellpadding="0">
 	<tr>
 		<td class="field-name" width="30%">

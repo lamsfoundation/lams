@@ -59,7 +59,7 @@
 		<!-- Instructions Row -->
 		<tr>
 			<td colspan="2">
-				<lams:SetEditor id="onlineInstruction" small="true" text="${formBean.forum.onlineInstructions}" key="label.authoring.online.instruction" />
+				<lams:SetEditor id="forum.onlineInstructions" small="true" text="${formBean.forum.onlineInstructions}" key="label.authoring.online.instruction" />
 			</td>
 		</tr>
 		<tr>
@@ -86,7 +86,7 @@
 		<!-- Offline Instructions -->
 		<tr>
 			<td colspan="2">
-			<lams:SetEditor id="offlineInstruction" small="true"  text="${formBean.forum.offlineInstructions}" key="label.authoring.offline.instruction"/>
+			<lams:SetEditor id="forum.offlineInstructions" small="true"  text="${formBean.forum.offlineInstructions}" key="label.authoring.offline.instruction"/>
 			</td>
 		</tr>
 		<tr>

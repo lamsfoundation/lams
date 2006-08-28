@@ -11,9 +11,8 @@
 <html:form action="authoring/update" method="post" styleId="authoringForm">
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<html:hidden property="toolContentID" />
-	<html:hidden property="mode" value="teacher" />
 	<html:hidden property="sessionMapID"/>
-	<input type="hidden" name="mode" value="teacher">
+	<html:hidden property="mode" value="teacher" />
 	
 	<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true" />

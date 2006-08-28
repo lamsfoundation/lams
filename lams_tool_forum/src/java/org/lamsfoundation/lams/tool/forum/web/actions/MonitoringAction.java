@@ -521,6 +521,7 @@ public class MonitoringAction extends Action {
 			
 		boolean isForumEditable = ForumWebUtils.isForumEditable(forum);
 		request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
 		request.setAttribute("title", title);
 		request.setAttribute("instruction", instruction);
 		return mapping.findForward("success");
