@@ -51,10 +51,11 @@
 </head>
 <body onLoad="init()">
 <div id="page">
-	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
+	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="resource.contentId" />
 		<html:hidden property="mode" value="teacher"/>
+		<html:hidden property="sessionMapID" />
 		
 		<h1>
 			<fmt:message key="label.authoring.heading" />
@@ -72,7 +73,9 @@
 
 
 			<!-- Button Row -->
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.resource.toolContentID}"  accessMode="teacher" defineLater="yes" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" 
+				toolContentID="${formBean.resource.contentId}"  accessMode="teacher" defineLater="yes"  
+				customiseSessionID="${formBean.sessionMapID}" />
 
 			<lams:HTMLEditor />
 		</div>
