@@ -182,7 +182,7 @@ public class ViewItemAction extends Action {
 			sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT,item);
 		}
 		//set url to content frame
-		request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item));
+		request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item,sessionMapID));
 		
 		//these attribute will be use to instruction navigator page
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
@@ -227,7 +227,7 @@ public class ViewItemAction extends Action {
 	      return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
 	}
 	
-	private Object getReviewUrl(ResourceItem item) {
+	private Object getReviewUrl(ResourceItem item, String sessionMapID) {
 		short type = item.getType();
 		String url = null;
 		switch (type) {
@@ -249,7 +249,7 @@ public class ViewItemAction extends Action {
 			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
 			break;
 		case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-			url = "/pages/learningobj/mainframe.jsp";
+			url = "/pages/learningobj/mainframe.jsp?sessionMapID="+sessionMapID;
 			break;
 		}
 		return url;
