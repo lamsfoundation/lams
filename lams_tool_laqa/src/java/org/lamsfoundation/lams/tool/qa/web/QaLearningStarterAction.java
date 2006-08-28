@@ -265,8 +265,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		logger.debug("REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
 		generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 	    
-		generalLearnerFlowDTO.setEndLearningMessage(qaContent.getEndLearningMessage());
-	    logger.debug("END_LEARNING_MESSAGE: " + qaContent.getEndLearningMessage());
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
 	     */

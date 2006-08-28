@@ -91,14 +91,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		</td>
 			  	</tr>
 			  	
-			  	<tr> 
-					<td class="field-name">							
-				 		<bean:message key="label.report.endLearningMessage"/>: 
-		      		</td>
-					<td>							
-			 			<html:text property="endLearningMessage" value="${qaGeneralAuthoringDTO.endLearningMessage}" size="60" maxlength="100"/>
-			 		</td>
-			  	</tr>
 			</table>	  	
 
 

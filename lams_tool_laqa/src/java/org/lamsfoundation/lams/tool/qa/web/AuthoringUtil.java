@@ -195,7 +195,6 @@ public class AuthoringUtil implements QaAppConstants {
 		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
 		String reportTitle=request.getParameter(REPORT_TITLE);
 		String monitoringReportTitle=request.getParameter(MONITORING_REPORT_TITLE);
-		String endLearningMessage=request.getParameter(END_LEARNING_MESSAGE);
 		String richTextOfflineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
 		String richTextOnlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
 		String activeModule=request.getParameter(ACTIVE_MODULE);
@@ -275,7 +274,6 @@ public class AuthoringUtil implements QaAppConstants {
          	qaContent.setSynchInMonitor(isSynchInMonitor);
          	qaContent.setOnlineInstructions(richTextOnlineInstructions);
          	qaContent.setOfflineInstructions(richTextOfflineInstructions);
-         	qaContent.setEndLearningMessage(endLearningMessage);
          	qaContent.setReportTitle(reportTitle);
          	qaContent.setMonitoringReportTitle(monitoringReportTitle);
          	qaContent.setUsernameVisible(usernameVisibleBoolean);
