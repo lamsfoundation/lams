@@ -112,7 +112,7 @@ class WorkspaceDialog extends MovieClip{
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         _resultDTO = new Object();
-		
+		this.tabEnabled = true
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
@@ -125,6 +125,7 @@ class WorkspaceDialog extends MovieClip{
         delete this.onEnterFrame;
 		//TODO: DC apply the themes here
         
+
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
         
@@ -190,6 +191,8 @@ class WorkspaceDialog extends MovieClip{
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
         resourceTitle_txi.setFocus();
 		_container.contentLoaded();
+		this.tabChildren = true;
+		setTabIndex();
     }
 	
 	/**
@@ -232,6 +235,7 @@ class WorkspaceDialog extends MovieClip{
 		
 	}
 	
+	
 	/**
 	 * Recieved update events from the WorkspaceModel. Dispatches to relevent handler depending on update.Type
 	 * @usage   
@@ -239,7 +243,7 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		 //Update view from info object
+		//Update view from info object
         //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
        var wm:WorkspaceModel = event.target;
 	   //set a permenent ref to the model for ease (sorry mvc guru)
@@ -551,7 +555,7 @@ class WorkspaceDialog extends MovieClip{
 		resourceDesc_txa.visible = v;
 		licenseImg_pnl.visible = v;
 		viewLicense_btn.visible = v;
-		
+		licenseID_cmb.visible = v;
 		if(licenseID_cmb.value.licenseID == OTHER_LICENSE_ID) {
 			license_comment_lbl.visible = v;
 			license_txa.visible = v;
@@ -575,13 +579,14 @@ class WorkspaceDialog extends MovieClip{
 		if(tabToSelect == "LOCATION"){
 			setLocationContentVisible(true);
 			setPropertiesContentVisible(false);
+			//setTabIndex("LOCATION");
 			_currentTab = LOCATION_TAB;
-				
+						
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
 			setPropertiesContentVisible(true);
+			//setTabIndex("PROPERTIES");
 			_currentTab = PROP_TAB;
-		
 		}
 		
 		//set the right label on the 'doit' button
@@ -598,7 +603,28 @@ class WorkspaceDialog extends MovieClip{
 		
 	}
 	
-	
+	private function setTabIndex(selectedTab:String){
+		
+		ok_btn.tabIndex = 25
+        cancel_btn.tabIndex = 26
+		switchView_tab.tabIndex = 1
+		//think this is failing....
+		//if(tabToSelect == "LOCATION"){
+			new_btn.tabIndex = 2
+			//cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+			copy_btn.tabIndex = 3
+			paste_btn.tabIndex = 4
+			delete_btn.tabIndex = 5
+			rename_btn.tabIndex = 6
+			location_dnd.tabIndex = 7
+			treeview.tabIndex = 7
+		//}else {
+			resourceDesc_txa.tabIndex = 8
+			licenseID_cmb.tabIndex = 9
+			viewLicense_btn.tabIndex = 10
+		//}
+		
+	}
     
     /**
     * Event fired by StyleManager class to notify listeners that Theme has changed
@@ -683,10 +709,16 @@ class WorkspaceDialog extends MovieClip{
 		
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		
-		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
-			saveFile(snode);
-		} else {
-			openFile(snode);
+		if (resourceTitle_txi.text == "" || resourceTitle_txi.text == undefined || resourceTitle_txi.text == null){
+			var sendMsg:String = Dictionary.getValue('ws_file_name_empty')+"\n"+Dictionary.getValue('ws_entre_file_name')+"\n\n";
+			LFMessage.showMessageAlert(sendMsg,null);
+			resourceTitle_txi.setFocus();
+		}else{
+			if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
+				saveFile(snode);
+			} else {
+				openFile(snode);
+			}
 		}
 			
     }
