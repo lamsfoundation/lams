@@ -252,6 +252,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.groupingType = groupingType;
 		//this.groupingDTO = groupingDTO;
 	}
+	public AuthoringActivityDTO(ToolActivity toolActivity){
+		super();
+		this.activityID = toolActivity.getActivityId();
+		this.activityUIID = toolActivity.getActivityUIID();
+		this.toolContentID = toolActivity.getToolContentId();
+	}
 	public AuthoringActivityDTO(Activity activity){
 		processActivityType(activity);
 		this.activityID = activity.getActivityId();
