@@ -74,6 +74,7 @@ public class ResourceConstants {
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final Object ATTR_RESOURCE_FORM = "resourceForm";
 	public static final String ATTR_ADD_RESOURCE_TYPE = "addType";
+	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

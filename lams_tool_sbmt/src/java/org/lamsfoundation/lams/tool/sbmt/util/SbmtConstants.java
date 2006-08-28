@@ -41,4 +41,9 @@ public class SbmtConstants {
 	public static final String ATTACHMENT_LIST = "attachmentList";
 	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 	public static final String PAGE_EDITABLE = "isPageEditable";
+	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
+
+	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
+
 }
+

@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
  *
  * User: Dapeng.Ni
  */
-public class ResourceForm extends ValidatorForm {
+public class ResourceForm extends ActionForm  {
 	private static final long serialVersionUID = 3599879328307492312L;
 
 	private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
@@ -56,8 +56,6 @@ public class ResourceForm extends ValidatorForm {
 	private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
-    private List onlineFileList;
-    private List offlineFileList;
 
     private Resource resource;
     
@@ -70,21 +68,7 @@ public class ResourceForm extends ValidatorForm {
 	public void setResource(Resource resource) {
         this.resource = resource;
         //set Form special varaible from given forum
-        if(resource != null){
-    		onlineFileList = new ArrayList();
-    		offlineFileList = new ArrayList();
-    		Set fileSet = resource.getAttachments();
-    		if(fileSet != null){
-    			Iterator iter = fileSet.iterator();
-    			while(iter.hasNext()){
-    				ResourceAttachment file = (ResourceAttachment) iter.next();
-    				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
-    					offlineFileList.add(file);
-    				else
-    					onlineFileList.add(file);
-    			}
-    		}
-        }else{
+        if(resource == null){
         	logger.error("Initial ResourceForum failed by null value of Resource.");
         }
 	}
@@ -122,16 +106,6 @@ public class ResourceForm extends ValidatorForm {
 	}
 
 
-	public List getOfflineFileList() {
-		return offlineFileList;
-	}
-
-
-	public void setOfflineFileList(List offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-
-
 	public FormFile getOnlineFile() {
 		return onlineFile;
 	}
@@ -139,16 +113,6 @@ public class ResourceForm extends ValidatorForm {
 
 	public void setOnlineFile(FormFile onlineFile) {
 		this.onlineFile = onlineFile;
-	}
-
-
-	public List getOnlineFileList() {
-		return onlineFileList;
-	}
-
-
-	public void setOnlineFileList(List onlineFileList) {
-		this.onlineFileList = onlineFileList;
 	}
 
 

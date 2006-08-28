@@ -73,6 +73,12 @@
 		</div>
 
 		<div id="content">
+			<table>
+			<tr><td>
+			<%@ include file="/common/messages.jsp"%>
+			</td></tr>
+			</table>
+			
 			<html:form action="authoring" method="post" styleId="authoringForm" enctype="multipart/form-data">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 			
@@ -81,7 +87,6 @@
 				<html:hidden property="toolContentID" />
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:hidden property="dispatch" value="updateContent" />
-				<%@ include file="/common/messages.jsp"%>
 
 				<!-- tab content 1 (Basic) -->
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />

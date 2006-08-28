@@ -143,13 +143,18 @@
         redirect="false"
       />
       <forward
-        name="onlineFileList"
-        path="/authoring/parts/onlinefilelist.jsp"
+        name="author"
+        path="/authoring/authoring.jsp"
         redirect="false"
       />
       <forward
-        name="offlineFileList"
-        path="/authoring/parts/offlinefilelist.jsp"
+        name="monitor"
+        path="/authoring/definelater.jsp"
+        redirect="false"
+      />
+      <forward
+        name="instructionFileList"
+        path="/authoring/parts/instructionfilelist.jsp"
         redirect="false"
       />
     </action>

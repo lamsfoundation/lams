@@ -87,6 +87,7 @@ public interface ForumConstants {
 	public static final String ATTR_TOPIC = "topic";
 	public static final String ATTR_USER= "user";
 	public static final String ATTR_REPORT = "report";
+	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	
 	public static final String PARAM_UPDATE_MODE = "updateMode";
 

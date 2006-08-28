@@ -99,7 +99,7 @@
 			scope="request" 
 			validate="false"
 			parameter="deleteOnlineFile" >
-			<forward name="success" path="/jsps/authoring/parts/onlinefilelist.jsp" />
+			<forward name="success" path="/jsps/authoring/parts/instructionfilelist.jsp" />
 		</action>
 		<action path="/authoring/deleteOffline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
@@ -107,7 +107,7 @@
 			scope="request" 
 			validate="false"
 			parameter="deleteOfflineFile" >
-			<forward name="success" path="/jsps/authoring/parts/offlinefilelist.jsp" />
+			<forward name="success" path="/jsps/authoring/parts/instructionfilelist.jsp" />
 		</action>
 		<!--  ================= topics  =================  -->	
 		<action path="/authoring/newTopic"

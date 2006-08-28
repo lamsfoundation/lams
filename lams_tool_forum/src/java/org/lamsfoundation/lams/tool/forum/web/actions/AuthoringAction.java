@@ -448,20 +448,6 @@ public class AuthoringAction extends Action {
 		//add to attachmentList
 		attachmentList.add(att);
 		
-		//update Html FORM, this will echo back to web page for display
-		List onlineFileList = new ArrayList();
-		List offlineFileList = new ArrayList();
-		iter = attachmentList.iterator();
-		while(iter.hasNext()){
-			Attachment attFile = (Attachment) iter.next();
-			if(StringUtils.equalsIgnoreCase(attFile.getFileType(),IToolContentHandler.TYPE_OFFLINE))
-				offlineFileList.add(attFile);
-			else
-				onlineFileList.add(attFile);
-		}
-		forumForm.setOnlineFileList(onlineFileList);
-		forumForm.setOfflineFileList(offlineFileList);
-		
 		return mapping.findForward("success");
 
 	}
@@ -512,24 +498,18 @@ public class AuthoringAction extends Action {
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		Attachment existAtt;
-		List leftAttachments = new ArrayList();
 		while(iter.hasNext()){
 			existAtt = (Attachment) iter.next();
 			if(existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();
-			}else if(StringUtils.equals(existAtt.getFileType(),type) ){
-				leftAttachments.add(existAtt);
 			}
 				
 		}
-
-		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
-			request.setAttribute("offlineFileList",leftAttachments);
-		}else{
-			request.setAttribute("onlineFileList",leftAttachments);
-		}
+		
+		request.setAttribute(ForumConstants.ATTR_FILE_TYPE_FLAG, type);
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		return mapping.findForward("success");
 	}
 	
@@ -900,7 +880,6 @@ public class AuthoringAction extends Action {
 			//define it later mode(TEACHER) skip below validation.
 			String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
-				mapping.setInput("/defineLater");
 				return errors;
 			}
 			if(!form.getForum().isAllowRichEditor()){

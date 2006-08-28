@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp" %>
 <c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
@@ -64,9 +65,9 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<c:set var="onlineFileList" value="${formBean.onlineFileList}"/>
+				<c:set var="fileTypeFlag" value="<%=IToolContentHandler.TYPE_ONLINE %>"/>
 				<div id="onlinefileArea">
-					<%@ include file="parts/onlinefilelist.jsp" %>
+					<%@ include file="parts/instructionfilelist.jsp" %>
 				</div>
 			</td>
 		</tr>
@@ -91,9 +92,9 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<c:set var="offlineFileList" value="${formBean.offlineFileList}"/>
+				<c:set var="fileTypeFlag" value="<%=IToolContentHandler.TYPE_OFFLINE %>"/>
 				<div id="offlinefileArea">
-					<%@ include file="parts/offlinefilelist.jsp" %>
+					<%@ include file="parts/instructionfilelist.jsp" %>
 				</div>
 			</td>
 		</tr>

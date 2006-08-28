@@ -58,12 +58,10 @@
 			<!-- end tab buttons -->
 		</div>
 		<div id="content">
-			<table align=center>
-				<tr>
-					<td NOWRAP>
-						<%@ include file="/common/messages.jsp"%>
-					</td>
-				</tr>
+			<table>
+			<tr><td>
+			<%@ include file="/common/messages.jsp"%>
+			</td></tr>
 			</table>
 			<html:form action="definelater" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />

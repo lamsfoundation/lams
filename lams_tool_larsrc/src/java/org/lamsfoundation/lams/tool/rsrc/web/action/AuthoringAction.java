@@ -455,6 +455,16 @@ public class AuthoringAction extends Action {
 		
 		ToolAccessMode mode = getAccessMode(request);
     	
+		ActionMessages errors = validate(resourceForm, mapping, request);
+		if(!errors.isEmpty()){
+			saveErrors(request, errors);
+			if(mode.isAuthor())
+	    		return mapping.findForward("author");
+	    	else
+	    		return mapping.findForward("monitor");			
+		}
+			
+		
 		Resource resource = resourceForm.getResource();
 		IResourceService service = getResourceService();
 		
@@ -585,7 +595,7 @@ public class AuthoringAction extends Action {
     	else
     		return mapping.findForward("monitor");
 	}
-	
+
 	/**
 	 * Handle upload online instruction files request. 
 	 * @param mapping
@@ -654,22 +664,7 @@ public class AuthoringAction extends Action {
 		}
 		//add to attachmentList
 		attachmentList.add(att);
-		
-		//update Html FORM, this will echo back to web page for display
-		List onlineFileList = new ArrayList();
-		List offlineFileList = new ArrayList();
-		iter = attachmentList.iterator();
-		while(iter.hasNext()){
-			ResourceAttachment attFile = (ResourceAttachment) iter.next();
-			if(StringUtils.equalsIgnoreCase(attFile.getFileType(),IToolContentHandler.TYPE_OFFLINE))
-				offlineFileList.add(attFile);
-			else
-				onlineFileList.add(attFile);
-		}
-		resourceForm.setOnlineFileList(onlineFileList);
-		resourceForm.setOfflineFileList(offlineFileList);
-		
-		
+
 		return mapping.findForward(ResourceConstants.SUCCESS);
 
 	}
@@ -721,24 +716,17 @@ public class AuthoringAction extends Action {
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		ResourceAttachment existAtt;
-		List leftAttachments = new ArrayList();
 		while(iter.hasNext()){
 			existAtt = (ResourceAttachment) iter.next();
 			if(existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();
-			}else if(StringUtils.equals(existAtt.getFileType(),type) ){
-				leftAttachments.add(existAtt);
 			}
-				
 		}
 
-		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
-			request.setAttribute("offlineFileList",leftAttachments);
-		}else{
-			request.setAttribute("onlineFileList",leftAttachments);
-		}
+		request.setAttribute(ResourceConstants.ATTR_FILE_TYPE_FLAG, type);
+		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 
 	}
@@ -1049,5 +1037,24 @@ public class AuthoringAction extends Action {
 			mode = ToolAccessMode.AUTHOR;
 		return mode;
 	}
+	
+	
+	private ActionMessages validate(ResourceForm resourceForm, ActionMapping mapping, HttpServletRequest request) {
+		ActionMessages errors = new ActionMessages();
+		if (StringUtils.isBlank(resourceForm.getResource().getTitle())) {
+			ActionMessage error = new ActionMessage("error.resource.item.title.blank");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		}
+		//define it later mode(TEACHER) skip below validation.
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+		if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
+			return errors;
+		}
+
+		//Some other validation outside basic Tab.
+		
+		return errors;
+	}
+
 
 }
