@@ -274,6 +274,7 @@ class WizardView extends AbstractView {
     */
 	private function draw(){
 		setStyles();
+		setScheduleDateRange();
 		showStep1();
 	    dispatchEvent({type:'load',target:this});
 		
@@ -1052,6 +1053,7 @@ class WizardView extends AbstractView {
 		if(schedule_cb.selected){
 			schedule_time.f_enableTimeSelect(true);
 			scheduleDate_dt.enabled = true;
+			setScheduleDateRange();
 			finish_btn.enabled = false;
 			start_btn.visible = false;
 			schedule_btn.visible = true;
@@ -1068,6 +1070,16 @@ class WizardView extends AbstractView {
 		scheduleDate_dt.visible = true;
 		next_btn.visible = false;
 		finish_btn.visible = true;
+	}
+	
+	private function setScheduleDateRange():Void{
+		
+		var mydate = new Date();
+		var year = mydate.getFullYear();
+		var month = mydate.getMonth();
+		var date = mydate.getDate();
+		Debugger.log('schedule date range starts from :'+date + "/" +month+ "/" +year,Debugger.CRITICAL,'setScheduleDateRange','org.lamsfoundation.lams.WizardView');
+		scheduleDate_dt.selectableRange = {rangeStart: new Date(year, month, date)};
 	}
 	
 	private function writeSummery():Void{
@@ -1143,6 +1155,8 @@ class WizardView extends AbstractView {
 		if(schedule_cb.selected && (scheduleDate_dt.selectedDate == null || scheduleDate_dt.selectedDate == undefined)){
 			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
 			valid = false;
+		}else {
+			
 		}
 		return valid;
 	}
