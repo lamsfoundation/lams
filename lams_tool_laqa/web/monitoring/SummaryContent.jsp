@@ -78,71 +78,75 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td valign=top>
 								<table align=center>
-									<tr> 
-										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
-						  			</tr>				 
+
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
 								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-												<tr> 
 													<c:if test="${qaGeneralMonitoringDTO.editResponse != 'true'}">	  	 									 			
-														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
-														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
-											
-														<c:if test="${userData.visible != 'true' }"> 			
-											                         <i><bean:message key="label.response.hidden"/> </i> 
-														</c:if> 								
-														 </td>
+														<tr> 
+															 <td  valign=top>   <c:out value="${userData.userName}"/>   </td>  
+															 <td  valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
+															 
+															  <td align=right valign=top> 
+																<b> <bean:message key="label.edit"/> </b>
+																<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	 																
+															  </td>
+
+		   													 <td align=right valign=top> 				 
+																<c:if test="${userData.visible == 'true' }"> 			
+												                            <html:submit property="hideResponse" 
+												                                         styleClass="linkbutton" 
+												                                         onclick="submitResponse(${responseUid}, 'hideResponse');">						                                             
+												                                <bean:message key="label.hide"/>
+												                            </html:submit>
+																</c:if> 													
 												
-														
-															 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
-															 <td NOWRAP valign=top> 				 
-															<c:if test="${userData.visible == 'true' }"> 			
-											                            <html:submit property="hideResponse" 
-											                                         styleClass="linkbutton" 
-											                                         onclick="submitResponse(${responseUid}, 'hideResponse');">						                                             
-											                                <bean:message key="label.hide"/>
-											                            </html:submit>
-															</c:if> 													
-											
-															<c:if test="${userData.visible != 'true' }"> 			
-											                            <html:submit property="showResponse" 
-											                                         styleClass="linkbutton" 
-											                                         onclick="submitResponse(${responseUid}, 'showResponse');">						                                             
-											                                <bean:message key="label.show"/>
-											                            </html:submit>
-															</c:if> 						
+																<c:if test="${userData.visible != 'true' }"> 			
+												                            <html:submit property="showResponse" 
+												                                         styleClass="linkbutton" 
+												                                         onclick="submitResponse(${responseUid}, 'showResponse');">						                                             
+												                                <bean:message key="label.show"/>
+												                            </html:submit>
+																</c:if> 						
 														 	</td>	  	 
+														</tr>	 
+														
+														<tr>
+															 <td colspan=4  valign=top>   
+																<c:if test="${userData.visible != 'true' }"> 			
+													                         <i><bean:message key="label.response.hidden"/> </i> 
+																</c:if> 								
+																 <c:out value="${userData.response}"/> 
+															 </td>
+														</tr>
 													</c:if>
 													
+													
+
 													<c:if test="${qaGeneralMonitoringDTO.editResponse == 'true'}">	  	
 														<c:if test="${editableResponseId == responseUid}">	  	 									 			
-															 <td NOWRAP valign=top>  <c:out value="${userData.userName}"/>   </td>  
-															 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>															 
-															 <td NOWRAP valign=top>  <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 
-											
-															<c:if test="${userData.visible != 'true' }"> 			
-												                         <i><bean:message key="label.response.hidden"/> </i> 
-															</c:if> 								
-															 </td>
+															<tr> 
+																 <td valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 													
-												
-																 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/tick.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">	</td>	  	 
-																 <td NOWRAP valign=top> 
+																  <td align=right valign=top>  
+																  	<b> <bean:message key="label.save"/> </b>
+																  	<img src="<c:out value="${tool}"/>images/tick.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">	
+																  </td>	  	 																	
+													
+
+			   													 <td align=right valign=top> 				 
 																	<c:if test="${userData.visible == 'true' }"> 			
 													                            <html:submit property="hideResponse" 
 													                                         styleClass="linkbutton" 
@@ -159,20 +163,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                            </html:submit>
 																	</c:if> 						
 															 	</td>	  	 
-															</c:if>
-													
-													<c:if test="${editableResponseId != responseUid}">	  	 									 			
-															 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-															 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>															 
-															 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
-																<c:if test="${userData.visible != 'true' }"> 			
-													                         <i><bean:message key="label.response.hidden"/> </i> 
-																</c:if> 								
-															 </td>
-													
-													
-																 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
-																 <td NOWRAP valign=top> 
+															</tr>
+
+															<tr>
+																 <td colspan=4 valign=top>   
+																	<c:if test="${userData.visible != 'true' }"> 			
+														                         <i><bean:message key="label.response.hidden"/> </i> 
+																	</c:if> 								
+																	 <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 
+																 </td>
+															</tr>
+															
+														</c:if>													
+
+
+
+														<c:if test="${editableResponseId != responseUid}">	  	 									 			
+															<tr> 
+																 <td valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
+
+																  <td align=right valign=top> 
+																	 <b> <bean:message key="label.edit"/> </b>
+																	<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	
+																  </td>	  	 
+
+			   													 <td align=right valign=top> 				 
 																	<c:if test="${userData.visible == 'true' }"> 			
 													                            <html:submit property="hideResponse" 
 													                                         styleClass="linkbutton" 
@@ -188,15 +204,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                                <bean:message key="label.show"/>
 													                            </html:submit>
 																	</c:if> 						
-																 	</td>	  	 
-														</c:if>														  					 									  													  			
-													</c:if>														  					 									  													  			
-												</tr>		
+															 	</td>	  	 
+															</tr>
 
+															<tr>
+																 <td colspan=4 valign=top>   
+																	<c:if test="${userData.visible != 'true' }"> 			
+														                         <i><bean:message key="label.response.hidden"/> </i> 
+																	</c:if> 								
+																	<input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 																	 
+																 </td>
+															</tr>
+															
+														</c:if>					
+												</c:if>													
+													
+											</c:if>														  					 									  													  			
 
-
-
-											</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	
 								</table>
