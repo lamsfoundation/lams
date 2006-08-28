@@ -2,7 +2,6 @@
 * {
 	margin: 0px;
 	padding: 0px;
-	color: #333;
 }
 
 body {
@@ -211,6 +210,17 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 #content a.button {
 	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
 	color: #333;
+	border: 0px none;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 25px;
+	padding-bottom: 25px
+}
+
+/*  style to disbable input buttons */
+#content a.button .disabled {
+	color: #999;
+	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
 	border: 0px none;
 	padding-left: 20px;
 	padding-right: 20px;
@@ -582,6 +592,11 @@ float:left;
 padding-left:40px;
 margin-top:15px;
 }
+
+#login-left-col a {
+	color:#47bc23;
+	text-decoration: underline;		
+}n
 
 #login-left-col h1 {
 margin:0px; 
