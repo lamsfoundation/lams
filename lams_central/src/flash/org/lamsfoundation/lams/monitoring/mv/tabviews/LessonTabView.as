@@ -269,9 +269,23 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		statusApply_btn.onRollOver = Proxy.create(this,this['showToolTip'], statusApply_btn, "ls_manage_apply_btn_tooltip");
 		statusApply_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		setScheduleDateRange();
 
 	}
 
+
+	private function setScheduleDateRange():Void{
+		
+		var mydate = new Date();
+		var year = mydate.getFullYear();
+		var month = mydate.getMonth();
+		var date = mydate.getDate();
+		Debugger.log('schedule date range starts from :'+date + "/" +month+ "/" +year,Debugger.CRITICAL,'setScheduleDateRange','org.lamsfoundation.lams.WizardView');
+		scheduleDate_dt.selectableRange = {rangeStart: new Date(year, month, date)};
+	}
+	
+	
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
