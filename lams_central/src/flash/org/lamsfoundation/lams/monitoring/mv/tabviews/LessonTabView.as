@@ -514,8 +514,16 @@ public function update (o:Observable,infoObj:Object):Void{
 		if (scheduleDate_dt.selectedDate == null || scheduleDate_dt.selectedDate == undefined){
 			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
 		}else {
-			var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
-			mm.getMonitor().startLesson(true, _root.lessonID, datetime);
+			//var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
+			var schDT = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
+			if (!schDT.validTime){
+				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schtime'), null, null);
+				return;
+			}else {
+				//trace(resultDTO.scheduleDateTime);
+				mm.getMonitor().startLesson(true, _root.lessonID, schDT.dateTime);
+			}
+			
 		}
 		
 	}
@@ -798,11 +806,12 @@ public function update (o:Observable,infoObj:Object):Void{
 		vm.setMenuItemEnabled(vm.getMenuItemAt(0), true);
 	}
     
-	public function getScheduleDateTime(date:Date, timeStr:String):String{
+	public function getScheduleDateTime(date:Date, timeStr:String):Object{
 		var bs:String = "%2F";		// backslash char
 		var dayStr:String;
 		var monthStr:String;
-		
+		var mydate = new Date();
+		var dtObj = new Object();
 		trace('output time: ' + timeStr);
 		var day = date.getDate();
 		if(day<10){
@@ -820,7 +829,38 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
 		trace('selected date: ' + dateStr);
-		return dateStr + '+' + timeStr;
+		
+		if (day == mydate.getDate()){
+			dtObj.validTime = validateTime()
+		}else {
+			dtObj.validTime = true
+		}
+		dtObj.dateTime = dateStr + '+' + timeStr;
+		return dtObj;
+		//return dateStr + '+' + timeStr;
+	}
+	
+	private function validateTime():Boolean{
+		var mydate = new Date();
+		var checkHours:Number;
+		var hours = mydate.getHours();
+		var minutes = mydate.getMinutes();
+		var selectedHours = Number(scheduleTime.tHour.text);
+		var selectedMinutes = Number(scheduleTime.tMinute.text);
+		if (scheduleTime.tMeridian.selectedIndex == 0){
+			checkHours = 0
+		}else{
+			checkHours = 12
+		}
+		if (hours > (selectedHours+checkHours)){
+			return false;
+		}else {
+			if (minutes > selectedMinutes){
+				return false;
+			}else {
+				return true;
+			}
+		}
 	}
 	
 	/**
