@@ -47,6 +47,7 @@ public class LessonDetailsDTO {
 	private String organisationName;
 	private String organisationDescription;	
 	private Integer workspaceFolderID;	
+	private String contentFolderID;
 	private Long licenseID;
 	private String licenseText;	
 	private Long learningDesignID;
@@ -83,6 +84,10 @@ public class LessonDetailsDTO {
 								 lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId():
 								 WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 		
+		this.contentFolderID = lesson.getLearningDesign().getContentFolderID()!=null?
+							   lesson.getLearningDesign().getContentFolderID():
+							   WDDXTAGS.STRING_NULL_VALUE;
+							   
 		this.licenseID = lesson.getLearningDesign().getLicense()!=null?
 						 lesson.getLearningDesign().getLicense().getLicenseID():
 					     WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
@@ -174,6 +179,13 @@ public class LessonDetailsDTO {
 	 */
 	public Integer getWorkspaceFolderID() {
 		return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	}
+	/**
+	 * 
+	 * @return Returns the contentFolderID.
+	 */
+	public String getContentFolderID() {
+		return contentFolderID!=null?contentFolderID:WDDXTAGS.STRING_NULL_VALUE;
 	}
 	public Integer getNumberStartedLearners() {
 		return numberStartedLearners;
