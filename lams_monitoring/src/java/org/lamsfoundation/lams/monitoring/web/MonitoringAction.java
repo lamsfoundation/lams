@@ -687,8 +687,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
-    	
+    	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
     	String url = monitoringService.getActivityMonitorURL(lessonID,activityID);
+    	url += "&contentFolderID="+contentFolderID;
     	return redirectToURL(mapping, response, url);
     }
     /** Calls the server to bring up the activity's define later page. Assumes destination is a new window */
