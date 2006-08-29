@@ -112,7 +112,6 @@ public class NbMonitoringForm extends ActionForm {
     public void setToolContentID(String toolContentId) {
         this.toolContentID = toolContentId;
     }
-    
     public void reset(ActionMapping mapping, HttpServletRequest request)
 	{
 		this.method = null;

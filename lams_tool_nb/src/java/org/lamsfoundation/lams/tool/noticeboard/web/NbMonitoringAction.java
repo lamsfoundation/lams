@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
@@ -82,7 +83,8 @@ public class NbMonitoringAction extends LamsDispatchAction {
     		HttpServletResponse response) throws NbApplicationException
     {
     	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
-        if (toolContentId == null)
+        String contentFolderID = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
+    	if (toolContentId == null)
  		{
  		    String error = "Unable to continue. Tool content id missing";
  		    logger.error(error);
@@ -94,7 +96,6 @@ public class NbMonitoringAction extends LamsDispatchAction {
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 
-		monitorForm.setToolContentID(toolContentId.toString());
     	monitorForm.setTitle(content.getTitle());
     	monitorForm.setContent(content.getContent());
     	monitorForm.setOnlineInstructions(content.getOnlineInstructions());
@@ -107,6 +108,7 @@ public class NbMonitoringAction extends LamsDispatchAction {
 		    Map<String,Object> map = new HashMap<String,Object>();
 		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId.toString());
 		    map.put(NoticeboardConstants.DEFINE_LATER, "true");
+		    map.put(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
 		    monitorForm.setParametersToAppend(map);
 		} else {
 			monitorForm.setContentEditable("false");

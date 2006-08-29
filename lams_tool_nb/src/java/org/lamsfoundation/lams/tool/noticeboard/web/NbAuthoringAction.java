@@ -127,7 +127,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 		
 		nbForm.setToolContentID(contentId.toString());
-		nbForm.setContentFolderID(contentFolderId);
 		
 		/* DefineLater is used in the basic screen. If defineLater is set, then in the authoring page,
 		 * the two tabs {Advanced, Instructions} are not visible.
@@ -157,6 +156,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			
 			//initialise the values in the form, so the values will be shown in the jsp
 			nbForm.setToolContentID(contentId.toString());
+			nbForm.setContentFolderID(contentFolderId);
 			nbForm.setTitle(nb.getTitle());
 			nbForm.setContent(nb.getContent());
 			nbForm.setOnlineInstructions(nb.getOnlineInstructions());
@@ -179,6 +179,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			    /* Define later set to true when the edit activity tab is brought up 
 			     * So that users cannot start using the content while the staff member is editing the content */
 			    nbForm.populateFormWithNbContentValues(nb);
+			    nbForm.setContentFolderID(contentFolderId);
 			    nb.setDefineLater(Boolean.parseBoolean(nbForm.getDefineLater()));
 			    nbService.saveNoticeboard(nb);
 			    
