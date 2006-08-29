@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +38,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -92,6 +93,8 @@ public class UserAction extends LamsDispatchAction {
 		OrganisationType orgType = org.getOrganisationType();
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 		
+		ActionMessages errors = new ActionMessages();
+		
 		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin, orgType));
 		// set canEdit for whether user should be able to edit anything other than roles
 		request.setAttribute("canEdit",isSysadmin);
@@ -106,16 +109,22 @@ public class UserAction extends LamsDispatchAction {
 			BeanUtils.copyProperties(userForm, user);
 			userForm.set("password",null);
 			
+			String[] roles = null;
 		    UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
-	        Iterator iter2 = uo.getUserOrganisationRoles().iterator();
-	        String[] roles = new String[uo.getUserOrganisationRoles().size()];
-	        int i=0;
-	        while(iter2.hasNext()){
-	            UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
-	            roles[i]=uor.getRole().getRoleId().toString();
-	            log.debug("got roleid: "+roles[i]);
-	            i++;
-	        }
+		    if (uo != null) {
+		    	Iterator iter2 = uo.getUserOrganisationRoles().iterator();
+		    	roles = new String[uo.getUserOrganisationRoles().size()];
+		    	int i=0;
+		    	while(iter2.hasNext()){
+		    		UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
+		    		roles[i]=uor.getRole().getRoleId().toString();
+		    		log.debug("got roleid: "+roles[i]);
+		    		i++;
+		    	}
+		    } else {
+		    	errors.add("roles", new ActionMessage("error.not.member"));
+		    	saveErrors(request,errors);
+		    }
 	        userForm.set("roles",roles);
 	        SupportedLocale locale = user.getLocale();
 			userForm.set("localeId",locale.getLocaleId());
