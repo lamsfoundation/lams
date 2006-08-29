@@ -2,6 +2,11 @@
 
 <tiles-definitions>
 
+	<definition name=".remove" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="remove.jsp" />	
+	</definition>
+
 	<definition name=".usersearchlist" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="usersearchlist.jsp" />	

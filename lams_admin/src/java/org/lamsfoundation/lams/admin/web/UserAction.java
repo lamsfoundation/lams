@@ -26,8 +26,10 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +47,9 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.Workspace;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -68,6 +73,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action-forward name="user" path=".user"
  * @struts:action-forward name="userlist" path="/usermanage.do"
+ * @struts:action-forward name="remove" path=".remove"
  */
 public class UserAction extends LamsDispatchAction {
 
@@ -138,18 +144,76 @@ public class UserAction extends LamsDispatchAction {
 		return mapping.findForward("user");
 	}
 	
+	// determine whether to disable or delete user based on their lams data
 	public ActionForward remove(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-		Integer userId = WebUtil.readIntParam(request,"userId",true);
-		log.debug("removing userid: "+userId);
-		getService().deleteById(User.class,userId);
+		
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
+		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		User user = (User)getService().findById(User.class,userId);
+		
+		Boolean hasData = userHasData(user);
+
+		log.debug("user has data: "+hasData);
+		request.setAttribute("method", (hasData?"disable":"delete"));
+		request.setAttribute("orgId",orgId);
+		request.setAttribute("userId",userId);
+		return mapping.findForward("remove");
+	}
+	
+	public ActionForward disable(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		Integer orgId = WebUtil.readIntParam(request,"orgId");
+		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		User user = (User)getService().findById(User.class,userId);
+		
+		user.setDisabledFlag(true);
+		log.debug("deleting userId="+userId+"'s userorgs");
+		Set uos = user.getUserOrganisations();
+		Iterator iter = uos.iterator();
+		while(iter.hasNext()) {
+			getService().delete(iter.next());
+			iter.remove();
+		}
+		getService().save(user);
+		
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
 	}
 	
+	public ActionForward delete(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		Integer orgId = WebUtil.readIntParam(request,"orgId");
+		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		User user = (User)getService().findById(User.class,userId);
+		Workspace workspace = user.getWorkspace();
+		WorkspaceFolder wf = workspace.getDefaultFolder();		
+		Set wwfs = workspace.getWorkspaceWorkspaceFolders();
+		
+		Iterator iter = wwfs.iterator();
+		if (iter.hasNext()) {
+			WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder)iter.next();
+			if (!iter.hasNext()) {				
+				log.debug("deleting wkspc_wkspc_folder: "+wwf.getId());
+				getService().delete(wwf);
+				getService().delete(wf);
+				getService().delete(workspace);
+				getService().delete(user);
+				log.debug("deleted user: "+userId);
+			}
+		}
+		
+		request.setAttribute("org",orgId);
+		return mapping.findForward("userlist");
+	}
 	
 	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
 		List<Role> allRoles = new ArrayList<Role>();
@@ -166,6 +230,41 @@ public class UserAction extends LamsDispatchAction {
 			allRoles.remove(role);
 		}
 		return allRoles;
+	}
+	
+	// check user has done anything
+	private Boolean userHasData(User user) {
+		if (user.getLearnerProgresses()!=null) {
+			if (!user.getLearnerProgresses().isEmpty()) {
+				log.debug("learnerProgresses: "+user.getLearnerProgresses().size());
+				return true;
+			}
+		}
+		if (user.getUserToolSessions()!=null) {
+			if (!user.getUserToolSessions().isEmpty()) {
+				log.debug("userToolSessions: "+user.getUserToolSessions().size());
+				return true;
+			}
+		}
+		if (user.getLearningDesigns()!=null) {
+			if (!user.getLearningDesigns().isEmpty()) {
+				log.debug("learningDesigns: "+user.getLearningDesigns().size());
+				return true;
+			}
+		}
+		if (user.getLessons()!=null) {
+			if (!user.getLessons().isEmpty()) {
+				log.debug("lessons: "+user.getLessons().size());
+				return true;
+			}
+		}
+		if (user.getUserGroups()!=null) {
+			if (!user.getUserGroups().isEmpty()) {
+				log.debug("userGroups: "+user.getUserGroups().size());
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
