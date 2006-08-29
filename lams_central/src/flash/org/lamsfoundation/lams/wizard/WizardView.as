@@ -1359,19 +1359,26 @@ class WizardView extends AbstractView {
 		var minutes = mydate.getMinutes();
 		var selectedHours = Number(schedule_time.tHour.text);
 		var selectedMinutes = Number(schedule_time.tMinute.text);
-		if (schedule_time.tMeridian.selectedIndex == 0){
+		if (schedule_time.tMeridian.selectedItem.data == "AM"){
 			checkHours = 0
-		}else{
-			checkHours = 12
 		}
-		if (hours > (selectedHours+checkHours)){
+		if (schedule_time.tMeridian.selectedItem.data == "PM"){
+			if (Number (selectedHours) == 12){
+				checkHours = 0
+			}else {
+				checkHours = 12
+			}
+		}
+		if (hours > (Number(selectedHours+checkHours))){
 			return false;
-		}else {
+		}else if (hours == Number(selectedHours+checkHours)){
 			if (minutes > selectedMinutes){
 				return false;
 			}else {
 				return true;
 			}
+		}else {
+			return true;
 		}
 	}
 	/**

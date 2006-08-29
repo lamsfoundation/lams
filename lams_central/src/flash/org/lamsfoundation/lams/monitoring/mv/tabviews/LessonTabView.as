@@ -847,19 +847,29 @@ public function update (o:Observable,infoObj:Object):Void{
 		var minutes = mydate.getMinutes();
 		var selectedHours = Number(scheduleTime.tHour.text);
 		var selectedMinutes = Number(scheduleTime.tMinute.text);
-		if (scheduleTime.tMeridian.selectedIndex == 0){
+		if (scheduleTime.tMeridian.selectedItem.data == "AM"){
 			checkHours = 0
-		}else{
-			checkHours = 12
 		}
-		if (hours > (selectedHours+checkHours)){
+		
+		if (scheduleTime.tMeridian.selectedItem.data == "PM"){
+			if (Number (selectedHours) == 12){
+				checkHours = 0
+			}else {
+				checkHours = 12
+			}
+		}
+		
+		
+		if (hours > (Number(selectedHours+checkHours))){
 			return false;
-		}else {
+		}else if (hours == Number(selectedHours+checkHours)){
 			if (minutes > selectedMinutes){
 				return false;
 			}else {
 				return true;
 			}
+		}else {
+			return true;
 		}
 	}
 	
