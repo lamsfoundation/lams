@@ -56,46 +56,45 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 
 
-				<table class="forms">
+					<table class="forms">
 				
-					<tr> <td valign=top>
-						<table width="100%">
-
-								<tr> 
-									<td colspan=2 valign=top>
-										<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
-									</td> 
-							  	</tr>
-		
-							  	<tr> 
-									<td colspan=2 valign=top>
-										<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
-									</td> 
-								</tr>
+							<tr> 
+								<td valign=top>
+									<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
+								</td> 
+						  	</tr>
+	
+						  	<tr> 
+								<td valign=top>
+									<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
+								</td> 
+							</tr>
 
 
-					 		<!--default Option content, this entry can not be deleted but can be updated -->
-						 		<tr> 
-									<td valign=top>
-										<lams:SetEditor id="optionContent0" text="${voteGeneralAuthoringDTO.defaultOptionContent}" key="label.nomination.col"/>								
-									</td> 
-									
-									
-								  	<td valign=top>			
-										  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
-									</td> 								
-							  	</tr>
+					 		<tr> 
+								<td NOWRAP valign=top>
+								<table>
+
+				 		<!--default Option content, this entry can not be deleted but can be updated -->
+					 		<tr> 
+					 		
+								<td valign=top>
+									<lams:SetEditor id="optionContent0" text="${voteGeneralAuthoringDTO.defaultOptionContent}" key="label.nomination.col"/>								
+
+								  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
+								</td> 
+						  	</tr>
 				
 						  	<!--end of default Option content -->
-						  	
+
 					  		<!-- if there is more than just the default content start presenting them -->
 					  	 		<c:set var="optIndex" scope="request" value="1"/>
 								<c:forEach var="optionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
 							  		<c:if test="${optionEntry.key > 1}"> 			
 										<c:set var="optIndex" scope="request" value="${optIndex +1}"/>
 										  <tr>
-											<td valign=top>
-												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" key="label.nomination.col"/>								
+
+											<td NOWRAP valign=top>
 			                                	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'monitoring' }"> 			
 					 		 						<html:submit property="removeContent" 
 			                                                     styleClass="linkbutton"  
@@ -111,10 +110,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<bean:message key="button.delete"/>
 													</html:submit>
 												</c:if> 													
-		                                    </td>
-		                                    
-			      						  	<td valign=top>			
-								  				<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex == optIndex}"> 			
+											
+												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" key="label.nomination.col"/>								
+
+								  			 	<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex == optIndex}"> 			
 				     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
 				     							</c:if> 	    
 												
@@ -122,27 +121,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
 					       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
 												</c:if> 	           								 
-				                         	</td>
+											</td>					
+
 										  </tr>
 									</c:if> 			
 								</c:forEach>
 								<html:hidden property="optIndex"/>
-		                        
-		                        <tr>
-		                            <td colspan=2 valign=top align="right">
-		                                <html:submit property="addContent" 
-		                                             styleClass="linkbutton" 
-		                                             onclick="submitMethod('addNewNomination');">
-		                                    <bean:message key="button.add"/>
-		                                </html:submit>
-		                            </td>
-		                        </tr>
-						
+								
+								
+								</table> </td> </tr>
+								
+								
 						</table>
-						</td>
-					</tr>
-				
-					</table>
+
+
+				<table class="forms">
+	                    <tr>
+	                        <td valign=top align="right">
+	                            <html:submit property="addContent" 
+	                                         styleClass="linkbutton" 
+	                                         onclick="submitMethod('addNewNomination');">
+	                                <bean:message key="button.add"/>
+	                            </html:submit>
+	                        </td>
+	                    </tr>
+	                    <tr> <td> &nbsp</td> </tr>
+	                    <tr> <td> &nbsp</td> </tr>	                    
+	             </table>
+
+
 
       	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring' }"> 					
 			<p align="right">
