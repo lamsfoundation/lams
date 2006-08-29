@@ -46,12 +46,14 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * <p>
@@ -502,6 +504,53 @@ public class UserManagementService implements IUserManagementService {
 		List<UserManageBean> userManageBeans = new ArrayList<UserManageBean>();
 		userManageBeans.addAll(beansMap.values());
 		return userManageBeans;
+	}
+	
+	/** Remove a user from the system completely. Only able to be done if they don't have any 
+	 * related learning designs, etc.
+	 * @param userId
+	 */
+	public void removeUser(Integer userId) {
+		
+		User user = (User)findById(User.class,userId);
+		if ( user != null ) {
+			
+			// check that the user doesn't have any contents - move that logic from the action to a 
+			// method call in the service. throw an exception if they do have contents
+			
+			// write out an entry in the audit log.
+			
+			Workspace workspace = user.getWorkspace();
+			Set wwfs = workspace != null ? workspace.getWorkspaceWorkspaceFolders() : null;
+		
+			Set<WorkspaceFolder> foldersToDelete = new HashSet<WorkspaceFolder>(); 
+			if ( wwfs != null ) {
+				Iterator iter = wwfs.iterator();
+				while (iter.hasNext()) {
+					WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder)iter.next();
+					foldersToDelete.add(wwf.getWorkspaceFolder());
+	
+					log.debug("deleting wkspc_wkspc_folder: "+wwf.getId());
+					delete(wwf);
+				}
+			}
+			
+			for ( WorkspaceFolder wf : foldersToDelete ) {
+				log.debug("deleting wkspc_folder: "+wf.getName());
+				delete(wf);
+			}
+			
+			if ( workspace != null ) {
+				log.debug("deleting workspace: "+workspace.getName());
+				delete(workspace);
+			}
+			
+			log.debug("deleting user "+user.getLogin());
+			delete(user);
+			
+		} else {
+			log.error("Requested delete of a user who does not exist. User ID "+userId);
+		}
 	}
 	
 }

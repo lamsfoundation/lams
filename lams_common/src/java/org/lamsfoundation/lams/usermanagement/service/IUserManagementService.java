@@ -292,4 +292,10 @@ public interface IUserManagementService {
     
     public List<UserManageBean> getUserManageBeans(Integer orgId);
     
+	/** Remove a user from the system completely. Only able to be done if they don't have any 
+	 * related learning designs, etc.
+	 * @param userId
+	 */
+	public void removeUser(Integer userId);
+
 }
