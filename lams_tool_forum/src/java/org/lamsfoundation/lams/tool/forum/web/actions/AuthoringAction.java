@@ -866,11 +866,26 @@ public class AuthoringAction extends Action {
     	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
 		ActionMessage ae;
 		try {
+			String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 			if (StringUtils.isBlank(form.getForum().getTitle())) {
 				ActionMessage error = new ActionMessage("error.title.empty");
 				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 			}
-			if(!form.getForum().isAllowNewTopic()){
+			boolean allowEdit = form.getForum().isAllowNewTopic();
+//			define it later mode(TEACHER): need read out allowEdit flag rather than get from HTML form
+			//becuase defineLater does not include this field
+			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
+				forumService = getForumManager();
+				Forum forumPO = forumService.getForumByContentId(form.getToolContentID());
+				if(forumPO != null)
+					allowEdit = forumPO.isAllowEdit();
+				else{
+					//failure tolerance
+					log.error("ERROR: Can not found Forum by toolContentID:"+ form.getToolContentID());
+					allowEdit = true;
+				}
+			}
+			if(!allowEdit){
 				List topics = getTopicList(sessionMap);
 				if(topics.size() == 0){
 					ActionMessage error = new ActionMessage("error.must.have.topic");
@@ -878,7 +893,6 @@ public class AuthoringAction extends Action {
 				}
 			}
 			//define it later mode(TEACHER) skip below validation.
-			String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
 				return errors;
 			}
