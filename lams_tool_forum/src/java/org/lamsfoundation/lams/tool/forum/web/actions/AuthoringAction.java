@@ -871,21 +871,21 @@ public class AuthoringAction extends Action {
 				ActionMessage error = new ActionMessage("error.title.empty");
 				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 			}
-			boolean allowEdit = form.getForum().isAllowNewTopic();
-//			define it later mode(TEACHER): need read out allowEdit flag rather than get from HTML form
+			boolean allowNewTopic = form.getForum().isAllowNewTopic();
+//			define it later mode(TEACHER): need read out AllowNewTopic flag rather than get from HTML form
 			//becuase defineLater does not include this field
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
 				forumService = getForumManager();
 				Forum forumPO = forumService.getForumByContentId(form.getToolContentID());
 				if(forumPO != null)
-					allowEdit = forumPO.isAllowEdit();
+					allowNewTopic = forumPO.isAllowNewTopic();
 				else{
 					//failure tolerance
 					log.error("ERROR: Can not found Forum by toolContentID:"+ form.getToolContentID());
-					allowEdit = true;
+					allowNewTopic = true;
 				}
 			}
-			if(!allowEdit){
+			if(!allowNewTopic){
 				List topics = getTopicList(sessionMap);
 				if(topics.size() == 0){
 					ActionMessage error = new ActionMessage("error.must.have.topic");

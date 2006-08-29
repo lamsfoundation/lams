@@ -143,16 +143,6 @@
         redirect="false"
       />
       <forward
-        name="author"
-        path="/authoring/authoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="monitor"
-        path="/authoring/definelater.jsp"
-        redirect="false"
-      />
-      <forward
         name="instructionFileList"
         path="/authoring/parts/instructionfilelist.jsp"
         redirect="false"
@@ -161,7 +151,11 @@
 
    <!-- ========== Action Mapping Definitions ============================== -->
 <action path="/definelater" type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction" 
-		name="SbmtAuthoringForm" scope="request" parameter="dispatch" validate="false">
+		name="SbmtAuthoringForm" 
+		scope="request" 
+		input="/authoring/definelater.jsp"
+		parameter="dispatch" 
+		validate="false">
 	<forward name="success" path="/authoring/definelater.jsp"/>
 	<forward name="forbidden" path="/authoring/definelaterforbid.jsp"/>
 </action>

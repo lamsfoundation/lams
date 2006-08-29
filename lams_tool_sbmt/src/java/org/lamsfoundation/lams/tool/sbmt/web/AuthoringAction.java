@@ -70,8 +70,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *                validate="false"
  * 
  * @struts.action-forward name="success" path="/authoring/authoring.jsp"
- * @struts.action-forward name="author" path="/authoring/authoring.jsp"
- * @struts.action-forward name="monitor" path="/authoring/definelater.jsp"
  * @struts.action-forward name="instructionFileList" path="/authoring/parts/instructionfilelist.jsp"
  */
 public class AuthoringAction extends LamsDispatchAction {
@@ -163,10 +161,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		ActionMessages errors = validate(authForm, mapping, request);
 		if(!errors.isEmpty()){
 			saveErrors(request, errors);
-			if(mode.isAuthor())
-	    		return mapping.findForward("author");
-	    	else
-	    		return mapping.findForward("monitor");			
+			return mapping.getInputForward();
 		}
 		
 		SubmitFilesContent content = getContent(form);
@@ -241,10 +236,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		
 		//to jump to common success page in lams_central
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
-    	if(mode.isAuthor())
-    		return mapping.findForward("author");
-    	else
-    		return mapping.findForward("monitor");
+		return mapping.findForward("success");
 	}
 	/**
 	 * Handle upload online instruction files request. Once the file uploaded successfully, database
