@@ -65,6 +65,7 @@ class Sequence {
 	// LD and workspace data
 	private var _learningDesignID:Number;
 	private var _workspaceFolderID:Number;
+	private var _contentFolderID:Number;
 	
 	// statistics data
 	private var _noPossibleLearners:Number;
@@ -125,6 +126,7 @@ class Sequence {
 		_organisationDescription = dto.organisationDescription;
 		
 		_workspaceFolderID = dto.workspaceFolderID;
+		_contentFolderID = dto.contentFolderID;
 		
 		_noPossibleLearners = dto.numberPossibleLearners;
 		_noStartedLearners = dto.numberStartedLearners;
@@ -399,6 +401,10 @@ class Sequence {
 	
 	public function get workspaceFolderID():Number{
 		return _workspaceFolderID;
+	}
+	
+	public function get contentFolderID():Number{
+		return _contentFolderID;
 	}
 	
 	public function get duration():Number{

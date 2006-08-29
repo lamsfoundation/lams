@@ -281,7 +281,7 @@ class MonitorModel extends Observable{
 		for(var i=0; i< todos.length; i++){
 			var t:Object = todos[i];
 			var todo:ContributeActivity = new ContributeActivity();
-			todo.populateFromDTO(t);
+			todo.populateFromDTO(t, _activeSeq.contentFolderID);
 			_todos.push(todo);
 		}
 		

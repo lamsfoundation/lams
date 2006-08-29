@@ -67,7 +67,7 @@ class ContributeActivity extends Activity {
 	}
 	
 	
-	public function populateFromDTO(dto:Object){
+	public function populateFromDTO(dto:Object, id:String){
 		trace('populating from dto...');
 		_activityID = dto.activityID;
 		_parentActivityID = dto.parentActivityID;
@@ -77,7 +77,7 @@ class ContributeActivity extends Activity {
 			// create children
 			for(var i=0; i<dto.childActivities.length;i++){
 				var ca:ContributeActivity = new ContributeActivity();
-				ca.populateFromDTO(dto.childActivities[i]);
+				ca.populateFromDTO(dto.childActivities[i], id);
 				_childActivities.push(ca);
 				trace('adding a child');
 			}
@@ -87,14 +87,14 @@ class ContributeActivity extends Activity {
 			// create entries
 			for(var i=0; i<dto.contributeEntries.length;i++){
 				var ca:ContributeActivity = new ContributeActivity();
-				ca.populateFromDTO(dto.contributeEntries[i]);
+				ca.populateFromDTO(dto.contributeEntries[i], id);
 				_contributeEntries.push(ca);
 				trace('adding a entry');
 			}
 		}
 		_title = dto.title;
 		_description = dto.description;
-		_taskURL = dto.URL;
+		_taskURL = dto.URL + '&contentFolderID=' + id;
 		trace("URL in DTO for "+dto.title+ " is: "+dto.URL)
 		_contributionType = dto.contributionType;
 		_isRequired = dto.isRequired;

@@ -175,6 +175,9 @@ class MonitorController extends AbstractController {
 			//getActivityMonitorURL&activityID=31&lessonID=4
 			Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 			URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
+			URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
+			Debugger.log('activityDoubleClick URL:'+URLToSend,Debugger.CRITICAL,'activityDoubleClick','MonitorController');
+			
 		}else {
 			if (learnerID != null){
 				_learnerID = learnerID;
