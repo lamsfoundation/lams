@@ -201,8 +201,8 @@ CREATE TABLE lams_workspace (
 
 CREATE TABLE lams_wkspc_wkspc_folder (
        id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , workspace_id BIGINT(20) NOT NULL
-     , workspace_folder_id BIGINT(20) NOT NULL
+     , workspace_id BIGINT(20) 
+     , workspace_folder_id BIGINT(20) 
      , PRIMARY KEY (id)
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_ww_folder_1 FOREIGN KEY (workspace_id)
