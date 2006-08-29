@@ -708,8 +708,8 @@ class WorkspaceDialog extends MovieClip{
 		}
 		
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
-		
-		if (resourceTitle_txi.text == "" || resourceTitle_txi.text == undefined || resourceTitle_txi.text == null){
+		var tempTitle = StringUtils.replace(resourceTitle_txi.text, " ", "");
+		if (tempTitle == "" || tempTitle == undefined){
 			var sendMsg:String = Dictionary.getValue('ws_file_name_empty')+"\n"+Dictionary.getValue('ws_entre_file_name')+"\n\n";
 			LFMessage.showMessageAlert(sendMsg,null);
 			resourceTitle_txi.setFocus();
