@@ -90,6 +90,18 @@ public interface IForumService {
      * @throws PersistenceException
      */
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
+    
+    /**
+     * Clone topics from tool content and give these new topics with given SessionID if 
+     * this session has not such topics yet. 
+     * This method will be called once learner page open. Program does not
+     * clone content topics when createToolSession() is called, the reason is define later
+     * page could change content topics. For more detail see LDEV-649. 
+     *  
+     * @param contentID
+     * @param sessionID
+     */
+    public void cloneContentTopics(Long contentID, Long sessionID);
 	//************************************************************************************
 	//Topic Method
 	//************************************************************************************

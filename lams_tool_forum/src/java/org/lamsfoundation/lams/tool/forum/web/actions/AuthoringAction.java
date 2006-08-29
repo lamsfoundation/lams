@@ -178,7 +178,7 @@ public class AuthoringAction extends Action {
 		//get back the topic list and display them on page
 		forumService = getForumManager();
 
-		List topics = null;
+		List<Message> topics = null;
 		Forum forum = null;
 		try {
 			forum = forumService.getForumByContentId(contentId);
@@ -213,7 +213,7 @@ public class AuthoringAction extends Action {
 		//set back STRUTS component value
 		//init it to avoid null exception in following handling
 		if(topics == null)
-			topics = new ArrayList();
+			topics = new ArrayList<Message>();
 		
 		sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");

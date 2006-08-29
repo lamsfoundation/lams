@@ -127,10 +127,11 @@ public class LearningAction extends Action {
 	/**
 	 * Display root topics of a forum. This page will be the initial page of
 	 * Learner page.
+	 * @throws Exception 
 	 * 
 	 */
 	private ActionForward viewForm(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//initial Session Map 
 		String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
@@ -161,11 +162,12 @@ public class LearningAction extends Action {
 		// Try to get ForumID according to sessionId
 		forumService = getForumManager();
 		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+
 		if (session == null || session.getForum() == null) {
 			log.error("Failed on getting session by given sessionID:" + sessionId);
-			return mapping.findForward("error");
+			throw new Exception("Failed on getting session by given sessionID:" + sessionId);
 		}
-		
+
 		Forum forum = session.getForum();
 		//lock on finish
 		ForumUser forumUser = getCurrentUser(request,sessionId);
@@ -180,6 +182,12 @@ public class LearningAction extends Action {
 			return mapping.findForward("runOffline");
 		}
 		
+		
+		//try to clone topics from :See bug LDEV-649 
+		Long contentId = forum.getContentId();
+		forumService.cloneContentTopics(contentId, sessionId);
+		
+		//set some option flag to HttpSession
 		Long forumId = forum.getUid();
 		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
 		int allowNumber = forum.getLimitedChar();

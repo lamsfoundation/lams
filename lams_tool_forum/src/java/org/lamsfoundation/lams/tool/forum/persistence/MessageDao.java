@@ -39,6 +39,9 @@ public class MessageDao extends HibernateDaoSupport {
 	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
 					+ " where is_authored = true and forum_uid=? order by create_date";
 	
+	private static final String SQL_QUERY_COUNT_SESSION_TOPICS_FROM_AUTHOR = "select count(*) from " + Message.class.getName()
+	+ " as m where m.isAuthored = true and m.toolSession.uid=?";
+	
 	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
 					+ " where parent=?";
 	
@@ -126,6 +129,13 @@ public class MessageDao extends HibernateDaoSupport {
 			return ((Integer)list.get(0)).intValue();
 		else
 			return 0;
+	}
+	public boolean hasAuthoredTopics(Long sessionId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_COUNT_SESSION_TOPICS_FROM_AUTHOR,new Object[]{sessionId});
+		if(list != null && list.size() > 0)
+			return ((Integer)list.get(0)).intValue() > 0 ? true:false;
+		else
+			return false;
 	}
 
 }

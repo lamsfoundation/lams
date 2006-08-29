@@ -459,7 +459,25 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		currentUser.setSessionFinished(true);
 		forumUserDao.save(currentUser);
 	}
-
+	
+	public void cloneContentTopics(Long contentID, Long sessionID) {
+		//only session does not have content topcis
+		if(!messageDao.hasAuthoredTopics(sessionID)){
+			Forum forum = (Forum) forumDao.getByContentId(contentID);
+			Set contentTopcis = forum.getMessages();
+			
+			//only forum has content topics, clone happens 
+			if(contentTopcis != null && contentTopcis.size() > 0){
+				Iterator iter = contentTopcis.iterator();
+				ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
+				while(iter.hasNext()){
+					Message msg = (Message) iter.next();
+					msg.setToolSession(session);
+					messageDao.update(msg);
+				}
+			}
+		}
+	}
     //***************************************************************************************************************
     // Private methods
     //***************************************************************************************************************
@@ -583,6 +601,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 					continue;
 				msg.setReplyNumber(0);
 				msg.setCreated(new Date());
+				msg.setUpdated(new Date());
 				msg.setLastReplyDate(new Date());
 				msg.setHideFlag(false);
 				msg.setForum(toContent);
@@ -718,34 +737,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		Forum forum = forumDao.getByContentId(toolContentId);
 		session.setForum(forum);
 		forumToolSessionDao.saveOrUpdate(session);
-		
-		//also clone author created topic from this forum tool content!!!
-		//this can avoid topic record information conflict when multiple sessions are against same tool content
-		//for example, the reply number maybe various for different sessions.
-		List topicsFromAuthor = messageDao.getTopicsFromAuthor(session.getForum().getUid());
-		
-		//sorted by last post date
-		Message msg;
-		SortedMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
-		Iterator iter = topicsFromAuthor.iterator();
-		while(iter.hasNext()){
-			msg = (Message) iter.next();
-			//Don't copy other session's topic, only from tool content!!!.
-			if(msg.getToolSession() != null)
-				continue;
-			//set this message forum Uid as toContent
-			if(!msg.getIsAuthored())
-				continue;
-			Message newMsg = (Message) msg.clone();
-			//reset some value.
-			newMsg.setReplyNumber(0);
-			newMsg.setHideFlag(false);
-			//it should be new message
-			newMsg.setUid(null);
-			//!!! set current session to authored message
-			newMsg.setToolSession(session);
-			createRootTopic(toolContentId,null,newMsg);
-		}
+
+		//Update(29/08/2006): Do not clone author topic BUG: LDEV-649.
+//		also clone author created topic from this forum tool content!!!
+//		this can avoid topic record information conflict when multiple sessions are against same tool content
+//		for example, the reply number maybe various for different sessions.
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
@@ -1029,5 +1025,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setForumReportDAO(ForumReportDAO forumReportDAO) {
 		this.forumReportDAO = forumReportDAO;
 	}
+
+	
 
 }
