@@ -68,7 +68,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/usersave" name="UserForm" input=".user" scope="request"
  *                validate="false"
  * 
- * @struts:action-forward name="user" path=".user"
+ * @struts:action-forward name="user" path="/user.do?method=edit"
  * @struts:action-forward name="userlist" path="/usermanage.do"
  */
 public class UserSaveAction extends Action {
@@ -88,6 +88,7 @@ public class UserSaveAction extends Action {
 		Boolean passwordChanged = true;
 
 		Integer orgId = (Integer) userForm.get("orgId");
+		Organisation org = (Organisation)getService().findById(Organisation.class, orgId);
 		
 		if (isCancelled(request)) {
 			request.setAttribute("org", orgId);
@@ -133,31 +134,33 @@ public class UserSaveAction extends Action {
 				BeanUtils.copyProperties(user, userForm);
 				user.setLocale(locale);
 				log.debug("locale: " + locale);
-				List<String> rolesList = Arrays.asList(roles);
-				List<String> rolesCopy = new ArrayList<String>();
-				rolesCopy.addAll(rolesList);
-				log.debug("rolesList.size: " + rolesList.size());
 				UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
-				Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
-				Set<UserOrganisationRole> uorsCopy = new HashSet<UserOrganisationRole>();
-				uorsCopy.addAll(uors);
-				//remove the common part from the rolesList and uors
-				//to get the uors to remove and the roles to add 
-				for(String roleId : rolesList) { 
-					for(UserOrganisationRole uor : uors) {
-						if (uor.getRole().getRoleId().toString().equals(roleId)) {
-							rolesCopy.remove(roleId);
-							uorsCopy.remove(uor);
+				if (uo != null ) {
+					List<String> rolesList = Arrays.asList(roles);
+					List<String> rolesCopy = new ArrayList<String>();
+					rolesCopy.addAll(rolesList);
+					log.debug("rolesList.size: " + rolesList.size());
+					Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
+					Set<UserOrganisationRole> uorsCopy = new HashSet<UserOrganisationRole>();
+					uorsCopy.addAll(uors);
+					// remove the common part from the rolesList and uors
+					// to get the uors to remove and the roles to add 
+					for(String roleId : rolesList) { 
+						for(UserOrganisationRole uor : uors) {
+							if (uor.getRole().getRoleId().toString().equals(roleId)) {
+								rolesCopy.remove(roleId);
+								uorsCopy.remove(uor);
+							}
 						}
 					}
+					uors.removeAll(uorsCopy);
+					for(String roleId : rolesCopy){
+						UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(rolelist, roleId));
+						getService().save(uor);
+						uors.add(uor);
+					}
+					uo.setUserOrganisationRoles(uors);
 				}
-				uors.removeAll(uorsCopy);
-				for(String roleId : rolesCopy){
-					UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(rolelist, roleId));
-					getService().save(uor);
-					uors.add(uor);
-				}
-				uo.setUserOrganisationRoles(uors);
 				getService().save(user);
 			} else { // create user
 				log.debug("creating user...");
@@ -180,7 +183,6 @@ public class UserSaveAction extends Action {
 					List<Organisation> orgs = new ArrayList<Organisation>();
 					// if user is to be added to a class, make user a member of
 					// parent course also
-					Organisation org = (Organisation)getService().findById(Organisation.class, orgId);
 					orgs.add(org);
 					OrganisationType orgType = org.getOrganisationType();
 					if (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
@@ -210,6 +212,7 @@ public class UserSaveAction extends Action {
 				userForm.set("userId", null);
 			}
 			saveErrors(request, errors);
+			request.setAttribute("orgId", orgId);
 			return mapping.findForward("user");
 		}
 	}
