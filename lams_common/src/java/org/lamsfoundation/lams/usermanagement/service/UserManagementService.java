@@ -382,7 +382,8 @@ public class UserManagementService implements IUserManagementService {
 		Map<String,Object> properties = new HashMap<String,Object>();
 		properties.put("user.userId",userId);
 		properties.put("organisation.organisationId",orgId);
-		return (UserOrganisation)baseDAO.findByProperties(UserOrganisation.class,properties).get(0);
+		List results = baseDAO.findByProperties(UserOrganisation.class,properties);
+		return results.isEmpty() ? null : (UserOrganisation)results.get(0);
 	}
 
 	private User createWorkspaceForUser(User user) {
