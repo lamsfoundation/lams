@@ -93,8 +93,8 @@
 						<td align="center">
 							${item.title}
 							<c:if test="${!item.createByAuthor}">
-						[${item.createBy.loginName}]
-					</c:if>
+								[${item.createBy.loginName}]
+							</c:if>
 						</td>
 						<td align="center">
 							<c:if test="${item.complete}">

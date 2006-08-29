@@ -1,5 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<c:set var="sessionMapID" value="${param.sessionMapID}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="mode" value="${sessionMap.mode}"/>
+<c:set var="title" value="${sessionMap.title}"/>
+
 <html:html locale="true">
 <head>
 	<title><fmt:message key="export.title" /></title>
@@ -22,9 +28,8 @@
 
 <div id="page-learner"><!--main box 'page'-->
 
-	<h1 class="no-tabs-below"> </h1>
+	<h1 class="no-tabs-below">${title} </h1>
 	<div id="header-no-tabs-learner">
-
 	</div><!--closes header-->
 
 	<div id="content-learner">

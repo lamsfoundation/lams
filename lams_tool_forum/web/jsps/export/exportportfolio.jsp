@@ -1,5 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<c:set var="sessionMapID" value="${param.sessionMapID}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="ToolContentTopicList" value="${sessionMap.ToolContentTopicList}"/>
+<c:set var="mode" value="${sessionMap.mode}"/>
+<c:set var="title" value="${sessionMap.title}"/>
+
 <html:html locale="true">
 
 <head>
@@ -16,9 +22,6 @@
 
 <div id="content-learner">
 
-	<h2>
-		<fmt:message key="title.message.view.topic" />
-	</h2>
 <c:forEach var="entry" items="${ToolContentTopicList}">
 	<c:set var="sessionName" value="${entry.key}"/>
 	<h2>

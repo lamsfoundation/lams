@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.forum.web.actions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -80,20 +82,25 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 		
+//		initial sessionMap
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
-			 request.getSession().setAttribute(AttributeNames.PARAM_MODE, ToolAccessMode.LEARNER);
-			learner(request,response,directoryName,cookies);
+			sessionMap.put(AttributeNames.PARAM_MODE, ToolAccessMode.LEARNER);
+			learner(request,response,directoryName,cookies,sessionMap);
 		}else if (StringUtils.equals(mode,ToolAccessMode.TEACHER.toString())){
-			request.getSession().setAttribute(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER);
-			teacher(request,response,directoryName,cookies);
+			sessionMap.put(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER);
+			teacher(request,response,directoryName,cookies,sessionMap);
 		}
 		
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
-		writeResponseToFile(basePath+"/jsps/export/exportportfolio.jsp",directoryName,FILENAME,cookies);
+		writeResponseToFile(basePath+"/jsps/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
+				,directoryName,FILENAME,cookies);
 		
 		return FILENAME;
 	}
-    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
     {
         
         IForumService forumService = ForumServiceProxy.getForumService(getServletContext());
@@ -124,15 +131,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         Map sessionTopicMap = new TreeMap();
         sessionTopicMap.put(session.getSessionName(), msgDtoList);
         
-		request.getSession().setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
+		sessionMap.put(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
 		
 		//set forum title 
-		request.setAttribute(ForumConstants.ATTR_FORUM_TITLE, session.getForum().getTitle());
+		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, session.getForum().getTitle());
 		
     }
 
     
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
     {
     	IForumService forumService = ForumServiceProxy.getForumService(getServletContext());
        
@@ -162,7 +169,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         	List<MessageDTO> sessionMsgDTO = getSessionTopicList(session.getSessionId(), directoryName, forumService);
     		topicsByUser.put(session.getSessionName(),sessionMsgDTO);	
         }
-		request.getSession().setAttribute(ForumConstants.ATTR_TOOL_CONTENT_TOPICS,topicsByUser);
+        sessionMap.put(ForumConstants.ATTR_TOOL_CONTENT_TOPICS,topicsByUser);
+        
+//      set forum title 
+		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, content.getTitle());
     }
 
 	/**

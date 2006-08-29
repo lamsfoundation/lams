@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static final long serialVersionUID = -4529093489007108143L;
@@ -87,11 +88,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		ISubmitFilesService sbmtService = SubmitFilesServiceProxy
 				.getSubmitFilesService(getServletContext());
 
+		//		initial sessionMap
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
 		Map map = null;
 		if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-			map = learner(request, response, directoryName, cookies, sbmtService);
+			map = learner(request, response, directoryName, cookies, sbmtService,sessionMap);
 		} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-			map = teacher(request, response, directoryName, cookies, sbmtService);
+			map = teacher(request, response, directoryName, cookies, sbmtService,sessionMap);
 		}
 
 		String basePath = request.getScheme() + "://" + request.getServerName()
@@ -204,12 +209,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		// TODO
 		
 		// writing out the attachmentList
-		request.getSession().setAttribute("attachmentList", attachmentList);
-		writeResponseToFile(basePath + "/export/exportAttachmentList.jsp",
+		sessionMap.put("attachmentList", attachmentList);
+		writeResponseToFile(basePath + "/export/exportAttachmentList.jsp?sessionMapID="+sessionMap.getSessionID(),
 				directoryName, "attachment_list.txt", cookies);
 		
 		// generate the submit main page
-		writeResponseToFile(basePath + "/export/exportportfolio.jsp",
+		writeResponseToFile(basePath + "/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID(),
 				directoryName, FILENAME, cookies);
 
 		return FILENAME;
@@ -217,7 +222,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	public Map learner(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies, ISubmitFilesService sbmtService) {
+			HttpServletResponse response, String directoryName, Cookie[] cookies, ISubmitFilesService sbmtService, HashMap sessionMap) {
 		
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
@@ -235,9 +240,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 
-		SubmitFilesContent content = sbmtService
-				.getSubmitFilesContent(toolContentID);
-
+		SubmitFilesSession session = sbmtService.getSessionById(toolSessionID);
+		if (session == null) {
+			String error = "The session does not exist.";
+			logger.error(error);
+			throw new SubmitFilesException(error);
+		}
+		SubmitFilesContent content = session.getContent();
 		if (content == null) {
 			String error = "The content for this activity has not been defined yet.";
 			logger.error(error);
@@ -261,12 +270,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		//add session name to construct a new map
 		Map report = new TreeMap(this.new StringComparator());
 		report.put(sbmtService.getSessionById(toolSessionID).getSessionName(), userFilesMap);
-		request.getSession().setAttribute("report", report);
+		sessionMap.put("report", report);
 		return userFilesMap;
 	}
 
 	public Map teacher(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies, ISubmitFilesService sbmtService) {
+			HttpServletResponse response, String directoryName, Cookie[] cookies, ISubmitFilesService sbmtService, HashMap sessionMap) {
 		
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
@@ -298,7 +307,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 //		add session name to construct a new map
-		request.getSession().setAttribute("report", report);
+		sessionMap.put("report", report);
 
 		return allFileMap;
 	}

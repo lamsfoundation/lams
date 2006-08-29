@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.rsrc.web.servlet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -44,6 +45,7 @@ import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Export portfolio servlet to export all shared resource into offline HTML
@@ -61,13 +63,18 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private final String FILENAME = "shared_resources_main.html";
 
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+
+//		initial sessionMap
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
-				learner(request, response, directoryName, cookies);
+				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
+				learner(request, response, directoryName, cookies,sessionMap);
 			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
-				teacher(request, response, directoryName, cookies);
+				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
+				teacher(request, response, directoryName, cookies,sessionMap);
 			}
 		} catch (ResourceApplicationException e) {
 			logger.error("Cannot perform export for share resource tool.");
@@ -75,12 +82,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath();
-		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp", directoryName, FILENAME, cookies);
+		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
+				, directoryName, FILENAME, cookies);
 
 		return FILENAME;
 	}
 
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws ResourceApplicationException {
 
 		IResourceService service = ResourceServiceProxy.getResourceService(getServletContext());
@@ -99,22 +107,25 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new ResourceApplicationException(error);
 		}
 
-		Resource content = service.getResourceByContentId(toolSessionID);
+		Resource content = service.getResourceBySessionId(toolSessionID);
 
 		if (content == null) {
 			String error = "The content for this activity has not been defined yet.";
 			logger.error(error);
 			throw new ResourceApplicationException(error);
 		}
+		
+		
 		List<Summary> group = service.exportBySessionId(toolSessionID,true);
 		
 		List<List> groupList = new ArrayList<List>();
 		if(group.size() > 0)
 			groupList.add(group);
-		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws ResourceApplicationException {
 		IResourceService service = ResourceServiceProxy.getResourceService(getServletContext());
 
@@ -135,7 +146,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
 		
 		// put it into HTTPSession
-		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 }

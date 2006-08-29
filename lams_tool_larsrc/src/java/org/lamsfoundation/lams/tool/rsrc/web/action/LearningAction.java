@@ -160,6 +160,9 @@ public class LearningAction extends Action {
 		if(items != null){
 			//remove hidden items.
 			for(ResourceItem item : items){
+				//becuase in webpage will use this login name. Here is just 
+				//initial it to avoid session close error in proxy object. 
+				item.getCreateBy().getLoginName();
 				if(!item.isHide()){
 					resourceItemList.add(item);
 				}

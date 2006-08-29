@@ -3,6 +3,9 @@
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
+<c:set var="sessionMapID" value="${param.sessionMapID}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="report" value="${sessionMap.report}"/>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
