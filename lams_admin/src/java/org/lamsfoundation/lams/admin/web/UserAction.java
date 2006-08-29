@@ -202,24 +202,7 @@ public class UserAction extends LamsDispatchAction {
 		
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
-		User user = (User)getService().findById(User.class,userId);
-		Workspace workspace = user.getWorkspace();
-		WorkspaceFolder wf = workspace.getDefaultFolder();		
-		Set wwfs = workspace.getWorkspaceWorkspaceFolders();
-		
-		Iterator iter = wwfs.iterator();
-		if (iter.hasNext()) {
-			WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder)iter.next();
-			if (!iter.hasNext()) {				
-				log.debug("deleting wkspc_wkspc_folder: "+wwf.getId());
-				getService().delete(wwf);
-				getService().delete(wf);
-				getService().delete(workspace);
-				getService().delete(user);
-				log.debug("deleted user: "+userId);
-			}
-		}
-		
+		getService().removeUser(userId);
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
 	}
