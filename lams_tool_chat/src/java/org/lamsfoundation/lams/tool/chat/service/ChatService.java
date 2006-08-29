@@ -1092,16 +1092,16 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     /**
      * Import the data for a 1.0.2 Chat
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
     	Chat toolContentObj = new Chat();
     	toolContentObj.setContentInUse(Boolean.FALSE);
-    	toolContentObj.setCreateBy(newUserId != null ? new Long(newUserId.longValue()) : null);
+    	toolContentObj.setCreateBy(new Long(user.getUserID().longValue()));
     	toolContentObj.setCreateDate(now);
     	toolContentObj.setDefineLater(Boolean.FALSE);
     	toolContentObj.setFilterKeywords(null);
-    	toolContentObj.setFilteringEnabled(null);
+    	toolContentObj.setFilteringEnabled(Boolean.FALSE);
     	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
     	toolContentObj.setLockOnFinished(Boolean.FALSE);
     	toolContentObj.setOfflineInstructions(null);
