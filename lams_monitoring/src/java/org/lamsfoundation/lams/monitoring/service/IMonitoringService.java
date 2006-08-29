@@ -332,7 +332,7 @@ public interface IMonitoringService
      * @return String The required information in WDDX format
      * @throws IOException
      */
-    public String getActivityMonitorURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException;
+    public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID)throws IOException, LamsToolServiceException;
   
    /**
      * This method moves the learning design corresponding to the given

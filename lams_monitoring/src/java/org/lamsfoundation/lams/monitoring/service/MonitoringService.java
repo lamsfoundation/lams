@@ -397,7 +397,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 			}
         }
             	
-        //copy the current learning design
+         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(copyType),
                                                                                   user,
@@ -1157,14 +1157,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityMonitorURL(java.lang.Long)
 	 */
-	public String getActivityMonitorURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException{
+	public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID)throws IOException, LamsToolServiceException{
 		Activity activity = activityDAO.getActivityByActivityId(activityID);
     	
     	if(activity==null){
     		log.error("getActivityMonitorURL activity missing. Activity ID "+activityID+" activity " +activity);
     		
     	} else if ( activity.isToolActivity() || activity.isSystemToolActivity() ){
-        	return lamsCoreToolService.getToolMonitoringURL(lessonID, activity);
+        	return lamsCoreToolService.getToolMonitoringURL(lessonID, activity) + "&contentFolderID=" + contentFolderID;
     	}
     	return null;
 	}
