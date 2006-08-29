@@ -118,9 +118,22 @@ public class UserSearchAction extends Action {
 			saveMessages(request,messages);
 		}
 		
+		userList = removeDisabledUsers(userList);
+		
 		userSearchForm.set("searched", true);
 		request.setAttribute("userList",userList);
 		return mapping.findForward("usersearchlist");
+	}
+	
+	private List removeDisabledUsers(List userList) {
+		List filteredList = new ArrayList();
+		for(int i=0; i<userList.size(); i++) {
+			User u = (User)userList.get(i);
+			if(!u.getDisabledFlag()) {
+				filteredList.add(u);
+			}
+		}
+		return filteredList;
 	}
 	
 	private IUserManagementService getService(){
