@@ -95,12 +95,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 													<c:if test="${qaGeneralMonitoringDTO.editResponse != 'true'}">	  	 									 			
 														<tr> 
-															 <td  valign=top>   <c:out value="${userData.userName}"/>   </td>  
+															 <td  valign=top>  <c:out value="${userData.userName}"/>   </td>  
 															 <td  valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 															 
-															  <td align=right valign=top> 
+															  <td align=right valign=top width="150"> 
 																<b> <bean:message key="label.edit"/> </b>
-																<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	 																
+																<a title="<bean:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">
+							                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
+																</a> 
 															  </td>
 
 		   													 <td align=right valign=top> 				 
@@ -137,12 +139,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:if test="${qaGeneralMonitoringDTO.editResponse == 'true'}">	  	
 														<c:if test="${editableResponseId == responseUid}">	  	 									 			
 															<tr> 
-																 <td valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																 <td valign=top>  <c:out value="${userData.userName}"/>   </td>  
 																 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 													
-																  <td align=right valign=top>  
+																  <td align=right valign=top width="150">  
 																  	<b> <bean:message key="label.save"/> </b>
-																  	<img src="<c:out value="${tool}"/>images/tick.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">	
+
+																	<a title="<bean:message key='label.tooltip.tick'/>" href="javascript:;" onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">
+								                                                <img src="<c:out value="${tool}"/>images/tick.gif" border="0">
+																	</a> 
 																  </td>	  	 																	
 													
 
@@ -180,12 +185,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 														<c:if test="${editableResponseId != responseUid}">	  	 									 			
 															<tr> 
-																 <td valign=top>   <c:out value="${userData.userName}"/>   </td>  
+																 <td valign=top>  <c:out value="${userData.userName}"/>   </td>  
 																 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 
-																  <td align=right valign=top> 
+																  <td align=right valign=top width="150"> 
 																	 <b> <bean:message key="label.edit"/> </b>
-																	<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	
+																	<a title="<bean:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">
+								                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
+																	</a> 
 																  </td>	  	 
 
 			   													 <td align=right valign=top> 				 
@@ -212,7 +219,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${userData.visible != 'true' }"> 			
 														                         <i><bean:message key="label.response.hidden"/> </i> 
 																	</c:if> 								
-																	<input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 																	 
+																	 <c:out value="${userData.response}"/> 
 																 </td>
 															</tr>
 															

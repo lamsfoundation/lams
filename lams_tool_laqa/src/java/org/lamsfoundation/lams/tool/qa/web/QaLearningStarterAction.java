@@ -308,9 +308,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	while (contentIterator.hasNext())
     	{
     		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
+    		logger.debug("qaQueContent: " + qaQueContent);
+    		logger.debug("question: " + qaQueContent.getQuestion());
     		if (qaQueContent != null)
     		{
     			int displayOrder=qaQueContent.getDisplayOrder();
+    			logger.debug("displayOrder: " + displayOrder);
+    			
         		if (displayOrder != 0)
         		{
         			/*
@@ -320,21 +324,22 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
         		}
     		}
     	}
+    	logger.debug("mapQuestions: " + mapQuestions);
+    	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
+    	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
 		
-    	mapAnswers=mapQuestions;
-    	Iterator itMap = mapAnswers.entrySet().iterator();
+    	Iterator itMapQuestions = mapQuestions.entrySet().iterator();
     	
-    	while (itMap.hasNext()) 
+    	while (itMapQuestions.hasNext()) 
     	{
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            pairs.setValue("");
+        	Map.Entry pairs = (Map.Entry)itMapQuestions.next();
+        	mapAnswers.put(pairs.getKey(), "");
+
     	}
     	logger.debug("mapAnswers : " + mapAnswers);
-    	
-    	
     	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
-    	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
-    	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
+    	logger.debug("mapQuestions: " + mapQuestions);
+
     	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
     	
     	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
