@@ -261,7 +261,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
-	    	    Map mapQuestions= new TreeMap(new QaComparator());
+	    Map mapQuestions= new TreeMap(new QaComparator());
 		Map mapAnswers= new TreeMap(new QaComparator());
 		
 	    generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
@@ -358,7 +358,14 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
     	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
     	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
-
+    	
+    	if (mapAnswers != null)
+    	{
+    	    String currentAnswer=(String)mapAnswers.get("1");
+    	    logger.debug("first entry as the current answer : " + currentAnswer);
+    	    generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
+    	}
+    	
     	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
     	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
     	
@@ -503,6 +510,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	
     	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, true, false);
     	
+    	
+    	
         return (mapping.findForward(LOAD_LEARNER));
     }
     
@@ -527,6 +536,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         String currentQuestionIndex=qaLearningForm.getCurrentQuestionIndex(); 
         logger.debug("currentQuestionIndex:" + currentQuestionIndex);
         
+	    Map mapAnswers=(Map)sessionMap.get(MAP_ALL_RESULTS_KEY);
+	    logger.debug("mapAnswers retrieved: " + mapAnswers);
+
+	    if (mapAnswers == null)
+	        mapAnswers= new TreeMap(new QaComparator());
+        
         logger.debug("getting answer for question: " + currentQuestionIndex + "as: " +  qaLearningForm.getAnswer());
         logger.debug("mapSequentialAnswers size:" + mapSequentialAnswers.size());
         
@@ -541,6 +556,16 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         logger.debug("adding new answer:" + qaLearningForm.getAnswer() + " to mapSequentialAnswers.");
         
         logger.debug("updated mapSequentialAnswers:" + mapSequentialAnswers);
+        
+        mapAnswers.put(currentQuestionIndex, qaLearningForm.getAnswer());
+        logger.debug("updated mapAnswers:" + mapAnswers);
+        
+	    sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+    	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+        
 
         int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue(); 
         logger.debug("intCurrentQuestionIndex:" + intCurrentQuestionIndex);
@@ -555,9 +580,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         logger.debug("current map size:" + mapSequentialAnswers.size());
         
         String currentAnswer="";
-        if (mapSequentialAnswers.size() >= intCurrentQuestionIndex)
+        if (mapAnswers.size() >= intCurrentQuestionIndex)
         {
-            currentAnswer=(String)mapSequentialAnswers.get(new Long(intCurrentQuestionIndex).toString());
+            currentAnswer=(String)mapAnswers.get(new Long(intCurrentQuestionIndex).toString());
+            logger.debug("currentAnswer:" + currentAnswer);
         }
         logger.debug("currentAnswer:" + currentAnswer);
         generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);

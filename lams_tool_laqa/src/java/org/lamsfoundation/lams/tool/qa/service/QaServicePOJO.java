@@ -2059,21 +2059,21 @@ public class QaServicePOJO
         
     	Date now = new Date();
     	QaContent toolContentObj = new QaContent();
-    	toolContentObj.setContentLocked(Boolean.FALSE);
+    	toolContentObj.setContentLocked(Boolean.FALSE.booleanValue() );
     	toolContentObj.setCreatedBy(user.getUserID().longValue());
     	toolContentObj.setCreationDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setDefineLater(Boolean.FALSE.booleanValue());
     	toolContentObj.setInstructions(null);
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
     	// TODO add reflection
     	//toolContentObj.setReflectInstructions(null);
     	//toolContentObj.setReflectOnActivity(Boolean.FALSE);
-    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	toolContentObj.setQaContentId(toolContentId);
     	toolContentObj.setUpdateDate(now);
-    	toolContentObj.setQuestionsSequenced(Boolean.FALSE); // there is only 1 question
+    	toolContentObj.setQuestionsSequenced(Boolean.FALSE.booleanValue()); // there is only 1 question
     	toolContentObj.setContent(null);
     	toolContentObj.setReportTitle(null);
     	toolContentObj.setMonitoringReportTitle(null);
