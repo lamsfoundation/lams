@@ -39,6 +39,7 @@ import java.util.Hashtable;
 
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 public interface ToolContentImport102Manager {
 
@@ -46,21 +47,25 @@ public interface ToolContentImport102Manager {
 	public static final String TAGS_JOURNAL = "journal";
 	public static final String TAGS_NOTICEBOARD = "noticeboard";
 	public static final String TAGS_MESSAGEBOARD = "messageboard";
-	public static final String TAGS_LOMS = "loms";
 	public static final String TAGS_CHAT = "chat";
 	public static final String TAGS_RPT_SUBMIT= "reportsubmission";
-	public static final String TAGS_RPT_MARK= "reportmarking";
 	public static final String TAGS_GROUPING = "group";
 	public static final String TAGS_GROUPREPORTING = "groupreporting";
 	public static final String TAGS_RANKING = "ranking";
 	public static final String TAGS_QUESTIONANSWER = "qa";
 	public static final String TAGS_SIMPLE_ASSESSMENT = "simpleassessment";
 	public static final String TAGS_URLCONTENT = "urlcontent";
-	public static final String TAGS_FILECONTENT = "filecontent"; 
 	public static final String TAGS_HTMLNOTICBOARD = "htmlnb";
-	public static final String TAGS_SINGLE_RESOURCE = "singleresource";	
-	public static final String TAGS_IMAGEGALLERY = "imagegallery"; 
-	public static final String TAGS_IMAGERANKING = "imageranking";
+	
+	// the following tools haven't supported for a while or can't be supported by 
+	// import as they are tied to files which won't be in the import, 
+	// so we won't support them in the import
+	// public static final String TAGS_LOMS = "loms"; 
+	// public static final String TAGS_IMAGEGALLERY = "imagegallery"; 
+	// public static final String TAGS_IMAGERANKING = "imageranking";
+	// public static final String TAGS_RPT_MARK= "reportmarking";
+	// public static final String TAGS_SINGLE_RESOURCE = "singleresource"; 
+	// public static final String TAGS_FILECONTENT = "filecontent"; 
 	
 	public static final String CONTENT_BODY = "body"; // used
 	public static final String CONTENT_SHOW_USER = "contentShowUser"; // boolean
@@ -129,44 +134,6 @@ public interface ToolContentImport102Manager {
 	// for file upload - SingleResource, HTMLNoticeboard, Image tools
 	public static final String DIRECTORY_NAME = "directoryName";
 
-	// ImageGallery task tags (extended from Content.java)
-	public static final String CONTENT_IMGG_DIRECTORY = DIRECTORY_NAME;
-	public static final String CONTENT_IMGG_BODY = CONTENT_BODY;
-	public static final String CONTENT_IMGG_DEFINE_LATER = CONTENT_DEFINE_LATER;  //Bolean
-	public static final String CONTENT_IMGG_GROUPING = "grouping";
-	public static final String CONTENT_IMGG_SHOW_USER = CONTENT_SHOW_USER;
-	public static final String CONTENT_IMGG_MAX_IMAGES = "maxImages";
-	public static final String CONTENT_IMGG_ALLOW_SEARCH = "allowSearch"; // Boolean
-	public static final String CONTENT_IMGG_SEARCH_URL = "searchURL"; 
-	public static final String CONTENT_IMGG_ALLOW_URL = "allowURL"; // Boolean
-	public static final String CONTENT_IMGG_ALLOW_UPLOAD = "allowUpload";
-	public static final String CONTENT_IMGG_IMAGES = CONTENT_URL_URLS;
-	
-	// ImageGallery images array (also used by ImageRanking)
-	public static final String CONTENT_IMGG_IMAGE_SID = "sid";
-	public static final String CONTENT_IMGG_IMAGE_COMMENTS = "comments";
-	public static final String CONTENT_IMGG_IMAGE_VIEW_ORDER = "order";
-	public static final String CONTENT_IMGG_IMAGE_DATECREATED = "dateCreated";
-	public static final String CONTENT_IMGG_IMAGE_DATEUPDATED = "dateUpdated";
-	public static final String CONTENT_IMGG_IMAGE_TYPE = "type"; // "resourceType", values are "externalurl" or "file"
-	public static final String CONTENT_IMGG_IMAGE_URL = "url";
-	public static final String CONTENT_IMGG_IMAGE_FILENAME = "filename";
-	public static final String CONTENT_IMGG_IMAGE_PATH = "path";
-	public static final String CONTENT_IMGG_IMAGE_OWNERID = "ownerId";
-	public static final String CONTENT_IMGG_IMAGE_OWNERNAME = "owerName";
-	// Additional field to use the image array for ImageRanking (runtime only)
-	public static final String CONTENT_IMGR_IMAGE_IS_SELECTED = "isSelected";
-
-	// ImageRanking task tags (extended from Content.java)
-	public static final String CONTENT_IMGR_DIRECTORY = DIRECTORY_NAME;
-	public static final String CONTENT_IMGR_BODY = CONTENT_BODY; // this is the description
-	public static final String CONTENT_IMGR_DEFINE_LATER = CONTENT_DEFINE_LATER;  //Bolean
-	public static final String CONTENT_IMGR_GROUPING = "grouping";
-	public static final String CONTENT_IMGR_SHOW_USER = CONTENT_SHOW_USER;
-	public static final String CONTENT_IMGR_MAX_VOTE = CONTENT_VOTE_MAXCHOOSE;
-	public static final String CONTENT_IMGR_PROGRESSIVE_DISPLAY = CONTENT_VOTE_PROGRESSIVE_DISPLAY; // Boolean
-	public static final String CONTENT_IMGR_IMAGES = CONTENT_URL_URLS;
-	// ImageRanking images array - same as the ImageGallery images array
 
     /**
      * Import some 1.0.2 data, where the importValues is a map of the fields from the 
@@ -182,12 +149,12 @@ public interface ToolContentImport102Manager {
      * 
      * Does not set the "reflective" fields.
      * 
-     * @param toolContentId new tool content id
-     * @param newUserId user id of the person importing the data
-     * @param importValues map of values to import. 
+     * @param toolContentId new tool content id - will not be null.
+     * @param user user importing the data - will not be null.
+     * @param importValues map of values to import - will not be null.
      * @throws ToolException an error occurs
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues) 
+    public void import102ToolContent(Long toolContentId, UserDTO creator, Hashtable importValues) 
     	throws ToolException;
     
     /** 
@@ -195,8 +162,8 @@ public interface ToolContentImport102Manager {
      * do not support the title entry for reflection, so any text in that field will be
      * lost during the import. Only the description is kept.
      * 
-     * @param title heading to use above reflective entry box
-     * @param description default contents for the reflective entry box.
+     * @param title heading to use above reflective entry box - may be null
+     * @param description default contents for the reflective entry box - may be null
     */
     public void setReflectiveData(Long toolContentId, String title, String description) 
 		throws ToolException, DataMissingException; 

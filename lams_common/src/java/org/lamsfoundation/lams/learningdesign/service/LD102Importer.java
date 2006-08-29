@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -101,6 +102,8 @@ public class LD102Importer implements ApplicationContextAware{
 	private String originalPacket = null;
 	private List<String> toolsErrorMsgs;
 	private Date createDate = new Date();
+	private User importer = null;
+	private UserDTO importerDTO = null; // pass the dto to tools, rather than the real user object 
 	
 	/** 
 	* Store relationship between an activity and its grouping for processing after all the activities have been process.
@@ -317,6 +320,7 @@ public class LD102Importer implements ApplicationContextAware{
 		this.libraryActivityUiImages = getLibraryActivityUiImages();
 		this.toolImportSupport = getToolImportSupport();
 		this.toolsErrorMsgs = toolsErrorMsgs;
+			
 		if ( toolsErrorMsgs == null ) {
 			log.warn("The list toolsErrorMsgs supplied is null so any warnings will be logged but won't appear in the user's screen.");
 			toolsErrorMsgs = new ArrayList<String>();
@@ -324,9 +328,11 @@ public class LD102Importer implements ApplicationContextAware{
 		
 		originalPacket = ldWddxPacket;
 		
-		if (importer == null)
-		{
+		if (importer == null) {
 			throw new ImportToolContentException("Importer is missing");
+		} else {
+			this.importer = importer;
+			this.importerDTO = importer.getUserDTO();
 		}
 
 		if (containsNulls(ldWddxPacket))
@@ -367,7 +373,7 @@ public class LD102Importer implements ApplicationContextAware{
 		
 		else if (isLearningDesign((String) ldHashTable.get(WDDXTAGS102.OBJECT_TYPE))){
 			
-			processLearningDesign(ldHashTable, importer, folder);
+			processLearningDesign(ldHashTable, folder);
 			
 			Vector<ValidationErrorDTO> listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(ldInProgress);
 			if (listOfValidationErrorDTOs.size() > 0) {
@@ -403,12 +409,12 @@ public class LD102Importer implements ApplicationContextAware{
 		toolsErrorMsgs.add("Invalid import data format - WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
-	private void processLearningDesign(Hashtable newLdHashTable, User importer, WorkspaceFolder folder)
+	private void processLearningDesign(Hashtable newLdHashTable, WorkspaceFolder folder)
 	{
 		
 		// put the learning design in a member variable - the updating of the tasks and
 		// activities needs to get to the content, but its a pain to keep passing everything around!
-		createLearningDesign(newLdHashTable, importer, folder);
+		createLearningDesign(newLdHashTable, folder);
 		baseDAO.insert(ldInProgress);
 
 		// put all the content in the contentMap ready for use by activities.
@@ -452,12 +458,11 @@ public class LD102Importer implements ApplicationContextAware{
 	 * <li>lams_license - all details null as 1.0.x doesn't support licenses</li>
 	 * <li>lams_copy_type - Set to 1.This indicates it is "normal" design.</li>
 	 * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
-	 * <li>User - The person who execute import action</li>
 	 * <li>OriginalLearningDesign - set to null</li>
 	 * 
 	 * Sets ldInProgress to the new learning design.
 	 */
-	private void createLearningDesign(Hashtable newLdHashTable, User importer, WorkspaceFolder folder) {
+	private void createLearningDesign(Hashtable newLdHashTable, WorkspaceFolder folder) {
 		
 		LearningDesign ld = new LearningDesign();
 	
@@ -565,7 +570,7 @@ public class LD102Importer implements ApplicationContextAware{
 			createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
 			
 		} else if ( taskTransitions.size()==3 ) {
-			createReflectiveActivity(activityDetails, activityUIID, nextTransition, xCoOrd, yCoOrd, title, description, taskTransitions);
+			createTwoPartActivity(activityDetails, activityUIID, nextTransition, xCoOrd, yCoOrd, title, description, taskTransitions);
 			
 		} else {
 			String message = "Unexpected activity format for activity "+ title +" expect either 1 or 3 tasks within an activity. This activity will be missing from the sequence. Activity "+activityDetails;
@@ -575,40 +580,28 @@ public class LD102Importer implements ApplicationContextAware{
 		
 	}
 
-	/** Assume this is a "do something on one task/multi-task, reflect on it another multitask" 
+	/** Assume that this is either a "do something on one task/multi-task, reflect on it another multitask" 
 	 * e.g. Chat & Scribe + Notebook Scribe + Notebook
+	 * or a "do something and view the results on another page" e.g. Voting.
+	 * <p>
+	 * So look for a journal and if we find it assume we have case 1. 
 	 * In all cases in 1.0.2 the second part should only be for the purposes of reflection
 	 * so we just need to convert the first part and set the "journal" flag on the task that
 	 * had the content output (as that is the one displayed on the following notebook).
+	 * <p>
+	 * If we don't find a journal then we assume it is the second case
 	 */ 
-	private Activity createReflectiveActivity(Hashtable activityDetails, Integer activityUIID, Long nextTransition, Integer xCoOrd, Integer yCoOrd, String title, String description, List taskTransitions) throws WDDXProcessorConversionException {
+	private Activity createTwoPartActivity(Hashtable activityDetails, Integer activityUIID, Long nextTransition, Integer xCoOrd, Integer yCoOrd, String title, String description, List taskTransitions) throws WDDXProcessorConversionException {
 		Activity realTask = null;
 		Activity reflectiveTask = null;
-		String reflectiveTitle = null;
-		String reflectiveDescription = null;
+		String[] reflectiveText = null; // 2 entries: 0 title, 1 description
 
-		Integer firstTaskId = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_FIRSTTASK);
-		if ( firstTaskId == null ) {
-			// hmmm, firstTaskId missing - try to derive it from the transition.
-			Iterator iter = taskTransitions.iterator();
-			while ( iter.hasNext() ) {
-				Hashtable task = (Hashtable) iter.next();
-				if ( isTransition((String) task.get(WDDXTAGS102.OBJECT_TYPE)) ) {
-					firstTaskId =  WDDXProcessor.convertToInteger(task, WDDXTAGS102.TRANSITION_FROM_TASKS);
-				}
-			}
-			
-			if ( firstTaskId == null || NUMERIC_NULL_VALUE_INTEGER.equals(firstTaskId) ) {
-				firstTaskId = null;
-				String message = "Unable to determine the first task definition in a combined activity "+ title +". This activity will be missing from the sequence. Activity "+activityDetails;
-				log.warn(message);
-				toolsErrorMsgs.add(message);
-				return null;
-			} else {
-				String message = "First task definition missing from activity "+ title +". Guessed it from the rest of the packet. This activity may be incorrect. Activity "+activityDetails;
-				log.warn(message);
-				toolsErrorMsgs.add(message);
-			}
+		Integer firstTaskId = getFirstTaskId(activityDetails, title, taskTransitions);
+		if ( firstTaskId == null || NUMERIC_NULL_VALUE_INTEGER.equals(firstTaskId) ) {
+			String message = "Unable to determine the first task definition in a combined activity "+ title +". This activity will be missing from the sequence. Activity "+activityDetails;
+			log.warn(message);
+			toolsErrorMsgs.add(message);
+			return null;
 		}
 		
 		Iterator iter = taskTransitions.iterator();
@@ -625,58 +618,14 @@ public class LD102Importer implements ApplicationContextAware{
 					
 					// create the activity that we keep
 					realTask = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
-
-					Integer outputContentTaskId  = null;
-					if ( isMultiTask(objectType, toolType) ) {
-						outputContentTaskId = WDDXProcessor.convertToInteger(task, WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK);
-						ComplexActivity cActivity = (ComplexActivity) realTask;
-						if ( outputContentTaskId != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(outputContentTaskId) ) {
-							Iterator actIter = cActivity.getActivities().iterator();
-							while (reflectiveTask==null && actIter.hasNext()) {
-								Activity subActivity = (Activity) actIter.next();
-								if ( outputContentTaskId.equals(subActivity.getActivityUIID()) ) {
-									reflectiveTask = subActivity;
-								}
-							}
-						}
-					} else {
-						reflectiveTask = realTask;
-					}
-					
-					if ( reflectiveTask==null ) {
-						String message = "Can't find the task in activity "+title+" that should be reflective. The activity will be created but the reflective part will be missing. Task is "+activityDetails;
-						log.warn(message);
-						toolsErrorMsgs.add(message);
-					} 
+					// one of the sub-activities may be reflective
+					reflectiveTask = findReflectiveTask(realTask, reflectiveTask, task, objectType, toolType);
 					
 				} else {
 					
-					// reflective part - just need the title and description - don't create matching activities
-					List subTasks = (List) task.get(WDDXTAGS102.MTASK_SUBTASKS);
-					Integer journalTaskInputContentId = null;
-					if ( subTasks != null ) {
-						Iterator subTaskIterator = subTasks.iterator();
-						while (subTaskIterator.hasNext()) {
-							Hashtable subTask = (Hashtable) subTaskIterator.next();
-							if ( ToolContentImport102Manager.TAGS_JOURNAL.equals(subTask.get(WDDXTAGS102.TASK_TOOLTYPE)) ) {
-								journalTaskInputContentId = WDDXProcessor.convertToInteger(subTask, WDDXTAGS102.TASK_INPUT_CONTENT);
-							}
-						}
-					}
-					
-					Hashtable journalContent = null;
-					if ( journalTaskInputContentId != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(journalTaskInputContentId) ) {
-						journalContent = contentMap.get(journalTaskInputContentId);
-					} 
-					
-					if ( journalContent != null ) {
-						reflectiveTitle = (String) journalContent.get(WDDXTAGS102.TITLE);
-						reflectiveDescription = (String) journalContent.get(WDDXTAGS102.CONTENT_BODY);
-					} else {
-						String message = "Can't find the journal details in the reflective part of "+title+". The reflective settings in this activity will be missing. Task is "+task;
-						log.warn(message);
-						toolsErrorMsgs.add(message);
-					}
+					// second partof the 1.0.2 activity - if it has a journal we just need the 
+					// title and description - don't create matching activities
+					reflectiveText = getReflectiveText(title, task);
 
 				}
 			}
@@ -686,18 +635,89 @@ public class LD102Importer implements ApplicationContextAware{
 			String message = "Couldn't find the \"real\" activity inside "+title+". This activity will be missing from the sequence. Activity "+activityDetails;
 			log.warn(message);
 			toolsErrorMsgs.add(message);
-		} else if ( reflectiveTask == null ) {
-			String message = "Couldn't find \"reflective\" activity inside "+title+". The reflective settings in this activity will be missing. ";
-			log.warn(message);
-			toolsErrorMsgs.add(message);
-		} else {
-			// TODO make the appropriate activity reflective. Don't have support for this in the tools yet!
-			String message = "Activity "+reflectiveTask.getTitle()+" should be reflective ("+reflectiveTitle+":"+reflectiveDescription+") but this isn't supported in the tools yet. To be added when the tools are ready.";
-			log.warn(message);
-			toolsErrorMsgs.add(message);
+		} else if ( reflectiveTask != null ) {
+	    	try {
+	    		ToolActivity toolActivity = (ToolActivity) reflectiveTask;
+			    ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(toolActivity.getTool().getServiceName());
+		    	toolService.setReflectiveData(toolActivity.getToolContentId(), reflectiveText[0], reflectiveText[1]);
+	    	} catch ( Exception e ) {
+		    	String message = "Tool content for activity "+title+" should be reflective ("+reflectiveText[0]+":"+reflectiveText[1]+") but activity doesn't seem to support reflection. Reflective details will be missing."; 
+				log.warn(message,e);
+				toolsErrorMsgs.add(message);
+	    	}
 		}
 		
 		return realTask;
+	}
+
+	private Activity findReflectiveTask(Activity realTask, Activity reflectiveTask, Hashtable task, String objectType, String toolType) throws WDDXProcessorConversionException {
+		Integer outputContentTaskId  = null;
+		if ( isMultiTask(objectType, toolType) ) {
+			outputContentTaskId = WDDXProcessor.convertToInteger(task, WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK);
+			ComplexActivity cActivity = (ComplexActivity) realTask;
+			if ( outputContentTaskId != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(outputContentTaskId) ) {
+				Iterator actIter = cActivity.getActivities().iterator();
+				while (reflectiveTask==null && actIter.hasNext()) {
+					Activity subActivity = (Activity) actIter.next();
+					if ( outputContentTaskId.equals(subActivity.getActivityUIID()) ) {
+						reflectiveTask = subActivity;
+					}
+				}
+			}
+		} else {
+			reflectiveTask = realTask;
+		}
+		return reflectiveTask;
+	}
+
+	/** If a journal entry exists, return the title and description. If it doesn't, return ["",""] */
+	private String[] getReflectiveText(String title, Hashtable task) throws WDDXProcessorConversionException {
+		String[] reflectiveText = new String[2];
+		List subTasks = (List) task.get(WDDXTAGS102.MTASK_SUBTASKS);
+		Integer journalTaskInputContentId = null;
+		if ( subTasks != null ) {
+			Iterator subTaskIterator = subTasks.iterator();
+			while (subTaskIterator.hasNext()) {
+				Hashtable subTask = (Hashtable) subTaskIterator.next();
+				if ( ToolContentImport102Manager.TAGS_JOURNAL.equals(subTask.get(WDDXTAGS102.TASK_TOOLTYPE)) ) {
+					journalTaskInputContentId = WDDXProcessor.convertToInteger(subTask, WDDXTAGS102.TASK_INPUT_CONTENT);
+				}
+			}
+		}
+		
+		Hashtable journalContent = null;
+		if ( journalTaskInputContentId != null && ! NUMERIC_NULL_VALUE_INTEGER.equals(journalTaskInputContentId) ) {
+			journalContent = contentMap.get(journalTaskInputContentId);
+		} 
+		
+		if ( journalContent != null ) {
+			reflectiveText[0] = (String) journalContent.get(WDDXTAGS102.TITLE);
+			reflectiveText[1] = (String) journalContent.get(WDDXTAGS102.CONTENT_BODY);
+		} else {
+			reflectiveText[0] = "";
+			reflectiveText[1] = "";
+		}
+		return reflectiveText;
+	}
+
+	private Integer getFirstTaskId(Hashtable activityDetails, String title, List taskTransitions) throws WDDXProcessorConversionException {
+		Integer firstTaskId = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS102.ACT_FIRSTTASK);
+		if ( firstTaskId == null ) {
+			// hmmm, firstTaskId missing - try to derive it from the transition.
+			Iterator iter = taskTransitions.iterator();
+			while ( iter.hasNext() ) {
+				Hashtable task = (Hashtable) iter.next();
+				if ( isTransition((String) task.get(WDDXTAGS102.OBJECT_TYPE)) ) {
+					firstTaskId =  WDDXProcessor.convertToInteger(task, WDDXTAGS102.TRANSITION_FROM_TASKS);
+				}
+			}
+			if ( firstTaskId != null ) {
+				String message = "First task definition missing from activity "+ title +". Guessed it from the rest of the packet. This activity may be incorrect. Activity "+activityDetails;
+				log.warn(message);
+				toolsErrorMsgs.add(message);
+			}
+		}
+		return firstTaskId;
 	}
 
 	/** Handles simple (including grouping), parallel and optional activities. Can cope with the sub activities but not
@@ -891,7 +911,7 @@ public class LD102Importer implements ApplicationContextAware{
 	    		activity.setDefineLater(defineLater);
 	    		
 			    ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(tool.getServiceName());
-		    	toolService.import102ToolContent(toolContentId, ldInProgress.getUser().getUserId(), content);
+		    	toolService.import102ToolContent(toolContentId, importerDTO, content);
 	    	} catch ( Exception e ) {
 		    	String message = "Tool content for activity "+title+" cannot be set up due to an error. Activity will be use the default content. Activity is "+taskDetails; 
 				log.warn(message,e);
