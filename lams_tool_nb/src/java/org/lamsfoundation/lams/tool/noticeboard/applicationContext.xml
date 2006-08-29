@@ -52,7 +52,11 @@
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
-				
+
+				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean> 

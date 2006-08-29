@@ -94,7 +94,7 @@ import org.springframework.dao.DataAccessException;
  * @author Manpreet Minhas
  */
 public class SubmitFilesService implements ToolContentManager,
-		ToolSessionManager, ISubmitFilesService {
+		ToolSessionManager, ISubmitFilesService, ToolContentImport102Manager {
 
 	private static Logger log = Logger.getLogger(SubmitFilesService.class);
 	
@@ -776,7 +776,7 @@ public class SubmitFilesService implements ToolContentManager,
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
     	SubmitFilesContent toolContentObj = new SubmitFilesContent();

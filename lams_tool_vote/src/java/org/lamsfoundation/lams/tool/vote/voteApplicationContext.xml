@@ -94,6 +94,10 @@
 					<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="exportToolSession">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="leaveToolSession">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="importToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="exportToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

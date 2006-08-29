@@ -101,6 +101,10 @@
 					<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="exportToolSession">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="leaveToolSession">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="importToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="exportToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

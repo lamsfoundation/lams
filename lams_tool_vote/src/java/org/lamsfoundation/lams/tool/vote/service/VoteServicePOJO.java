@@ -23,10 +23,12 @@
 package org.lamsfoundation.lams.tool.vote.service;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -50,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -73,8 +76,11 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -87,7 +93,7 @@ import org.springframework.dao.DataAccessException;
  * 
  */
 public class VoteServicePOJO implements
-                              IVoteService, ToolContentManager, ToolSessionManager, VoteAppConstants
+                              IVoteService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, VoteAppConstants
                
 {
 	static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
@@ -2616,4 +2622,87 @@ public class VoteServicePOJO implements
 		this.exportContentService = exportContentService;
 	}
 
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
+
+    /**
+     * Import the data for a 1.0.2 Chat
+     */
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	VoteContent toolContentObj = new VoteContent();
+    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	toolContentObj.setCreatedBy(user.getUserID().longValue());
+    	toolContentObj.setCreationDate(now);
+    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setOfflineInstructions(null);
+    	toolContentObj.setOnlineInstructions(null);
+    	// TODO add reflection
+    	//toolContentObj.setReflectInstructions(null);
+    	//toolContentObj.setReflectOnActivity(Boolean.FALSE);
+    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	
+    	toolContentObj.setContent(null);
+    	toolContentObj.setUpdateDate(now);
+    	toolContentObj.setVoteContentId(toolContentId);
+    	toolContentObj.setVoteChangable(Boolean.FALSE);
+    	
+		try {
+			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);
+	    	toolContentObj.setAllowText(bool!=null?bool:false);
+
+	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_MB_REUSABLE);
+	    	toolContentObj.setLockOnFinish(bool!=null?bool:true);
+
+	    	Integer maxCount = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);
+	        toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
+	        
+		} catch (WDDXProcessorConversionException e) {
+	   		logger.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
+    		throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+ 		}
+		
+    	// leave as empty, no need to set them to anything.
+    	//setVoteUploadedFiles(Set voteAttachments);
+    	//setVoteSessions(Set voteSessions);
+    	
+    	// set up question from body 	
+    	Vector nominations = (Vector) importValues.get(CONTENT_VOTE_NOMINATIONS);
+    	if ( nominations != null ) {
+    		Iterator iter = nominations.iterator();
+    		int order = 1;
+    		while (iter.hasNext()) {
+				String element = (String) iter.next();
+				VoteQueContent nomination = new VoteQueContent(element,  toolContentObj, null);
+				nomination.setDisplayOrder(order++);
+				toolContentObj.getVoteQueContents().add(nomination);
+			}
+    	}
+    	
+    	voteContentDAO.saveVoteContent(toolContentObj);
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+    	
+    	VoteContent toolContentObj = null;
+    	if ( toolContentId != null ) {
+    		toolContentObj=retrieveVote(toolContentId);
+    	}
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+    	
+    	// TODO add reflection
+    	// qaContent.setReflectOnActivity(Boolean.TRUE);
+    	// qaContent.setReflectInstructions(description);
+    }
+    
+    //=========================================================================================
 }

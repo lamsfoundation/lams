@@ -101,7 +101,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * 
  */
 public class ResourceServiceImpl implements
-                              IResourceService,ToolContentManager, ToolSessionManager
+                              IResourceService,ToolContentManager, ToolSessionManager, ToolContentImport102Manager
                
 {
 	static Logger log = Logger.getLogger(ResourceServiceImpl.class.getName());
@@ -938,7 +938,7 @@ public class ResourceServiceImpl implements
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
     	Resource toolContentObj = new Resource();
@@ -977,13 +977,13 @@ public class ResourceServiceImpl implements
              [showbuttons=false]  no equivalent in 2.0
              [isReusable=false]   not used in 1.0.2 (would be lock when finished)
 */
-	    	ResourceUser user = null;
-	    	if ( newUserId != null ) {
-	    		user = new ResourceUser();
-	    		user.setUserId(new Long(newUserId.longValue()));
-				createUser(user);
-		    	toolContentObj.setCreatedBy(user);
-	    	}
+	    	ResourceUser ruser = new ResourceUser();
+	    	ruser.setUserId(new Long(user.getUserID().longValue()));
+	    	ruser.setFirstName(user.getFirstName());
+	    	ruser.setLastName(user.getLastName());
+	    	ruser.setLoginName(user.getLogin());
+			createUser(ruser);
+		    toolContentObj.setCreatedBy(ruser);
 	
 	    	//resource Items
 	    	Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
@@ -995,7 +995,7 @@ public class ResourceServiceImpl implements
 	    			ResourceItem item = new ResourceItem();
 	    			item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
 	    			item.setCreateDate(now);
-	    			item.setCreateBy(user);
+	    			item.setCreateBy(ruser);
 	    			item.setCreateByAuthor(true);
 	    			item.setHide(false);
 	

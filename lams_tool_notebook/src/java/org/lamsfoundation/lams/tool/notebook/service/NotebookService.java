@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.tool.notebook.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
@@ -50,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -79,7 +82,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  */
 
 public class NotebookService implements ToolSessionManager, ToolContentManager,
-		INotebookService {
+		INotebookService,  ToolContentImport102Manager {
 
 	static Logger logger = Logger.getLogger(NotebookService.class.getName());
 
@@ -491,6 +494,51 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
+
+    /**
+     * Import the data for a 1.0.2 Notebook
+     */
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	Notebook toolContentObj = new Notebook();
+    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	toolContentObj.setCreateBy(new Long(user.getUserID().longValue()));
+    	toolContentObj.setCreateDate(now);
+    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setLockOnFinished(Boolean.TRUE);
+    	toolContentObj.setOfflineInstructions(null);
+    	toolContentObj.setOnlineInstructions(null);
+    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	toolContentObj.setToolContentId(toolContentId);
+    	toolContentObj.setUpdateDate(now);
+    	toolContentObj.setAllowRichEditor(Boolean.FALSE);
+    	// leave as empty, no need to set them to anything.
+    	//setNotebookAttachments(Set notebookAttachments);
+    	//setNotebookSessions(Set notebookSessions);
+    	notebookDAO.saveOrUpdate(toolContentObj);
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+
+    	logger.warn("Setting the reflective field on a notebook. This doesn't make sense as the notebook is for reflection and we don't reflect on reflection!");
+    	Notebook toolContentObj = getNotebookByContentId(toolContentId);
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+    	
+    	toolContentObj.setInstructions(description);
+    }
+    
+    //=========================================================================================
 	/* ********** Used by Spring to "inject" the linked objects ************* */
 
 	public INotebookAttachmentDAO getNotebookAttachmentDAO() {

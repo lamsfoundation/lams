@@ -23,10 +23,12 @@
 package org.lamsfoundation.lams.tool.mc.service;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -50,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -74,7 +77,10 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -87,7 +93,7 @@ import org.springframework.dao.DataAccessException;
  * 
  */
 public class McServicePOJO implements
-                              IMcService, ToolContentManager, ToolSessionManager, McAppConstants
+                              IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, McAppConstants
                
 {
 	static Logger logger = Logger.getLogger(McServicePOJO.class.getName());
@@ -2601,4 +2607,138 @@ public class McServicePOJO implements
 		this.exportContentService = exportContentService;
 	}
 
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
+
+    /**
+     * Import the data for a 1.0.2 Chat
+     */
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	McContent toolContentObj = new McContent();
+    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	toolContentObj.setCreatedBy(user.getUserID().longValue());
+    	toolContentObj.setCreationDate(now);
+    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setOfflineInstructions(null);
+    	toolContentObj.setOnlineInstructions(null);
+    	// TODO add reflection
+    	//toolContentObj.setReflectInstructions(null);
+    	//toolContentObj.setReflectOnActivity(Boolean.FALSE);
+    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	
+    	toolContentObj.setContent(null);
+    	toolContentObj.setUpdateDate(now);
+    	toolContentObj.setMcContentId(toolContentId);
+    	toolContentObj.setQuestionsSequenced(false);
+    	toolContentObj.setUsernameVisible(false);
+    	// I can't find a use for these.
+    	toolContentObj.setUsernameVisible(false);
+    	toolContentObj.setSynchInMonitor(false);
+    	toolContentObj.setShowReport(false);
+    	// not supported in 1.0.2 so set to blank. Fields are mandatory in the database 
+    	toolContentObj.setReportTitle("");
+    	toolContentObj.setMonitoringReportTitle("");
+    	toolContentObj.setEndLearningMessage("");
+    	
+    	
+		try {
+			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_Q_ALLOW_REDO);
+	    	toolContentObj.setRetries(bool!=null?bool:false);
+
+	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_Q_FEEDBACK);
+	    	toolContentObj.setShowFeedback(bool!=null?bool:false);
+
+	    	Integer minPassMark = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_Q_MIN_PASSMARK);
+	    	toolContentObj.setPassMark(minPassMark != null ? minPassMark : new Integer(0));
+		
+	    	// leave as empty, no need to set them to anything.
+	    	//setMcUploadedFiles(Set mcSessions);
+	    	//setMcSessions(Set mcSessions);
+	    	
+			mcContentDAO.saveMcContent(toolContentObj);
+
+			// set up questions  	
+	    	Vector questions = (Vector) importValues.get(CONTENT_Q_QUESTION_INFO);
+	    	if ( questions != null ) {
+	    		
+	    		// work out what weights to give questions. 1.0.2 didn't have weights so try to make
+	    		// them all equal. But should add up 100% so may have to fudge the first one.
+	    		int numQuestions =  questions.size();
+		    	int standardPercentage = 100/numQuestions;
+		    	int firstPercentage = numQuestions > 1 ? 100 - (numQuestions - 1)* standardPercentage : 100;
+		    	boolean isFirst = true;
+		    	
+	    		Iterator iter = questions.iterator();
+	    		while (iter.hasNext()) {
+	    			Hashtable questionMap = (Hashtable) iter.next();
+	    			create102Question(questionMap, isFirst ? firstPercentage : standardPercentage, toolContentObj );
+	    			isFirst = false;
+				}    	
+	
+	    	}
+    	
+		} catch (WDDXProcessorConversionException e) {
+	   		logger.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
+    		throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+ 		}
+
+		mcContentDAO.saveMcContent(toolContentObj);
+    }
+
+
+    private void create102Question( Hashtable questionMap, Integer weight, McContent toolContentObj) throws WDDXProcessorConversionException {
+		McQueContent question = new McQueContent();
+		question.setDisplayOrder( WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_Q_ORDER) );
+		// only one feedback field in 1.0.2, so use it for both
+		question.setFeedbackCorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
+		question.setFeedbackIncorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
+		question.setQuestion((String)questionMap.get(CONTENT_Q_QUESTION));
+		question.setWeight( weight );
+		
+		String correctAnswer = (String)questionMap.get(CONTENT_Q_ANSWER);
+
+		Vector candidates = (Vector)questionMap.get(CONTENT_Q_CANDIDATES);
+		if ( candidates != null ) {
+			Iterator candIterator = candidates.iterator();
+			while (candIterator.hasNext()) {
+				Hashtable candidate = (Hashtable) candIterator.next();
+				String optionText = (String)candidate.get(CONTENT_Q_ANSWER);
+				// 1.0.2 has a display order but 2.0 doesn't ToolContentImport102Manager.CONTENT_Q_ORDER
+				McOptsContent options = new McOptsContent();
+				options.setCorrectOption(correctAnswer != null && correctAnswer.equals(optionText));
+				options.setMcQueOptionText(optionText);
+				options.setMcQueContent(question);
+				question.getMcOptionsContents().add(options);
+			}
+		}
+		
+		toolContentObj.getMcQueContents().add(question);
+		question.setMcContent(toolContentObj);
+		question.setMcContentId(toolContentObj.getUid());
+    }
+    
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+    	
+    	McContent toolContentObj = null;
+    	if ( toolContentId != null ) {
+    		toolContentObj=retrieveMc(toolContentId);
+    	}
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+    	
+    	// TODO add reflection
+    	// qaContent.setReflectOnActivity(Boolean.TRUE);
+    	// qaContent.setReflectInstructions(description);
+    }
+    
+    //=========================================================================================
 }

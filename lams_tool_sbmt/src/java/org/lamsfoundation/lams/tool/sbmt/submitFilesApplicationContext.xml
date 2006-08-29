@@ -86,6 +86,11 @@
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="createToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>				
+
+				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>	

@@ -820,7 +820,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     /**
      * Import the data for a 1.0.2 Forum
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
     	Forum toolContentObj = new Forum();
@@ -866,13 +866,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 
 
-    	ForumUser forumUser = null;
-    	if ( newUserId != null ) {
-			forumUser = new ForumUser();
-			forumUser.setUserId(new Long(newUserId.longValue()));
-			createUser(forumUser);
-	    	toolContentObj.setCreatedBy(forumUser);
-    	}
+    	ForumUser forumUser = new ForumUser();
+		forumUser.setUserId(new Long(user.getUserID().longValue()));
+		forumUser.setFirstName(user.getFirstName());
+		forumUser.setLastName(user.getLastName());
+		forumUser.setLoginName(user.getLogin());
+		createUser(forumUser);
+    	toolContentObj.setCreatedBy(forumUser);
 
     	// leave as empty, no need to set them to anything.
     	//toolContentObj.setAttachments(attachments);
@@ -890,6 +890,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     			Message message = new Message();
     			message.setIsAuthored(true);
     			message.setCreated(now);
+    			message.setCreatedBy(forumUser);
     			message.setUpdated(now);
     			message.setLastReplyDate(now);
     			message.setSubject((String)messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));

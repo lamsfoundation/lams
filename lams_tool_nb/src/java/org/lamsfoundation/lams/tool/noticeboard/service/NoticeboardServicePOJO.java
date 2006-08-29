@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.springframework.dao.DataAccessException;
 
 
@@ -1030,13 +1031,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
-    public void import102ToolContent(Long toolContentId, Integer newUserId, Hashtable importValues)
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
     	NoticeboardContent toolContentObj = new NoticeboardContent();
     	toolContentObj.setContent((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
     	toolContentObj.setContentInUse(false);
-    	toolContentObj.setCreatorUserId(newUserId != null ? new Long(newUserId.longValue()) : null);
+    	toolContentObj.setCreatorUserId(user.getUserID().longValue());
     	toolContentObj.setDateCreated(now);
     	toolContentObj.setDateUpdated(now);
     	toolContentObj.setDefineLater(false);
