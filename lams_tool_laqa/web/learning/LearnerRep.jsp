@@ -118,7 +118,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
 													</tr>
 													<tr> 															
-													 	<td colspan=2 valign=top>   <c:out value="${userData.response}"/>  </td>														 
+													 	<td colspan=2 valign=top>   <c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>														 
 													</tr>													 
 											</c:if>														  					 
 	 									</c:forEach>		  	
@@ -200,7 +200,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
  														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
 													</tr>
 													<tr>
-														 <td colspan=2 valign=top>  <c:out value="${userData.response}"/>  </td>														 
+														 <td colspan=2 valign=top>  <c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>														 
 													</tr>															
 											</c:if>														  					 
 	 									</c:forEach>		  	

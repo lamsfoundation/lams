@@ -92,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  </tr>
 									  
 									  
-				  			  		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+				  			  		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
 										  <tr>
 											<td colspan=2> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  
@@ -101,7 +101,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  
 										  <tr>
 											<td colspan=2> 
-												  <c:out value="${answerEntry.value}" escapeXml="false" />						  																	
+												  <c:out value="${answerEntry.value}" escapeXml="false"/>						  																	
 										  	</td>
 										  </tr>
 										  

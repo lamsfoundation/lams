@@ -77,6 +77,17 @@ public abstract class QaUtils implements QaAppConstants {
 	    qaGeneralAuthoringDTO.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
 	    qaGeneralAuthoringDTO.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
 	}
+    
+    
+    public static String replaceNewLines(String text)
+    {
+        logger.debug("using text: " + text);
+        String newText = text.replaceAll("\n","<br>");
+        logger.debug("newText: " + newText);
+        
+        return newText;
+    }
+    
 
     
     public static QaGeneralAuthoringDTO buildGeneralAuthoringDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent, 

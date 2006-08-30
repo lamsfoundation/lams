@@ -109,6 +109,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -185,6 +186,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	logger.debug("questionListingMode: " + questionListingMode);
     	
     	Map mapAnswers= new TreeMap(new QaComparator());
+    	Map mapAnswersPresentable= new TreeMap(new QaComparator());
         /* if the listing mode is QUESTION_LISTING_MODE_COMBINED populate  the answers here*/
     	if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_COMBINED))
     	{
@@ -193,7 +195,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
             {
                 String answer=request.getParameter("answer" + questionIndex);
                 logger.debug("answer for question " + questionIndex + " is:" + answer);
+                String answerPresentable=QaUtils.replaceNewLines(answer);
+                logger.debug("answerPresentable: " + answerPresentable);
+                
                 mapAnswers.put(new Long(questionIndex).toString(), answer);
+                mapAnswersPresentable.put(new Long(questionIndex).toString(), answerPresentable);
             }
             logger.debug("final mapAnswers for the combined mode:" + mapAnswers);
     	}
@@ -203,7 +209,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     		if (totalQuestionCount.equals("1"))
     		{
     			logger.debug("totalQuestionCount is 1: " + qaLearningForm.getAnswer());
+    			String answerPresentable=QaUtils.replaceNewLines(qaLearningForm.getAnswer());
+    			logger.debug("answerPresentable: " + answerPresentable);
+    			
     			mapAnswers.put(new Long(1).toString(), qaLearningForm.getAnswer());
+    			mapAnswersPresentable.put(new Long(1).toString(), answerPresentable);
     		}
     		else 
     		{
@@ -216,6 +226,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	}
 		logger.debug("using mapAnswers:" + mapAnswers);
     	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
+    	
+		logger.debug("using mapAnswersPresentable:" + mapAnswersPresentable);;
+    	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
+    	
 
     	/*mapAnswers will be used in the viewAllAnswers screen*/
 	    SessionMap sessionMap = new SessionMap();

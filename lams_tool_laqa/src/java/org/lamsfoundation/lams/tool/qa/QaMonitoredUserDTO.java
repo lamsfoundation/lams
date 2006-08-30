@@ -52,6 +52,8 @@ public class QaMonitoredUserDTO implements Comparable
 	
 	private String response;
 	
+	private String responsePresentable;
+	
 	private String sessionId;
 	
 	private String questionUid;
@@ -208,5 +210,17 @@ public class QaMonitoredUserDTO implements Comparable
      */
     public void setAttemptTime(Date attemptTime) {
         this.attemptTime = attemptTime;
+    }
+    /**
+     * @return Returns the responsePresentable.
+     */
+    public String getResponsePresentable() {
+        return responsePresentable;
+    }
+    /**
+     * @param responsePresentable The responsePresentable to set.
+     */
+    public void setResponsePresentable(String responsePresentable) {
+        this.responsePresentable = responsePresentable;
     }
 }

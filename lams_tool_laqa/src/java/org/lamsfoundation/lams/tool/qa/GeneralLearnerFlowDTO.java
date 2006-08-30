@@ -74,6 +74,8 @@ public class GeneralLearnerFlowDTO implements Comparable
 
     protected Map mapAnswers;
     
+    protected Map mapAnswersPresentable;
+    
     protected Map mapQuestions;
     
     protected Map mapQuestionContentLearner;
@@ -408,4 +410,16 @@ public class GeneralLearnerFlowDTO implements Comparable
         this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
     }
 
+    /**
+     * @return Returns the mapAnswersPresentable.
+     */
+    public Map getMapAnswersPresentable() {
+        return mapAnswersPresentable;
+    }
+    /**
+     * @param mapAnswersPresentable The mapAnswersPresentable to set.
+     */
+    public void setMapAnswersPresentable(Map mapAnswersPresentable) {
+        this.mapAnswersPresentable = mapAnswersPresentable;
+    }
 }
