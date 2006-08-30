@@ -823,7 +823,7 @@ public class LD102Importer implements ApplicationContextAware{
 				String subTaskUIID = subActivity.getActivityUIID()!=null ? subActivity.getActivityUIID().toString() : "";
 				for ( int i=0; orderId==null && i<subTaskOrder.length; i++ ) {
 					if ( subTaskOrder[i].equals(subTaskUIID) ) {
-						orderId = new Integer(i);
+						orderId = new Integer(i+1); // order ids start at 1, not 0
 					}
 				}
 				if ( orderId == null ) {
