@@ -35,6 +35,7 @@ public class UserBean {
     private Integer userId;
     private String login;
     private String[] roleIds = {};
+    private Boolean memberOfParent;
     
     public Integer getUserId() {
     	return this.userId;
@@ -58,6 +59,14 @@ public class UserBean {
     
     public void setRoleIds(String[] roleIds){
     	this.roleIds = roleIds;
+    }
+    
+    public Boolean getMemberOfParent() {
+    	return this.memberOfParent;
+    }
+    
+    public void setMemberOfParent(Boolean memberOfParent) {
+    	this.memberOfParent = memberOfParent;
     }
     
 }

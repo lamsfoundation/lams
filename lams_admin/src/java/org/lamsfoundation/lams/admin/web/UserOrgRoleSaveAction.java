@@ -37,7 +37,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -78,6 +80,7 @@ public class UserOrgRoleSaveAction extends Action {
 		ArrayList userBeans = userOrgRoleForm.getUserBeans();
 		log.debug("userBeans is null? "+userBeans==null);
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
+		Organisation organisation = (Organisation)getService().findById(Organisation.class, orgId);
 		request.setAttribute("org",orgId);
 		request.getSession().removeAttribute("UserOrgRoleForm");		
 		if(isCancelled(request)){
@@ -86,24 +89,37 @@ public class UserOrgRoleSaveAction extends Action {
 		
 		log.debug("orgId: "+orgId);
 		
+		// save UserOrganisation memberships, and the associated roles;
+		// for subgroups, if user is not a member of the parent group then add to that as well.
 		for(int i=0; i<userBeans.size(); i++){
 			UserBean bean = (UserBean)userBeans.get(i);
 			log.debug("userId: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
-			UserOrganisation uo = new UserOrganisation(getService().getUserByLogin(bean.getLogin()),(Organisation)getService().findById(Organisation.class, orgId));
-			getService().save(uo);
-			log.debug("added: "+uo.getUser().getUserId());
-			Set uors = new HashSet();
-			for(int j=0; j<roleIds.length; j++) {
-				Role currentRole = (Role)getService().findById(Role.class,new Integer(roleIds[j]));
-				log.debug("setting role: "+currentRole.getRoleId());
-				UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
-				getService().save(newUor);
-				uors.add(newUor);
+			saveRoles(bean.getUserId(), organisation, roleIds);
+			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+				if (getService().getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
+					saveRoles(bean.getUserId(), organisation.getParentOrganisation(), roleIds);
+				}
 			}
-			uo.setUserOrganisationRoles(uors);
 		}
 		return mapping.findForward("userlist");
+	}
+	
+	private void saveRoles(Integer userId, Organisation organisation, String[] roleIds) {
+		
+		User user = (User)getService().findById(User.class, userId);
+		UserOrganisation uo = new UserOrganisation(user, organisation);
+		getService().save(uo);
+		log.debug("added "+uo.getUser().getLogin()+" to "+uo.getOrganisation().getName());
+		Set uors = new HashSet();
+		for(int j=0; j<roleIds.length; j++) {
+			Role currentRole = (Role)getService().findById(Role.class,new Integer(roleIds[j]));
+			log.debug("setting role: "+currentRole.getName());
+			UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
+			getService().save(newUor);
+			uors.add(newUor);
+		}
+		uo.setUserOrganisationRoles(uors);
 	}
 	
 	private IUserManagementService getService(){

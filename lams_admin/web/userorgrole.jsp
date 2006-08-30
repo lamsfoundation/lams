@@ -14,12 +14,12 @@ function toggleCheckboxes(roleIndex, object){
 }
 </script>
 
-<h2>Assign Roles</h2>
-
-<div align="center"><html-el:errors/></div>
+<h2><fmt:message key="admin.user.assign.roles" /></h2>
+<p>&nbsp;</p>
 
 <html-el:form action="/userorgrolesave.do" method="post">
 <html-el:hidden property="orgId" />
+
 <table class="alternative-color" width=100%>
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
@@ -34,7 +34,7 @@ function toggleCheckboxes(roleIndex, object){
 <logic-el:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">
 	<tr>
 		<td>
-			<c:out value="${userBean.login}" /><br />
+			<c:out value="${userBean.login}" /><c:if test="${!userBean.memberOfParent}"> *<c:set var="parentFlag" value="true" /></c:if>
 		</td>
 		<logic-el:iterate id="role" name="roles">
 			<td>
@@ -51,6 +51,8 @@ function toggleCheckboxes(roleIndex, object){
 		<html-el:cancel><fmt:message key="admin.cancel"/></html-el:cancel>
 	</td>
 </tr>
-
 </table>
+<c:if test="${parentFlag}">
+<p><fmt:message key="msg.user.add.to.parent.group" /></p>
+</c:if>
 </html-el:form>
