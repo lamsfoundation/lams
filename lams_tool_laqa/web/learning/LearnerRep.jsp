@@ -107,11 +107,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr> 
 							<td valign=top>
 								<table cellpadding="0" class="alternative-color">
-									<tr> 
-										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>				  						 
-						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
 								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
@@ -120,9 +115,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td  valign=top>   	  <c:out value="${userData.response}"/>  </td>														 
 														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
-													</tr>															
+													</tr>
+													<tr> 															
+													 	<td colspan=2 valign=top>   <c:out value="${userData.response}"/>  </td>														 
+													</tr>													 
 											</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	
@@ -192,11 +189,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr> 
 							<td valign=top>
 								<table cellpadding="0" class="alternative-color">
-									<tr> 
-										 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.response"/> 	</b></td>
-				  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>				  						 
-						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
 								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
@@ -205,8 +197,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 													<tr> 
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td valign=top>   		  <c:out value="${userData.response}"/>  </td>														 
-														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
+ 														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
+													</tr>
+													<tr>
+														 <td colspan=2 valign=top>  <c:out value="${userData.response}"/>  </td>														 
 													</tr>															
 											</c:if>														  					 
 	 									</c:forEach>		  	
