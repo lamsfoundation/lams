@@ -7,38 +7,50 @@
 	<!-- Advance options Row -->
 	<tr>
 		<td>
-			<html:checkbox property="forum.lockWhenFinished">
+			<html:checkbox property="forum.lockWhenFinished"  styleClass="noBorder">
 				<fmt:message key="label.authoring.advance.lock.on.finished" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<html:checkbox property="forum.allowEdit">
+			<html:checkbox property="forum.allowEdit"  styleClass="noBorder">
 				<fmt:message key="label.authoring.advance.allow.edit" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<html:checkbox property="forum.allowUpload">
+			<html:checkbox property="forum.allowUpload"  styleClass="noBorder">
 				<fmt:message key="label.authoring.advance.allow.upload" />
 			</html:checkbox>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<html:checkbox property="forum.allowRichEditor" styleId="richEditor">
+			<html:checkbox property="forum.allowRichEditor" styleId="richEditor"  styleClass="noBorder">
 				<fmt:message key="label.authoring.advance.use.richeditor" />
 			</html:checkbox>
 		</td>
 	</tr>	
 	<tr>
 		<td>
-			<html:checkbox property="forum.limitedInput" styleId="limitedInput">
+			<html:checkbox property="forum.limitedInput" styleId="limitedInput" styleClass="noBorder">
 				<fmt:message key="label.authoring.advance.limited.input" />
 			</html:checkbox>
 			<html:text property="forum.limitedChar" styleId="limitedChar" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"  styleId="reflectOn">
+				<fmt:message key="advanced.reflectOnActivity" />
+			</html:checkbox>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<lams:STRUTS-textarea property="forum.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
 		</td>
 	</tr>
 	<tr>
@@ -145,6 +157,15 @@
 			}
 			allowNewTopic();
 			
+			function checkReflection(){
+				var ropt = document.getElementById("reflectOn");
+				var rins = document.getElementById("reflectInstructions");
+				if(ropt.checked){
+					rins.disabled=false;
+				}else{
+					rins.disabled=true;
+				}
+			}
 </script>
 
 

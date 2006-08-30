@@ -90,6 +90,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	<put name="pageTitleKey" value="title.message.edit"/>
     	<put name="body" value="/jsps/learning/edit.jsp"/>
 	</definition>
+    <definition name="tiles:/learning/reflection" extends="tiles:learner:layout">
+    	<put name="pageTitleKey" value="title.reflection"/>
+    	<put name="body" value="/jsps/learning/notebook.jsp"/>
+	</definition>
 	<!-- E: Learning -->
 	
 	<!-- B: Monitoring -->
@@ -124,6 +128,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name="tiles:/monitoring/forum/viewTopicTree" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
     	<put name="body" value="/jsps/monitoring/message/viewtopictree.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/viewReflection" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.reflection"/>
+    	<put name="body" value="/jsps/monitoring/notebook.jsp"/>
 	</definition>
 	
 	<!-- E: Monitoring -->

@@ -57,6 +57,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -118,7 +120,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private IAuditService auditService;
     private MessageService messageService;
     private IExportToolContentService exportContentService;
-    private IUserManagementService userManagementService; 
+    private IUserManagementService userManagementService;
+	private ICoreNotebookService coreNotebookService;
+	
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -570,7 +574,17 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
     }
 
-
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
+		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
+	}
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
     //***************************************************************************************************************
     // ToolContentManager and ToolSessionManager methods
     //***************************************************************************************************************
@@ -1026,6 +1040,12 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.forumReportDAO = forumReportDAO;
 	}
 
-	
+	public ICoreNotebookService getCoreNotebookService() {
+		return coreNotebookService;
+	}
+
+	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+		this.coreNotebookService = coreNotebookService;
+	}
 
 }

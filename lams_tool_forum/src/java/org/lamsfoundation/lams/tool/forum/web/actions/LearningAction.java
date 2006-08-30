@@ -44,6 +44,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
+import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -118,8 +120,20 @@ public class LearningAction extends Action {
 		if (param.equals("updateMessageHideFlag")) {
 			return updateMessageHideFlag(mapping, form, request, response);
 		}
+		
+		//================ Reflection =======================
+		if (param.equals("newReflection")) {
+			return newReflection(mapping, form, request, response);
+		}
+		if (param.equals("submitReflection")) {
+			return submitReflection(mapping, form, request, response);
+		}
+		
+		
 		return mapping.findForward("error");
 	}
+
+
 
 	// ==========================================================================================
 	// Forum level methods
@@ -201,6 +215,8 @@ public class LearningAction extends Action {
 		sessionMap.put(ForumConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
+		sessionMap.put(ForumConstants.ATTR_REFLECTION_ON,forum.isReflectOnActivity());
+		sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION,forum.getReflectInstructions());
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
 		
@@ -229,39 +245,29 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward finish(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		Long sessionId = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID);
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, MODE_OPTIONAL);
 		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		
+		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
 		forumService = getForumManager();
 		
 		if (mode == ToolAccessMode.LEARNER || mode==ToolAccessMode.AUTHOR) {
-			ForumToolSession session = forumService.getSessionBySessionId(sessionId);
-			Forum forum = session.getForum();
-			// get session from shared session.
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			Long userID = new Long(user.getUserID().longValue());
-			if(!forum.getRunOffline() && !forum.isAllowNewTopic()){
-				int postNum = forumService.getTopicsNum(userID,sessionId);
-				if(postNum < forum.getMinimumReply()){
-					ActionMessages errors = new ActionMessages();
-					errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.less.mini.post",(forum.getMinimumReply() - postNum)));
-					saveErrors(request, errors);
-					// get all root topic to display on init page
-					List rootTopics = forumService.getRootTopics(sessionId);
-					request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
-					request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID );
-					return mapping.findForward("success");
-				}
-			}
+			if(!validateBeforeFinish(mapping, request, sessionMapID, sessionId))
+				return mapping.getInputForward();
 
 			String nextActivityUrl;
 			try {
+//				 get session from shared session.
+				HttpSession ss = SessionManager.getSession();
+				UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+				Long userID = new Long(user.getUserID().longValue());
+				
+				//finish current session for user
 				forumService.finishUserSession(getCurrentUser(request, sessionId));
 				ToolSessionManager sessionMgrService = ForumServiceProxy.getToolSessionManager(getServlet().getServletContext());
-				nextActivityUrl = sessionMgrService.leaveToolSession(sessionId,
-						userID);
+				nextActivityUrl = sessionMgrService.leaveToolSession(sessionId,userID);
 				response.sendRedirect(nextActivityUrl);
 			} catch (DataMissingException e) {
 				throw new ForumException(e);
@@ -277,9 +283,64 @@ public class LearningAction extends Action {
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 		
-		return mapping.findForward("success");
+		return mapping.getInputForward();
 	}
 
+
+
+	/**
+	 * Submit reflection form input database.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		ReflectionForm refForm = (ReflectionForm) form;
+		Integer userId = refForm.getUserID();
+		
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		
+		forumService.createNotebookEntry(sessionId, 
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				ForumConstants.TOOL_SIGNATURE, 
+				userId,
+				refForm.getEntryText());
+
+		return finish(mapping, form, request, response);
+	}
+	
+	/**
+	 * Display empty reflection form.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		//get session value
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		if(!validateBeforeFinish(mapping, request, sessionMapID, sessionId))
+			return mapping.getInputForward();
+
+		ReflectionForm refForm = (ReflectionForm) form;
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		
+		refForm.setUserID(user.getUserID());
+		refForm.setSessionMapID(sessionMapID);
+		
+		return mapping.findForward("success");
+	}
 	// ==========================================================================================
 	// Topic level methods
 	// ==========================================================================================
@@ -456,7 +517,7 @@ public class LearningAction extends Action {
 		if(forum != null){
 			if(!forum.isAllowNewTopic()){
 				int posts = forumService.getTopicsNum(forumUser.getUserId(), sessionId);
-				if(posts >= forum.getMaximumReply())
+				if(forum.getMaximumReply() != 0 && (posts >= forum.getMaximumReply()))
 					sessionMap.put(ForumConstants.ATTR_NO_MORE_POSTS, Boolean.TRUE);
 			}
 		}
@@ -623,6 +684,33 @@ public class LearningAction extends Action {
 	// ==========================================================================================
 	// Utility methods
 	// ==========================================================================================
+	/**
+	 * Validation method to check whether user posts meet minimum number.
+	 */
+	private boolean validateBeforeFinish(ActionMapping mapping, HttpServletRequest request, String sessionMapID, Long sessionId) {
+		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+		Forum forum = session.getForum();
+		// get session from shared session.
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long userID = new Long(user.getUserID().longValue());
+		if(!forum.getRunOffline() && !forum.isAllowNewTopic()){
+			int postNum = forumService.getTopicsNum(userID,sessionId);
+			if(postNum < forum.getMinimumReply()){
+				//create error
+				ActionMessages errors = new ActionMessages();
+				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.less.mini.post",(forum.getMinimumReply() - postNum)));
+				saveErrors(request, errors);
+				
+				// get all root topic to display on init page
+				List rootTopics = forumService.getRootTopics(sessionId);
+				request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+				request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID );
+				return false;
+			}
+		}
+		return true;
+	}
 	/**
 	 * This method will set flag in message DTO:
 	 * <li>If this topic is created by current login user, then set Author mark

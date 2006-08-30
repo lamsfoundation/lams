@@ -903,7 +903,8 @@ public class AuthoringAction extends Action {
 				}
 			}
 			if(!form.getForum().isAllowNewTopic()){
-				if(form.getForum().getMaximumReply() < form.getForum().getMinimumReply()){
+				if(form.getForum().getMaximumReply() !=0 
+						&& (form.getForum().getMaximumReply() < form.getForum().getMinimumReply())){
 					ActionMessage error = new ActionMessage("error.min.less.max");
 					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 				}

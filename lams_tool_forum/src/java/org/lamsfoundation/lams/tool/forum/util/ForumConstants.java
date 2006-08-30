@@ -86,6 +86,7 @@ public interface ForumConstants {
 	public static final String ATTR_TOOL_CONTENT_TOPICS = "ToolContentTopicList";
 	public static final String ATTR_TOPIC = "topic";
 	public static final String ATTR_USER= "user";
+	public static final String ATTR_USER_UID= "userUid";
 	public static final String ATTR_REPORT = "report";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	
@@ -98,6 +99,8 @@ public interface ForumConstants {
 	public static final String ATTR_PARENT_TOPIC_ID = "parentID";
 
 	public static final String ATTR_TOPIC_ID = "topicID";
+	public static final String ATTR_REFLECTION_ON = "reflectOn";
+	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
 
 	

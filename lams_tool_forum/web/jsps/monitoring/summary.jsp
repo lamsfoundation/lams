@@ -53,26 +53,54 @@
 		<tr><td colspan="3">
 			<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
 			<span id="messageArea"></span>
-		</td></tr>	
+		</td>
+		</tr>	
 		<tr>
-			<th colspan="3">
-				<fmt:message key="message.session.name" />
-				:
-				<c:out value="${toolSessionDto.sessionName}" />
-			</th>
+			<td colspan="3" >
+				<h2>
+					<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
+				</h2>
+			</td>
 		</tr>
-		<c:forEach var="user" items="${userlist}">
+	</table>
+	<table cellpadding="0">
+		<c:forEach var="user" items="${userlist}" varStatus="status">
+			<c:if test="${status.first}">
+				<tr>
+					<th>
+						<fmt:message key="monitoring.user.fullname"/>
+					</th>
+					<th>
+						<fmt:message key="monitoring.user.loginname"/>
+					</th>
+					<c:if test="${user.hasRefection}">
+						<th>
+							<fmt:message key="monitoring.user.reflection"/>
+						</th>
+					</c:if>
+					<th>&nbsp;</th>
+				</tr>
+			</c:if>
 			<tr>
 				<td>
-					<c:out value="${user.firstName}" />
-					<c:out value="${user.lastName}" />
+					<c:out value="${user.fullName}" />
 				</td>
 				<td>
 					<c:out value="${user.loginName}" />
 				</td>
 				<td>
+					<c:if test="${user.hasRefection}">
+						<c:set var="viewReflection">
+							<c:url value="/monitoring/viewReflection.do?toolSessionID=${toolSessionDto.sessionID}&userUid=${user.userUid}"/>
+						</c:set>
+						<html:link href="javascript:launchPopup('${viewReflection}')">
+							<fmt:message key="label.view" />
+						</html:link>
+					</c:if>
+				</td>
+				<td>
 					<c:url value="/monitoring/viewUserMark.do" var="viewuserurl">
-						<c:param name="userID" value="${user.uid}" />
+						<c:param name="userID" value="${user.userUid}" />
 						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
 					</c:url>
 					<html:link href="javascript:launchPopup('${viewuserurl}')" styleClass="button">
@@ -81,7 +109,6 @@
 				</td>
 			</tr>
 		</c:forEach>
-
 		<c:if test="${empty userlist}">
 			<tr>
 				<td colspan="3">
@@ -89,7 +116,9 @@
 				</td>
 			</tr>
 		</c:if>
+ 	 </table>
 
+	<table cellpadding="0">
 		<tr>
 			<td align="right">
 				<html:form action="/learning/viewForum.do" target="_blank">

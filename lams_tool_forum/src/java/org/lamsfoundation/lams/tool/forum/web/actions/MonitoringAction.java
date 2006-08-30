@@ -37,7 +37,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,9 +58,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.forum.dto.UserDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
@@ -72,7 +76,6 @@ import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -92,9 +95,19 @@ public class MonitoringAction extends Action {
 				return -1;
 		}
 	}
-	
+
 	private class ForumUserComparator implements Comparator<ForumUser>{
 		public int compare(ForumUser o1, ForumUser o2) {
+			if(o1 != null && o2 != null){
+				return o1.getLoginName().compareTo(o2.getLoginName());
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+	}
+	private class UserDTOComparator implements Comparator<UserDTO>{
+		public int compare(UserDTO o1, UserDTO o2) {
 			if(o1 != null && o2 != null){
 				return o1.getLoginName().compareTo(o2.getLoginName());
 			}else if(o1 != null)
@@ -145,6 +158,11 @@ public class MonitoringAction extends Action {
 		if (param.equals("viewTopicTree")) {
 			return viewTopicTree(mapping, form, request, response);
 		}
+		
+		if (param.equals("viewReflection")) {
+			return viewReflection(mapping, form, request, response);
+		}
+		
 		return mapping.findForward("error");
 	}
 	
@@ -163,7 +181,7 @@ public class MonitoringAction extends Action {
 	}
 	
 	private ActionForward doTabs(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-   	 	this.listContentUsers(mapping, form, request, response);
+   	 	this.summary(mapping, form, request, response);
    	 	this.viewInstructions(mapping, form, request, response);
    	 	this.viewActivity(mapping, form, request, response);
    	 	this.statistic(mapping, form, request, response);
@@ -180,10 +198,43 @@ public class MonitoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	private ActionForward listContentUsers(ActionMapping mapping,
+	private ActionForward summary(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return userList(mapping, request);
+		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+		forumService = getForumService();
+		List sessionsList = forumService.getSessionsByContentId(toolContentID);
+
+		Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
+		// build a map with all users in the submitFilesSessionList
+		Iterator it = sessionsList.iterator();
+		while (it.hasNext()) {
+			SessionDTO sessionDto = new SessionDTO();
+			ForumToolSession fts = (ForumToolSession) it.next();
+			boolean hasReflection = fts.getForum().isReflectOnActivity();
+			
+			sessionDto.setSessionID(fts.getSessionId());
+			sessionDto.setSessionName(fts.getSessionName());
+			List userList = forumService.getUsersBySessionId(fts.getSessionId());
+			
+			//sort and create DTO list
+			Set<UserDTO> dtoList = new TreeSet<UserDTO>(this.new UserDTOComparator());
+			Iterator iter = userList.iterator();
+			while(iter.hasNext()){
+				ForumUser user = (ForumUser) iter.next();
+				UserDTO userDTO = new UserDTO(user);
+				userDTO.setHasRefection(hasReflection);
+				dtoList.add(userDTO);
+				//userDTO.setNoOfPosts(noOfPosts)
+			}
+			sessionUsersMap.put(sessionDto, dtoList);
+		}
+
+		// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		request.setAttribute("sessionUserMap", sessionUsersMap);
+		return mapping.findForward("success");
+
 	}
 
 	/**
@@ -647,6 +698,32 @@ public class MonitoringAction extends Action {
 		return mapping.findForward("success");
 	}
 
+	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		Long uid = WebUtil.readLongParam(request, ForumConstants.ATTR_USER_UID); 
+		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID); 
+		
+		ForumUser user = forumService.getUser(uid);
+		NotebookEntry notebookEntry = forumService.getEntry(sessionID, 
+				CoreNotebookConstants.NOTEBOOK_TOOL, 
+				ForumConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		
+		ForumToolSession session = forumService.getSessionBySessionId(sessionID);
+		
+		UserDTO userDTO = new UserDTO(user);
+		if(notebookEntry == null){
+			userDTO.setFinishReflection(false);
+			userDTO.setReflect(null);
+		}else{
+			userDTO.setFinishReflection(true);
+			userDTO.setReflect(notebookEntry.getEntry());
+		}
+		userDTO.setReflectInstrctions(session.getForum().getReflectInstructions());
+		
+		request.setAttribute("userDTO", userDTO);
+		return mapping.findForward("success");
+	}
 	/**
 	 * View topic subject, content and attachement.
 	 * 
@@ -695,37 +772,6 @@ public class MonitoringAction extends Action {
 	// ==========================================================================================
 	// Utility methods
 	// ==========================================================================================
-	/**
-	 * Show all users in a ToolContentID.
-	 * 
-	 * @param mapping
-	 * @param request
-	 * @return
-	 */
-	private ActionForward userList(ActionMapping mapping,
-			HttpServletRequest request) {
-		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-		forumService = getForumService();
-		List sessionsList = forumService.getSessionsByContentId(toolContentID);
-
-		Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
-		// build a map with all users in the submitFilesSessionList
-		Iterator it = sessionsList.iterator();
-		while (it.hasNext()) {
-			SessionDTO sessionDto = new SessionDTO();
-			ForumToolSession fts = (ForumToolSession) it.next();
-			sessionDto.setSessionID(fts.getSessionId());
-			sessionDto.setSessionName(fts.getSessionName());
-			List userList = forumService
-					.getUsersBySessionId(fts.getSessionId());
-			sessionUsersMap.put(sessionDto, userList);
-		}
-
-		// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		request.setAttribute("sessionUserMap", sessionUsersMap);
-		return mapping.findForward("success");
-	}
 
 	/**
 	 * Get Forum Service.

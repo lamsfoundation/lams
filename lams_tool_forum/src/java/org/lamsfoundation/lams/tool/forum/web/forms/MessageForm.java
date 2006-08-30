@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
  */
 public class MessageForm extends ValidatorForm {
 	private static final long serialVersionUID = -9054365604649146734L;
-	private static Logger logger = Logger.getLogger(ForumForm.class.getName());
+	private static Logger logger = Logger.getLogger(MessageForm.class.getName());
 	
     protected Message message;
     protected String sessionMapID;

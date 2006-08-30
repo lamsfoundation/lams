@@ -105,6 +105,7 @@
    		</property>
    		<property name="auditService"><ref bean="auditService"/></property>
    		<property name="messageService"><ref bean="forumMessageService"/></property>
+  		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
     </bean>
 
     <bean id="forumService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

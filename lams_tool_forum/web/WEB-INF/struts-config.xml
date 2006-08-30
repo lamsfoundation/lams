@@ -25,6 +25,10 @@
       name="messageForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
     />
+    <form-bean
+      name="reflectionForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm"
+    />
 
    <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
 
@@ -70,8 +74,7 @@
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
-			scope="request" 
-			parameter="updateContent" 
+			scope="request" 			parameter="updateContent" 
 			validate="false">
 			<forward name="author" path="tiles:/authoring/forum/main" />
 			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
@@ -241,9 +244,27 @@
 		</action>	
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			input="tiles:/learning/forum/viewForum" 
 			parameter="finish">
-			<forward name="defineLater" path="tiles:/learning/forum/defineLater" />
-			<forward name="success" path="tiles:/learning/forum/viewForum" />
+		</action>
+		<!--  ========= Reflection =============== -->
+		<action path="/learning/newReflection"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			name="reflectionForm" 
+			validate="false" 
+			parameter="newReflection" 
+			input="tiles:/learning/forum/viewForum" 
+			scope="request">
+			<forward name="success" path="tiles:/learning/reflection" />
+		</action>
+		<action path="/learning/submitReflection"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			name="reflectionForm" 
+			validate="true" 
+			input="tiles:/learning/reflection"
+			parameter="submitReflection" 
+			scope="request">
+			<forward name="success" path="tiles:/learning/reflection" />
 		</action>
 		<!-- ========== END: Learning  Definitions ============================== -->
 		<!-- ========== START: Monitoring  Definitions ============================== -->
@@ -316,6 +337,11 @@
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 			parameter="viewTopicTree">
 			<forward name="success" path="tiles:/monitoring/forum/viewTopicTree" />
+		</action>
+		<action path="/monitoring/viewReflection"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="viewReflection">
+			<forward name="success" path="tiles:/monitoring/forum/viewReflection" />
 		</action>
 
 		<!-- ========== END: Monitoring  Definitions ============================== -->

@@ -27,7 +27,9 @@ package org.lamsfoundation.lams.tool.forum.service;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
+import org.lamsfoundation.lams.tool.forum.dto.UserDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
@@ -267,7 +269,7 @@ public interface IForumService {
      * @param sessionID
      * @return
      */
-	public List getUsersBySessionId(Long sessionID);
+    public List getUsersBySessionId(Long sessionID);
 	/**
 	 * Get user by uid
 	 * @param userUid
@@ -301,4 +303,14 @@ public interface IForumService {
 	 * @param currentUser
 	 */
 	public void finishUserSession(ForumUser currentUser);
+	/**
+	 * Create refection entry into notebook tool.
+	 * @param sessionId
+	 * @param notebook_tool
+	 * @param tool_signature
+	 * @param userId
+	 * @param entryText
+	 */
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 }
