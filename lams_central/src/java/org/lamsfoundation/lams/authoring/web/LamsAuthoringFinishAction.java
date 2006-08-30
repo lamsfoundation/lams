@@ -93,6 +93,9 @@ public abstract class LamsAuthoringFinishAction extends Action {
 			String nextUrl = getLamsUrl() + "authoringConfirm.jsp";
 			String signature = request.getParameter(TOOL_SIGNATURE);
 			Long toolContentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+			
+			String contentFolderID = "TODO_remove-change_optional_to_false";
+			contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID, true);
 
 			//check whether it use on define it later page
 			IToolVO tool = getToolService().getToolBySignature(signature);
@@ -104,10 +107,15 @@ public abstract class LamsAuthoringFinishAction extends Action {
 				//define it later page
 				reeditUrl = WebUtil.appendParameterToURL(getLamsUrl()+tool.getDefineLaterUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID,
 						toolContentId.toString());
+				reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID,
+						contentFolderID);
+								
 			}else{
 				//authoring page
 				reeditUrl = WebUtil.appendParameterToURL(getLamsUrl()+tool.getAuthorUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID,
 						toolContentId.toString());
+				reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID,
+						contentFolderID);
 			}
 			
 			nextUrl = WebUtil.appendParameterToURL(nextUrl,RE_EDIT_URL,URLEncoder.encode(reeditUrl,"UTF-8"));
