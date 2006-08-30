@@ -187,16 +187,6 @@ public class LearningAction extends Action {
 		ForumUser forumUser = getCurrentUser(request,sessionId);
 		boolean lock =  forum.getLockWhenFinished() && forumUser.isSessionFinished();
 		
-		//add define later support
-		if(forum.isDefineLater()){
-			return mapping.findForward("defineLater");
-		}
-		//add run offline support
-		if(forum.getRunOffline()){
-			return mapping.findForward("runOffline");
-		}
-		
-		
 		//try to clone topics from :See bug LDEV-649 
 		Long contentId = forum.getContentId();
 		forumService.cloneContentTopics(contentId, sessionId);
@@ -220,6 +210,15 @@ public class LearningAction extends Action {
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
 		
+		//add define later support
+		if(forum.isDefineLater()){
+			return mapping.findForward("defineLater");
+		}
+		//add run offline support
+		if(forum.getRunOffline()){
+			return mapping.findForward("runOffline");
+		}
+				
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
