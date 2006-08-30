@@ -129,7 +129,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<c:if test="${userData.visible != 'true' }"> 			
 													                         <i><bean:message key="label.response.hidden"/> </i> 
 																</c:if> 								
-																 <c:out value="${userData.response}"/> 
+																 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 															 </td>
 														</tr>
 													</c:if>
@@ -219,7 +219,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${userData.visible != 'true' }"> 			
 														                         <i><bean:message key="label.response.hidden"/> </i> 
 																	</c:if> 								
-																	 <c:out value="${userData.response}"/> 
+																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 																 </td>
 															</tr>
 															
