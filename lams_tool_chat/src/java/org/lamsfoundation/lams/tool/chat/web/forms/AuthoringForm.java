@@ -53,6 +53,8 @@ public class AuthoringForm extends ActionForm {
 	String onlineInstruction;
 
 	Long toolContentID;
+	
+	String contentFolderID;
 
 	boolean lockOnFinished;
 	
@@ -221,5 +223,13 @@ public class AuthoringForm extends ActionForm {
 
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
+	}
+
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 }
