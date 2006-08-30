@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +42,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -72,7 +72,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class MonitoringAction extends LamsDispatchAction
 {
-	
+		
 	//---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
@@ -258,8 +258,10 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
         	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+        	
         	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
-    		Date startDate = DateFormat.getInstance().parse(dateStr);
+    		Date startDate = DateUtil.convertFromLAMSFlashFormat(dateStr);
+    		
     		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId(request));
     		flashMessage = new FlashMessage("startOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {

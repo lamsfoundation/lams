@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -75,8 +76,8 @@ public class TestDateUtil extends TestCase {
 	public void testConvertFromUTCToLocal() {
 	}
 
-	/*
-	 * Test the conversion of dates given hardcoded date formats.
+	
+	/** Test the conversion of dates given hardcoded date formats.
 	 */
 	public void testConvertFromStringString() {
 		
@@ -115,8 +116,8 @@ public class TestDateUtil extends TestCase {
 		assertEquals(cal.get(Calendar.SECOND),second);
 	}
 
-	/*
-	 * Test the conversion of dates given supplied date formats.
+	
+	/** Test the conversion of dates given supplied date formats. 
 	 */
 	public void testConvertFromStringStringString() {
 		Date date;
@@ -131,4 +132,25 @@ public class TestDateUtil extends TestCase {
 		}
 	}
 
+	public void testFlashConversion() {
+		Date date = null;
+		String dateString = null;
+		
+		try {
+			dateString = "17/12/2006 11:13 AM";
+	        date = DateUtil.convertFromLAMSFlashFormat(dateString);
+			checkDate(date, 2006, Calendar.DECEMBER, 17, 11, 13, 0);
+	        
+			dateString = "17/09/2006 11:13 AM";
+			date = DateUtil.convertFromLAMSFlashFormat(dateString);
+			checkDate(date, 2006, Calendar.SEPTEMBER, 17, 11, 13, 0);
+			
+			dateString = "17/9/2006 02:03 PM";
+			date = DateUtil.convertFromLAMSFlashFormat(dateString);
+			checkDate(date, 2006, Calendar.SEPTEMBER, 17, 14, 3, 0);
+			
+		} catch (ParseException e) {
+			fail("Parse exception thrown trying to convert "+dateString);
+		}
+	}
 }

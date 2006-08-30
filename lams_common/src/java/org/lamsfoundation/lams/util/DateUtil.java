@@ -43,8 +43,10 @@ import java.util.TimeZone;
 public class DateUtil
 {
 
-	public static final String FLASH_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-    /**
+	public static final String WDDX_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+	public static final String LAMS_FLASH_FORMAT = "dd/M/yyyy h:mm a";
+
+	/**
      * Convert your local time to Universal Time Coordinator.
      * TODO conversion is not working properly. The returned Date object still 
      * contain server local timezone rather than GMT time zone.
@@ -89,7 +91,6 @@ public class DateUtil
      * 
      * @param dateString the date as a string
      * @return converted Date
-     * TODO junit tests to test this code.
      * @throws ParseException
      */
     public static Date convertFromString(String dateString) throws ParseException
@@ -100,7 +101,7 @@ public class DateUtil
     	// Replace this implementation with commons.lang.time.DateUtils.parseDate()
     	// if/when we upgrade to commons 2.1
         SimpleDateFormat parser = null;
-        String[] parseFormats = new String[] {FLASH_FORMAT};
+        String[] parseFormats = new String[] {WDDX_FORMAT};
         for (int i = 0; i < parseFormats.length; i++) {
             if (i == 0) {
                 parser = new SimpleDateFormat(parseFormats[0]);
@@ -135,6 +136,22 @@ public class DateUtil
     	
         SimpleDateFormat parser = new SimpleDateFormat(dateFormat);
         return parser.parse(dateString);
+    }
+    
+    /**
+     * Convert from String formatted date to a Date. Tries the following
+     * date format: DD/MM/YYYY hh:mm a
+     * 
+     * This is the format used by Flash to send the data/time for 
+     * scheduling a lesson. It has a matching custom date formatter in Flash
+     * 
+     * @param dateString the date as a string
+     * @return converted Date
+     * @throws ParseException
+     */
+    public static Date convertFromLAMSFlashFormat(String dateString) throws ParseException
+    {  
+    	return convertFromString(dateString, LAMS_FLASH_FORMAT);
     }
 
 }
