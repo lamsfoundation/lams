@@ -1,27 +1,32 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="authoringForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-
 <!-- ========== Advanced Tab ========== -->
 <table cellpadding="0">
 	<tbody>
 		<tr>
 			<td align="right">
-				<html:checkbox property="lockOnFinished" value="1" styleClass="noBorder"></html:checkbox>
+				<html:checkbox property="lockOnFinished" value="1"
+					styleClass="noBorder" styleId="lockOnFinished">
+				</html:checkbox>
 			</td>
 			<td>
-				<fmt:message key="advanced.lockOnFinished" />
+				<label for="lockOnFinished">
+					<fmt:message key="advanced.lockOnFinished" />
+				</label>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
-				<html:checkbox property="reflectOnActivity" value="1" styleClass="noBorder"></html:checkbox>
+				<html:checkbox property="reflectOnActivity" value="1"
+					styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
 			</td>
 			<td>
-				<fmt:message key="advanced.reflectOnActivity" />
+				<label for="reflectOnActivity">
+					<fmt:message key="advanced.reflectOnActivity" />
+				</label>
 			</td>
 		</tr>
-				<tr>
+		<tr>
 			<td>
 				&nbsp;
 			</td>
@@ -31,10 +36,13 @@
 		</tr>
 		<tr>
 			<td align="right">
-				<html:checkbox property="filteringEnabled" value="1" styleClass="noBorder"></html:checkbox>
+				<html:checkbox property="filteringEnabled" value="1"
+					styleClass="noBorder" styleId="filteringEnabled"></html:checkbox>
 			</td>
 			<td>
-				<fmt:message key="advanced.filteringEnabled" />
+				<label for="filteringEnabled">
+					<fmt:message key="advanced.filteringEnabled" />
+				</label>
 			</td>
 		</tr>
 		<tr>
@@ -47,4 +55,3 @@
 		</tr>
 	</tbody>
 </table>
-

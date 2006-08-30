@@ -1,14 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div id="header">
-
-	<!--  TITLE KEY PAGE GOES HERE -->
 	<lams:Tabs control="true">
 		<lams:Tab id="1" key="button.basic" />
 		<lams:Tab id="2" key="button.advanced" />
 		<lams:Tab id="3" key="button.instructions" />
 	</lams:Tabs>
-
 </div>
 <!--closes header-->
 
@@ -17,6 +14,7 @@
 		enctype="multipart/form-data">
 		<div>
 			<html:hidden property="toolContentID" />
+			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
 			<html:hidden property="dispatch" value="updateContent" />
 			<html:hidden property="sessionMapID" />
@@ -49,11 +47,11 @@
 			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
 			toolContentID="${formBean.toolContentID}"
 			accessMode="${sessionMap.mode}" defineLater="${defineLater}"
-			customiseSessionID="${sessionMap.sessionID}" />
+			customiseSessionID="${sessionMap.sessionID}"
+			contentFolderID="${formBean.contentFolderID}" />
 
 	</html:form>
 </div>
+<!--closes content-->
 
 <div id="footer"></div>
-
-<lams:HTMLEditor />
