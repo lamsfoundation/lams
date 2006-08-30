@@ -296,6 +296,19 @@ public interface IUserManagementService {
 	 * related learning designs, etc.
 	 * @param userId
 	 */
-	public void removeUser(Integer userId);
+	public void removeUser(Integer userId) throws Exception;
+	
+	/** 
+	 * Determines whether a user has associated learning designs, progress data, etc.
+	 * @param user
+	 * @return Boolean
+	 */
+	public Boolean userHasData(User user);
+	
+	/** 
+	 * Sets user's disabled flag to true, and removes their organisation memberships.
+	 * @param userId
+	 */
+	public void disableUser(Integer userId);
 
 }

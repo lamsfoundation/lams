@@ -510,13 +510,14 @@ public class UserManagementService implements IUserManagementService {
 	 * related learning designs, etc.
 	 * @param userId
 	 */
-	public void removeUser(Integer userId) {
+	public void removeUser(Integer userId) throws Exception {
 		
 		User user = (User)findById(User.class,userId);
 		if ( user != null ) {
 			
-			// check that the user doesn't have any contents - move that logic from the action to a 
-			// method call in the service. throw an exception if they do have contents
+			if ( userHasData(user) ) {
+				throw new Exception("Cannot remove User ID "+userId+". User has data.");
+			}
 			
 			// write out an entry in the audit log.
 			
@@ -551,6 +552,56 @@ public class UserManagementService implements IUserManagementService {
 		} else {
 			log.error("Requested delete of a user who does not exist. User ID "+userId);
 		}
+	}
+	
+	public Boolean userHasData(User user) {
+		if (user.getLearnerProgresses()!=null) {
+			if (!user.getLearnerProgresses().isEmpty()) {
+				log.debug("user has data, learnerProgresses: "+user.getLearnerProgresses().size());
+				return true;
+			}
+		}
+		if (user.getUserToolSessions()!=null) {
+			if (!user.getUserToolSessions().isEmpty()) {
+				log.debug("user has data, userToolSessions: "+user.getUserToolSessions().size());
+				return true;
+			}
+		}
+		if (user.getLearningDesigns()!=null) {
+			if (!user.getLearningDesigns().isEmpty()) {
+				log.debug("user has data, learningDesigns: "+user.getLearningDesigns().size());
+				return true;
+			}
+		}
+		if (user.getLessons()!=null) {
+			if (!user.getLessons().isEmpty()) {
+				log.debug("user has data, lessons: "+user.getLessons().size());
+				return true;
+			}
+		}
+		if (user.getUserGroups()!=null) {
+			if (!user.getUserGroups().isEmpty()) {
+				log.debug("user has data, userGroups: "+user.getUserGroups().size());
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void disableUser(Integer userId) {
+		
+		User user = (User)findById(User.class,userId);
+		user.setDisabledFlag(true);
+		Set uos = user.getUserOrganisations();
+		Iterator iter = uos.iterator();
+		while(iter.hasNext()) {
+			UserOrganisation uo = (UserOrganisation)iter.next();
+			log.debug("removing membership of: "+uo.getOrganisation().getName());
+			delete(uo);
+			iter.remove();
+		}
+		log.debug("disabling user "+user.getLogin());
+		save(user);
 	}
 	
 }
