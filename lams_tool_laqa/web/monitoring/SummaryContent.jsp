@@ -175,7 +175,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${userData.visible != 'true' }"> 			
 														                         <i><bean:message key="label.response.hidden"/> </i> 
 																	</c:if> 								
-																	 <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 
+									 						 			<textarea name="updatedResponse" rows=6 cols=60><c:out value="${userData.response}" escapeXml="false"/></textarea>
 																 </td>
 															</tr>
 															
