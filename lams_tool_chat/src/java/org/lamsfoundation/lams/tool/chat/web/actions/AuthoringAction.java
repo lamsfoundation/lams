@@ -96,6 +96,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		// Extract toolContentID from parameters.
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 		// set up chatService
 		if (chatService == null) {
@@ -125,21 +127,18 @@ public class AuthoringAction extends LamsDispatchAction {
 		chat.setDefineLater(true);
 		chatService.saveOrUpdateChat(chat);
 
-		// Set up sessionMap
-		SessionMap<String, Object> map = new SessionMap<String, Object>();
-		initSessionMap(map, request);
-		updateSessionMap(map, chat);
-
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
 		updateAuthForm(authForm, chat);
-
-		// add the sessionMapID to form
+		
+		// Set up sessionMap
+		SessionMap<String, Object> map = createSessionMap(chat, getAccessMode(request));
 		authForm.setSessionMapID(map.getSessionID());
+		
+		authForm.setContentFolderID(contentFolderID);
 
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
-
 		request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
 		
 		return mapping.findForward("success");
@@ -388,15 +387,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * 
 	 * @param map
 	 * @param chat
+	 * @param mode 
 	 */
-	private void updateSessionMap(SessionMap<String, Object> map, Chat chat) {
-
-		getAttList(KEY_UNSAVED_OFFLINE_FILES, map).clear();
-		getAttList(KEY_UNSAVED_ONLINE_FILES, map).clear();
-		getAttList(KEY_DELETED_FILES, map).clear();
-		getAttList(KEY_OFFLINE_FILES, map).clear();
-		getAttList(KEY_ONLINE_FILES, map).clear();
-
+	private SessionMap<String, Object> createSessionMap(Chat chat, ToolAccessMode mode) {
+		
+		SessionMap<String, Object> map = new SessionMap<String, Object>();
+		
+		map.put(KEY_MODE, mode);
+		map.put(KEY_ONLINE_FILES, new LinkedList<ChatAttachment>());
+		map.put(KEY_OFFLINE_FILES, new LinkedList<ChatAttachment>());
+		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<ChatAttachment>());
+		map.put(KEY_UNSAVED_OFFLINE_FILES, new LinkedList<ChatAttachment>());
+		map.put(KEY_DELETED_FILES, new LinkedList<ChatAttachment>());		
+			
 		Iterator iter = chat.getChatAttachments().iterator();
 		while (iter.hasNext()) {
 			ChatAttachment attachment = (ChatAttachment) iter.next();
@@ -408,6 +411,8 @@ public class AuthoringAction extends LamsDispatchAction {
 				getAttList(KEY_ONLINE_FILES, map).add(attachment);
 			}
 		}
+		
+		return map;
 	}
 
 	/**
