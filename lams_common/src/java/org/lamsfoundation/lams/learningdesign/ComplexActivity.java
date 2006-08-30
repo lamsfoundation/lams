@@ -188,7 +188,8 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 		//add the DTO for all child activities
 		for(Iterator i = this.getActivities().iterator();i.hasNext();) {
             Activity child = (Activity)i.next();
-            dtoSet.add(new AuthoringActivityDTO(child));
+            
+            dtoSet.addAll(child.getAuthoringActivityDTOSet());
 		}
 		
 		return dtoSet;
