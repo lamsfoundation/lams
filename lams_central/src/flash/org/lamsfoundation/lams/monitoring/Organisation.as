@@ -41,8 +41,8 @@ class Organisation {
 	/**
 	* constants
 	*/
-	public static var TEACHER_ROLE:String = "TEACHER";
-	public static var STAFF_ROLE:String = "STAFF";
+	public static var COURSE_MANAGER_ROLE:String = "COURSE MANAGER";
+	public static var MONITOR_ROLE:String = "MONITOR";
 	public static var LEARNER_ROLE:String = "LEARNER";
 	
 	/**
@@ -121,20 +121,20 @@ class Organisation {
 		return true;
 	}
 	
-	public function getTeachers():Array{
+	public function getCourseManagers():Array{
 		if(_users==null){
 			return null;
 		}
 		
-		return getUsersByRole(TEACHER_ROLE);
+		return getUsersByRole(COURSE_MANAGER_ROLE);
 	}
 	
-	public function getStaff():Array{
+	public function getMonitors():Array{
 		if(_users==null){
 			return null;
 		}
 		
-		return getUsersByRole(STAFF_ROLE);
+		return getUsersByRole(MONITOR_ROLE);
 	}
 	
 	public function getLearners():Array{
@@ -156,10 +156,10 @@ class Organisation {
 		return false;
 	}
 	
-	public function isStaff(key:Number):Boolean{
+	public function isMonitor(key:Number):Boolean{
 		if(_users.containsKey(key)){
 			var user:User = User(_users.get(key));
-			if(user.hasRole(STAFF_ROLE)){
+			if(user.hasRole(MONITOR_ROLE)){
 				return true;
 			}
 		}

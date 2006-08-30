@@ -206,7 +206,7 @@ class WizardView extends AbstractView {
                 break;
 			case 'USERS_LOADED' :
 				loadLearners(wm.organisation.getLearners());
-				loadStaff(wm.organisation.getStaff());
+				loadStaff(wm.organisation.getMonitors());
 				_wizardController.clearBusy();
 				break;
 			case 'SAVED_LC' :

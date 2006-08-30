@@ -39,7 +39,7 @@ public class Role implements Serializable,Comparable{
 
 	public static final String LEARNER = "LEARNER";
 	
-	public static final String STAFF = "STAFF";
+	public static final String MONITOR = "MONITOR";
 	
 	public static final String AUTHOR = "AUTHOR";
 	
@@ -61,7 +61,7 @@ public class Role implements Serializable,Comparable{
 		public static final Integer ROLE_SYSADMIN =new Integer(1);
 		public static final Integer ROLE_COURSE_MANAGER =new Integer(2);
 		public static final Integer ROLE_AUTHOR =new Integer(3);
-		public static final Integer ROLE_STAFF =new Integer(4);
+		public static final Integer ROLE_MONITOR =new Integer(4);
 		public static final Integer ROLE_LEARNER =new Integer(5);
 		public static final Integer ROLE_COURSE_ADMIN =new Integer(6);
 	/***********************************************************/
@@ -220,8 +220,8 @@ public class Role implements Serializable,Comparable{
     	return this.roleId.equals(ROLE_COURSE_ADMIN);
     }
     
-    public boolean isStaff(){
-    	return this.roleId.equals(ROLE_STAFF);
+    public boolean isMonitor(){
+    	return this.roleId.equals(ROLE_MONITOR);
     }
 
     public boolean isSysAdmin(){

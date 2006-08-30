@@ -43,8 +43,8 @@ class WizardModel extends Observable{
 	   
 	// constants
 	private static var LEARNER_ROLE:String = "LEARNER";
-	private static var STAFF_ROLE:String = "STAFF";
-	private static var TEACHER_ROLE:String = "TEACHER";
+	private static var MONITOR_ROLE:String = "MONITOR";
+	private static var COURSE_MANAGER_ROLE:String = "COURSE MANAGER";
 	   
 	private static var USER_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var USER_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
@@ -186,7 +186,7 @@ class WizardModel extends Observable{
 		trace('requesting staff members...');
 		var callback:Function = Proxy.create(this,saveStaff);
 		
-		_wizard.requestUsers(STAFF_ROLE, data.organisationID, callback);
+		_wizard.requestUsers(MONITOR_ROLE, data.organisationID, callback);
 	}
 	
 	public function saveLearners(users:Array){
@@ -198,9 +198,9 @@ class WizardModel extends Observable{
 	}
 	
 	public function saveStaff(users:Array){
-		trace('retrieving back users for org by role: ' + STAFF_ROLE);
+		trace('retrieving back users for org by role: ' + MONITOR_ROLE);
 		
-		saveUsers(users, STAFF_ROLE);
+		saveUsers(users, MONITOR_ROLE);
 		
 		dispatchEvent({type:'staffLoad',target:this});
 	}
@@ -331,7 +331,7 @@ class WizardModel extends Observable{
 		trace('branch: ' + _selectedOrgTreeNode.attributes.isBranch);
 		//if(!_selectedOrgTreeNode.attributes.isBranch){
 			// get the organisations (node) users by role
-			//var roles:Array = new Array(LEARNER_ROLE, STAFF_ROLE, TEACHER_ROLE);
+			//var roles:Array = new Array(LEARNER_ROLE, MONITOR_ROLE, COURSE_MANAGER_ROLE);
 			setOrganisation(new Organisation(_selectedOrgTreeNode.attributes.data));
 			resetUserFlags();
 			// polling method - waiting for all users to load before displaying users in UI

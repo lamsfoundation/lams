@@ -140,16 +140,16 @@ public class IndexAction extends Action {
 				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
 			}
 		}
-		if ((contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF))
+		if ((contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 				&& state.equals(OrganisationState.ACTIVE)) {
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 				if((!isSysAdmin)&&(contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER))){
 					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
 				}
-				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF))
+				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')"));
 			}else{//CLASS_TYPE
-				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF))
+				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")"));
 			}
 		}
@@ -163,7 +163,7 @@ public class IndexAction extends Action {
 				if(!lesson.isPreviewLesson()){
 					List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 					if(state.equals(OrganisationState.ACTIVE)){
-						if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
+						if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_MONITOR)){
 							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
 								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
 							}

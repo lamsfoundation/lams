@@ -448,7 +448,7 @@ public class UserManagementService implements IUserManagementService {
                     				User user = (User)findById(User.class,m.getUserID());
                     				UserOrganisation uo = new UserOrganisation(user,organisation);
                     				log.debug("adding course manager: "+user.getUserId()+" as staff");
-                    				UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)findById(Role.class,Role.ROLE_STAFF));
+                    				UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)findById(Role.class,Role.ROLE_MONITOR));
                     				HashSet uors = new HashSet();
                     				uors.add(uor);
                     				uo.setUserOrganisationRoles(uors);

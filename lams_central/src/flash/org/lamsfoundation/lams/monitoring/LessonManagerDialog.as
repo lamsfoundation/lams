@@ -454,10 +454,10 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		var callback:Function = Proxy.create(this,showOrgTree);
            
 		if(classID != undefined){
-			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID+'&roles=STAFF,TEACHER',callback, false);
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID+'&roles=MONITOR,COURSE MANAGER',callback, false);
 		}else if(courseID != undefined){
 			trace('course defined: doing request');
-			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+courseID+'&roles=STAFF,TEACHER',callback, false);
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+courseID+'&roles=MONITOR,COURSE MANAGER',callback, false);
 		}else{
 			// TODO no course or class defined
 		}
@@ -616,7 +616,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		for(var i=0; i<_staffList.length; i++){
 			trace('checking staff list item : ' + i);
 			trace(_staffList[i].data.userID);
-			if(org.isStaff(_staffList[i].data.userID)){
+			if(org.isMonitor(_staffList[i].data.userID)){
 				_staffList[i].user_cb.selected = true;
 			}
 		}

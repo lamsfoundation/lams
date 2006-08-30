@@ -43,7 +43,7 @@ class MonitorModel extends Observable{
 	public var RT_ORG:String = "Organisation";
 	   
 	private static var LEARNER_ROLE:String = "LEARNER";
-	private static var STAFF_ROLE:String = "STAFF";
+	private static var MONITOR_ROLE:String = "MONITOR";
 	private static var TEACHER_ROLE:String = "TEACHER";
 	   
 	private var __width:Number;
@@ -582,7 +582,7 @@ class MonitorModel extends Observable{
 		trace('requesting staff members...');
 		//var callback:Function = Proxy.create(this,saveStaff);
 		
-		_monitor.requestUsers(STAFF_ROLE, data.organisationID, callback);
+		_monitor.requestUsers(MONITOR_ROLE, data.organisationID, callback);
 	}
 	
 	public function saveLearners(users:Array){
@@ -595,9 +595,9 @@ class MonitorModel extends Observable{
 	}
 	
 	public function saveStaff(users:Array){
-		trace('retrieving back users for org by role: ' + STAFF_ROLE);
+		trace('retrieving back users for org by role: ' + MONITOR_ROLE);
 		
-		saveUsers(users, STAFF_ROLE);
+		saveUsers(users, MONITOR_ROLE);
 		
 		//dispatchEvent({type:'staffLoad',target:this});
 		broadcastViewUpdate("STAFF_LOADED", null, null);
@@ -773,7 +773,7 @@ class MonitorModel extends Observable{
 		trace('branch: ' + _selectedTreeNode.attributes.isBranch);
 		if(!_selectedTreeNode.attributes.isBranch){
 			// get the organisations (node) users by role
-			//var roles:Array = new Array(LEARNER_ROLE, STAFF_ROLE, TEACHER_ROLE);
+			//var roles:Array = new Array(LEARNER_ROLE, MONITOR_ROLE, TEACHER_ROLE);
 			setOrganisation(new Organisation(_selectedTreeNode.attributes.data));
 			resetUserFlags();
 			// polling method - waiting for all users to load before displaying users in UI
