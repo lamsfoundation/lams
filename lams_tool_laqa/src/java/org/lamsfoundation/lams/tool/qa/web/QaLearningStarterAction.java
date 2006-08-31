@@ -398,8 +398,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
     		QaUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("warning to learner: the activity is offline.");
-	    	//persistError(request,"label.learning.runOffline");
-			//return (mapping.findForward(ERROR_LIST_LEARNER));
 	    	logger.debug("fwding to :" + RUN_OFFLINE);
 			return (mapping.findForward(RUN_OFFLINE));
 	    }

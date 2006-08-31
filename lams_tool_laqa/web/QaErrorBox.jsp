@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<c:if test="${userExceptionRunOffline == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
-						 <bean:message key="label.learning.runOffline"/>
+						 <bean:message key="label.learning.forceOfflineMessage"/>
 			</td> </tr>
 		</c:if> 				    
 
