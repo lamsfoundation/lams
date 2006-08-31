@@ -92,6 +92,7 @@ public class AuthoringAction extends LamsDispatchAction {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
+		
 		//when first time open flash icon on authoring page: mode will be null 
 		if(mode == null)
 			mode = ToolAccessMode.AUTHOR;
@@ -100,6 +101,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		//get back the upload file list and display them on page
 		submitFilesService = getService();
 		
@@ -137,6 +139,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setSessionMapID(sessionMap.getSessionID());
 		//current tab
 		authForm.setCurrentTab(request.getParameter("currentTab"));
+		authForm.setContentFolderID(contentFolderID);
 		
 		return mapping.findForward("success");
 	}

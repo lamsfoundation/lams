@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.tool.sbmt.form;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
@@ -16,7 +14,6 @@ import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.dto.DTOException;
 
 /**
  * 
@@ -26,6 +23,8 @@ import org.lamsfoundation.lams.tool.sbmt.dto.DTOException;
 public class AuthoringForm extends ValidatorForm {
 
 	private Long toolContentID;
+	private String contentFolderID;
+	
 	//control fields
 	private String sessionMapID;
 	private String currentTab;
@@ -171,5 +170,11 @@ public class AuthoringForm extends ValidatorForm {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 }

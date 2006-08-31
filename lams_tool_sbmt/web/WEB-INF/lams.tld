@@ -287,12 +287,8 @@
        <path>/WEB-INF/tags/TabBody.tag</path>
    	</tag-file>
    	<tag-file>
-       <name>HTMLEditor</name>
-       <path>/WEB-INF/tags/HTMLEditor.tag</path>
-   	</tag-file>
-   	<tag-file>
-       <name>SetEditor</name>
-       <path>/WEB-INF/tags/SetEditor.tag</path>
+       <name>FCKEditor</name>
+       <path>/WEB-INF/tags/FCKEditor.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AuthoringButton</name>
@@ -310,14 +306,8 @@
 	    <name>ExportPortOutput</name>
 		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
-   	<tag-file>
+	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
    	</tag-file>  
-	<tag-file>
-	    <name>DefineLater</name>
-		<path>/WEB-INF/tags/DefineLater.tag</path>
-   	</tag-file>  
-   	
-   	
 </taglib>

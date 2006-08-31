@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+            "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
 <c:set var="lams">
@@ -35,10 +35,6 @@
             else
                 selectTab(1); //select the default tab;
             
-            initEditor("Title");
-            initEditor("Instructions");
-            initEditor("OnlineInstruction");
-            initEditor("OfflineInstruction");
         }     
         
         function doSelectTab(tabId) {
@@ -85,6 +81,7 @@
 				<input type="hidden" name="mode" value="author">
 				<html:hidden property="sessionMapID" />
 				<html:hidden property="toolContentID" />
+				<html:hidden property="contentFolderID" />
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:hidden property="dispatch" value="updateContent" />
 
@@ -102,9 +99,8 @@
 
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" 
-					customiseSessionID="${formBean.sessionMapID}" />
-
-				<lams:HTMLEditor />
+					customiseSessionID="${formBean.sessionMapID}" 
+					contentFolderID="abc"/>
 			</html:form>
 		</div>
 		<div id="footer"></div>
