@@ -9,7 +9,7 @@
 <table-list>
 <table alias="" name="tl_lamc11_content" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="320" width="203" x="96" y="391"/>
+<table-figure-bounds height="328" width="203" x="96" y="391"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -59,6 +59,19 @@
 <column-description></column-description>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="reflect" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant type-name-pattern="TINYINT"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="questions_sequenced" remarks="">
@@ -163,12 +176,6 @@
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="true" name="end_learning_message" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
-<variant type-name-pattern="TEXT"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="content_in_use" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
@@ -232,6 +239,12 @@
 <variant type-name-pattern="TINYINT UNSIGNED"/>
 <variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="reflectionSubject" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 </column-list>
@@ -817,8 +830,8 @@
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="viewSummaryRequested" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>

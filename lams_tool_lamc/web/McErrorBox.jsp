@@ -98,23 +98,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				
 
-		<c:if test="${userExceptionLearnerRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.learner.user.doesNoExist"/> 
-			</td> </tr>
-		</c:if> 				    
 
-		<c:if test="${userExceptionContentDoesNotExist == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.content.doesNotExist"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionToolSessionIdRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.toolSessionId.required"/> 
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionNumberFormat == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
@@ -122,27 +106,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionUserDoesNotExist == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.learner.userId.required"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionContentIdRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.contentId.required"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionToolSessionIdInconsistent == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.learner.sessionId.inconsistent"/> 
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionContentRunOffline == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
-						 <bean:message key="label.learning.runOffline"/> 
+						 <bean:message key="label.learning.forceOfflineMessage"/> 
 			</td> </tr>
 		</c:if> 				    
 
@@ -165,23 +132,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionContentBeingModified == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.content.beingModified"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionDefaultContentNotSetup == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.defaultContent.notSetup"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionModeInvalid == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.mode.invalid"/> 
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionSingleOption == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>

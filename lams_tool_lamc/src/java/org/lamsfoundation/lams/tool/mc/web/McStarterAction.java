@@ -277,7 +277,7 @@ public class McStarterAction extends Action implements McAppConstants {
 			{
 		    	McUtils.cleanUpSessionAbsolute(request);
 		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
-		    	persistError(request,"error.numberFormatException");
+		    	//persistError(request,"error.numberFormatException");
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 			}
@@ -546,7 +546,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		/*used in advanced tab*/
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
-	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
+	    //request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 		
 	    /* used in instructions tab*/
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
@@ -677,7 +677,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
-		request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
+		//request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 		request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,"");
 		request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,"");
 

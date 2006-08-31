@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="header-no-tabs-learner"></div>
 	
 	<div id="content-learner">
-		<lams:DefineLater defineLaterMessageKey="label.learning.runOffline"/>
+		&nbsp&nbsp&nbsp&nbsp&nbsp <bean:message key="label.learning.forceOfflineMessage" />
 	</div>
 	
 	<div id="footer-learner"></div>

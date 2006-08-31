@@ -68,7 +68,7 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 			session.removeAttribute(McAction.LIST_ONLINEFILES_METADATA);
 			session.removeAttribute(McAction.QUESTIONS_WITHNO_OPTIONS);
 			session.removeAttribute(McAction.RICHTEXT_CORRECT_FEEDBACK);
-			session.removeAttribute(McAction.RICHTEXT_END_LEARNING_MSG);
+			//session.removeAttribute(McAction.RICHTEXT_END_LEARNING_MSG);
 			session.removeAttribute(McAction.RICHTEXT_OFFLINEINSTRUCTIONS);
 			session.removeAttribute(McAction.RICHTEXT_ONLINEINSTRUCTIONS);
 			session.removeAttribute(McAction.RICHTEXT_INSTRUCTIONS);

@@ -61,12 +61,14 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private String instructions;
 
-    /** nullable persistent field */
     private boolean defineLater;
 
-    /** nullable persistent field */
     private boolean runOffline;
 
+    /** nullable persistent field */
+    private boolean reflect;
+
+    
     /** nullable persistent field */
     private Date creationDate;
 
@@ -100,9 +102,7 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private String onlineInstructions;
 
-    /** nullable persistent field */
-    private String endLearningMessage;
-
+    
     /** nullable persistent field */
     private boolean retries;
     
@@ -114,6 +114,8 @@ public class McContent implements Serializable {
 
     /** nullable persistent field */
     private boolean showFeedback;
+    
+    private String reflectionSubject;
 
     
     /** persistent field */
@@ -129,7 +131,8 @@ public class McContent implements Serializable {
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
     		Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, 
 			long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
-			String endLearningMessage, Integer passMark, boolean showReport, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions, 
+			Integer passMark, boolean showReport, boolean showFeedback, boolean retries, boolean reflect, 
+			String reflectionSubject, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
         this.mcContentId = mcContentId;
         this.content=content;
@@ -149,8 +152,9 @@ public class McContent implements Serializable {
         this.showFeedback = showFeedback;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
-        this.endLearningMessage = endLearningMessage;
         this.retries=retries;
+        this.reflectionSubject=reflectionSubject;
+        this.reflect=reflect;
         this.passMark = passMark;
         this.showReport = showReport;
         this.mcQueContents = mcQueContents;
@@ -202,11 +206,12 @@ public class McContent implements Serializable {
 					 mc.isContentInUse(),
 					 mc.getOfflineInstructions(),
 					 mc.getOnlineInstructions(),
-					 mc.getEndLearningMessage(),
 					 mc.getPassMark(),
 					 mc.isShowReport(),
 					 mc.isShowFeedback(),
 					 mc.isRetries(),
+					 mc.isReflect(),
+					 mc.getReflectionSubject(),
          			 new TreeSet(),
                      new TreeSet(),
                      new TreeSet()
@@ -393,14 +398,6 @@ public class McContent implements Serializable {
         this.onlineInstructions = onlineInstructions;
     }
 
-    public String getEndLearningMessage() {
-        return this.endLearningMessage;
-    }
-
-    public void setEndLearningMessage(String endLearningMessage) {
-        this.endLearningMessage = endLearningMessage;
-    }
-
     public Integer getPassMark() {
         return this.passMark;
     }
@@ -506,4 +503,26 @@ public class McContent implements Serializable {
 	public void setContent(String content) {
 		this.content = content;
 	}
+    /**
+     * @return Returns the reflect.
+     */
+    public boolean isReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(boolean reflect) {
+        this.reflect = reflect;
+    }
+    
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
+    }    
 }

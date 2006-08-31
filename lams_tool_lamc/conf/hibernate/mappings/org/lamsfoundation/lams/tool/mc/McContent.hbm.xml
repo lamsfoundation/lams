@@ -31,15 +31,24 @@
         type="java.lang.String"
         access="property"
         column="title"
-        length="100"
+        length="65535"
     />
+
 
     <property
         name="instructions"
         type="java.lang.String"
         access="property"        
         column="instructions"
-        length="255"
+        length="65535"
+    />
+
+    <property
+        name="reflectionSubject"
+        type="java.lang.String"
+        access="property"
+        column="reflectionSubject"
+        length="65535"
     />
 
 
@@ -86,6 +95,14 @@
         length="1"        
    />
 
+   <property
+        name="reflect"
+        type="boolean"
+        access="property"
+        column="reflect"
+        length="1"        
+   />
+
     <property
         name="usernameVisible"
         type="boolean"
@@ -99,7 +116,7 @@
         type="java.lang.String"
         access="property"        
         column="report_title"
-        length="100"
+        length="65535"
     />
     
     <property
@@ -107,7 +124,7 @@
         type="java.lang.String"
         access="property"        
         column="monitoring_report_title"
-        length="100"
+        length="65535"
     />
  
     <property
@@ -147,14 +164,6 @@
         type="java.lang.String"
         access="property"        
         column="online_instructions"
-        length="65535"
-    />
-    
-    <property
-        name="endLearningMessage"
-        type="java.lang.String"
-        access="property"        
-        column="end_learning_message"
         length="65535"
     />
     

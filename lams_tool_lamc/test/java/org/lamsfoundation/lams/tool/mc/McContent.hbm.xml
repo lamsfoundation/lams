@@ -86,6 +86,14 @@
         length="1"        
    />
 
+   <property
+        name="reflect"
+        type="boolean"
+        access="property"
+        column="reflect"
+        length="1"        
+   />
+
     <property
         name="usernameVisible"
         type="boolean"

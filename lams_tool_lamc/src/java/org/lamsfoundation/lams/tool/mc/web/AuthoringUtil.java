@@ -1467,8 +1467,8 @@ public class AuthoringUtil implements McAppConstants {
     	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
 		logger.debug("richTextReportTitle: " + richTextReportTitle);
 		
-		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+		//String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+		///logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
     	
 		creationDate=(Date)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
@@ -1503,11 +1503,11 @@ public class AuthoringUtil implements McAppConstants {
 	    mc.setDefineLater(false);
 	    mc.setSynchInMonitor(isSynchInMonitor);
 	    mc.setContentInUse(isContentInUse);
-	    mc.setEndLearningMessage("Thanks");
+	    //mc.setEndLearningMessage("Thanks");
 	    mc.setRunOffline(isRunOffline);
 	    mc.setReportTitle(richTextReportTitle);
 	    mc.setMonitoringReportTitle(monitoringReportTitle);
-	    mc.setEndLearningMessage(richTextEndLearningMessage);
+	    //mc.setEndLearningMessage(richTextEndLearningMessage);
 	    mc.setRetries(isRetries);
 	    mc.setPassMark(new Integer(passmark));
 	    mc.setShowReport(isSln);
@@ -3143,7 +3143,7 @@ public class AuthoringUtil implements McAppConstants {
     	request.getSession().removeAttribute(IS_REVISITING_USER);
     	request.getSession().removeAttribute(MAP_WEIGHTS);
     	request.getSession().removeAttribute(DEFINE_LATER_EDIT_ACTIVITY);
-    	request.getSession().removeAttribute(RICHTEXT_END_LEARNING_MSG);
+    	//request.getSession().removeAttribute(RICHTEXT_END_LEARNING_MSG);
     	request.getSession().removeAttribute(RICHTEXT_FEEDBACK_CORRECT);
     	request.getSession().removeAttribute(RICHTEXT_FEEDBACK_INCORRECT);
     	request.getSession().removeAttribute(RICHTEXT_TITLE);

@@ -103,6 +103,9 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	protected String usernameVisible;
 	protected String questionsSequenced;
 	
+	protected String reflect;
+	protected String reflectionSubject;
+	
 	/* proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
 	protected String instructionsMonitoring;
@@ -205,6 +208,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     	this.sln				 =OPTION_OFF;
     	this.showFeedback 		 =OPTION_OFF;
     	this.usernameVisible	 =OPTION_OFF;
+    	this.reflect			 =OPTION_OFF;
 	}
 
 	
@@ -849,4 +853,30 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setEditOptionsMode(String editOptionsMode) {
         this.editOptionsMode = editOptionsMode;
     }
+    
+    /**
+     * @return Returns the reflect.
+     */
+    public String getReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(String reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
+    }
+
 }

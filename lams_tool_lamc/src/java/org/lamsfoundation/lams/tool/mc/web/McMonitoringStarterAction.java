@@ -437,7 +437,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			{
 	    		McUtils.cleanUpSessionAbsolute(request);
 		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
-	    		persistError(request, "error.numberFormatException");
+	    		//persistError(request, "error.numberFormatException");
 	    		logger.debug("add error.numberFormatException to ActionMessages.");
 				return (mapping.findForward(ERROR_LIST));
 			}

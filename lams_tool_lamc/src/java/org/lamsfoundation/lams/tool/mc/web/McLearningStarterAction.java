@@ -333,7 +333,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				 (mcSessionLocal.getMcSessionId().longValue() != new Long(toolSessionID).longValue()))
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
-		    	persistError(request, "error.learner.sessionId.inconsistent");
+		    	//persistError(request, "error.learner.sessionId.inconsistent");
 				return (mapping.findForward(ERROR_LIST));
 		    }
 		    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
@@ -560,7 +560,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
 	    	McUtils.cleanUpSessionAbsolute(request);
-	    	persistError(request, "error.mode.required");
+	    	//persistError(request, "error.mode.required");
 	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    

@@ -77,8 +77,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</html:radio>
 		      			</td>
 			        </tr>
+			        
 
-			         <tr> 
+   				<tr>
+					<td class="field-name">							
+			      			<bean:message key="label.reflect"/>:
+					</td>
+					<td>							
+						<html:radio property="reflect" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="reflect" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+	      			</td>
+		        </tr>
+
+   				<tr>
+					<td class="field-name">							
+							&nbsp
+					</td>
+					<td>							
+ 						<textarea name="reflectionSubject" rows=3 cols=30></textarea>
+	      			</td>
+		        </tr>
+
+			        
+			        
+		         <tr> 
 						<td colspan=2>							
 								<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
 				 		</td>

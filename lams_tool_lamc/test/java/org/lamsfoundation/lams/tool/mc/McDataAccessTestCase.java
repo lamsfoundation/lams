@@ -124,7 +124,6 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 	    mc.setSynchInMonitor(false);
 	    mc.setOnlineInstructions("online instructions...");
 	    mc.setOfflineInstructions("offline instructions...");
-	    mc.setEndLearningMessage("Thanks.");
 	    mc.setContentInUse(false);
 	    mc.setRetries(false);
 	    mc.setShowFeedback(false);

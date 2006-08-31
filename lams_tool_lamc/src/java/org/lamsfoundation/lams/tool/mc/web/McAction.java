@@ -2205,8 +2205,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
 		logger.debug("richTextReportTitle: " + richTextReportTitle);
 		
-		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+		//String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+		//logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
 		logger.debug("existing mcContent:" + mcContent);
 		
@@ -2245,7 +2245,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			    mcContent.setOnlineInstructions(richTextOnlineInstructions);
 			    mcContent.setReportTitle(richTextReportTitle);
 			    mcContent.setMonitoringReportTitle("Monitoring Report");
-			    mcContent.setEndLearningMessage(richTextEndLearningMessage);
+			    //mcContent.setEndLearningMessage(richTextEndLearningMessage);
 		    }
 			    
 		}
