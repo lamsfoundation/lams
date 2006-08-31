@@ -88,7 +88,10 @@ public interface QaAppConstants {
 	
 	public static final String SOURCE_MC_STARTER						="sourceMcStarter";
 	public static final Integer MAX_QUESTION_COUNT						=new Integer(50);
-	
+
+	public static final String RUN_OFFLINE								="runOffline";
+	public static final String REFLECT									="reflect";
+	public static final String REFLECTION_SUBJECT						="reflectionSubject";
 	
 	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
 	public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";

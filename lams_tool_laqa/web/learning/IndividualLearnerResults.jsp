@@ -113,6 +113,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</table>
 					</td></tr>
 					
+					<tr> <td align=left colspan=2>							
+							<b>	<bean:message key="label.responses.locked"/> </b>
+						</td>
+					</tr>
+							
 
 	  	   		  <tr>
 	  	   		  		<td>

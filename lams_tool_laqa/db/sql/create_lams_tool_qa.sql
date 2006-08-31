@@ -5,6 +5,7 @@ CREATE TABLE tl_laqa11_content (
      , instructions TEXT
      , creation_date DATETIME
      , update_date DATETIME
+     , reflect TINYINT(1) NOT NULL DEFAULT 0
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
      , monitoring_report_title VARCHAR(100) DEFAULT 'Learner Results'
@@ -16,6 +17,7 @@ CREATE TABLE tl_laqa11_content (
      , offline_instructions TEXT
      , online_instructions TEXT
      , content_inUse TINYINT(1) DEFAULT 0
+     , reflectionSubject TEXT
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
@@ -88,10 +90,10 @@ CREATE TABLE tl_laqa11_uploadedfile (
                   REFERENCES tl_laqa11_content (uid)
 )TYPE=InnoDB;
 
-
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date)  VALUES (${default_content_id}, 'Q&A Title', 'Q&A Instructions', NOW());
 
 -- data for content questions table
 INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
+
 

@@ -74,6 +74,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String endLearningMessage;
 	protected String usernameVisible;
 	protected String questionsSequenced;
+	protected String reflect;
+	protected String reflectionSubject;
 	
 	/* proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
@@ -134,6 +136,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		this.reportTitle=null;
 		this.monitoringReportTitle=null;
 		this.questionsSequenced=null;
+		this.reflect=null;
+		
     	
 		this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
@@ -149,6 +153,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		this.synchInMonitor		=OPTION_OFF;
 		this.usernameVisible	=OPTION_OFF;
 		this.questionsSequenced	=OPTION_OFF;
+		this.reflect			=OPTION_OFF;
 	}
 
 	public String toString() {
@@ -168,6 +173,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
             .append("usernameVisible: ", usernameVisible)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
+            .append("reflect: ", reflect)
             .append("defineLaterInEditMode: ", defineLaterInEditMode)
             .toString();
     }
@@ -644,5 +650,29 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
         this.defineLaterInEditMode = defineLaterInEditMode;
+    }
+    /**
+     * @return Returns the reflect.
+     */
+    public String getReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(String reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
     }
 }

@@ -89,6 +89,10 @@ public class QaContent implements Serializable {
     /** nullable persistent field */
     private boolean defineLater;
     
+    private boolean reflect;
+    
+    private String  reflectionSubject;
+    
     /** nullable persistent field */
     private boolean runOffline;
     
@@ -137,6 +141,7 @@ public class QaContent implements Serializable {
 	                 boolean 	usernameVisible,
 	                 boolean 	synchInMonitor,
 	                 boolean 	contentLocked,
+	                 boolean 	reflect,
 	                 Date		creationDate,
 	                 Date 		updateDate,
 	                 Set 		qaQueContents,
@@ -158,6 +163,7 @@ public class QaContent implements Serializable {
         this.usernameVisible 	 = usernameVisible;
         this.synchInMonitor 	 = synchInMonitor;
         this.contentLocked		 = contentLocked;
+        this.reflect		 	= reflect;
         this.creationDate 		 = creationDate;
         this.updateDate 		 = updateDate;
         this.qaQueContents 		 = qaQueContents;
@@ -193,6 +199,7 @@ public class QaContent implements Serializable {
                      qa.isUsernameVisible(),
                      qa.isSynchInMonitor(),
 					 qa.isContentLocked(),
+					 qa.isReflect(),
                      qa.getCreationDate(),
                      qa.getUpdateDate(),
 					 new TreeSet(),
@@ -553,5 +560,29 @@ public class QaContent implements Serializable {
      */
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+    /**
+     * @return Returns the reflect.
+     */
+    public boolean isReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(boolean reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
     }
 }

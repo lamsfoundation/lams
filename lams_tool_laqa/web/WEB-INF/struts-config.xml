@@ -172,6 +172,13 @@
 	        path="/learning/defineLater.jsp"
 		    redirect="false"
 	  	/>
+	  	
+	  	<forward
+		    name="runOffline"
+	        path="/learning/RunOffline.jsp"
+		    redirect="false"
+	  	/>
+	  	
 
 		<forward
 		    name="errorListLearner"

@@ -33,7 +33,7 @@
         type="java.lang.String"
         access="property"
         column="title"
-        length="100"
+        length="65535"
     />
 
     <property
@@ -41,23 +41,31 @@
         type="java.lang.String"
         access="property"        
         column="instructions"
-        length="255"
+        length="65535"
+    />
+    
+    <property
+        name="reflectionSubject"
+        type="java.lang.String"
+        access="property"        
+        column="reflectionSubject"
+        length="65535"
     />
 
 
    <property
-            name="defineLater"
-            type="boolean"
-            access="property"
-            column="define_later"
+        name="defineLater"
+        type="boolean"
+        access="property"
+        column="define_later"
    />
 
 
    <property
-            name="runOffline"
-            type="boolean"
-            access="property"
-            column="run_offline"
+        name="runOffline"
+        type="boolean"
+        access="property"
+        column="run_offline"
    />
 
 
@@ -80,11 +88,20 @@
 
 
    <property
-            name="questionsSequenced"
-            type="boolean"
-            access="property"
-            column="questions_sequenced"
+        name="questionsSequenced"
+        type="boolean"
+        access="property"
+        column="questions_sequenced"
    />
+   
+   <property
+        name="reflect"
+        type="boolean"
+        access="property"
+        column="reflect"
+        length="1"        
+   />
+   
 
     <property
         name="usernameVisible"
