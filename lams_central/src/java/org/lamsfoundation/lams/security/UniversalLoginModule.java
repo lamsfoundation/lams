@@ -128,6 +128,11 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				if (user == null)
 					return false;
 
+				if (user.getDisabledFlag()) {
+					log.debug("===> user is disabled.");
+					return false;
+				}
+				
 				AuthenticationMethod method = null;
 				try {
 					method = user.getAuthenticationMethod();
@@ -175,7 +180,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				//if login is valid, register userDTO into session.
 				if(isValid){
 					HttpSession sharedsession = SessionManager.getSession(); 
-					sharedsession.setAttribute(AttributeNames.USER,user.getUserDTO());					
+					sharedsession.setAttribute(AttributeNames.USER,user.getUserDTO());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
