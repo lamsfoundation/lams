@@ -60,8 +60,6 @@
 			<logic:equal name='orgManageBean' property='editable' value="true">
 				<a href="organisation.do?method=edit&orgId=<bean:write name='orgManageBean' property='organisationId' />"><fmt:message key="admin.edit"/></a>
 				&nbsp;
-				<a href="organisation.do?method=remove&orgId=<bean:write name='orgManageBean' property='organisationId' />&parentId=<bean:write name='OrgManageForm' property='parentId'/>"><fmt:message key="admin.remove"/></a>
-				&nbsp;
 				<logic:equal name="OrgManageForm" property="type" value="1">
 					<a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>" target="_blank"><fmt:message key="admin.class.manage"/></a>
 					&nbsp;
