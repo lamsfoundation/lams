@@ -12,7 +12,6 @@
 		<c:param name="method" value="edit" />
 		<c:param name="typeId" value="2" />
 		<c:param name="parentId" value="${OrgManageForm.parentId}" />
-		<c:param name="parentName" value="${OrgManageForm.parentName}" />
 	</c:url>
 	<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
 </logic:equal>
@@ -22,7 +21,6 @@
 		<c:param name="method" value="edit" />
 		<c:param name="typeId" value="3" />
 		<c:param name="parentId" value="${OrgManageForm.parentId}" />
-		<c:param name="parentName" value="${OrgManageForm.parentName}" />
 	</c:url>
 	<p align="right"><input type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
 </logic:equal>
