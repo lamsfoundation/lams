@@ -1,18 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="authoringForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+<c:set var="authoringForm"
+	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- ========== Basic Tab ========== -->
 <table cellpadding="0">
 	<tbody>
 		<tr>
 			<td>
-				<lams:SetEditor id="Title" text="${authoringForm.title}" small="true" key="label.authoring.basic.title" />
+				<div class="field-name" style="text-align: left;">
+					<fmt:message key="label.authoring.basic.title"></fmt:message>
+				</div>
+				<html:text property="title" style="width: 100%;"></html:text>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<lams:SetEditor id="Instructions" text="${authoringForm.instructions}" key="label.authoring.basic.instructions" />
+				<div class="field-name" style="text-align: left;">
+					<fmt:message key="label.authoring.basic.instructions"></fmt:message>
+				</div>
+				<lams:FCKEditor id="instructions"
+					value="${authoringForm.instructions}"
+					contentFolderID="${authoringForm.contentFolderID}"></lams:FCKEditor>
 			</td>
 		</tr>
 	</tbody>

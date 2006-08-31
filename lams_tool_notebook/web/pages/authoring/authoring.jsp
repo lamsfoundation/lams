@@ -39,11 +39,10 @@
 		</c:if>
 		
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lantbk11" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" toolContentID="${formBean.toolContentID}"
-			accessMode="${sessionMap.mode}" defineLater="${defineLater}" customiseSessionID="${sessionMap.sessionID}"/>
+			accessMode="${sessionMap.mode}" defineLater="${defineLater}" customiseSessionID="${sessionMap.sessionID}" contentFolderID="abc"/>
 
 	</html:form>
 </div>
 
 <div id="footer"></div>
 
-<lams:HTMLEditor />
