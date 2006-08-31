@@ -204,10 +204,10 @@ public class LearningAction extends Action {
 		sessionMap.put(ForumConstants.ATTR_ALLOW_NEW_TOPICS,forum.isAllowNewTopic());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
-		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
 		sessionMap.put(ForumConstants.ATTR_REFLECTION_ON,forum.isReflectOnActivity());
 		sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION,forum.getReflectInstructions());
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
 		
 		//add define later support
@@ -253,7 +253,7 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		
 		if (mode == ToolAccessMode.LEARNER || mode==ToolAccessMode.AUTHOR) {
-			if(!validateBeforeFinish(mapping, request, sessionMapID, sessionId))
+			if(!validateBeforeFinish(request, sessionMapID))
 				return mapping.getInputForward();
 
 			String nextActivityUrl;
@@ -326,9 +326,7 @@ public class LearningAction extends Action {
 		
 		//get session value
 		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		if(!validateBeforeFinish(mapping, request, sessionMapID, sessionId))
+		if(!validateBeforeFinish(request, sessionMapID))
 			return mapping.getInputForward();
 
 		ReflectionForm refForm = (ReflectionForm) form;
@@ -686,7 +684,10 @@ public class LearningAction extends Action {
 	/**
 	 * Validation method to check whether user posts meet minimum number.
 	 */
-	private boolean validateBeforeFinish(ActionMapping mapping, HttpServletRequest request, String sessionMapID, Long sessionId) {
+	private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		
 		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 		Forum forum = session.getForum();
 		// get session from shared session.

@@ -312,5 +312,13 @@ public interface IForumService {
 	 * @param entryText
 	 */
 	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	/**
+	 * Get reflection entry from notebook tool.
+	 * @param sessionId
+	 * @param idType
+	 * @param signature
+	 * @param userID
+	 * @return
+	 */
 	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 }
