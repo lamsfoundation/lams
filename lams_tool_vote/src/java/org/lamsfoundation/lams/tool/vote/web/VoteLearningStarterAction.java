@@ -352,11 +352,12 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	logger.debug("warning to learner: the activity is offline.");
     	voteLearningForm.setActivityRunOffline(new Boolean(true).toString());
     	voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(true).toString());
-    	persistInRequestError(request,"label.learning.runOffline");
     	
     	logger.debug("runOffline voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
     	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
-		return (mapping.findForward(ERROR_LIST));
+		//return (mapping.findForward(ERROR_LIST));
+    	logger.debug("fwding to :" + RUN_OFFLINE);
+		return (mapping.findForward(RUN_OFFLINE));
     }
 
     /* find out if the content is being modified at the moment. */

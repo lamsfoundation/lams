@@ -7,6 +7,7 @@ CREATE TABLE tl_lavote11_content (
      , update_date DATETIME
      , maxNominationCount VARCHAR(20) NOT NULL DEFAULT '1'
      , allowText TINYINT(1) NOT NULL DEFAULT 0
+     , reflect TINYINT(1) NOT NULL DEFAULT 0
      , voteChangable TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0
      , run_offline TINYINT(1) NOT NULL DEFAULT 0
@@ -16,6 +17,7 @@ CREATE TABLE tl_lavote11_content (
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
      , lock_on_finish TINYINT(1) NOT NULL DEFAULT 0
      , retries TINYINT(1) NOT NULL DEFAULT 0
+     , reflectionSubject TEXT
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 

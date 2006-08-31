@@ -179,7 +179,12 @@
 		    path="/learning/RedoQuestions.jsp"
 		    redirect="false"
 	  	/>
-	  	
+
+	  	<forward
+		    name="runOffline"
+	        path="/learning/RunOffline.jsp"
+		    redirect="false"
+	  	/>
 
 	  	<forward
 		    name="exitPage"

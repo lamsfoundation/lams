@@ -51,6 +51,9 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String lockOnFinish;
 	protected String allowText;
 	
+	protected String reflect;
+	protected String reflectionSubject;
+	
 	protected String activeModule;
 	
 	protected String maxNominationCount;
@@ -179,6 +182,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.richTextOnlineInstructions=null;
 	
 		this.voteChangable=null;
+		this.reflect=null;
 		this.lockOnFinish=null;
 		this.allowText=null;
 		this.maxNominationCount=null;
@@ -198,6 +202,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     	this.voteChangable		 =OPTION_OFF;
 		this.lockOnFinish		 =OPTION_OFF;
 		this.allowText			 =OPTION_OFF;
+		this.reflect			 =OPTION_OFF;
 	}
 
 	
@@ -884,6 +889,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
             .append("allowText: ", allowText)
             .append("voteChangable: ", voteChangable)
             .append("lockOnFinish: ", lockOnFinish)
+            .append("reflect: ", reflect)
             .append("defaultContentId: ", defaultContentId)
             .append("defaultContentIdStr: ", defaultContentIdStr)
             .append("maxNominationCount: ", maxNominationCount)
@@ -897,4 +903,28 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
             .toString();
     }
 
+    /**
+     * @return Returns the reflect.
+     */
+    public String getReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(String reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
+    }
 }

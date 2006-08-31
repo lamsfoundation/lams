@@ -58,6 +58,8 @@ public class VoteContent implements Serializable {
     private String title;
 
     /** nullable persistent field */
+    private String reflectionSubject;
+    
     private String instructions;
     
        /** nullable persistent field */
@@ -77,6 +79,8 @@ public class VoteContent implements Serializable {
     private long createdBy;
     
     private boolean voteChangable;
+    
+    private boolean reflect;
     
     private boolean allowText;
     
@@ -106,7 +110,7 @@ public class VoteContent implements Serializable {
 
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, 
-            Date creationDate, Date updateDate, boolean voteChangable, boolean allowText, String maxNominationCount, 
+            Date creationDate, Date updateDate, boolean voteChangable, boolean allowText,boolean reflect, String maxNominationCount, 
             long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
             String onlineInstructions, Set voteQueContents, Set voteSessions, 
 			Set voteAttachments) {
@@ -121,6 +125,7 @@ public class VoteContent implements Serializable {
         this.voteChangable=voteChangable;
         this.maxNominationCount=maxNominationCount;
         this.allowText=allowText;
+        this.reflect=reflect;
         this.createdBy = createdBy;
         this.lockOnFinish = lockOnFinish;
         this.contentInUse = contentInUse;
@@ -168,6 +173,7 @@ public class VoteContent implements Serializable {
     				 vote.getUpdateDate(),
     				 vote.isVoteChangable(),
     				 vote.isAllowText(),
+    				 vote.isReflect(),
     				 vote.getMaxNominationCount(),
     				 vote.getCreatedBy(),				 
     				 vote.isLockOnFinish(),
@@ -455,5 +461,29 @@ public class VoteContent implements Serializable {
      */
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
+    }
+    /**
+     * @return Returns the reflect.
+     */
+    public boolean isReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(boolean reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
     }
 }

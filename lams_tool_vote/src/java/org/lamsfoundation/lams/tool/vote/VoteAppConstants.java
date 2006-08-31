@@ -121,6 +121,8 @@ public interface VoteAppConstants {
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
     public static final String OPT_INDEX 								= "optIndex";
     
+    public static final String RUN_OFFLINE								= "runOffline";
+    
     /*
      * refers to number of questions presented initially, we have a single record for default content
      */
@@ -178,6 +180,7 @@ public interface VoteAppConstants {
     public static final String DEFINE_LATER								="defineLater";
     public static final String VIEW_ANSWERS								="viewAnswers";
         
+    public static final String REFLECT									="reflect";
     public static final String ON										="ON";
     public static final String OFF										="OFF";
     public static final String RICHTEXT_FEEDBACK_CORRECT				="richTextFeedbackCorrect";
