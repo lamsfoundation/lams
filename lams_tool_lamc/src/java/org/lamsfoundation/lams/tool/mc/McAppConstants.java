@@ -65,6 +65,7 @@ public interface McAppConstants {
     public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String QUESTION_INDEX							="questionIndex";
+    public static final String REFLECTION_SUBJECT						="reflectionSubject";
     
     /*
      * authoring mode controllers
@@ -168,7 +169,7 @@ public interface McAppConstants {
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
     public static final String RICHTEXT_REPORT_TITLE					="richTextReportTitle";
-    public static final String RICHTEXT_END_LEARNING_MSG				="richTextEndLearningMsg";
+    //public static final String RICHTEXT_END_LEARNING_MSG				="richTextEndLearningMsg";
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
@@ -279,8 +280,8 @@ public interface McAppConstants {
     
     public static final String MODE										="mode";
     public static final String LEARNING_MODE							="learningMode";
-    
     public static final String EXPORT_USER_ID							="exportUserId";
+    public static final String REFLECT									="reflect";
     
     /*
      * exception constants

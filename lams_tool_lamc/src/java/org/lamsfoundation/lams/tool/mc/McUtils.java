@@ -275,18 +275,20 @@ public abstract class McUtils implements McAppConstants {
 		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
 		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
 		
-		String richTextEndLearningMessage=request.getParameter(RICHTEXT_END_LEARNING_MSG);
-		logger.debug("read parameter richTextEndLearningMessage: " + richTextEndLearningMessage);
+		//String richTextEndLearningMessage=request.getParameter(RICHTEXT_END_LEARNING_MSG);
+		//logger.debug("read parameter richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
 		if ((richTextReportTitle != null) && (richTextReportTitle.length() > 0))
 		{
 			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,richTextReportTitle);
 		}
 		
+		/*
 		if ((richTextEndLearningMessage != null) && (richTextEndLearningMessage.length() > 0))
 		{
 			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,richTextEndLearningMessage);
 		}
+		*/
 		
 		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
 	}
@@ -662,7 +664,7 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
     	request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
     	request.getSession().removeAttribute(RICHTEXT_REPORT_TITLE);
-    	request.getSession().removeAttribute(RICHTEXT_END_LEARNING_MSG);
+    	//request.getSession().removeAttribute(RICHTEXT_END_LEARNING_MSG);
     	request.getSession().removeAttribute(RICHTEXT_TITLE);
     	request.getSession().removeAttribute(RICHTEXT_INSTRUCTIONS);
     	request.getSession().removeAttribute(RICHTEXT_BLANK);
