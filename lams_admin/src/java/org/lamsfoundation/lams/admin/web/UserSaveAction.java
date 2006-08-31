@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -52,6 +53,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -172,6 +175,19 @@ public class UserSaveAction extends Action {
 					errors.add("loginUnique", new ActionMessage("error.login.unique"));
 				}
 				if (errors.isEmpty()) {
+					// TODO set flash/html themes according to user input instead of server default.
+					String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
+					List list = getService().findByProperty(CSSThemeVisualElement.class, "name", flashName);
+					if (list!=null) {
+						CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
+						user.setFlashTheme(flashTheme);
+					}
+					String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+					list = getService().findByProperty(CSSThemeVisualElement.class, "name", htmlName);
+					if (list!=null) {
+						CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
+						user.setHtmlTheme(htmlTheme);
+					}
 					user.setDisabledFlag(false);
 					user.setCreateDate(new Date());
 					user.setAuthenticationMethod((AuthenticationMethod) getService().findByProperty(AuthenticationMethod.class,
