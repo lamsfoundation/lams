@@ -114,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td></tr>
 					
 					<tr> <td align=left colspan=2>							
-							<b>	<bean:message key="label.responses.locked"/> </b>
+								<bean:message key="label.responses.locked"/> 
 						</td>
 					</tr>
 							
