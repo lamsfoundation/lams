@@ -577,9 +577,9 @@ public class AuthoringAction extends Action {
 			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 		}
 		
-		//if miniview number is bigger than available items, then force it to 1
+		//if miniview number is bigger than available items, then set it topics size
 		if(resourcePO.getMiniViewResourceNumber() > topics.size())
-			resourcePO.setMiniViewResourceNumber((topics.size()==0?0:1));
+			resourcePO.setMiniViewResourceNumber((topics.size()));
 		//**********************************************
 		//finally persist resourcePO again
 		service.saveOrUpdateResource(resourcePO);

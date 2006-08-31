@@ -111,6 +111,7 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="messageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
     </bean>
 
     <bean id="resourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

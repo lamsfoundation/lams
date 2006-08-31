@@ -164,7 +164,7 @@
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"
 			parameter="finish" >
-			<forward name="finish" path="/pages/learning/finish.jsp" />
+			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
 		
 		
@@ -197,6 +197,27 @@
 			<forward name="success" path="/pages/learning/success.jsp" />
 		</action>
 		
+		<!--  ========= Reflection =============== -->
+		<action path="/learning/newReflection"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			name="reflectionForm" 
+			validate="false" 
+			parameter="newReflection" 
+			input="/pages/learning/learning.jsp" 
+			scope="request">
+			<forward name="success" path="/pages/learning/notebook.jsp" />
+		</action>
+		
+		<action path="/learning/submitReflection"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			name="reflectionForm" 
+			validate="true" 
+			input="/pages/learning/notebook.jsp"
+			parameter="submitReflection" 
+			scope="request">
+			<forward name="success" path="/pages/learning/finish.jsp" />
+
+		</action>
 		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
 		<action path="/monitoring/summary"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
@@ -217,6 +238,12 @@
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="showitem" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+		</action>
+		
+		<action path="/monitoring/viewReflection"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="viewReflection">
+			<forward name="success" path="/pages/monitoring/notebook.jsp" />
 		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"

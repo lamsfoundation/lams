@@ -13,12 +13,15 @@
 		<c:set var="groupSize" value="${fn:length(group)}" />
 		<c:forEach var="item" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
-			<c:if test="${status.index == 0}">
+			<c:if test="${status.first}">
 				<tr>
 					<td colspan="5">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> <SPAN style="font-size: 12px;"> <c:if test="${firstGroup.index==0}">
+						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
+						<SPAN style="font-size: 12px;"> 
+							<c:if test="${firstGroup.index==0}">
 								<fmt:message key="monitoring.summary.note" />
-							</c:if> </SPAN>
+							</c:if> 
+						</SPAN>
 					</td>
 				</tr>
 				<tr>
@@ -84,8 +87,8 @@
 								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
 							</c:when>
 							<c:otherwise>
-												0
-											</c:otherwise>
+									0
+							</c:otherwise>
 						</c:choose>
 					</td>
 					<td align="center">
@@ -100,6 +103,49 @@
 					</td>
 				</tr>
 			</c:if>
+			
+				<%-- Reflection list  --%>
+				<c:if test="${sessionMap.resource.reflectOnActivity && status.last}">
+					<c:set var="userList" value="${sessionMap.reflectList[item.sessionId]}"/>
+					<c:forEach var="user" items="${userList}" varStatus="refStatus">
+						<c:if test="${refStatus.first}">
+							<tr>
+								<td colspan="5">
+									<h2><fmt:message key="title.reflection"/>	</h2>
+								</td>
+							</tr>
+							<tr>
+								<th colspan="2">
+									<fmt:message key="monitoring.user.fullname"/>
+								</th>
+								<th colspan="2">
+									<fmt:message key="monitoring.label.user.loginname"/>
+								</th>
+								<th>
+									<fmt:message key="monitoring.user.reflection"/>
+								</th>
+							</tr>
+						</c:if>
+						<tr>
+							<td colspan="2">
+								${user.fullName}
+							</td>
+							<td colspan="2">
+								${user.loginName}
+							</td>
+							<td >
+								<c:set var="viewReflection">
+									<c:url value="/monitoring/viewReflection.do?toolSessionID=${item.sessionId}&userUid=${user.userUid}"/>
+								</c:set>
+								<html:link href="javascript:launchPopup('${viewReflection}')">
+									<fmt:message key="label.view" />
+								</html:link>
+							</td>
+						</tr>
+					</c:forEach>
+				</c:if>
+			
 		</c:forEach>
+		
 	</c:forEach>
 </table>

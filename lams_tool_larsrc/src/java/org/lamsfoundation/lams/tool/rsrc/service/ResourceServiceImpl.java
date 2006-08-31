@@ -29,13 +29,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
@@ -57,6 +60,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -71,6 +76,7 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
+import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
@@ -121,7 +127,19 @@ public class ResourceServiceImpl implements
 	private IAuditService auditService;
 	private IUserManagementService userManagementService; 
 	private IExportToolContentService exportContentService;
+	private ICoreNotebookService coreNotebookService;
 	
+	
+	private class ReflectDTOComparator implements Comparator<ReflectDTO>{
+		public int compare(ReflectDTO o1, ReflectDTO o2) {
+			if(o1 != null && o2 != null){
+				return o1.getFullName().compareTo(o2.getFullName());
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+	}
 	public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
 		ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class,itemUid);
 		if ( item == null )
@@ -530,7 +548,26 @@ public class ResourceServiceImpl implements
 		return groupList;
 
 	}
+	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
+		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
+		List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
+		for(ResourceSession session:sessionList){
+			Long sessionId = session.getSessionId();
+			boolean hasRefection = session.getResource().isReflectOnActivity();
+			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(this.new ReflectDTOComparator());
+			//get all users in this session
+			List<ResourceUser> users = resourceUserDao.getBySessionID(sessionId);
+			for(ResourceUser user : users){
+				ReflectDTO ref = new ReflectDTO(user);
+				ref.setHasRefection(hasRefection);
+				list.add(ref);
+			}
+			map.put(sessionId, list);
+		}
+		
+		return map;
+	}
 	public List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
 		List<ResourceItemVisitLog> logList = resourceItemVisitDao.getResourceItemLogBySession(sessionId,itemUid);
 		List<ResourceUser> userList = new ArrayList(logList.size());
@@ -556,7 +593,21 @@ public class ResourceServiceImpl implements
 			resourceItemDao.saveObject(item);
 		}
 	}
-
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
+		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
+	}
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+	
+	public ResourceUser getUser(Long uid){
+		return (ResourceUser) resourceUserDao.getObject(ResourceUser.class, uid);
+	}
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
@@ -1079,6 +1130,16 @@ public class ResourceServiceImpl implements
 
 	public void setUserManagementService(IUserManagementService userManagementService) {
 		this.userManagementService = userManagementService;
+	}
+
+
+	public ICoreNotebookService getCoreNotebookService() {
+		return coreNotebookService;
+	}
+
+
+	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+		this.coreNotebookService = coreNotebookService;
 	}
 
 

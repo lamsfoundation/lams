@@ -24,9 +24,13 @@
 package org.lamsfoundation.lams.tool.rsrc.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
@@ -205,5 +209,37 @@ public interface IResourceService
 	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
 	public List<List<Summary>> exportByContentId(Long contentId);
 
+	/**
+	 * Create refection entry into notebook tool.
+	 * @param sessionId
+	 * @param notebook_tool
+	 * @param tool_signature
+	 * @param userId
+	 * @param entryText
+	 */
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	/**
+	 * Get reflection entry from notebook tool.
+	 * @param sessionId
+	 * @param idType
+	 * @param signature
+	 * @param userID
+	 * @return
+	 */
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+
+	/**
+	 * Get Reflect DTO list grouped by sessionID.
+	 * @param contentId
+	 * @return
+	 */
+	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+
+	/**
+	 * Get user by UID
+	 * @param uid
+	 * @return
+	 */
+	ResourceUser getUser(Long uid);
 }
 

@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+
 <html>
 	<head>
 		<title>${instructions.title}</title>
@@ -29,6 +31,9 @@
 						window.parent.opener=null;
 						window.parent.close();
 					}
+				}
+				function continueReflect(){
+					 window.parent.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 				}
 				function nextIns(currIns){
 					document.location.href="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
@@ -60,6 +65,11 @@
 							<c:when test="${instructions.current < instructions.total}">
 								<a href="#" id="NextInstruction" onClick="javascript:nextIns(${instructions.current})" class="button">
 									<fmt:message key='label.next.instruction'/>
+								</a>
+							</c:when>
+							<c:when test="${sessionMap.reflectOn && sessionMap.runAuto}">
+								<a href="#" id="FinishInstruction" onClick="javascript:continueReflect()" class="button">
+									<fmt:message key='label.continue'/>
 								</a>
 							</c:when>
 							<c:otherwise>

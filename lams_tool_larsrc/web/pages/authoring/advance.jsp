@@ -6,14 +6,14 @@
 		<!-- Instructions Row -->
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.lockWhenFinished">
+				<html:checkbox property="resource.lockWhenFinished" styleClass="noBorder">
 					<fmt:message key="label.authoring.advance.lock.on.finished" />
 				</html:checkbox>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.runAuto">
+				<html:checkbox property="resource.runAuto" styleClass="noBorder">
 					<fmt:message key="label.authoring.advance.run.content.auto" />
 				</html:checkbox>
 			</td>
@@ -39,16 +39,28 @@
 		</tr>
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.allowAddUrls">
+				<html:checkbox property="resource.allowAddUrls" styleClass="noBorder">
 					<fmt:message key="label.authoring.advance.allow.learner.add.urls" />
 				</html:checkbox>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.allowAddFiles">
+				<html:checkbox property="resource.allowAddFiles" styleClass="noBorder">
 					<fmt:message key="label.authoring.advance.allow.learner.add.files" />
 				</html:checkbox>
 			</td>
 		</tr>
+		<tr>
+			<td colspan="2">
+				<html:checkbox property="resource.reflectOnActivity" styleClass="noBorder"  styleId="reflectOn">
+					<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+				</html:checkbox>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<lams:STRUTS-textarea property="resource.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
+			</td>
+		</tr>		
 	</table>

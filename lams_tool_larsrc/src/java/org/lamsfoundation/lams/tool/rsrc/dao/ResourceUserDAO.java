@@ -23,6 +23,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 public interface ResourceUserDAO extends DAO {
@@ -31,4 +33,5 @@ public interface ResourceUserDAO extends DAO {
 
 	ResourceUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
+	List<ResourceUser> getBySessionID(Long sessionId);
 }

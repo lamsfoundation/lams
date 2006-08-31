@@ -41,6 +41,8 @@ create table tl_larsrc11_resource (
    allow_add_urls tinyint,
    mini_view_resource_number integer,
    allow_auto_run tinyint,
+   reflect_instructions varchar(255), 
+   reflect_on_activity smallint, 
    primary key (uid)
 );
 create table tl_larsrc11_resource_item (
@@ -109,6 +111,6 @@ alter table tl_larsrc11_user add index FK30113BFC309ED320 (resource_uid), add co
 
 
 
-INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_add_files`, `allow_add_urls`, `mini_view_resource_number`, `allow_auto_run`) VALUES
-  (2,NULL,NULL,NULL,'Shared Resources','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},1,1,0,1);
+INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_add_files`, `allow_add_urls`, `mini_view_resource_number`, `allow_auto_run`,`reflect_on_activity`) VALUES
+  (2,NULL,NULL,NULL,'Shared Resources','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},1,1,0,1,0);
 SET FOREIGN_KEY_CHECKS=1;

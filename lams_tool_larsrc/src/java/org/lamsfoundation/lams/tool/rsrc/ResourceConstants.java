@@ -72,10 +72,10 @@ public class ResourceConstants {
 	public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
-	public static final Object ATTR_RESOURCE_FORM = "resourceForm";
+	public static final String ATTR_RESOURCE_FORM = "resourceForm";
 	public static final String ATTR_ADD_RESOURCE_TYPE = "addType";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
-	public static final Object ATTR_TITLE = "title";
+	public static final String ATTR_TITLE = "title";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
@@ -88,5 +88,9 @@ public class ResourceConstants {
 	
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String MODE_AUTHOR_SESSION = "author_session";
+	public static final String ATTR_REFLECTION_ON = "reflectOn";
+	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+	public static final String ATTR_REFLECT_LIST = "reflectList";
+	public static final String ATTR_USER_UID = "userUid";
 
 }

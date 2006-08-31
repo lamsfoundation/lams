@@ -51,7 +51,7 @@
 	    	
 	    	//for advanceTab
 	    	if(tabId == 2)
-	    		changeViewNum();	    	
+	    		changeViewNum(-1);	    	
         } 
 
         function doUploadOnline() {
@@ -65,25 +65,29 @@
         	myForm.submit();
         }
         
-        function changeViewNum(){
+        function changeViewNum(initVal){
 			var tb = document.getElementById("itemTable");
 			var num = tb.getElementsByTagName("tr");
 			var sel = document.getElementById("viewNumList");
 			var newField = sel.options;
 			var len = sel.length;
-			var selIdx=-1;
+			
+			//when first enter, it should get value from Resource
+			var selIdx=initVal < 0?-1:initVal;
 			//there is bug in Opera8.5: if add alert before this loop, it will work,weird.
 			for (var idx=0;idx<len;idx++)
 			{
-				if(newField[0].selected && selIdx == -1)
+				if(newField[0].selected && selIdx == -1 ){
 					selIdx = newField[0].value;
+				}
 				sel.removeChild(newField[0]);
 			}
 		
-			for(var i=1;i<=num.length;i++){
+			for(var i=0;i<=num.length;i++){
 				var opt = document.createElement("option");
 				var optT =document.createTextNode(i);
 				opt.value=i;
+				//get back user choosen value
 				if(selIdx > 0 && selIdx==i){
 					opt.selected = true;
 				}else{
@@ -152,5 +156,9 @@
 <lams:HTMLEditor />
 <!-- end page div -->
 </div>
+
+<script type="text/javascript">
+	changeViewNum(${formBean.resource.miniViewResourceNumber});
+</script>
 </body>
 </html:html>

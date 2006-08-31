@@ -33,6 +33,7 @@ public class ResourceUserDAOHibernate extends BaseDAOHibernate implements Resour
 	
 	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.resource.contentId=?";
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
+	private static final String FIND_BY_SESSION_ID = "from " + ResourceUser.class.getName() + " as u where u.session.sessionId=?";
 
 	public ResourceUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
@@ -46,6 +47,10 @@ public class ResourceUserDAOHibernate extends BaseDAOHibernate implements Resour
 		if(list == null || list.size() == 0)
 			return null;
 		return (ResourceUser) list.get(0);
+	}
+
+	public List<ResourceUser> getBySessionID(Long sessionId) {
+		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

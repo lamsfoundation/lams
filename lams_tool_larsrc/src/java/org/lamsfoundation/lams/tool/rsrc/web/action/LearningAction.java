@@ -46,6 +46,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -54,6 +56,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
+import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -96,6 +99,15 @@ public class LearningAction extends Action {
         if (param.equals("saveOrUpdateItem")) {
         	return saveOrUpdateItem(mapping, form, request, response);
         }
+        
+		//================ Reflection =======================
+		if (param.equals("newReflection")) {
+			return newReflection(mapping, form, request, response);
+		}
+		if (param.equals("submitReflection")) {
+			return submitReflection(mapping, form, request, response);
+		}
+		
 		return  mapping.findForward(ResourceConstants.ERROR);
 	}
 	/**
@@ -126,10 +138,9 @@ public class LearningAction extends Action {
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		//save toolContentID into HTTPSession
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, true);
 		
 		Long sessionId =  new Long(request.getParameter(ResourceConstants.PARAM_TOOL_SESSION_ID));
-		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		
 		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
@@ -143,7 +154,37 @@ public class LearningAction extends Action {
 		Resource resource;
 		items = service.getResourceItemsBySessionId(sessionId);
 		resource = service.getResourceBySessionId(sessionId);
+
+		//check whehter finish lock is on/off
+		boolean lock = resource.getLockWhenFinished() && resourceUser.isSessionFinished();
 		
+		
+		//check whether there is only one resource item and run auto flag is true or not.
+		boolean runAuto = false;
+		int itemsNumber = 0;
+		if(resource.getResourceItems() != null){
+			itemsNumber = resource.getResourceItems().size();
+			if(resource.isRunAuto() && itemsNumber == 1){
+				ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
+				//only visible item can be run auto.
+				if(!item.isHide()){
+					runAuto = true;
+					request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
+				}
+			}
+		}
+		
+		//basic information
+		sessionMap.put(ResourceConstants.ATTR_TITLE,resource.getTitle());
+		sessionMap.put(ResourceConstants.ATTR_RESOURCE_INSTRUCTION,resource.getInstructions());
+		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK,lock);
+		
+		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
+		sessionMap.put(AttributeNames.ATTR_MODE,mode);
+		//reflection information
+		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON,resource.isReflectOnActivity());
+		sessionMap.put(ResourceConstants.ATTR_REFLECTION_INSTRUCTION,resource.getReflectInstructions());
+		sessionMap.put(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
 		
 		//add define later support
 		if(resource.isDefineLater()){
@@ -151,8 +192,10 @@ public class LearningAction extends Action {
 		}
 		//add run offline support
 		if(resource.getRunOffline()){
+			sessionMap.put(ResourceConstants.PARAM_RUN_OFFLINE, true);
 			return mapping.findForward("runOffline");
-		}
+		}else
+			sessionMap.put(ResourceConstants.PARAM_RUN_OFFLINE, false);
 				
 		//init resource item list
 		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
@@ -173,26 +216,6 @@ public class LearningAction extends Action {
 		service.retrieveComplete(resourceItemList, resourceUser);
 		
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE,resource);
-		
-		//check whether there is only one resource item and run auto flag is true or not.
-		boolean runAuto = false;
-		int itemsNumber = 0;
-		if(resource.getResourceItems() != null){
-			itemsNumber = resource.getResourceItems().size();
-			if(resource.isRunAuto() && itemsNumber == 1){
-				ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
-				//only visible item can be run auto.
-				if(!item.isHide()){
-					runAuto = true;
-					request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
-				}
-			}
-		}
-		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
-		
-		//check whehter finish lock is on/off
-		boolean lock = resource.getLockWhenFinished() && resourceUser.isSessionFinished();
-		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK,lock);
 		
 		//set contentInUse flag to true!
 		resource.setContentInUse(true);
@@ -229,49 +252,43 @@ public class LearningAction extends Action {
 	 * @return
 	 */
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
-		String runOffline = request.getParameter(ResourceConstants.PARAM_RUN_OFFLINE);
 		
 		//get back SessionMap
 		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		
-		Long sessionId =  (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		//get mode and ToolSessionID from sessionMAP
+		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
+		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
+		String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 		if(resourceItemUid != null){
 			doComplete(request);
+			//NOTE:So far this flag is useless(31/08/2006).
+			//set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,true);
 		}else
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,false);
 		
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Long userID = new Long(user.getUserID().longValue());
+		if(!validateBeforeFinish(request, sessionMapID))
+			return mapping.getInputForward();
 		
 		IResourceService service = getResourceService();
-		int miniViewFlag = service.checkMiniView(sessionId,userID);
-		//if current user view less than reqired view count number, then just return error message.
-		//if it is runOffline content, then need not check minimum view count
-		if(miniViewFlag > 0 && !StringUtils.equalsIgnoreCase(runOffline,"true")){
-			ActionErrors errors = new ActionErrors();
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
-			this.addErrors(request,errors);
-			return mapping.getInputForward();
-			
-		}
 		// get sessionId from HttpServletRequest
 		String nextActivityUrl = null ;
 		try {
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			Long userID = new Long(user.getUserID().longValue());
+			
 			nextActivityUrl = service.finishToolSession(sessionId,userID);
 			request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL,nextActivityUrl);
 		} catch (ResourceApplicationException e) {
 			log.error("Failed get next activity url:" + e.getMessage());
 		}
 		
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		return mapping.findForward("finish");
+		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
 	
@@ -349,10 +366,84 @@ public class LearningAction extends Action {
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
+	/**
+	 * Display empty reflection form.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		//get session value
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		if(!validateBeforeFinish(request, sessionMapID))
+			return mapping.getInputForward();
+
+		ReflectionForm refForm = (ReflectionForm) form;
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		
+		refForm.setUserID(user.getUserID());
+		refForm.setSessionMapID(sessionMapID);
+		
+		return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	/**
+	 * Submit reflection form input database.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		ReflectionForm refForm = (ReflectionForm) form;
+		Integer userId = refForm.getUserID();
+		
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		
+		IResourceService service = getResourceService();
+		service.createNotebookEntry(sessionId, 
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				ResourceConstants.TOOL_SIGNATURE, 
+				userId,
+				refForm.getEntryText());
+
+		return finish(mapping, form, request, response);
+	}
 	
+
 	//*************************************************************************************
 	// Private method 
 	//*************************************************************************************
+	private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long userID = new Long(user.getUserID().longValue());
+		
+		IResourceService service = getResourceService();
+		int miniViewFlag = service.checkMiniView(sessionId,userID);
+		//if current user view less than reqired view count number, then just return error message.
+		//if it is runOffline content, then need not check minimum view count
+		Boolean runOffline = (Boolean) sessionMap.get(ResourceConstants.PARAM_RUN_OFFLINE);
+		if(miniViewFlag > 0 && !runOffline){
+			ActionErrors errors = new ActionErrors();
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
+			this.addErrors(request,errors);
+			return false;
+		}
+		
+		return true;
+	}
 	private IResourceService getResourceService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	      return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);

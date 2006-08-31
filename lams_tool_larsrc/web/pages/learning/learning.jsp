@@ -8,14 +8,13 @@
 	<%@ include file="/common/header.jsp"%>
 
 	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.mode}">
-		<c:set var="mode" value="${param.mode}" />
-	</c:if>
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>
 
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
+	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}"/>
 	<c:set var="resource" value="${sessionMap.resource}"/>
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}"/>
@@ -51,12 +50,18 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
+		function continueReflect(){
+			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		}
+		
 		function showMessage(url) {
 			var area=document.getElementById("reourceInputArea");
-			area.style.width="100%";
-			area.style.height="100%";
-			area.src=url;
-			area.style.display="block";
+			if(area != null){
+				area.style.width="100%";
+				area.style.height="100%";
+				area.src=url;
+				area.style.display="block";
+			}
 		}
 	-->        
     </script>
@@ -133,15 +138,24 @@
 			</div>
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons">
-					<html:button property="FinishButton"  onclick="return finishSession()" disabled="${finishedLock}"  styleClass="button">
-						<fmt:message key="label.finished" />
-					</html:button>
+					<c:choose>
+						<c:when test="${sessionMap.reflectOn}">
+							<html:button property="FinishButton"  onclick="return continueReflect()" disabled="${finishedLock}"  styleClass="button">
+								<fmt:message key="label.continue" />
+							</html:button>
+						</c:when>
+						<c:otherwise>
+							<html:button property="FinishButton"  onclick="return finishSession()" disabled="${finishedLock}"  styleClass="button">
+								<fmt:message key="label.finished" />
+							</html:button>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</c:if>
-			<P>&nbsp;</P>
+			<div style="height: 70px"></div> 
 			<c:if test="${mode != 'teacher' && (not finishedLock)}">
 				<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
-					<table border="0" align="center" width="100%">
+					<table border="0" width="100%">
 						<tr>
 							<td style="align:left">
 								<fmt:message key="label.suggest.new" />

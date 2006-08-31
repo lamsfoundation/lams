@@ -1,9 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <html>
 	<body>
 
 		<c:choose>
-			<c:when test="${runAuto}">
+			<c:when test="${sessionMap.runAuto}">
 				<script type="text/javascript">
 					document.location = "<c:url value="/reviewItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=${itemUid}";
 				</script>
