@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
@@ -75,11 +76,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="user" path=".user"
  * @struts:action-forward name="userlist" path="/usermanage.do"
  * @struts:action-forward name="remove" path=".remove"
+ * @struts:action-forward name="disabledlist" path="/disabledmanage.do"
  */
 public class UserAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(UserAction.class);
 	private static IUserManagementService service;
+	private static MessageService messageService;
 	private static List<Role> rolelist;
 	private static List<SupportedLocale> locales;
 	
@@ -159,13 +162,18 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
+		if (!request.isUserInRole(Role.SYSADMIN)) {
+			request.setAttribute("errorName","UserAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			return mapping.findForward("error");
+		}
+		
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		User user = (User)getService().findById(User.class,userId);
 		
-		Boolean hasData = userHasData(user);
+		Boolean hasData = getService().userHasData(user);
 
-		log.debug("user has data: "+hasData);
 		request.setAttribute("method", (hasData?"disable":"delete"));
 		request.setAttribute("orgId",orgId);
 		request.setAttribute("userId",userId);
@@ -177,20 +185,15 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
+		if (!request.isUserInRole(Role.SYSADMIN)) {
+			request.setAttribute("errorName","UserAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			return mapping.findForward("error");
+		}
+		
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
-		User user = (User)getService().findById(User.class,userId);
-		
-		user.setDisabledFlag(true);
-		log.debug("deleting userId="+userId+"'s userorgs");
-		Set uos = user.getUserOrganisations();
-		Iterator iter = uos.iterator();
-		while(iter.hasNext()) {
-			getService().delete(iter.next());
-			iter.remove();
-		}
-		getService().save(user);
-		
+		getService().disableUser(userId);
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
 	}
@@ -200,11 +203,45 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
+		if (!request.isUserInRole(Role.SYSADMIN)) {
+			request.setAttribute("errorName","UserAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			return mapping.findForward("error");
+		}
+		
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
-		getService().removeUser(userId);
+		try {
+			getService().removeUser(userId);
+		} catch (Exception e) {
+			request.setAttribute("errorName","UserAction");
+			request.setAttribute("errorMessage",e.getMessage());
+			return mapping.findForward("error");
+		}
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
+	}
+	
+	// called from disabled users screen
+	public ActionForward enable(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		if (!request.isUserInRole(Role.SYSADMIN)) {
+			request.setAttribute("errorName","UserAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			return mapping.findForward("error");
+		}
+		
+		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		User user = (User)getService().findById(User.class,userId);
+		
+		log.debug("enabling user: "+userId);
+		user.setDisabledFlag(false);
+		getService().save(user);
+				
+		return mapping.findForward("disabledlist");
 	}
 	
 	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
@@ -224,41 +261,6 @@ public class UserAction extends LamsDispatchAction {
 		return allRoles;
 	}
 	
-	// check user has done anything
-	private Boolean userHasData(User user) {
-		if (user.getLearnerProgresses()!=null) {
-			if (!user.getLearnerProgresses().isEmpty()) {
-				log.debug("learnerProgresses: "+user.getLearnerProgresses().size());
-				return true;
-			}
-		}
-		if (user.getUserToolSessions()!=null) {
-			if (!user.getUserToolSessions().isEmpty()) {
-				log.debug("userToolSessions: "+user.getUserToolSessions().size());
-				return true;
-			}
-		}
-		if (user.getLearningDesigns()!=null) {
-			if (!user.getLearningDesigns().isEmpty()) {
-				log.debug("learningDesigns: "+user.getLearningDesigns().size());
-				return true;
-			}
-		}
-		if (user.getLessons()!=null) {
-			if (!user.getLessons().isEmpty()) {
-				log.debug("lessons: "+user.getLessons().size());
-				return true;
-			}
-		}
-		if (user.getUserGroups()!=null) {
-			if (!user.getUserGroups().isEmpty()) {
-				log.debug("userGroups: "+user.getUserGroups().size());
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	@SuppressWarnings("unchecked")
 	private IUserManagementService getService(){
 		if(service==null){
@@ -270,5 +272,13 @@ public class UserAction extends LamsDispatchAction {
 			Collections.sort(rolelist);
 		}
 		return service;
+	}
+	
+	private MessageService getMessageService(){
+		if(messageService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			messageService = (MessageService)ctx.getBean("adminMessageService");
+		}
+		return messageService;
 	}
 }

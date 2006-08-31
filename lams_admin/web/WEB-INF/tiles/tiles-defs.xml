@@ -2,6 +2,11 @@
 
 <tiles-definitions>
 
+	<definition name=".disabledlist" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="disabledusers.jsp" />	
+	</definition>
+
 	<definition name=".remove" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="remove.jsp" />	

@@ -36,7 +36,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -122,6 +121,7 @@ public class UserOrgAction extends Action {
 				return mapping.findForward("error");
 			}
 		}
+		users = removeDisabledUsers(users);
 		Collections.sort(users);
 		request.setAttribute("userlist",users);
 		
@@ -139,6 +139,17 @@ public class UserOrgAction extends Action {
 		userOrgForm.set("userIds",userIds);
 
 		return mapping.findForward("userorg");
+	}
+	
+	private List removeDisabledUsers(List userList) {
+		List filteredList = new ArrayList();
+		for(int i=0; i<userList.size(); i++) {
+			User u = (User)userList.get(i);
+			if(!u.getDisabledFlag()) {
+				filteredList.add(u);
+			}
+		}
+		return filteredList;
 	}
 	
 	private IUserManagementService getService(){
