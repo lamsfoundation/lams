@@ -124,4 +124,8 @@ public class ConfigurationKeys {
 
 	public static String XMPP_PASSWORD = "XmppPassword";
 
+	public static String DEFAULT_FLASH_THEME = "DefaultFlashTheme";
+	
+	public static String DEFAULT_HTML_THEME = "DefaultHTMLTheme";
+	
 }
