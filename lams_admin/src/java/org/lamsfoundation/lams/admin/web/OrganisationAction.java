@@ -84,13 +84,13 @@ public class OrganisationAction extends LamsDispatchAction {
 		return mapping.findForward("organisation");
 	}
 
-	public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
+	/*public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		getService().deleteById(Organisation.class,orgId);
 		Integer parentId = WebUtil.readIntParam(request,"parentId");
 		request.setAttribute("org",parentId);
 		return mapping.findForward("orglist");
-	}
+	}*/
 
 	private IUserManagementService getService(){
 		if(service==null){
