@@ -54,7 +54,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-
 /**
  * @author
  * @version
@@ -97,14 +96,18 @@ public class AuthoringAction extends LamsDispatchAction {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
 
+		String contentFolderID = WebUtil.readStrParam(request,
+				AttributeNames.PARAM_CONTENT_FOLDER_ID);
+
 		// set up notebookService
 		if (notebookService == null) {
-			notebookService = NotebookServiceProxy.getNotebookService(this.getServlet()
-					.getServletContext());
+			notebookService = NotebookServiceProxy.getNotebookService(this
+					.getServlet().getServletContext());
 		}
 
 		// retrieving Notebook with given toolContentID
-		Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
+		Notebook notebook = notebookService
+				.getNotebookByContentId(toolContentID);
 		if (notebook == null) {
 			notebook = notebookService.copyDefaultContent(toolContentID);
 			notebook.setCreateDate(new Date());
@@ -125,23 +128,21 @@ public class AuthoringAction extends LamsDispatchAction {
 		notebook.setDefineLater(true);
 		notebookService.saveOrUpdateNotebook(notebook);
 
-		// Set up sessionMap
-		SessionMap<String, Object> map = new SessionMap<String, Object>();
-		initSessionMap(map, request);
-		updateSessionMap(map, notebook);
-
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
 		updateAuthForm(authForm, notebook);
 
-		// add the sessionMapID to form
+		// Set up sessionMap
+		SessionMap<String, Object> map = createSessionMap(notebook,
+				getAccessMode(request));
 		authForm.setSessionMapID(map.getSessionID());
+
+		authForm.setContentFolderID(contentFolderID);
 
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
-
 		request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
-		
+
 		return mapping.findForward("success");
 	}
 
@@ -154,7 +155,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		// get notebook content.
-		Notebook notebook = notebookService.getNotebookByContentId(authForm.getToolContentID());
+		Notebook notebook = notebookService.getNotebookByContentId(authForm
+				.getToolContentID());
 
 		// update notebook content using form inputs.
 		updateNotebook(notebook, authForm);
@@ -171,11 +173,11 @@ public class AuthoringAction extends LamsDispatchAction {
 					.getFileVersionId());
 			attachments.remove(att);
 		}
-		
+
 		// add unsaved attachments
 		attachments.addAll(getAttList(KEY_UNSAVED_ONLINE_FILES, map));
 		attachments.addAll(getAttList(KEY_UNSAVED_OFFLINE_FILES, map));
-		
+
 		// set attachments in case it didn't exist
 		notebook.setNotebookAttachments(attachments);
 
@@ -189,10 +191,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,
 				Boolean.TRUE);
-		
+
 		// add the sessionMapID to form
 		authForm.setSessionMapID(map.getSessionID());
-		
+
 		request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
 
 		return mapping.findForward("success");
@@ -258,8 +260,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// upload file to repository
-		NotebookAttachment newAtt = notebookService.uploadFileToContent(authForm
-				.getToolContentID(), file, type);
+		NotebookAttachment newAtt = notebookService.uploadFileToContent(
+				authForm.getToolContentID(), file, type);
 
 		// Add attachment to unsavedFiles
 		// check to see if file with same name exists
@@ -380,16 +382,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	/**
 	 * Updates SessionMap using Notebook content.
 	 * 
-	 * @param map
 	 * @param notebook
+	 * @param mode
 	 */
-	private void updateSessionMap(SessionMap<String, Object> map, Notebook notebook) {
+	private SessionMap<String, Object> createSessionMap(Notebook notebook,
+			ToolAccessMode mode) {
 
-		getAttList(KEY_UNSAVED_OFFLINE_FILES, map).clear();
-		getAttList(KEY_UNSAVED_ONLINE_FILES, map).clear();
-		getAttList(KEY_DELETED_FILES, map).clear();
-		getAttList(KEY_OFFLINE_FILES, map).clear();
-		getAttList(KEY_ONLINE_FILES, map).clear();
+		SessionMap<String, Object> map = new SessionMap<String, Object>();
+
+		map.put(KEY_MODE, mode);
+		map.put(KEY_ONLINE_FILES, new LinkedList<NotebookAttachment>());
+		map.put(KEY_OFFLINE_FILES, new LinkedList<NotebookAttachment>());
+		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<NotebookAttachment>());
+		map
+				.put(KEY_UNSAVED_OFFLINE_FILES,
+						new LinkedList<NotebookAttachment>());
+		map.put(KEY_DELETED_FILES, new LinkedList<NotebookAttachment>());
 
 		Iterator iter = notebook.getNotebookAttachments().iterator();
 		while (iter.hasNext()) {
@@ -402,6 +410,8 @@ public class AuthoringAction extends LamsDispatchAction {
 				getAttList(KEY_ONLINE_FILES, map).add(attachment);
 			}
 		}
+
+		return map;
 	}
 
 	/**
@@ -429,12 +439,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param map
 	 * @param request
 	 */
-	private void initSessionMap(SessionMap<String, Object> map, HttpServletRequest request) {
+	private void initSessionMap(SessionMap<String, Object> map,
+			HttpServletRequest request) {
 		map.put(KEY_MODE, getAccessMode(request));
 		map.put(KEY_ONLINE_FILES, new LinkedList<NotebookAttachment>());
 		map.put(KEY_OFFLINE_FILES, new LinkedList<NotebookAttachment>());
 		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<NotebookAttachment>());
-		map.put(KEY_UNSAVED_OFFLINE_FILES, new LinkedList<NotebookAttachment>());
+		map
+				.put(KEY_UNSAVED_OFFLINE_FILES,
+						new LinkedList<NotebookAttachment>());
 		map.put(KEY_DELETED_FILES, new LinkedList<NotebookAttachment>());
 	}
 
@@ -445,7 +458,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param map
 	 * @return
 	 */
-	private List<NotebookAttachment> getAttList(String key, SessionMap<String, Object> map) {
+	private List<NotebookAttachment> getAttList(String key,
+			SessionMap<String, Object> map) {
 		List<NotebookAttachment> list = (List<NotebookAttachment>) map.get(key);
 		return list;
 	}
@@ -457,8 +471,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param authForm
 	 * @return
 	 */
-	private SessionMap<String, Object> getSessionMap(HttpServletRequest request,
-			AuthoringForm authForm) {
-		return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
+	private SessionMap<String, Object> getSessionMap(
+			HttpServletRequest request, AuthoringForm authForm) {
+		return (SessionMap<String, Object>) request.getSession().getAttribute(
+				authForm.getSessionMapID());
 	}
 }
