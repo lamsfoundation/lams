@@ -1,8 +1,9 @@
-<%@ include file="/common/taglibs.jsp" %>
-<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean"
+	value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 
-<script lang="javascript">
+<script type="text/javascript">
 <!-- Common Javascript functions for LAMS -->
 	var offlineArea = "offlinefileArea";
 	var onlineArea = "onlinefileArea";
@@ -52,65 +53,83 @@
 		hideBusy(onlineArea);
 	}
 </script>
-	<!-- Instruction Tab Content -->
-	<table class="forms">
-		<!--hidden field contentID passed by flash-->
-		<tr>
-		</tr>
-		<!-- Instructions Row -->
-		<tr>
-			<td colspan="2">
-				<lams:SetEditor id="forum.onlineInstructions" small="true" text="${formBean.forum.onlineInstructions}" key="label.authoring.online.instruction" />
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<c:set var="fileTypeFlag" value="<%=IToolContentHandler.TYPE_ONLINE %>"/>
-				<div id="onlinefileArea">
-					<%@ include file="parts/instructionfilelist.jsp" %>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td nowrap="nowrap" class="field-name">
-				<fmt:message key="label.authoring.online.file" />:
-			</td>
-			<td>
-				<html:file property="onlineFile">
-					<fmt:message key="label.authoring.choosefile.button" />
-				</html:file>
-				<a href="#" onclick="javascript:doSubmit('uploadOnline');" class="button">
-					<fmt:message key="label.authoring.upload.online.button" />
-				</a>
-			</td>
-		</tr>	
-		<!-- Offline Instructions -->
-		<tr>
-			<td colspan="2">
-			<lams:SetEditor id="forum.offlineInstructions" small="true"  text="${formBean.forum.offlineInstructions}" key="label.authoring.offline.instruction"/>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<c:set var="fileTypeFlag" value="<%=IToolContentHandler.TYPE_OFFLINE %>"/>
-				<div id="offlinefileArea">
-					<%@ include file="parts/instructionfilelist.jsp" %>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td nowrap="nowrap" valign="top" class="field-name">
-				<fmt:message key="label.authoring.offline.file" />:
-			</td>
-			<td valign="top">
-				<html:file property="offlineFile">
-					<fmt:message key="label.authoring.choosefile.button" />
-				</html:file>
-				<a href="#" onclick="javascript:doSubmit('uploadOffline');" class="button">
-					<fmt:message key="label.authoring.upload.offline.button" />
-				</a>
-				<p>&nbsp;</p>
-			</td>
-		</tr>			
-		</table>
-		
+<!-- Instruction Tab Content -->
+<table class="forms">
+	<!-- Instructions Row -->
+	<tr>
+		<td>
+			<div class="field-name" style="text-align: left;">
+				<fmt:message key="label.authoring.online.instruction"></fmt:message>
+			</div>
+			<html:textarea property="forum.onlineInstructions" rows="3" cols="80"></html:textarea>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<c:set var="fileTypeFlag"
+				value="<%=IToolContentHandler.TYPE_ONLINE %>" />
+			<div id="onlinefileArea">
+				<%@ include file="parts/instructionfilelist.jsp"%>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="field-name">
+			<div class="field-name" style="text-align: left">
+				<fmt:message key="label.authoring.online.file" />
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<html:file property="onlineFile">
+				<fmt:message key="label.authoring.choosefile.button" />
+			</html:file>
+			<a href="#" onclick="javascript:doSubmit('uploadOnline');"
+				class="button"> <fmt:message
+					key="label.authoring.upload.online.button" /> </a>
+		</td>
+	</tr>
+</table>
+
+<hr />
+
+<table>
+	<!-- Offline Instructions -->
+	<tr>
+		<td>
+			<div class="field-name-alternative-color" style="text-align: left;">
+				<fmt:message key="label.authoring.offline.instruction"></fmt:message>
+			</div>
+			<html:textarea property="forum.offlineInstructions" rows="3"
+				cols="80"></html:textarea>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<c:set var="fileTypeFlag"
+				value="<%=IToolContentHandler.TYPE_OFFLINE %>" />
+			<div id="offlinefileArea">
+				<%@ include file="parts/instructionfilelist.jsp"%>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div class="field-name-alternative-color" style="text-align: left">
+				<fmt:message key="label.authoring.offline.file" />
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<html:file property="offlineFile">
+				<fmt:message key="label.authoring.choosefile.button" />
+			</html:file>
+			<a href="#" onclick="javascript:doSubmit('uploadOffline');"
+				class="button"> <fmt:message
+					key="label.authoring.upload.offline.button" /> </a>
+		</td>
+	</tr>
+</table>
+

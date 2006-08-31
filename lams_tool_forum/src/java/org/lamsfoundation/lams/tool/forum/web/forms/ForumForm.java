@@ -63,6 +63,7 @@ public class ForumForm extends ActionForm {
 	private Long toolContentID;
 	private String currentTab;
 	private String sessionMapID;
+	private String contentFolderID;
 	
     private FormFile offlineFile;
     private FormFile onlineFile;
@@ -176,6 +177,12 @@ public class ForumForm extends ActionForm {
 	}
 	public void setSessionMapID(String sessionMapID) {
 		this.sessionMapID = sessionMapID;
+	}
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 
 }

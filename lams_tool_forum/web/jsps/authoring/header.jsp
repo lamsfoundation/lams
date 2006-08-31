@@ -20,11 +20,6 @@
 			selectTab(tag.value);
         else
 			selectTab(1);
-
-	   initEditor("forum.title");
-	   initEditor("forum.instructions");
-	   initEditor("forum.onlineInstructions");
-	   initEditor("forum.offlineInstructions");
 	}  
         
 	function doSelectTab(tabId) {

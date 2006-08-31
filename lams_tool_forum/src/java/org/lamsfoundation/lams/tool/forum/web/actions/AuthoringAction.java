@@ -172,8 +172,10 @@ public class AuthoringAction extends Action {
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		ForumForm forumForm = (ForumForm)form;
 		forumForm.setSessionMapID(sessionMap.getSessionID());
+		forumForm.setContentFolderID(contentFolderID);
 		
 		//get back the topic list and display them on page
 		forumService = getForumManager();
