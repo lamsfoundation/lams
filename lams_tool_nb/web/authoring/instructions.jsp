@@ -11,12 +11,14 @@
 	</c:if>
 </c:forEach>
 
-
 <!-- Instructions Tab Content  -->
 <table>
 	<tr>
 		<td>
-			<lams:SetEditor id="onlineInstructions" text="${NbAuthoringForm.onlineInstructions}" key="instructions.onlineInstructions" small="true" />
+			<div class="field-name" style="text-align: left;">
+				<fmt:message key="instructions.onlineInstructions"></fmt:message>
+			</div>
+			<html:textarea property="onlineInstructions" rows="3" cols="80"></html:textarea>
 		</td>
 	</tr>
 
@@ -25,24 +27,32 @@
 			<td>
 				<c:if test="${not empty requestScope.sessionMap.attachmentList}">
 					<ul>
-						<c:forEach var="attachment" items="${requestScope.sessionMap.attachmentList}">
+						<c:forEach var="attachment"
+							items="${requestScope.sessionMap.attachmentList}">
 							<c:if test="${attachment.onlineFile}">
 								<li>
 									${attachment.filename}
 									<c:set var="viewURL">
-										<html:rewrite page="/download/?uuid=${attachment.uuid}&amp;preferDownload=false" />
+										<html:rewrite
+											page="/download/?uuid=${attachment.uuid}&amp;preferDownload=false" />
 									</c:set>
-									<a href="javascript:launchInstructionsPopup('${viewURL}');"> <fmt:message key="link.view" /> </a> &nbsp;
+									<a href="javascript:launchInstructionsPopup('${viewURL}');">
+										<fmt:message key="link.view" /> </a> &nbsp;
 
 									<c:set var="downloadURL">
-										<html:rewrite page="/download/?uuid=${attachment.uuid}&amp;preferDownload=true" />
+										<html:rewrite
+											page="/download/?uuid=${attachment.uuid}&amp;preferDownload=true" />
 									</c:set>
-									<a href="${downloadURL}"> <fmt:message key="link.download" /> </a> &nbsp;
+									<a href="${downloadURL}"> <fmt:message key="link.download" />
+									</a> &nbsp;
 
 									<c:set var="deleteURL">
-										<html:rewrite page="/authoring.do?method=Delete&amp;uuid=${attachment.uuid}" />
+										<html:rewrite
+											page="/authoring.do?method=Delete&amp;uuid=${attachment.uuid}" />
 									</c:set>
-									<a href="${deleteURL}" onclick="javascript:return confirm('Are you sure you want to delete this file?')" target="_self"> <fmt:message key="link.delete" /> </a>
+									<a href="${deleteURL}"
+										onclick="javascript:return confirm('Are you sure you want to delete this file?')"
+										target="_self"> <fmt:message key="link.delete" /> </a>
 								</li>
 							</c:if>
 						</c:forEach>
@@ -53,8 +63,10 @@
 	</c:if>
 
 	<tr>
-		<td class="field-name">
-			<fmt:message key="instructions.uploadOnlineInstr" />
+		<td>
+			<div class="field-name" style="text-align: left;">
+				<fmt:message key="instructions.uploadOnlineInstr" />
+			</div>
 		</td>
 	</tr>
 	<tr>
@@ -72,33 +84,44 @@
 <table>
 	<tr>
 		<td>
-			<lams:SetEditor id="offlineInstructions" text="${NbAuthoringForm.offlineInstructions}" key="instructions.offlineInstructions" alt="true" small="true" />
+			<div class="field-name-alternative-color" style="text-align: left;">
+				<fmt:message key="instructions.offlineInstructions"></fmt:message>
+			</div>
+			<html:textarea property="offlineInstructions" rows="3" cols="80"></html:textarea>
 		</td>
-	</tr>  
+	</tr>
 
 	<c:if test="${offlineExist == 'true'}">
 		<tr>
 			<td>
 				<c:if test="${not empty requestScope.sessionMap.attachmentList}">
 					<ul>
-						<c:forEach var="attachment" items="${requestScope.sessionMap.attachmentList}">
+						<c:forEach var="attachment"
+							items="${requestScope.sessionMap.attachmentList}">
 							<c:if test="${not attachment.onlineFile}">
 								<li>
 									${attachment.filename}
 									<c:set var="viewURL">
-										<html:rewrite page="/download/?uuid=${attachment.uuid}&amp;preferDownload=false" />
+										<html:rewrite
+											page="/download/?uuid=${attachment.uuid}&amp;preferDownload=false" />
 									</c:set>
-									<a href="javascript:launchInstructionsPopup('${viewURL}');"> <fmt:message key="link.view" /> </a> &nbsp;
+									<a href="javascript:launchInstructionsPopup('${viewURL}');">
+										<fmt:message key="link.view" /> </a> &nbsp;
 
 									<c:set var="downloadURL">
-										<html:rewrite page="/download/?uuid=${attachment.uuid}&amp;preferDownload=true" />
+										<html:rewrite
+											page="/download/?uuid=${attachment.uuid}&amp;preferDownload=true" />
 									</c:set>
-									<a href="${downloadURL}"> <fmt:message key="link.download" /> </a> &nbsp;
+									<a href="${downloadURL}"> <fmt:message key="link.download" />
+									</a> &nbsp;
 
 									<c:set var="deleteURL">
-										<html:rewrite page="/authoring.do?method=Delete&amp;uuid=${attachment.uuid}" />
+										<html:rewrite
+											page="/authoring.do?method=Delete&amp;uuid=${attachment.uuid}" />
 									</c:set>
-									<a href="${deleteURL}" onclick="javascript:return confirm('Are you sure you want to delete this file?')" target="_self"> <fmt:message key="link.delete" /> </a>
+									<a href="${deleteURL}"
+										onclick="javascript:return confirm('Are you sure you want to delete this file?')"
+										target="_self"> <fmt:message key="link.delete" /> </a>
 								</li>
 							</c:if>
 						</c:forEach>
@@ -109,8 +132,10 @@
 	</c:if>
 
 	<tr>
-		<td class="field-name-alternative-color">
-			<fmt:message key="instructions.uploadOfflineInstr" />
+		<td>
+			<div class="field-name-alternative-color" style="text-align: left;">
+				<fmt:message key="instructions.uploadOfflineInstr" />
+			</div>
 		</td>
 	</tr>
 	<tr>

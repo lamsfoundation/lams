@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+            "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ include file="/includes/taglibs.jsp"%>
 
@@ -14,15 +14,9 @@
 	    var themeName="aqua";
         
         function init(){
-			
-			initEditor("title");						
-			initEditor("content");
 			var showBasicContent = "${requestScope.showBasicContent}";
 			if (showBasicContent != "true") {
 	            initTabSize(3);
-	            
-       			initEditor("onlineInstructions");						
-       			initEditor("offlineInstructions");
 	        }
 	        
 	        var tag = document.getElementById("currentTab");
@@ -52,13 +46,18 @@
 <body onLoad="init()">
 
 	<div id="page">
-		<html:form action="/authoring" styleId="authoringForm" target="_self" enctype="multipart/form-data">
+		<html:form action="/authoring" styleId="authoringForm" target="_self"
+			enctype="multipart/form-data">
 			<html:hidden property="toolContentID" />
+			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
 			<html:hidden property="sessionMapID" />
 
-			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-			<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" scope="request"/>	
+			<c:set var="formBean"
+				value="<%=request
+											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="sessionMap"
+				value="${sessionScope[formBean.sessionMapID]}" scope="request" />
 
 			<%-- in define later mode we edit only the basic content. But if we don't have the instructions tab, then the instructions are lost when saving. --%>
 			<h1>
@@ -68,15 +67,17 @@
 				<!-- start tabs -->
 				<lams:Tabs control="true">
 					<lams:Tab id="1" key="label.authoring.heading.basic" />
-					<lams:Tab id="2" key="label.authoring.heading.advanced" inactive="true" />
+					<lams:Tab id="2" key="label.authoring.heading.advanced"
+						inactive="true" />
 					<c:choose>
-					<c:when test="${formBean.defineLater != 'true'}">
-						<lams:Tab id="3" key="label.authoring.heading.instructions" />
-					</c:when>
-					<c:otherwise>
-						<lams:Tab id="3" key="label.authoring.heading.instructions" inactive="true" />
-					</c:otherwise>
-				</c:choose>
+						<c:when test="${formBean.defineLater != 'true'}">
+							<lams:Tab id="3" key="label.authoring.heading.instructions" />
+						</c:when>
+						<c:otherwise>
+							<lams:Tab id="3" key="label.authoring.heading.instructions"
+								inactive="true" />
+						</c:otherwise>
+					</c:choose>
 				</lams:Tabs>
 				<!-- end tab buttons -->
 			</div>
@@ -86,21 +87,27 @@
 				<%@ include file="../errorbox.jsp"%>
 
 				<!--  Set up tabs  -->
-				<lams:TabBody id="1" titleKey="label.authoring.heading.basic" page="basic.jsp" />
-				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced" page="advance.jsp" />
-				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions" page="instructions.jsp" />
+				<lams:TabBody id="1" titleKey="label.authoring.heading.basic"
+					page="basic.jsp" />
+				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
+					page="advance.jsp" />
+				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions"
+					page="instructions.jsp" />
 
 				<!-- Button Row -->
 				<c:set var="dispatchMethodName">
 					<fmt:message key="button.save" />
 				</c:set>
 				<html:hidden property="method" value="${dispatchMethodName}" />
-				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lanb11" 
-					toolContentID="${formBean.toolContentID}" cancelButtonLabelKey="button.cancel" 
-					saveButtonLabelKey="button.save" customiseSessionID="${sessionMap.sessionID}"/>
+				<lams:AuthoringButton formID="authoringForm"
+					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
+					toolContentID="${formBean.toolContentID}"
+					cancelButtonLabelKey="button.cancel"
+					saveButtonLabelKey="button.save"
+					customiseSessionID="${sessionMap.sessionID}"
+					contentFolderID="${NbAuthoringForm.contentFolderID}" />
 			</div>
 			<div id="footer" />
-				<lams:HTMLEditor contentFolderID="${NbAuthoringForm.contentFolderID}" />
 		</html:form>
 	</div>
 </body>
