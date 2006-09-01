@@ -261,7 +261,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
 		    {
 		    	VoteUtils.cleanUpSessionAbsolute(request);
-		    	saveInRequestError(request,"error.contentId.required");
+		    	//saveInRequestError(request,"error.contentId.required");
 		    	VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));

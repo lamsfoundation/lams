@@ -624,7 +624,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
 	    	VoteUtils.cleanUpSessionAbsolute(request);
-	    	persistInRequestError(request, "error.toolSessionId.required");
+	    	//persistInRequestError(request, "error.toolSessionId.required");
 	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    else

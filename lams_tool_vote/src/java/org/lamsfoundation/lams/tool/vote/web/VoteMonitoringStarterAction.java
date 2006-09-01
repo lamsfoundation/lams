@@ -323,7 +323,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	        persistInRequestError(request, "error.contentId.required");
+	        //persistInRequestError(request, "error.contentId.required");
 	    	VoteUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
