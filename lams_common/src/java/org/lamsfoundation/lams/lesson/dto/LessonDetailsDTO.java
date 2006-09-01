@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.lesson.dto;
 
 import java.util.Date;
+import java.text.DateFormat;
 import java.util.Set;
 
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -41,6 +42,7 @@ public class LessonDetailsDTO {
 	private Date createDateTime;
 	private Date startDateTime;
     private Date scheduleStartDate;
+    private String scheduleStartDateStr;
     private Date scheduleEndDate;
  	private Long duration;	
 	private Integer organisationID;
@@ -64,6 +66,8 @@ public class LessonDetailsDTO {
 		this.createDateTime = lesson.getCreateDateTime();
 		this.startDateTime = lesson.getStartDateTime();
 		this.scheduleStartDate = lesson.getScheduleStartDate();
+		this.scheduleStartDateStr = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.scheduleStartDate);
+		
 		this.scheduleEndDate = lesson.getScheduleEndDate();
 		
 		this.duration = lesson.getLearningDesign().getDuration();
@@ -108,6 +112,13 @@ public class LessonDetailsDTO {
 	public Date getScheduleStartDate() {
 		return scheduleStartDate;
 	}
+	public String getScheduleStartDateStr() {
+		return scheduleStartDateStr;
+	}
+	public void setScheduleStartDateStr(String scheduleStartDateStr) {
+		this.scheduleStartDateStr = scheduleStartDateStr;
+	}
+	
 	/**
 	 * @return Returns the createDateTime.
 	 */
