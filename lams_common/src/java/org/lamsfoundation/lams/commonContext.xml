@@ -74,6 +74,11 @@
 				
 				<!-- Core Notebook Service related mapping files -->
 				<value>org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>
+				
+				<!-- Integration related mapping files -->
+				<value>org/lamsfoundation/lams/integration/ExtServerOrgMap.hbm.xml</value>
+				<value>org/lamsfoundation/lams/integration/ExtCourseClassMap.hbm.xml</value>
+				<value>org/lamsfoundation/lams/integration/ExtUserUseridMap.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
