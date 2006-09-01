@@ -54,8 +54,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	private var _canvas_mc:MovieClip;
 	private var canvas_scp:ScrollPane;
     private var bkg_pnl:Panel;
+	private var isRread_only:Boolean = false;
 	private var read_only:MovieClip;
+	private var titleBar:MovieClip;
+	private var leftCurve:MovieClip;
+	private var rightCurve:MovieClip;
+	private var nameBG:MovieClip;
 	//private var act_pnl:Panel;
+	
+	private var designName_lbl:Label;
 	
     private var _gridLayer_mc:MovieClip;
     private var _transitionLayer_mc:MovieClip;
@@ -137,10 +144,11 @@ public function viewUpdate(event:Object):Void{
 			case 'SELECTED_ITEM' :
                 highlightActivity(cm);
                 break;
-			/*
-			case 'START_TRANSITION_TOOL':
-				startDrawingTransition(cm);
+			
+			case 'POSITION_TITLEBAR':
+				setDesignTitle(cm);
 				break;
+			/*
 			case 'STOP_TRANSITION_TOOL':
 				stopDrawingTransition(cm);
 				break;
@@ -171,9 +179,11 @@ public function viewUpdate(event:Object):Void{
 		_transitionLayer_mc = _canvas_mc.createEmptyMovieClip("_transitionLayer_mc", _canvas_mc.getNextHighestDepth());
 		_activityLayerComplex_mc = _canvas_mc.createEmptyMovieClip("_activityLayerComplex_mc", _canvas_mc.getNextHighestDepth());
 		_activityLayer_mc = _canvas_mc.createEmptyMovieClip("_activityLayer_mc", _canvas_mc.getNextHighestDepth());
-		var styleObj = _tm.getStyleObject('redLabel');
-		read_only = _canvas_mc.attachMovie('Label', 'read_only', _canvas_mc.getNextHighestDepth(), {_x:1, _y:1, _visible:false, styleName:styleObj});
-		read_only.text = Dictionary.getValue('cv_readonly_lbl');
+		titleBar = _canvasView.attachMovie("DesignTitleBar", "titleBar", _canvasView.getNextHighestDepth())
+		//var styleObj = _tm.getStyleObject('redLabel');
+		var styleObj = _tm.getStyleObject('label');
+		read_only = _canvasView.attachMovie('Label', 'read_only', _canvasView.getNextHighestDepth(), {_x:5, _y:titleBar._y, _visible:true, autoSize:"left", html:true, styleName:styleObj});
+		//read_only.text = Dictionary.getValue('cv_readonly_lbl');
 		
 		//_canvas_mc.addEventListener('onRelease',this);
 		bkg_pnl.onRelease = function(){
@@ -181,12 +191,65 @@ public function viewUpdate(event:Object):Void{
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
 		bkg_pnl.useHandCursor = false;
+		setDesignTitle()
 		
 		setStyles();
-	
+		
         //Debugger.log('canvas view dispatching load event'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});
+	}
+	
+	private function setDesignTitle(cm:CanvasModel){
+		//titleBar.designName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>";
+		var dTitle:String;
+		var titleToCheck:String;
+		if (isRread_only){
+			dTitle = cm.getCanvas().ddm.title + " (<font color='#FF0000'>"+Dictionary.getValue('cv_readonly_lbl')+"</font>)"
+			titleToCheck = cm.getCanvas().ddm.title + Dictionary.getValue('cv_readonly_lbl')
+		}else {
+			dTitle = cm.getCanvas().ddm.title
+			titleToCheck = dTitle
+		}
+		if (dTitle == undefined || dTitle == null || dTitle == ""){
+			dTitle = Dictionary.getValue('cv_untitled_lbl');
+			titleToCheck = dTitle
+		}
+			
+		read_only.text = dTitle;
+		setSizeTitleBar(titleToCheck);
+	}
+	
+	private function setSizeTitleBar(dTitle:String):Void{
+		dTitle = StringUtils.replace(dTitle, " ", "")
+		_canvasView.createTextField("designTitle", _canvasView.getNextHighestDepth(), -10000, -10000, 20, 20)
+		var nameTextFormat = new TextFormat();
+		nameTextFormat.bold = true;
+		nameTextFormat.font = "Verdana";
+		nameTextFormat.size = 12;
+		
+		var titleTxt = _canvasView["designTitle"];
+		titleTxt.multiline = false;
+		titleTxt.autoSize = true
+		titleTxt.text = dTitle;
+		titleTxt.setNewTextFormat(nameTextFormat);
+		
+		var bgWidth = titleTxt.textWidth;
+		titleBar.nameBG._width = bgWidth;
+		titleBar.nameBGShadow._width = bgWidth;
+		titleBar.nameBG._visible  = true;
+		titleBar.rightCurve._x = bgWidth+27;
+		titleBar.rightCurveShadow._x = titleBar.rightCurve._x+2
+		
+		
+	}
+	
+	
+	private function positionTitleBar(cm:CanvasModel):Void{
+		titleBar._y = canvas_scp._y;
+		titleBar._x = (canvas_scp.width/2)-(titleBar._width/2)
+		read_only._x = titleBar._x + 5;
+		
 	}
    
 	public function initDrawTempTrans(){
@@ -414,6 +477,7 @@ public function viewUpdate(event:Object):Void{
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(cm:CanvasModel):Void{
+		//positionTitleBar();
         var s:Object = cm.getSize();
 		canvas_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
@@ -439,6 +503,9 @@ public function viewUpdate(event:Object):Void{
         
 		var styleObj = _tm.getStyleObject('CanvasPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
+		
+		//styleObj = _tm.getStyleObject('label');
+		//titleBar.designName_lbl.setStyle('styleName',styleObj);
 		
 		
 		
@@ -484,7 +551,7 @@ public function viewUpdate(event:Object):Void{
 	}
 	
 	public function showReadOnly(b:Boolean){
-		_canvas_mc.read_only._visible = b;
+		isRread_only = b;
 	}
 	
 	/**
