@@ -9,7 +9,8 @@
 	<title><fmt:message key="tool.display.name" /></title>
 	<html:base />
 	<lams:headItems />
-
+	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
+	
 	<script type="text/javascript">
 		function submitCount(tUrl){
 			var lockOnFinished = <c:out value="${sessionMap.lockOnFinish}"/>;
