@@ -66,8 +66,11 @@ public class LessonDetailsDTO {
 		this.createDateTime = lesson.getCreateDateTime();
 		this.startDateTime = lesson.getStartDateTime();
 		this.scheduleStartDate = lesson.getScheduleStartDate();
-		this.scheduleStartDateStr = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.scheduleStartDate);
-		
+		if(this.scheduleStartDate != null) {
+			this.scheduleStartDateStr = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.scheduleStartDate);
+		} else {
+			this.scheduleStartDateStr = null;
+		}
 		this.scheduleEndDate = lesson.getScheduleEndDate();
 		
 		this.duration = lesson.getLearningDesign().getDuration();
