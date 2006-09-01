@@ -25,11 +25,8 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,15 +37,10 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -80,13 +72,11 @@ public class UserOrgRoleAction extends Action {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-		ActionMessages messages = new ActionMessages();
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
 		
 		// set list of roles appropriate for the organisation type
 		List roles = (List)request.getAttribute("roles");
 		request.setAttribute("numroles", roles.size());
-		log.debug("num roles: "+roles.size());
 		Collections.sort(roles);
 		request.setAttribute("roles",roles);
 		
@@ -100,17 +90,14 @@ public class UserOrgRoleAction extends Action {
 			User user = ((UserOrganisation)userOrgs.get(i)).getUser();
 			BeanUtils.copyProperties(userBean,user);
 			// flag users that will be added to parent group if necessary
+			userBean.setMemberOfParent(true);
 			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-				if (getService().getUserOrganisation(user.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
+				if (getService().getUserOrganisation(user.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null)
 					userBean.setMemberOfParent(false);
-				} else {
-					userBean.setMemberOfParent(true);
-				}
 			}
 			userOrgRoleForm.addUserBean(userBean);
-			log.debug("added userbean: "+user.getUserId());
 		}
-		log.debug("userBeans.size: "+userOrgRoleForm.getUserBeans().size());
+		log.debug("ready to assign roles for "+userOrgRoleForm.getUserBeans().size()+" new users in organisation "+organisation.getName());
 
 		return mapping.findForward("userorgrole");		
 	}
