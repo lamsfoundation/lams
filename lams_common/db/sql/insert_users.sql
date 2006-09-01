@@ -25,7 +25,7 @@ insert into lams_workspace (workspace_id, name, default_fld_id) values(5,'One Te
 insert into lams_workspace (workspace_id, name, default_fld_id) values(6,'Two Test',6);
 insert into lams_workspace (workspace_id, name, default_fld_id) values(7,'Three Test',7);
 insert into lams_workspace (workspace_id, name, default_fld_id) values(8,'Four Test',8);
-insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(9,'Moodle Test',9,40);
+insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(50,'Moodle Test',40,41);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(1,null,'ROOT',1,'20041223','20041223',1);
@@ -58,10 +58,10 @@ insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,use
 values(8,null,'Four Test Workspace',8,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(9,1,'Moodle Test',1,'20041223','20041223',1);
+values(40,1,'Moodle Test',1,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(40,9,'Lesson Sequence Folder',1,'20041223','20041223',2);
+values(41,40,'Lesson Sequence Folder',1,'20041223','20041223',2);
 
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (1, 1,1);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (2, 2,2);
@@ -73,7 +73,7 @@ insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) valu
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (8, 6,6);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (9, 7,7);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (10, 8,8);
-insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (11, 9,9);
+insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (11, 50,40);
 
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
 	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,1,1);
@@ -88,7 +88,7 @@ INSERT INTO lams_organisation (organisation_id, name, code, description, parent_
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
 	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),null,2,1);
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,2,NOW(),9,1,1);
+	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,2,NOW(),50,1,1);
 
 
 -- users
