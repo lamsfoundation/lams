@@ -830,7 +830,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
 		trace('selected date: ' + dateStr);
 		
-		if (day == mydate.getDate()){
+		if (day == mydate.getDate() && month == mydate.getMonth()+1 && date.getFullYear() == mydate.getFullYear()){
 			dtObj.validTime = validateTime()
 		}else {
 			dtObj.validTime = true

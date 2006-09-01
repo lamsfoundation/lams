@@ -1343,7 +1343,7 @@ class WizardView extends AbstractView {
 		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
 		trace('selected date: ' + dateStr);
 		Debugger.log('schedule time to starts :'+timeStr,Debugger.CRITICAL,'getScheduleDateTime','org.lamsfoundation.lams.WizardView');
-		if (day == mydate.getDate()){
+		if (day == mydate.getDate() && month == mydate.getMonth()+1 && date.getFullYear() == mydate.getFullYear()){
 			dtObj.validTime = validateTime()
 		}else {
 			dtObj.validTime = true
