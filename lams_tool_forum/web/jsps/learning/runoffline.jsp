@@ -27,7 +27,7 @@
 		<div class="buttons-right">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn}">
-					<html:button property="continue" onclick="javascript:location.href='${continue}';" styleClass="button">
+					<html:button property="continue" onclick="javascript:location.href='${continue}';"   disabled="${sessionMap.finishedLock}"  styleClass="button">
 						<fmt:message key="label.continue" />
 					</html:button>
 				</c:when>
