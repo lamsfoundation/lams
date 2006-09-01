@@ -212,3 +212,8 @@ INSERT INTO lams_tool_import_support VALUES (7, 'lachat11', 'chat');
 INSERT INTO lams_tool_import_support VALUES (8, 'larsrc11', 'urlcontent');
 INSERT INTO lams_tool_import_support VALUES (11, 'lavote11', 'ranking');
 INSERT INTO lams_tool_import_support VALUES (12, 'lantbk11', 'journal');
+
+-- external server mapping to a lams organisation
+INSERT INTO lams_ext_server_org_map VALUES
+  (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','http://dummy','\0',7);
+
