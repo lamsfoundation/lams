@@ -47,6 +47,10 @@ class LessonView extends AbstractView {
 	
 	private static var ACTIVITY_OFFSET = 65;
 	private static var LESSON_NAME_LIMIT = 15;
+	private static var SCROLL_CHECK_INTERVAL:Number = 10;
+	private static var SCROLL_LOOP_FACTOR:Number = 2;
+	
+	private var ScrollCheckIntervalID:Number;
 	
 	private var _className = "LessonView";
 	private var _depth:Number;
@@ -64,6 +68,7 @@ class LessonView extends AbstractView {
 	
 	private var ACT_X:Number = -20;
 	private var ACT_Y:Number = 32.5;
+	
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -279,14 +284,67 @@ class LessonView extends AbstractView {
 	 */
 	private function updateActivity(a:Activity,lm:LessonModel):Boolean{
 		
+		
+		var targetPos;
+		
 		if(lm.activitiesDisplayed.containsKey(a.activityUIID)){
 			var activityMC:Object = lm.activitiesDisplayed.get(a.activityUIID);
 			activityMC.refresh();
+			
+			Debugger.log('progess data:'+lm.progressData.getCurrentActivityId()+' a.activityID:'+a.activityID,Debugger.CRITICAL,'updateActivity','LessonView');
+			
+			if(lm.progressData.getCurrentActivityId() == a.activityID){
+					//progress_scp.vPosition = activityMC._x;
+				var scrollBarPosition = activityMC._y - (ACTIVITY_OFFSET*1.5);
+				Debugger.log('|| sb pos: ' + scrollBarPosition + ' || max pos: ' + progress_scp.vScroller.maxPos+ ' || activity Y:'+activityMC._y+' || progress_scp.content._height:'+progress_scp.content._height,Debugger.CRITICAL,'updateActivity','LessonView');
+				
+				if((scrollBarPosition >= 0) && (scrollBarPosition <= progress_scp.vScroller.maxPos)){
+					targetPos = scrollBarPosition;
+				} else if(scrollBarPosition >= progress_scp.vScroller.maxPos){
+					targetPos = progress_scp.vScroller.maxPos;
+				} else {
+					targetPos = progress_scp.vScroller.minPos;
+				}
+				
+				ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
+				
+			}
+		
 		} else {
 			drawActivity(a, lm);
 		}
 		
+		
+		
+		
 		return true;
+	}
+	
+	private function adjustScrollBar(targetVal:Number) {
+		
+		var offset:Number;
+		var count:Number = 0;
+		
+		while(count < SCROLL_LOOP_FACTOR) {
+			var currentVal:Number = Number(progress_scp.vPosition);
+			count++;
+			
+			if(Math.round(currentVal) == Math.round(targetVal)) {
+				Debugger.log('clearing Scroll Check Interval: ' + targetVal,Debugger.CRITICAL,'adjustScrollBar','LessonView');
+				clearInterval(ScrollCheckIntervalID);
+			} else {
+			
+				if(Math.round(currentVal) < Math.round(targetVal)) {
+					offset = 1;
+				} else {
+					offset = -1;
+				}
+				
+				progress_scp.vPosition = currentVal + offset;
+				Debugger.log('adjusting scroll position - offset: ' + offset+ ' - currentVal: ' + currentVal,Debugger.CRITICAL,'adjustScrollBar','LessonView');
+				
+			}
+		}
 	}
 	
 	 /**
