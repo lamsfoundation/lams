@@ -306,8 +306,9 @@ class LessonView extends AbstractView {
 					targetPos = progress_scp.vScroller.minPos;
 				}
 				
-				ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
-				
+				if(progress_scp.vScroller._visible) {
+					ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
+				}
 			}
 		
 		} else {
