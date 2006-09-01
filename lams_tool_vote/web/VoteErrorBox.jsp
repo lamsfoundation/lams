@@ -86,11 +86,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionToolSessionIdRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.toolSessionId.required"/> 
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionNumberFormat == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
