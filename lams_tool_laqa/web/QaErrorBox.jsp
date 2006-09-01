@@ -20,17 +20,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 	<table>
-		<c:if test="${userExceptionContentDoesNotExist == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.content.doesNotExist"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionNoToolSessions == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.toolSession.notAvailable"/> 
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionRunOffline == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
@@ -38,35 +27,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionToolSessionIdRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.toolSessionId.required"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionUserDoesNotExist == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.learningUser.notAvailable"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionModeRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.mode.required"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionNumberFormat == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.sessionId.numberFormatException"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionContentIdRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.contentId.required"/> 
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionContentInUse == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
@@ -74,17 +34,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionModeInvalid == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.mode.invalid"/> 
-			</td> </tr>
-		</c:if> 				    
-		
-		<c:if test="${userExceptionDefaultContentNotSetup == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.defaultContent.notSetup"/> 
-			</td> </tr>
-		</c:if> 				    
 	</table>
 
 
