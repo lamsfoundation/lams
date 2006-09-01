@@ -190,6 +190,12 @@ public class LearningAction extends Action {
 		if(resource.isDefineLater()){
 			return mapping.findForward("defineLater");
 		}
+		
+		//set contentInUse flag to true!
+		resource.setContentInUse(true);
+		resource.setDefineLater(false);
+		service.saveOrUpdateResource(resource);
+		
 		//add run offline support
 		if(resource.getRunOffline()){
 			sessionMap.put(ResourceConstants.PARAM_RUN_OFFLINE, true);
@@ -216,12 +222,6 @@ public class LearningAction extends Action {
 		service.retrieveComplete(resourceItemList, resourceUser);
 		
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE,resource);
-		
-		//set contentInUse flag to true!
-		resource.setContentInUse(true);
-		resource.setDefineLater(false);
-		service.saveOrUpdateResource(resource);
-
 		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}

@@ -214,6 +214,12 @@ public class LearningAction extends Action {
 		if(forum.isDefineLater()){
 			return mapping.findForward("defineLater");
 		}
+		
+		//set contentInUse flag to true!
+		forum.setContentInUse(true);
+		forum.setDefineLater(false);
+		forumService.updateForum(forum);
+		
 		//add run offline support
 		if(forum.getRunOffline()){
 			return mapping.findForward("runOffline");
@@ -222,11 +228,6 @@ public class LearningAction extends Action {
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
-		
-		//set contentInUse flag to true!
-		forum.setContentInUse(true);
-		forum.setDefineLater(false);
-		forumService.updateForum(forum);
 		
 		return mapping.findForward("success");
 	}
