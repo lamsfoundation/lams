@@ -638,7 +638,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    	catch(NumberFormatException e)
 			{
 	    		VoteUtils.cleanUpSessionAbsolute(request);
-	    		persistInRequestError(request, "error.sessionId.numberFormatException");
+	    		//persistInRequestError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
 	    		return (mapping.findForward(ERROR_LIST));
 			}

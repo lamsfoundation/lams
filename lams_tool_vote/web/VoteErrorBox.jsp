@@ -86,19 +86,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-
-		<c:if test="${userExceptionNumberFormat == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<bean:message key="error.numberFormatException"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionContentIdRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.contentId.required"/> 
-			</td> </tr>
-		</c:if> 				    
-
 		<c:if test="${userExceptionContentRunOffline == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						 <bean:message key="label.learning.forceOfflineMessage"/> 
@@ -121,12 +108,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${userExceptionContentInUse == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						 <bean:message key="error.content.inUse"/> 
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionDefaultContentNotSetup == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						 <bean:message key="error.defaultContent.notSetup"/> 
 			</td> </tr>
 		</c:if> 				    
 
