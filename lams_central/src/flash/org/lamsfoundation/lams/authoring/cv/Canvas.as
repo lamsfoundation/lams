@@ -499,6 +499,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			LFMenuBar.getInstance().enableSave(true);
 			canvasView.showReadOnly(false);
 		}
+		canvasModel.setDesignTitle();
 	}
 	
 	/**
@@ -672,6 +673,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			}
 			checkValidDesign();
 			checkReadOnlyDesign();
+			canvasModel.setDesignTitle();
 			canvasModel.setDirty();
 			LFMenuBar.getInstance().enableExport(!canvasModel.autoSaveWait);
 		}else{
