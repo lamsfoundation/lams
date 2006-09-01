@@ -272,12 +272,15 @@ Ant build file.
 			<transaction src="${db.scripts}/create_lams_11_db.sql"/>
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
-			<transaction src="${db.scripts}/insert_types_data.sql"/>
+			<!-- Create tables for LAMS and other application's integration -->
+			<transaction src="${db.scripts}/create_integration_tables.sql"/>
 			<transaction src="${db.scripts}/insert_users.sql"/> 
+			<transaction src="${db.scripts}/insert_types_data.sql"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
 			<!-- Create tables for Core Notebook Service -->
 			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
+			
 			<!-- Test the scripts for translations
             <transaction src="${db.scripts}/shaun/all.sql"/>
             -->
