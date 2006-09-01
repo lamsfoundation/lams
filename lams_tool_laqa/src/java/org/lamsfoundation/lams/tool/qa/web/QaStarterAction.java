@@ -300,7 +300,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    if ((strToolContentID == null) || (strToolContentID.equals(""))) 
 	    {
 	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	persistError(request,"error.contentId.required");
+	    	//persistError(request,"error.contentId.required");
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 	    }
@@ -515,7 +515,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			{
 				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("default content id has not been setup");
-				persistError(request,"error.defaultContent.notSetup");
+				//persistError(request,"error.defaultContent.notSetup");
 				return (mapping.findForward(ERROR_LIST));	
 			}
 		}

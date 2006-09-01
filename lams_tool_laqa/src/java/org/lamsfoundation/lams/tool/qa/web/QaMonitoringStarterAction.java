@@ -239,32 +239,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (qaContent == null)
 		{
 			QaUtils.cleanUpSessionAbsolute(request);
-			persistError(request, "error.content.doesNotExist");
+			//persistError(request, "error.content.doesNotExist");
 			return false;
 		}
-		
-		/*
-		if (qaContent.getTitle() == null)
-		{
-			generalMonitoringDTO.setActivityTitle("Questions and Answers");
-			generalMonitoringDTO.setActivityInstructions("Please answer the questions.");
-		}
-		else
-		{
-			generalMonitoringDTO.setActivityTitle(qaContent.getTitle());
-			generalMonitoringDTO.setActivityInstructions(qaContent.getInstructions());
-		}
-		*/
-
-		/*
-		if (qaService.studentActivityOccurred(qaContent))
-		{
-			QaUtils.cleanUpSessionAbsolute(request);
-			logger.debug("student activity occurred on this content:" + qaContent);
-			//request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
-			generalMonitoringDTO.setUserExceptionContentInUse(new Boolean(true).toString());
-		}
-		*/
 		
 		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 		logger.debug("refreshing summary data...");
@@ -301,7 +278,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	    	persistError(request, "error.contentId.required");
+	    	//persistError(request, "error.contentId.required");
 	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
@@ -316,7 +293,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		persistError(request, "error.contentId.numberFormatException");
+	    		//persistError(request, "error.contentId.numberFormatException");
 	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
 	    		QaUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));

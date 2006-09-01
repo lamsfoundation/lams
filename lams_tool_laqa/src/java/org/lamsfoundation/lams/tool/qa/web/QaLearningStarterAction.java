@@ -217,7 +217,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		{
 	    		QaUtils.cleanUpSessionAbsolute(request);
 		    	logger.debug("error: The tool expects mcSession.");
-		    	persistError(request,"error.toolSession.notAvailable");
+		    	//persistError(request,"error.toolSession.notAvailable");
 				return (mapping.findForward(ERROR_LIST_LEARNER));
 		}
 	    
@@ -244,7 +244,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
     		QaUtils.cleanUpSessionAbsolute(request);	    	
 	    	logger.debug("error: The tool expects qaContent.");
-	    	persistError(request,"error.toolContent.notAvailable");
+	    	//persistError(request,"error.toolContent.notAvailable");
 	    	return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    
@@ -541,7 +541,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	catch(NumberFormatException e)
 			{
 	    		QaUtils.cleanUpSessionAbsolute(request);
-	    		persistError(request, "error.sessionId.numberFormatException");
+	    		//persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
 				return (mapping.findForward(ERROR_LIST_LEARNER));
 			}
@@ -554,14 +554,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
     		QaUtils.cleanUpSessionAbsolute(request);
-	    	persistError(request, "error.mode.required");
+	    	//persistError(request, "error.mode.required");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
 	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	persistError(request, "error.mode.invalid");
+	    	//persistError(request, "error.mode.invalid");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 
