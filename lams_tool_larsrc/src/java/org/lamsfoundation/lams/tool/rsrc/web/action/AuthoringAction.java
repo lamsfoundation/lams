@@ -365,7 +365,11 @@ public class AuthoringAction extends Action {
 		List items = null;
 		Resource resource = null;
 		ResourceForm resourceForm = (ResourceForm)form;
-
+		
+		// Get contentFolderID and save to form.
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		resourceForm.setContentFolderID(contentFolderID);
+				
 		//initial Session Map 
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);

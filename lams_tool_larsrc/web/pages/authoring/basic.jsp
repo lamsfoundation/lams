@@ -65,11 +65,21 @@
 	<!-- Basic Tab Content -->
 	<table>
 		<tr>
-			<td colspan="2"><lams:SetEditor id="Resource.title" text="${formBean.resource.title}" small="true" key="label.authoring.basic.title" /></td>
+			<td colspan="2">
+				<div class="field-name" style="text-align: left;">
+					<fmt:message key="label.authoring.basic.title"></fmt:message>
+				</div>
+				<html:text property="resource.title" style="width: 100%;"></html:text>
+			</td>
 		</tr>
 		<tr>
 			<td colspan="2">
-				<lams:SetEditor id="Resource.instructions" text="${formBean.resource.instructions}"  key="label.authoring.basic.instruction"/>
+				<div class="field-name" style="text-align: left;">
+					<fmt:message key="label.authoring.basic.instruction"></fmt:message>
+				</div>
+				<lams:FCKEditor id="resource.instructions"
+					value="${formBean.resource.instructions}"
+					contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor>
 			</td>
 		</tr>
 		<tr>

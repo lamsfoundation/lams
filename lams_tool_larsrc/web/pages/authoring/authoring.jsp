@@ -34,12 +34,7 @@
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-            
-            initEditor("Title");
-            initEditor("Instructions");
-            initEditor("OnlineInstruction");
-            initEditor("OfflineInstruction");
-            
+          
         }     
         
         function doSelectTab(tabId) {
@@ -123,6 +118,7 @@
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="resource.contentId" />
 		<html:hidden property="sessionMapID" />
+		<html:hidden property="contentFolderID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 
 			<!-- tab content 1 (Basic) -->
@@ -147,13 +143,13 @@
 			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 				toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.resource.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}" />
+				 customiseSessionID="${formBean.sessionMapID}"
+				 contentFolderID="${formBean.contentFolderID}" />
 	</html:form>
 
 </div>
 
 <div id="footer"></div>
-<lams:HTMLEditor />
 <!-- end page div -->
 </div>
 

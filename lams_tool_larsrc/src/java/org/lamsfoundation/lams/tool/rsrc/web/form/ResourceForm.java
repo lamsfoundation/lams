@@ -53,6 +53,7 @@ public class ResourceForm extends ActionForm  {
 
 	//Forum fields
 	private String sessionMapID;
+	private String contentFolderID;
 	private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
@@ -126,6 +127,14 @@ public class ResourceForm extends ActionForm  {
 
 	public void setSessionMapID(String sessionMapID) {
 		this.sessionMapID = sessionMapID;
+	}
+
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 
 
