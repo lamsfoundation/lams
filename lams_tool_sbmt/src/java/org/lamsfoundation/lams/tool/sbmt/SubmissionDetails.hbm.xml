@@ -92,7 +92,7 @@
         <many-to-one
             name="learner"
             class="org.lamsfoundation.lams.tool.sbmt.Learner"
-            cascade="save-update"
+            cascade="none"
             outer-join="auto"
             update="true"
             insert="true"

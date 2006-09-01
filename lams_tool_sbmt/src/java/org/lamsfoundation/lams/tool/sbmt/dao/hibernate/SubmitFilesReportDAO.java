@@ -38,9 +38,7 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 public class SubmitFilesReportDAO extends BaseDAO implements
 		ISubmitFilesReportDAO {
 	
-	private static final String TABLENAME ="tl_lasbmt11_report";
-	private static final String FIND_BY_SUBMISSION = "from " + TABLENAME +
-											   " in class " + SubmitFilesReport.class.getName() + 
+	private static final String FIND_BY_SUBMISSION = "from " + SubmitFilesReport.class.getName() + 
 											   " where submission_id=?" ;
 
 	/**

@@ -36,14 +36,21 @@ public class SbmtConstants {
 //	public static final String TOOL_CONTENT_ID = "toolContentID";
 	public static final String USER_ID = "userID";
 	
-	//TODO: hard code, need to read from config file/db
-	public static final String TOOL_URL_BASE = "/lams/tool/lasbmt11/";
 	public static final String ATTACHMENT_LIST = "attachmentList";
 	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
+	public static final String ATTR_USER_UID = "userUid";
+	public static final String SUCCESS = "success";
+	public static final String ATTR_FINISH_LOCK = "finishLock";
+	public static final String ATTR_REFLECTION_ON = "reflectOn";
+	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+	public static final String ATTR_TITLE = "title";
+	public static final String ATTR_INSTRUCTION = "instruction";
+	public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
+	public static final String PARAM_MIN_UPLOAD = "minUpload";
 
 }
 

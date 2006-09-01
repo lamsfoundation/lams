@@ -23,6 +23,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 public class AuthoringForm extends ValidatorForm {
 
 	private Long toolContentID;
+	
 	private String contentFolderID;
 	
 	//control fields
@@ -41,7 +42,8 @@ public class AuthoringForm extends ValidatorForm {
     private FormFile onlineFile;
     private List onlineFileList;
     private List offlineFileList;
-    
+    private boolean reflectOnActivity;
+    private String reflectInstructions;
 
     public void reset(ActionMapping mapping, HttpServletRequest request){
     	lockOnFinished = false;
@@ -57,6 +59,9 @@ public class AuthoringForm extends ValidatorForm {
 		this.offlineInstruction = content.getOfflineInstruction();
 		this.onlineInstruction = content.getOnlineInstruction();
 		this.lockOnFinished = content.isLockOnFinished();
+		
+		this.reflectOnActivity = content.isReflectOnActivity();
+		this.reflectInstructions = content.getReflectInstructions();
 		
 		onlineFileList = new ArrayList();
 		offlineFileList = new ArrayList();
@@ -170,6 +175,18 @@ public class AuthoringForm extends ValidatorForm {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
 	}
 	public String getContentFolderID() {
 		return contentFolderID;

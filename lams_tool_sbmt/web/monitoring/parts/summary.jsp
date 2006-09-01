@@ -84,17 +84,47 @@
 	<c:set var="userlist" value="${element.value}" />
 	<table cellpadding="0">
 		<tr>
-			<th colspan="3"><fmt:message key="label.session.name" /> : 
-				<c:out value="${sessionDto.sessionName}" /></th>
+			<th colspan="3">
+				<h2>
+				<fmt:message key="label.session.name" /> : 
+				<c:out value="${sessionDto.sessionName}" />
+				</h2>
+			</th>
 		</tr>
-		<c:forEach var="user" items="${userlist}">
+		<c:forEach var="user" items="${userlist}" varStatus="status">
+			<c:if test="${status.first}">
+				<tr>
+					<th>
+						<fmt:message key="monitoring.user.fullname"/>
+					</th>
+					<th>
+						<fmt:message key="monitoring.user.loginname"/>
+					</th>
+					<c:if test="${user.hasRefection}">
+						<th>
+							<fmt:message key="monitoring.user.reflection"/>
+						</th>
+					</c:if>
+					<th>&nbsp;</th>
+				</tr>
+			</c:if>		
 			<tr>
-				<td><c:out value="${user.firstName}" /> 
-					<c:out value="${user.lastName}" />
+				<td><c:out value="${user.userDto.firstName}" /> 
+					<c:out value="${user.userDto.lastName}" />
 				</td>
-				<td><c:out value="${user.login}" /></td>
+				<td><c:out value="${user.userDto.login}" /></td>
+				<td>
+					<c:if test="${user.hasRefection}">
+						<c:set var="viewReflection">
+							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userDto.userID}"/>
+						</c:set>
+						<html:link href="javascript:launchPopup('${viewReflection}')">
+							<fmt:message key="label.view" />
+						</html:link>
+					</c:if>				
+				</td>
 				<td><html:link
-					href="javascript:viewMark(${user.userID},${sessionDto.sessionID});"
+					href="javascript:viewMark(${user.userDto.userID},${sessionDto.sessionID});"
 					property="Mark" styleClass="button">
 					<fmt:message key="label.monitoring.Mark.button" />
 				</html:link></td>

@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.sbmt.Learner;
 
 public interface ILearnerDAO extends IBaseDAO  {
 
-	public Learner getLearner(Long sessionID, Long userID);
+	public Learner getLearner(Long sessionID, Integer userID);
 	
 	/**
 	 * This method returns a list of files that were uploaded by the
@@ -42,7 +42,7 @@ public interface ILearnerDAO extends IBaseDAO  {
 	 * @param sessionID The <code>session_id</code> to be looked up
 	 * @return List The list of required objects.
 	 */
-	public List getSubmissionDetailsForUserBySession(Long userID,Long sessionID);
+	public List getSubmissionDetailsForUserBySession(Integer userID,Long sessionID);
 	
 	public void saveLearner(Learner learner);
 

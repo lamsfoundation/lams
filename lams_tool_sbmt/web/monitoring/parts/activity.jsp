@@ -38,7 +38,7 @@
 			<c:otherwise>
 				<td colspan="2">
 					<p>
-						<fmt:message key="message.monitoring.edit.activity.not.editable" />
+						<B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B>
 					</p>
 				</td>
 			</c:otherwise>

@@ -30,6 +30,7 @@ import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -85,7 +86,7 @@ public interface ISubmitFilesService {
 	 * @throws SubmitFilesException
 	 */
 	public void uploadFileToSession(Long sessionID, FormFile uploadFile,
-			   String fileDescription, Long userID) throws SubmitFilesException;
+			   String fileDescription, Integer userID) throws SubmitFilesException;
 	/**
 	 * Upload file to repository and persist relative attributes into database.
 	 *   
@@ -108,7 +109,7 @@ public interface ISubmitFilesService {
 	 * @param sessionID The <code>session_id</code> to be looked up
 	 * @return List The list of required objects.
 	 */
-	public List getFilesUploadedByUser(Long userID, Long sessionID);
+	public List getFilesUploadedByUser(Integer userID, Long sessionID);
 	/**
 	 * This method returns a SortedMap of all files that were submitted users within a
 	 * given <code>sessionID</code>.
@@ -126,7 +127,7 @@ public interface ISubmitFilesService {
 	
 	public void updateMarks(Long reportID, Long marks, String comments);
 	
-	public UserDTO getUserDetails(Long userID);
+	public UserDTO getUserDetails(Integer userID);
 	
 	public FileDetailsDTO getFileDetails(Long detailID);
 	/**
@@ -152,7 +153,7 @@ public interface ISubmitFilesService {
 	 * @param sessionID
 	 * @param userID
 	 */
-	public void finishSubmission(Long sessionID, Long userID);
+	public void finishSubmission(Long sessionID, Integer userID);
 	/**
 	 * Get learner by given <code>toolSessionID</code> and <code>userID</code>.
 	 *  
@@ -160,7 +161,7 @@ public interface ISubmitFilesService {
 	 * @param userID
 	 * @return
 	 */
-	public Learner getLearner(Long sessionID, Long userID);
+	public Learner getLearner(Long sessionID, Integer userID);
     /**
      * Create the default content for the given contentID. These default data will copy from default record in 
      * Tool Content database table.
@@ -191,4 +192,27 @@ public interface ISubmitFilesService {
      * 			The <code>SubmitFilesContent</code> to be updated
      */
 	public void saveOrUpdateContent(SubmitFilesContent persistContent);
+	
+	/**
+	 * Create refection entry into notebook tool.
+	 * @param sessionId
+	 * @param notebook_tool
+	 * @param tool_signature
+	 * @param userId
+	 * @param entryText
+	 */
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	/**
+	 * Get reflection entry from notebook tool.
+	 * @param sessionId
+	 * @param idType
+	 * @param signature
+	 * @param userID
+	 * @return
+	 */
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+
+	public Learner createLearner(UserDTO userDto, Long sessionID);
+	
+	public Learner getLearnerByUid(Long uid);
 }

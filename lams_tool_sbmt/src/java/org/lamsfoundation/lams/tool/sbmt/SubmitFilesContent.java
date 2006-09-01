@@ -69,6 +69,9 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	private boolean runOffline;
 	private boolean contentInUse;
 
+	private boolean reflectOnActivity;
+	private String reflectInstructions;
+	
 	//relationship fields
 	private Set toolSession;
 	//temporary fields
@@ -351,5 +354,24 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
 	}
-
+	/**
+	 * @hibernate.property column="reflect_instructions"
+	 * @return
+	 */	
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+	/**
+	 * @hibernate.property column="reflect_on_activity"
+	 * @return
+	 */		
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
 }

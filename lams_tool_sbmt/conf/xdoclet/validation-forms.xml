@@ -1,6 +1,0 @@
-<form name="SbmtLearnerForm">
-	<field property="filePath" depends="required">
-		<arg key="learner.form.filepath.displayname" />
-	</field>
-	<field property="filePath.fileSize" depends="maxFileSize" />
-</form>

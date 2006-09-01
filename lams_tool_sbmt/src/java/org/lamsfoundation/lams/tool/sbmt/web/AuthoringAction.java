@@ -91,8 +91,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
-		
+		ToolAccessMode mode = null;
+		try{
+			mode =  WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,true);
+		}catch(Exception e){
+		}
 		//when first time open flash icon on authoring page: mode will be null 
 		if(mode == null)
 			mode = ToolAccessMode.AUTHOR;
@@ -160,7 +163,16 @@ public class AuthoringAction extends LamsDispatchAction {
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
 		
-		ToolAccessMode mode = SbmtWebUtils.getAccessMode(request);
+
+		ToolAccessMode mode = null;
+		try{
+			mode =  WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,true);
+		}catch(Exception e){
+		}
+		//when first time open flash icon on authoring page: mode will be null 
+		if(mode == null)
+			mode = ToolAccessMode.AUTHOR;
+		
 		ActionMessages errors = validate(authForm, mapping, request);
 		if(!errors.isEmpty()){
 			saveErrors(request, errors);
@@ -388,6 +400,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		content.setOnlineInstruction(online_instruction);
 		content.setTitle(title);
 		content.setLockOnFinished(lock_on_finished);
+		content.setReflectInstructions(authForm.getReflectInstructions());
+		content.setReflectOnActivity(authForm.isReflectOnActivity());
 		// content.setInstrctionFiles()
 		// content.setToolSession();
 		return content;

@@ -41,19 +41,35 @@ public class Learner implements Serializable,Cloneable{
 	private static final long serialVersionUID = 4951104689120529660L;
 	private static Logger log = Logger.getLogger(Learner.class);
 	
-    /** identifier field */
+	//key
     private Long learnerID;
-
-	/** persistent field */
-	private Long userID;
-	
-	/** persistent field */
+    //lams User ID
+	private Integer userID;
+	private String firstName;
+	private String lastName;
+	private String loginName;
 	private Long sessionID;
-	
-	/** persistent field */
 	private boolean finished;
-	
 	private Set submissionDetails;
+	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	public Object clone() {
+		
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + Learner.class + " failed");
+		}
+		return obj;
+	}
+	
+	//***********************************************************
+	// Get / Set methods
+	//***********************************************************
 	/**
 	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="learner_id"
 	 * @return Returns the learnerID.
@@ -72,14 +88,14 @@ public class Learner implements Serializable,Cloneable{
 	 * @hibernate.property column="user_id" length="20"
 	 * @return Returns the userID.
 	 */
-	public Long getUserID() {
+	public Integer getUserID() {
 		return userID;
 	}
 	/**
 	 * @param userID
 	 *            The userID to set.
 	 */
-	public void setUserID(Long userID) {
+	public void setUserID(Integer userID) {
 		this.userID = userID;
 	}
 	/**
@@ -95,19 +111,7 @@ public class Learner implements Serializable,Cloneable{
 	public void setFinished(boolean finished) {
 		this.finished = finished;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	public Object clone() {
-		
-		Object obj = null;
-		try {
-			obj = super.clone();
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Learner.class + " failed");
-		}
-		return obj;
-	}
+
 	/**
 	 * @hibernate.property column="session_id" length="20"
 	 * @return Returns the sessionID.
@@ -137,5 +141,37 @@ public class Learner implements Serializable,Cloneable{
 	 */
 	public void setSubmissionDetails(Set submissionDetails) {
 		this.submissionDetails = submissionDetails;
+	}
+	/**
+	 * @hibernate.property column="first_name" 
+	 */
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	/**
+	 * @hibernate.property column="login_name" 
+	 */
+	public String getLoginName() {
+		return loginName;
+	}
+
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+
+	/**
+	 * @hibernate.property column="last_name" 
+	 */
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String secondName) {
+		this.lastName = secondName;
 	}
 }

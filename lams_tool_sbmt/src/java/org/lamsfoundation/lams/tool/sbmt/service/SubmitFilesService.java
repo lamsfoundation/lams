@@ -61,6 +61,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -110,6 +112,19 @@ public class SubmitFilesService implements ToolContentManager,
 	private ILearnerService learnerService;
 	private IRepositoryService repositoryService;
 	private IExportToolContentService exportContentService;
+	private ICoreNotebookService coreNotebookService;
+	
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
+		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
+	}
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}	
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -506,7 +521,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long ) 
 	 */
 	public void uploadFileToSession(Long sessionID, FormFile uploadFile,
-						   String fileDescription, Long userID) throws SubmitFilesException{
+						   String fileDescription, Integer userID) throws SubmitFilesException{
 			
 			if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 				throw new SubmitFilesException("Could not find upload file: " + uploadFile);
@@ -527,12 +542,6 @@ public class SubmitFilesService implements ToolContentManager,
 			details.setDateOfSubmission(now);
 			
 			Learner learner = learnerDAO.getLearner(sessionID,userID);
-			if(learner == null)
-				learner = new Learner();
-			learner.setUserID(userID);
-			learner.setFinished(false);
-			learner.setSessionID(sessionID);
-			
 			details.setLearner(learner);
 			details.setUuid(nodeKey.getUuid());
 			details.setVersionID(nodeKey.getVersion());
@@ -579,7 +588,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
-	public List getFilesUploadedByUser(Long userID, Long sessionID){
+	public List getFilesUploadedByUser(Integer userID, Long sessionID){
 		List list =  learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
 		ArrayList details = new ArrayList();
 		if(list ==null)
@@ -649,8 +658,8 @@ public class SubmitFilesService implements ToolContentManager,
 		
 		Iterator iterator = users.iterator();
 		while(iterator.hasNext()){
-			Long userID = (Long)iterator.next();			
-			User user = (User)baseDAO.find(User.class,userID.intValue());
+			Integer userID = (Integer) iterator.next();			
+			User user = (User)baseDAO.find(User.class,userID);
 			table.add(user.getUserDTO());
 		}
 		return table;
@@ -664,7 +673,7 @@ public class SubmitFilesService implements ToolContentManager,
 			submitFilesReportDAO.update(report);
 		}
 	}
-	public UserDTO getUserDetails(Long userID){
+	public UserDTO getUserDetails(Integer userID){
 		User user = (User)baseDAO.find(User.class,userID.intValue());
 		if(user == null)
 			return null;
@@ -703,18 +712,10 @@ public class SubmitFilesService implements ToolContentManager,
 		//current there is no false return
 		return true;
 	}
-	public void finishSubmission(Long sessionID, Long userID){
+	public void finishSubmission(Long sessionID, Integer userID){
 		Learner learner = learnerDAO.getLearner(sessionID,userID);
-		if(learner == null){
-			learner = new Learner();
-			learner.setFinished(true);
-			learner.setUserID(userID);
-			learner.setSessionID(sessionID);
-			learnerDAO.saveLearner(learner);
-		}else{
-			learner.setFinished(true);
-			learnerDAO.updateLearer(learner);
-		}
+		learner.setFinished(true);
+		learnerDAO.updateLearer(learner);
 	}
 
     /* (non-Javadoc)
@@ -817,6 +818,27 @@ public class SubmitFilesService implements ToolContentManager,
     	// toolContentObj.setReflectInstructions(description);
     }
 
+    public Learner getLearnerByUid(Long learnerID){
+    	return (Learner) learnerDAO.find(Learner.class,learnerID);
+    	
+    }
+    public Learner createLearner(UserDTO userDto, Long sessionID){
+    	Learner learner = learnerDAO.getLearner(sessionID, userDto.getUserID());
+    	if(learner != null)
+    		return learner;
+    	learner = new Learner();
+    	learner.setUserID(userDto.getUserID());
+    	learner.setFirstName(userDto.getFirstName());
+    	learner.setLastName(userDto.getLastName());
+    	learner.setLoginName(userDto.getLogin());
+    	learner.setSessionID(sessionID);
+    	learner.setFinished(false);
+    	
+    	
+    	learnerDAO.saveLearner(learner);
+    	
+    	return learner;
+    }
 	/***************************************************************************
 	 * Property Injection Methods
 	 **************************************************************************/
@@ -892,7 +914,7 @@ public class SubmitFilesService implements ToolContentManager,
 		this.learnerDAO = learnerDAO;
 	}
 
-	public Learner getLearner(Long sessionID, Long userID) {
+	public Learner getLearner(Long sessionID, Integer userID) {
 		return learnerDAO.getLearner(sessionID,userID);
 	}
 
@@ -916,6 +938,12 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	public void setExportContentService(IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
+	}
+	public ICoreNotebookService getCoreNotebookService() {
+		return coreNotebookService;
+	}
+	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+		this.coreNotebookService = coreNotebookService;
 	}
 	
 

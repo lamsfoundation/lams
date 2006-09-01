@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -50,15 +51,20 @@ public class LearnerDetailsDTO implements Serializable{
 	private Long marks;	
 	private Date dateOfSubmission;
 	private Date dateMarksReleased;
-	//If lockOnFinished is true, and learner finished the submission, this flag will be true.
-	private boolean locked;
-	
-	private String contentTitle;
-	private String contentInstruction;
-	private boolean contentLockOnFinished;
 	
 	private List filesUploaded;
 
+	private boolean hasRefection;
+	private String reflectInstrctions;
+	private boolean finishReflection;
+	private String reflect;
+	
+	public LearnerDetailsDTO(){
+		
+	}
+	public LearnerDetailsDTO(UserDTO userDto){
+		this.setUserDto(userDto);
+	}
 	/**
 	 * @return Returns the comments.
 	 */
@@ -132,42 +138,6 @@ public class LearnerDetailsDTO implements Serializable{
 		this.marks = marks;
 	}
 	/**
-	 * @return Returns the contentInstruction.
-	 */
-	public String getContentInstruction() {
-		return contentInstruction;
-	}
-	/**
-	 * @param contentInstruction The contentInstruction to set.
-	 */
-	public void setContentInstruction(String contentInstruction) {
-		this.contentInstruction = contentInstruction;
-	}
-	/**
-	 * @return Returns the contentLockOnFinished.
-	 */
-	public boolean isContentLockOnFinished() {
-		return contentLockOnFinished;
-	}
-	/**
-	 * @param contentLockOnFinished The contentLockOnFinished to set.
-	 */
-	public void setContentLockOnFinished(boolean contentLockOnFinished) {
-		this.contentLockOnFinished = contentLockOnFinished;
-	}
-	/**
-	 * @return Returns the contentTitle.
-	 */
-	public String getContentTitle() {
-		return contentTitle;
-	}
-	/**
-	 * @param contentTitle The contentTitle to set.
-	 */
-	public void setContentTitle(String contentTitle) {
-		this.contentTitle = contentTitle;
-	}
-	/**
 	 * @return Returns the toolSessionID.
 	 */
 	public Long getToolSessionID() {
@@ -192,23 +162,35 @@ public class LearnerDetailsDTO implements Serializable{
 	public void setFilesUploaded(List filesUploaded) {
 		this.filesUploaded = filesUploaded;
 	}
-	/**
-	 * @return Returns the locked.
-	 */
-	public boolean isLocked() {
-		return locked;
-	}
-	/**
-	 * @param locked The locked to set.
-	 */
-	public void setLocked(boolean locked) {
-		this.locked = locked;
-	}
 
 	public UserDTO getUserDto() {
 		return userDto;
 	}
 	public void setUserDto(UserDTO userDto) {
 		this.userDto = userDto;
+	}
+	public boolean isFinishReflection() {
+		return finishReflection;
+	}
+	public void setFinishReflection(boolean finishReflection) {
+		this.finishReflection = finishReflection;
+	}
+	public boolean isHasRefection() {
+		return hasRefection;
+	}
+	public void setHasRefection(boolean hasRefection) {
+		this.hasRefection = hasRefection;
+	}
+	public String getReflect() {
+		return reflect;
+	}
+	public void setReflect(String reflect) {
+		this.reflect = reflect;
+	}
+	public String getReflectInstrctions() {
+		return reflectInstrctions;
+	}
+	public void setReflectInstrctions(String reflectInstrctions) {
+		this.reflectInstrctions = reflectInstrctions;
 	}
 }

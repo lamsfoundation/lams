@@ -230,7 +230,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 
-		Learner learner = sbmtService.getLearner(toolSessionID, userID);
+		Learner learner = sbmtService.getLearner(toolSessionID, new Integer(userID.intValue()));
 
 		if (learner == null) {
 			String error = "The user with user id "
@@ -253,7 +253,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 
-		List fileList = sbmtService.getFilesUploadedByUser(userID,toolSessionID);
+		List fileList = sbmtService.getFilesUploadedByUser(new Integer(userID.intValue()),toolSessionID);
 		//if mark not release, then set these message as null.
 		Iterator iter = fileList.iterator();
 		while(iter.hasNext()){

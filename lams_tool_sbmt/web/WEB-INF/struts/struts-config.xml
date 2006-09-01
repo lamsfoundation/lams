@@ -17,20 +17,14 @@
       name="SbmtAuthoringForm"
       type="org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm"
     />
-
-<form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
-	<form-property name="filePath"
-				   type="org.apache.struts.upload.FormFile"/>
-	<form-property name="fileDescription"
-				   type="java.lang.String"/>
-	<form-property name="toolSessionID"
-				   type="java.lang.Long"/>
-	<form-property name="userID"
-				   type="java.lang.Long"/>		
-
-	<form-property name="filesUploaded"
-				   type="java.util.List"/>
-</form-bean>
+    <form-bean
+      name="learnerForm"
+      type="org.lamsfoundation.lams.tool.sbmt.form.LearnerForm"
+    />
+    <form-bean
+      name="reflectionForm"
+      type="org.lamsfoundation.lams.tool.sbmt.form.ReflectionForm"
+    />
 
 <form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
 
@@ -69,16 +63,16 @@
     <action
       path="/learner"
       type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
-      name="SbmtLearnerForm"
+      name="learnerForm"
       scope="request"
-      input="/learner/sbmtLearner.jsp"
+      input="/learner/sbmtlearner.jsp"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="upload"
-        path="/learner/sbmtLearner.jsp"
+        name="success"
+        path="/learner/sbmtlearner.jsp"
         redirect="false"
       />
       <forward
@@ -126,6 +120,11 @@
         path="/monitoring/parts/statisticpart.jsp"
         redirect="false"
       />
+      <forward
+        name="viewReflect"
+        path="/monitoring/notebook.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/authoring"
@@ -150,15 +149,34 @@
     </action>
 
    <!-- ========== Action Mapping Definitions ============================== -->
-<action path="/definelater" type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction" 
-		name="SbmtAuthoringForm" 
-		scope="request" 
-		input="/authoring/definelater.jsp"
-		parameter="dispatch" 
-		validate="false">
-	<forward name="success" path="/authoring/definelater.jsp"/>
-	<forward name="forbidden" path="/authoring/definelaterforbid.jsp"/>
-</action>
+		<action path="/definelater" type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction" 
+				name="SbmtAuthoringForm" 
+				scope="request" 
+				input="/authoring/definelater.jsp"
+				parameter="dispatch" 
+				validate="false">
+			<forward name="success" path="/authoring/definelater.jsp"/>
+			<forward name="forbidden" path="/authoring/definelaterforbid.jsp"/>
+		</action>
+		<!--  ========= Reflection =============== -->
+		<action path="/learning/newReflection"
+			type="org.lamsfoundation.lams.tool.sbmt.web.ReflectAction"
+			name="reflectionForm" 
+			validate="false" 
+			parameter="newReflection" 
+			input="/learner/sbmtlearner.jsp" 
+			scope="request">
+			<forward name="success" path="/learner/notebook.jsp" />
+		</action>
+		<action path="/learning/submitReflection"
+			type="org.lamsfoundation.lams.tool.sbmt.web.ReflectAction"
+			name="reflectionForm" 
+			validate="true" 
+			input="/learner/notebook.jsp"
+			parameter="submitReflection" 
+			scope="request">
+			<forward name="success" path="/learner.do?method=finish" />
+		</action>
 
 <!-- ========== BEGIN: Common ============================== -->
 <action path="/clearsession" type="org.lamsfoundation.lams.tool.sbmt.web.ClearSessionAction"></action>

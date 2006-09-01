@@ -224,7 +224,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 	/**
 	/**
-	 * @hibernate.many-to-one column="learner_id" cascade="save-update"
+	 * @hibernate.many-to-one column="learner_id" cascade="none"
 	 * @return Returns the learner.
 	 */
 	public Learner getLearner() {

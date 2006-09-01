@@ -5,12 +5,9 @@
     Define global validation config in validation-global.xml
   -->
   <formset>
-  <form name="SbmtLearnerForm">
-	<field property="filePath" depends="required">
-		<arg key="learner.form.filepath.displayname" />
-	</field>
-	<field property="filePath.fileSize" depends="maxFileSize" />
-</form>
+  <!--
+    Define form validation config in validation-forms.xml
+  -->
 
   </formset>
 </form-validation>

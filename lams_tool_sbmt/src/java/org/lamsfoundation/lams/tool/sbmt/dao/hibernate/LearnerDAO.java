@@ -35,15 +35,10 @@ import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.dao.ILearnerDAO;
 
 public class LearnerDAO extends BaseDAO implements ILearnerDAO {
-	private static final String TABLENAME = "tl_lasbmt11_session_learners";
-	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + TABLENAME +
-	 " in class " + Learner.class.getName() +
-	 " where user_id=? and session_id=?";
-	private static final String FIND_FOR_USER_BY_SESSION = "from " + TABLENAME +
-								" in class " + Learner.class.getName() +
-								" where user_id=? AND session_id=?";
+	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + Learner.class.getName() +
+	 		" where user_id=? and session_id=?";
 
-	public Learner getLearner(Long sessionID, Long userID) {
+	public Learner getLearner(Long sessionID, Integer userID) {
 		if ( sessionID != null && userID != null ) {
 			return (Learner) this.getSession().createQuery(FIND_BY_USER_ID_SESSION_ID)
 				.setLong(0, userID.longValue())
@@ -71,9 +66,9 @@ public class LearnerDAO extends BaseDAO implements ILearnerDAO {
 		this.getHibernateTemplate().flush();
 	}
 
-	public List getSubmissionDetailsForUserBySession(Long userID, Long sessionID) {
+	public List getSubmissionDetailsForUserBySession(Integer userID, Long sessionID) {
 		if ( userID != null && sessionID != null ) {
-			Learner learner = (Learner) this.getSession().createQuery(FIND_FOR_USER_BY_SESSION)
+			Learner learner = (Learner) this.getSession().createQuery(FIND_BY_USER_ID_SESSION_ID)
 										.setLong(0, userID.longValue())
 										.setLong(1, sessionID.longValue())
 										.uniqueResult();

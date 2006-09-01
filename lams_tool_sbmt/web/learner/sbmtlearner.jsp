@@ -2,6 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <html:html>
 <head>
@@ -10,28 +11,34 @@
 	<lams:headItems />
 
 	<script type="text/javascript">
-		var locked =  <c:out value="${learner.locked}"/>;
-		function finish(){
-			var lockOnFinished = <c:out value="${learner.contentLockOnFinished}"/>;
+		function submitCount(tUrl){
+			var lockOnFinished = <c:out value="${sessionMap.lockOnFinish}"/>;
 			var uploadFileNum = <c:choose><c:when test="${empty learner.filesUploaded}">0</c:when><c:otherwise>1</c:otherwise></c:choose>;
-			var finishUrl= "<html:rewrite page='/learner.do?mode=${mode}&method=finish&toolSessionID=${learner.toolSessionID}'/>";
 			if(lockOnFinished && uploadFileNum==0){
 				if(confirm("<fmt:message key='learner.finish.without.upload'/>"))
-					location.href= finishUrl;
+					location.href= tUrl;
 				else
 					return false;
 			}else
-				location.href= finishUrl;
+				location.href= tUrl;
+		
+		}
+		function finish(){
+			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
+			return submitCount(finishUrl);
+		}
+		function notebook(){
+			var continueUrl= "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
+			return submitCount(continueUrl);
 		}
 	</script>
-	<html:javascript formName="SbmtLearnerForm" method="validateForm" />
 
 </head>
 
 <body>
 	<div id="page-learner">
 		<h1 class="no-tabs-below">
-			<c:out value="${learner.contentTitle}" escapeXml="false" />
+			<c:out value="${sessionMap.title}" escapeXml="false" />
 		</h1>
 
 		<div id="header-no-tabs-learner">
@@ -43,8 +50,13 @@
 				<tr>
 					<td colspan="2">
 						<h2>
-							<c:out value="${learner.contentInstruction}" escapeXml="false" />
-						</h2xs>
+							<c:out value="${sessionMap.instruction}" escapeXml="false" />
+						</h2>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<%@include file="/common/messages.jsp"%>
 					</td>
 				</tr>
 
@@ -137,15 +149,12 @@
 
 			</table>
 
-			<c:if test="${mode != 'teacher'}">
-				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" focus="filePath" onsubmit="return validateForm(this);">
-					<input type="hidden" name="mode" value="${mode}">
-					<p>
-						<html:errors />
-					</p>
+			<c:if test="${sessionMap.mode != 'teacher'}">
+				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data">
+					<html:hidden property="sessionMapID"/>
 					<table>
 						<!-- Hidden fields -->
-						<html:hidden property="toolSessionID" value="${learner.toolSessionID}" />
+						<html:hidden property="toolSessionID" value="${sessionMap.toolSessionID}" />
 
 						<!--File path row -->
 						<tr>
@@ -153,7 +162,7 @@
 								<fmt:message key="label.learner.filePath" />
 							</td>
 							<td>
-								<html:file property="filePath" disabled="${learner.locked}" size="40" tabindex="1" />
+								<html:file property="file" disabled="${sessionMap.finishLock}" size="40" tabindex="1" />
 							</td>
 						</tr>
 						<!--File Description row -->
@@ -162,17 +171,26 @@
 								<fmt:message key="label.learner.fileDescription" />
 							</td>
 							<td>
-								<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="fileDescription" disabled="${learner.locked}" />
+								<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="description" disabled="${sessionMap.finishLock}" />
 							</td>
 						</tr>
 						<tr>
 							<td colspan="2" align="center">
-								<html:submit disabled="${learner.locked}" styleClass="button">
+								<html:submit disabled="${sessionMap.finishLock}" styleClass="button">
 									<fmt:message key="label.learner.upload" />
 								</html:submit>
-								<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="button">
-									<fmt:message key="label.learner.finished" />
-								</html:button>
+								<c:choose>
+									<c:when test="${sessionMap.reflectOn}">
+										<html:button property="notebookButton" onclick="javascript:notebook();" disabled="${sessionMap.finishLock}"  styleClass="button">
+											<fmt:message key="label.continue" />
+										</html:button>
+									</c:when>
+									<c:otherwise>
+										<html:button property="finishButton" onclick="javascript:finish();" disabled="${sessionMap.finishLock}" styleClass="button">
+											<fmt:message key="button.finish" />
+										</html:button>
+									</c:otherwise>
+								</c:choose>								
 							</td>
 						</tr>
 					</table>

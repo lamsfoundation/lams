@@ -1,22 +1,4 @@
 
-<form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
-	<form-property name="filePath"
-				   type="org.apache.struts.upload.FormFile"/>
-	
-	<form-property name="fileDescription"
-				   type="java.lang.String"/>
-	
-	<form-property name="toolSessionID"
-				   type="java.lang.Long"/>
-				   
-	<form-property name="userID"
-				   type="java.lang.Long"/>		
-
-	<form-property name="filesUploaded"
-				   type="java.util.List"/>
-</form-bean>
-
-
 <form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
 
 	<form-property name="toolSessionID"

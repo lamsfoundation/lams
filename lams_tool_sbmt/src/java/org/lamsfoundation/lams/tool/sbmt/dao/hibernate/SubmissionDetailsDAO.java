@@ -42,10 +42,8 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 public class SubmissionDetailsDAO extends BaseDAO implements
 		ISubmissionDetailsDAO {
 	
-	private static final String TABLENAME = "tl_lasbmt11_submission_details";
-	
-	private static final String FIND_BY_SESSION = "from " + TABLENAME +
-													" in class " + SubmissionDetails.class.getName() +
+	private static final String FIND_BY_SESSION = "from " + 
+													SubmissionDetails.class.getName() +
 													" where session_id=?";
 	
 	private static final String FIND_DISTINCT_USER = " select distinct learner.userID from SubmissionDetails details " +

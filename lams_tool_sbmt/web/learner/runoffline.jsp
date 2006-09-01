@@ -2,14 +2,18 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <html:html>
 <head>
 	<lams:headItems />
 	<script type="text/javascript">
-		var locked =  <c:out value="${learner.locked}"/>;
 		function finish(){
-			var finishUrl= "<html:rewrite page='/learner.do?method=finish&toolSessionID=${learner.toolSessionID}'/>";
+			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
+			location.href= finishUrl;
+		}
+		function notebook(){
+			var finishUrl= "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
 			location.href= finishUrl;
 		}
 	</script>
@@ -35,11 +39,20 @@
 				</tr>
 			</table>
 			
-									<div class="right-buttons">
-							<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="button">
-								<fmt:message key="button.finish" />
-							</html:button>
-						</div>
+			<div class="right-buttons">
+				<c:choose>
+					<c:when test="${sessionMap.reflectOn}">
+						<html:button property="continueButton" onclick="javascript:notebook();" disabled="${sessionMap.finishLock}"  styleClass="button">
+							<fmt:message key="label.continue" />
+						</html:button>
+					</c:when>
+					<c:otherwise>
+						<html:button property="finishButton" onclick="javascript:finish();" disabled="${sessionMap.finishLock}" styleClass="button">
+							<fmt:message key="button.finish" />
+						</html:button>
+					</c:otherwise>
+				</c:choose>				
+			</div>
 		</div>
 		<div id="footer-learner"></div>
 	</div>

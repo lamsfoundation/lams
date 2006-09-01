@@ -11,12 +11,14 @@ create table tl_lasbmt11_content (
    content_id bigint not null,
    title varchar(64) not null,
    instruction text,
-   define_later bit not null,
-   run_offline bit not null,
+   define_later smallint not null,
+   run_offline smallint not null,
    offline_instruction text,
    online_instruction text,
-   content_in_use bit,
-   lock_on_finished bit,
+   content_in_use smallint,
+   lock_on_finished smallint,
+   reflect_instructions varchar(255), 
+   reflect_on_activity smallint, 
    primary key (content_id)
 );
 create table tl_lasbmt11_instruction_files (
@@ -45,8 +47,11 @@ create table tl_lasbmt11_session (
 create table tl_lasbmt11_session_learners (
    learner_id bigint not null auto_increment,
    user_id bigint,
-   finished bit,
+   finished smallint,
    session_id bigint,
+   first_name varchar(255), 
+   login_name varchar(255), 
+   last_name varchar(255), 
    primary key (learner_id)
 );
 create table tl_lasbmt11_submission_details (
@@ -66,5 +71,5 @@ alter table tl_lasbmt11_session_learners add index FKC56CD05893C861A (session_id
 alter table tl_lasbmt11_submission_details add index FK1411A53C93C861A (session_id), add constraint FK1411A53C93C861A foreign key (session_id) references tl_lasbmt11_session (session_id);
 alter table tl_lasbmt11_submission_details add index FK1411A53C10BBAB1B (learner_id), add constraint FK1411A53C10BBAB1B foreign key (learner_id) references tl_lasbmt11_session_learners (learner_id);
 
-INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(${default_content_id},"Submit files","Upload your files below...",0,0,0,0);
+INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished,reflect_on_activity) values(${default_content_id},"Submit files","Upload your files below...",0,0,0,0,0);
 SET FOREIGN_KEY_CHECKS=1;

@@ -41,7 +41,7 @@ public class FileDetailsDTO implements Serializable{
 
 	private Logger log = Logger.getLogger(FileDetailsDTO.class);
 	private static final long serialVersionUID = 2964711101016972263L;
-	private Long userID;
+	private Integer userID;
 	private Long submissionID;
 	private Long reportID;
 	private String filePath;
@@ -217,14 +217,14 @@ public class FileDetailsDTO implements Serializable{
 	/**
 	 * @return Returns the userID.
 	 */
-	public Long getUserID() {
+	public Integer getUserID() {
 		return userID;
 	}
 
 	/**
 	 * @param userID The userID to set.
 	 */
-	public void setUserID(Long userID) {
+	public void setUserID(Integer userID) {
 		this.userID = userID;
 	}
 

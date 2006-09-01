@@ -27,7 +27,7 @@
 
         <property
             name="userID"
-            type="java.lang.Long"
+            type="java.lang.Integer"
             update="true"
             insert="true"
             column="user_id"
@@ -70,6 +70,30 @@
             />
 
         </set>
+
+        <property
+            name="firstName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="first_name"
+        />
+
+        <property
+            name="loginName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="login_name"
+        />
+
+        <property
+            name="lastName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="last_name"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named
