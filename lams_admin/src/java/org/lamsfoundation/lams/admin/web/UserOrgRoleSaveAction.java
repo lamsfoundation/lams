@@ -120,6 +120,8 @@ public class UserOrgRoleSaveAction extends Action {
 			uors.add(newUor);
 		}
 		uo.setUserOrganisationRoles(uors);
+		Set uos = organisation.getUserOrganisations();
+		uos.add(uo);
 	}
 	
 	private IUserManagementService getService(){
