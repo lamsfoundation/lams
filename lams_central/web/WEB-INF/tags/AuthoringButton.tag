@@ -37,6 +37,7 @@
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>
 <%@ attribute name="toolSignature" required="true" rtexprvalue="true" %>
 <%@ attribute name="toolContentID" required="true" rtexprvalue="true" %>
+<%@ attribute name="contentFolderID" required="true" rtexprvalue="true" %>
 <%@ attribute name="clearSessionActionUrl" required="true" rtexprvalue="true" %>
 
 <%-- Optional attribute --%>
@@ -64,7 +65,7 @@
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}'/>";
+       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
     	document.getElementById("${formID}").submit();
@@ -81,7 +82,7 @@
 		}
     }  				
 </script>				
-<p align="right">
+<p style="text-align: right">
 	<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button">
 		<fmt:message key="${saveButtonLabelKey}" /> 
 	</html:link>
