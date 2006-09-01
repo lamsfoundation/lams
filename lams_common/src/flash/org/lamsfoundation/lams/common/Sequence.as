@@ -56,6 +56,7 @@ class Sequence {
 	private var _seqCreatedDate:Date;
 	private var _seqStartDate:Date;
 	private var _seqScheduleStartDate:Date;
+	private var _seqScheduleStartDateStr:String;
 	
 	// organisation data
 	private var _organisationID:Number;
@@ -120,6 +121,7 @@ class Sequence {
 		_seqCreatedDate = dto.createDateTime;
 		_seqStartDate = dto.startDateTime;
 		_seqScheduleStartDate = dto.scheduleStartDate;
+		_seqScheduleStartDateStr = dto.scheduleStartDateStr;
 		
 		_organisationID = dto.organisationID;
 		_organisationName = dto.organisationName;
@@ -277,6 +279,8 @@ class Sequence {
 		return _seqCreatedDate;
 	}
 	
+	
+	
 	public function setStartDateTime(seqStartDate:Date){
 		_seqStartDate = seqStartDate;
 	}
@@ -308,8 +312,18 @@ class Sequence {
 		_seqScheduleStartDate = seqScheduleDate;
 	}
 	
+	public function setScheduleDateTimeStr(seqScheduleDateStr:String){
+		_seqScheduleStartDateStr = seqScheduleDateStr;
+	}
+	
+	public function get scheduledatestr():String {
+		return _seqScheduleStartDateStr;
+	}
+	
 	public function getScheduleDateTime():String{
-		var dateFormated:String;
+		
+		
+		/**var dateFormated:String;
 		var timeFormated:String;
 		if (_seqScheduleStartDate.getDate() == undefined || _seqScheduleStartDate.getDate() == null){
 			//dateFormated = "Not Scheduled"
@@ -328,6 +342,10 @@ class Sequence {
 			dateFormated = (_seqScheduleStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqScheduleStartDate.getMonth()))+" "+_seqScheduleStartDate.getFullYear());;
 		}
 		return timeFormated + " " + dateFormated;
+		
+		*/
+		
+		return this.scheduledatestr;
 	}
 	
 	public function get scheduledate():Date{
