@@ -24,7 +24,7 @@
 
 	<security-role>
 		<description>Can running and monitoring a learning session</description>
-		<role-name>STAFF</role-name>
+		<role-name>MONITOR</role-name>
 	</security-role>
 
 	<security-role>

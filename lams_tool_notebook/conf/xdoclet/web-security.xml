@@ -9,7 +9,7 @@
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>TEACHER</role-name>
-    		<role-name>STAFF</role-name>
+    		<role-name>MONITOR</role-name>
     		<role-name>AUTHOR</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
@@ -32,7 +32,7 @@
 		    <url-pattern>/monitoring.do</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
-    		<role-name>STAFF</role-name>
+    		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -45,7 +45,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
-    		<role-name>STAFF</role-name>
+    		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
@@ -80,7 +80,7 @@
 
 	<security-role>
 		<description>Can running and monitoring a learning session</description>
-		<role-name>STAFF</role-name>
+		<role-name>MONITOR</role-name>
 	</security-role>
 
 	<security-role>
