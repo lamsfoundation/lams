@@ -80,7 +80,6 @@ public class UserOrgSaveAction extends Action{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		DynaActionForm userOrgForm = (DynaActionForm)form;
-		log.debug("orgId: "+userOrgForm.get("orgId"));
 				
 		Integer orgId = (Integer)userOrgForm.get("orgId");
 		request.setAttribute("org",orgId);
@@ -94,8 +93,7 @@ public class UserOrgSaveAction extends Action{
 		
 		String[] userIds = (String[])userOrgForm.get("userIds");
 		List<String> userIdList = Arrays.asList(userIds);
-		log.debug("userIdList: "+userIdList);
-		List newUserOrganisations = new ArrayList();
+		log.debug("new user membership of orgId="+orgId+" will be: "+userIdList);
 		
 		// remove UserOrganisations that aren't in form data
 		Iterator iter = uos.iterator();
@@ -108,10 +106,11 @@ public class UserOrgSaveAction extends Action{
 				Set userUos = user.getUserOrganisations();
 				userUos.remove(uo);
 				user.setUserOrganisations(userUos);
-				log.debug("removed: "+userId);
+				log.debug("removed userId="+userId+" from orgId="+orgId);
 			}
 		}
 		// add UserOrganisations that are in form data
+		List newUserOrganisations = new ArrayList();
 		for(int i=0; i<userIdList.size(); i++){
 			Integer userId = new Integer((String)userIdList.get(i));
 			Iterator iter2 = uos.iterator();
@@ -127,18 +126,17 @@ public class UserOrgSaveAction extends Action{
 				User user = (User)getService().findById(User.class,userId);
 				UserOrganisation uo = new UserOrganisation(user,organisation);
 				newUserOrganisations.add(uo);
-				/*Role role = (Role)getService().findByProperty(Role.class,"name",Role.LEARNER).get(0);
-		        UserOrganisationRole uor = new UserOrganisationRole(uo,role);
-		        getService().save(uor);*/
 			}
 		}
 		
 		organisation.setUserOrganisations(uos);
 		getService().save(organisation);
 		
+		// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
 		if(newUserOrganisations.isEmpty()){
+			log.debug("no new users to add to orgId="+orgId);
 			return mapping.findForward("userlist");
-		}else{  // send user to screen where they can assign roles for the newly added users
+		}else{
 			request.setAttribute("roles",filterRoles(rolelist,false, organisation.getOrganisationType()));
 			request.setAttribute("newUserOrganisations",newUserOrganisations);
 			request.setAttribute("orgId",orgId);
