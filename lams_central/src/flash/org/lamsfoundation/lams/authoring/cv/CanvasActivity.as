@@ -291,7 +291,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 		}
 			
-				Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
+		
+		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		setStyles();
 		
 		var theIcon_mc:MovieClip;
@@ -359,7 +360,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		_visible = true;
+		if (_activity.runOffline){
+			bgNegative = "true"
+			setStyles();
+		}
 	}
+
 	
 	private function localOnRollOver():Void{
 		_ccm.showCustomCM(_ccm.loadMenu("activity"))
@@ -537,6 +543,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				}
 			
 		}
+		
     }
     
 
