@@ -217,7 +217,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_lesson'), instanceName:"goLessonTab"});
         go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_schedule'), instanceName:"goScheduleTab"});
         go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_learners'), instanceName:"goLearnerTab"});
-		go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_todo'), instanceName:"goTodoTab"});
+		//go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_todo'), instanceName:"goTodoTab"});
 
 		/*=================
             HELP MENU
