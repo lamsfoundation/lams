@@ -316,6 +316,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}else if(_ddm.readOnly){
 			saveDesignToServerAs(Workspace.MODE_SAVEAS);
 		}else{
+			Cursor.showCursor(Application.C_HOURGLASS);
 			saveDesignToServer();
 		}
 	}
@@ -443,7 +444,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			
 			checkValidDesign();
 			checkReadOnlyDesign();
-			
+			Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		}
 	}
 	
