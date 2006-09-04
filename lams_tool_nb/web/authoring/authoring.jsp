@@ -3,7 +3,7 @@
 
 <%@ include file="/includes/taglibs.jsp"%>
 
-<html:html>
+<lams:html>
 <head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
@@ -107,4 +107,4 @@
 		</html:form>
 	</div>
 </body>
-</html:html>
+</lams:html>
