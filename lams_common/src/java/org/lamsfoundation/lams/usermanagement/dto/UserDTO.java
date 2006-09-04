@@ -42,7 +42,7 @@ public class UserDTO {
    // private CSSThemeVisualElement theme;
     private CSSThemeBriefDTO flashTheme;
     private CSSThemeBriefDTO htmlTheme;
-    private TimeZone timezone;
+    private TimeZone timeZone;
 
 //	public UserDTO(Integer userID, String firstName, String lastName,
 //			String login, String email, CSSThemeVisualElement theme) {		
@@ -68,7 +68,7 @@ public class UserDTO {
 		this.email = email;
 		this.flashTheme = flashTheme;
 		this.htmlTheme = htmlTheme;
-		this.timezone = timezone;
+		this.timeZone = timezone;
 	}
 	
 	/**
@@ -156,7 +156,7 @@ public class UserDTO {
 	
 	/** User's timezone. At the moment, this is always the server's timezone */
 	public TimeZone getTimeZone() {
-		return timezone;
+		return timeZone;
 	}
 
 //	public CSSThemeVisualElement getTheme() {
