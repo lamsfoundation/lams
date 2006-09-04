@@ -70,6 +70,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			hideFlow();
 			_app.getCanvas().openDesignBySelection();
 		}else if(tgt.indexOf("save") != -1){
+			Cursor.showCursor(Application.C_HOURGLASS);
 			hideFlow();
 			_app.getCanvas().saveDesign();
 		}else if(tgt.indexOf("copy") != -1){
