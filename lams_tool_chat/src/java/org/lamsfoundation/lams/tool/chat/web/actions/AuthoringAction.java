@@ -385,7 +385,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	/**
 	 * Updates SessionMap using Chat content.
 	 * 
-	 * @param map
 	 * @param chat
 	 * @param mode 
 	 */
