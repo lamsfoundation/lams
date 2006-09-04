@@ -18,7 +18,7 @@ create table tl_lafrum11_attachment (
    forum_uid bigint,
    message_uid bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lafrum11_forum (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -45,7 +45,7 @@ create table tl_lafrum11_forum (
    reflect_instructions varchar(255),
    reflect_on_activity smallint, 
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lafrum11_forum_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -55,7 +55,7 @@ create table tl_lafrum11_forum_user (
    login_name varchar(255),
    session_finished smallint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lafrum11_message (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -74,21 +74,21 @@ create table tl_lafrum11_message (
    hide_flag smallint,
    report_id bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lafrum11_message_seq (
    uid bigint not null auto_increment,
    root_message_uid bigint,
    message_uid bigint,
    message_level smallint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lafrum11_report (
    uid bigint not null auto_increment,
    comment text,
    release_date datetime,
    mark float,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lafrum11_tool_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -99,7 +99,7 @@ create table tl_lafrum11_tool_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-);
+)TYPE=InnoDB;
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 alter table tl_lafrum11_forum add index FK87917942E42F4351 (create_by), add constraint FK87917942E42F4351 foreign key (create_by) references tl_lafrum11_forum_user (uid);

@@ -20,7 +20,7 @@ create table tl_lasbmt11_content (
    reflect_instructions varchar(255), 
    reflect_on_activity smallint, 
    primary key (content_id)
-);
+)TYPE=InnoDB;
 create table tl_lasbmt11_instruction_files (
    uid bigint not null auto_increment,
    uuid bigint,
@@ -29,21 +29,21 @@ create table tl_lasbmt11_instruction_files (
    name varchar(255),
    content_id bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_lasbmt11_report (
    report_id bigint not null auto_increment,
    comments varchar(250),
    marks bigint,
    date_marks_released datetime,
    primary key (report_id)
-);
+)TYPE=InnoDB;
 create table tl_lasbmt11_session (
    session_id bigint not null,
    status integer not null,
    content_id bigint,
    session_name varchar(250),
    primary key (session_id)
-);
+)TYPE=InnoDB;
 create table tl_lasbmt11_session_learners (
    learner_id bigint not null auto_increment,
    user_id bigint,
@@ -53,7 +53,7 @@ create table tl_lasbmt11_session_learners (
    login_name varchar(255), 
    last_name varchar(255), 
    primary key (learner_id)
-);
+)TYPE=InnoDB;
 create table tl_lasbmt11_submission_details (
    submission_id bigint not null auto_increment,
    filePath varchar(250),
@@ -64,7 +64,7 @@ create table tl_lasbmt11_submission_details (
    session_id bigint,
    learner_id bigint,
    primary key (submission_id)
-);
+)TYPE=InnoDB;
 alter table tl_lasbmt11_instruction_files add index FKA75538F9785A173A (content_id), add constraint FKA75538F9785A173A foreign key (content_id) references tl_lasbmt11_content (content_id);
 alter table tl_lasbmt11_session add index FKEC8C77C9785A173A (content_id), add constraint FKEC8C77C9785A173A foreign key (content_id) references tl_lasbmt11_content (content_id);
 alter table tl_lasbmt11_session_learners add index FKC56CD05893C861A (session_id), add constraint FKC56CD05893C861A foreign key (session_id) references tl_lasbmt11_session (session_id);
