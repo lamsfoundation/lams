@@ -18,19 +18,13 @@
 	<title><fmt:message key="activity.title" /></title>
 
 	<script>
-    
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
+      
         function init(){
         
             initTabSize(1);
             
             var tag = document.getElementById("currentTab");
             selectTab(1); //select the default tab;
-            
-            initEditor("Title");
-            initEditor("Instructions");
         }     
         
         function doSelectTab(tabId) {
@@ -77,9 +71,6 @@
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher" 
 					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" defineLater="true" 
 					customiseSessionID="${formBean.sessionMapID}" />
-
-				<lams:HTMLEditor />
-
 			</html:form>
 		</div>
 		<div id="footer"></div>

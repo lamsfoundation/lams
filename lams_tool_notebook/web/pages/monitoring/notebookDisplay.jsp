@@ -13,7 +13,8 @@
 			<fmt:message key="label.created" />
 		</td>
 		<td>
-			${userDTO.entryDTO.createDate }
+			<lams:Date value="${userDTO.entryDTO.createDate }"></lams:Date>
+			
 		</td>
 	</tr>
 	<tr>
@@ -21,7 +22,7 @@
 			<fmt:message key="label.lastModified" />
 		</td>
 		<td>
-			${userDTO.entryDTO.lastModified }
+			<lams:Date value="${userDTO.entryDTO.lastModified }"></lams:Date>
 		</td>
 	</tr>
 

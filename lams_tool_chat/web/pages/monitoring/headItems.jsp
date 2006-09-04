@@ -7,9 +7,6 @@
 
 <!--  Tab Controller Script -->
 <script type="text/javascript">
-	var imgRoot="${lams}images/";
-	var themeName="aqua";
-        
 	function init(){
 		initTabSize(4);
             

@@ -9,11 +9,7 @@
 	<title><fmt:message key="activity.title" /></title>
 
 	<script type="text/javascript">
-    
-    	var imgRoot="<lams:LAMSURL />images/";
-	    var themeName="aqua";
-        
-        function init(){
+		function init(){
 			var showBasicContent = "${requestScope.showBasicContent}";
 			if (showBasicContent != "true") {
 	            initTabSize(3);

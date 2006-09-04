@@ -46,8 +46,6 @@
 			<lams:FCKEditor id="forum.instructions"
 				value="${formBean.forum.instructions}"
 				contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor>
-
-			<%--			<lams:SetEditor id="forum.instructions" text="${formBean.forum.instructions}" key="label.authoring.basic.instruction"/>--%>
 		</td>
 	</tr>
 </table>

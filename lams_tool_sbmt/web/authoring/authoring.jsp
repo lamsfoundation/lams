@@ -21,10 +21,6 @@
 	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 	
 	<script type="text/javascript">
-    
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
         function init(){
         
             initTabSize(3);
@@ -69,11 +65,9 @@
 		</div>
 
 		<div id="content">
-			<table>
-			<tr><td>
+
 			<%@ include file="/common/messages.jsp"%>
-			</td></tr>
-			</table>
+
 			
 			<html:form action="authoring" method="post" styleId="authoringForm" enctype="multipart/form-data">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />

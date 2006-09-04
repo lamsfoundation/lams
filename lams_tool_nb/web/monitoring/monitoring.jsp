@@ -22,9 +22,6 @@
 
 	<script type="text/javascript">
 
-		var imgRoot="${lams}images/";
-	    var themeName="aqua";
-	
 		 function init(){
             initTabSize(4);
             var tag = document.getElementById("currentTab");

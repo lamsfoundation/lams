@@ -30,6 +30,5 @@
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 			toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" 
 			accessMode="teacher" defineLater="yes" customiseSessionID="${formBean.sessionMapID}" />
-		<lams:HTMLEditor />
 	</div>
 </html:form>

@@ -9,9 +9,6 @@
 	<!-- ********************  CSS ********************** -->
 	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
 	<script type="text/javascript">
-		var imgRoot="${lams}images/";
-	    var themeName="aqua";
-	
 		 function init(){
             initTabSize(4);
             
@@ -20,11 +17,6 @@
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-            
-            initEditor("Title");
-            initEditor("Instructions");
-            initEditor("Comments");
-            
         }   
         
 		function doSelectTab(tabId) {
@@ -118,12 +110,9 @@
 				<!-- tab content 4 (Stats) -->
 				<lams:TabBody id="4" titleKey="label.monitoring.heading.stats.desc" page="parts/statistic.jsp" />
 				<!-- end of content (Stats) -->
-		
-
 			</html:form>
 		</div>
 		<div id="footer"></div>
 	</div>
-	<lams:HTMLEditor />
 </body>
 </html:html>
