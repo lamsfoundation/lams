@@ -5,7 +5,7 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<lams:html locale="true">
+<lams:html>
   	<head>    
 	    <title><c:out value="${NbExportForm.title}"/></title>
 	  	
