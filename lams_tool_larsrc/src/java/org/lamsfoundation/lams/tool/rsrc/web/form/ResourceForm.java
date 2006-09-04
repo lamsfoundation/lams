@@ -84,6 +84,7 @@ public class ResourceForm extends ActionForm  {
 	    	resource.setDefineLater(false);
 	    	resource.setRunAuto(false);
 	    	resource.setRunOffline(false);
+	    	resource.setReflectOnActivity(false);
     	}
     }
 
