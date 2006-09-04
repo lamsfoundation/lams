@@ -23,6 +23,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.dto;
 
+import java.util.TimeZone;
+
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 /**
  * @author Manpreet Minhas
@@ -35,10 +37,12 @@ public class UserDTO {
 	private String login;
 	private String localeLanguage;
 	private String localeCountry;
+	private String direction;
     private String email;
    // private CSSThemeVisualElement theme;
     private CSSThemeBriefDTO flashTheme;
     private CSSThemeBriefDTO htmlTheme;
+    private TimeZone timezone;
 
 //	public UserDTO(Integer userID, String firstName, String lastName,
 //			String login, String email, CSSThemeVisualElement theme) {		
@@ -51,17 +55,20 @@ public class UserDTO {
 //	}
 	
 	public UserDTO(Integer userID, String firstName, String lastName,
-			String login, String localeLanguage, 
-			String localeCountry, String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme) {		
+			String login, String localeLanguage,  String localeCountry, String direction, 
+			String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme,
+			TimeZone timezone) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.login = login;
 		this.localeCountry = localeCountry;
 		this.localeLanguage = localeLanguage;
+		this.direction = direction;
 		this.email = email;
 		this.flashTheme = flashTheme;
 		this.htmlTheme = htmlTheme;
+		this.timezone = timezone;
 	}
 	
 	/**
@@ -142,6 +149,16 @@ public class UserDTO {
 		return localeLanguage;
 	}
 	
+	/** Should the page be displayed left to right (LTR) or right to left (RTL) */
+	public String getDirection() {
+		return direction;
+	}
+	
+	/** User's timezone. At the moment, this is always the server's timezone */
+	public TimeZone getTimeZone() {
+		return timezone;
+	}
+
 //	public CSSThemeVisualElement getTheme() {
 //		return theme;
 //	}

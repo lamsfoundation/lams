@@ -13,7 +13,7 @@
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<lams:css/>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
@@ -79,5 +79,5 @@
 </body>
 
 
-</html:html>
+</lams:html>
 

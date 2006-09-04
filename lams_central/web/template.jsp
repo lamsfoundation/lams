@@ -6,7 +6,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html:html locale = "true">
+<lams:html>
 <head>
 	<html:base/>
 	<title><fmt:message><tiles:getAsString name="titleKey"/></fmt:message></title>
@@ -29,4 +29,4 @@
 	</div>
 </div>
 </body>
-</html:html>
+</lams:html>

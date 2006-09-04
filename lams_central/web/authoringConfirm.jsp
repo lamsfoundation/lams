@@ -2,7 +2,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-html" prefix="html"%>
-<html>
+<lams:html>
 	<head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css />
@@ -37,4 +37,4 @@
 			</tr>
 		</table>
 	</body>
-</html>
+</lams:html>

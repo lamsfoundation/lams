@@ -59,6 +59,16 @@
             unique="false"
         />
 
+        <property
+            name="direction"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="direction"
+            length="3"
+            not-null="false"
+            unique="false"
+        />
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-SupportedLocale.xml

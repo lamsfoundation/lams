@@ -4,7 +4,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO" %>
-<HTML>
+<lams:html>
 <HEAD>
 <META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <%
@@ -269,4 +269,4 @@ function checkSaved(){
 		</object>
 	</noscript>
 </BODY>
-</HTML>
+</lams:html>

@@ -106,7 +106,11 @@ public class ConfigurationKeys {
 
 	public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
 
+	/** Default locale for the server. Originally en_AU */
 	public static String SERVER_LANGUAGE = "ServerLanguage";
+
+	/** Direction (left to right, right to left) for writing on HTML pages. Originally LTR */
+	public static String SERVER_PAGE_DIRECTION = "ServerPageDirection";
 
 	public static String DICTIONARY_DATES = "DictionaryDates";
 

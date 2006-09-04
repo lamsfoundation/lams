@@ -27,7 +27,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -37,6 +39,7 @@ import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.LanguageUtil;
 
 /** 
  *        @hibernate.class
@@ -712,18 +715,17 @@ public class User implements Serializable,Comparable {
     }
     public UserDTO getUserDTO(){
     	String languageIsoCode = null;
+    	String countryIsoCode = null;
+    	String direction = null;
     	if (locale != null) {
     		languageIsoCode = locale.getLanguageIsoCode();
+    		countryIsoCode = locale.getCountryIsoCode();
+    		direction = locale.getDirection();
     	} else {
-    		// get the server language
-    		String serverLang = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE); 
-    		
-    		if ( serverLang != null) {
-    			languageIsoCode = serverLang;
-    		} else {
-    			// fallback to english
-    			languageIsoCode = "en";
-    		}
+    		String defaults[] = LanguageUtil.getDefaultLangCountry();
+    		languageIsoCode = defaults[0];
+    		countryIsoCode=defaults[1];
+    		direction=LanguageUtil.getDefaultDirection();
     	}
     	
     	return new UserDTO(this.userId,
@@ -731,10 +733,12 @@ public class User implements Serializable,Comparable {
 							this.lastName,
 							this.login,
 							languageIsoCode,
-							locale != null? locale.getCountryIsoCode() : null,
+							countryIsoCode,
+							direction,
 							this.email,
 							new CSSThemeBriefDTO(this.flashTheme),
-							new CSSThemeBriefDTO(this.htmlTheme));
+							new CSSThemeBriefDTO(this.htmlTheme),
+							TimeZone.getDefault());
     }
 	
 	/**This method checks whether user is a member of the 

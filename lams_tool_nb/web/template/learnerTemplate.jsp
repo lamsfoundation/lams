@@ -10,7 +10,7 @@
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<lams:css />
 	<title><fmt:message key="activity.title"/></title>
@@ -22,4 +22,4 @@
 	<tiles:insert attribute="content" />
 	
 </body>
-</html:html>
+</lams:html>

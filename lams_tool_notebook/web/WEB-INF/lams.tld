@@ -24,6 +24,26 @@
    </tag>
    <tag>
 
+      <description>Render html tag with direction and language</description>
+      <display-name>Render html tag with direction and language</display-name>
+      <icon>    
+      </icon>
+      <name>html</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Render html tag with direction and language</description>
+         <name>xhtml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
       <display-name>generate unique ID</display-name>
       <icon>    
@@ -306,8 +326,13 @@
 	    <name>ExportPortOutput</name>
 		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
-	<tag-file>
+   	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
    	</tag-file>  
+   	<tag-file>
+	    <name>DefineLater</name>
+		<path>/WEB-INF/tags/DefineLater.tag</path>
+   	</tag-file>  
+
 </taglib>

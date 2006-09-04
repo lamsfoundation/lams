@@ -10,7 +10,7 @@
 <%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser()); %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
+<lams:html>
 <head>
 	<title>LAMS::<fmt:message key="index.welcome"/></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -100,5 +100,5 @@
 		</div>
 	</div>
 </body>	
-</html>
+</lams:html>
 

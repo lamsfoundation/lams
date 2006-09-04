@@ -163,43 +163,43 @@ VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.',
 
 -- Supported Locales
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (1, 'en', 'AU', 'English (Australia)', 'RTL');
+VALUES (1, 'en', 'AU', 'English (Australia)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (2, 'es', 'ES', 'Español', 'RTL');
+VALUES (2, 'es', 'ES', 'Español', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (3, 'mi', 'NZ', 'Māori', 'RTL');
+VALUES (3, 'mi', 'NZ', 'M�?ori', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (4, 'de', 'DE', 'Deutsch', 'RTL');
+VALUES (4, 'de', 'DE', 'Deutsch', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (5, 'zh', 'CN', '简体中文', 'RTL');
+VALUES (5, 'zh', 'CN', '简体中文', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (6, 'fr', 'FR', 'Français', 'RTL');
+VALUES (6, 'fr', 'FR', 'Français', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (7, 'it', 'IT', 'Italiano', 'RTL');
+VALUES (7, 'it', 'IT', 'Italiano', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (8, 'no', 'NO', 'Norsk', 'RTL');
+VALUES (8, 'no', 'NO', 'Norsk', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (9, 'sv', 'SE', 'Svenska', 'RTL');
+VALUES (9, 'sv', 'SE', 'Svenska', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (10, 'ko', 'KR', '한국어', 'RTL');
+VALUES (10, 'ko', 'KR', '한국어', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (11, 'pl', 'PL', 'Polski', 'RTL');
+VALUES (11, 'pl', 'PL', 'Polski', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (12, 'pt', 'BR', 'Português (Brasil)', 'RTL');
+VALUES (12, 'pt', 'BR', 'Português (Brasil)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (13, 'hu', 'HU', 'Magyar', 'RTL');
+VALUES (13, 'hu', 'HU', 'Magyar', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (14, 'bg', 'BG', 'Български', 'RTL');
+VALUES (14, 'bg', 'BG', 'Българ�?ки', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (15, 'cy', 'GB', 'Cymraeg (Cymru)', 'RTL');
+VALUES (15, 'cy', 'GB', 'Cymraeg (Cymru)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (16, 'th', 'TH', 'Thai', 'RTL');
+VALUES (16, 'th', 'TH', 'Thai', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (17, 'el', 'GR', 'Ελληνικά', 'RTL');
+VALUES (17, 'el', 'GR', 'Ελληνικά', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (18, 'nl', 'BE', 'Nederlands (België)', 'RTL');
+VALUES (18, 'nl', 'BE', 'Nederlands (België)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (19, 'ar', 'JO', 'عربي', 'LTR');
+VALUES (19, 'ar', 'JO', 'عربي', 'RTL');
 
 -- which current tool supports the old 1.0.x tools?
 INSERT INTO lams_tool_import_support VALUES (1, 'lafrum11', 'messageboard');
@@ -216,4 +216,3 @@ INSERT INTO lams_tool_import_support VALUES (12, 'lantbk11', 'journal');
 -- external server mapping to a lams organisation
 INSERT INTO lams_ext_server_org_map VALUES
   (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','http://dummy','\0',7);
-

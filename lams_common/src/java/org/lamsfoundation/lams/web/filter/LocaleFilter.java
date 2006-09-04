@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -52,9 +53,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class LocaleFilter extends OncePerRequestFilter {
 	private String encoding;
 	
-	//	private static final String DEFAULT_LANGUAGE = "en";
-//	private static final String DEFUALT_COUNTRY = "AU";
 	public static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
+	/** Key used in request to get the required direction. Used by the HTML tag */
+	public static final String DIRECTION = "page_direction";
+	
 	/**
 	 * Set the encoding to use for requests. This encoding will be
 	 * passed into a ServletRequest.setCharacterEncoding call.
@@ -72,6 +74,8 @@ public class LocaleFilter extends OncePerRequestFilter {
     		request.setCharacterEncoding("UTF-8");
     	
     	Locale preferredLocale = null;
+    	String direction = null; 
+    	TimeZone tz = null;
     	//Comment: This getParameter() cause problem when reading WDDX packet, which need request.getInputStream() method.
     	//user set has first prority:
 //    	String locale = request.getParameter("locale");
@@ -83,6 +87,8 @@ public class LocaleFilter extends OncePerRequestFilter {
 			HttpSession sharedsession = SessionManager.getSession(); 
 			UserDTO user = (UserDTO) sharedsession.getAttribute(AttributeNames.USER);
 			if(user != null){
+				direction = user.getDirection();
+				tz = user.getTimeZone();
 				String lang = user.getLocaleLanguage();
 				String country = user.getLocaleCountry();
 				// would prefer both the language and country but that's not always feasible.
@@ -94,7 +100,15 @@ public class LocaleFilter extends OncePerRequestFilter {
     	}
 		if(preferredLocale == null){
         	//if request does not have, set it default then.
-        	preferredLocale = new Locale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
+			String defaults[] = LanguageUtil.getDefaultLangCountry();
+        	preferredLocale = new Locale(defaults[0]!=null?defaults[0]:"",
+        								 defaults[1]!=null?defaults[1]:"");
+		} 
+		if(direction == null){
+			direction = LanguageUtil.getDefaultDirection();
+		}
+		if(tz == null) {
+			LanguageUtil.getDefaultTimeZone();
 		}
 
     	HttpSession session = request.getSession(false);
@@ -104,15 +118,15 @@ public class LocaleFilter extends OncePerRequestFilter {
             if (preferredLocale != null) {
                 session.setAttribute(PREFERRED_LOCALE_KEY, preferredLocale);
                 Config.set(session, Config.FMT_LOCALE, preferredLocale);
+                session.setAttribute(DIRECTION, direction);
             }
-            Config.set(session, Config.FMT_TIME_ZONE, TimeZone.getDefault());
+            Config.set(session, Config.FMT_TIME_ZONE, tz);
         }
         if (preferredLocale != null && !(request instanceof LocaleRequestWrapper)) {
             request = new LocaleRequestWrapper(request, preferredLocale);
             LocaleContextHolder.setLocale(preferredLocale);
         }
 
-        
         chain.doFilter(request, response);
         
         // Reset thread-bound LocaleContext.

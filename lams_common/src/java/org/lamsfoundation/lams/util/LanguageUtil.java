@@ -23,7 +23,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
-import java.util.Locale;
+import java.util.TimeZone;
+
 
 /**
  * Various internationalisation (internationalization) utilities.
@@ -33,44 +34,57 @@ import java.util.Locale;
  */
 public class LanguageUtil {
 
-    /**
-     * 
-     */
-    public LanguageUtil() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	public static final String DEFAULT_LANGUAGE = "en";
+	public static final String DEFAULT_COUNTRY = "AU";
+	public static final String DEFAULT_DIRECTION = "LTR";
 
-    public static void main(String[] args) {
-        
-        String[] arr = null;
-        
-        Locale defaultLocale = Locale.getDefault();
-        if ( defaultLocale != null ) {
-            System.out.println("Default locale "+defaultLocale.getCountry()
-                    +":"+defaultLocale.getISO3Country()
-                    +":"+defaultLocale.getDisplayCountry()
-                    +":"+defaultLocale.getLanguage()
-                    +":"+defaultLocale.getISO3Language());
-        }
-        printArray(Locale.getISOCountries(), "2 code countries: ");
-        printArray(Locale.getISOLanguages(), "2 code lamguages: ");
-    }
+	/** 
+	 * Get the default language, country, based on entries in the 
+	 * server configuration file. 
+	 * 
+	 * @return String[language, country]
+	 */
+	public static String[] getDefaultLangCountry() {
 
-    /**
-     * @param arr
-     * @param comment
-     */
-    private static void printArray(String[] arr, String comment) {
-        System.out.println(comment);
-        int i=0; 
-        while ( i<arr.length ) {
-            System.out.print(arr[i]);
-            i++;
-            if ( i < arr.length) {
-                System.out.print(", ");
-            }
-        }
-        System.out.println(".\n");
-    }
+    	String languageIsoCode = null;
+    	String countryIsoCode = null;
+
+		String serverLang = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE); 
+		if ( serverLang != null) {
+			// assume either "en" or "en_AU" formats
+			if ( serverLang.length() >= 2)
+				languageIsoCode = serverLang.substring(0,2);
+			if ( serverLang.length() >= 5)
+				countryIsoCode = serverLang.substring(3,5);
+		} 
+
+		// fallback to en_AU
+		if ( languageIsoCode == null )
+			languageIsoCode = DEFAULT_LANGUAGE;
+		if ( countryIsoCode == null )
+			languageIsoCode = DEFAULT_COUNTRY;
+
+		return new String[]{languageIsoCode, countryIsoCode};
+
+	}
+	
+	/** 
+	 * Get the default direction, based on the values in the server configuration file. 
+	 * @return direction
+	 */
+	public static String getDefaultDirection() {
+		String direction = Configuration.get(ConfigurationKeys.SERVER_PAGE_DIRECTION);
+		if ( direction == null )
+			direction = DEFAULT_DIRECTION;
+		return direction;
+	}
+
+	/** 
+	 * Get the default timezone 
+	 * @return timezone
+	 */
+	public static TimeZone getDefaultTimeZone() {
+		return TimeZone.getDefault();
+	}
+
 }

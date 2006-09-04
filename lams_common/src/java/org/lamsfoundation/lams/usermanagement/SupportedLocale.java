@@ -29,11 +29,15 @@ public class SupportedLocale implements Serializable,Comparable {
     /** persistent field */
     private String description;
 
+    /** persistent field */
+    private String direction;
+
     /** full constructor */
-    public SupportedLocale(String languageIsoCode, String countryIsoCode, String description) {
+    public SupportedLocale(String languageIsoCode, String countryIsoCode, String description, String direction) {
         this.languageIsoCode = languageIsoCode;
         this.countryIsoCode = countryIsoCode;
         this.description = description;
+        this.direction = direction;
     }
 
     /** default constructor */
@@ -103,12 +107,30 @@ public class SupportedLocale implements Serializable,Comparable {
 		this.description = description;
 	}
  
+	/** 
+     *            @hibernate.property
+     *             column="direction"
+     *             unique="false"
+     *             length="3"
+     *             not-null="true"
+     *         
+     */
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+
+
 	public String toString() {
 		return new ToStringBuilder(this)
 	            .append("localeId", getLocaleId())
 	            .append("languageIsoCode", getLanguageIsoCode())
 	            .append("countryIsoCode", getCountryIsoCode())
 	            .append("description", getDescription())
+	            .append("direction", getDirection())
 	            .toString();
 	}
 
