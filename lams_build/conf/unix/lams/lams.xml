@@ -33,6 +33,7 @@
 	<LearnerClientVersion>1.0.@datetimestamp@</LearnerClientVersion>
 	<ServerVersionNumber>1.1</ServerVersionNumber>
 	<ServerLanguage>en_AU</ServerLanguage>
+	<ServerPageDirection>LTR</ServerPageDirection>
 	<DictionaryDates>
 		<Dictionary>
 			<language>en_AU</language>

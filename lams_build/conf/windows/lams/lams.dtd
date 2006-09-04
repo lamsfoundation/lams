@@ -1,4 +1,4 @@
-<!ELEMENT Lams (ServerURL,Version,LamsHome,TempDir,DumpDir,EARDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener,CleanupPreviewOlderThanDays,AuthoringClientVersion,MonitorClientVersion,LearnerClientVersion,ServerVersionNumber,ServerLanguage, DictionaryDates,XmppDomain, XmppConference, XmppAdmin, XmppPassword, DefaultFlashTheme, DefaultHTMLTheme)>
+<!ELEMENT Lams (ServerURL,Version,LamsHome,TempDir,DumpDir,EARDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener,CleanupPreviewOlderThanDays,AuthoringClientVersion,MonitorClientVersion,LearnerClientVersion,ServerVersionNumber,ServerLanguage,ServerPageDirection,DictionaryDates,XmppDomain, XmppConference, XmppAdmin, XmppPassword, DefaultFlashTheme, DefaultHTMLTheme)>
 <!ELEMENT ServerURL (#PCDATA)>
 <!ELEMENT Version (#PCDATA)>
 <!ELEMENT LamsHome (#PCDATA)>
@@ -25,6 +25,7 @@
 <!ELEMENT LearnerClientVersion (#PCDATA)>
 <!ELEMENT ServerVersionNumber (#PCDATA)>
 <!ELEMENT ServerLanguage (#PCDATA)>
+<!ELEMENT ServerPageDirection (#PCDATA)>
 <!ELEMENT DictionaryDates (Dictionary+) >
 <!ELEMENT Dictionary (language, createDate)>
 <!ELEMENT language (#PCDATA)>
@@ -35,6 +36,7 @@
 <!ELEMENT XmppPassword (#PCDATA)>
 <!ELEMENT DefaultFlashTheme (#PCDATA)>
 <!ELEMENT DefaultHTMLTheme (#PCDATA)>
+
 
 
 
