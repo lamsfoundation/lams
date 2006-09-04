@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dto;
 
 import java.util.TimeZone;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 /**
  * @author Manpreet Minhas
@@ -157,6 +158,22 @@ public class UserDTO {
 	/** User's timezone. At the moment, this is always the server's timezone */
 	public TimeZone getTimeZone() {
 		return timeZone;
+	}
+	
+	public String toString() {
+		return new ToStringBuilder(this)
+			.append("userID", getUserID())
+			.append("firstName", getFirstName())
+			.append("lastName", getLastName())
+			.append("login", getLogin())
+			.append("localeLanguage", getLocaleLanguage())
+			.append("localeCountry", getLocaleCountry())
+			.append("direction", getDirection())
+			.append("email", getEmail())
+			.append("flashTheme", getFlashTheme())
+			.append("htmlTheme", getHtmlTheme())
+			.append("timeZone", getTimeZone())
+			.toString();
 	}
 
 //	public CSSThemeVisualElement getTheme() {
