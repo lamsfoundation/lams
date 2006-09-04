@@ -91,6 +91,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -101,6 +102,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -176,8 +179,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
-	    
-   	
  	    String totalQuestionCount=generalLearnerFlowDTO.getTotalQuestionCount().toString();
  	    logger.debug("totalQuestionCount: " + totalQuestionCount);
  	    int intTotalQuestionCount= new Integer(totalQuestionCount).intValue();
@@ -424,6 +425,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	 	logger.debug("toolSessionID: " + toolSessionID);
 	 	qaLearningForm.setToolSessionID(toolSessionID);
+
+	 	String userID=request.getParameter("userID");
+	 	logger.debug("userID: " + userID);
+
 	 	
 	 	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
 	    logger.debug("retrieving qaSession: " + qaSession);
@@ -469,6 +474,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 		generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
 
+		generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
+		generalLearnerFlowDTO.setNotebookEntriesVisible(new Boolean(false).toString());
 		request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 		
 		logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
@@ -523,8 +530,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	
     	
     	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, true, false);
-    	
-    	
     	
         return (mapping.findForward(LOAD_LEARNER));
     }
@@ -709,6 +714,39 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    QaQueUsr qaQueUsr=qaService.getQaUserBySession(new Long(userID), qaSession.getUid());
 	    logger.debug("QaQueUsr:" + qaQueUsr);
 	    
+	    /* it is possible that qaQueUsr can be null if the content is set as runoffline and reflection is on*/
+	    if (qaQueUsr == null)
+	    {
+    		logger.debug("attempt creating  user record since it must exist for the runOffline + reflection screens");
+		    HttpSession ss = SessionManager.getSession();
+
+		    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    	logger.debug("retrieving toolUser: " + toolUser);
+	    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+	    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
+
+	    	String userName=toolUser.getLogin(); 
+	    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+	    	
+	    	Long userId=new Long(toolUser.getUserID().longValue());
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+
+	    	 qaQueUsr= new QaQueUsr(userId,
+									userName,
+									fullName,
+									null, 
+									qaSession, 
+									new TreeSet());
+							    	
+	    	logger.debug("createQaQueUsr - qaQueUsr: " + qaQueUsr);
+	    	
+	    	logger.debug("session uid: " + qaSession.getUid());
+	    	logger.debug("qaQueUsr: " + qaQueUsr);
+    	    qaService.createQaQueUsr(qaQueUsr);
+    		logger.debug("created qaQueUsr in the db: " + qaQueUsr);
+	    }
+
 	    qaQueUsr.setLearnerFinished(true);
 	    logger.debug("learner is finished:" + qaQueUsr);
 	    qaService.updateQaQueUsr(qaQueUsr);	    
@@ -746,4 +784,112 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    
 	    return null;
 	}
+    
+
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	throws IOException, ServletException, ToolException
+	{ 
+        logger.debug("dispatching submitReflection...");
+    	QaLearningForm qaLearningForm = (QaLearningForm) form;        
+    	
+    	LearningUtil.saveFormRequestData(request,  qaLearningForm);
+    	
+    	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		logger.debug("qaService: " + qaService);
+
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	qaLearningForm.setToolSessionID(toolSessionID);
+
+	 	String userID=request.getParameter("userID");
+	 	logger.debug("userID: " + userID);	 	
+	 	qaLearningForm.setUserID(userID);
+	 	
+	 	String reflectionEntry=request.getParameter(ENTRY_TEXT);
+	 	logger.debug("reflectionEntry: " + reflectionEntry);
+
+	 	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
+	    logger.debug("retrieving qaSession: " + qaSession);
+	
+	    QaQueUsr qaQueUsr=qaService.getQaUserBySession(new Long(userID), qaSession.getUid());
+	    logger.debug("QaQueUsr:" + qaQueUsr);
+	    
+	    /* it is possible that qaQueUsr can be null if the content is set as runoffline and reflection is on*/
+	    if (qaQueUsr == null)
+	    {
+    		logger.debug("attempt creating  user record since it must exist for the runOffline + reflection screens");
+		    HttpSession ss = SessionManager.getSession();
+
+		    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    	logger.debug("retrieving toolUser: " + toolUser);
+	    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+	    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
+
+	    	String userName=toolUser.getLogin(); 
+	    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+	    	
+	    	Long userId=new Long(toolUser.getUserID().longValue());
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+
+	    	 qaQueUsr= new QaQueUsr(userId,
+									userName,
+									fullName,
+									null, 
+									qaSession, 
+									new TreeSet());
+							    	
+	    	logger.debug("createQaQueUsr - qaQueUsr: " + qaQueUsr);
+	    	
+	    	logger.debug("session uid: " + qaSession.getUid());
+	    	logger.debug("qaQueUsr: " + qaQueUsr);
+    	    qaService.createQaQueUsr(qaQueUsr);
+    		logger.debug("created qaQueUsr in the db: " + qaQueUsr);
+	    }
+	    
+	    logger.debug("QaQueUsr:" + qaQueUsr);
+	    logger.debug("toolSessionID:" + toolSessionID);
+	    logger.debug("CoreNotebookConstants.NOTEBOOK_TOOL:" + CoreNotebookConstants.NOTEBOOK_TOOL);
+	    logger.debug("MY_SIGNATURE:" + MY_SIGNATURE);
+	    logger.debug("userID:" + userID);
+	    logger.debug("reflectionEntry:" + reflectionEntry);
+	    
+		qaService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID), reflectionEntry);
+	    
+		qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
+	    return endLearning(mapping, form, request, response);
+	}
+    
+    public ActionForward forwardtoReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	throws IOException, ServletException, ToolException
+	{
+        logger.debug("dispatching forwardtoReflection...");
+        QaLearningForm qaLearningForm = (QaLearningForm) form;
+        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		logger.debug("qaService: " + qaService);        
+        
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+
+	 	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
+	    logger.debug("retrieving qaSession: " + qaSession);
+	    
+	    QaContent qaContent=qaSession.getQaContent();
+	    logger.debug("using qaContent: " + qaContent);
+	    
+        
+        GeneralLearnerFlowDTO generalLearnerFlowDTO= new GeneralLearnerFlowDTO();
+        generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
+        generalLearnerFlowDTO.setReflectionSubject(qaContent.getReflectionSubject());
+        
+        request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+		logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+		qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
+        
+		logger.debug("fwd'ing to: " + NOTEBOOK);
+        return (mapping.findForward(NOTEBOOK));
+	}
+    
+
 }

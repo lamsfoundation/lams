@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -257,6 +258,15 @@ public interface IQaService
     public void cleanUploadedFilesMetaData() throws QaApplicationException;
     
     public List retrieveQaQueContentsByToolContentId(long toolContentId);
+    
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry);
+	
+
+	public NotebookEntry getEntry(Long id, Integer idType, String signature,
+			Integer userID);
+
+
     
     /** Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer,
      * so the log entry must be made by the web layer. */

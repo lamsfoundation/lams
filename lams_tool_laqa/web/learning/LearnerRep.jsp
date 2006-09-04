@@ -129,7 +129,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>		  	
 
 
-		
+				<c:if test="${generalLearnerFlowDTO.notebookEntriesVisible != 'false'}"> 			
+						<tr> 
+						<td valign=top>
+								<table>
+									<tr> 
+					  	   		  		<td>
+											<b> <bean:message key="label.notebook.entries"/> </b>						
+										 </td>
+									</tr>
+									
+									<tr> 
+					  	   		  		<td>
+											<c:out value="${generalLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
+										 </td>
+									</tr>
+							</table>
+	
+						</td>
+						</tr>
+				</c:if>														  					 					
+
 
 				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
 			       	<table> 	  
@@ -142,15 +162,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                 </html:submit>
 					  	 </td>
 
-							
 							<td  valign=top>
-								<div class="right-buttons">
-
-									<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-										<bean:message key="button.endLearning"/>
-									</html:submit>	 				
-								</div> 		  															 		  					
-								</td> 
+								<div class="right-buttons">							
+									<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+										<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
+											<bean:message key="button.endLearning"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+					
+									<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+											<bean:message key="label.continue"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+								</div> 		  															 		  												  	
+							</td> 
+							
 							</tr>
 					</table>
 			  	</c:if> 				    				  
@@ -209,6 +236,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td>  
 			  			</tr>
 					</c:forEach>		  	
+					
+
+				<c:if test="${generalLearnerFlowDTO.notebookEntriesVisible != 'false'}"> 			
+						<tr> 
+						<td valign=top>
+								<table>
+									<tr> 
+					  	   		  		<td>
+											<b> <bean:message key="label.notebook.entries"/> </b>						
+										 </td>
+									</tr>
+									
+									<tr> 
+					  	   		  		<td>
+											<c:out value="${generalLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
+										 </td>
+									</tr>
+							</table>
+	
+						</td>
+						</tr>
+				</c:if>														  					 					
+					
 
 
 				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
@@ -224,10 +274,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 							<td>
 								<div class="right-buttons">
-
-									<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-										<bean:message key="button.endLearning"/>
-									</html:submit>	 				
+									<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+										<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
+											<bean:message key="button.endLearning"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+					
+									<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+											<bean:message key="label.continue"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
 								</div> 		  															 		  					
 								</td> 
 							</tr>

@@ -184,7 +184,14 @@
 		    name="errorListLearner"
 		    path="/QaErrorBox.jsp"
 		    redirect="false"
-	  	/>      
+	  	/>   
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	  	   
 	</action>  
 	
 	<action
@@ -252,6 +259,13 @@
 		    path="/QaErrorBox.jsp"
 		    redirect="false"
 	  	/>      
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	  	
 	</action>
 	
 	   <!--Define Later Starter Action: initializes the DefineLater module -->

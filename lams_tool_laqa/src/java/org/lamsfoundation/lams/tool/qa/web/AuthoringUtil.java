@@ -197,6 +197,12 @@ public class AuthoringUtil implements QaAppConstants {
 		String monitoringReportTitle=request.getParameter(MONITORING_REPORT_TITLE);
 		String richTextOfflineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
 		String richTextOnlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
+		String reflect=request.getParameter(REFLECT);
+		logger.debug("reflect: " + reflect);
+		
+		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
+		logger.debug("reflectionSubject: " + reflectionSubject);
+		
 		String activeModule=request.getParameter(ACTIVE_MODULE);
 		logger.debug("activeModule: " + activeModule);
         
@@ -211,6 +217,7 @@ public class AuthoringUtil implements QaAppConstants {
         boolean questionsSequencedBoolean=false;
         boolean synchInMonitorBoolean=false;
         boolean usernameVisibleBoolean=false;
+        boolean reflectBoolean=false;
         if (setCommonContent)
         {
             if (questionsSequenced.equalsIgnoreCase(ON))
@@ -222,6 +229,9 @@ public class AuthoringUtil implements QaAppConstants {
             
             if (usernameVisible.equalsIgnoreCase(ON))
             	usernameVisibleBoolean=true;
+            
+            if (reflect.equalsIgnoreCase(ON))
+                reflectBoolean=true;
         }
         
         
@@ -279,9 +289,10 @@ public class AuthoringUtil implements QaAppConstants {
          	qaContent.setUsernameVisible(usernameVisibleBoolean);
          	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
          	qaContent.setSynchInMonitor(synchInMonitorBoolean);	
+         	qaContent.setReflect(reflectBoolean);
+         	qaContent.setReflectionSubject(reflectionSubject);
 		}
-        
-	
+        	
  
         if (newContent)
         {

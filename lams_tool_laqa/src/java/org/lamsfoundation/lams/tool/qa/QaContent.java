@@ -142,6 +142,7 @@ public class QaContent implements Serializable {
 	                 boolean 	synchInMonitor,
 	                 boolean 	contentLocked,
 	                 boolean 	reflect,
+	                 String 	reflectionSubject,
 	                 Date		creationDate,
 	                 Date 		updateDate,
 	                 Set 		qaQueContents,
@@ -163,7 +164,8 @@ public class QaContent implements Serializable {
         this.usernameVisible 	 = usernameVisible;
         this.synchInMonitor 	 = synchInMonitor;
         this.contentLocked		 = contentLocked;
-        this.reflect		 	= reflect;
+        this.reflect		 	 = reflect;
+        this.reflectionSubject	 =reflectionSubject;
         this.creationDate 		 = creationDate;
         this.updateDate 		 = updateDate;
         this.qaQueContents 		 = qaQueContents;
@@ -200,6 +202,7 @@ public class QaContent implements Serializable {
                      qa.isSynchInMonitor(),
 					 qa.isContentLocked(),
 					 qa.isReflect(),
+					 qa.getReflectionSubject(),
                      qa.getCreationDate(),
                      qa.getUpdateDate(),
 					 new TreeSet(),
@@ -320,6 +323,7 @@ public class QaContent implements Serializable {
                                         .append("offline_instructions:", getOfflineInstructions())
 										.append("online_instructions:", getOnlineInstructions())
                                         .append("report_title: ", getReportTitle())
+                                        .append("reflection subject: ", getReflectionSubject())
 										.append("synch_in_monitor: ", isSynchInMonitor())
                                         .toString();
     }

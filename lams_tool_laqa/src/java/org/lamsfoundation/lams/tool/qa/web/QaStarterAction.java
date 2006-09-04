@@ -376,7 +376,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		logger.debug("before fwding to jsp, qaAuthoringForm : " + qaAuthoringForm);
-		logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+		logger.debug("final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 		request.setAttribute(QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 		
 		return (mapping.findForward(destination));
@@ -412,7 +412,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
 	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
 	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
-		
+	    qaAuthoringForm.setReflect(qaContent.isReflect()?ON:OFF);
+	    
+	    qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
+	    
         List attachmentList = qaService.retrieveQaUploadedFiles(qaContent); 
         qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
         qaGeneralAuthoringDTO.setDeletedAttachmentList(new ArrayList());

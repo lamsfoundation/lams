@@ -40,6 +40,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
@@ -250,6 +252,24 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 		generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
+		
+		logger.debug("is tool reflective: " + qaContent.isReflect());
+		generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
+		logger.debug("reflection subject: " + qaContent.getReflectionSubject());
+		generalLearnerFlowDTO.setReflectionSubject(qaContent.getReflectionSubject());
+		
+		
+		logger.debug("attempt getting notebookEntry: ");
+		NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+		if (notebookEntry != null) {
+		    generalLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
+		}
+		
 	    
 
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());

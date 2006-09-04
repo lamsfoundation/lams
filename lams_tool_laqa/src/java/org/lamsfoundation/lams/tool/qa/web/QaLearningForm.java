@@ -41,12 +41,15 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String getPreviousQuestion;
 	protected String endLearning;
 	protected String refreshAnswers;
+	protected String submitReflection;
+	protected String forwardtoReflection;
 	
 	protected String totalQuestionCount;
 	protected String httpSessionID;
     protected String toolSessionID;
     protected String questionIndex;		
 	protected String userID;
+	protected String entryText;
 	protected String viewAllResults;
 	protected String redoQuestions;
 	protected String responseId;
@@ -67,7 +70,10 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
     	this.getNextQuestion=null;
     	this.getPreviousQuestion=null;
     	this.endLearning=null;
+    	this.submitReflection=null;
+    	this.forwardtoReflection=null;
     }
+    
 	
 	
 	/**
@@ -319,5 +325,41 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
      */
     public void setRefreshAnswers(String refreshAnswers) {
         this.refreshAnswers = refreshAnswers;
+    }
+    /**
+     * @return Returns the entryText.
+     */
+    public String getEntryText() {
+        return entryText;
+    }
+    /**
+     * @param entryText The entryText to set.
+     */
+    public void setEntryText(String entryText) {
+        this.entryText = entryText;
+    }
+    /**
+     * @return Returns the forwardtoReflection.
+     */
+    public String getForwardtoReflection() {
+        return forwardtoReflection;
+    }
+    /**
+     * @param forwardtoReflection The forwardtoReflection to set.
+     */
+    public void setForwardtoReflection(String forwardtoReflection) {
+        this.forwardtoReflection = forwardtoReflection;
+    }
+    /**
+     * @return Returns the submitReflection.
+     */
+    public String getSubmitReflection() {
+        return submitReflection;
+    }
+    /**
+     * @param submitReflection The submitReflection to set.
+     */
+    public void setSubmitReflection(String submitReflection) {
+        this.submitReflection = submitReflection;
     }
 }
