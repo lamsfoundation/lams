@@ -25,6 +25,7 @@ import mx.controls.*
 import mx.utils.*
 import mx.managers.*
 import mx.events.*
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
@@ -192,6 +193,7 @@ class WorkspaceDialog extends MovieClip{
         resourceTitle_txi.setFocus();
 		_container.contentLoaded();
 		this.tabChildren = true;
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		setTabIndex();
     }
 	
@@ -695,6 +697,7 @@ class WorkspaceDialog extends MovieClip{
     *</code>
 	*/
     private function ok(){
+		Cursor.showCursor(ApplicationParent.C_HOURGLASS);
         trace('OK');
 		_global.breakpoint();
 	
@@ -767,6 +770,7 @@ class WorkspaceDialog extends MovieClip{
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
 		}
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 	}
 	
 	private function searchForFile(snode:XMLNode, filename:String){
