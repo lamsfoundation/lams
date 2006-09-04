@@ -36,7 +36,9 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -116,6 +118,10 @@ public class PasswordChangeAction extends Action {
 			        	//service.updatePassword(login, HashUtil.sha1(password));
 						user.setPassword(HashUtil.sha1(password));
 						service.save(user);
+						
+						// make 'password changed' audit log entry
+						IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+						auditService.log(CentralConstants.MODULE_NAME, "Password changed for: "+user.getLogin()+"("+user.getUserId()+")");
 					}
 	    	    }
 		        	
