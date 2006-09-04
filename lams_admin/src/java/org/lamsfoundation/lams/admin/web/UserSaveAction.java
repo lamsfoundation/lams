@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -56,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -124,12 +126,17 @@ public class UserSaveAction extends Action {
 		SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
 		log.debug("locale: " + locale);
 
+		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+		IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+		
 		if (errors.isEmpty()) {
 			String[] roles = (String[]) userForm.get("roles");
 			if (edit) { // edit user
 				log.debug("editing userId: " + userId);
 				User user = (User)getService().findById(User.class, userId);
 				if (passwordChanged) {
+					// make 'password changed' audit log entry
+					auditService.log(AdminConstants.MODULE_NAME, "Password changed for: "+user.getLogin()+"("+userId+")");
 					userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
 				} else {
 					userForm.set("password", user.getPassword());
@@ -195,6 +202,11 @@ public class UserSaveAction extends Action {
 					user.setUserId(null);
 					user.setLocale(locale);
 					getService().save(user);
+					
+					// make 'create user' audit log entry
+					auditService.log(AdminConstants.MODULE_NAME, "Created user: "+user.getLogin()
+							+"("+user.getUserId()+"), Full Name: "+user.getFullName());
+					
 					log.debug("user: " + user.toString());
 					List<Organisation> orgs = new ArrayList<Organisation>();
 					// if user is to be added to a class, make user a member of
@@ -251,4 +263,5 @@ public class UserSaveAction extends Action {
 		}
 		return service;
 	}
+	
 }

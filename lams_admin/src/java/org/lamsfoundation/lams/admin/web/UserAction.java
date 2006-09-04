@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -48,14 +48,12 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Workspace;
-import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -83,6 +81,7 @@ public class UserAction extends LamsDispatchAction {
 	private static Logger log = Logger.getLogger(UserAction.class);
 	private static IUserManagementService service;
 	private static MessageService messageService;
+	private static IAuditService auditService;
 	private static List<Role> rolelist;
 	private static List<SupportedLocale> locales;
 	
@@ -194,6 +193,8 @@ public class UserAction extends LamsDispatchAction {
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		getService().disableUser(userId);
+		getAuditService().log(AdminConstants.MODULE_NAME, "Disabled userId: "+userId);
+		
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
 	}
@@ -218,6 +219,8 @@ public class UserAction extends LamsDispatchAction {
 			request.setAttribute("errorMessage",e.getMessage());
 			return mapping.findForward("error");
 		}
+		getAuditService().log(AdminConstants.MODULE_NAME, "Deleted userId: "+userId);
+		
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
 	}
@@ -280,5 +283,13 @@ public class UserAction extends LamsDispatchAction {
 			messageService = (MessageService)ctx.getBean("adminMessageService");
 		}
 		return messageService;
+	}
+	
+	private IAuditService getAuditService(){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			auditService = (IAuditService)ctx.getBean("auditService");
+		}
+		return auditService;
 	}
 }

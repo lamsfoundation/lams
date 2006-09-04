@@ -35,12 +35,14 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -101,9 +103,11 @@ public class OrgSaveAction extends Action {
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			SupportedLocale locale = (SupportedLocale)getService().findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
+			OrganisationState state = (OrganisationState)getService().findById(OrganisationState.class,(Integer)orgForm.get("stateId"));
 
 			if(orgId!=0){
 				org = (Organisation)getService().findById(Organisation.class,orgId);
+				writeAuditLog(org, orgForm, state, locale);
 				BeanUtils.copyProperties(org,orgForm);
 				org.setLocale(locale);
 			}else{
@@ -112,10 +116,11 @@ public class OrgSaveAction extends Action {
 				org.setLocale(locale);
 				org.setParentOrganisation((Organisation)getService().findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)getService().findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
+				writeAuditLog(org, orgForm, org.getOrganisationState(), org.getLocale());
 			}
 			
 			log.debug("orgId:"+org.getOrganisationId()+" locale:"+org.getLocale()+" create date:"+org.getCreateDate());
-			org.setOrganisationState((OrganisationState)getService().findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
+			org.setOrganisationState(state);
 			org = getService().saveOrganisation(org, user.getUserID());
 			
 			request.setAttribute("org",orgForm.get("parentId"));
@@ -123,6 +128,57 @@ public class OrgSaveAction extends Action {
 		}else{
 			saveErrors(request,errors);
 			return mapping.findForward("organisation");
+		}
+	}
+	
+	private void writeAuditLog(Organisation org, DynaActionForm orgForm, OrganisationState newState, SupportedLocale newLocale) {
+		
+		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+		IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+		
+		// audit log entries for organisation attribute changes	
+		if((Integer)orgForm.get("orgId")!=0) {
+			if(!org.getOrganisationState().getOrganisationStateId().equals((Integer)orgForm.get("stateId"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed state for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getOrganisationState().getDescription()
+						+" to: "+newState.getDescription());
+			}
+			if(!org.getName().equals((String)orgForm.get("name"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed name for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getName()+" to: "+orgForm.get("name"));
+			}
+			if(!org.getCode().equals((String)orgForm.get("code"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed code for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getCode()+" to: "+orgForm.get("code"));
+			}
+			if(!org.getDescription().equals((String)orgForm.getString("description"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed description for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getDescription()+" to: "+orgForm.getString("description"));
+			}
+			if(!org.getCourseAdminCanAddNewUsers().equals((Boolean)orgForm.get("courseAdminCanAddNewUsers"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanAddNewUsers for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanAddNewUsers()+" to: "+orgForm.get("courseAdminCanAddNewUsers"));
+			}
+			if(!org.getCourseAdminCanBrowseAllUsers().equals((Boolean)orgForm.get("courseAdminCanBrowseAllUsers"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanBrowseAllUsers for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanBrowseAllUsers()+" to: "+orgForm.get("courseAdminCanBrowseAllUsers"));
+			}
+			if(!org.getCourseAdminCanChangeStatusOfCourse().equals((Boolean)orgForm.get("courseAdminCanChangeStatusOfCourse"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanChangeStatusOfCourse for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanChangeStatusOfCourse()+" to: "+orgForm.get("courseAdminCanChangeStatusOfCourse"));
+			}
+			/* this field not set yet 
+			if(!org.getCourseAdminCanCreateGuestAccounts().equals((Boolean)orgForm.get("courseAdminCanCreateGuestAccounts"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanCreateGuestAccounts for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanCreateGuestAccounts()+" to: "+orgForm.get("courseAdminCanCreateGuestAccounts"));
+			}*/
+			if(!org.getLocale().getLocaleId().equals((Byte)orgForm.get("localeId"))) {
+				auditService.log(AdminConstants.MODULE_NAME, "Changed locale for organisation: "+org.getName()
+						+"("+org.getOrganisationId()+") from: "+org.getLocale().getDescription()+" to: "+newLocale.getDescription());
+			}
+		} else {
+			auditService.log(AdminConstants.MODULE_NAME, "Created organisation: "+org.getName()
+					+"("+org.getOrganisationId()+") of type: "+org.getOrganisationType().getName());
 		}
 	}
 	
