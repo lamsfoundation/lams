@@ -33,18 +33,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
@@ -59,8 +59,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				  validate = "false"
  * @struts.action-forward name = "success" path = "/index.jsp"
  */
-public class WorkspaceAction extends DispatchAction {
+public class WorkspaceAction extends LamsDispatchAction {
 	
+	protected Logger log = Logger.getLogger(WorkspaceAction.class.getName());
+
 	public static final String RESOURCE_ID = "resourceID";
 	public static final String RESOURCE_TYPE = "resourceType";
 	public static final String ROLE_DELIMITER = ",";
@@ -561,6 +563,9 @@ public class WorkspaceAction extends DispatchAction {
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 			Vector<UserDTO> users = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);
+			if ( log.isDebugEnabled()) {
+				log.debug("getUsersFromOrganisationByRole: organisationID="+organisationID+" role="+role+" users "+users);
+			}
 			flashMessage = new FlashMessage("getUsersFromOrganisationByRole",users);
 
 		} catch (Exception e) {
