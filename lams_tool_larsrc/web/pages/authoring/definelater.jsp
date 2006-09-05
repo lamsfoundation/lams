@@ -55,6 +55,7 @@
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="resource.contentId" />
 		<html:hidden property="mode" value="teacher"/>
+		<html:hidden property="contentFolderID" />
 		<html:hidden property="sessionMapID" />
 		
 		<h1>
@@ -81,7 +82,7 @@
 			<!-- Button Row -->
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" 
 				toolContentID="${formBean.resource.contentId}"  accessMode="teacher" defineLater="yes"  
-				customiseSessionID="${formBean.sessionMapID}" />
+				customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}"/>
 
 			<lams:HTMLEditor />
 		</div>
