@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -69,8 +70,15 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	private boolean runOffline;
 	private boolean contentInUse;
 
+	private boolean limitUpload;
+	private int limitUploadNumber;
+	
 	private boolean reflectOnActivity;
 	private String reflectInstructions;
+	
+	private Date created;
+	private Date updated;
+	private SubmitUser createdBy;
 	
 	//relationship fields
 	private Set toolSession;
@@ -160,7 +168,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	}	
 
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+	 * @hibernate.set lazy="true" inverse="true" cascade="all"
 	 * @hibernate.collection-key column="content_id"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
 	 *  
@@ -271,7 +279,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	}
 
 	/**
- 	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
+ 	 * @hibernate.set lazy="true" inverse="false" cascade="all"
 	 * @hibernate.collection-key column="content_id"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
 	 * 
@@ -373,5 +381,63 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	}
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	/**
+	 * @hibernate.property column="limit_upload"
+	 * @return
+	 */		
+	public boolean isLimitUpload() {
+		return limitUpload;
+	}
+
+	public void setLimitUpload(boolean limitUpload) {
+		this.limitUpload = limitUpload;
+	}
+
+	/**
+	 * @hibernate.property column="limit_upload_number"
+	 * @return
+	 */		
+	public int getLimitUploadNumber() {
+		return limitUploadNumber;
+	}
+
+	public void setLimitUploadNumber(int limitUploadNumber) {
+		this.limitUploadNumber = limitUploadNumber;
+	}
+	/**
+	 * @hibernate.property column="created"
+	 * @return
+	 */		
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+	/**
+	 * @hibernate.many-to-one  column="created_by" cascade="none"
+	 *  
+	 * @return
+	 */		
+	public SubmitUser getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(SubmitUser createdBy) {
+		this.createdBy = createdBy;
+	}
+	/**
+	 * @hibernate.property column="updated"
+	 * @return
+	 */		
+	public Date getUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(Date updated) {
+		this.updated = updated;
 	}
 }

@@ -18,8 +18,8 @@
 				<tr>
 					<td>
 						<h1>
-							${userDTO.userDto.firstName}
-							${userDTO.userDto.lastName}
+							${userDTO.firstName}
+							${userDTO.lastName}
 						</h1>
 					</td>
 				</tr>

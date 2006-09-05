@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -41,32 +41,42 @@ public class FileDetailsDTO implements Serializable{
 
 	private Logger log = Logger.getLogger(FileDetailsDTO.class);
 	private static final long serialVersionUID = 2964711101016972263L;
-	private Integer userID;
+	
 	private Long submissionID;
-	private Long reportID;
+
+	//basic info
 	private String filePath;
 	private String fileDescription;
-	private Date dateOfSubmission;
-	private Date dateMarksReleased;
-	private boolean finished;
+
+	//owner info
+	private SubmitUserDTO owner;
+	
+	//report (mark) info
+	private Long reportID;
 	private String comments;	
 	private String marks;
+	private Date dateOfSubmission;
+	private Date dateMarksReleased;
+	
+	//file repository info
 	private Long uuID;
 	private Long versionID;
+	
+	private boolean finished;
+	//if this file uploaded by current learner
+	private boolean currentLearner;
 	private String exportedURL;  // the location of this file saved by the export function.      	
-	private UserDTO userDTO;
 	
 
-	public FileDetailsDTO(SubmissionDetails details, UserDTO userDTO){
+	public FileDetailsDTO(SubmissionDetails details){
 		if(details == null){
 			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
 			return;
 		}
 		
-		Learner learner = details.getLearner();
+		SubmitUser learner = details.getLearner();
 		if(learner != null){
-			this.userID = learner.getUserID();
-			this.finished = learner.isFinished();
+			this.owner = new SubmitUserDTO(learner);
 		}
 		
 		this.submissionID = details.getSubmissionID();
@@ -82,7 +92,6 @@ public class FileDetailsDTO implements Serializable{
 			this.comments = report.getComments();
 			this.marks = report.getMarks() != null? report.getMarks().toString():"";
 		}
-		this.userDTO = userDTO;
 	}
 
 	public String getExportedURL() {
@@ -214,33 +223,7 @@ public class FileDetailsDTO implements Serializable{
 		this.submissionID = submissionID;
 	}
 
-	/**
-	 * @return Returns the userID.
-	 */
-	public Integer getUserID() {
-		return userID;
-	}
-
-	/**
-	 * @param userID The userID to set.
-	 */
-	public void setUserID(Integer userID) {
-		this.userID = userID;
-	}
-
-	/**
-	 * @return Returns the userDTO.
-	 */
-	public UserDTO getUserDTO() {
-		return userDTO;
-	}
-
-	/**
-	 * @param userDTO The userDTO to set.
-	 */
-	public void setUserDTO(UserDTO userDTO) {
-		this.userDTO = userDTO;
-	}
+	
 	/**
 	 * @return Returns the finished.
 	 */
@@ -253,4 +236,21 @@ public class FileDetailsDTO implements Serializable{
 	public void setFinished(boolean finished) {
 		this.finished = finished;
 	}
+
+	public boolean isCurrentLearner() {
+		return currentLearner;
+	}
+
+	public void setCurrentLearner(boolean currentLearner) {
+		this.currentLearner = currentLearner;
+	}
+
+	public SubmitUserDTO getOwner() {
+		return owner;
+	}
+
+	public void setOwner(SubmitUserDTO owner) {
+		this.owner = owner;
+	}
+	
 }

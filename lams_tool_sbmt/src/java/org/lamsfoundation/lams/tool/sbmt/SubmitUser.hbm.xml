@@ -7,19 +7,19 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.sbmt.Learner"
-        table="tl_lasbmt11_session_learners"
+        name="org.lamsfoundation.lams.tool.sbmt.SubmitUser"
+        table="tl_lasbmt11_user"
     >
 
         <id
-            name="learnerID"
-            column="learner_id"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="identity">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-Learner.xml 
+                  hibernate-generator-params-SubmitUser.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
@@ -80,7 +80,7 @@
         />
 
         <property
-            name="loginName"
+            name="login"
             type="java.lang.String"
             update="true"
             insert="true"
@@ -95,9 +95,17 @@
             column="last_name"
         />
 
+        <property
+            name="contentID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="content_id"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-Learner.xml
+                hibernate-properties-SubmitUser.xml
             containing the additional properties and place it in your merge dir.
         -->
 

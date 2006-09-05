@@ -109,14 +109,14 @@
 				</tr>
 			</c:if>		
 			<tr>
-				<td><c:out value="${user.userDto.firstName}" /> 
-					<c:out value="${user.userDto.lastName}" />
+				<td><c:out value="${user.firstName}" /> 
+					<c:out value="${user.lastName}" />
 				</td>
-				<td><c:out value="${user.userDto.login}" /></td>
+				<td><c:out value="${user.login}" /></td>
 				<td>
 					<c:if test="${user.hasRefection}">
 						<c:set var="viewReflection">
-							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userDto.userID}"/>
+							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userUid}"/>
 						</c:set>
 						<html:link href="javascript:launchPopup('${viewReflection}')">
 							<fmt:message key="label.view" />
@@ -124,7 +124,7 @@
 					</c:if>				
 				</td>
 				<td><html:link
-					href="javascript:viewMark(${user.userDto.userID},${sessionDto.sessionID});"
+					href="javascript:viewMark(${user.userID},${sessionDto.sessionID});"
 					property="Mark" styleClass="button">
 					<fmt:message key="label.monitoring.Mark.button" />
 				</html:link></td>

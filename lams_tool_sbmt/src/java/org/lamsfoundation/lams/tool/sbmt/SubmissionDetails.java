@@ -64,10 +64,11 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	/** persistent field */
 	private SubmitFilesReport report;
 
-	private Learner learner;
+	private SubmitUser learner;
 	
 	/** persistent field, but not cloned to avoid to clone block*/
 	private SubmitFilesSession submitFileSession;
+	
 	
 	/** default constructor */
 	public SubmissionDetails() {
@@ -227,13 +228,13 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	 * @hibernate.many-to-one column="learner_id" cascade="none"
 	 * @return Returns the learner.
 	 */
-	public Learner getLearner() {
+	public SubmitUser getLearner() {
 		return learner;
 	}
 	/**
 	 * @param learner The learner to set.
 	 */
-	public void setLearner(Learner learner) {
+	public void setLearner(SubmitUser learner) {
 		this.learner = learner;
 	}
 

@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.sbmt.Learner;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SbmtBaseTestCase;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 
@@ -74,11 +74,6 @@ public class TestSubmissionDetailsDAO extends SbmtBaseTestCase {
 		assertEquals(details.getFilePath(),TEST_FILE_NAME);
 	}
 
-	public void testGetUsersForSession() {
-		List list = submissionDetailsDAO.getUsersForSession(TEST_SESSION_ID);
-		assertEquals("Expect only 1 learner", list.size(), 1);
-		Long userId = (Long) list.iterator().next();
-		assertNotNull("userId", userId);
-	}
+
 
 }

@@ -22,7 +22,7 @@
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesSession.hbm.xml</value>				
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmissionDetails.hbm.xml</value>				
 				<value>org/lamsfoundation/lams/tool/sbmt/InstructionFiles.hbm.xml</value>				
-				<value>org/lamsfoundation/lams/tool/sbmt/Learner.hbm.xml</value>				
+				<value>org/lamsfoundation/lams/tool/sbmt/SubmitUser.hbm.xml</value>				
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -46,7 +46,11 @@
 		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
 	</bean>
 
-	<bean id="learnerDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.LearnerDAO">
+	<bean id="submitUserDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmitUserDAO">
+		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+	</bean>
+
+	<bean id="attachmentDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.AttachmentDAO">
 		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
 	</bean>
 	
@@ -55,13 +59,15 @@
 		<property name="submitFilesSessionDAO"><ref bean="submitFilesSessionDAO"/></property>
 		<property name="submitFilesReportDAO"><ref bean="submitFilesReportDAO"/></property>
 		<property name="submissionDetailsDAO"><ref bean="submissionDetailsDAO"/></property>
-		<property name="learnerDAO"><ref bean="learnerDAO"/></property>
+		<property name="submitUserDAO"><ref bean="submitUserDAO"/></property>
+		<property name="attachmentDAO"><ref bean="attachmentDAO"/></property>
 		<property name="sbmtToolContentHandler"><ref bean="sbmtToolContentHandler"/></property>
-		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="learnerService"><ref bean="learnerService"/></property>
 		<property name="toolService"><ref bean="lamsToolService"/></property>
 		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>		
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		
 	</bean>
 	
 	<bean id="submitFilesService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -79,9 +85,15 @@
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
+                <prop key="create*">PROPAGATION_REQUIRED</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED</prop>
                 <prop key="new*">PROPAGATION_REQUIRED</prop>
                 <prop key="export*">PROPAGATION_REQUIRED</prop>
+                <prop key="release*">PROPAGATION_REQUIRED</prop>
+                <prop key="finish*">PROPAGATION_REQUIRED</prop>
+                
+                <prop key="uploadFileToSession">PROPAGATION_REQUIRED</prop>
                 
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>

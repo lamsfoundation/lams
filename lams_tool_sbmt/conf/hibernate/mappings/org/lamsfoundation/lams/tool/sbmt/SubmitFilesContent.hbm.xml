@@ -47,7 +47,7 @@
             name="toolSession"
             lazy="true"
             inverse="true"
-            cascade="all-delete-orphan"
+            cascade="all"
             sort="unsorted"
         >
 
@@ -111,7 +111,7 @@
             name="instructionFiles"
             lazy="true"
             inverse="false"
-            cascade="all-delete-orphan"
+            cascade="all"
             sort="unsorted"
         >
 
@@ -149,6 +149,48 @@
             update="true"
             insert="true"
             column="reflect_on_activity"
+        />
+
+        <property
+            name="limitUpload"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="limit_upload"
+        />
+
+        <property
+            name="limitUploadNumber"
+            type="int"
+            update="true"
+            insert="true"
+            column="limit_upload_number"
+        />
+
+        <property
+            name="created"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="created"
+        />
+
+        <many-to-one
+            name="createdBy"
+            class="org.lamsfoundation.lams.tool.sbmt.SubmitUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="created_by"
+        />
+
+        <property
+            name="updated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="updated"
         />
 
         <!--

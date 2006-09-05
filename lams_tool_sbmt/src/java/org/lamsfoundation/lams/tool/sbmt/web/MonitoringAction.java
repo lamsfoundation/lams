@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -37,9 +38,9 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -52,12 +53,12 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
@@ -68,7 +69,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -231,7 +231,7 @@ public class MonitoringAction extends LamsDispatchAction {
 					if(first){
 						row = sheet.createRow(idx++);
 						cell = row.createCell((short) 0);
-						cell.setCellValue(dto.getUserDTO().getFirstName()+" "+dto.getUserDTO().getLastName());
+						cell.setCellValue(dto.getOwner().getFirstName()+" "+dto.getOwner().getLastName());
 						sheet.addMergedRegion(new Region(idx-1,(short)0,idx-1, (short)1));
 						first = false;
 						row1 = sheet.createRow(idx+1);
@@ -258,9 +258,16 @@ public class MonitoringAction extends LamsDispatchAction {
 					cell.setCellValue(dto.getFileDescription());
 					
 					cell = row3.createCell((short) fileCount);
-					if(dto.getMarks() != null)
-						cell.setCellValue(new Double(dto.getMarks().toString()).doubleValue());
-					else
+					if(dto.getMarks() != null){
+						String marks = "";
+						try {
+							NumberFormat format = NumberFormat.getInstance();
+							format.setMaximumFractionDigits(1);
+							marks = format.format(NumberUtils.createFloat(dto.getMarks()));
+						} catch (Exception e) {
+						}
+						cell.setCellValue(marks);
+					}else
 						cell.setCellValue("");
 					
 					cell = row4.createCell((short) fileCount);
@@ -335,7 +342,6 @@ public class MonitoringAction extends LamsDispatchAction {
 			  HttpServletResponse response){
 		
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
 		String updateMode = request.getParameter("updateMode");
 		
@@ -405,10 +411,10 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 		submitFilesService.updateMarks(reportID,marks,comments);
 		
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		if(StringUtils.equals(updateMode, "listMark")){
 			List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 			request.setAttribute("report",report);
-			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 			return mapping.findForward("listMark");
 		}else{
 			Map report = submitFilesService.getFilesUploadedBySession(sessionID);
@@ -534,11 +540,10 @@ public class MonitoringAction extends LamsDispatchAction {
             
             boolean hasReflect = sfs.getContent().isReflectOnActivity();
             //construct LearnerDTO list
-            List<UserDTO> userList = submitFilesService.getUsers(sessionID);
-            List<LearnerDetailsDTO> learnerList = new ArrayList<LearnerDetailsDTO>();
-            for(UserDTO user : userList){
-            	LearnerDetailsDTO learnerDto = new LearnerDetailsDTO();
-            	learnerDto.setUserDto(user);
+            List<SubmitUser> userList = submitFilesService.getUsersBySession(sessionID);
+            List<SubmitUserDTO> learnerList = new ArrayList<SubmitUserDTO>();
+            for(SubmitUser user : userList){
+            	SubmitUserDTO learnerDto = new SubmitUserDTO(user);
             	learnerDto.setHasRefection(hasReflect);
             	learnerList.add(learnerDto);
             }
@@ -551,11 +556,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	
 	public ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Integer userID = WebUtil.readIntParam(request,SbmtConstants.ATTR_USER_UID);
+		Long userUid = WebUtil.readLongParam(request,SbmtConstants.ATTR_USER_UID);
 		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 		
 		submitFilesService = getSubmitFilesService();
-		UserDTO userDto = submitFilesService.getUserDetails(userID);
+		SubmitUser userDto = submitFilesService.getUserByUid(userUid);
 
 		submitFilesService = getSubmitFilesService();
 		NotebookEntry notebookEntry = submitFilesService.getEntry(sessionID, 
@@ -564,7 +569,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		
-		LearnerDetailsDTO userDTO = new LearnerDetailsDTO(userDto);
+		SubmitUserDTO userDTO = new SubmitUserDTO(userDto);
 		if(notebookEntry == null){
 			userDTO.setFinishReflection(false);
 			userDTO.setReflect(null);

@@ -42,11 +42,18 @@ public class AuthoringForm extends ValidatorForm {
     private FormFile onlineFile;
     private List onlineFileList;
     private List offlineFileList;
+    
+    private boolean limitUpload;
+    private int limitUploadNumber;
+    
     private boolean reflectOnActivity;
     private String reflectInstructions;
 
     public void reset(ActionMapping mapping, HttpServletRequest request){
     	lockOnFinished = false;
+    	limitUpload= false;
+    	reflectOnActivity = false;
+    	
     }
 	public void initContentValue(SubmitFilesContent content){
 		if(content == null)
@@ -59,6 +66,9 @@ public class AuthoringForm extends ValidatorForm {
 		this.offlineInstruction = content.getOfflineInstruction();
 		this.onlineInstruction = content.getOnlineInstruction();
 		this.lockOnFinished = content.isLockOnFinished();
+		
+		this.limitUpload = content.isLimitUpload();
+		this.limitUploadNumber = content.getLimitUploadNumber();
 		
 		this.reflectOnActivity = content.isReflectOnActivity();
 		this.reflectInstructions = content.getReflectInstructions();
@@ -193,5 +203,17 @@ public class AuthoringForm extends ValidatorForm {
 	}
 	public void setContentFolderID(String contentFolderID) {
 		this.contentFolderID = contentFolderID;
+	}
+	public boolean isLimitUpload() {
+		return limitUpload;
+	}
+	public void setLimitUpload(boolean limitUpload) {
+		this.limitUpload = limitUpload;
+	}
+	public int getLimitUploadNumber() {
+		return limitUploadNumber;
+	}
+	public void setLimitUploadNumber(int limitUploadNumber) {
+		this.limitUploadNumber = limitUploadNumber;
 	}
 }

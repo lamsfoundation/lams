@@ -30,25 +30,27 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 /**
  * 
- * @hibernate.class table="tl_lasbmt11_session_learners"
+ * @hibernate.class table="tl_lasbmt11_user"
  * @author Steve.Ni
  * 
  * @version $Revision$
  * @serial 4951104689120529660L;
  */
-public class Learner implements Serializable,Cloneable{
+public class SubmitUser implements Serializable,Cloneable{
 
 	private static final long serialVersionUID = 4951104689120529660L;
-	private static Logger log = Logger.getLogger(Learner.class);
+	private static Logger log = Logger.getLogger(SubmitUser.class);
 	
 	//key
-    private Long learnerID;
+    private Long uid;
     //lams User ID
 	private Integer userID;
 	private String firstName;
 	private String lastName;
-	private String loginName;
+	private String login;
 	private Long sessionID;
+	private Long contentID;
+	
 	private boolean finished;
 	private Set submissionDetails;
 	
@@ -62,7 +64,7 @@ public class Learner implements Serializable,Cloneable{
 		try {
 			obj = super.clone();
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Learner.class + " failed");
+			log.error("When clone " + SubmitUser.class + " failed");
 		}
 		return obj;
 	}
@@ -71,17 +73,17 @@ public class Learner implements Serializable,Cloneable{
 	// Get / Set methods
 	//***********************************************************
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="learner_id"
+	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
 	 * @return Returns the learnerID.
 	 */
-	public Long getLearnerID() {
-		return learnerID;
+	public Long getUid() {
+		return uid;
 	}
 	/**
 	 * @param learnerID The learnerID to set.
 	 */
-	public void setLearnerID(Long learnerID) {
-		this.learnerID = learnerID;
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 
 	/**
@@ -156,12 +158,12 @@ public class Learner implements Serializable,Cloneable{
 	/**
 	 * @hibernate.property column="login_name" 
 	 */
-	public String getLoginName() {
-		return loginName;
+	public String getLogin() {
+		return login;
 	}
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
+	public void setLogin(String loginName) {
+		this.login = loginName;
 	}
 
 	/**
@@ -173,5 +175,16 @@ public class Learner implements Serializable,Cloneable{
 
 	public void setLastName(String secondName) {
 		this.lastName = secondName;
+	}
+	/**
+	 * @hibernate.property column="content_id" 
+	 * @return Returns the sessionID.
+	 */
+	public Long getContentID() {
+		return contentID;
+	}
+
+	public void setContentID(Long contentID) {
+		this.contentID = contentID;
 	}
 }

@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -36,7 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -56,7 +59,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
-import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -71,16 +73,17 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
-import org.lamsfoundation.lams.tool.sbmt.dao.ILearnerDAO;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
+import org.lamsfoundation.lams.tool.sbmt.dao.IAttachmentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
+import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
@@ -88,6 +91,7 @@ import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.dao.DataAccessException;
@@ -104,8 +108,8 @@ public class SubmitFilesService implements ToolContentManager,
 	private ISubmitFilesReportDAO submitFilesReportDAO;
 	private ISubmitFilesSessionDAO submitFilesSessionDAO;
 	private ISubmissionDetailsDAO submissionDetailsDAO;
-	private ILearnerDAO learnerDAO;
-	private IBaseDAO baseDAO;
+	private ISubmitUserDAO submitUserDAO;
+	private IAttachmentDAO attachmentDAO;
 	
 	private IToolContentHandler sbmtToolContentHandler;
 	private ILamsToolService toolService;
@@ -113,7 +117,21 @@ public class SubmitFilesService implements ToolContentManager,
 	private IRepositoryService repositoryService;
 	private IExportToolContentService exportContentService;
 	private ICoreNotebookService coreNotebookService;
+	private IUserManagementService userManagementService;
 	
+	private class FileDtoComparator implements Comparator<FileDetailsDTO>{
+
+		public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
+			if(o1 != null && o2 != null){
+				//don't use Date.comparaTo() directly, because the date could be Timestamp or Date (depeneds the object is persist or not)
+				return (int) (o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime());
+			}else if(o1 != null)
+				return 1;
+			else
+				return -1;
+		}
+		
+	}
 	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
 		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
 	}
@@ -272,6 +290,23 @@ public class SubmitFilesService implements ToolContentManager,
 			
 			//reset it to new toolContentId
 			toolContentObj.setContentID(toolContentId);
+			
+			SubmitUser user = submitUserDAO.getContentUser(toolContentId,newUserUid);
+			if(user == null){
+				user = new SubmitUser();
+				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
+				user.setFirstName(sysUser.getFirstName());
+				user.setLastName(sysUser.getLastName());
+				user.setLogin(sysUser.getLogin());
+				user.setUserID(newUserUid);
+				user.setContentID(toolContentId);
+				submitUserDAO.saveOrUpdateUser(user);
+			}
+			
+			toolContentObj.setCreatedBy(user);
+			toolContentObj.setCreated(new Date());
+			toolContentObj.setUpdated(new Date());
+			
 			submitFilesContentDAO.saveOrUpdate(toolContentObj);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
@@ -284,6 +319,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#updateSubmitFilesContent(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
 	 */
 	public void saveOrUpdateContent(SubmitFilesContent submitFilesContent) {
+		submitFilesContent.setUpdated(new Date());
 		submitFilesContentDAO.saveOrUpdate(submitFilesContent);
 	}
 
@@ -366,9 +402,8 @@ public class SubmitFilesService implements ToolContentManager,
 							+ " the repository " + e.getMessage());
 		}
 	}
-
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type){
-		submitFilesContentDAO.deleteInstructionFile(contentID, uuid, versionID, type);
+	public void deleteInstructionFile(Long uid){
+		attachmentDAO.deleteById(InstructionFiles.class, uid);
 	}
 
 	/*
@@ -541,7 +576,7 @@ public class SubmitFilesService implements ToolContentManager,
 			now = DateUtil.convertToUTC(now);
 			details.setDateOfSubmission(now);
 			
-			Learner learner = learnerDAO.getLearner(sessionID,userID);
+			SubmitUser learner = submitUserDAO.getLearner(sessionID,userID);
 			details.setLearner(learner);
 			details.setUuid(nodeKey.getUuid());
 			details.setVersionID(nodeKey.getVersion());
@@ -589,20 +624,19 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
 	public List getFilesUploadedByUser(Integer userID, Long sessionID){
-		List list =  learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
-		ArrayList details = new ArrayList();
+		SubmitUser learner = getSessionUser(sessionID, userID);
+		Set list =  learner.getSubmissionDetails();
+		SortedSet details = new TreeSet(this.new FileDtoComparator());
 		if(list ==null)
-			return details;
+			return new ArrayList(details);
 		
 		Iterator iterator = list.iterator();
 		while(iterator.hasNext()){
 			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-			UserDTO user = getUserDetails(userID);
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,user);
-			detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails);
 			details.add(detailDto);
 		}
-		return details;
+		return  new ArrayList(details);
 	}
 	/**
 	 * This method save SubmissionDetails list into a map container: key is user id,
@@ -617,21 +651,20 @@ public class SubmitFilesService implements ToolContentManager,
 			List userFileList;
 			while(iterator.hasNext()){
 				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-				Learner learner = submissionDetails.getLearner();
+				SubmitUser learner = submissionDetails.getLearner();
 				if(learner == null){
 					log.error("Could not find learer for special submission item:" + submissionDetails);
 					return null;
 				}
-				UserDTO user = getUserDetails(learner.getUserID());
 				
-				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,user);
+				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails);
 				detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
-				userFileList = (List) map.get(user);
+				userFileList = (List) map.get(learner);
 				//if it is first time to this user, creating a new ArrayList for this user.
 				if(userFileList == null)
 					userFileList = new ArrayList();
 				userFileList.add(detailDto);
-				map.put(user, userFileList);
+				map.put(learner, userFileList);
 			}
 			return map;
 		}
@@ -641,28 +674,14 @@ public class SubmitFilesService implements ToolContentManager,
 	public FileDetailsDTO getFileDetails(Long detailID){
 			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
 			details.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), details.getDateOfSubmission()));
-			UserDTO user = getUserDetails(details.getLearner().getUserID());
-			
-			return new FileDetailsDTO(details,user);			
+			return new FileDetailsDTO(details);			
 	}
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsers(java.lang.Long)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsersBySession(java.lang.Long)
 	 */
-	public List getUsers(Long sessionID){
-		List users = submissionDetailsDAO.getUsersForSession(sessionID);
-		List table = new ArrayList();
-		
-		if(users == null)
-			return table; 
-		
-		Iterator iterator = users.iterator();
-		while(iterator.hasNext()){
-			Integer userID = (Integer) iterator.next();			
-			User user = (User)baseDAO.find(User.class,userID);
-			table.add(user.getUserDTO());
-		}
-		return table;
+	public List<SubmitUser> getUsersBySession(Long sessionID){
+		return submitUserDAO.getUsersBySession(sessionID);
 	}
 
 	public void updateMarks(Long reportID, Long marks, String comments){
@@ -672,13 +691,6 @@ public class SubmitFilesService implements ToolContentManager,
 			report.setMarks(marks);
 			submitFilesReportDAO.update(report);
 		}
-	}
-	public UserDTO getUserDetails(Integer userID){
-		User user = (User)baseDAO.find(User.class,userID.intValue());
-		if(user == null)
-			return null;
-		
-		return user.getUserDTO();
 	}
 	public IVersionedNode downloadFile(Long uuid, Long versionID)throws SubmitFilesException{
 		ITicket ticket = getRepositoryLoginTicket();		
@@ -713,9 +725,9 @@ public class SubmitFilesService implements ToolContentManager,
 		return true;
 	}
 	public void finishSubmission(Long sessionID, Integer userID){
-		Learner learner = learnerDAO.getLearner(sessionID,userID);
+		SubmitUser learner = submitUserDAO.getLearner(sessionID,userID);
 		learner.setFinished(true);
-		learnerDAO.updateLearer(learner);
+		submitUserDAO.saveOrUpdateUser(learner);
 	}
 
     /* (non-Javadoc)
@@ -785,16 +797,18 @@ public class SubmitFilesService implements ToolContentManager,
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	toolContentObj.setContentID(toolContentId);
     	toolContentObj.setContentInUse(Boolean.FALSE);
-    	// toolContentObj.setCreated(now);
+    	toolContentObj.setCreated(now);
     	toolContentObj.setDefineLater(Boolean.FALSE);
     	toolContentObj.setInstruction((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
     	toolContentObj.setOfflineInstruction(null);
     	toolContentObj.setOnlineInstruction(null);
     	toolContentObj.setRunOffline(Boolean.FALSE);
-    	// toolContentObj.setUpdated(now);
+    	toolContentObj.setUpdated(now);
     	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
     	toolContentObj.setLockOnFinished(Boolean.TRUE);  
-    	// toolContentObj.setCreatedBy(user);
+    	
+		SubmitUser suser = createSessionUser(user, null);
+    	toolContentObj.setCreatedBy(suser);
     	
     	// leave as empty, no need to set them to anything.
     	//toolContentObj.setInstructionFiles(attachments);
@@ -818,27 +832,49 @@ public class SubmitFilesService implements ToolContentManager,
     	// toolContentObj.setReflectInstructions(description);
     }
 
-    public Learner getLearnerByUid(Long learnerID){
-    	return (Learner) learnerDAO.find(Learner.class,learnerID);
+    public SubmitUser getUserByUid(Long learnerID){
+    	return (SubmitUser) submitUserDAO.find(SubmitUser.class,learnerID);
     	
     }
-    public Learner createLearner(UserDTO userDto, Long sessionID){
-    	Learner learner = learnerDAO.getLearner(sessionID, userDto.getUserID());
+    public SubmitUser createSessionUser(UserDTO userDto, Long sessionID){
+    	SubmitUser learner = submitUserDAO.getLearner(sessionID, userDto.getUserID());
     	if(learner != null)
     		return learner;
-    	learner = new Learner();
+    	learner = new SubmitUser();
     	learner.setUserID(userDto.getUserID());
     	learner.setFirstName(userDto.getFirstName());
     	learner.setLastName(userDto.getLastName());
-    	learner.setLoginName(userDto.getLogin());
+    	learner.setLogin(userDto.getLogin());
     	learner.setSessionID(sessionID);
     	learner.setFinished(false);
     	
-    	
-    	learnerDAO.saveLearner(learner);
+    	submitUserDAO.saveOrUpdateUser(learner);
     	
     	return learner;
     }
+	public SubmitUser getSessionUser(Long sessionID, Integer userID) {
+		return submitUserDAO.getLearner(sessionID,userID);
+	}
+	public SubmitUser createContentUser(UserDTO userDto, Long contentId) {
+		SubmitUser learner = submitUserDAO.getContentUser(contentId, userDto.getUserID());
+    	if(learner != null)
+    		return learner;
+    	learner = new SubmitUser();
+    	learner.setUserID(userDto.getUserID());
+    	learner.setFirstName(userDto.getFirstName());
+    	learner.setLastName(userDto.getLastName());
+    	learner.setLogin(userDto.getLogin());
+    	learner.setContentID(contentId);
+    	learner.setFinished(false);
+    	
+    	submitUserDAO.saveOrUpdateUser(learner);
+    	return learner;
+    	
+	}
+	public SubmitUser getContentUser(Long contentId, Integer userID) {
+		return submitUserDAO.getContentUser(contentId,userID);
+	}
+
 	/***************************************************************************
 	 * Property Injection Methods
 	 **************************************************************************/
@@ -894,28 +930,17 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	
 	/**
-	 * @param baseDAO The baseDAO to set.
-	 */
-	public void setBaseDAO(IBaseDAO baseDAO) {
-		this.baseDAO = baseDAO;
-	}
-
-	/**
 	 * @return Returns the learnerDAO.
 	 */
-	public ILearnerDAO getLearnerDAO() {
-		return learnerDAO;
+	public ISubmitUserDAO getSubmitUserDAO() {
+		return submitUserDAO;
 	}
 
 	/**
 	 * @param learnerDAO The learnerDAO to set.
 	 */
-	public void setLearnerDAO(ILearnerDAO learnerDAO) {
-		this.learnerDAO = learnerDAO;
-	}
-
-	public Learner getLearner(Long sessionID, Integer userID) {
-		return learnerDAO.getLearner(sessionID,userID);
+	public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
+		this.submitUserDAO = learnerDAO;
 	}
 
 	public ILearnerService getLearnerService() {
@@ -944,6 +969,12 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 		this.coreNotebookService = coreNotebookService;
+	}
+	public void setAttachmentDAO(IAttachmentDAO attachmentDAO) {
+		this.attachmentDAO = attachmentDAO;
+	}
+	public void setUserManagementService(IUserManagementService userManagementService) {
+		this.userManagementService = userManagementService;
 	}
 	
 

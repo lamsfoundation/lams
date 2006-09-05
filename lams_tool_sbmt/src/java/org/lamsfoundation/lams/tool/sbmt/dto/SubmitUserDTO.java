@@ -29,20 +29,23 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.sbmt.Learner;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 
 /**
  * @author Manpreet Minhas
  * @serial 5900249986365640342L
  */
-public class LearnerDetailsDTO implements Serializable{
+public class SubmitUserDTO implements Serializable{
 	
 	private static final long serialVersionUID = 5900249986365640342L;
 	private Long toolSessionID;
 	
-	//learner personal info dto
-	private UserDTO userDto;
+	//user personal info dto
+	private Long userUid;
+	private Integer userID;
+	private String firstName;
+	private String lastName;
+	private String login;
 	
 	//learner uploaded file info
 	private String fileName;
@@ -52,18 +55,26 @@ public class LearnerDetailsDTO implements Serializable{
 	private Date dateOfSubmission;
 	private Date dateMarksReleased;
 	
+	//submit file list
 	private List filesUploaded;
 
+	//reflect option
 	private boolean hasRefection;
 	private String reflectInstrctions;
 	private boolean finishReflection;
 	private String reflect;
 	
-	public LearnerDetailsDTO(){
+	
+	public SubmitUserDTO(){
 		
 	}
-	public LearnerDetailsDTO(UserDTO userDto){
-		this.setUserDto(userDto);
+	public SubmitUserDTO(SubmitUser user){
+		this.userUid = user.getUid();
+		this.userID = user.getUserID();
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.login = user.getLogin();
+		
 	}
 	/**
 	 * @return Returns the comments.
@@ -163,12 +174,7 @@ public class LearnerDetailsDTO implements Serializable{
 		this.filesUploaded = filesUploaded;
 	}
 
-	public UserDTO getUserDto() {
-		return userDto;
-	}
-	public void setUserDto(UserDTO userDto) {
-		this.userDto = userDto;
-	}
+
 	public boolean isFinishReflection() {
 		return finishReflection;
 	}
@@ -192,5 +198,35 @@ public class LearnerDetailsDTO implements Serializable{
 	}
 	public void setReflectInstrctions(String reflectInstrctions) {
 		this.reflectInstrctions = reflectInstrctions;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public String getLogin() {
+		return login;
+	}
+	public void setLogin(String loginName) {
+		this.login = loginName;
+	}
+	public Long getUserUid() {
+		return userUid;
+	}
+	public void setUserUid(Long userUid) {
+		this.userUid = userUid;
+	}
+	public Integer getUserID() {
+		return userID;
+	}
+	public void setUserID(Integer userID) {
+		this.userID = userID;
 	}
 }

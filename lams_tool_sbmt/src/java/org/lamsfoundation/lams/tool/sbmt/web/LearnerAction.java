@@ -47,11 +47,11 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.form.LearnerForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
@@ -128,9 +128,10 @@ public class LearnerAction extends DispatchAction {
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		SubmitFilesContent content = session.getContent();
 
+		//this must before getFileUploadByUser() method becuase getCurrentLearner() 
+		// will create session user if it does not exist.
+		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		Learner learner = getCurrentLearner(sessionID, submitFilesService);
-		setLearnerDTO(request, user,learner,  filesUploaded);
 		
 //		check whehter finish lock is on/off
 		boolean lock = content.isLockOnFinished() && learner.isFinished();
@@ -143,7 +144,11 @@ public class LearnerAction extends DispatchAction {
 		sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION,content.getReflectInstructions());
 		sessionMap.put(SbmtConstants.ATTR_TITLE,content.getTitle());
 		sessionMap.put(SbmtConstants.ATTR_INSTRUCTION,content.getInstruction());
+		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD,content.isLimitUpload());
+		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER,content.getLimitUploadNumber());
+
 		
+		setLearnerDTO(request, sessionMap, learner, filesUploaded);
 		
 		//if content in use, return special page.
 		if(content.isDefineLater()){
@@ -183,16 +188,12 @@ public class LearnerAction extends DispatchAction {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		
-		if(validateUploadForm(learnerForm,request)){
-			return mapping.getInputForward();
-		}
-		
-		
 		 //set the mode into http session 
         Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
        	
-		if(!isTokenValid(request,true)){
+		if(!isTokenValid(request,true) || validateUploadForm(learnerForm,request)){
 			resetToken(request);
+			
 			//get session from shared session.
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
@@ -202,9 +203,10 @@ public class LearnerAction extends DispatchAction {
 			ISubmitFilesService submitFilesService = getService();
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 
-			Learner learner = getCurrentLearner(sessionID, submitFilesService);
-			setLearnerDTO(request, user,learner, filesUploaded);
-			return returnErrors(mapping,request,"submit.upload.twice","success");
+			SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
+			setLearnerDTO(request,sessionMap, learner, filesUploaded);
+			
+			return mapping.getInputForward();
 		}
 		//to avoid user without patience click "upload" button too fast 
 		saveToken(request);
@@ -223,17 +225,12 @@ public class LearnerAction extends DispatchAction {
 		
 		ISubmitFilesService submitFilesService = getService();
 
-		try{
-			submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
-			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-			Learner learner = getCurrentLearner(sessionID, submitFilesService);
-			
-			setLearnerDTO(request,user, learner, filesUploaded);
-			return mapping.getInputForward();			
-		}catch(SubmitFilesException se){
-			logger.error("uploadFile: Submit Files Exception has occured" + se.getMessage());
-			return returnErrors(mapping,request,se.getMessage(),"success");
-		}
+		submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
+		
+		setLearnerDTO(request,sessionMap, learner, filesUploaded);
+		return mapping.getInputForward();			
 	}
 
 
@@ -317,51 +314,31 @@ public class LearnerAction extends DispatchAction {
 		
 		return error;
 	}
-	/**
-	 * This is a utily function for forwarding the errors to the respective JSP
-	 * page indicated by <code>forward</code>
-	 * 
-	 * @param mapping
-	 * @param request
-	 * @param errorMessage
-	 *            The error message to be displayed
-	 * @param forward
-	 *            The JSP page to which the errors would be forwarded
-	 * @return ActionForward
-	 */
-	private ActionForward returnErrors(ActionMapping mapping, 
-							  HttpServletRequest request, 
-							  String errorMessage,String forward){
-		ActionMessages messages = new ActionMessages();
-		messages.add(ActionMessages.GLOBAL_MESSAGE,
-					 new ActionMessage(errorMessage));
-		saveErrors(request,messages);
-		return mapping.findForward(forward);
-	}
-	
 
 	/**
 	 * 
 	 * Set information into learner DTO object for page display.
 	 * Fill file list uploaded by the special user into web form. Remove the unauthorized mark and comments.
 	 * @param request
+	 * @param sessionMap 
 	 * @param sessionID
 	 * @param userID
 	 * @param content
 	 * @param filesUploaded 
 	 */
-	private void setLearnerDTO(HttpServletRequest request, UserDTO userDto, Learner learner, 
-			List filesUploaded) {
+	private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser, List filesUploaded) {
 		
-		LearnerDetailsDTO dto = new LearnerDetailsDTO();
-		dto.setUserDto(userDto);
-		
-		if(learner != null){
+		SubmitUserDTO dto = new SubmitUserDTO(currUser);
+		if(currUser != null){
 			//if Monitoring does not release marks, then skip this mark and comment content.
 			if(filesUploaded != null){
 				Iterator iter = filesUploaded.iterator();
 				while(iter.hasNext()){
 					FileDetailsDTO filedto = (FileDetailsDTO) iter.next();
+					if(currUser.getUid().equals(filedto.getOwner().getUserUid()))
+						filedto.setCurrentLearner(true);
+					else
+						filedto.setCurrentLearner(false);
 					if(filedto .getDateMarksReleased() == null){
 						filedto .setComments(null);
 						filedto .setMarks(null);
@@ -370,19 +347,30 @@ public class LearnerAction extends DispatchAction {
 			}
 			dto.setFilesUploaded(filesUploaded);
 		}
+		
+		//preset
+		boolean limitUpload = (Boolean) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD);
+		if(limitUpload &&  filesUploaded != null){
+			int limit = (Integer)sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER);
+			if(limit == filesUploaded.size()){
+				//lock upload: currently, use same lock with "FINISH_ON_LOCK"
+				sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, true);
+			}
+		}
+		
 		request.setAttribute("learner",dto);
 	}
 
-	private Learner getCurrentLearner(Long sessionID, ISubmitFilesService submitFilesService) {
+	private SubmitUser getCurrentLearner(Long sessionID, ISubmitFilesService submitFilesService) {
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Integer userID = user.getUserID();
 
-		Learner learner = submitFilesService.getLearner(sessionID,userID);
+		SubmitUser learner = submitFilesService.getSessionUser(sessionID,userID);
 		if(learner == null){
-			learner = submitFilesService.createLearner(user, sessionID);
+			learner = submitFilesService.createSessionUser(user, sessionID);
 		}
 			
 		return learner;

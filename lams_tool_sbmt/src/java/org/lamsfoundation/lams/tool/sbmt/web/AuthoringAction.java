@@ -25,7 +25,9 @@
 
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +35,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,13 +51,16 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -156,14 +162,16 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param request
 	 * @param response
 	 * @return
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
 	 */
 	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws Exception{
 
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
 		
-
 		ToolAccessMode mode = null;
 		try{
 			mode =  WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,true);
@@ -182,72 +190,80 @@ public class AuthoringAction extends LamsDispatchAction {
 		SubmitFilesContent content = getContent(form);
 		
 		submitFilesService = getService();
-		try {
-			SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
-			
-			if(persistContent == null || content.getContentID() == null 
-					|| !content.getContentID().equals(persistContent.getContentID())){
-				//new content
-				persistContent = content;
-			}
-				
-			//keep Set type attribute for persist content becuase this update only 
-			//include updating simple properties from web page(i.e. text value, list value, etc)
-			Set attPOSet = persistContent.getInstructionFiles();
-			if(attPOSet == null)
-				attPOSet = new HashSet();
-			List attachmentList = getAttachmentList(sessionMap);
-			List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-			Iterator iter = attachmentList.iterator();
-			while(iter.hasNext()){
-				InstructionFiles newAtt = (InstructionFiles) iter.next();
-				//add new attachment, UID is not null
-				if(newAtt.getUid() == null)
-					attPOSet.add(newAtt);
-			}
-			attachmentList.clear();
-			
-			iter = deleteAttachmentList.iterator();
-			while(iter.hasNext()){
-				InstructionFiles delAtt = (InstructionFiles) iter.next();
-				//delete from repository
-				submitFilesService.deleteFromRepository(delAtt.getUuID(),delAtt.getVersionID());
-				//it is an existed att, then delete it from current attachmentPO
-				if(delAtt.getUid() != null){
-					Iterator attIter = attPOSet.iterator();
-					while(attIter.hasNext()){
-						InstructionFiles att = (InstructionFiles) attIter.next();
-						if(delAtt.getUid().equals(att.getUid())){
-							attIter.remove();
-							break;
-						}
-					}
-					submitFilesService.deleteInstructionFile(content.getContentID(), delAtt.getUuID(), delAtt
-							.getVersionID(), delAtt.getType());
-				}//end remove from persist value
-			}
-			deleteAttachmentList.clear();
-			
-			//copy back
-			content.setInstructionFiles(attPOSet);
-			content.setToolSession(persistContent.getToolSession());
+		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
+		
+		if(persistContent == null){
+			//new content
+			persistContent = content;
+			content.setCreated(new Date());
+		}else{
 			//copy web page value into persist content, as above, the "Set" type value kept.
 			if(mode.isAuthor()){
 				Long uid = persistContent.getContentID();
 				PropertyUtils.copyProperties(persistContent,content);
 				persistContent.setContentID(uid);
 			}else{
-//				if it is Teacher, then just update basic tab content (definelater)
+//			    if it is Teacher, then just update basic tab content (definelater)
 				persistContent.setInstruction(content.getInstruction());
 				persistContent.setTitle(content.getTitle());
-				persistContent.setDefineLater(content.isDefineLater());
-				persistContent.setRunOffline(content.isRunOffline());
+				//change define later status
+				persistContent.setDefineLater(false);
 			}
-			
-			submitFilesService.saveOrUpdateContent(persistContent);
-		} catch (Exception e) {
-			log.error(e);
 		}
+//		*******************************Handle user*******************
+		//get session from shared session.
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		
+		Long contentId = authForm.getToolContentID();
+		SubmitUser user = submitFilesService.getContentUser(contentId,userDto.getUserID());
+		if(user == null){
+			user = submitFilesService.createContentUser(userDto, contentId);
+		}
+		persistContent.setCreatedBy(user);
+		
+		//**********************************Handle Authoring Instruction Attachement *********************
+//		so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
+		Set attPOSet = persistContent.getInstructionFiles();
+		if(attPOSet == null)
+			attPOSet = new HashSet();
+		
+		//get Attachment from HttpSession
+		List attachmentList = getAttachmentList(sessionMap);
+		Iterator iter = attachmentList.iterator();
+		while(iter.hasNext()){
+			InstructionFiles newAtt = (InstructionFiles) iter.next();
+			attPOSet.add(newAtt);
+		}
+		attachmentList.clear();
+		
+		//handle deleted instruction files
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		iter = deleteAttachmentList.iterator();
+		while(iter.hasNext()){
+			InstructionFiles delAtt = (InstructionFiles) iter.next();
+			//delete from repository
+			submitFilesService.deleteFromRepository(delAtt.getUuID(),delAtt.getVersionID());
+			//it is an existed att, then delete it from current attachmentPO
+			if(delAtt.getUid() != null){
+				Iterator attIter = attPOSet.iterator();
+				while(attIter.hasNext()){
+					InstructionFiles att = (InstructionFiles) attIter.next();
+					if(delAtt.getUid().equals(att.getUid())){
+						attIter.remove();
+						break;
+					}
+				}
+				submitFilesService.deleteInstructionFile(delAtt.getUid());
+			}//end remove from persist value
+		}
+		deleteAttachmentList.clear();
+		
+		//copy back
+		persistContent.setInstructionFiles(attPOSet);
+		
+		submitFilesService.saveOrUpdateContent(persistContent);
 		
 		//to jump to common success page in lams_central
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
@@ -386,22 +402,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	 */
 	private SubmitFilesContent getContent(ActionForm form) {
 		AuthoringForm authForm = (AuthoringForm) form;
-		Long contentID = authForm.getToolContentID();
-		String title = authForm.getTitle();
-		String instructions = authForm.getInstructions();
-		String online_instruction = authForm.getOnlineInstruction();
-		String offline_instruction = authForm.getOfflineInstruction();
-		boolean lock_on_finished = authForm.isLockOnFinished();
+		Long contentId = authForm.getToolContentID();
 		
 		SubmitFilesContent content = new SubmitFilesContent();
-		content.setContentID(contentID);
-		content.setInstruction(instructions);
-		content.setOfflineInstruction(offline_instruction);
-		content.setOnlineInstruction(online_instruction);
-		content.setTitle(title);
-		content.setLockOnFinished(lock_on_finished);
+		content.setContentID(contentId);
+		content.setInstruction(authForm.getInstructions());
+		content.setOfflineInstruction(authForm.getOfflineInstruction());
+		content.setOnlineInstruction(authForm.getOnlineInstruction());
+		content.setTitle(authForm.getTitle());
+		content.setLockOnFinished( authForm.isLockOnFinished());
 		content.setReflectInstructions(authForm.getReflectInstructions());
 		content.setReflectOnActivity(authForm.isReflectOnActivity());
+		content.setLimitUpload(authForm.isLimitUpload());
+		content.setLimitUploadNumber(authForm.getLimitUploadNumber());
 		// content.setInstrctionFiles()
 		// content.setToolSession();
 		return content;

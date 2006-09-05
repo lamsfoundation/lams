@@ -39,8 +39,6 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
  */
 public class SubmitFilesContentDAO extends BaseDAO implements ISubmitFilesContentDAO {
 
-	private static final String FIND_INSTRUCTION_FILE = "from " + InstructionFiles.class.getName() 
-													+ " as i where content_id=? and i.uuID=? and i.versionID=? and i.type=?";
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#getContentByID(java.lang.Long)
@@ -53,28 +51,7 @@ public class SubmitFilesContentDAO extends BaseDAO implements ISubmitFilesConten
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#save(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
 	 */
 	public void saveOrUpdate(SubmitFilesContent content) {
-		this.getSession().setFlushMode(FlushMode.COMMIT);
 		this.getHibernateTemplate().saveOrUpdate(content);
-		this.getHibernateTemplate().flush();
-	}
-
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-		HibernateTemplate templ = this.getHibernateTemplate();
-		if ( contentID != null && uuid != null && versionID != null ) {
-			List list = getSession().createQuery(FIND_INSTRUCTION_FILE)
-				.setLong(0,contentID.longValue())
-				.setLong(1,uuid.longValue())
-				.setLong(2,versionID.longValue())
-				.setString(3,type)
-				.list();
-			if(list != null && list.size() > 0){
-				InstructionFiles file = (InstructionFiles) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(file);
-				templ.flush();
-			}
-		}
-		
 	}
 		
 }

@@ -91,7 +91,7 @@
 
         <many-to-one
             name="learner"
-            class="org.lamsfoundation.lams.tool.sbmt.Learner"
+            class="org.lamsfoundation.lams.tool.sbmt.SubmitUser"
             cascade="none"
             outer-join="auto"
             update="true"

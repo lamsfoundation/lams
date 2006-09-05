@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
@@ -112,7 +112,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		Iterator userIter = map.keySet().iterator();
 		while (userIter.hasNext()) {
-			UserDTO user = (UserDTO) userIter.next();
+			SubmitUser user = (SubmitUser) userIter.next();
 			List fileList = (List) map.get(user);
 
 			Iterator fileListIter = fileList.iterator();
@@ -230,7 +230,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 
-		Learner learner = sbmtService.getLearner(toolSessionID, new Integer(userID.intValue()));
+		SubmitUser learner = sbmtService.getSessionUser(toolSessionID, new Integer(userID.intValue()));
 
 		if (learner == null) {
 			String error = "The user with user id "
@@ -265,7 +265,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		Map userFilesMap = new HashMap();
-		userFilesMap.put(sbmtService.getUserDetails(learner.getUserID()),fileList);
+		userFilesMap.put(sbmtService.getSessionUser(toolSessionID, learner.getUserID()),fileList);
 		
 		//add session name to construct a new map
 		Map report = new TreeMap(this.new StringComparator());

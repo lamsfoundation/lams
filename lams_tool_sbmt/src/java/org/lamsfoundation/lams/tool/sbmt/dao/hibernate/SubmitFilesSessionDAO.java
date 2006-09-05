@@ -55,7 +55,6 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
 	 */
 	public void createSession(SubmitFilesSession submitSession) {
 		 this.getHibernateTemplate().save(submitSession);
-		 this.getHibernateTemplate().flush();
 	}
     
     public List getSubmitFilesSessionByContentID(Long contentID){

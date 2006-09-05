@@ -66,8 +66,6 @@ public class SubmitFilesReportDAO extends BaseDAO implements
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO#updateReport(org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport)
 	 */
 	public void updateReport(SubmitFilesReport report) {
-		this.getSession().setFlushMode(FlushMode.AUTO);
 		getHibernateTemplate().update(report);
-		getHibernateTemplate().flush();
 	}
 }

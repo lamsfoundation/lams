@@ -85,7 +85,13 @@
 									<fmt:message key="label.learner.fileName" />
 								</td>
 								<td>
-									<c:out value="${file.filePath}" />
+									<c:out value="${file.filePath}" /> &nbsp;&nbsp;
+									<c:if test="${file.currentLearner}">
+										<c:set var="downloadURL">
+											<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true"/>
+										</c:set>
+										<a href="${downloadURL}"><fmt:message key="label.download"/> </a>
+									</c:if>
 								</td>
 							</tr>
 							<tr>

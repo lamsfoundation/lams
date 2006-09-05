@@ -24,7 +24,7 @@
 					<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
 					<input type="hidden" name="reportID" value="${fileInfo.reportID}" />
 					<input type="hidden" name="detailID" value="${fileInfo.submissionID}" />
-					<input type="hidden" name="userID" value="${fileInfo.userDTO.userID}" />
+					<input type="hidden" name="userID" value="${fileInfo.owner.userID}" />
 					<input type="hidden" name="updateMode" value="${updateMode}" />
 						<table cellpadding="0">
 							<%@include file="fileinfo.jsp"%>

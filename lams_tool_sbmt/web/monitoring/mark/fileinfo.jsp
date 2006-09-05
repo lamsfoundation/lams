@@ -1,10 +1,10 @@
 <c:if test="${status.first}">
 	<tr>
 		<td colspan="2">
-			<c:out value="${fileInfo.userDTO.firstName}" />
-			<c:out value="${fileInfo.userDTO.lastName}" />
+			<c:out value="${fileInfo.owner.firstName}" />
+			<c:out value="${fileInfo.owner.lastName}" />
 			,
-			<c:out value="${fileInfo.userDTO.login}" />
+			<c:out value="${fileInfo.owner.login}" />
 			,
 			<fmt:message key="label.submit.file.suffix" />
 			:

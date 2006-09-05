@@ -34,7 +34,7 @@
 
 <tr>
 	<td colspan="2">
-		<html:link href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.userDTO.userID});" 
+		<html:link href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 
 			property="submit" styleClass="button">
 			<bean:message key="label.monitoring.updateMarks.button" />
 		</html:link>

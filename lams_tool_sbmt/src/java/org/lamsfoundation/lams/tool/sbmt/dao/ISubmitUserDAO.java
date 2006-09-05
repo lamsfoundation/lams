@@ -28,23 +28,22 @@ package org.lamsfoundation.lams.tool.sbmt.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 
-public interface ILearnerDAO extends IBaseDAO  {
+public interface ISubmitUserDAO extends IBaseDAO  {
 
-	public Learner getLearner(Long sessionID, Integer userID);
-	
 	/**
-	 * This method returns a list of files that were uploaded by the
-	 * given <code>User<code> for given <code>sessionID</code>.
-	 * 
-	 * @param userID The <code>user_id</code> of the <code>User</code>
-	 * @param sessionID The <code>session_id</code> to be looked up
-	 * @return List The list of required objects.
+	 * get user from some Tool Session
+	 * @param sessionID
+	 * @param userID
+	 * @return
 	 */
-	public List getSubmissionDetailsForUserBySession(Integer userID,Long sessionID);
+	public SubmitUser getLearner(Long sessionID, Integer userID);
+	public SubmitUser getContentUser(Long contentId, Integer userID);
 	
-	public void saveLearner(Learner learner);
+	public List<SubmitUser> getUsersBySession(Long sessionID);
+	
+	public void saveOrUpdateUser(SubmitUser user);
 
-	public void updateLearer(Learner learner);
+
 }

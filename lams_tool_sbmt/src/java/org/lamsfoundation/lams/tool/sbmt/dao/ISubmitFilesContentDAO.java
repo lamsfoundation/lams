@@ -50,6 +50,5 @@ public interface ISubmitFilesContentDAO extends IBaseDAO{
 	 */
 	public void saveOrUpdate(SubmitFilesContent content);
 
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);	
-	
+
 }

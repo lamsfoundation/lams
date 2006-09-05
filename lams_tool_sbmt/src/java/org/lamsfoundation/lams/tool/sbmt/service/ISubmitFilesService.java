@@ -32,7 +32,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -119,15 +119,7 @@ public interface ISubmitFilesService {
 	 */
 	public SortedMap getFilesUploadedBySession(Long sessionID);
 
-	/**
-	 * Get information of all users who have submitted file.
-	 * @return The user information list
-	 */
-	public List getUsers(Long contentID);
-	
 	public void updateMarks(Long reportID, Long marks, String comments);
-	
-	public UserDTO getUserDetails(Integer userID);
 	
 	public FileDetailsDTO getFileDetails(Long detailID);
 	/**
@@ -146,7 +138,6 @@ public interface ISubmitFilesService {
 	public boolean releaseMarksForSession(Long sessionID);
 
 	public void deleteFromRepository(Long uuid, Long versionID);
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 	/**
 	 * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
 	 * 
@@ -154,14 +145,6 @@ public interface ISubmitFilesService {
 	 * @param userID
 	 */
 	public void finishSubmission(Long sessionID, Integer userID);
-	/**
-	 * Get learner by given <code>toolSessionID</code> and <code>userID</code>.
-	 *  
-	 * @param sessionID
-	 * @param userID
-	 * @return
-	 */
-	public Learner getLearner(Long sessionID, Integer userID);
     /**
      * Create the default content for the given contentID. These default data will copy from default record in 
      * Tool Content database table.
@@ -212,7 +195,48 @@ public interface ISubmitFilesService {
 	 */
 	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
-	public Learner createLearner(UserDTO userDto, Long sessionID);
+	/**
+	 * Delete instruction file by UID
+	 * @param uid
+	 */
+	public void deleteInstructionFile(Long uid);
+	//*************************************************************
+	// get SubmitUser methods
+	//*************************************************************
 	
-	public Learner getLearnerByUid(Long uid);
+	/**
+	 * Get learner by given <code>toolSessionID</code> and <code>userID</code>.
+	 *  
+	 * @param sessionID
+	 * @param userID
+	 * @return
+	 */
+	public SubmitUser getSessionUser(Long sessionID, Integer userID);
+	public SubmitUser getContentUser(Long contentId, Integer userID);
+	
+	/**
+	 * Create new user
+	 * @param userDto
+	 * @param sessionID
+	 * @return
+	 */
+	public SubmitUser createSessionUser(UserDTO userDto, Long sessionID);
+	public SubmitUser createContentUser(UserDTO user, Long contentId);
+
+
+	/**
+	 * Get information of all users who have submitted file.
+	 * @return The user information list
+	 */
+	public List<SubmitUser> getUsersBySession(Long sessionID);
+	
+	/**
+	 * get user by UID
+	 * @param uid
+	 * @return
+	 */
+	public SubmitUser getUserByUid(Long uid);
+
+
+
 }

@@ -51,6 +51,8 @@ public class SbmtConstants {
 	public static final String ATTR_INSTRUCTION = "instruction";
 	public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
 	public static final String PARAM_MIN_UPLOAD = "minUpload";
+	public static final String ATTR_LIMIT_UPLOAD = "limitUpload";
+	public static final String ATTR_LIMIT_UPLOAD_NUMBER = "limitUploadNumber";
 
 }
 
