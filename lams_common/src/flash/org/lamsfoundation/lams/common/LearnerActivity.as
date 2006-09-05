@@ -256,7 +256,7 @@ class LearnerActivity extends MovieClip {
 	}
 	
 	private function onPress():Void{
-			hideToolTip();
+			
 			// check double-click
 			var now:Number = new Date().getTime();
 			
@@ -264,7 +264,7 @@ class LearnerActivity extends MovieClip {
 				//if (app.controlKeyPressed != "transition"){
 					_doubleClicking = true;
 					controller.activityDoubleClick(this);
-					
+					Debugger.log('DoubleClicking:+'+this,Debugger.GEN,'onPress','LearnerActivity');
 				//}
 			}else{
 				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','LearnerActivity');
@@ -272,6 +272,7 @@ class LearnerActivity extends MovieClip {
 			}
 			
 			_dcStartTime = now;
+			hideToolTip();
 	
 	}
 	
