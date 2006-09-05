@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
@@ -1374,9 +1375,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/** 
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUsersFromOrganisationByRole(Integer, String)
 	 */
-	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) 
+	public Vector<UserFlashDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) 
 	{
-		return userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName);
+		return (Vector<UserFlashDTO>) userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName, true);
 	}
 	
 	

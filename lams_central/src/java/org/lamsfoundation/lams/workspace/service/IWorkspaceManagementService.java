@@ -30,6 +30,7 @@ import java.util.Vector;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
@@ -338,7 +339,7 @@ public interface IWorkspaceManagementService {
 	 * @param role
 	 * @return
 	 */
-	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
+	public Vector<UserFlashDTO> getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
 
 	/**
 	 * Returns a single OrganisationDTO with the user's roles included. If the user does not have 

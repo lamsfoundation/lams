@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -562,7 +563,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 		FlashMessage flashMessage = null; 
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			Vector<UserDTO> users = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);
+			Vector<UserFlashDTO> users = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);
 			if ( log.isDebugEnabled()) {
 				log.debug("getUsersFromOrganisationByRole: organisationID="+organisationID+" role="+role+" users "+users);
 			}
