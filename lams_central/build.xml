@@ -121,6 +121,9 @@
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="*.tld"/>
+				<include name="conf/**"/>
+				<include name="modules/**"/>
+				<include name="services/**"/>
 				<include name="tags/**"/>
 				<include name="*.properties"/>
 				<include name="struts/**"/>
