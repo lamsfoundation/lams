@@ -804,7 +804,7 @@ public class SubmitFilesService implements ToolContentManager,
     	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
     	toolContentObj.setLockOnFinished(Boolean.TRUE);  
     	
-		SubmitUser suser = createSessionUser(user, null);
+		SubmitUser suser = createContentUser(user, toolContentId);
     	toolContentObj.setCreatedBy(suser);
     	
     	// leave as empty, no need to set them to anything.
