@@ -388,7 +388,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.helpItem :
 				break;
 			case eventObj.menu.aboutItem :
-				LFMessage.showMessageAlert("build version: " + _root.build);
+				LFMessage.showMessageAlert("Serial No: " + ApplicationParent.SERIAL_NO);
 				break;
 		}
 	}

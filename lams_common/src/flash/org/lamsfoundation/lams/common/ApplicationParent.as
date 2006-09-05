@@ -42,6 +42,7 @@ class ApplicationParent {
 	public static var C_GROUP:String = "c_group";
 	public static var C_DEFAULT:String = "default";
 	
+	public static var SERIAL_NO = "0000-0000-0000-0001-AAAA";
 	
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
