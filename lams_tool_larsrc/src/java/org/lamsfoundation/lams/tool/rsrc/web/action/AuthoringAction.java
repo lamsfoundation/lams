@@ -488,6 +488,7 @@ public class AuthoringAction extends Action {
 			}else{ //if it is Teacher, then just update basic tab content (definelater)
 				resourcePO.setInstructions(resource.getInstructions());
 				resourcePO.setTitle(resource.getTitle());
+//				change define later status
 				resourcePO.setDefineLater(false);
 			}
 			resourcePO.setUpdated(new Timestamp(new Date().getTime()));

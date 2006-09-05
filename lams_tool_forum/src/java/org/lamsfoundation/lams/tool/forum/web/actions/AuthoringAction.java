@@ -286,6 +286,7 @@ public class AuthoringAction extends Action {
 //					if it is Teacher, then just update basic tab content (definelater)
 					forumPO.setInstructions(forum.getInstructions());
 					forumPO.setTitle(forum.getTitle());
+//					change define later status
 					forumPO.setDefineLater(false);
 				}
 			}
