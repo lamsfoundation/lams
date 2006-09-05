@@ -29,7 +29,7 @@
 <archive path="/lams_build/lib/jdom/jdom.jar"/>
 <archive path="/lams_build/lib/junit/junit.jar"/>
 <archive path="/lams_build/lib/jfreechart/gnujaxp.jar"/>
-<archive path="/lams_build/lib/log4j/log4j-1.2.9.jar"/>
+<archive path="/lams_build/lib/log4j/log4j-1.2.13.jar"/>
 <archive path="/lams_build/lib/middlegen/velocity-1.4-dev.jar"/>
 <archive path="/lams_build/lib/middlegen/middlegen-2.1.jar"/>
 <archive path="/lams_build/lib/middlegen/middlegen-hibernate-plugin-2.1.jar"/>
