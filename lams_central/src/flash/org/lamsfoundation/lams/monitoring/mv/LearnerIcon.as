@@ -95,6 +95,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		}
 		learnerOffset_X = _x
 		learnerOffset_Y = _y
+		Debugger.log('Learner x pos and y pos : '+learnerOffset_X+ " and "+learnerOffset_Y ,4,'draw','LearnerIcon');
 		showAssets(false);
 		//Click, Rollover and rollout Events for Learner Icon;
 		click_mc.onRollOver = Proxy.create (this, localOnRollOver);
@@ -148,7 +149,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			//trace("Module passed is: "+_module)
 			if (app.controlKeyPressed != "transition"){
 				_doubleClicking = true;
-				//Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.GEN,'onPress','CanvasActivity For Monitoring');
+				Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'onPress','CanvasActivity For Monitoring');
 				var _learnerID:Number = learner.getLearnerId()
 				_monitorController.activityDoubleClick(_activity, "MonitorTabViewLearner", _learnerID);
 						
