@@ -509,6 +509,7 @@ public class AuthoringAction extends Action {
 		
 		//**********************************Handle Authoring Instruction Attachement *********************
     	//merge attachment info
+		//so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
 		Set attPOSet = resourcePO.getAttachments();
 		if(attPOSet == null)
 			attPOSet = new HashSet();
@@ -561,7 +562,7 @@ public class AuthoringAction extends Action {
     		}
     	}
     	resourcePO.setResourceItems(itemList);
-    	//delete them from database.
+    	//delete instructino file from database.
     	List delResourceItemList = getDeletedResourceItemList(sessionMap);
     	iter = delResourceItemList.iterator();
     	while(iter.hasNext()){
