@@ -1,9 +1,30 @@
 <servlet-mapping>
 	<servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
+	<url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
 <servlet-mapping>
-  <servlet-name>download</servlet-name>
-  <url-pattern>/download/*</url-pattern>
+	<servlet-name>download</servlet-name>
+	<url-pattern>/download/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>AxisRESTServlet</servlet-name>
+	<url-pattern>/rest/*</url-pattern>
+</servlet-mapping>
+
+
+<servlet-mapping>
+	<servlet-name>AxisServlet</servlet-name>
+	<url-pattern>/servlet/AxisServlet</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>AxisServlet</servlet-name>
+	<url-pattern>*.jws</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>AxisServlet</servlet-name>
+	<url-pattern>/services/*</url-pattern>
 </servlet-mapping>

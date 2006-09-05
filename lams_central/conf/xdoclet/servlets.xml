@@ -1,33 +1,54 @@
 <servlet>
-    <servlet-name>action</servlet-name>
-    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-    <init-param>
-      <param-name>config</param-name>
-      <param-value>/WEB-INF/struts/struts-config.xml</param-value>
-    </init-param>
-    <init-param>
-      <param-name>debug</param-name>
-      <param-value>999</param-value>
-    </init-param>
-    <init-param>
-      <param-name>detail</param-name>
-      <param-value>2</param-value>
-    </init-param>
-    <init-param>
-      <param-name>validate</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
+	<servlet-name>action</servlet-name>
+	<servlet-class>
+		org.apache.struts.action.ActionServlet
+	</servlet-class>
+	<init-param>
+		<param-name>config</param-name>
+		<param-value>/WEB-INF/struts/struts-config.xml</param-value>
+	</init-param>
+	<init-param>
+		<param-name>debug</param-name>
+		<param-value>999</param-value>
+	</init-param>
+	<init-param>
+		<param-name>detail</param-name>
+		<param-value>2</param-value>
+	</init-param>
+	<init-param>
+		<param-name>validate</param-name>
+		<param-value>true</param-value>
+	</init-param>
+	<load-on-startup>1</load-on-startup>
 </servlet>
 
 <servlet>
-		<description>Instructions Download</description>
-		<display-name>Instructions Download</display-name>
-		<servlet-name>download</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
-	    <init-param>
-	      <param-name>toolContentHandlerBeanName</param-name>
-	      <param-value>centralToolContentHandler</param-value>
-	    </init-param>
-	    <load-on-startup>3</load-on-startup>
+	<description>Instructions Download</description>
+	<display-name>Instructions Download</display-name>
+	<servlet-name>download</servlet-name>
+	<servlet-class>
+		org.lamsfoundation.lams.contentrepository.client.ToolDownload
+	</servlet-class>
+	<init-param>
+		<param-name>toolContentHandlerBeanName</param-name>
+		<param-value>centralToolContentHandler</param-value>
+	</init-param>
+	<load-on-startup>3</load-on-startup>
+</servlet>
+
+<servlet>
+	<servlet-name>AxisServlet</servlet-name>
+	<display-name>Apache-Axis Servlet</display-name>
+	<servlet-class>
+		org.apache.axis2.transport.http.AxisServlet
+	</servlet-class>
+	<load-on-startup>2</load-on-startup>
+</servlet>
+
+<servlet>
+	<servlet-name>AxisRESTServlet</servlet-name>
+	<display-name>Apache-Axis Servlet (REST)</display-name>
+	<servlet-class>
+		org.apache.axis2.transport.http.AxisRESTServlet
+	</servlet-class>
 </servlet>
