@@ -74,6 +74,9 @@ class MonitorController extends AbstractController {
 	public function activityRelease(act:Object, forObj:String):Void{
 		Debugger.log('activityRelease CanvasActivity:'+act.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
 		if (forObj == "LearnerIcon"){
+			if(_monitorModel.isDragging){
+				act.stopDrag();
+			}
 			var hasHit:Boolean = false;
 			var actUIIDToCompare = act.activity.activityUIID;
 			if (act.activity.parentUIID != null){
@@ -83,9 +86,7 @@ class MonitorController extends AbstractController {
 			}
 			var indexArray:Array = _monitorModel.activitiesOnCanvas()	//setDesignOrder();
 			var currentActOrder:Number = checkLearnerCurrentActivity(indexArray, actUIIDToCompare)
-			if(_monitorModel.isDragging){
-				act.stopDrag();
-			}
+			
 			trace("current activity order: "+currentActOrder)
 			//run a loop to check which activity has been hitted by the learner.
 			for (var i=0; i<indexArray.length; i++){ 
@@ -101,7 +102,9 @@ class MonitorController extends AbstractController {
 						var fnCancel:Function = Proxy.create(ref,activitySnapBack, act);
 						LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[act.Learner.getFullName(), indexArray[i].activity.title]), fnOk,fnCancel);
 						
-					}else if (actHitOrder == currentActOrder || actHitOrder < currentActOrder){
+					}else if (actHitOrder == currentActOrder ){
+						activitySnapBack(act)
+					}else if (actHitOrder < currentActOrder){
 						activitySnapBack(act)
 						var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[act.Learner.getFullName(), indexArray[i].activity.title]) ;
 						LFMessage.showMessageAlert(msg);
@@ -173,10 +176,10 @@ class MonitorController extends AbstractController {
 		
 	   if (forTabView == "MonitorTabView"){
 			//getActivityMonitorURL&activityID=31&lessonID=4
-			Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
+			//Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 			URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
 			URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
-			Debugger.log('activityDoubleClick URL:'+URLToSend,Debugger.CRITICAL,'activityDoubleClick','MonitorController');
+			//Debugger.log('activityDoubleClick URL:'+URLToSend,Debugger.CRITICAL,'activityDoubleClick','MonitorController');
 			
 		}else {
 			if (learnerID != null){
@@ -190,19 +193,19 @@ class MonitorController extends AbstractController {
 				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 				URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
 			}else {
-				
 				URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
-				
 			}
 		}
 
-		//Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','MonitorModel');
-		if (forTabView != "MonitorTabView"){
+		Debugger.log('Opening url (ca.activityID) :'+URLToSend+" Opening url (ca.activityID)"+URLToSend,Debugger.CRITICAL,'openToolActivityContent','MonitorModel');
+		if (forTabView != "MonitorTabView" && forTabView != "MonitorTabViewLearner"){
 			if (ca.activityStatus == undefined){
 		
 				var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity',[ca.learnerName, ca.activity.title]);
 				getURL("javascript:alert('"+alertMSG+"');");
 				
+			}else {
+				JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 			}
 		}else {
 			JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
