@@ -94,12 +94,16 @@ public class UserAction extends LamsDispatchAction {
 		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
 		OrganisationType orgType = org.getOrganisationType();
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
+		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
+		Boolean hasRole = getService().isUserInRole(requestor.getUserId(), orgId, Role.COURSE_ADMIN)
+							|| getService().isUserInRole(requestor.getUserId(), orgId, Role.COURSE_MANAGER);
+		Boolean canEdit = org.getCourseAdminCanAddNewUsers() && hasRole;
 		
 		ActionMessages errors = new ActionMessages();
 		
 		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin, orgType));
 		// set canEdit for whether user should be able to edit anything other than roles
-		request.setAttribute("canEdit",isSysadmin);
+		request.setAttribute("canEdit",isSysadmin || canEdit);
 		request.setAttribute("locales",locales);
 
 		// editing a user

@@ -109,23 +109,25 @@ public class UserManageAction extends Action {
 		OrganisationType orgType = organisation.getOrganisationType();
 		request.setAttribute("orgType",orgType.getOrganisationTypeId());
 		
+		// create form object
+		UserListDTO userManageForm = new UserListDTO();
 		
 		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		Organisation orgOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg : organisation;
         // check permission
 		if(request.isUserInRole(Role.SYSADMIN)){
-			request.setAttribute("canAdd",true);
-		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) || getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
-			request.setAttribute("canAdd",orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
+			userManageForm.setCourseAdminCanAddNewUsers(true);
+			userManageForm.setCourseAdminCanBrowseAllUsers(true);
+		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) 
+				|| getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
+			userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
+			userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
 		}else{
 			request.setAttribute("errorName","UserManageAction");
 			request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
-		
-		// create form object
-		UserListDTO userManageForm = new UserListDTO();
 		userManageForm.setOrgId(orgId);
 		userManageForm.setOrgName(orgName);
 		List<UserManageBean> userManageBeans = getService().getUserManageBeans(orgId);

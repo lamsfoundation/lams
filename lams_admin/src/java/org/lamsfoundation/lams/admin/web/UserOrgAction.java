@@ -106,20 +106,19 @@ public class UserOrgAction extends Action {
 		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
 		if(request.isUserInRole(Role.SYSADMIN)){
 			users = getService().findAll(User.class);
-		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)){
-			if(orgOfCourseAdmin.getCourseAdminCanAddNewUsers()){
-				if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
-					users = getService().findAll(User.class);
-				}else if(orgType.equals(OrganisationType.CLASS_TYPE)){
-					users = getService().getUsersFromOrganisation(parentOrg.getOrganisationId());
-				}else if(orgType.equals(OrganisationType.COURSE_TYPE)){
-					users = getService().getUsersFromOrganisation(orgId);
-				}
-			}else{
-				request.setAttribute("errorName","UserOrgAction");
-				request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
-				return mapping.findForward("error");
+		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)
+				|| getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
+			if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
+				users = getService().findAll(User.class);
+			}else if(orgType.equals(OrganisationType.CLASS_TYPE)){
+				users = getService().getUsersFromOrganisation(parentOrg.getOrganisationId());
+			}else if(orgType.equals(OrganisationType.COURSE_TYPE)){
+				users = getService().getUsersFromOrganisation(orgId);
 			}
+		}else{
+			request.setAttribute("errorName","UserOrgAction");
+			request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
+			return mapping.findForward("error");
 		}
 		users = removeDisabledUsers(users);
 		Collections.sort(users);

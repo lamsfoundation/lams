@@ -38,6 +38,8 @@ public class UserListDTO {
 	private List<UserManageBean> userManageBeans;
 	private Integer orgId;
 	private String orgName;
+	private Boolean courseAdminCanAddNewUsers;
+	private Boolean courseAdminCanBrowseAllUsers;
 
 	public List<UserManageBean> getUserManageBeans() {
 		return userManageBeans;
@@ -61,5 +63,21 @@ public class UserListDTO {
 	
 	public void setOrgName(String orgName) {
 		this.orgName = orgName;
+	}
+	
+	public Boolean getCourseAdminCanAddNewUsers() {
+		return courseAdminCanAddNewUsers;
+	}
+	
+	public void setCourseAdminCanAddNewUsers(Boolean courseAdminCanAddNewUsers) {
+		this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
+	}
+	
+	public Boolean getCourseAdminCanBrowseAllUsers() {
+		return courseAdminCanBrowseAllUsers;
+	}
+	
+	public void setCourseAdminCanBrowseAllUsers(Boolean courseAdminCanBrowseAllUsers) {
+		this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
 	}
 }
