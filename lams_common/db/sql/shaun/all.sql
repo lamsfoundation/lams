@@ -265,8 +265,8 @@ values(15,'portuguese','portuguese','Dr','Portuguese','Test','15', 'Portuguese A
 
 -- need a new user_organisation_id for each row, user_id must match user_id created in the lams_user
 -- belongs to course Playpen, Class Everybody
-INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (42, 5, 15);
-INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (43, 5, 15);
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (42, 2, 15);
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (43, 3, 15);
 
 -- need a new user_organisation_role_id for each row, use the same role_ids (3,4,2) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (102,42,3);
