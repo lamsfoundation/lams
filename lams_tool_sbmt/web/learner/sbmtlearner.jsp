@@ -58,6 +58,11 @@
 				<tr>
 					<td colspan="2">
 						<%@include file="/common/messages.jsp"%>
+						<c:if test="${sessionMap.limitUpload}">
+							<fmt:message key="message.left.upload.limit">
+								 <fmt:param value="${learner.limitUploadLeft}"/>
+							</fmt:message>
+						</c:if>
 					</td>
 				</tr>
 
@@ -68,10 +73,11 @@
 						<tr>
 							<td>
 							<fmt:message key="label.learner.noUpload" />
-							<p>
-								<fmt:message key="label.learner.uploadMessage" />
-							</p>
-							</center>
+								<%-- 
+								<p>
+									<fmt:message key="label.learner.uploadMessage" />
+								</p>
+								--%>
 							</td>
 						</tr>
 					</c:when>

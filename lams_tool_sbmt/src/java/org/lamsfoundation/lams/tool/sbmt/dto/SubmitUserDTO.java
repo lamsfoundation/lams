@@ -64,6 +64,7 @@ public class SubmitUserDTO implements Serializable{
 	private boolean finishReflection;
 	private String reflect;
 	
+	private int limitUploadLeft;
 	
 	public SubmitUserDTO(){
 		
@@ -228,5 +229,11 @@ public class SubmitUserDTO implements Serializable{
 	}
 	public void setUserID(Integer userID) {
 		this.userID = userID;
+	}
+	public int getLimitUploadLeft() {
+		return limitUploadLeft;
+	}
+	public void setLimitUploadLeft(int limitUploadLeft) {
+		this.limitUploadLeft = limitUploadLeft;
 	}
 }

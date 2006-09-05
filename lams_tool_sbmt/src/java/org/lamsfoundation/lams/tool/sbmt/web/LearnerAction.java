@@ -349,6 +349,8 @@ public class LearnerAction extends DispatchAction {
 				//lock upload: currently, use same lock with "FINISH_ON_LOCK"
 				sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, true);
 			}
+			int limitUploadLeft = limit -  filesUploaded.size();
+			dto.setLimitUploadLeft(limitUploadLeft);
 		}
 		
 		request.setAttribute("learner",dto);
