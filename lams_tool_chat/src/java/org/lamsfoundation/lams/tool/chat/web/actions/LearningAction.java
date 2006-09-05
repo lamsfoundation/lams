@@ -113,10 +113,10 @@ public class LearningAction extends LamsDispatchAction {
 			return mapping.findForward("defineLater");
 		}
 
+		request.setAttribute("MODE", mode.toString());
+		
 		// check runOffline
 		if (chat.getRunOffline()) {
-			request.setAttribute("MODE", mode.toString());
-			request.setAttribute("USER_UID", chatUser.getUid());
 			return mapping.findForward("runOffline");
 		}
 
@@ -132,7 +132,6 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("XMPPDOMAIN", Configuration
 				.get(ConfigurationKeys.XMPP_DOMAIN));
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
-		request.setAttribute("MODE", mode.toString());
 		
 		ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
 		if (chatUser.getFinishedActivity()) {
