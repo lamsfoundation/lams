@@ -84,8 +84,8 @@ public class IndexAction extends Action {
 			List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 			//headerLinks.add(new IndexLinkBean("index.dummymonitor","javascript:openDummyMonitor()"));
 			headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile('" + request.getRemoteUser()+"')"));
-			if (request.isUserInRole(Role.SYSADMIN)) {
-				log.debug("user is sysadmin");
+			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
+				log.debug("user is an admin or manager");
 				headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 				headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+")"));
 			}

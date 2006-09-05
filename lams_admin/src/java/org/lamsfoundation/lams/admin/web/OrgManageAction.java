@@ -110,7 +110,7 @@ public class OrgManageAction extends Action {
 		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
 		//if(getService().isUserSysAdmin(username)){
 		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
-		if(request.isUserInRole(Role.SYSADMIN) || getService().isUserInRole(userId, orgId, Role.COURSE_ADMIN) || getService().isUserInRole(userId, orgId, Role.COURSE_MANAGER)){
+		if(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)){
 			Integer type;
 			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){
 				type = OrganisationType.COURSE_TYPE;
@@ -118,11 +118,18 @@ public class OrgManageAction extends Action {
 				type = OrganisationType.CLASS_TYPE;
 			}
 			List organisations = getService().findByProperty(Organisation.class,"organisationType.organisationTypeId",type);
-			log.debug("user is sysadmin");
-			log.debug("Got "+organisations.size()+" organsiations");
+			log.debug("user is an admin or manager");
+			log.debug("Got "+organisations.size()+" organisations");
 			log.debug("organisationType is "+type);
 			for(int i=0; i<organisations.size(); i++){
 				Organisation organisation = (Organisation)organisations.get(i);
+				Organisation parentOrg = (type.equals(OrganisationType.CLASS_TYPE)) ? organisation.getParentOrganisation() : organisation;
+				if (!request.isUserInRole(Role.SYSADMIN)) {
+					if (!getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN))
+						continue;
+					if (!getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER))
+						continue;
+				}
 				if(type.equals(OrganisationType.CLASS_TYPE)){
 					if (organisation.getParentOrganisation().getOrganisationId() != orgId)
 						continue;
