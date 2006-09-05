@@ -125,13 +125,12 @@ public class OrgManageAction extends Action {
 				Organisation organisation = (Organisation)organisations.get(i);
 				Organisation parentOrg = (type.equals(OrganisationType.CLASS_TYPE)) ? organisation.getParentOrganisation() : organisation;
 				if (!request.isUserInRole(Role.SYSADMIN)) {
-					if (!getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN))
-						continue;
-					if (!getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER))
+					if (!(getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN)
+							|| getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER)))
 						continue;
 				}
 				if(type.equals(OrganisationType.CLASS_TYPE)){
-					if (organisation.getParentOrganisation().getOrganisationId() != orgId)
+					if (parentOrg.getOrganisationId() != orgId)
 						continue;
 				}
 				OrgManageBean orgManageBean = new OrgManageBean();
