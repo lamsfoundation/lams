@@ -52,25 +52,6 @@
             length="20"
         />
 
-        <set
-            name="submissionDetails"
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-
-            <key
-                column="learner_id"
-            >
-            </key>
-
-            <one-to-many
-                  class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
-            />
-
-        </set>
-
         <property
             name="firstName"
             type="java.lang.String"

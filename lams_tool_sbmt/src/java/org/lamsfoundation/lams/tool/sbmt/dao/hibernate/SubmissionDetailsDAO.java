@@ -38,9 +38,9 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 public class SubmissionDetailsDAO extends BaseDAO implements
 		ISubmissionDetailsDAO {
 	
-	private static final String FIND_BY_SESSION = "from " + 
-													SubmissionDetails.class.getName() +
-													" where session_id=?";
+	private static final String FIND_BY_SESSION = "from " + SubmissionDetails.class.getName() + " as d where d.submitFileSession.sessionID=? ";
+	private static final String FIND_BY_SESSION_LEARNER = "from " + SubmissionDetails.class.getName() 
+		+ " as d where d.submitFileSession.sessionID=? and d.learner.userID=?";
 	
 	/**
 	 * (non-Javadoc)
@@ -70,5 +70,11 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 				.list();
 		}
 		return null;
+	}
+	
+	public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Long userID){
+		
+		return this.getHibernateTemplate().find(FIND_BY_SESSION_LEARNER, new Object[]{sessionID,userID});
+		
 	}
 }

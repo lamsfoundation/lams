@@ -192,7 +192,8 @@ public class LearnerAction extends DispatchAction {
         Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
        	
 		if(!isTokenValid(request,true) || validateUploadForm(learnerForm,request)){
-			resetToken(request);
+			if(!isTokenValid(request,true))
+				resetToken(request);
 			
 			//get session from shared session.
 			HttpSession ss = SessionManager.getSession();

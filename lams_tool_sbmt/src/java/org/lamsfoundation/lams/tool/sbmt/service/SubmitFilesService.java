@@ -162,8 +162,6 @@ public class SubmitFilesService implements ToolContentManager,
 			fromContent = getDefaultSubmit();
 		}
 		SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent,toContentId,sbmtToolContentHandler);
-		//clear ToolSession
-		toContent.setToolSession(new HashSet());
 
 		submitFilesContentDAO.saveOrUpdate(toContent);
 	}
@@ -242,7 +240,7 @@ public class SubmitFilesService implements ToolContentManager,
 		SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
 		if (submitFilesContent != null) {
 		   //if session data exist and removeSessionData=false, throw an exception
-			Set submissionData = submitFilesContent.getToolSession();
+			List submissionData = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
 			if ( !(submissionData==null || submissionData.isEmpty()) && ! removeSessionData) {
 		        throw new SessionDataExistsException("Delete failed: There is session data that belongs to this tool content id");
 			} else if ( submissionData != null ){
@@ -256,6 +254,9 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
 
+	public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID){
+		return submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentID);
+	}
 	/**
      * Export the XML fragment for the tool's content, along with any files needed
      * for the content.
@@ -269,7 +270,6 @@ public class SubmitFilesService implements ToolContentManager,
  		
  		//set toolContentHandler as null to avoid duplicate file node in repository.
  		toolContentObj = SubmitFilesContent.newInstance(toolContentObj,toolContentId,null);
- 		toolContentObj.setToolSession(null);
  		toolContentObj.setToolContentHandler(null);
 		try {
 			exportContentService.exportToolContent( toolContentId, toolContentObj,sbmtToolContentHandler, toPath);
@@ -624,15 +624,12 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
 	public List getFilesUploadedByUser(Integer userID, Long sessionID){
-		SubmitUser learner = getSessionUser(sessionID, userID);
-		Set list =  learner.getSubmissionDetails();
+		List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, new Long(userID.intValue()));
 		SortedSet details = new TreeSet(this.new FileDtoComparator());
 		if(list ==null)
 			return new ArrayList(details);
 		
-		Iterator iterator = list.iterator();
-		while(iterator.hasNext()){
-			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
+		for(SubmissionDetails submissionDetails : list){
 			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails);
 			details.add(detailDto);
 		}

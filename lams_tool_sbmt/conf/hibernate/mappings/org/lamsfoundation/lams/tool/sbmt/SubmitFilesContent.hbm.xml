@@ -43,25 +43,6 @@
             column="instruction"
         />
 
-        <set
-            name="toolSession"
-            lazy="true"
-            inverse="true"
-            cascade="all"
-            sort="unsorted"
-        >
-
-            <key
-                column="content_id"
-            >
-            </key>
-
-            <one-to-many
-                  class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
-            />
-
-        </set>
-
         <property
             name="defineLater"
             type="boolean"

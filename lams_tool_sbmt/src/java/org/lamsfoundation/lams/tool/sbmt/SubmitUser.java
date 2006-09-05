@@ -52,7 +52,6 @@ public class SubmitUser implements Serializable,Cloneable{
 	private Long contentID;
 	
 	private boolean finished;
-	private Set submissionDetails;
 	
 	
 	/* (non-Javadoc)
@@ -127,23 +126,7 @@ public class SubmitUser implements Serializable,Cloneable{
 	public void setSessionID(Long sessionID) {
 		this.sessionID = sessionID;
 	}
-	
-	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
-	 * @hibernate.collection-key column="learner_id"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
-	 *  
-	 * @return Returns the submissionDetails.
-	 */
-	public Set getSubmissionDetails() {
-		return submissionDetails;
-	}
-	/**
-	 * @param submissionDetails The submissionDetails to set.
-	 */
-	public void setSubmissionDetails(Set submissionDetails) {
-		this.submissionDetails = submissionDetails;
-	}
+
 	/**
 	 * @hibernate.property column="first_name" 
 	 */

@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
@@ -200,6 +201,8 @@ public interface ISubmitFilesService {
 	 * @param uid
 	 */
 	public void deleteInstructionFile(Long uid);
+	
+	public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID);
 	//*************************************************************
 	// get SubmitUser methods
 	//*************************************************************
@@ -236,6 +239,7 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public SubmitUser getUserByUid(Long uid);
+
 
 
 

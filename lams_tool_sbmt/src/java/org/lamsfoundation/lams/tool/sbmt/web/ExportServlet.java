@@ -293,13 +293,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 		// return FileDetailsDTO list according to the given sessionID
-		Set sessionList = content.getToolSession();
-		Iterator iter = sessionList.iterator();
 		Map report = new TreeMap(this.new StringComparator());
 		Map allFileMap = new TreeMap(new LastNameAlphabeticComparator());
-		while (iter.hasNext()) {
+		
+		//iterate all session in this content
+		List<SubmitFilesSession> sessionList = sbmtService.getSessionsByContentID(toolContentID);
+		for (SubmitFilesSession session : sessionList) {
 			SortedMap userFilesMap = new TreeMap(new LastNameAlphabeticComparator());
-			SubmitFilesSession session = (SubmitFilesSession) iter.next();
 			userFilesMap.putAll(sbmtService.getFilesUploadedBySession(session
 					.getSessionID()));
 			allFileMap.putAll(userFilesMap);

@@ -38,8 +38,8 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
 		ISubmitFilesSessionDAO {
 
     private static final String FIND_LEARNER_BY_CONTENT_ID = 
-        " from SubmitFilesSession session " +
-        " where session.content.contentID = :contentID";
+        " from " + SubmitFilesSession.class.getName() + 
+        " as session where session.content.contentID = :contentID";
 
     
 	/**
@@ -57,7 +57,7 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
 		 this.getHibernateTemplate().save(submitSession);
 	}
     
-    public List getSubmitFilesSessionByContentID(Long contentID){
+    public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID){
         if ( contentID != null ) {
             return this.getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
                 .setLong("contentID", contentID.longValue())

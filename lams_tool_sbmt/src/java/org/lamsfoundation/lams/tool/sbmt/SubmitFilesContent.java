@@ -80,40 +80,12 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	private Date updated;
 	private SubmitUser createdBy;
 	
-	//relationship fields
-	private Set toolSession;
 	//temporary fields
 	private IToolContentHandler toolContentHandler;
 	
-	/** full constructor */
-	public SubmitFilesContent(String title, String instructions,
-							  Set toolSession) {
-		this.title = title;
-		this.instruction = instructions;		
-		this.toolSession = toolSession;
-	}
 
 	/** default constructor */
 	public SubmitFilesContent() {
-	}
-
-	/** minimal constructor */
-	public SubmitFilesContent(Long contentID, 
-							  String title,
-							  String instructions,
-							  Set toolSession
-							  ) {
-		super();
-		this.contentID = contentID;
-		this.title = title;
-		this.instruction = instructions;
-		this.toolSession = toolSession;
-	}
-	
-	public SubmitFilesContent(Long contentID, String title, String instructions){
-		this.contentID = contentID;
-		this.title = title;
-		this.instruction = instructions;
 	}
 
 	/**
@@ -166,20 +138,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public void setInstruction(String instructions) {
 		this.instruction = instructions;
 	}	
-
-	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="all"
-	 * @hibernate.collection-key column="content_id"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
-	 *  
-	 */
-	public Set getToolSession() {
-		return this.toolSession;
-	}
-
-	public void setToolSession(Set toolSession) {
-		this.toolSession = toolSession;
-	}
 
 	public String toString() {
 		return new ToStringBuilder(this).append("contentID", getContentID())
@@ -319,14 +277,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 			obj = super.clone();
 			//never clone key!
 			((SubmitFilesContent)obj).setContentID(null);
-			//clone SubmitFileSession object
-			if(toolSession != null ){
-				Iterator iter = toolSession.iterator();
-				Set set = new HashSet();
-				while(iter.hasNext())
-					set.add(((SubmitFilesSession)iter.next()).clone());
-				((SubmitFilesContent)obj).toolSession = set;
-			}
 			//clone InstructionFiles object
 			if(instructionFiles != null ){
 				Iterator iter = instructionFiles.iterator();
@@ -343,6 +293,10 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 					set.add(newFile);
 				}
 				((SubmitFilesContent)obj).instructionFiles= set;
+				
+				if(this.createdBy != null){
+					((SubmitFilesContent)obj).setCreatedBy((SubmitUser) this.createdBy.clone());
+	  			}
 			}
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmitFilesContent.class + " failed");

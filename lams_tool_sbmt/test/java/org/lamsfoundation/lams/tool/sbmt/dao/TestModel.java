@@ -156,11 +156,7 @@ public class TestModel extends TestCase {
 		assertEquals(contentC.getTitle(),titA);
 		assertEquals(contentC.isDefineLater(),deA);
 		assertEquals(contentC.isRunOffline(),offA);
-		//test SubmitFilesSession l Set 
-		Iterator iter = contentC.getToolSession().iterator();
-		SubmitFilesSession session = new SubmitFilesSession();
-		fillSessionA(session);
-		assertEquals(iter.next(),session);
+
 		
 		//do more test to ensure origial object keep desired values "B"
 		assertEquals(content.getInstruction(),insB);
@@ -168,10 +164,6 @@ public class TestModel extends TestCase {
 		assertEquals(content.isDefineLater(),deB);
 		assertEquals(content.isRunOffline(),offB);
 		//test SubmitFilesSession l Set 
-		iter = content.getToolSession().iterator();
-		session = new SubmitFilesSession();
-		fillSessionB(session);
-		assertEquals(iter.next(),session);
 		
 	}
 	//================Fill init data for model object==========
@@ -201,7 +193,6 @@ public class TestModel extends TestCase {
 		fillSessionA(session);
 		Set sessions = new HashSet();
 		sessions.add(session);
-		content.setToolSession(sessions);
 	}
 	private void fillContentB(SubmitFilesContent content){
 		content.setDefineLater(deB);
@@ -214,7 +205,6 @@ public class TestModel extends TestCase {
 		fillSessionB(session);
 		Set sessions = new HashSet();
 		sessions.add(session);
-		content.setToolSession(sessions);
 	}
 	private void fillSessionA(SubmitFilesSession session){
 		session.setSessionID(sessA);

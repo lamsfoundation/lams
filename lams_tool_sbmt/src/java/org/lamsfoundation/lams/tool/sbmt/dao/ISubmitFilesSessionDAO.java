@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -49,5 +50,5 @@ public interface ISubmitFilesSessionDAO extends IBaseDAO {
 	 */
 	public void createSession(SubmitFilesSession submitSession);
 	
-    public List getSubmitFilesSessionByContentID(Long contentID);
+    public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID);
 }
