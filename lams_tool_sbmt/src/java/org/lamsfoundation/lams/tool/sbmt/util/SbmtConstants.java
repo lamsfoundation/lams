@@ -53,6 +53,7 @@ public class SbmtConstants {
 	public static final String PARAM_MIN_UPLOAD = "minUpload";
 	public static final String ATTR_LIMIT_UPLOAD = "limitUpload";
 	public static final String ATTR_LIMIT_UPLOAD_NUMBER = "limitUploadNumber";
+	public static final Object ATTR_ARRIVE_LIMIT = "arriveLimit";
 
 }
 

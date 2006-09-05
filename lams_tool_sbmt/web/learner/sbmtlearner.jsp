@@ -175,7 +175,7 @@
 								<fmt:message key="label.learner.filePath" />
 							</td>
 							<td>
-								<html:file property="file" disabled="${sessionMap.finishLock}" size="40" tabindex="1" />
+								<html:file property="file" disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" size="40" tabindex="1" />
 							</td>
 						</tr>
 						<!--File Description row -->
@@ -184,12 +184,12 @@
 								<fmt:message key="label.learner.fileDescription" />
 							</td>
 							<td>
-								<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="description" disabled="${sessionMap.finishLock}" />
+								<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="description" disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
 							</td>
 						</tr>
 						<tr>
 							<td colspan="2" align="center">
-								<html:submit disabled="${sessionMap.finishLock}" styleClass="button">
+								<html:submit disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" styleClass="button">
 									<fmt:message key="label.learner.upload" />
 								</html:submit>
 								<c:choose>
