@@ -134,9 +134,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	   		  <tr>
 	  	   		    <td NOWRAP colspan=2 valign=top>
 	  						<div class="right-buttons">	  	   		    
-						  	   <html:submit property="learnerFinished" styleClass="button">
+									<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+										<html:submit property="learnerFinished"  styleClass="button">
 											<bean:message key="label.finished"/>
-							   </html:submit>
+										</html:submit>	 				
+								  	</c:if> 				    					
+					
+									<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+										<html:submit property="forwardtoReflection" styleClass="button">
+											<bean:message key="label.continue"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
 					  	   </div>						   
 				  	 </td>
 				  </tr>

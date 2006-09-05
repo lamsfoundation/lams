@@ -144,6 +144,16 @@ public class AuthoringUtil implements McAppConstants {
 			mcAuthoringForm.setSln(OFF);	
 			logger.debug("setting sln to false");				
 		}
+		
+
+		if (mcContent.isReflect())
+		{
+			mcAuthoringForm.setReflect(ON);	
+		}
+		else
+		{
+			mcAuthoringForm.setReflect(OFF);	
+		}
 	}
 
     
@@ -1404,6 +1414,7 @@ public class AuthoringUtil implements McAppConstants {
     	boolean isRetries=false;
     	boolean isShowFeedback=false;
     	boolean isSln=false;
+    	boolean isReflect=false;
     	
     	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
     	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
@@ -1425,6 +1436,11 @@ public class AuthoringUtil implements McAppConstants {
 		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
 			isSln=true;
     	
+		logger.debug("isReflect" +  mcAuthoringForm.getReflect());
+		if (mcAuthoringForm.getReflect().equalsIgnoreCase(ON))
+		    isReflect=true;		
+		
+		
     	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
     	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
     		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
@@ -1432,7 +1448,10 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
     	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
     		isShowFeedback=true;
-    	    	
+
+		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
+		logger.debug("reflectionSubject: " + reflectionSubject);
+
     	
     	/*
     	String richTextTitle="";
@@ -1511,6 +1530,8 @@ public class AuthoringUtil implements McAppConstants {
 	    mc.setRetries(isRetries);
 	    mc.setPassMark(new Integer(passmark));
 	    mc.setShowReport(isSln);
+	    mc.setReflect(isReflect);
+	    mc.setReflectionSubject(reflectionSubject);
 	    mc.setShowFeedback(isShowFeedback);
 	    mc.setMcQueContents(new TreeSet());
 	    mc.setMcSessions(new TreeSet());

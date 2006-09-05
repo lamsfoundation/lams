@@ -194,16 +194,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 
 		 			  	   		    <td  valign=top>
 			    	  						<div class="right-buttons">
-										  	   <html:submit property="learnerFinished" styleClass="button">
-															<bean:message key="label.finished"/>
-											   </html:submit>
+												<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+													<html:submit property="learnerFinished"  styleClass="button">
+														<bean:message key="label.finished"/>
+													</html:submit>	 				
+											  	</c:if> 				    					
+								
+												<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+													<html:submit property="forwardtoReflection" styleClass="button">
+														<bean:message key="label.continue"/>
+													</html:submit>	 				
+											  	</c:if> 				    					
+											   
 											</div>
 								  	 </td>
 								  	 
 								  </tr>
 								</c:if> 																		
 						</c:if> 																								
-					</c:if> 																								
+					</c:if> 					
+					
+
+							<tr> 
+							<td valign=top>
+									<table>
+										<tr> 
+						  	   		  		<td>
+												<b> <bean:message key="label.notebook.entries"/> </b>						
+											 </td>
+										</tr>
+										
+										<tr> 
+						  	   		  		<td>
+												<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
+											 </td>
+										</tr>
+								</table>
+		
+							</td>
+							</tr>
+
 					
 				  	<html:hidden property="doneLearnerProgress"/>						   
 				</table>

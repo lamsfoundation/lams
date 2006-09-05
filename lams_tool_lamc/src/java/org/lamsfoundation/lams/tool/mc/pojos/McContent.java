@@ -134,6 +134,8 @@ public class McContent implements Serializable {
 			Integer passMark, boolean showReport, boolean showFeedback, boolean retries, boolean reflect, 
 			String reflectionSubject, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
+        
+        logger.debug("copying properties");
         this.mcContentId = mcContentId;
         this.content=content;
         this.title = title;

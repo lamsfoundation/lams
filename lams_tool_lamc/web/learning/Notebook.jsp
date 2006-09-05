@@ -41,41 +41,44 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body>
 	<div id="page-learner">
 	
-	<h1 class="no-tabs-below">&nbsp;</h1>
+	<h1 class="no-tabs-below">
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
+	</h1>
+	
 	
 	<div id="header-no-tabs-learner"></div>
 	
-	<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
+	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
 		<html:hidden property="toolSessionID"/>						
 		<html:hidden property="httpSessionID"/>			
 		<html:hidden property="userID"/>								
-
-	
+		
 		<div id="content-learner">
-			&nbsp&nbsp&nbsp&nbsp&nbsp <bean:message key="label.learning.forceOfflineMessage" />
-			
-			<table>	
-			<tr>	
-			<td>
-				<div class="right-buttons">
-
-					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-						<html:submit property="learnerFinished" styleClass="button">
-							<bean:message key="label.finished"/>
-						</html:submit>	 				
-				  	</c:if> 				    					
-	
-					<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-						<html:submit property="forwardtoReflection"  styleClass="button">
-							<bean:message key="label.continue"/>
-						</html:submit>	 				
-				  	</c:if> 				    					
-			  	
-				</div> 		  															 		  					
-			</td> 
+		
+		<table>
+			<tr>
+				<td>
+					<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false"/> 
+				</td>
 			</tr>
-			</table>
+
+			<tr>
+				<td>
+					<html:textarea cols="66" rows="8" property="entryText"></html:textarea>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="right-buttons">
+					<html:submit property="submitReflection" styleClass="button">					
+						<bean:message key="button.endLearning"/>
+					</html:submit>
+				</td>
+			</tr>
+		</table>
+
+		
 		</div>
 	</html:form>	
 	

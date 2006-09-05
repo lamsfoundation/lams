@@ -198,6 +198,13 @@
 		    path="/McErrorBox.jsp"
 		    redirect="false"
 	  	/>
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	  	
 	</action>  
 	
 	
@@ -264,6 +271,13 @@
 	        path="/learning/Preview.jsp"
 		    redirect="false"
 	     />
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	     
     </action>
     
     

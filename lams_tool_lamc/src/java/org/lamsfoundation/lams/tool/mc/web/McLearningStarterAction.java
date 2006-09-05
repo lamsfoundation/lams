@@ -41,6 +41,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -189,6 +191,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		mcLearningForm.setMcService(mcService);
     	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
 		mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
+		
 
 		ActionForward validateParameters=validateParameters(request, mcLearningForm, mapping);
 	    logger.debug("validateParameters: " + validateParameters);
@@ -269,7 +272,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	    
 	    mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
-	    commonContentSetup(request, mcContent, mcService);
+	    commonContentSetup(request, mcContent, mcService,mcLearningForm, toolSessionID);
 	    
 	    
     	/* Is the request for a preview by the author?
@@ -485,7 +488,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 * @param request
 	 * @param mcContent
 	 */
-	protected void commonContentSetup(HttpServletRequest request, McContent mcContent, IMcService mcService)
+	protected void commonContentSetup(HttpServletRequest request, McContent mcContent, IMcService mcService, 
+	        McLearningForm mcLearningForm, String toolSessionID)
 	{
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		
@@ -497,6 +501,28 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 		mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
 		mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1).toString());
+		
+	    logger.debug("is tool reflective: " + mcContent.isReflect());
+	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
+		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		
+		String userID=mcLearningForm.getUserID();
+		logger.debug("userID: " +  userID);
+		
+		
+		logger.debug("attempt getting notebookEntry: ");
+		NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+		if (notebookEntry != null) {
+		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
+		}
+
 
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));

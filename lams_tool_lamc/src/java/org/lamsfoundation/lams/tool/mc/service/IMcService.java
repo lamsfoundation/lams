@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -290,5 +291,14 @@ public interface IMcService
     public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
     
     public List findMcOptionNamesByQueId(Long mcQueContentId) throws McApplicationException;
+    
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry);
+	
+
+	public NotebookEntry getEntry(Long id, Integer idType, String signature,
+			Integer userID);
+
+    
 }
 

@@ -537,6 +537,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
 		
+	    mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
+		
 		logger.debug("passMark:" +mcContent.getPassMark());
 		if (mcContent.getPassMark() == null)
 			mcContent.setPassMark(new Integer(0));
@@ -669,7 +671,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		{
 		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());    
 		}
-		
+
+		mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
 		
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
@@ -700,6 +703,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		mcAuthoringForm.setRetries(OFF);
 		mcAuthoringForm.setShowFeedback(OFF);
 		mcAuthoringForm.setSln(OFF);
+		mcAuthoringForm.setReflect(OFF);
 				
 		/* collect options for the default question content into a Map*/
 		McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());

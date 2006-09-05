@@ -45,7 +45,8 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String redoQuestionsOk;
 	protected String donePreview;
 	protected String doneLearnerProgress;
-	
+	protected String submitReflection;
+	protected String forwardtoReflection;
 	
 	protected String[] checkedCa;
 	protected String[] sequentialCheckedCa;
@@ -66,6 +67,8 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String reportViewOnly;
     
     protected String questionListingMode;
+    
+    protected String entryText;
 
     protected String questionIndex;
     protected String nextQuestionSelected;
@@ -448,5 +451,43 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+    
+    /**
+     * @return Returns the submitReflection.
+     */
+    public String getSubmitReflection() {
+        return submitReflection;
+    }
+    /**
+     * @param submitReflection The submitReflection to set.
+     */
+    public void setSubmitReflection(String submitReflection) {
+        this.submitReflection = submitReflection;
+    }
+    
+    /**
+     * @return Returns the forwardtoReflection.
+     */
+    public String getForwardtoReflection() {
+        return forwardtoReflection;
+    }
+    /**
+     * @param forwardtoReflection The forwardtoReflection to set.
+     */
+    public void setForwardtoReflection(String forwardtoReflection) {
+        this.forwardtoReflection = forwardtoReflection;
+    }
+    /**
+     * @return Returns the entryText.
+     */
+    public String getEntryText() {
+        return entryText;
+    }
+    /**
+     * @param entryText The entryText to set.
+     */
+    public void setEntryText(String entryText) {
+        this.entryText = entryText;
     }
 }

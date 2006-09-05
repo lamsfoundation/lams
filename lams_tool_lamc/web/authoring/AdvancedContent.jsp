@@ -99,7 +99,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							&nbsp
 					</td>
 					<td>							
- 						<textarea name="reflectionSubject" rows=3 cols=30></textarea>
+ 						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
 	      			</td>
 		        </tr>
 
@@ -108,12 +108,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         <tr> 
 						<td colspan=2>							
 								<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
-				 		</td>
-				  	</tr>
-				  	
-				  	<tr> 
-						<td colspan=2>							
-								<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true" key="label.report.endLearningMessage.col"/>														
 				 		</td>
 				  	</tr>
 		</table>

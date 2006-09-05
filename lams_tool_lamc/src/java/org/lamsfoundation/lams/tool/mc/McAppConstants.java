@@ -231,6 +231,8 @@ public interface McAppConstants {
     public static final String USER_FEEDBACK							="userFeedback";
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String TOTAL_COUNT_REACHED						="totalCountReached";
+    public static final String NOTEBOOK									="notebook";
+    public static final String ENTRY_TEXT								="entryText";
     
     public static final String MC_LEARNER_STARTER_DTO					="mcLearnerStarterDTO";
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";

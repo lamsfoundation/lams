@@ -2013,6 +2013,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		boolean isRetries=false;
 		boolean isShowFeedback=false;
 		boolean isSln=false;
+		boolean isReflect=false;
 		
 		String monitoringReportTitle="";
 		String reportTitle="";
@@ -2055,6 +2056,18 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
 				isSln=true;
 		}
+		
+		logger.debug("isReflect" +  mcAuthoringForm.getReflect());
+		if (mcAuthoringForm.getReflect() != null)
+		{
+			if (mcAuthoringForm.getReflect().equalsIgnoreCase(ON))
+				isReflect=true;
+		}
+
+		
+		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
+		logger.debug("reflectionSubject: " + reflectionSubject);
+
 		
 		logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
 		
@@ -2237,8 +2250,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 			if (mcAuthoringForm.getSln() != null)
 				mcContent.setShowReport(isSln);
+			
+			if (mcAuthoringForm.getReflect() != null)
+				mcContent.setReflect(isReflect);
+			
 
 		    mcContent.setPassMark(new Integer(passmark));
+		    mcContent.setReflectionSubject(reflectionSubject);
 		    if (activeModule.equals(AUTHORING))
 		    {
 		    	mcContent.setOfflineInstructions(richTextOfflineInstructions);
