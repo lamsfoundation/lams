@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -309,9 +310,13 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
 	 *      java.lang.String)
 	 */
-	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) {
-		
-		Vector<UserDTO> users = new Vector<UserDTO>();
+	public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall) {
+		Vector users = null;
+		if(isFlashCall)
+			users = new Vector<UserFlashDTO>();
+		else 
+			users = new Vector<UserDTO>();
+			
 		Organisation organisation = (Organisation)baseDAO.find(Organisation.class,organisationID);
 		if (organisation != null) {
 			Iterator iterator = organisation.getUserOrganisations().iterator();
@@ -321,7 +326,10 @@ public class UserManagementService implements IUserManagementService {
 				while (userOrganisationRoleIterator.hasNext()) {
 					UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator.next();
 					if (userOrganisationRole.getRole().getName().equals(roleName))
-						users.add(userOrganisation.getUser().getUserDTO());
+						if(isFlashCall)
+							users.add(userOrganisation.getUser().getUserFlashDTO());
+						else 
+							users.add(userOrganisation.getUser().getUserDTO());
 				}
 			}
 		}
@@ -443,7 +451,7 @@ public class UserManagementService implements IUserManagementService {
                     
                     if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){ 	 
                     		// get course managers and give them staff role in this new class
-                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(organisation.getParentOrganisation().getOrganisationId(),Role.COURSE_MANAGER);
+                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(organisation.getParentOrganisation().getOrganisationId(),Role.COURSE_MANAGER, false);
                     		for(UserDTO m: managers){
                     				User user = (User)findById(User.class,m.getUserID());
                     				UserOrganisation uo = new UserOrganisation(user,organisation);

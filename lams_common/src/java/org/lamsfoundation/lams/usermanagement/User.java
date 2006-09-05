@@ -37,6 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.LanguageUtil;
@@ -738,9 +739,16 @@ public class User implements Serializable,Comparable {
 							this.email,
 							new CSSThemeBriefDTO(this.flashTheme),
 							new CSSThemeBriefDTO(this.htmlTheme),
-							TimeZone.getDefault());
+							TimeZone.getTimeZone("Australia/Sydney"));
     }
 	
+    public UserFlashDTO getUserFlashDTO() {
+    	return new UserFlashDTO(this.userId,
+				this.firstName,
+				this.lastName,
+				this.login);
+    }
+    
 	/**This method checks whether user is a member of the 
 	 * given organisation*/
 	public boolean isMember(Organisation organisation){

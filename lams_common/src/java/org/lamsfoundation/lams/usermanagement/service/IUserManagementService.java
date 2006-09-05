@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 
 /**
@@ -216,9 +217,10 @@ public interface IUserManagementService {
 	 * 
 	 * @param organisationID
 	 * @param roleName
-	 * @return UserDTO objects (in a Vector to suit WDDX)
+	 * @param isFlashCall
+	 * @return UserFlashDTO objects (in a Vector to suit WDDX)
 	 */
-	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName);	
+	public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall);	
 
 	public Organisation getRootOrganisation();
 	
