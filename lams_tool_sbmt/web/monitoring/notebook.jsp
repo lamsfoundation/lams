@@ -37,7 +37,7 @@
 								<c:out value="${userDTO.reflect}" escapeXml="false"/>
 							</c:when>
 							<c:otherwise>
-								<fmt:message key="message.not.avaliable" />
+								<fmt:message key="label.learner.notAvailable" />
 							</c:otherwise>
 						</c:choose>
 					</td>

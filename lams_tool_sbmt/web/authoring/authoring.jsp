@@ -94,7 +94,7 @@
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" 
 					customiseSessionID="${formBean.sessionMapID}" 
-					contentFolderID="abc"/>
+					contentFolderID="${formBean.contentFolderID}"/>
 			</html:form>
 		</div>
 		<div id="footer"></div>

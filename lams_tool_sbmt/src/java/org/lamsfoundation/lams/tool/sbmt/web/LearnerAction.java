@@ -100,9 +100,6 @@ public class LearnerAction extends DispatchAction {
             HttpServletRequest request,
             HttpServletResponse response)
     {
-		//to avoid user without patience click "upload" button too fast
-		saveToken(request);
-
     	//initial session Map
     	SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -191,10 +188,7 @@ public class LearnerAction extends DispatchAction {
 		 //set the mode into http session 
         Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
        	
-		if(!isTokenValid(request,true) || validateUploadForm(learnerForm,request)){
-			if(!isTokenValid(request,true))
-				resetToken(request);
-			
+		if(validateUploadForm(learnerForm,request)){
 			//get session from shared session.
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
@@ -209,8 +203,6 @@ public class LearnerAction extends DispatchAction {
 			
 			return mapping.getInputForward();
 		}
-		//to avoid user without patience click "upload" button too fast 
-		saveToken(request);
 		
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();

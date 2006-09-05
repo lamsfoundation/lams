@@ -62,6 +62,7 @@
 				<html:hidden property="mode" value="teacher" />
 				<html:hidden property="sessionMapID" />				
 				<html:hidden property="toolContentID" />
+				<html:hidden property="contentFolderID" />
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:hidden property="dispatch" value="updateContent" />
 
@@ -70,7 +71,7 @@
 
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher" 
 					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" defineLater="true" 
-					customiseSessionID="${formBean.sessionMapID}" />
+					customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}"/>
 			</html:form>
 		</div>
 		<div id="footer"></div>
