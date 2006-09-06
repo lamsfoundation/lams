@@ -19,9 +19,7 @@
 		<input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:equal>
 	<logic:notEqual name="UserManageForm" property="orgId" value="1">
-  		<logic:equal name="UserManageForm" property="courseAdminCanBrowseAllUsers" value="true">
-			<input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
-		</logic:equal>
+		<input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:notEqual>
 </p>
 <table class="alternative-color" width=100%>
