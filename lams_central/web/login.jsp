@@ -66,9 +66,9 @@ j_security_login_page
 				 <h2><fmt:message key="button.login"/></h2>
 				 <form action="j_security_check" method="post" name="loginForm" id="loginForm">
 					<c:if test="${!empty param.failed}">
-						<p class="warning">
+						<div class="warning-login">
 							<fmt:message key="error.login"/>
-						</p>
+						</div>
 					</c:if>	
 				 <p class="first"><fmt:message key="label.username"/>: 
 				   <input name="j_username" type="text" size="16" width="130px" tabindex="1"/>

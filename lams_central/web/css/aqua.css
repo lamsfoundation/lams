@@ -552,12 +552,30 @@ hr {
 .warning {
 	color: #cc0000;
 	padding: 10px;
+	padding-top: 5px;
 	padding-left: 35px;
-	margin-top: 5px;
+	margin-top: 25px;
+	margin-left: 15px;
 	text-align: left;
 	font-weight: normal;
 	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
-	width: 72%
+	width: 70%;
+	border: 1px solid #E82A28;
+}
+
+.warning-login {
+	color: #cc0000;
+	padding: 10px;
+	padding-top: 5px;
+	padding-left: 35px;
+	margin-top: -5px;
+	margin-bottom: -10px;
+	margin-left: 15px;
+	text-align: left;
+	font-weight: normal;
+	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
+	width: 70%;
+	border: 1px solid #E82A28;
 }
 
 
@@ -641,6 +659,7 @@ height:450px;
 margin-top:22px; 
 margin-left:20px;
 color:#239CF7;
+margin-bottom: 30px;
 }
 
 #login-right-col p {
@@ -649,7 +668,7 @@ margin-right:50px;
 text-align:right;
 }
 #login-right-col p.first {
-margin-top:35px; 
+margin-top:25px; 
 margin-right:50px; 
 text-align:right; 
 margin-bottom:15px;
