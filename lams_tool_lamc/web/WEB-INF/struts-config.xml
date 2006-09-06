@@ -325,6 +325,7 @@
       		parameter="method"
       		unknown="false"
       		validate="false"> 
+      		
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
@@ -355,6 +356,13 @@
 	        path="/index.jsp"
 		    redirect="true"
 	     />
+	     
+        <forward
+          name="learnerNotebook"
+          path="/monitoring/LearnerNotebook.jsp"
+          redirect="false"
+        />
+	     
 
 	  	<forward
 		    name="errorList"

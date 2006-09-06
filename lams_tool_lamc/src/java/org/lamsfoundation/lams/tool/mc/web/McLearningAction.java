@@ -1671,7 +1671,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         
 	    McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO= new McGeneralLearnerFlowDTO();
 	    mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
-	    mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+	    String reflectionSubject=mcContent.getReflectionSubject();
+	    
+	    reflectionSubject=McUtils.replaceNewLines(reflectionSubject);
+	    mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
         
         request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("final mcGeneralLearnerFlowDTO: " + mcGeneralLearnerFlowDTO);

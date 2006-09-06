@@ -22,6 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
@@ -109,5 +110,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:forEach>		
 					</c:forEach>		  	
 			</table>		  	 		
-
+			
+	
 	

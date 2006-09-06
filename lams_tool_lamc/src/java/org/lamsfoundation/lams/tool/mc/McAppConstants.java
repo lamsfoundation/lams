@@ -66,6 +66,8 @@ public interface McAppConstants {
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String QUESTION_INDEX							="questionIndex";
     public static final String REFLECTION_SUBJECT						="reflectionSubject";
+    public static final String REFLECTIONS_CONTAINER_DTO				="reflectionsContainerDTO";
+    public static final String LEARNER_NOTEBOOK							="learnerNotebook";
     
     /*
      * authoring mode controllers

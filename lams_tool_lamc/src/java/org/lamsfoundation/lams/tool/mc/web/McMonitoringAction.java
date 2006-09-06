@@ -23,6 +23,9 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,11 +39,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
@@ -208,6 +216,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
 		
+		prepareReflectionData(request, mcContent, mcService, null,false);
     	return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}
     
@@ -279,6 +288,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
 
+		prepareReflectionData(request, mcContent, mcService, null,false);
 	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
 	}
 
@@ -348,6 +358,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("setting passmark to: " + mcContent.getPassMark());
 		mcMonitoringForm.setPassmark(mcContent.getPassMark().toString());
 		
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
 		logger.debug("fwd ing to : " + LOAD_MONITORING_CONTENT);
 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
 	}
@@ -407,6 +419,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
 		
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
 		McStarterAction mcStarterAction= new McStarterAction();
  		return mcStarterAction.executeGetMonitoringTab(mapping, form, request, response);
 	}
@@ -464,6 +478,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
 	 	McStarterAction mcStarterAction= new McStarterAction();
 	 	return mcStarterAction.executeGetMonitoringTab(mapping, form, request, response);
 	}
@@ -522,6 +538,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
 		
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
  		McStarterAction mcStarterAction= new McStarterAction();
 	 	return mcStarterAction.executeGetMonitoringTab(mapping, form, request, response);
 	}
@@ -576,6 +594,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.addNewQuestion(mapping, form, request, response);
 	}
@@ -629,6 +649,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
 	    McAction mcAction = new McAction();
     	return mcAction.removeQuestion(mapping, form, request, response);
 	}
@@ -683,6 +705,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.editOptions(mapping, form, request, response);
     }
@@ -737,6 +761,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.addOption(mapping, form, request, response);
     }
@@ -790,6 +816,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.removeOption(mapping, form, request, response);
     }
@@ -845,6 +873,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.moveQuestionDown(mapping, form, request, response);
     }
@@ -899,6 +929,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.moveQuestionUp(mapping, form, request, response);
     }
@@ -952,6 +984,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.doneOptions(mapping, form, request, response);
     }
@@ -1012,6 +1046,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 		
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.submitQuestions(mapping, form, request, response);
     }
@@ -1065,6 +1101,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.deleteOfflineFile(mapping, form, request, response);
     }
@@ -1119,6 +1157,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.deleteOnlineFile(mapping, form, request, response);
     }
@@ -1176,6 +1216,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.submitOfflineFiles(mapping, form, request, response);
     }
@@ -1231,8 +1273,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("mcContent:" + mcContent);
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
-	    
-    	McAction mcAction = new McAction();
+		
+		prepareReflectionData(request, mcContent, mcService, null,false);
+    	
+		McAction mcAction = new McAction();
     	return mcAction.submitOnlineFiles(mapping, form, request, response);
     }
 
@@ -1285,6 +1329,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.doneAdvancedTab(mapping, form, request, response);
     }
@@ -1339,6 +1385,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
 	    
+		prepareReflectionData(request, mcContent, mcService, null,false);
+		
     	McAction mcAction = new McAction();
     	return mcAction.doneInstructionsTab(mapping, form, request, response);
     }
@@ -1370,6 +1418,136 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	return null;
     }
     
+	public void prepareReflectionData(HttpServletRequest request, McContent mcContent, 
+	        IMcService mcService, String userID, boolean exportMode)
+	{
+	    logger.debug("starting prepareReflectionData: " + mcContent);
+	    logger.debug("exportMode: " + exportMode);
+	    List reflectionsContainerDTO= new LinkedList();
+	    
+	    if (userID == null)
+	    {
+	        logger.debug("all users mode");
+		    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
+		    {
+		        McSession qaSession = (McSession) sessionIter.next();
+		        logger.debug("qaSession: " + qaSession);
+		       for (Iterator userIter = qaSession.getMcQueUsers().iterator(); userIter.hasNext();) 
+		       {
+					McQueUsr user = (McQueUsr) userIter.next();
+					logger.debug("user: " + user);
+
+					NotebookEntry notebookEntry = mcService.getEntry(qaSession.getMcSessionId(),
+							CoreNotebookConstants.NOTEBOOK_TOOL,
+							MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
+					
+					logger.debug("notebookEntry: " + notebookEntry);
+					
+					if (notebookEntry != null) {
+					    ReflectionDTO reflectionDTO = new ReflectionDTO();
+					    reflectionDTO.setUserId(user.getQueUsrId().toString());
+					    reflectionDTO.setSessionId(qaSession.getMcSessionId().toString());
+					    reflectionDTO.setUserName(user.getUsername());
+					    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
+					    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+					    reflectionDTO.setEntry(notebookEntryPresentable);
+					    reflectionsContainerDTO.add(reflectionDTO);
+					} 
+					
+		       }
+		   }
+	    }
+	    else
+	    {
+			logger.debug("single user mode");
+		    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
+		    {
+		        McSession qaSession = (McSession) sessionIter.next();
+		        logger.debug("qaSession: " + qaSession);
+		       for (Iterator userIter = qaSession.getMcQueUsers().iterator(); userIter.hasNext();) 
+		       {
+					McQueUsr user = (McQueUsr) userIter.next();
+					logger.debug("user: " + user);
+					
+					if (user.getQueUsrId().toString().equals(userID))
+					{
+						NotebookEntry notebookEntry = mcService.getEntry(qaSession.getMcSessionId(),
+								CoreNotebookConstants.NOTEBOOK_TOOL,
+								MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
+						
+						logger.debug("notebookEntry: " + notebookEntry);
+						
+						if (notebookEntry != null) {
+						    ReflectionDTO reflectionDTO = new ReflectionDTO();
+						    reflectionDTO.setUserId(user.getQueUsrId().toString());
+						    reflectionDTO.setSessionId(qaSession.getMcSessionId().toString());
+						    reflectionDTO.setUserName(user.getUsername());
+						    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
+						    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+						    reflectionDTO.setEntry(notebookEntryPresentable);
+						    reflectionsContainerDTO.add(reflectionDTO);
+						} 
+					    
+					}
+		       }
+		   }	        
+	        
+	    }
+	    
+	    
+	   logger.debug("reflectionsContainerDTO: " + reflectionsContainerDTO);
+	   //request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   
+	   if (exportMode)
+	   {
+	       request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   }
+	}
+
+
+	public ActionForward openNotebook(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException,
+            ServletException, ToolException
+    {
+        logger.debug("dispatching openNotebook...");
+    	IMcService qaService = McServiceProxy.getMcService(getServlet().getServletContext());
+		logger.debug("qaService: " + qaService);
+
+		
+		String uid=request.getParameter("uid");
+		logger.debug("uid: " + uid);
+		
+		String userId=request.getParameter("userId");
+		logger.debug("userId: " + userId);
+		
+		String userName=request.getParameter("userName");
+		logger.debug("userName: " + userName);
+
+		String sessionId=request.getParameter("sessionId");
+		logger.debug("sessionId: " + sessionId);
+		
+		
+		NotebookEntry notebookEntry = qaService.getEntry(new Long(sessionId),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userId));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+        McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO= new McGeneralLearnerFlowDTO();
+		if (notebookEntry != null) {
+		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+		    mcGeneralLearnerFlowDTO.setUserName(userName);
+		}
+
+		logger.debug("mcGeneralLearnerFlowDTO: " + mcGeneralLearnerFlowDTO);
+		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+		
+		return mapping.findForward(LEARNER_NOTEBOOK);
+	}
+
     
     /**
      * persists error messages to request scope

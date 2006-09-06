@@ -18,6 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -41,13 +42,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="page-learner">
 	
 	<h1 class="no-tabs-below">
-		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />		
 	</h1>
-
-<div id="header-no-tabs-learner"></div>
-
-<div id="content-learner">
-
+	
+	
+	<div id="header-no-tabs-learner"></div>
+	
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 			<html:hidden property="toolContentID"/>						
 			<html:hidden property="toolSessionID"/>								
@@ -58,7 +58,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="learnerProgress"/>										
 			<html:hidden property="learnerProgressUserId"/>										
 			<html:hidden property="questionListingMode"/>													
-		
+
+			<div id="content-learner">		
 				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
@@ -117,12 +118,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:submit>	 				 		  					
 				  	 </td>
 				  </tr>
+			 </table>
 
-</html:form>	
+			
+		 	</div>
 
-</div>
+	
+		</html:form>	
+	
+	<div id="footer-learner"></div>
 
-<div id="footer-learner"></div>
 
 </div>
 </body>
@@ -135,6 +140,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-
-	
 	

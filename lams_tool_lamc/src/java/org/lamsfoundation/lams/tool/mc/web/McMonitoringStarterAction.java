@@ -259,6 +259,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
     	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
 
     	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
+    	McMonitoringAction mcMonitoringAction= new McMonitoringAction();
+		mcMonitoringAction.prepareReflectionData(request, mcContent, mcService, null, false);
 		
 	    return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}

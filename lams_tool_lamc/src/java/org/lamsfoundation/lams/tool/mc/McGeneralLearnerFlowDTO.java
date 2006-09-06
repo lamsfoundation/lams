@@ -40,6 +40,8 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String learnerMark;
     
+    protected String userName;
+    
     protected String learnerMarkAtLeast;
     
     protected String totalQuestionCount;
@@ -537,5 +539,19 @@ public class McGeneralLearnerFlowDTO implements Comparable
      */
     public void setNotebookEntriesVisible(String notebookEntriesVisible) {
         this.notebookEntriesVisible = notebookEntriesVisible;
+    }
+    
+    
+    /**
+     * @return Returns the userName.
+     */
+    public String getUserName() {
+        return userName;
+    }
+    /**
+     * @param userName The userName to set.
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

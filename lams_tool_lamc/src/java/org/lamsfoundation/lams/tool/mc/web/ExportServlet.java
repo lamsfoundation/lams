@@ -131,6 +131,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
 	    
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
+	    mcMonitoringAction.prepareReflectionData(request, content, mcService, userID.toString(), true);
     	logger.debug("ending learner mode: ");
     }
 
@@ -370,6 +371,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 
 	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
+	    
+	    mcMonitoringAction.prepareReflectionData(request, content, mcService, null, true);
         logger.debug("ending teacher mode: ");
     }
 
