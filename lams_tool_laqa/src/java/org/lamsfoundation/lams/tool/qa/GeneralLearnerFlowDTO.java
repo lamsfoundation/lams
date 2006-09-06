@@ -48,6 +48,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String countSessionComplete;
     
+    protected String userName;
+    
     protected String toolSessionID;
     
     protected String httpSessionID;
@@ -478,5 +480,17 @@ public class GeneralLearnerFlowDTO implements Comparable
      */
     public void setNotebookEntriesVisible(String notebookEntriesVisible) {
         this.notebookEntriesVisible = notebookEntriesVisible;
+    }
+    /**
+     * @return Returns the userName.
+     */
+    public String getUserName() {
+        return userName;
+    }
+    /**
+     * @param userName The userName to set.
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

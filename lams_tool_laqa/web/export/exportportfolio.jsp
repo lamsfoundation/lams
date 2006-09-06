@@ -61,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-			<table width="80%" cellspacing="8" align="CENTER" class="forms">
+			<table width="80%" cellspacing="8" class="forms">
 			
 					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
@@ -91,7 +91,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 									<tr>
 														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
 														 <td NOWRAP valign=top>    <lams:Date value="${userData.attemptTime}"/>  </td>														 
-														 <td NOWRAP valign=top>   <c:out value="${userData.response}"/>  </td>
+														 <td NOWRAP valign=top>   <c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>
 													</tr>
 											</c:if>														  					 
 	 									</c:forEach>		  	
@@ -100,7 +100,52 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td>  
 			  			</tr>
 					</c:forEach>		  	
+
+						<tr>			
+							<td valign=top align=left>
+								&nbsp
+							</td>
+						</tr>
+
+					
+						<tr>			
+							<td valign=top align=left>
+								<table align=center>
+								
+										<tr>			
+											<td colspan=3 valign=top align=center>
+												<b>  <bean:message key="label.reflection"/>  </b> 
+											 </td>
+										</tr>	
+								
+								
+									<c:forEach var="currentDto" items="${reflectionsContainerDTO}">
+							  	 		<c:set var="userName" scope="request" value="${currentDto.userName}"/>
+							  	 		<c:set var="userId" scope="request" value="${currentDto.userId}"/>
+							  	 		<c:set var="sessionId" scope="request" value="${currentDto.sessionId}"/>
+							  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
+							  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
+										<tr>			
+											<td valign=top align=left>
+												  <b>  <bean:message key="label.user"/>:  </b>
+											 </td>
+
+											<td valign=top align=left>
+	 												  <c:out value="${userName}" escapeXml="false"/> 
+											 </td>
+
+											<td valign=top align=left>
+												 <c:out value="${entry}" escapeXml="false"/> 
+											 </td>
+										</tr>	
+									</c:forEach>		
+								</table>  	
+							 </td>
+						</tr>	
+
+					
 			</table>			
+			
 		</c:if>					
 
 		</div>  <!--closes content-->

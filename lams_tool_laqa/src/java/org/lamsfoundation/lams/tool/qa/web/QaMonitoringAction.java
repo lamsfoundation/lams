@@ -88,6 +88,8 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -102,13 +104,18 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
+import org.lamsfoundation.lams.tool.qa.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QAConstants;
@@ -153,6 +160,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getStats..." + request);
+    	
     	GeneralMonitoringDTO generalMonitoringDTO= new GeneralMonitoringDTO();
     	initStatsContent(mapping, form, request, response, generalMonitoringDTO);
     	return (mapping.findForward(LOAD_MONITORING));
@@ -216,6 +224,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
     	refreshStatsData(request, qaMonitoringForm, qaService, generalMonitoringDTO);
     	generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
+    	
+        prepareReflectionData(request, qaContent, qaService, null, false);
 
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
@@ -312,12 +322,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		}
 		
 		generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
+		
+        prepareReflectionData(request, qaContent, qaService,null, false);
     	
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
     	logger.debug("ending  initInstructionsContent...");
-	 	
 	}
 
     /**
@@ -390,8 +401,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 			logger.debug("forwarding to: " + LOAD_MONITORING);
 			return (mapping.findForward(LOAD_MONITORING));
 		}
-		//request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
-	    //request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
 		
 		if (qaContent.getTitle() == null)
 		{
@@ -407,6 +416,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 	    
+        prepareReflectionData(request, qaContent, qaService,null, false);
+		
 	    /* note that we are casting monitoring form subclass into Authoring form*/
 	    logger.debug("watch here: note that we are casting monitoring form subclass into Authoring form");
 	    return qaStarterAction.executeDefineLater(mapping, qaMonitoringForm, request, response, qaService);
@@ -504,6 +515,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
 		
+        prepareReflectionData(request, qaContent, qaService,null, false);
+		
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
@@ -532,7 +545,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		//request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true).toString());
 		generalMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 		
-		logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
+        logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 		QaUtils.setDefineLater(request, true,strToolContentID,  qaService);
@@ -557,7 +570,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("questionIndex: " + questionIndex);
 		//request.getSession().setAttribute(REMOVABLE_QUESTION_INDEX, questionIndex);
     	
-    	QaAction qaAction= new QaAction(); 
+        QaAction qaAction= new QaAction(); 
     	return qaAction.removeQuestion(mapping, form, request, response);
     }
     
@@ -650,6 +663,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
+	    prepareReflectionData(request, qaContent, qaService,null, false);
+        
 		refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
 		
     	return (mapping.findForward(LOAD_MONITORING));	
@@ -735,6 +750,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, true);
+	    
+        prepareReflectionData(request, qaContent, qaService,null, false);
 	    
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -826,11 +843,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 		request.setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
-	    
 		GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
+	    
+        prepareReflectionData(request, qaContent, qaService,null, false);
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
 
@@ -917,6 +935,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
+	    
+        prepareReflectionData(request, qaContent, qaService,null, false);
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
@@ -952,6 +972,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	    Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
+		
+		prepareReflectionData(request, qaContent, qaService,null, false);
 		request.setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
     }
     
@@ -1171,6 +1193,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	    }
 	    
+	    
+	    prepareReflectionData(request, qaContent, qaService,null, false);
+	    
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 	    /* ends here. */
@@ -1223,6 +1248,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("countSessionComplete: " + countSessionComplete);
 
 		generalMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
+		
+		prepareReflectionData(request, qaContent, qaService,null, false);
 		
 		logger.debug("ending refreshStatsData with generalMonitoringDTO: " + generalMonitoringDTO);
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
@@ -1298,6 +1325,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    }
 
 		logger.debug("SELECTION_CASE: " + request.getAttribute(SELECTION_CASE));
+		
+		prepareReflectionData(request, qaContent, qaService,null, false);
 
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
@@ -1371,7 +1400,139 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
 	    
+	    prepareReflectionData(request, qaContent, qaService,null, false);
+	    
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
      }
+    
+    
+	public ActionForward openNotebook(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException,
+            ServletException, ToolException
+    {
+        logger.debug("dispatching openNotebook...");
+    	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		logger.debug("qaService: " + qaService);
+
+		
+		String uid=request.getParameter("uid");
+		logger.debug("uid: " + uid);
+		
+		String userId=request.getParameter("userId");
+		logger.debug("userId: " + userId);
+		
+		String userName=request.getParameter("userName");
+		logger.debug("userName: " + userName);
+
+		String sessionId=request.getParameter("sessionId");
+		logger.debug("sessionId: " + sessionId);
+		
+		
+		NotebookEntry notebookEntry = qaService.getEntry(new Long(sessionId),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userId));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+        GeneralLearnerFlowDTO generalLearnerFlowDTO= new GeneralLearnerFlowDTO();
+		if (notebookEntry != null) {
+		    String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+		    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+		    generalLearnerFlowDTO.setUserName(userName);
+		}
+
+		
+		logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+		request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+		
+		return mapping.findForward(LEARNER_NOTEBOOK);
+	}
+	
+	public void prepareReflectionData(HttpServletRequest request, QaContent qaContent, 
+	        IQaService qaService, String userID, boolean exportMode)
+	{
+	    logger.debug("starting prepareReflectionData: " + qaContent);
+	    logger.debug("userID: " + userID);
+	    logger.debug("exportMode: " + exportMode);
+	    
+	    List reflectionsContainerDTO= new LinkedList();
+	    if (userID == null)
+	    {
+	        logger.debug("all users mode");
+		    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) 
+		    {
+		       QaSession qaSession = (QaSession) sessionIter.next();
+		       logger.debug("qaSession: " + qaSession);
+		       for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) 
+		       {
+					QaQueUsr user = (QaQueUsr) userIter.next();
+					logger.debug("user: " + user);
+
+					NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
+							CoreNotebookConstants.NOTEBOOK_TOOL,
+							MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
+					
+					logger.debug("notebookEntry: " + notebookEntry);
+					
+					if (notebookEntry != null) {
+					    ReflectionDTO reflectionDTO = new ReflectionDTO();
+					    reflectionDTO.setUserId(user.getQueUsrId().toString());
+					    reflectionDTO.setSessionId(qaSession.getQaSessionId().toString());
+					    reflectionDTO.setUserName(user.getUsername());
+					    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
+					    String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+					    reflectionDTO.setEntry(notebookEntryPresentable);
+					    reflectionsContainerDTO.add(reflectionDTO);
+					} 
+		       }
+		   }
+	   }
+	   else
+	   {
+	       logger.debug("single user mode");
+		    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) 
+		    {
+		       QaSession qaSession = (QaSession) sessionIter.next();
+		       logger.debug("qaSession: " + qaSession);
+		       for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) 
+		       {
+					QaQueUsr user = (QaQueUsr) userIter.next();
+					logger.debug("user: " + user);
+					
+					if (user.getQueUsrId().toString().equals(userID))
+					{
+					    logger.debug("getting reflection for user with  userID: " + userID);
+						NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
+								CoreNotebookConstants.NOTEBOOK_TOOL,
+								MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
+						
+						logger.debug("notebookEntry: " + notebookEntry);
+						
+						if (notebookEntry != null) {
+						    ReflectionDTO reflectionDTO = new ReflectionDTO();
+						    reflectionDTO.setUserId(user.getQueUsrId().toString());
+						    reflectionDTO.setSessionId(qaSession.getQaSessionId().toString());
+						    reflectionDTO.setUserName(user.getUsername());
+						    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
+						    String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+						    reflectionDTO.setEntry(notebookEntryPresentable);
+						    reflectionsContainerDTO.add(reflectionDTO);
+						} 
+					}
+		       }		       
+	   }
+    }
+	    
+	    
+	   logger.debug("reflectionsContainerDTO: " + reflectionsContainerDTO);
+	   request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   
+	   if (exportMode)
+	   {
+	       request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   }
+	   
+	}
 }

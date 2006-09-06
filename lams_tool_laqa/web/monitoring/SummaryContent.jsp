@@ -235,6 +235,48 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  			</tr>
 					</c:forEach>		  	
 
+
+						<tr>			
+							<td valign=top align=left>
+								<table align=center>
+								
+										<tr>			
+											<td colspan=2 valign=top align=left>
+												<b>  <bean:message key="label.reflection"/>  </b> 
+											 </td>
+										</tr>	
+								
+								
+									<c:forEach var="currentDto" items="${reflectionsContainerDTO}">
+							  	 		<c:set var="userName" scope="request" value="${currentDto.userName}"/>
+							  	 		<c:set var="userId" scope="request" value="${currentDto.userId}"/>
+							  	 		<c:set var="sessionId" scope="request" value="${currentDto.sessionId}"/>
+							  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
+										<tr>			
+											<td valign=top align=left>
+												 <c:out value="${userName}" escapeXml="false"/> 
+											 </td>
+
+											<td valign=top align=left>
+												<c:url value="monitoring.do" var="openNotebook">
+													<c:param name="method" value="openNotebook" />
+													<c:param name="uid" value="${reflectionUid}" />
+													<c:param name="userId" value="${userId}" />
+													<c:param name="userName" value="${userName}" />
+													<c:param name="sessionId" value="${sessionId}" />													
+												</c:url>
+				
+												<html:link href="${fn:escapeXml(openNotebook)}" target="_blank">
+													<bean:message key="label.view" />
+												</html:link>
+
+											 </td>
+										</tr>	
+									</c:forEach>		
+								</table>  	
+							 </td>
+						</tr>	
+
 				</table>
 		</c:if>						
 

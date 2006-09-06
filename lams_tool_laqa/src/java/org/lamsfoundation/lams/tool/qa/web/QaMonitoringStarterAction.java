@@ -54,7 +54,7 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
+import org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction; 
 
 /**
  * 
@@ -204,7 +204,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
         generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
         /** ...till here **/
 
-		
+        qaMonitoringAction.prepareReflectionData(request, qaContent, qaService, null, false);
+        
 		logger.debug("final qaMonitoringForm: " + qaMonitoringForm);
 		logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);

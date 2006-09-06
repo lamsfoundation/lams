@@ -881,7 +881,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         
         GeneralLearnerFlowDTO generalLearnerFlowDTO= new GeneralLearnerFlowDTO();
         generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
-        generalLearnerFlowDTO.setReflectionSubject(qaContent.getReflectionSubject());
+        String reflectionSubject=qaContent.getReflectionSubject();
+        reflectionSubject=QaUtils.replaceNewLines(reflectionSubject);
+        generalLearnerFlowDTO.setReflectionSubject(reflectionSubject);
         
         request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 		logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
@@ -890,6 +892,4 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		logger.debug("fwd'ing to: " + NOTEBOOK);
         return (mapping.findForward(NOTEBOOK));
 	}
-    
-
 }

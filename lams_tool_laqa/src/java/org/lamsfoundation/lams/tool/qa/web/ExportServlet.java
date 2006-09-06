@@ -124,8 +124,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 
     	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
     	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-
     	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
+    	
+    	qaMonitoringAction.prepareReflectionData(request, content, qaService, userID.toString(), true);
     	logger.debug("ending learner mode: ");
     }
     
@@ -169,6 +170,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
     	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
         request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
+        
+        qaMonitoringAction.prepareReflectionData(request, content, qaService, null, true);
         logger.debug("ending teacher mode: ");
     }
 }
