@@ -1560,6 +1560,19 @@
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="created_by" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="workspace_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
@@ -3027,6 +3040,12 @@ It will be used for the IMS LD import/export.</column-description>
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="help_url" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="true" name="create_date_time" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
@@ -3985,6 +4004,19 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="user_id" remarks="User for whom this node was created">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PK_LAMS_CR_NODE_VERSION" remarks="">
 <primary-key-description></primary-key-description>
@@ -4145,19 +4177,6 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="user_id" remarks="User for whom this node was created">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
 <variant type-name-pattern="BIGINT UNSIGNED"/>
@@ -4828,6 +4847,12 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="help_url" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="true" name="create_date_time" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
@@ -5021,8 +5046,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="workspace_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -5034,8 +5059,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="workspace_folder_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>

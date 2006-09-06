@@ -75,20 +75,20 @@ insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) valu
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (10, 8,8);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (11, 50,40);
 
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,1,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (2, 'Playpen', 'PP101', 'Developers Playpen',1,2,NOW(),2,1,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (3, 'Everybody', null, 'All People In Course',2,3,NOW(),null,1,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (4, 'Mathematics 1', 'MATH111', 'Mathematics 1',1,2,NOW(),3,2,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (5, 'Tutorial Group A', 'TUTA', 'Tutorial Group A',4,3,NOW(),null,2,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),null,2,1);
-INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_id, organisation_state_id)
-	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,2,NOW(),50,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,1,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (2, 'Playpen', 'PP101', 'Developers Playpen',1,2,NOW(),1,2,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (3, 'Everybody', null, 'All People In Course',2,3,NOW(),1,null,1,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (4, 'Mathematics 1', 'MATH111', 'Mathematics 1',1,2,NOW(),1,3,2,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (5, 'Tutorial Group A', 'TUTA', 'Tutorial Group A',4,3,NOW(),1,null,2,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),1,null,2,1);
+INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
+	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,2,NOW(),1,50,1,1);
 
 
 -- users

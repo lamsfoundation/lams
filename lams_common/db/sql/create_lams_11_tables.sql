@@ -220,6 +220,7 @@ CREATE TABLE lams_organisation (
      , parent_organisation_id BIGINT(20)
      , organisation_type_id INT(3) NOT NULL DEFAULT 0
      , create_date DATETIME NOT NULL
+     , created_by BIGINT(20) NOT NULL
      , workspace_id BIGINT(20)
      , organisation_state_id INT(3) NOT NULL
      , admin_add_new_users TINYINT(1) NOT NULL DEFAULT 0
@@ -406,6 +407,7 @@ CREATE TABLE lams_system_tool (
      , export_pfolio_class_url TEXT
      , monitor_url TEXT
      , contribute_url TEXT
+     , help_url TEXT
      , create_date_time DATETIME NOT NULL
      , UNIQUE UQ_systool_activity_type (learning_activity_type_id)
      , PRIMARY KEY (system_tool_id)
@@ -441,6 +443,7 @@ CREATE TABLE lams_tool (
      , monitor_url TEXT 
      , contribute_url TEXT
      , moderation_url TEXT
+     , help_url TEXT
      , create_date_time DATETIME NOT NULL
      , language_file VARCHAR(255)
      , UNIQUE UQ_lams_tool_sig (tool_signature)
@@ -622,7 +625,6 @@ CREATE TABLE lams_cr_node (
      , created_date_time DATETIME NOT NULL
      , next_version_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 1
      , parent_nv_id BIGINT(20) UNSIGNED
-     , user_id BIGINT(20)
      , PRIMARY KEY (node_id)
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_cr_node_1 FOREIGN KEY (workspace_id)
@@ -635,6 +637,7 @@ CREATE TABLE lams_cr_node_version (
      , node_id BIGINT(20) UNSIGNED NOT NULL
      , version_id BIGINT(20) UNSIGNED NOT NULL
      , created_date_time DATETIME NOT NULL
+     , user_id BIGINT(20) NOT NULL
      , PRIMARY KEY (nv_id)
      , INDEX (node_id)
      , CONSTRAINT FK_lams_cr_node_version_2 FOREIGN KEY (node_id)
