@@ -26,8 +26,7 @@
 <!ELEMENT ServerVersionNumber (#PCDATA)>
 <!ELEMENT ServerLanguage (#PCDATA)>
 <!ELEMENT ServerPageDirection (#PCDATA)>
-<!ELEMENT DictionaryDates (Dictionary+) >
-<!ELEMENT Dictionary (language, createDate)>
+<!ELEMENT DictionaryDateCreated (#PCDATA) >
 <!ELEMENT language (#PCDATA)>
 <!ELEMENT createDate (#PCDATA)>
 <!ELEMENT XmppDomain (#PCDATA)>
