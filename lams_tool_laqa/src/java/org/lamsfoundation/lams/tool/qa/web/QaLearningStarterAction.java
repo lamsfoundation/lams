@@ -267,7 +267,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
         logger.debug("notebookEntry: " + notebookEntry);
 		
 		if (notebookEntry != null) {
-		    generalLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
+		    String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+		    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 		}
 		
 	    
