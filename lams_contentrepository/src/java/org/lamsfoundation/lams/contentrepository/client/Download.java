@@ -288,10 +288,10 @@ public abstract class Download extends HttpServlet {
 
 		if (saveFile) {
 		    log.debug("Sending as attachment");
-			response.setHeader("Content-Disposition","attachment;filename=" + filename);
+			response.setHeader("Content-Disposition","attachment;filename=\"" + filename+"\"");
 		} else {
 		    log.debug("Sending as inline");
-			response.setHeader("Content-Disposition","inline;filename=" + filename);
+			response.setHeader("Content-Disposition","inline;filename=\"" + filename+"\"");
 		}
 		response.setHeader("Cache-control","must-revalidate");
 		if ( filename != null ) {
