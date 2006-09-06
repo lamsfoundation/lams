@@ -28,10 +28,8 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -93,7 +91,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
-import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -572,9 +569,7 @@ public class SubmitFilesService implements ToolContentManager,
 			SubmissionDetails details = new SubmissionDetails();
 			details.setFileDescription(fileDescription);
 			details.setFilePath(uploadFile.getFileName());
-			Date now = Calendar.getInstance().getTime();
-			now = DateUtil.convertToUTC(now);
-			details.setDateOfSubmission(now);
+			details.setDateOfSubmission(new Date());
 			
 			SubmitUser learner = submitUserDAO.getLearner(sessionID,userID);
 			details.setLearner(learner);
@@ -655,7 +650,6 @@ public class SubmitFilesService implements ToolContentManager,
 				}
 				
 				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails);
-				detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
 				userFileList = (List) map.get(learner);
 				//if it is first time to this user, creating a new ArrayList for this user.
 				if(userFileList == null)
@@ -670,7 +664,6 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	public FileDetailsDTO getFileDetails(Long detailID){
 			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
-			details.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), details.getDateOfSubmission()));
 			return new FileDetailsDTO(details);			
 	}
 	/**
@@ -715,7 +708,6 @@ public class SubmitFilesService implements ToolContentManager,
 		while(iter.hasNext()){
 			details = (SubmissionDetails) iter.next();
 			report = details.getReport();
-			report.setDateMarksReleased(DateUtil.convertToUTC(Calendar.getInstance().getTime()));
 			submitFilesReportDAO.updateReport(report);
 		}
 		//current there is no false return
