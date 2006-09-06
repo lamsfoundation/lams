@@ -51,11 +51,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <% 
 String clientVersion = Configuration.get(ConfigurationKeys.MONITOR_CLIENT_VERSION);
 String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
+String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
 %>
 
 	<%-- courseID and classID are passed in as request parameters by addLesson.jsp in lams_central. --%>
-	<c:set var="wizardurl_params">?loadFile=monitoring/lams_wizard.swf&loadLibrary=monitoring/lams_wizard_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&courseID=<c:out value="${param.courseID}"/>&classID=<c:out value="${param.classID}"/></c:set>
+	<c:set var="wizardurl_params">?loadFile=monitoring/lams_wizard.swf&loadLibrary=monitoring/lams_wizard_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&courseID=<c:out value="${param.courseID}"/>&classID=<c:out value="${param.classID}"/></c:set>
 	<c:set var="wizardurl_nojs">../lams_preloader.swf<c:out value="${wizardurl_params}"/></c:set>
 	<c:set var="wizardurl_js">../lams_preloader<c:out value="${wizardurl_params}"/></c:set>
 
