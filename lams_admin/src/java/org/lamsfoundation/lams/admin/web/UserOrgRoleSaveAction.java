@@ -25,7 +25,9 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,35 +95,17 @@ public class UserOrgRoleSaveAction extends Action {
 		// for subgroups, if user is not a member of the parent group then add to that as well.
 		for(int i=0; i<userBeans.size(); i++){
 			UserBean bean = (UserBean)userBeans.get(i);
+			User user = (User)getService().findById(User.class, bean.getUserId());
 			log.debug("userId: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
-			saveRoles(bean.getUserId(), organisation, roleIds);
+			getService().setRolesForUserOrganisation(user, organisation, (List<String>)Arrays.asList(roleIds));
 			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 				if (getService().getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
-					saveRoles(bean.getUserId(), organisation.getParentOrganisation(), roleIds);
+					getService().setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
 				}
 			}
 		}
 		return mapping.findForward("userlist");
-	}
-	
-	private void saveRoles(Integer userId, Organisation organisation, String[] roleIds) {
-		
-		User user = (User)getService().findById(User.class, userId);
-		UserOrganisation uo = new UserOrganisation(user, organisation);
-		getService().save(uo);
-		log.debug("added "+uo.getUser().getLogin()+" to "+uo.getOrganisation().getName());
-		Set uors = new HashSet();
-		for(int j=0; j<roleIds.length; j++) {
-			Role currentRole = (Role)getService().findById(Role.class,new Integer(roleIds[j]));
-			log.debug("setting role: "+currentRole.getName());
-			UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
-			getService().save(newUor);
-			uors.add(newUor);
-		}
-		uo.setUserOrganisationRoles(uors);
-		Set uos = organisation.getUserOrganisations();
-		uos.add(uo);
 	}
 	
 	private IUserManagementService getService(){

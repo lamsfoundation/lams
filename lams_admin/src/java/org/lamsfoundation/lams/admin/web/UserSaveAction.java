@@ -144,34 +144,7 @@ public class UserSaveAction extends Action {
 				BeanUtils.copyProperties(user, userForm);
 				user.setLocale(locale);
 				log.debug("locale: " + locale);
-				UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
-				if (uo != null ) {
-					List<String> rolesList = Arrays.asList(roles);
-					List<String> rolesCopy = new ArrayList<String>();
-					rolesCopy.addAll(rolesList);
-					log.debug("rolesList.size: " + rolesList.size());
-					Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
-					Set<UserOrganisationRole> uorsCopy = new HashSet<UserOrganisationRole>();
-					uorsCopy.addAll(uors);
-					// remove the common part from the rolesList and uors
-					// to get the uors to remove and the roles to add 
-					for(String roleId : rolesList) { 
-						for(UserOrganisationRole uor : uors) {
-							if (uor.getRole().getRoleId().toString().equals(roleId)) {
-								rolesCopy.remove(roleId);
-								uorsCopy.remove(uor);
-							}
-						}
-					}
-					uors.removeAll(uorsCopy);
-					for(String roleId : rolesCopy){
-						UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(rolelist, roleId));
-						getService().save(uor);
-						uors.add(uor);
-					}
-					uo.setUserOrganisationRoles(uors);
-				}
-				getService().save(user);
+				getService().setRolesForUserOrganisation(user, org, (List<String>)Arrays.asList(roles));
 			} else { // create user
 				log.debug("creating user...");
 				User user = new User();
@@ -218,14 +191,7 @@ public class UserSaveAction extends Action {
 						orgs.add(parentOrg);
 					}
 					for (Organisation o : orgs) {
-						UserOrganisation uo = new UserOrganisation(user,o);
-						getService().save(uo);
-						for (String roleId : roles) { 
-							UserOrganisationRole uor = new UserOrganisationRole(uo, findRole(rolelist,roleId));
-							getService().save(uor);
-							uo.addUserOrganisationRole(uor);
-						}
-						user.addUserOrganisation(uo);
+						getService().setRolesForUserOrganisation(user, o, (List<String>)Arrays.asList(roles));
 					}
 				}
 			}
@@ -245,14 +211,6 @@ public class UserSaveAction extends Action {
 		}
 	}
 
-	
-	private Role findRole(List<Role> allRoles, String roleId){
-		for(Role role: allRoles){
-			if(role.getRoleId().toString().equals(roleId))
-				return role;
-		}
-		return null;
-	}
 	
 	@SuppressWarnings("unchecked")
 	private IUserManagementService getService() {
