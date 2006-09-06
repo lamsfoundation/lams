@@ -313,4 +313,12 @@ public interface IUserManagementService {
 	 */
 	public void disableUser(Integer userId);
 
+	/**
+	 * Set the roles for the specified user and organisation using the roleIds in rolesList.
+	 * If userOrganisation exists, will also remove roles that are not in rolesList.
+	 * @param user
+	 * @param org
+	 * @param rolesList
+	 */
+	public void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList);
 }

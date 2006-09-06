@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -609,6 +610,60 @@ public class UserManagementService implements IUserManagementService {
 			iter.remove();
 		}
 		log.debug("disabling user "+user.getLogin());
+		save(user);
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setRolesForUserOrganisation(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.Organisation, java.util.List)
+	 */
+	public void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList) {
+		
+		UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
+		if (uo == null) {
+			uo = new UserOrganisation(user, org);
+			save(uo);
+			log.debug("added "+user.getLogin()+" to "+org.getName());
+			Set uos = org.getUserOrganisations();
+			uos.add(uo);
+		}
+
+		List<String> rolesCopy = new ArrayList<String>();
+		rolesCopy.addAll(rolesList);
+		log.debug("rolesList.size: " + rolesList.size());
+		Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
+		Set<UserOrganisationRole> uorsCopy = new HashSet<UserOrganisationRole>();
+		if (uors != null) {
+			uorsCopy.addAll(uors);
+			// remove the common part from the rolesList and uors
+			// to get the uors to remove and the roles to add 
+			for (String roleId : rolesList) { 
+				for (UserOrganisationRole uor : uors) {
+					if (uor.getRole().getRoleId().toString().equals(roleId)) {
+						rolesCopy.remove(roleId);
+						uorsCopy.remove(uor);
+						log.debug("removing role: "+uor.getRole().getName());
+					}
+				}
+			}
+			uors.removeAll(uorsCopy);
+		} else {
+			uors = new HashSet<UserOrganisationRole>();
+		}
+		for (String roleId : rolesCopy){
+			Role role = (Role)findById(Role.class, Integer.parseInt(roleId));
+			UserOrganisationRole uor = new UserOrganisationRole(uo, role);
+			save(uor);
+			log.debug("setting role: "+role.getName());
+			uors.add(uor);
+			if (role.getName().equals(Role.AUTHOR)) {
+				if (user.getWorkspace()==null) {
+					createWorkspaceForUser(user);
+				}
+			}
+		}
+		uo.setUserOrganisationRoles(uors);
+		
 		save(user);
 	}
 	
