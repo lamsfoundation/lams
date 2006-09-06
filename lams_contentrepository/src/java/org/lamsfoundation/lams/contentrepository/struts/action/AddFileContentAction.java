@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.contentrepository.struts.form.AddFileContentForm;
  */
 public class AddFileContentAction extends RepositoryDispatchAction {
 
+	public static final Integer dummyUserId = new Integer(1);
 	// --------------------------------------------------------- Instance Variables
 
 	// --------------------------------------------------------- Methods
@@ -120,11 +121,11 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 			if ( uuid != null ) {
 				// create a new version of this node
 				nodeKey = getRepository().updateFileItem(ticket, uuid, filename,
-						is, contentType, versionDescription);
+						is, contentType, versionDescription, dummyUserId);
 			} else {
 				// create a new node
 				nodeKey = getRepository().addFileItem(ticket, is, filename, 
-						contentType, versionDescription);
+						contentType, versionDescription, dummyUserId);
 			}
 
 			// normally the application would store the node key and
@@ -198,10 +199,10 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 			if ( uuid != null ) {
 				// create a new version of this node
 				nodeKey = getRepository().updatePackageItem(ticket, uuid, dirName,
-						entryString, versionDescription);
+						entryString, versionDescription, dummyUserId);
 			} else {
 				// create a new node
-				nodeKey = getRepository().addPackageItem(ticket,dirName, entryString, versionDescription);
+				nodeKey = getRepository().addPackageItem(ticket,dirName, entryString, versionDescription, dummyUserId);
 			}
 			
 			// normally the application would store the node key and

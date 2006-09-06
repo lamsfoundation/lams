@@ -80,6 +80,9 @@ public class SystemTool implements Serializable {
     private String contributeUrl;
     
     /** persistent field */
+    private String helpUrl;
+    
+    /** persistent field */
     private Date createDateTime;
     
 	/** 
@@ -100,6 +103,7 @@ public class SystemTool implements Serializable {
                 String exportPortfolioClassUrl,
                 String monitorUrl,
                 String contributeUrl,
+                String helpUrl,
                 Date createDateTime) 
     {
         this.systemToolId = systemToolId;
@@ -114,6 +118,7 @@ public class SystemTool implements Serializable {
         this.exportPortfolioClassUrl = exportPortfolioClassUrl;
         this.monitorUrl = monitorUrl;
         this.contributeUrl = contributeUrl;
+        this.helpUrl = helpUrl;
 
         this.createDateTime = createDateTime;
     }
@@ -290,7 +295,23 @@ public class SystemTool implements Serializable {
         this.monitorUrl = monitorUrl;
     }
  
-    
+    /**
+     * @hibernate.property column="help_url" length="65535" not-null="false"  
+     * @return Returns the helpUrl.
+     */
+    public String getHelpUrl()
+    {
+        return helpUrl;
+    }
+    /**
+     * @param helpUrl The helpUrl to set.
+     */
+    public void setHelpUrl(String helpUrl)
+    {
+        this.helpUrl = helpUrl;
+    }
+ 
+   
     public String toString() {
         return new ToStringBuilder(this)
             .append("systemToolId", getSystemToolId())

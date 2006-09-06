@@ -24,7 +24,6 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.contentrepository.service;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
@@ -64,8 +62,10 @@ import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -361,18 +361,31 @@ public class SimpleRepository implements IRepositoryAdmin {
 		return ( ticket != null &&  ticketIdSet.contains(ticket.getTicketId()) );
     }
 
+	/**
+	 * Import tool content 
+	 * TODO Remove once all tools converted to supply user id. 
+	 */
+	public NodeKey addFileItem(ITicket ticket, InputStream istream,
+			String filename, String mimeType, String versionDescription)
+			throws FileException, AccessDeniedException,
+			InvalidParameterException {
+		log.error("addFileItem() to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
+		return addFileItem(ticket, istream,
+				filename, mimeType, versionDescription, new Integer(1));
+	}
+
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public NodeKey addFileItem(ITicket ticket, InputStream istream,
-			String filename, String mimeType, String versionDescription)
+			String filename, String mimeType, String versionDescription, Integer userId)
 			throws FileException, AccessDeniedException,
 			InvalidParameterException {
 		
     	try { 
     		CrWorkspace workspace = getWorkspace(ticket.getWorkspaceId());
     		SimpleVersionedNode initialNodeVersion = nodeFactory.createFileNode(workspace, 
-    				 null, null, istream, filename, mimeType, versionDescription); 
+    				 null, null, istream, filename, mimeType, versionDescription, userId); 
        		initialNodeVersion.save();
     		return initialNodeVersion.getNodeKey();
 		} catch ( ValidationException e) {
@@ -391,7 +404,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addPackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public NodeKey addPackageItem(ITicket ticket, String dirPath,
-			String startFile, String versionDescription)
+			String startFile, String versionDescription, Integer userId)
 			throws AccessDeniedException, InvalidParameterException,
 			FileException {
 		
@@ -406,10 +419,10 @@ public class SimpleRepository implements IRepositoryAdmin {
 		}
 
     	SimpleVersionedNode packageNode = null;
-   		packageNode = nodeFactory.createPackageNode(workspace, startFile, versionDescription); 
+   		packageNode = nodeFactory.createPackageNode(workspace, startFile, versionDescription, userId); 
     	
 		try { 
-			packageNode.addPackageFiles(workspace, dirPath, versionDescription); 
+			packageNode.addPackageFiles(workspace, dirPath, versionDescription, userId); 
 			packageNode.save();
     	} catch ( ValidationException e) {
     		// if this is thrown, then it is bug - nothing external should cause it.
@@ -512,12 +525,12 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updateFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.io.InputStream, java.lang.String, java.lang.String)
 	 */
 	public NodeKey updateFileItem(ITicket ticket, Long uuid, String filename,
-			InputStream istream, String mimeType, String versionDescription)
+			InputStream istream, String mimeType, String versionDescription, Integer userId)
 			throws AccessDeniedException, ItemNotFoundException, FileException,
 			InvalidParameterException {
 	   	
 		SimpleVersionedNode newNodeVersion = nodeFactory.getNodeNewVersion(ticket.getWorkspaceId(), 
-				uuid, null, versionDescription);
+				uuid, null, versionDescription, userId);
 
 	   	if ( ! newNodeVersion.isNodeType( NodeType.FILENODE) )
 	   		throw new InvalidParameterException("Node is not a file node - it is a "+newNodeVersion.getNodeType()
@@ -537,12 +550,12 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public NodeKey updatePackageItem(ITicket ticket, Long uuid, String dirPath,
-			String startFile, String versionDescription)
+			String startFile, String versionDescription, Integer userId)
 			throws AccessDeniedException, ItemNotFoundException, FileException,
 			InvalidParameterException {
 		
 		SimpleVersionedNode newNodeVersion = nodeFactory.getNodeNewVersion(ticket.getWorkspaceId(), 
-				uuid, null, versionDescription);
+				uuid, null, versionDescription, userId);
 
 	   	if ( ! newNodeVersion.isNodeType( NodeType.PACKAGENODE) )
 	   		throw new InvalidParameterException("Node is not a package node - it is a "+newNodeVersion.getNodeType()
@@ -553,7 +566,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 		try { 
 			CrWorkspace workspace = getWorkspace(ticket.getWorkspaceId());
 			
-			newNodeVersion.addPackageFiles(workspace, dirPath, versionDescription); 
+			newNodeVersion.addPackageFiles(workspace, dirPath, versionDescription, userId); 
 			newNodeVersion.save();
 
     	} catch ( ValidationException e) {
@@ -591,12 +604,12 @@ public class SimpleRepository implements IRepositoryAdmin {
     /* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#copyNodeVersion(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.Long)
 	 */
-    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId) throws AccessDeniedException, ItemNotFoundException {
+    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId, Integer userId) throws AccessDeniedException, ItemNotFoundException {
 
         
     	try { 
             SimpleVersionedNode originalNode = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,versionId);
-           	SimpleVersionedNode newNode = nodeFactory.copy(originalNode);
+           	SimpleVersionedNode newNode = nodeFactory.copy(originalNode, userId);
            	newNode.save();
     		return newNode.getNodeKey();
     		 

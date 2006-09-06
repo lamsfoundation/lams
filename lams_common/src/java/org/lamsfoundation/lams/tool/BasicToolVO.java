@@ -73,7 +73,10 @@ public class BasicToolVO implements Serializable, IToolVO {
     
     /** persistent field */
     private String moderationUrl;
-    
+
+    /** persistent field */
+    private String helpUrl;
+
     /** persistent field */
     private boolean supportsRunOffline;
     
@@ -124,6 +127,7 @@ public class BasicToolVO implements Serializable, IToolVO {
                 String monitorUrl,
                 String contributeUrl,
                 String moderationUrl,
+                String helpUrl,
                 boolean supportsRunOffline,
                 long defaultToolContentId, 
                 String toolSignature, 
@@ -147,6 +151,7 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.monitorUrl=monitorUrl;
 		this.contributeUrl=contributeUrl;
 		this.moderationUrl=moderationUrl;
+		this.helpUrl = helpUrl;
 		this.supportsRunOffline=supportsRunOffline;
 		this.defaultToolContentId=defaultToolContentId;
 		this.toolSignature=toolSignature;
@@ -220,6 +225,21 @@ public class BasicToolVO implements Serializable, IToolVO {
 	public void setContributeUrl(String contributeUrl) {
 		this.contributeUrl = contributeUrl;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.IToolVO#getHelpUrl()
+	 */
+	public String getHelpUrl() {
+		return helpUrl;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.IToolVO#setHelpUrl(java.lang.String)
+	 */
+	public void setHelpUrl(String helpUrl) {
+		this.helpUrl = helpUrl;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.IToolVO#getCreateDateTime()

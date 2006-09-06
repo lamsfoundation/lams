@@ -104,9 +104,9 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
     public void testUploadFile() {
         try {
             NodeKey offlineNodeKey = handler.uploadFile(CRResources.getSingleFile(), CRResources.singleFileName, 
-                    CRResources.singleFileMimeType, ToolContentHandlerImpl.TYPE_OFFLINE);
+                    CRResources.singleFileMimeType, ToolContentHandlerImpl.TYPE_OFFLINE, mmmUser);
             NodeKey onlineNodeKey = handler.uploadFile(CRResources.getSingleFile(), CRResources.singleFileName, 
-                    CRResources.singleFileMimeType, ToolContentHandlerImpl.TYPE_ONLINE);
+                    CRResources.singleFileMimeType, ToolContentHandlerImpl.TYPE_ONLINE, mmmUser);
 
             Long uuid = offlineNodeKey.getUuid();
             IVersionedNode node = handler.getFileNode(uuid);
@@ -137,7 +137,7 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
         try {
 		    // unpack the zip file so we have a directory to play with 
     	    String tempDir = ZipFileUtil.expandZip(CRResources.getZipFile(), CRResources.zipFileName);
-		    NodeKey nodeKey = handler.uploadPackage(tempDir, "index.html"); 
+		    NodeKey nodeKey = handler.uploadPackage(tempDir, "index.html", mmmUser); 
 
 		    Long uuid = nodeKey.getUuid();
             IVersionedNode node = handler.getFileNode(uuid);

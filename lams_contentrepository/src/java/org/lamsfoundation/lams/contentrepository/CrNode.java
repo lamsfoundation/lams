@@ -78,7 +78,7 @@ public class CrNode implements Serializable {
 
 	/** Create the CrNode and its initial CrNodeVersion.  
 	 */
-	public CrNode(String relPath, String nodeTypeName, Date createdDateTime, CrWorkspace workspace, 
+	public CrNode(String relPath, String nodeTypeName, Date createdDateTime, Integer userId, CrWorkspace workspace, 
 			CrNodeVersion parentNodeVersion, String versionDescription)	{ 
 		
         this.path = relPath;
@@ -90,7 +90,7 @@ public class CrNode implements Serializable {
         
         this.crWorkspace = workspace;
         this.parentNodeVersion = parentNodeVersion;
-		this.addCrNodeVersion(new CrNodeVersion(this, createdDateTime, incrementNextVersionId(), versionDescription));
+		this.addCrNodeVersion(new CrNodeVersion(this, createdDateTime, incrementNextVersionId(), versionDescription, userId));
 	}
 
     /** full constructor */

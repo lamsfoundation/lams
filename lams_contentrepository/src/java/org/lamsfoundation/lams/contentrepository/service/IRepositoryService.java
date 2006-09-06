@@ -131,6 +131,15 @@ public interface IRepositoryService {
 	public void updateCredentials(ICredentials oldCredential, ICredentials newCredential)
 		throws AccessDeniedException, RepositoryCheckedException;
 
+	/**
+    * TODO To be removed from the system and replaced with the call with the user id.
+	 * @Deprecated
+	*/
+	public abstract NodeKey addFileItem(ITicket ticket, InputStream istream, String filename,
+			String mimeType, String versionDescription) 
+		throws FileException, AccessDeniedException, InvalidParameterException;
+	
+
 	/** 
 	 * Add a new file to the repository. This will create 
 	 * a completely new entry (node) in the repository, starting
@@ -139,6 +148,7 @@ public interface IRepositoryService {
 	 * @param istream new file, as an input stream - mandatory
 	 * @param mimeType mime type of file - optional
 	 * @param versionDescription human readable comment about the version - optional
+	 * @param userId user who is creating this node - mandatory
 	 * @return nodeKey (uuid and version)
      * @throws AccessDeniedException if ticket doesn't allow this action
      * @throws FileException if unable to save node due to file error
@@ -146,7 +156,7 @@ public interface IRepositoryService {
      * @throws RepositoryRuntimeException if any internal errors have occured 
 	 */
 	public abstract NodeKey addFileItem(ITicket ticket, InputStream istream, String filename,
-					String mimeType, String versionDescription) 
+					String mimeType, String versionDescription, Integer userId) 
 			throws FileException, AccessDeniedException, InvalidParameterException;
 
 	/** 
@@ -161,6 +171,7 @@ public interface IRepositoryService {
 	 * @param dirPath directory path containing files - mandatory
 	 * @param startFile relative path of initial file - optional
 	 * @param versionDescription human readable comment about the version - optional
+	 * @param userId user who is creating this node - mandatory
 	 * @return nodeKey (uuid and version)
      * @throws AccessDeniedException if ticket doesn't allow this action
      * @throws FileException if unable to save node due to file error
@@ -168,7 +179,7 @@ public interface IRepositoryService {
      * @throws RepositoryRuntimeException if any internal errors have occured 
 	 */
 	public abstract NodeKey addPackageItem(ITicket ticket, String dirPath, String startFile,
-				String versionDescription) 
+				String versionDescription, Integer userId) 
 		throws AccessDeniedException, InvalidParameterException, FileException;
 
     /** 
@@ -179,6 +190,7 @@ public interface IRepositoryService {
      * @param istream new file, as an input stream - mandatory
      * @param versionDescription human readable comment about the version - optional
      * @param mimeType mime type of file - optional
+	 * @param userId user who is creating this node - mandatory
      * @throws AccessDeniedException if ticket doesn't allow this action
      * @throws ItemNotFoundException if node with uuid cannot be found
      * @throws FileException if unable to save node due to file error
@@ -187,7 +199,7 @@ public interface IRepositoryService {
      */
 	public NodeKey updateFileItem(ITicket ticket, Long uuid, String filename, 
 	   				InputStream istream, String mimeType, 
-					String versionDescription) 
+					String versionDescription, Integer userId) 
 	   		throws AccessDeniedException, ItemNotFoundException, 
 					FileException, InvalidParameterException;
 
@@ -205,6 +217,7 @@ public interface IRepositoryService {
 	 * @param startFile relative path of initial file - optional
 	 * @param versionDescription human readable comment about the version - optional
 	 * @return nodeKey (uuid and version)
+	 * @param userId user who is creating this node - mandatory
      * @throws AccessDeniedException if ticket doesn't allow this action
      * @throws ItemNotFoundException if node with uuid cannot be found
      * @throws FileException if unable to save node due to file error
@@ -212,7 +225,7 @@ public interface IRepositoryService {
      * @throws RepositoryRuntimeException if any internal errors have occured 
 	 */
 	public abstract NodeKey updatePackageItem(ITicket ticket, Long uuid, String dirPath,
-			String startFile, String versionDescription)
+			String startFile, String versionDescription, Integer userId)
 			throws AccessDeniedException, ItemNotFoundException, 
 			FileException, InvalidParameterException ;
 
@@ -246,11 +259,12 @@ public interface IRepositoryService {
 	 * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
 	 * @param uuid id of the file/package - mandatory
 	 * @param version desired version - if null gets latest version
+	 * @param userId user who is creating this node - mandatory
 	 * @return nodeKey (uuid and version)
 	 * @throws AccessDeniedException if the ticket is invalid
 	 * @throws ItemNotFoundException if the node cannot be found
      */
-    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId) throws AccessDeniedException, ItemNotFoundException;
+    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId, Integer userId) throws AccessDeniedException, ItemNotFoundException;
 
 	/** 
 	 * Get an item from the repository based on the UUID. This

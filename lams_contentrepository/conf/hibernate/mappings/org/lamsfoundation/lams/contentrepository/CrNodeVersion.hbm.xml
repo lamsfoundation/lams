@@ -46,6 +46,15 @@
             length="14"
         />
 
+        <property
+            name="userId"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="user_id"
+            not-null="true"
+        />
+
         <many-to-one
             name="node"
             class="org.lamsfoundation.lams.contentrepository.CrNode"

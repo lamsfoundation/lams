@@ -35,6 +35,10 @@ public interface IToolVO {
 
 	public abstract void setContributeUrl(String contributeUrl);
 
+	public abstract String getHelpUrl();
+
+	public abstract void setHelpUrl(String helpUrl);
+
 	public abstract Date getCreateDateTime();
 
 	public abstract void setCreateDateTime(Date createDateTime);

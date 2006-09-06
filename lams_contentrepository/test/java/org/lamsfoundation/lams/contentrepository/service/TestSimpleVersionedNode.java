@@ -409,9 +409,9 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	public void testAddNode() {
 		try { 
 			// file nodes are tested in another test
-			SimpleVersionedNode dataNode = nodeFactory.createDataNode(getWorkspace(INITIAL_WORKSPACE_ID), null,"Initial Version");
+			SimpleVersionedNode dataNode = nodeFactory.createDataNode(getWorkspace(INITIAL_WORKSPACE_ID), null,"Initial Version", mmmUser);
 
-			SimpleVersionedNode packageNode = nodeFactory.createPackageNode(getWorkspace(INITIAL_WORKSPACE_ID), "index.html", "Initial Version");
+			SimpleVersionedNode packageNode = nodeFactory.createPackageNode(getWorkspace(INITIAL_WORKSPACE_ID), "index.html", "Initial Version", mmmUser);
 			
 			assertTrue("2 nodes created, but not saved into database ", 
 					dataNode != null && dataNode.getUUID() == null
@@ -474,7 +474,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 				
 			try {
 				if ( newUuid  == null ) {
-					fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, null, filename, null, null);
+					fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, null, filename, null, null, mmmUser);
 				} else {
 					fileNode = (SimpleVersionedNode) getNode(INITIAL_WORKSPACE_ID, newUuid);
 					fileNode.setFile(null, filename, null);
@@ -486,7 +486,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 
 			try {
 				if ( newUuid  == null ) {
-					fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, is, null, null, null);
+					fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, is, null, null, null, mmmUser);
 				} else {
 					fileNode = (SimpleVersionedNode) getNode(INITIAL_WORKSPACE_ID, newUuid);
 					fileNode.setFile(is, null, null);
@@ -497,7 +497,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 			}
 
 			
-			fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, is, filename, null, null);
+			fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, is, filename, null, null, mmmUser);
 			fileNode.setFile(is, filename, null);
 			saveCheckNode("File", NodeType.FILENODE, fileNode);
 			newUuid = fileNode.getUUID();
@@ -562,7 +562,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	public void testAddNodeBadType() {
 		try {
 	
-			SimpleVersionedNode newNode = nodeFactory.createDataNode(getWorkspace(INITIAL_WORKSPACE_ID), null,"Initial Version");
+			SimpleVersionedNode newNode = nodeFactory.createDataNode(getWorkspace(INITIAL_WORKSPACE_ID), null,"Initial Version", mmmUser);
 			newNode.getNode().setType("XYZ");
 			newNode.save();
 			fail("NoSuchNodeTypeException should have been thrown");

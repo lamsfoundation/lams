@@ -188,6 +188,14 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	}
 
     /**
+     * TODO To be removed from the system and replaced with the call with the user id.
+     */
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+		log.error("uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty) to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
+		return uploadFile(stream, fileName, mimeType, fileProperty, new Integer(1));
+    }
+
+    /**
      * Save a file in the content repository.
      * 
      * @param stream Input filestream. Mandatory.
@@ -199,18 +207,18 @@ public abstract class ToolContentHandler implements IToolContentHandler {
      * @throws FileException An error occured writing the input stream to disk.
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty, Integer userId) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
         if ( fileProperty == null )
             throw new InvalidParameterException("uploadFile: fileProperty parameter empty. Should be either TYPE_ONLINE or TYPE_OFFLINE");
 	    
         NodeKey nodeKey = null;
         try {
 		    try {
-		        nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
+		        nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null, userId);
 		    } catch (AccessDeniedException e) {
 		        log.warn("Unable to access repository to add file "+fileName
 					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
-	            nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
+	            nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null, userId);
 		    }
 	        
 		    try {
@@ -231,6 +239,14 @@ public abstract class ToolContentHandler implements IToolContentHandler {
     }
 
     /**
+     * TODO To be removed from the system and replaced with the call with the user id.
+     */
+    public NodeKey uploadPackage(String dirPath, String startFile) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+		log.error("uploadPackage(String dirPath, String startFile)  to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
+		return uploadPackage(dirPath, startFile, new Integer(1));
+    }
+
+    /**
      * Save a directory of files in the content repository.
      * 
 	 * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
@@ -241,18 +257,18 @@ public abstract class ToolContentHandler implements IToolContentHandler {
      * @throws FileException An error occured writing the files to disk.
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public NodeKey uploadPackage(String dirPath, String startFile) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+    public NodeKey uploadPackage(String dirPath, String startFile, Integer userId) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
         if ( dirPath == null )
             throw new InvalidParameterException("uploadFile: dirPath parameter empty. Directory containing files must be supplied");
          	    
         NodeKey nodeKey = null;
         try {
 		    try {
-		        nodeKey = getRepositoryService().addPackageItem(getTicket(false), dirPath, startFile, null);
+		        nodeKey = getRepositoryService().addPackageItem(getTicket(false), dirPath, startFile, null, userId);
 		    } catch (AccessDeniedException e) {
 		        log.warn("Unable to access repository to add directory of files. AccessDeniedException: "
 		        		+e.getMessage()+" Retrying login.");
-		        nodeKey = getRepositoryService().addPackageItem(getTicket(true), dirPath, startFile, null);
+		        nodeKey = getRepositoryService().addPackageItem(getTicket(true), dirPath, startFile, null, userId);
 		    }
 	        
         } catch (RepositoryCheckedException e2) {
@@ -296,21 +312,29 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 		} 
     }
     /**
+     * TODO To be removed from the system and replaced with the call with the user id.
+     */
+    public NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException {
+		log.error("copyFile(Long uuid) to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
+    	return copyFile(uuid, new Integer(1));
+    }
+
+    /**
      * Copy an entry in the content repository.
      * 
      * @param uuid id of the file node. Mandatory
      * @throws ItemNotFoundException Node to copy cannot be found 
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException {
+    public NodeKey copyFile(Long uuid, Integer userId) throws ItemNotFoundException, RepositoryCheckedException {
         NodeKey nodeKey = null;
         try {
 	        try {
-				nodeKey = getRepositoryService().copyNodeVersion(getTicket(false), uuid, null);
+				nodeKey = getRepositoryService().copyNodeVersion(getTicket(false), uuid, null, userId);
 		    } catch (AccessDeniedException e) {
 		        log.warn("Unable to access repository to add copy node "+uuid
 					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
-	            nodeKey = getRepositoryService().copyNodeVersion(getTicket(true), uuid, null);
+	            nodeKey = getRepositoryService().copyNodeVersion(getTicket(true), uuid, null, userId);
 		    }
 	    } catch (ItemNotFoundException e) {
 	        log.warn("Unable to to copy node "+uuid

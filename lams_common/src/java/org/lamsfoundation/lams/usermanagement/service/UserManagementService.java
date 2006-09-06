@@ -439,9 +439,12 @@ public class UserManagementService implements IUserManagementService {
 	public Organisation saveOrganisation( Organisation organisation, Integer userID ) 	 
     { 	 
 	 
+    		User creator = (User)findById(User.class,userID);
+    			
             if ( organisation.getOrganisationId() == null ) { 	 
                     Date createDateTime = new Date(); 	 
-                    organisation.setCreateDate(createDateTime); 	 
+                    organisation.setCreateDate(createDateTime);
+                    organisation.setCreatedBy(creator);
 	 
                     if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){ 	 
                             Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime); 	 

@@ -200,5 +200,12 @@ public interface IVersionedNode {
 	 */
 	public InputStream getFile() throws FileException;
 
+   /**
+     * Get the user_id of the user who created this node.
+     *  
+     * @return userId
+     */
+    public Integer getUserId();
+
 
 }

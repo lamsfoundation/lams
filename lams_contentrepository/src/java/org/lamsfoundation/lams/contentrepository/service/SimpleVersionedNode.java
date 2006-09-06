@@ -309,6 +309,16 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 		
 	}
 	
+	/**
+	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getUserId()
+	 */
+	public Integer getUserId() {
+		nodeObjectInitilised("Unable to get user id.");
+		return nodeVersion.getUserId();
+		
+	}
+	
+
 	/** Get the file, as an inputstream. It is the responsibility 
 	 * of the caller to close the stream. Note: this should only be 
 	 * called once the node is saved - do not call it directly after
@@ -803,7 +813,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	 * @throws InvalidParameterException
 	 * @throws FileException
 	 */
-	protected void addPackageFiles(CrWorkspace workspace, String dirPath, String versionDescription) 
+	protected void addPackageFiles(CrWorkspace workspace, String dirPath, String versionDescription, Integer userId) 
 				throws InvalidParameterException, FileException, ValidationException {
 		
     	File directory = new File(dirPath);
@@ -817,7 +827,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     	if ( removePathToMakeRelPath.charAt(removePathToMakeRelPath.length()-1) != File.separatorChar )
     		removePathToMakeRelPath += File.separatorChar;
 		
-    	processDirectory(workspace, removePathToMakeRelPath, directory, versionDescription);
+    	processDirectory(workspace, removePathToMakeRelPath, directory, versionDescription, userId);
 	}
 
 	/** 
@@ -838,7 +848,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	 * not be null.
 	 * @throws FileException
 	 */
-	private void processDirectory(CrWorkspace workspace, String removePathToMakeRelPath, File dirFile, String versionDescription) 
+	private void processDirectory(CrWorkspace workspace, String removePathToMakeRelPath, File dirFile, String versionDescription, Integer userId) 
 			throws InvalidParameterException, FileException, ValidationException {
 
 		if ( ! dirFile.exists() || ! dirFile.isDirectory() || ! dirFile.canRead() ) {
@@ -858,7 +868,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 				if ( file.isDirectory() ) {
 					
 					// recurse to get files in this directory
-					processDirectory(workspace, removePathToMakeRelPath, file, versionDescription);
+					processDirectory(workspace, removePathToMakeRelPath, file, versionDescription, userId);
 					
 				} else {
 					
@@ -881,7 +891,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 					// the file node. Mime type is unknown.
 					// no need to the new node as a childe node, as createFileNode will do it.
 					FileInputStream istream = new FileInputStream(file);
-					nodeFactory.createFileNode(workspace, this, relPath, istream, filename, null, versionDescription);
+					nodeFactory.createFileNode(workspace, this, relPath, istream, filename, null, versionDescription, userId);
 				}
 			}
 			
@@ -915,9 +925,9 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	 *   file, filename or mimetype properties are invalid.
 	 * @throws ValueFormatException will only occur if there is an internal bug as it will only happen if the filename or mimetype properties are not strings. 
 	 */
-	public SimpleVersionedNode copy( ) throws FileException, ValueFormatException, InvalidParameterException  {
+	public SimpleVersionedNode copy( Integer userId) throws FileException, ValueFormatException, InvalidParameterException  {
 		
-		return nodeFactory.copy(this);
+		return nodeFactory.copy(this, userId);
 
 	}
 

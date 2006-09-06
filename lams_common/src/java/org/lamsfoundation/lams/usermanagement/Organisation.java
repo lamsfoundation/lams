@@ -60,6 +60,9 @@ public class Organisation implements Serializable {
     private Date createDate;
 
     /** persistent field */
+    private User createdBy;
+
+    /** persistent field */
     private Workspace workspace;
 
     /** persistent field */
@@ -91,7 +94,8 @@ public class Organisation implements Serializable {
     private Boolean courseAdminCanCreateGuestAccounts;
 
     /** full constructor */
-    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, 
+    public Organisation(String name, String description, Organisation parentOrganisation, 
+    			Date createDate, User createdBy, Workspace workspace, 
     			OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons,
     			Boolean courseAdminCanAddNewUsers, Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse, 
     			Boolean courseAdminCanCreateGuestAccounts) {
@@ -99,6 +103,7 @@ public class Organisation implements Serializable {
         this.description = description;
         this.parentOrganisation = parentOrganisation;
         this.createDate = createDate;
+        this.createdBy = createdBy;
         this.workspace = workspace;
         this.organisationType = organisationType;
         this.userOrganisations = userOrganisations;
@@ -120,8 +125,9 @@ public class Organisation implements Serializable {
     }
 
     /** minimal constructor */
-    public Organisation(Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set lessons) {
+    public Organisation(Date createDate, User createdBy, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set lessons) {
         this.createDate = createDate;
+        this.createdBy = createdBy;
         this.workspace = workspace;
         this.organisationType = organisationType;
         this.userOrganisations = userOrganisations;
@@ -135,12 +141,14 @@ public class Organisation implements Serializable {
     }
     public Organisation(String name, 
     					String description,						
-						Date createDate,						 
+						Date createDate,
+						User createdBy,
 						OrganisationType organisationType) {
 		super();
 		this.name = name;
 		this.description = description;		
 		this.createDate = createDate;		
+		this.createdBy = createdBy;
 		this.organisationType = organisationType;
 	}
 
@@ -228,6 +236,20 @@ public class Organisation implements Serializable {
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
+
+    /**
+     * 		@hibernate.many-to-one not-null="true"
+     *      @hibernate.column name="created_by"    
+     *         
+     */
+    public User getCreatedBy() {
+        return this.createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
 
     /** 
      *            @hibernate.many-to-one

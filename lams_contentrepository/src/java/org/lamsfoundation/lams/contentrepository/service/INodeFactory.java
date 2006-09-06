@@ -52,7 +52,7 @@ public interface INodeFactory {
 	public abstract SimpleVersionedNode createFileNode(CrWorkspace workspace,
 			SimpleVersionedNode parentNode, String relPath,
 			InputStream istream, String filename, String mimeType,
-			String versionDescription)
+			String versionDescription, Integer userId)
 			throws org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 
 	/**
@@ -64,7 +64,7 @@ public interface INodeFactory {
 	 * @throws RepositoryRuntimeException if an internal error occurs.
 	 */
 	public abstract SimpleVersionedNode createPackageNode(
-			CrWorkspace workspace, String initialPath, String versionDescription)
+			CrWorkspace workspace, String initialPath, String versionDescription, Integer userId)
 			throws org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 
 	/**
@@ -75,7 +75,7 @@ public interface INodeFactory {
 	 * @throws RepositoryRuntimeException if an internal error occurs.
 	 */
 	public abstract SimpleVersionedNode createDataNode(CrWorkspace workspace,
-			SimpleVersionedNode parentNode, String versionDescription)
+			SimpleVersionedNode parentNode, String versionDescription, Integer userId)
 			throws org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 
 	/**
@@ -117,7 +117,8 @@ public interface INodeFactory {
 	 * @throws RepositoryRuntimeException if an internal error occurs.
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#createNewVersion(java.lang.String, java.lang.String)
 	 */
-	public abstract SimpleVersionedNode getNodeNewVersion(Long workspaceId, Long uuid, Long versionId, String versionDescription) throws ItemNotFoundException;
+	public abstract SimpleVersionedNode getNodeNewVersion(Long workspaceId, Long uuid, Long versionId, 
+			String versionDescription, Integer userId) throws ItemNotFoundException;
 
 
 	/** Copy the supplied node/version to a new node. Does not copy the history
@@ -131,7 +132,7 @@ public interface INodeFactory {
 	 *   file, filename or mimetype properties are invalid.
 	 * @throws ValueFormatException will only occur if there is an internal bug as it will only happen if the filename or mimetype properties are not strings. 
 	 */
-	public abstract SimpleVersionedNode copy(SimpleVersionedNode originalNode)
+	public abstract SimpleVersionedNode copy(SimpleVersionedNode originalNode, Integer userId)
 			throws FileException, ValueFormatException,
 			InvalidParameterException;
 

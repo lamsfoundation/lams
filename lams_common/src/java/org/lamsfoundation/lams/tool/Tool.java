@@ -75,6 +75,9 @@ public class Tool implements Serializable {
     private String moderationUrl;
     
     /** persistent field */
+    private String helpUrl;
+    
+    /** persistent field */
     private boolean supportsRunOffline;
     
     /** persistent field */
@@ -516,6 +519,22 @@ public class Tool implements Serializable {
         this.monitorUrl = monitorUrl;
     }
  
+    /**
+     * @hibernate.property column="help_url" length="65535" not-null="false"  
+     * @return Returns the helpUrl.
+     */
+    public String getHelpUrl()
+    {
+        return helpUrl;
+    }
+    /**
+     * @param helpUrl The helpUrl to set.
+     */
+    public void setHelpUrl(String helpUrl)
+    {
+        this.helpUrl = helpUrl;
+    }
+
     
     /** 
      * @hibernate.property column="tool_identifier" length="64"       
@@ -589,6 +608,7 @@ public class Tool implements Serializable {
     			this.monitorUrl,
     			this.contributeUrl,
     			this.moderationUrl,
+    			this.helpUrl,
     			this.supportsRunOffline,
     			this.defaultToolContentId, 
     			this.toolSignature, 

@@ -305,7 +305,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 		log.debug("Copy node "+uuid+" version "+version);
 
 		try {
-			NodeKey key = getRepository().copyNodeVersion(ticket,uuid,version);
+			NodeKey key = getRepository().copyNodeVersion(ticket,uuid,version, AddFileContentAction.dummyUserId);
 			log.info("Copy node, new ids "+key);
 			return getList(mapping,form,request,response);
 

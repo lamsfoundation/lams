@@ -57,6 +57,7 @@ public class BaseTestCase extends AbstractLamsTestCase {
 	protected static final Long INITIAL_WORKSPACE_ID = new Long(1);
 	protected static final String INITIAL_WORKSPACE_USER = "atool";
 	protected static final char[] INITIAL_WORKSPACE_PASSWORD = {'a','t','o','o','l'};
+	protected static final Integer mmmUser = new Integer(4); 
 	
 	protected static final String SECONDARY_WORKSPACE = "atoolWorkspace2";
 
@@ -92,8 +93,9 @@ public class BaseTestCase extends AbstractLamsTestCase {
 
 	protected String[] getContextConfigLocation() {
 		return new String[] {
-				IRepositoryService.CORE_LOCAL_CONTEXT_PATH,
-		        IRepositoryService.REPOSITORY_CONTEXT_PATH,
+				"/org/lamsfoundation/lams/contentrepository/applicationContext.xml",
+				"/org/lamsfoundation/lams/localApplicationContext.xml",
+				"/org/lamsfoundation/lams/toolApplicationContext.xml",
 		        "/org/lamsfoundation/lams/contentrepository/testApplicationContext.xml"
 		        };
 	}

@@ -193,7 +193,8 @@ removes the node completely - from both the database and the file system.</P>
 							fileInputStream, 
 							filename, 
 							fileMimeType, 
-							"This is the initial version");
+							"This is the initial version",
+							user.getUserId());
 
 	User uploads a new version of the file:
 	NodeKey nodeKey2 = repositoryService.updateFileItem(repositoryTicket, 
@@ -201,7 +202,8 @@ removes the node completely - from both the database and the file system.</P>
 							filename,
 							fileInputStream, 
 							fileMimeType, 
-							"This is the updated version);
+							"This is the updated version,
+							user.getUserId());
 
 	Get the second version of the file:
 	IVersionedNode node = repositoryService.getFileItem(repositoryTicket, 
@@ -210,12 +212,14 @@ removes the node completely - from both the database and the file system.</P>
 	Copy the initial version of the file node. CopyNodeVersion copies the specified version or last version (if not specified), duplicates the actual files.
 	NodeKey nodeKey3 = repositoryService.copyNodeVersion(repositoryTicket, 
 							nodeKey1.getUuId(),
-							nodeKey1.getVersion());
+							nodeKey1.getVersion(),
+							user.getUserId());
 
 	Copy the latest version of the file node. 
 	NodeKey nodeKey3 = repositoryService.copyNodeVersion(repositoryTicket, 
 							nodeKey1.getUuId(),
-							null);
+							null,
+							user.getUserId());
 
 	Delete the second version of the file:
 	String[] problemFiles = repositoryService.deleteVersion(repositoryTicket,nodeKey2.getUuid(), nodeKey2.getVersion());

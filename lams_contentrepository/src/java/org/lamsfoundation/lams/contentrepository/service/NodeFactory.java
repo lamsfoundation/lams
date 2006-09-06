@@ -70,11 +70,12 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createFileNode(org.lamsfoundation.lams.contentrepository.CrWorkspace, org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode, java.lang.String, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode, 
-			String relPath, InputStream istream, String filename, String mimeType, String versionDescription) 
+			String relPath, InputStream istream, String filename, String mimeType, 
+			String versionDescription, Integer userId) 
 					throws org.lamsfoundation.lams.contentrepository.InvalidParameterException {
 
 		SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.FILENODE,
-				workspace, parentNode, relPath, versionDescription);
+				workspace, parentNode, relPath, versionDescription, userId);
 		initialNodeVersion.setFile(istream, filename, mimeType);
 
 		return initialNodeVersion;
@@ -84,11 +85,11 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createPackageNode(org.lamsfoundation.lams.contentrepository.CrWorkspace, java.lang.String, java.lang.String)
 	 */
 	public SimpleVersionedNode createPackageNode(CrWorkspace workspace, 
-			String initialPath, String versionDescription) 
+			String initialPath, String versionDescription, Integer userId) 
 					throws org.lamsfoundation.lams.contentrepository.InvalidParameterException {
 
 		SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.PACKAGENODE, 
-				workspace, null, null, versionDescription);
+				workspace, null, null, versionDescription, userId);
 		initialNodeVersion.setProperty(PropertyName.INITIALPATH, initialPath);
 
 		return initialNodeVersion;
@@ -98,24 +99,24 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createDataNode(org.lamsfoundation.lams.contentrepository.CrWorkspace, org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode, java.lang.String)
 	 */
 	public SimpleVersionedNode createDataNode(CrWorkspace workspace, SimpleVersionedNode parentNode, 
-			String versionDescription) 
+			String versionDescription, Integer userId) 
 					throws org.lamsfoundation.lams.contentrepository.InvalidParameterException {
 
 		SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.DATANODE, 
-				workspace, parentNode, null, versionDescription);
+				workspace, parentNode, null, versionDescription, userId);
 			
 		return initialNodeVersion;
 	}
 	
 	/** Create the core part of a node */
 	private SimpleVersionedNode createBasicNode(String nodeType, CrWorkspace workspace, SimpleVersionedNode parentNode, 
-			String relPath, String versionDescription) {
+			String relPath, String versionDescription, Integer userId) {
 		
 		SimpleVersionedNode initialNodeVersion = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
 
 		Date createdDate = new Date(System.currentTimeMillis());
 		CrNodeVersion parentNodeVersion = parentNode != null ? parentNode.getNodeVersion() : null; 
-		CrNode node = new CrNode(relPath, nodeType, createdDate, workspace, parentNodeVersion, versionDescription);
+		CrNode node = new CrNode(relPath, nodeType, createdDate, userId, workspace, parentNodeVersion, versionDescription);
 		CrNodeVersion nodeVersion = node.getNodeVersion(null);
 
 		initialNodeVersion.setNode(node);
@@ -172,7 +173,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.String)
 	 */
-	public SimpleVersionedNode getNodeNewVersion(Long workspaceId, Long uuid, Long versionId, String versionDescription) throws ItemNotFoundException {
+	public SimpleVersionedNode getNodeNewVersion(Long workspaceId, Long uuid, Long versionId, String versionDescription, Integer userId) throws ItemNotFoundException {
 
 		SimpleVersionedNode existingNode = getNode(workspaceId, uuid, versionId);
 		CrNode existingCrNode = existingNode.getNode();
@@ -182,7 +183,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 		
 		SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
 		newNode.setNode(existingCrNode);
-		CrNodeVersion newVersion = new CrNodeVersion(existingCrNode, new Date(System.currentTimeMillis()), nextVersionId, versionDescription); 
+		CrNodeVersion newVersion = new CrNodeVersion(existingCrNode, new Date(System.currentTimeMillis()), nextVersionId, versionDescription, userId); 
 		newNode.setNodeVersion(newVersion);
 		existingCrNode.addCrNodeVersion(newVersion);
 		
@@ -192,9 +193,9 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#copy(org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode)
 	 */
-	public SimpleVersionedNode copy( SimpleVersionedNode originalNode ) throws FileException, ValueFormatException, InvalidParameterException {
+	public SimpleVersionedNode copy( SimpleVersionedNode originalNode, Integer userId ) throws FileException, ValueFormatException, InvalidParameterException {
 		
-		return copy(originalNode, null);
+		return copy(originalNode, null, userId);
 	}
 	
 	/** Private method to handle the recursive copy. The parent node is needed to set up the
@@ -207,14 +208,14 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	 * @throws ValueFormatException
 	 * @throws InvalidParameterException
 	 */
-	private SimpleVersionedNode copy( SimpleVersionedNode originalNode, CrNodeVersion parentNodeVersion ) throws FileException, ValueFormatException, InvalidParameterException {
+	private SimpleVersionedNode copy( SimpleVersionedNode originalNode, CrNodeVersion parentNodeVersion, Integer userId ) throws FileException, ValueFormatException, InvalidParameterException {
 		
 		SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
 
 		// copy the basic CrNode/CrNodeVersion fields. Set a new timestamp and new ids
 		Date createdDate = new Date(System.currentTimeMillis());
 		
-		CrNode newCrNode = new CrNode(originalNode.getPath(), originalNode.getNodeType(), createdDate, 
+		CrNode newCrNode = new CrNode(originalNode.getPath(), originalNode.getNodeType(), createdDate, userId,
 				originalNode.getNode().getCrWorkspace(), parentNodeVersion, originalNode.getVersionDescription());
 		newNode.setNode(newCrNode);
 		
@@ -247,7 +248,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 		Iterator iter = originalNode.getChildNodes().iterator();
 		while ( iter.hasNext() ) {
 			SimpleVersionedNode childNode = (SimpleVersionedNode) iter.next();
-			SimpleVersionedNode newChildNode = this.copy(childNode, newCrNodeVersion);
+			SimpleVersionedNode newChildNode = this.copy(childNode, newCrNodeVersion, userId);
 			newNode.addChildNode(newChildNode);
 		}
 		

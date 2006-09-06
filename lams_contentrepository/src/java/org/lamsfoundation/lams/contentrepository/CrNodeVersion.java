@@ -54,6 +54,9 @@ public class CrNodeVersion implements Serializable {
     private Date createdDateTime;
 
     /** persistent field */
+    private Integer userId;
+
+    /** persistent field */
     private org.lamsfoundation.lams.contentrepository.CrNode node;
 
     /* child Nodes. persistent field 
@@ -78,10 +81,11 @@ public class CrNodeVersion implements Serializable {
 
 	/** Normal constructor 
 	 */
-	public CrNodeVersion (CrNode node, Date createdDate, Long versionId, String versionDescription) {
+	public CrNodeVersion (CrNode node, Date createdDate, Long versionId, String versionDescription, Integer userId) {
 		this.createdDateTime = createdDate;
 		this.node = node;
 		this.versionId = versionId;
+		this.userId = userId;
 		setVersionDescription(versionDescription);
 	}
 
@@ -141,6 +145,21 @@ public class CrNodeVersion implements Serializable {
     public void setCreatedDateTime(Date createdDateTime) {
         this.createdDateTime = createdDateTime;
     }
+
+	/** 
+     *            @hibernate.property
+     *		       type="java.lang.Integer"
+     *		       column="user_id"
+     *			   not-null="true"
+     */
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
 
     /** 
      * bi-directional many-to-one association to CrNode
