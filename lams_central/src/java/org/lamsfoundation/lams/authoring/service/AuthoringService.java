@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,13 +33,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.id.Configurable;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -58,15 +61,14 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
-import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
@@ -79,22 +81,15 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-
-import org.hibernate.id.UUIDHexGenerator;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.Configurable;
-import org.hibernate.Hibernate;
-import java.util.Properties;
 
 
 /**
