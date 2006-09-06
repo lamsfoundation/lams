@@ -122,9 +122,9 @@ public class SubmitFilesService implements ToolContentManager,
 	private class FileDtoComparator implements Comparator<FileDetailsDTO>{
 
 		public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
-			if(o1 != null && o2 != null){
+			if(o1 != null && o2 != null && o1.getDateOfSubmission() !=null && o2.getDateOfSubmission() != null){
 				//don't use Date.comparaTo() directly, because the date could be Timestamp or Date (depeneds the object is persist or not)
-				return (int) (o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime());
+				return (o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime()) > 0 ?1:-1;
 			}else if(o1 != null)
 				return 1;
 			else

@@ -94,7 +94,7 @@
 											:
 										</td>
 										<td>
-											<c:out value="${submission.dateOfSubmission}" />
+											<lams:Date value="${submission.dateOfSubmission}" />
 										</td>
 									</tr>
 									<tr>

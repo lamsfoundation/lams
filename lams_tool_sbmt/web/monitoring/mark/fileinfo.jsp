@@ -51,6 +51,6 @@
 		:
 	</td>
 	<td>
-		<c:out value="${fileInfo.dateOfSubmission}" />
+		<lams:Date value="${fileInfo.dateOfSubmission}" />
 	</td>
 </tr>

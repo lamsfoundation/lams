@@ -115,7 +115,7 @@
 									<fmt:message key="label.learner.time" />
 								</td>
 								<td>
-									<c:out value="${file.dateOfSubmission}" />
+									<lams:Date value="${file.dateOfSubmission}" />
 								</td>
 							</tr>
 							<tr>
