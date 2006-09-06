@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
 import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.util.*
@@ -93,7 +92,7 @@ dynamic class Dictionary {
 		
 		Debugger.log('Existing date:'+String(_oldDate) + ' Current date:' + String(_currentDate),Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
         
-		if(CookieMonster.cookieExists('dictionary.'+language) && Config.USE_CACHE && _oldDate != null) {
+		if(CookieMonster.cookieExists('dictionary.'+language+'.'+app.module) && Config.USE_CACHE && _oldDate != null) {
 			
 			if(this._currentDate != _oldDate){
 				openFromServer();
@@ -206,7 +205,7 @@ dynamic class Dictionary {
     public function saveToDisk():Void{
         //Convert to data object and then serialize before saving to a cookie
         var dataObj = toData();
-        CookieMonster.save(dataObj,'dictionary.' + _currentLanguage,true);
+        CookieMonster.save(dataObj,'dictionary.' + _currentLanguage + '.' + app.module,true);
 		var success = CookieMonster.save(_root.langDate, 'dictionary.date', true);
 		
 		if (!success) {
