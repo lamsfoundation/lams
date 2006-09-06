@@ -110,17 +110,8 @@ public class ConfigurationLoader {
 				if(node.getNodeType()== Node.ELEMENT_NODE){
 					Element ele = (Element)node;
 					
-					
-					 // DictionaryDates have a more complex structure than the rest of the configuration file.
-					if (ele.getNodeName().equals(ConfigurationKeys.DICTIONARY_DATES))
-					{
-						loadDictionaryDates(ele, items);
-					}
-					else
-					{
-						if(ele.getLastChild()!=null){
+					if(ele.getLastChild()!=null){
 							items.put(ele.getNodeName(),ele.getLastChild().getNodeValue());
-						}
 					}
 				}
 			}
@@ -150,6 +141,7 @@ public class ConfigurationLoader {
 	 * 
 	 * @param ele
 	 * @param items The main hashmap where the elements are stored.
+	 * @deprecated
 	 */
 	private static void loadDictionaryDates(Element ele, Map items)
 	{
@@ -173,6 +165,7 @@ public class ConfigurationLoader {
 	 * key->value pair.
 	 * @param dictionary
 	 * @param dictionaryItems The separate hashMap in which to store the different dictionary and the date it was created.
+	 * @deprecated
 	 */
 	private static void storeDictionaryDetailsInMap(Element dictionary, HashMap dictionaryItems)
 	{

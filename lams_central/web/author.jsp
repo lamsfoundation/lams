@@ -19,7 +19,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 
 String authoringClientVersion = Configuration.get(ConfigurationKeys.AUTHORING_CLIENT_VERSION);
 String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
+String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
 
 %>
 <script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
@@ -232,7 +232,7 @@ function checkSaved(){
 </HEAD>
 <BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&uniqueID=<lams:generateID/></c:set>
+<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&uniqueID=<lams:generateID/></c:set>
 <c:set var="authorurl_nojs">lams_preloader.swf<c:out value="${authorurl_params}"/></c:set>
 <c:set var="authorurl_js">lams_preloader<c:out value="${authorurl_params}"/></c:set>
 

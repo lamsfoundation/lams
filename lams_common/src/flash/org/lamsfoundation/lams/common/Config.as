@@ -44,7 +44,7 @@ class Config {
 	public static var MESSAGE_TYPE_ERROR:Number = 1;
 	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
 	public static var MESSAGE_TYPE_OK:Number = 3;
-	public static var USE_CACHE:Boolean = false;			//FLAG TO TELL DICT AND (todo:add to themes) Theme if thay can use the cached data.
+	public static var USE_CACHE:Boolean = true;			//FLAG TO TELL DICT AND (todo:add to themes) Theme if thay can use the cached data.
 	
 	//nulls
 	public static var STRING_NULL_VALUE:String = "string_null_value";

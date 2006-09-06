@@ -112,14 +112,18 @@ public class ConfigurationKeys {
 	/** Direction (left to right, right to left) for writing on HTML pages. Originally LTR */
 	public static String SERVER_PAGE_DIRECTION = "ServerPageDirection";
 
-	public static String DICTIONARY_DATES = "DictionaryDates";
+	/** universal date of dictionary updates */
+	public static String DICTIONARY_DATE_CREATED = "DictionaryDateCreated";
 
+	/** deprecated */
 	public static String DICTIONARY = "Dictionary";
-
+	
+	/** deprecated */
 	public static String DICTIONARY_CREATE_DATE = "createDate";
-
+	
+	/** deprecated */
 	public static String DICTIONARY_LANGUAGE = "language";
-
+	
 	public static String XMPP_DOMAIN = "XmppDomain";
 
 	public static String XMPP_CONFERENCE = "XmppConference";

@@ -36,6 +36,10 @@ if(StringUtils.isEmpty(build)){
 	Debugger.log('Build is not defined, using defualt:'+_root.build,Debugger.CRITICAL,'main','ROOT');			
 }
 
+if(StringUtils.isEmpty(langDate)){
+	_root.langDate = "01-01-1970";
+}
+
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";

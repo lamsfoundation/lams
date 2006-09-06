@@ -37,6 +37,7 @@ dynamic class Dictionary {
 
 	private var items:Hashtable;
     private var _currentLanguage:String;
+	private var _currentDate:Object;
 	private var _module:String;
 	private var comms:Communication;	
 	private var app:ApplicationParent;	
@@ -79,11 +80,27 @@ dynamic class Dictionary {
         //TODO DI 19/05/05 Check cookie and if not present load from server
         //Set Language
         this._currentLanguage = language;
+		this._currentDate = _root.langDate;
+		
+		var _oldDate:Object = null;
+		
         //Cookie or server?
 		Debugger.log('Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
 		Debugger.log('Config.USE_CACHE:'+Config.USE_CACHE,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
-        if(CookieMonster.cookieExists('dictionary.'+language) && Config.USE_CACHE) {
-            openFromDisk();
+        if(CookieMonster.cookieExists('dictionary.date')){
+			_oldDate = CookieMonster.open('dictionary.date', true);
+		}
+		
+		Debugger.log('Existing date:'+String(_oldDate) + ' Current date:' + String(_currentDate),Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+        
+		if(CookieMonster.cookieExists('dictionary.'+language) && Config.USE_CACHE && _oldDate != null) {
+			
+			if(this._currentDate != _oldDate){
+				openFromServer();
+			} else {
+				openFromDisk();
+			}
+			
         }else {
             openFromServer();
         }        
@@ -190,13 +207,21 @@ dynamic class Dictionary {
         //Convert to data object and then serialize before saving to a cookie
         var dataObj = toData();
         CookieMonster.save(dataObj,'dictionary.' + _currentLanguage,true);
+		var success = CookieMonster.save(_root.langDate, 'dictionary.date', true);
+		
+		if (!success) {
+			//TODO DI 30/05/05 raise error if config data can't be saved
+			Debugger.log('Config item could not be saved: ' + _root.langDate ,Debugger.CRITICAL,'saveToDisk','Dictionary');
+		}
     }
     
     /**
     * Open the Dictionary from disk 
     */
     public function openFromDisk():Void{
-        var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage,true);
+        Debugger.log('opening Dictionary from Shared Object',Debugger.CRITICAL,'openFromDisk','Dictionary');		
+	   
+		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage,true);
         createFromData(dataObj);
     }
     

@@ -31,6 +31,10 @@ if(StringUtils.isEmpty(uniqueID)){
 	Debugger.log('Unique ID is not defined.',Debugger.CRITICAL,'main','ROOT');
 }
 
+if(StringUtils.isEmpty(langDate)){
+	_root.langDate = "01-01-1970";
+}
+
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";

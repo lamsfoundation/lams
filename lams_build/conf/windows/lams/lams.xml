@@ -34,12 +34,7 @@
 	<ServerVersionNumber>2.0.@datetimestamp@</ServerVersionNumber>
 	<ServerLanguage>en_AU</ServerLanguage>
 	<ServerPageDirection>LTR</ServerPageDirection>
-	<DictionaryDates>
-		<Dictionary>
-			<language>en_AU</language>
-			<createDate>2006-01-02</createDate>
-		</Dictionary>
-	</DictionaryDates>
+	<DictionaryDateCreated>2006-01-02</DictionaryDateCreated>
 	<XmppDomain>shaun.melcoe.mq.edu.au</XmppDomain>
 	<XmppConference>conference.shaun.melcoe.mq.edu.au</XmppConference>
 	<XmppAdmin>admin</XmppAdmin>

@@ -23,6 +23,11 @@ if(StringUtils.isEmpty(lessonID)){
 	_root.lessonID = 1;
 	Debugger.log('LessonID is not defined, using defualt:'+_root.lessonID,Debugger.CRITICAL,'main','ROOT');			
 }
+
+if(StringUtils.isEmpty(langDate)){
+	_root.langDate = "01-01-1970";
+}
+
 _root.monitoringURL = "monitoring/monitoring.do?method="
 
 //Set stage alignment to top left and prent scaling

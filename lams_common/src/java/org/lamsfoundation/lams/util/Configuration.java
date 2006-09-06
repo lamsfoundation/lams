@@ -65,22 +65,16 @@ public class Configuration {
 	}
 	
 	/**
-	 * Retrieves the date in which the specified dictionary was created.
+	 * Retrieves the date in which the specified dictionary was created/updated.
 	 * If the dictionary isnt found, null is returned.
-	 * @param language
 	 * @return
 	 */
-	public static String getDictionaryDateForLanguage(String dictionary)
+	public static String getDictionaryDateForLanguage()
 	{
-		if ((items != null)&&(items.get(ConfigurationKeys.DICTIONARY_DATES)!=null))
-		{
-			Map map = (Map)items.get(ConfigurationKeys.DICTIONARY_DATES);
-			if (map!=null && map.get(dictionary) != null)
-			{
-				return (String)map.get(dictionary);
-			}
-		}
-		return null;
+		if ((items != null)&&(items.get(ConfigurationKeys.DICTIONARY_DATE_CREATED)!=null))
+			return (String)items.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
+		else
+			return null;
 	}
 
 }
