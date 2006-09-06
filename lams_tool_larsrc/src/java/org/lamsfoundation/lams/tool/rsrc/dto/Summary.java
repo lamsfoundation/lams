@@ -60,6 +60,7 @@ public class Summary {
 	private Long fileVersionId;
 	//true: initial group item, false, belong to some group.
 	private boolean isInitGroup;
+	
 	public Summary(){}
 	/**
 	 * Contruction method for monitoring summary function. 

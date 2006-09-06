@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -425,7 +426,7 @@ public class ResourceServiceImpl implements
 
 
 
-	public void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user) {
+	public void retrieveComplete(SortedSet<ResourceItem> resourceItemList, ResourceUser user) {
 		for(ResourceItem item:resourceItemList){
 			ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(item.getUid(),user.getUserId());
 			if(log == null)

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.rsrc.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
@@ -163,7 +164,7 @@ public interface IResourceService
 	 */
 	void saveOrUpdateResourceSession(ResourceSession resSession);
 	
-	void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user);
+	void retrieveComplete(SortedSet<ResourceItem> resourceItemList, ResourceUser user);
 	void setItemComplete(Long resourceItemUid, Long userId , Long sessionId);
 	void setItemAccess(Long resourceItemUid, Long userId, Long sessionId);
 	/**

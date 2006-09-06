@@ -35,6 +35,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +67,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
@@ -201,8 +204,12 @@ public class AuthoringAction extends Action {
 		
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceItemList(sessionMap);
-			ResourceItem item = resourceList.remove(itemIdx);
+			SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
+			List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
+			ResourceItem item = rList.remove(itemIdx);
+			resourceList.clear();
+			resourceList.addAll(rList);
+			//add to delList
 			List delList = getDeletedResourceItemList(sessionMap);
 			delList.add(item);
 		}	
@@ -228,8 +235,9 @@ public class AuthoringAction extends Action {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		ResourceItem item = null;
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceItemList(sessionMap);
-			item = resourceList.get(itemIdx);
+			SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
+			List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
+			item = rList.get(itemIdx);
 			if(item != null){
 				populateItemToForm(itemIdx, item,(ResourceItemForm) form,request);
 			}
@@ -270,7 +278,7 @@ public class AuthoringAction extends Action {
 	 * @throws ServletException
 	 */
 	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-		throws ServletException {
+		throws Exception {
 		//get instructions:
 		List<String> instructionList = getInstructionsFromRequest(request);
 		
@@ -285,14 +293,9 @@ public class AuthoringAction extends Action {
 		
 		try {
 			extractFormToResourceItem(request, instructionList, itemForm);
-		} catch (UploadResourceFileException e) {
+		} catch (Exception e) {
 			log.error("Uploading failed. The exception is " + e.toString());
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
-			if(!errors.isEmpty()){
-				this.addErrors(request,errors);
-				request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
-				return findForward(itemForm.getItemType(),mapping);
-			}
+			throw e;
 		}
 		//set session map ID so that itemlist.jsp can get sessionMAP
 		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
@@ -403,7 +406,7 @@ public class AuthoringAction extends Action {
 			items = new ArrayList();
 		
 		//init resource item list
-		List resourceItemList = getResourceItemList(sessionMap);
+		SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		resourceItemList.clear();
 		resourceItemList.addAll(items);
 		
@@ -550,14 +553,13 @@ public class AuthoringAction extends Action {
 		//************************* Handle resource items *******************
 		//Handle resource items
 		Set itemList = new LinkedHashSet();
-		List topics = getResourceItemList(sessionMap);
+		SortedSet topics = getResourceItemList(sessionMap);
     	iter = topics.iterator();
     	while(iter.hasNext()){
     		ResourceItem item = (ResourceItem) iter.next();
     		if(item != null){
 				//This flushs user UID info to message if this user is a new user. 
 				item.setCreateBy(resourceUser);
-				item.setCreateDate(new Timestamp(new Date().getTime()));
 				itemList.add(item);
     		}
     	}
@@ -765,8 +767,13 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getResourceItemList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
+		SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+		if(list == null){
+			list = new TreeSet<ResourceItem>(new ResourceItemComparator());
+			sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST,list);
+		}
+		return list;
 	}	
 	/**
 	 * List save deleted resource items, which could be persisted or non-persisted items. 
@@ -907,7 +914,7 @@ public class AuthoringAction extends Action {
 	 * @throws ResourceApplicationException 
 	 */
 	private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList, ResourceItemForm itemForm) 
-		throws UploadResourceFileException {
+		throws Exception {
 		/* BE CAREFUL: This method will copy nessary info from request form to a old or new ResourceItem instance.
 		 * It gets all info EXCEPT ResourceItem.createDate and ResourceItem.createBy, which need be set when persisting 
 		 * this resource item.
@@ -915,16 +922,18 @@ public class AuthoringAction extends Action {
 		
 		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(itemForm.getSessionMapID());
 		//check whether it is "edit(old item)" or "add(new item)"
-		List resourceList = getResourceItemList(sessionMap);
+		SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
 		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
-		ResourceItem item;
+		ResourceItem item = null;
 		
 		if(itemIdx == -1){ //add
 			item = new ResourceItem();
+			item.setCreateDate(new Timestamp(new Date().getTime()));
 			resourceList.add(item);
-		}else //edit
-			item = (ResourceItem) resourceList.get(itemIdx);
-		
+		}else{ //edit
+			List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
+			item = rList.get(itemIdx);
+		}
 		short type = itemForm.getItemType();	
 		item.setType(itemForm.getItemType());
 		/* Set following fields regards to the type:
@@ -1015,8 +1024,8 @@ public class AuthoringAction extends Action {
 		}
 //		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 //				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-			if(StringUtils.isBlank(itemForm.getDescription()))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
+//			if(StringUtils.isBlank(itemForm.getDescription()))
+//				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
 //		}
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT

@@ -60,6 +60,7 @@
 									<html:text property="title" size="55" tabindex="1" />
 								</td>
 							</tr>
+							  <%--  Remove description in as LDEV-617
 							<tr>
 								<td width="130px">
 									<fmt:message key="label.authoring.basic.resource.description.input" />
@@ -68,6 +69,7 @@
 									<lams:STRUTS-textarea rows="5" cols="55" tabindex="2" property="description" />
 								</td>
 							</tr>
+							--%>
 							<tr>
 								<td width="130px">
 									<fmt:message key="label.authoring.basic.resource.zip.file.input" />

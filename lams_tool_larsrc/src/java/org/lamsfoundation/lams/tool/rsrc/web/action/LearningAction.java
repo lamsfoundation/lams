@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -204,7 +207,7 @@ public class LearningAction extends Action {
 			sessionMap.put(ResourceConstants.PARAM_RUN_OFFLINE, false);
 				
 		//init resource item list
-		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+		SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		resourceItemList.clear();
 		if(items != null){
 			//remove hidden items.
@@ -358,7 +361,7 @@ public class LearningAction extends Action {
 		service.saveOrUpdateResourceSession(resSession);
 		
 		//update session value
-		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+		SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		resourceItemList.add(item);
 		
 		//URL or file upload
@@ -453,8 +456,13 @@ public class LearningAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getResourceItemList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
+		SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+		if(list == null){
+			list = new TreeSet<ResourceItem>(new ResourceItemComparator());
+			sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST,list);
+		}
+		return list;
 	}	
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
@@ -566,7 +574,7 @@ public class LearningAction extends Action {
 		service.setItemComplete(resourceItemUid,new Long(user.getUserID().intValue()),sessionId);
 		
 		//set resource item complete tag
-		List<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+		SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		for(ResourceItem item:resourceItemList){
 			if(item.getUid().equals(resourceItemUid)){
 				item.setComplete(true);
