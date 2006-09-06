@@ -91,7 +91,7 @@
             not-null="true"
         </meta>    
     </property>
-
+    
 	<!--  The following admin fields are NOT NULL DEFAULT 0 in the database -->
    <property
         name="courseAdminCanAddNewUsers"
@@ -155,6 +155,19 @@
 
     <!-- Associations -->
   
+    <!-- bi-directional many-to-one association to the User who created the organisation -->
+    <many-to-one 
+    	name="createdBy" 
+    	class="org.lamsfoundation.lams.usermanagement.User" 
+    	not-null="true">
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="created_by"         
+        </meta>
+        <column name="created_by" />
+	</many-to-one>
+	
     <!-- bi-directional many-to-one association to OrganisationState -->
     <many-to-one
         name="organisationState"
