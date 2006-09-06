@@ -186,5 +186,20 @@
         </meta>    
     </property>
     
+    <property
+        name="helpUrl"
+        type="java.lang.String"
+        column="help_url"
+        not-null="false"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="help_url"
+            length="65535"
+            not-null="false"
+        </meta>    
+    </property>
+    
 </class>
 </hibernate-mapping>
