@@ -27,19 +27,14 @@ package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
 import java.util.Date;
+import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE; 
+public class DateComparator implements Comparator<Date> {
 
-import org.apache.log4j.Logger;
-
-public class DateComparator implements Comparator {
-
-	private static final Logger log = Logger.getLogger(DateComparator.class);
-	
-	public int compare(Object arg0, Object arg1) {
-		if(!(arg0 instanceof Date) || !(arg1 instanceof Date)){
-			log.error("Topic is not Date instance.");
-			return 0;
-		}
-		return ((Date)arg0).before(((Date)arg1))?1:-1;
+	public int compare(Date arg0, Date arg1) {
+		if(OLD_FORUM_STYLE)
+			return (arg0.getTime() - arg1.getTime()) > 0 ?1:-1;
+		else
+			return (arg0.getTime() - arg1.getTime()) > 0 ?-1:1;
 	}
 
 }

@@ -73,6 +73,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE; 
 
 /**
  * @author Steve.Ni
@@ -591,7 +592,10 @@ public class AuthoringAction extends Action {
 		message.setAttachments(attSet);
 		
 		//save the new message into HttpSession
-		topics.add(0,MessageDTO.getMessageDTO(message));
+		if(OLD_FORUM_STYLE)
+			topics.add(MessageDTO.getMessageDTO(message));
+		else
+			topics.add(0,MessageDTO.getMessageDTO(message));
 		
 		
 		return mapping.findForward("success");

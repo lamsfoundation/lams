@@ -30,6 +30,13 @@ package org.lamsfoundation.lams.tool.forum.util;
  * Time: 10:33:00
  */
 public interface ForumConstants {
+	
+	//See LDEV652 
+	// For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.
+	// For new style (Ernie's early desc): Most current popular forum used style: latest topics 
+	// should be at the top, reply date will descide the order etc.
+	public static final boolean OLD_FORUM_STYLE  = true;
+	
 	public static final int COMPLETED = 1;
 	public static final int SESSION_STATUS_FINISHED = 1;
 	

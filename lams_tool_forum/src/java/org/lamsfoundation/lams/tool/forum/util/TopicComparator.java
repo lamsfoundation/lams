@@ -30,6 +30,7 @@ import java.util.Comparator;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
+import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE; 
 
 /**
  * This class implementaion <code>java.util.Comparator</code> interface. It can sort meesage according to
@@ -38,16 +39,10 @@ import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
  * 
  * @version $Revision$
  */
-public class TopicComparator implements Comparator {
+public class TopicComparator implements Comparator<MessageSeq> {
 	private static final Logger log = Logger.getLogger(TopicComparator.class);
 	
-	public int compare(Object obj0, Object obj1) {
-		if(!(obj0 instanceof MessageSeq) || !(obj1 instanceof MessageSeq)){
-			log.error("Topic is not MessageSeq instance.");
-			return 0;
-		}
-		MessageSeq msgSeq1 = (MessageSeq) obj0;
-		MessageSeq msgSeq2 = (MessageSeq) obj1;
+	public int compare(MessageSeq msgSeq1, MessageSeq msgSeq2) {
 		Message msg1 = msgSeq1.getMessage();
 		Message msg2 = msgSeq2.getMessage();
 		
@@ -84,20 +79,29 @@ public class TopicComparator implements Comparator {
 			//this comparation will handle different branch node
 			if(parent1 != parent2){
 				//compare last modified date, the latest is at beginning
-				return  parent1.getUpdated().before(parent2.getUpdated())?1:-1;
+				if(OLD_FORUM_STYLE)
+					return  parent1.getUpdated().before(parent2.getUpdated())?-1:1;
+				else
+					return  parent1.getUpdated().before(parent2.getUpdated())?1:-1;
 			}
 			//this comparation will handle same branch node
 			//the direct parent level, their parent(or themselves) are still equal
 			if(compareLevel==lessLevel){
 				if(msgSeq1.getMessageLevel() != msgSeq2.getMessageLevel())
 					return msgSeq1.getMessageLevel() -msgSeq2.getMessageLevel();
-				else
-					return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
+				else{
+					if(OLD_FORUM_STYLE)
+						return msg1.getUpdated().before(msg2.getUpdated())?-1:1;
+					else
+						return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
+				}
 			}
 			
 		}
-		
-		return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
+		if(OLD_FORUM_STYLE)
+			return msg1.getUpdated().before(msg2.getUpdated())?-1:1;
+		else
+			return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
 	}
 
 }

@@ -24,6 +24,7 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.forum.service;
 
+import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE; 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -359,7 +362,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		Iterator iter = topicsBySession.iterator();
 		while(iter.hasNext()){
 			msg = (Message) iter.next();
-			map.put(msg.getLastReplyDate(),msg);
+			if(OLD_FORUM_STYLE)
+				map.put(msg.getLastReplyDate(),msg);
+			else
+				map.put(msg.getCreated(),msg);
 		}
 		return 	MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 		
@@ -468,16 +474,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		//only session does not have content topcis
 		if(!messageDao.hasAuthoredTopics(sessionID)){
 			Forum forum = (Forum) forumDao.getByContentId(contentID);
-			Set contentTopcis = forum.getMessages();
+			Set<Message> contentTopcis = forum.getMessages();
 			
 			//only forum has content topics, clone happens 
 			if(contentTopcis != null && contentTopcis.size() > 0){
-				Iterator iter = contentTopcis.iterator();
-				ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
-				while(iter.hasNext()){
-					Message msg = (Message) iter.next();
-					msg.setToolSession(session);
-					messageDao.update(msg);
+				for(Message msg : contentTopcis){
+					Message newMsg = Message.newInstance(msg, forumToolContentHandler);
+					createRootTopic(contentID, sessionID, newMsg);
 				}
 			}
 		}
@@ -614,8 +617,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				if(!msg.getIsAuthored())
 					continue;
 				msg.setReplyNumber(0);
-				msg.setCreated(new Date());
-				msg.setUpdated(new Date());
 				msg.setLastReplyDate(new Date());
 				msg.setHideFlag(false);
 				msg.setForum(toContent);
