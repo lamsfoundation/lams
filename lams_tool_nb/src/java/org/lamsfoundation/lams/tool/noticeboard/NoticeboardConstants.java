@@ -102,7 +102,6 @@ public class NoticeboardConstants
     
     public static final String USER_ID = "userID";
     public static final String TOOL_SESSION_ID = "toolSessionID";
-    public static final String UUID = "uuid";
     
     // ---------------------------------------------------------------------------
     // Lookup Dispatch Action Keys (used in NbAuthoringAction class, NbLearnerAction),

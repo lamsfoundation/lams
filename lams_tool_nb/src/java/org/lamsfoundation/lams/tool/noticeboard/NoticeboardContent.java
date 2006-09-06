@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
@@ -393,17 +392,9 @@ public class NoticeboardContent implements Serializable {
 			while (iter.hasNext()) {
 				NoticeboardAttachment element = (NoticeboardAttachment) iter.next();
 				NoticeboardAttachment newAttachment = new NoticeboardAttachment(newContent, element.getFilename(), element.isOnlineFile());
-				if(toolContentHandler != null){
-					//if it is not null, copy file node and refresh uuid and version
-					NodeKey keys = toolContentHandler.copyFile(element.getUuid());
-					newAttachment.setUuid(keys.getUuid());
-					newAttachment.setVersionId(keys.getVersion());
-				}else{
-					//keep old value
-					newAttachment.setUuid(element.getUuid());
-					newAttachment.setVersionId(element.getVersionId());
-				}
-				
+				// point to the existing tool content
+				newAttachment.setUuid(element.getUuid());
+				newAttachment.setVersionId(element.getVersionId());
 				newAttachmentSet.add(newAttachment);
 			} 
 			newContent.setNbAttachments(newAttachmentSet);

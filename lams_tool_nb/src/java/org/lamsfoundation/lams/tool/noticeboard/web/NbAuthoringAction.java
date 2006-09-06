@@ -351,6 +351,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			checkContentId(content_id);
 			NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);
 	    	
+			UserDTO user = getUser(request);
+			
 	    	//check if the file uploaded is an online instructions file or offline instructions file.
 	    	//if one of the types is null, then the other one must have been uploaded. 
 	    	//here we check if the file is an online one
@@ -373,7 +375,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		    	{
 	    	        // This is a new file and so is saved to the content repository. Add it to the 
 		    		// attachments collection, but don't add it to the tool's tables yet.
-		    		NodeKey node = nbService.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType);
+		    		NodeKey node = nbService.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType, user.getUserID());
 	    	        NoticeboardAttachment file = new NoticeboardAttachment();
 		    	    file.setFilename(theFile.getFileName());
 		    	   	file.setOnlineFile(isOnlineFile);
@@ -456,7 +458,10 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws InvalidParameterException, RepositoryCheckedException, NbApplicationException {
 		
-		    Long uuid = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.UUID));
+	    	//set up the values in the map
+	    	NbAuthoringForm nbForm = (NbAuthoringForm)form;
+
+	    	Long uuid = nbForm.getDeleteFileUuid();
 	    	if (uuid == null)
 	    	{
 	    	    String error = "Unable to continue. The file uuid is missing.";
@@ -466,7 +471,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	    	
 	    	// move the file's details from the attachment collection to the deleted attachments collection
 	    	// the attachment will be delete on saving.
-		    NbAuthoringForm nbForm = (NbAuthoringForm)form;
 		    SessionMap map = getSessionMap(request, nbForm);
 			List attachmentList = (List) map.get(NoticeboardConstants.ATTACHMENT_LIST);
 	    	List deletedAttachmentList = (List) map.get(NoticeboardConstants.DELETED_ATTACHMENT_LIST);

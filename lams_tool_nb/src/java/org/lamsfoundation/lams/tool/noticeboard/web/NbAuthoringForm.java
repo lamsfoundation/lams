@@ -85,6 +85,7 @@ public class NbAuthoringForm extends ActionForm {
 	private String currentTab;
 	private String sessionMapID;
 	
+	private Long deleteFileUuid;
 
 	/**
      * @return Returns the offlineFile.
@@ -230,6 +231,7 @@ public class NbAuthoringForm extends ActionForm {
 	    this.defineLater = null;
 	    this.onlineFile = null;
 	    this.offlineFile = null;
+	    this.deleteFileUuid = null;
 	}
 	
 	/**
@@ -302,6 +304,11 @@ public class NbAuthoringForm extends ActionForm {
 	public void setSessionMapID(String sessionMapID) {
 		this.sessionMapID = sessionMapID;
 	}
-	
+	public Long getDeleteFileUuid() {
+		return deleteFileUuid;
+	}
+	public void setDeleteFileUuid(Long deleteFileUuid) {
+		this.deleteFileUuid = deleteFileUuid;
+	}	
   
 }

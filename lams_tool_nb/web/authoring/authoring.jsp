@@ -36,6 +36,13 @@
         	//	return false;
         	return true;
         }
+        
+		function deleteAttachment(dispatch, uuid) {
+			document.authoringForm.dispatch.value = dispatch;
+			document.authoringForm.deleteFileUuid.value = uuid;
+			document.authoringForm.submit();
+		}        
+		
      </script>
 </head>
 

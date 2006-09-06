@@ -46,13 +46,10 @@
 									<a href="${downloadURL}"> <fmt:message key="link.download" />
 									</a> &nbsp;
 
-									<c:set var="deleteURL">
-										<html:rewrite
-											page="/authoring.do?method=Delete&amp;uuid=${attachment.uuid}" />
-									</c:set>
-									<a href="${deleteURL}"
-										onclick="javascript:return confirm('Are you sure you want to delete this file?')"
-										target="_self"> <fmt:message key="link.delete" /> </a>
+									<html:link
+										href="javascript:deleteAttachment('Delete','${attachment.uuid}')">
+										<fmt:message key="link.delete" />
+									</html:link>
 								</li>
 							</c:if>
 						</c:forEach>
@@ -115,13 +112,10 @@
 									<a href="${downloadURL}"> <fmt:message key="link.download" />
 									</a> &nbsp;
 
-									<c:set var="deleteURL">
-										<html:rewrite
-											page="/authoring.do?method=Delete&amp;uuid=${attachment.uuid}" />
-									</c:set>
-									<a href="${deleteURL}"
-										onclick="javascript:return confirm('Are you sure you want to delete this file?')"
-										target="_self"> <fmt:message key="link.delete" /> </a>
+									<html:link
+										href="javascript:deleteAttachment('Delete','${attachment.uuid}')">
+										<fmt:message key="link.delete" />
+									</html:link>
 								</li>
 							</c:if>
 						</c:forEach>
