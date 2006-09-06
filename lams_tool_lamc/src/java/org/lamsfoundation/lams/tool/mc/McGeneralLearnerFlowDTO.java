@@ -348,6 +348,10 @@ public class McGeneralLearnerFlowDTO implements Comparable
             .append("questionListingMode: ", questionListingMode)
             .append("learnerProgress: ", learnerProgress)
             .append("reportViewOnly: ", reportViewOnly)
+            .append("reflection: ", reflection)
+            .append("reflectionSubject: ", reflectionSubject)
+            .append("notebookEntry: ", notebookEntry)
+            .append("notebookEntriesVisible: ", notebookEntriesVisible)
             .toString();
     }
 

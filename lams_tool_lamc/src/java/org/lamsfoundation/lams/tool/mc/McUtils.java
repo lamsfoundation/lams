@@ -65,6 +65,16 @@ public abstract class McUtils implements McAppConstants {
 		IMcService mcService=(IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 	    return mcService;
 	}
+	
+    public static String replaceNewLines(String text)
+    {
+        logger.debug("using text: " + text);
+        String newText = text.replaceAll("\n","<br>");
+        logger.debug("newText: " + newText);
+        
+        return newText;
+    }
+
 
 	/**
 	 * 

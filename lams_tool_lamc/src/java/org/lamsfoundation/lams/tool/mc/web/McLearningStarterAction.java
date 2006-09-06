@@ -352,8 +352,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("isRunOffline: " + isRunOffline);
 	    if (isRunOffline == true)
 	    {
-	    	McUtils.cleanUpSessionAbsolute(request);
-	    	logger.debug("warning to learner: the activity is offline.");
+	        logger.debug("the activity is offline.");
+			logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
+			
+	    	//McUtils.cleanUpSessionAbsolute(request);
+	    	
 	    	logger.debug("fwding to :" + RUN_OFFLINE);
 			return (mapping.findForward(RUN_OFFLINE));
 	    }
@@ -363,7 +366,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("isDefineLater: " + isDefineLater);
 	    if (isDefineLater == true)
 	    {
-	    	McUtils.cleanUpSessionAbsolute(request);
+	    	//McUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("fwding to :" + DEFINE_LATER);
 	    	return (mapping.findForward(DEFINE_LATER));
 	    }
@@ -491,6 +494,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	protected void commonContentSetup(HttpServletRequest request, McContent mcContent, IMcService mcService, 
 	        McLearningForm mcLearningForm, String toolSessionID)
 	{
+	    logger.debug("dettingcommon content: ");
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		
 		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
@@ -520,7 +524,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
         logger.debug("notebookEntry: " + notebookEntry);
 		
 		if (notebookEntry != null) {
-		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
+		    
+		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 		}
 
 
