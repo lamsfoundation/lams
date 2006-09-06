@@ -32,6 +32,7 @@ import java.util.Vector;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
@@ -46,6 +47,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
@@ -68,6 +70,13 @@ public class WorkspaceAction extends LamsDispatchAction {
 	public static final String RESOURCE_TYPE = "resourceType";
 	public static final String ROLE_DELIMITER = ",";
 	
+	private Integer getUserId(HttpServletRequest request) {
+		// return new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getUserID() : null;
+	}
+
 	/** 
 	 * Special value for folderID on getFolderContents(). Triggers getting the 
 	 * dummy value for the organisations (see ORG_FOLDER_ID) and the user's
@@ -144,7 +153,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 			return returnWDDXPacket(errorPacket, response);
 
 		String folderName = (String)WebUtil.readStrParam(request,"name");
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Integer userID = getUserId(request);
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.createFolderForFlash(parentFolderID,folderName,userID);		
 		return returnWDDXPacket(wddxPacket, response);
@@ -385,6 +394,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 		Integer workspaceFolderID =  new Integer(WebUtil.readIntParam(request,"workspaceFolderID"));
 		String mimeType = WebUtil.readStrParam(request,"mimeType");
 		String path = WebUtil.readStrParam(request,"path");
+		Integer userId = getUserId(request);
 		
 		String errorPacket = checkResourceNotDummyValue("createWorkspaceFolderContent", workspaceFolderID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
@@ -395,7 +405,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 			wddxPacket = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
 																				 workspaceFolderID,
-																				 mimeType,path);
+																				 mimeType,path,userId);
 		} catch (Exception e) {
 			log.error("createWorkspaceFolderContent: Exception occured. contentTypeID "+contentTypeID+" name "+name+" workspaceFolderID "+workspaceFolderID, e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, e.getMessage());
@@ -421,11 +431,11 @@ public class WorkspaceAction extends LamsDispatchAction {
 											 HttpServletResponse response)throws ServletException, Exception{
 		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
 		String path = WebUtil.readStrParam(request,"path");
-
+		Integer userId = getUserId(request);
 		String wddxPacket = null;
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path);
+			wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path,userId);
 		} catch (Exception e) {
 			log.error("updateWorkspaceFolderContent: Exception occured. path "+path+" folderContentID "+folderContentID, e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_UPDATE_WKF_CONTENT, e.getMessage());
@@ -448,7 +458,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 											ActionForm form,
 											HttpServletRequest request,
 											HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Integer userID = getUserId(request);
 		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));
 		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
 
@@ -510,7 +520,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
 		
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Integer userID = getUserId(request);
 		
 		String roles_str = WebUtil.readStrParam(request, "roles");
 		String[] roles = roles_str.split(ROLE_DELIMITER);
@@ -582,7 +592,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
 		
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Integer userID = getUserId(request);
 		Integer orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID,true);
 
 		String wddxPacket = null;
@@ -596,4 +606,3 @@ public class WorkspaceAction extends LamsDispatchAction {
 		}
 		return returnWDDXPacket(wddxPacket, response);	}
 }
-

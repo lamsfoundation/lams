@@ -222,11 +222,12 @@ public interface IWorkspaceManagementService {
 	 * 							holds this content
 	 * @param mimeType The MIME type of the file 
 	 * @param path The physical location of the file from where it has to be read
+	 * @param userID The <code>User</code> who has requested this opeartion
 	 * @return String The acknowledgement/error message in WDDX format for the 
 	 * 				  FLASH client.
 	 * @throws Exception
 	 */
-	public String createWorkspaceFolderContent(Integer contentTypeID, String name, String description, Integer workspaceFolderID, String mimeType, String path) throws Exception;
+	public String createWorkspaceFolderContent(Integer contentTypeID, String name, String description, Integer workspaceFolderID, String mimeType, String path, Integer userId) throws Exception;
 	
 	/**
 	 * This method updates an existing file(<code>workspaceFolderContet</code>)
@@ -235,10 +236,11 @@ public interface IWorkspaceManagementService {
 	 * @param folderContentID The <code>folder_content_id</code> of the file 
 	 * 						  to be updated
 	 * @param path The physical location of the file from where it has to be read
+	 * @param userID The <code>User</code> who has requested this opeartion
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws Exception
 	 */
-	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception;
+	public String updateWorkspaceFolderContent(Long folderContentID,String path, Integer userId)throws Exception;
 	
 	/**
 	 * This method is called when the user knows which version of the

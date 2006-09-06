@@ -85,6 +85,8 @@ public class PortraitSaveAction extends Action {
 		String fileName = file.getFileName();
 		log.debug("got file: "+fileName+" of type: "+file.getContentType()+" with size: "+file.getFileSize());
 		
+		User user = (User)getService().getUserByLogin(request.getRemoteUser());
+
 		// check if file is an image using the MIME content type
 		String mediaType = file.getContentType().split("/",2)[0];
 		if (!mediaType.equals("image")) {
@@ -109,7 +111,7 @@ public class PortraitSaveAction extends Action {
 		if (file!= null && !StringUtils.isEmpty(fileName)) {
             try {
             	//InputStream is = file.getInputStream();
-				node = centralToolContentHandler.uploadFile(is, fileName, file.getContentType(), IToolContentHandler.TYPE_ONLINE);
+				node = centralToolContentHandler.uploadFile(is, fileName, file.getContentType(), IToolContentHandler.TYPE_ONLINE, user.getUserId());
 				is.close();
 			} catch (Exception e) {
 				request.setAttribute("errorMessage", e.getMessage());
@@ -119,7 +121,6 @@ public class PortraitSaveAction extends Action {
 		
 		log.debug("saved file with uuid: "+node.getUuid()+" and version: "+node.getVersion());
 		
-		User user = (User)getService().getUserByLogin(request.getRemoteUser());
 		// delete old portrait file (we only want to keep the user's current portrait)
 		if (user.getPortraitUuid()!=null) centralToolContentHandler.deleteFile(user.getPortraitUuid());
 		user.setPortraitUuid(node.getUuid());
