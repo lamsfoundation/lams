@@ -68,6 +68,7 @@ public class Configuration {
 	 * Retrieves the date in which the specified dictionary was created/updated.
 	 * If the dictionary isnt found, null is returned.
 	 * @return
+	 * @deprecated
 	 */
 	public static String getDictionaryDateForLanguage()
 	{
