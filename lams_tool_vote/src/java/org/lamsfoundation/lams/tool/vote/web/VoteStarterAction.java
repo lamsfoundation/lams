@@ -498,6 +498,10 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    voteGeneralAuthoringDTO.setActivityInstructions(voteContent.getInstructions());
 		}
 		
+		
+		voteAuthoringForm.setReflectionSubject(voteContent.getReflectionSubject());
+
+		
 	    /*
 		 * get the nominations 
 		 */

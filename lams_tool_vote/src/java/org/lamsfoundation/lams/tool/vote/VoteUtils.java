@@ -53,6 +53,16 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 public abstract class VoteUtils implements VoteAppConstants {
 
 	static Logger logger = Logger.getLogger(VoteUtils.class.getName());
+	
+    public static String replaceNewLines(String text)
+    {
+        logger.debug("using text: " + text);
+        String newText = text.replaceAll("\n","<br>");
+        logger.debug("newText: " + newText);
+        
+        return newText;
+    }
+
 
 	/**
 	 * 
@@ -69,6 +79,7 @@ public abstract class VoteUtils implements VoteAppConstants {
     	return date;
     }
 
+    
 	
 	public static UserDTO getToolUser()
 	{
@@ -182,6 +193,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?ON:OFF);
 	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
 	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
+	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?ON:OFF);
         voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
 	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
 	    

@@ -166,6 +166,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -282,6 +284,29 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     voteGeneralLearnerFlowDTO.setToolContentUID(voteContent.getUid().toString());
     
     
+    String userID=voteLearningForm.getUserID();
+	logger.debug("userID: " + userID);
+
+	logger.debug("is tool reflective: " + voteContent.isReflect());
+	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
+	logger.debug("reflection subject: " + voteContent.getReflectionSubject());
+	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	
+	logger.debug("attempt getting notebookEntry: ");
+	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
+			CoreNotebookConstants.NOTEBOOK_TOOL,
+			MY_SIGNATURE, new Integer(userID));
+	
+    logger.debug("notebookEntry: " + notebookEntry);
+	
+	if (notebookEntry != null) {
+	    String notebookEntryPresentable=VoteUtils.replaceNewLines(notebookEntry.getEntry());
+	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	}
+
+    
+    
+    
 	/* Is the request for a preview by the author?
 	Preview The tool must be able to show the specified content as if it was running in a lesson. 
 	It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
@@ -386,7 +411,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      * his answers must be displayed  read-only
      * 
      */
-	String userID=voteLearningForm.getUserID();
+	
 	logger.debug("userID:" + userID);
     
 	logger.debug("voteSession uid :" + voteSession.getUid());

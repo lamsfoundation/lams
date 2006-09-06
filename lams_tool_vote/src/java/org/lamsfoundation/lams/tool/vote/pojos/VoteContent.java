@@ -62,7 +62,7 @@ public class VoteContent implements Serializable {
     
     private String instructions;
     
-       /** nullable persistent field */
+    /** nullable persistent field */
     private boolean defineLater;
 
     /** nullable persistent field */
@@ -110,8 +110,8 @@ public class VoteContent implements Serializable {
 
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, 
-            Date creationDate, Date updateDate, boolean voteChangable, boolean allowText,boolean reflect, String maxNominationCount, 
-            long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
+            Date creationDate, Date updateDate, boolean voteChangable, boolean allowText,boolean reflect, String reflectionSubject,
+            String maxNominationCount, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
             String onlineInstructions, Set voteQueContents, Set voteSessions, 
 			Set voteAttachments) {
         this.voteContentId = voteContentId;
@@ -126,6 +126,7 @@ public class VoteContent implements Serializable {
         this.maxNominationCount=maxNominationCount;
         this.allowText=allowText;
         this.reflect=reflect;
+        this.reflectionSubject=reflectionSubject;
         this.createdBy = createdBy;
         this.lockOnFinish = lockOnFinish;
         this.contentInUse = contentInUse;
@@ -174,6 +175,7 @@ public class VoteContent implements Serializable {
     				 vote.isVoteChangable(),
     				 vote.isAllowText(),
     				 vote.isReflect(),
+    				 vote.getReflectionSubject(),
     				 vote.getMaxNominationCount(),
     				 vote.getCreatedBy(),				 
     				 vote.isLockOnFinish(),

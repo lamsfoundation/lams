@@ -75,11 +75,12 @@
 					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>													
 			 		<property name="voteUploadedFileDAO"><ref bean="voteUploadedFileDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>
-		<!-- 		<property name="repositoryService"><ref bean="repositoryService"/></property> -->
+		 		<property name="repositoryService"><ref bean="repositoryService"/></property> 
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="auditService"><ref bean="auditService"/></property>			 		
 					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		
 			   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>						
+			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>								   		
 				</bean>
 			</property>
 			<property name="transactionAttributes">

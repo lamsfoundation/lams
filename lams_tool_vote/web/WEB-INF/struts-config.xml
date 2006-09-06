@@ -216,6 +216,12 @@
 	        path="/learning/defineLater.jsp"
 		    redirect="false"
 	  	/>
+	  	
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
 
 	  	<forward
 		    name="errorList"
@@ -289,6 +295,13 @@
 	        path="/learning/Preview.jsp"
 		    redirect="false"
 	     />
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	     
 
 	  	<forward
 		    name="errorList"

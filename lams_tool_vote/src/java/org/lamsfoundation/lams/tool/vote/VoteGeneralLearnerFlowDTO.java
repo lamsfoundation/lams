@@ -67,6 +67,14 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
 	
     protected String voteChangable;
     
+    protected String notebookEntriesVisible;
+    
+    protected String reflection;
+    
+    protected String reflectionSubject;
+    
+    protected String notebookEntry;
+    
     protected String totalQuestionCount;
     
     protected String previewOnly;
@@ -513,4 +521,54 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
         this.mapStandardToolSessionUid = mapStandardToolSessionUid;
     }
+    
+    /**
+     * @return Returns the notebookEntriesVisible.
+     */
+    public String getNotebookEntriesVisible() {
+        return notebookEntriesVisible;
+    }
+    /**
+     * @param notebookEntriesVisible The notebookEntriesVisible to set.
+     */
+    public void setNotebookEntriesVisible(String notebookEntriesVisible) {
+        this.notebookEntriesVisible = notebookEntriesVisible;
+    }
+    /**
+     * @return Returns the notebookEntry.
+     */
+    public String getNotebookEntry() {
+        return notebookEntry;
+    }
+    /**
+     * @param notebookEntry The notebookEntry to set.
+     */
+    public void setNotebookEntry(String notebookEntry) {
+        this.notebookEntry = notebookEntry;
+    }
+    /**
+     * @return Returns the reflection.
+     */
+    public String getReflection() {
+        return reflection;
+    }
+    /**
+     * @param reflection The reflection to set.
+     */
+    public void setReflection(String reflection) {
+        this.reflection = reflection;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
+    }
+    
 }

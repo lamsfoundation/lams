@@ -191,6 +191,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	</tr>
 
 
+
+
+						<tr> 
+						<td NOWRAP align=center  valign=top colspan=2> 
+								<table>
+									<tr> 
+					  	   		  		<td>
+											<b> <bean:message key="label.notebook.entries"/> </b>						
+										 </td>
+									</tr>
+									
+									<tr> 
+					  	   		  		<td>
+											<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
+										 </td>
+									</tr>
+							</table>
+	
+						</td>
+						</tr>
+
+
+
+
 				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }"> 			
 					  <tr>
 					  	<td NOWRAP valign=top> 
@@ -212,11 +236,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                                
 						</td>					
 						<td NOWRAP valign=top align=right> 			
-	                                <html:submit property="learnerFinished" 
-	                                             styleClass="button" 
-	                                             onclick="submitMethod('learnerFinished');">
-	                                    <bean:message key="label.finished"/>
-	                                </html:submit>
+	                                
+									<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+										<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
+											<bean:message key="label.finished"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+					
+									<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+											<bean:message key="label.continue"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+
 					  	 </td>
 					  </tr>
 				</c:if> 							  

@@ -51,6 +51,8 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -117,7 +119,8 @@ public class VoteServicePOJO implements
     private IAuditService 			auditService;
     private ILamsToolService 		toolService;
 	private IExportToolContentService exportContentService;
-	
+
+	private ICoreNotebookService coreNotebookService;
     private IToolContentHandler voteToolContentHandler = null;
     
     public VoteServicePOJO(){}
@@ -2330,21 +2333,6 @@ public class VoteServicePOJO implements
 	}
 	
 	
-	/*
-	public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long voteContentId) throws VoteApplicationException {
-		try
-        {
-            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesUuidPlusFilename(voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded offline file uuid plus filename:  "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	*/
-	
 	
 	/**
 	 * @return Returns the logger.
@@ -2622,6 +2610,21 @@ public class VoteServicePOJO implements
 		this.exportContentService = exportContentService;
 	}
 
+
+    /**
+     * @return Returns the coreNotebookService.
+     */
+    public ICoreNotebookService getCoreNotebookService() {
+        return coreNotebookService;
+    }
+    /**
+     * @param coreNotebookService The coreNotebookService to set.
+     */
+    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+        this.coreNotebookService = coreNotebookService;
+    }
+
+	
 	/* ===============Methods implemented from ToolContentImport102Manager =============== */
 	
 
@@ -2704,5 +2707,25 @@ public class VoteServicePOJO implements
     	// qaContent.setReflectInstructions(description);
     }
     
-    //=========================================================================================
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry) {
+	    logger.debug("coreNotebookService: " + coreNotebookService);
+		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+	}
+	
+	
+	
+
+	public NotebookEntry getEntry(Long id, Integer idType, String signature,
+			Integer userID) {
+		
+		List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+	
+
 }

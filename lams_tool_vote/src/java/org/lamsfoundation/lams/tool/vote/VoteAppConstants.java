@@ -101,6 +101,10 @@ public interface VoteAppConstants {
 	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
 
 	public static final String EXPORT_PORTFOLIO_DTO						= "exportPortfolioDto";
+	public static final String NOTEBOOK									="notebook";
+	public static final String ENTRY_TEXT								="entryText";
+	public static final String REFLECTION_SUBJECT						="reflectionSubject";
+	
     
     /*
      * authoring mode controllers

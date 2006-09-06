@@ -29,10 +29,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -41,6 +43,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
@@ -56,7 +59,10 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>Action class that controls the logic of tool behavior. </p>
@@ -269,10 +275,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
 	    logger.debug("end of  prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
 		
-		voteLearningForm.resetCommands();
+	    
+		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	    
+	    voteLearningForm.resetCommands();
     	
-    	
- 		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
+    	logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
  		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
 
     	
@@ -426,6 +435,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	 	setContentInUse(request, voteService, toolContentID);
 		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
 
+		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	    
 		voteLearningForm.resetCommands();
 
 		logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
@@ -472,6 +484,36 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	VoteQueUsr voteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
         logger.debug("voteQueUsr:" + voteQueUsr);
         
+        
+	    /* it is possible that voteQueUsr can be null if the content is set as runoffline and reflection is on*/
+	    if (voteQueUsr == null)
+	    {
+    		logger.debug("attempt creating  user record since it must exist for the runOffline + reflection screens");
+		    HttpSession ss = SessionManager.getSession();
+
+		    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    	logger.debug("retrieving toolUser: " + toolUser);
+	    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+	    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
+
+	    	String userName=toolUser.getLogin(); 
+	    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+	    	
+	    	Long userId=new Long(toolUser.getUserID().longValue());
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+	    	
+	    	 voteQueUsr= new VoteQueUsr(new Long(userID), 
+	    	        userName, 
+	    	        fullName,  
+	    	        voteSession, 
+					new TreeSet());		
+    		voteService.createVoteQueUsr(voteQueUsr);
+	    	logger.debug("createVoteQueUsr - voteQueUsr: " + voteQueUsr);
+	    	logger.debug("session uid: " + voteSession.getUid());
+	    }
+
+        
         voteQueUsr.setResponseFinalised(true);
         voteService.updateVoteUser(voteQueUsr);
         logger.debug("user's response is finalised:" + voteQueUsr);
@@ -488,7 +530,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 
 		logger.debug("attempting to leave/complete session with toolSessionID:" + toolSessionID + " and userID:"+userID);
-
+		
+		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	    
 		logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
  		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
 
@@ -726,6 +771,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	MonitoringUtil.prepareChartData(request, voteService, null, toolContentID.toString(), toolSessionUid.toString(), 
     	        voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
     	
+    	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	    
     	logger.debug("fwding to INDIVIDUAL_REPORT: " + INDIVIDUAL_REPORT);
     	voteLearningForm.resetCommands();
     	
@@ -796,6 +844,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    
 	    voteLearningForm.setUserEntry("");
 	    
+	    voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	    
 	    logger.debug("fwd'ing to LOAD_LEARNER : " + LOAD_LEARNER);
 	    voteLearningForm.resetCommands();
 	    
@@ -818,7 +869,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	voteService.saveVoteContent(voteContent);
     }
 
-    
+
     
     /**
      * persists error messages to request scope
@@ -832,7 +883,108 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
+
     
+    
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	throws IOException, ServletException, ToolException
+	{ 
+        logger.debug("dispatching submitReflection...");
+    	VoteLearningForm voteLearningForm = (VoteLearningForm) form;        
+    	
+    	repopulateRequestParameters(request,voteLearningForm);
+    	
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);
+
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	voteLearningForm.setToolSessionID(toolSessionID);
+
+	 	String userID=request.getParameter("userID");
+	 	logger.debug("userID: " + userID);	 	
+	 	voteLearningForm.setUserID(userID);
+	 	
+	 	String reflectionEntry=request.getParameter(ENTRY_TEXT);
+	 	logger.debug("reflectionEntry: " + reflectionEntry);
+
+	 	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
+	    logger.debug("retrieving voteSession: " + voteSession);
+	
+	    VoteQueUsr voteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
+	    logger.debug("voteQueUsr:" + voteQueUsr);
+	    
+	    /* it is possible that voteQueUsr can be null if the content is set as runoffline and reflection is on*/
+	    if (voteQueUsr == null)
+	    {
+    		logger.debug("attempt creating  user record since it must exist for the runOffline + reflection screens");
+		    HttpSession ss = SessionManager.getSession();
+
+		    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    	logger.debug("retrieving toolUser: " + toolUser);
+	    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+	    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
+
+	    	String userName=toolUser.getLogin(); 
+	    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+	    	
+	    	Long userId=new Long(toolUser.getUserID().longValue());
+	    	logger.debug("retrieving toolUser fullname: " + fullName);
+	    	
+	    	 voteQueUsr= new VoteQueUsr(new Long(userID), 
+	    	        userName, 
+	    	        fullName,  
+	    	        voteSession, 
+					new TreeSet());		
+    		voteService.createVoteQueUsr(voteQueUsr);
+	    	logger.debug("createVoteQueUsr - voteQueUsr: " + voteQueUsr);
+	    	logger.debug("session uid: " + voteSession.getUid());
+	    }
+	    
+	    logger.debug("voteQueUsr:" + voteQueUsr);
+	    logger.debug("toolSessionID:" + toolSessionID);
+	    logger.debug("CoreNotebookConstants.NOTEBOOK_TOOL:" + CoreNotebookConstants.NOTEBOOK_TOOL);
+	    logger.debug("MY_SIGNATURE:" + MY_SIGNATURE);
+	    logger.debug("userID:" + userID);
+	    logger.debug("reflectionEntry:" + reflectionEntry);
+	    
+		voteService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID), reflectionEntry);
+	    
+		voteLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
+	    return learnerFinished(mapping, form, request, response);
+	}
+    
+    
+    public ActionForward forwardtoReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	throws IOException, ServletException, ToolException
+	{
+        logger.debug("dispatching forwardtoReflection...");
+        VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+        IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("voteService: " + voteService);        
+        
+	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 	logger.debug("toolSessionID: " + toolSessionID);
+	 	
+	 	VoteSession voteSession=voteService.retrieveVoteSession(new Long(toolSessionID));
+	 	logger.debug("retrieving voteSession: " + voteSession);
+	    
+	    VoteContent voteContent=voteSession.getVoteContent();
+	    logger.debug("using voteContent: " + voteContent);
+	    
+	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO= new VoteGeneralLearnerFlowDTO();
+	    voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
+	    voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+        
+        request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+		logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
+		voteLearningForm.resetCommands();
+        
+		logger.debug("fwd'ing to: " + NOTEBOOK);
+        return (mapping.findForward(NOTEBOOK));
+	}    
     
     protected void repopulateRequestParameters(HttpServletRequest request, VoteLearningForm voteLearningForm)
     {

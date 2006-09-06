@@ -878,6 +878,12 @@ public class AuthoringUtil implements VoteAppConstants {
         String allowTextEntry=voteAuthoringForm.getAllowText();
         logger.debug("allowTextEntry: " + allowTextEntry);
 
+        String reflect=voteAuthoringForm.getReflect();
+        logger.debug("reflect: " + reflect);
+        
+        String reflectionSubject=voteAuthoringForm.getReflectionSubject();
+        logger.debug("reflectionSubject: " + reflectionSubject);
+        
         String maxNomcount= voteAuthoringForm.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);
 
@@ -900,6 +906,7 @@ public class AuthoringUtil implements VoteAppConstants {
         boolean voteChangableBoolean=false;
         boolean lockedOnFinishBoolean=false;
         boolean allowTextBoolean=false;
+        boolean reflectBoolean=false;
         
         if (setCommonContent)
         {
@@ -911,6 +918,9 @@ public class AuthoringUtil implements VoteAppConstants {
 
             if (allowTextEntry.equalsIgnoreCase(ON))
                 allowTextBoolean=true;
+            
+            if (reflect.equalsIgnoreCase(ON))
+                reflectBoolean=true;
         }
         
         
@@ -969,6 +979,8 @@ public class AuthoringUtil implements VoteAppConstants {
          	voteContent.setVoteChangable(voteChangableBoolean);
          	voteContent.setLockOnFinish(lockedOnFinishBoolean);
          	voteContent.setAllowText(allowTextBoolean);
+         	voteContent.setReflect(reflectBoolean);
+         	voteContent.setReflectionSubject(reflectionSubject);
          	voteContent.setMaxNominationCount(maxNomcount);
          	voteContent.setOnlineInstructions(richTextOnlineInstructions);
          	voteContent.setOfflineInstructions(richTextOfflineInstructions);

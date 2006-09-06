@@ -50,39 +50,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body>
 	<div id="page-learner">
 	
-	<h1 class="no-tabs-below">&nbsp;</h1>
+	<h1 class="no-tabs-below">
+		<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
+	</h1>
+	
 	
 	<div id="header-no-tabs-learner"></div>
-	
-	<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">	
+
+	<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
 		<html:hidden property="dispatch"/>
 		<html:hidden property="toolSessionID"/>
 		<html:hidden property="userID"/>	
 	
 		<div id="content-learner">
-			&nbsp&nbsp&nbsp&nbsp&nbsp <bean:message key="label.learning.forceOfflineMessage" />
-			
-			<table>	
-			<tr>	
-			<td>
-				<div class="right-buttons">
-
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-						<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
-							<bean:message key="label.finished"/>
-						</html:submit>	 										
-				  	</c:if> 				    					
-	
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-						<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-							<bean:message key="label.continue"/>
-						</html:submit>	 				
-				  	</c:if> 				    					
-			  	
-				</div> 		  															 		  					
-			</td> 
+		
+		<table>
+			<tr>
+				<td>
+					<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false"/> 
+				</td>
 			</tr>
-			</table>
+
+			<tr>
+				<td>
+					<html:textarea cols="66" rows="8" property="entryText"></html:textarea>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="right-buttons">
+					<html:submit property="submitReflection" onclick="javascript:submitMethod('submitReflection');" styleClass="button">					
+						<bean:message key="button.endLearning"/>
+					</html:submit>
+				</td>
+			</tr>
+		</table>
+
+		
 		</div>
 	</html:form>	
 	

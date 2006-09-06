@@ -108,7 +108,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							&nbsp
 					</td>
 					<td>							
- 						<textarea name="reflectionSubject" rows=3 cols=30></textarea>
+ 						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
 	      			</td>
 		        </tr>
 		  	
