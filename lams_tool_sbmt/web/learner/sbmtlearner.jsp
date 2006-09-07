@@ -106,7 +106,7 @@
 									<fmt:message key="label.learner.fileDescription" />
 								</td>
 								<td>
-									<c:out value="${file.fileDescription}" escapeXml="false" />
+									<lams:out value="${file.fileDescription}"/>
 								</td>
 							</tr>
 							<tr>
@@ -184,7 +184,7 @@
 								<fmt:message key="label.learner.fileDescription" />
 							</td>
 							<td>
-								<lams:STRUTS-textarea rows="5" cols="40" tabindex="2" property="description" disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
+								<html:textarea rows="5" cols="40" tabindex="2" property="description" disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
 							</td>
 						</tr>
 						<tr>

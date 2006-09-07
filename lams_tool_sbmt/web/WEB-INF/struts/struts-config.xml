@@ -187,10 +187,6 @@
 
   <message-resources parameter="org.lamsfoundation.lams.tool.sbmt.ApplicationResources" />
 
-    <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
-    <set-property property="pathnames"
-                     value="/WEB-INF/struts/validator-rules.xml,
-                            /WEB-INF/struts/validation.xml"/>
-  </plug-in>
+   <!-- Define your Struts plugins in a file called struts-plugins.xml and place it in your merge directory. -->
 
 </struts-config>
