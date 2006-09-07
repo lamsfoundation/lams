@@ -39,26 +39,26 @@ import java.util.List;
 public class JarFolder implements Comparable {
 
 	String name;
+
 	List<Jar> jars = new LinkedList<Jar>();
-	
-	void add(Jar jar){
+
+	void add(Jar jar) {
 		jars.add(jar);
 	}
+
 	public int compareTo(Object o) {
-		return name.compareTo(((JarFolder)o).name);
+		return name.compareTo(((JarFolder) o).name);
 	}
-	
-	static JarFolder buildJarFolder(File file) throws IOException{
+
+	static JarFolder buildJarFolder(File file) throws IOException {
 		JarFolder folder = new JarFolder();
 		folder.name = file.getName();
-		File[] jars = file.listFiles(
-					new FilenameFilter(){
-						public boolean accept(File dir, String name) {
-							return name.endsWith(".jar");
-						}
-					}
-				);
-		for(File jar:jars){
+		File[] jars = file.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".jar");
+			}
+		});
+		for (File jar : jars) {
 			folder.add(Jar.buildJar(jar));
 		}
 		return folder;
