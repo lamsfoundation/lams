@@ -53,10 +53,10 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
+import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.dto.UpdateContentDTO;
 
@@ -377,6 +378,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public Integer getPermissions(WorkspaceFolder workspaceFolder, User user){
 		Integer permission = null;
 
+		WorkspaceFolder userDefaultFolder = user.getWorkspace().getDefaultFolder();
+
 		if  ( workspaceFolder==null || user==null ) {
 			permission = WorkspaceFolder.NO_ACCESS;
 		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
@@ -388,7 +391,25 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 		return permission;
 	}
-
+	/** This method checks if the given workspaceFolder is a subFolder of the
+	 * given rootFolder. Returns false if they are the same folder. */
+	private boolean isSubFolder(WorkspaceFolder workspaceFolder,WorkspaceFolder rootFolder){
+		if ( rootFolder != null ) {
+			// is it the same folder?
+			if ( rootFolder.getWorkspaceFolderId().equals(workspaceFolder.getWorkspaceFolderId()) ) { 
+				return false;
+			}
+			// check the parent hierarchy
+			WorkspaceFolder folder = workspaceFolder;
+			while ( folder != null && ! rootFolder.getWorkspaceFolderId().equals(folder.getWorkspaceFolderId()) ) {
+				folder = folder.getParentWorkspaceFolder();
+			} 
+			return ( folder != null ); 
+		}
+		return false;
+		
+	}
+	
 	private Vector getFolderContentDTO(List designs, Integer permissions,Vector<FolderContentDTO> folderContent){		
 		Iterator iterator = designs.iterator();
 		while(iterator.hasNext()){
@@ -791,9 +812,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	}
 	
 	/**
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Integer)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
 	 */
-	public String createWorkspaceFolderContent(Integer contentTypeID,String name,String description,Integer workspaceFolderID, String mimeType, String path, Integer userId) throws Exception{
+	public String createWorkspaceFolderContent(Integer contentTypeID,String name,String description,Integer workspaceFolderID, String mimeType, String path) throws Exception{
 		// TODO add some validation so that a non-unique name doesn't result in an index violation 
 		// bit hard for the user to understand.
 		
@@ -808,7 +829,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	
 				try{
 				InputStream stream = new FileInputStream(path);
-				NodeKey nodeKey = addFileToRepository(stream,name,mimeType,userId);
+				NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
 				workspaceFolderContent.setUuid(nodeKey.getUuid());
 				workspaceFolderContent.setVersionID(nodeKey.getVersion());
 				baseDAO.update(workspaceFolderContent);
@@ -871,13 +892,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#updateWorkspaceFolderContent(java.lang.Long, java.io.InputStream, java.lang.Integer)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#updateWorkspaceFolderContent(java.lang.Long, java.io.InputStream)
 	 */
-	public String updateWorkspaceFolderContent(Long folderContentID,String path, Integer userId)throws Exception{
+	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception{
 		InputStream stream = new FileInputStream(path);
 		WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent)baseDAO.find(WorkspaceFolderContent.class,folderContentID);
 		if(workspaceFolderContent!=null){
-			NodeKey nodeKey = updateFileInRepository(workspaceFolderContent,stream, userId);
+			NodeKey nodeKey = updateFileInRepository(workspaceFolderContent,stream);
 			UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),folderContentID);
 			flashMessage = new FlashMessage(MSG_KEY_UPDATE_WKF_CONTENT,contentDTO);
 		}else
@@ -895,16 +916,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @param stream The <code>InputStream</code> representing the data to be added
 	 * @param fileName The name of the file being added
 	 * @param mimeType The MIME type of the file (eg. TXT, DOC, GIF etc)
-	 * @param userId The user who is creating the content
 	 * @return NodeKey Represents the two part key - UUID and Version.
 	 * @throws AccessDeniedException
 	 * @throws FileException
 	 * @throws InvalidParameterException
 	 */
-	private NodeKey addFileToRepository(InputStream stream, String fileName, String mimeType, Integer userId)throws AccessDeniedException,
+	private NodeKey addFileToRepository(InputStream stream, String fileName, String mimeType)throws AccessDeniedException,
 																							FileException,InvalidParameterException{
 		ITicket ticket = getRepositoryLoginTicket();
-		NodeKey nodeKey = repositoryService.addFileItem(ticket,stream,fileName,mimeType,null,userId);
+		NodeKey nodeKey = repositoryService.addFileItem(ticket,stream,fileName,mimeType,null);
 		return nodeKey;
 	}
 	/**
@@ -920,11 +940,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws Exception
 	 */
 	private NodeKey updateFileInRepository(WorkspaceFolderContent workspaceFolderContent,
-									   InputStream stream, Integer userId)throws Exception{		
+									   InputStream stream)throws Exception{		
 		ITicket ticket = getRepositoryLoginTicket();
 		NodeKey nodeKey = repositoryService.updateFileItem(ticket,workspaceFolderContent.getUuid(),
 														   workspaceFolderContent.getName(),
-														   stream,workspaceFolderContent.getMimeType(),null,userId);
+														   stream,workspaceFolderContent.getMimeType(),null);
 		workspaceFolderContent.setUuid(nodeKey.getUuid());
 		workspaceFolderContent.setVersionID(nodeKey.getVersion());
 		baseDAO.update(workspaceFolderContent);

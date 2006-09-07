@@ -111,7 +111,7 @@ public class PortraitSaveAction extends Action {
 		if (file!= null && !StringUtils.isEmpty(fileName)) {
             try {
             	//InputStream is = file.getInputStream();
-				node = centralToolContentHandler.uploadFile(is, fileName, file.getContentType(), IToolContentHandler.TYPE_ONLINE, user.getUserId());
+				node = centralToolContentHandler.uploadFile(is, fileName, file.getContentType(), IToolContentHandler.TYPE_ONLINE);
 				is.close();
 			} catch (Exception e) {
 				request.setAttribute("errorMessage", e.getMessage());

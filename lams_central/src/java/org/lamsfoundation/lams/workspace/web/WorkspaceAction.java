@@ -71,10 +71,10 @@ public class WorkspaceAction extends LamsDispatchAction {
 	public static final String ROLE_DELIMITER = ",";
 	
 	private Integer getUserId(HttpServletRequest request) {
-		// return new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		HttpSession ss = SessionManager.getSession();
+		return new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+	/*	HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		return user != null ? user.getUserID() : null;
+		return user != null ? user.getUserID() : null; */
 	}
 
 	/** 
@@ -394,7 +394,6 @@ public class WorkspaceAction extends LamsDispatchAction {
 		Integer workspaceFolderID =  new Integer(WebUtil.readIntParam(request,"workspaceFolderID"));
 		String mimeType = WebUtil.readStrParam(request,"mimeType");
 		String path = WebUtil.readStrParam(request,"path");
-		Integer userId = getUserId(request);
 		
 		String errorPacket = checkResourceNotDummyValue("createWorkspaceFolderContent", workspaceFolderID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
@@ -405,7 +404,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 			wddxPacket = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
 																				 workspaceFolderID,
-																				 mimeType,path,userId);
+																				 mimeType,path);
 		} catch (Exception e) {
 			log.error("createWorkspaceFolderContent: Exception occured. contentTypeID "+contentTypeID+" name "+name+" workspaceFolderID "+workspaceFolderID, e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, e.getMessage());
@@ -431,11 +430,10 @@ public class WorkspaceAction extends LamsDispatchAction {
 											 HttpServletResponse response)throws ServletException, Exception{
 		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
 		String path = WebUtil.readStrParam(request,"path");
-		Integer userId = getUserId(request);
 		String wddxPacket = null;
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path,userId);
+			wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path);
 		} catch (Exception e) {
 			log.error("updateWorkspaceFolderContent: Exception occured. path "+path+" folderContentID "+folderContentID, e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_UPDATE_WKF_CONTENT, e.getMessage());
