@@ -37,6 +37,7 @@ class ToolActivity extends Activity{
 	private var _authoringURL:String;
 	private var _monitoringURL:String;
 	private var _contributeURL:String;
+	private var _helpURL:String;
 	
 
 	
@@ -142,6 +143,9 @@ class ToolActivity extends Activity{
 			if(StringUtils.isWDDXNull(dto.authoringURL)) { _authoringURL = null }
 			else { _authoringURL = dto.authoringURL; }
 			
+			if(StringUtils.isWDDXNull(dto.helpURL)) { _helpURL = null }
+			else { _helpURL = dto.helpURL; }
+			
 			if(StringUtils.isWDDXNull(dto.toolDisplayName)) { _toolDisplayName = null }
 			else { _toolDisplayName = dto.toolDisplayName; }
 			
@@ -165,6 +169,7 @@ class ToolActivity extends Activity{
 	public function toData():Object{
 		var dto = super.toData();
 		dto.authoringURL = (_authoringURL) ?  _authoringURL : Config.STRING_NULL_VALUE;	
+		dto.helpURL = (_helpURL) ? _helpURL : Config.STRING_NULL_VALUE;
 		dto.toolDisplayName = (_toolDisplayName) ?  _toolDisplayName: Config.STRING_NULL_VALUE;	
 		
 		//if(isCopy) { Application.getInstance().getCanvas().getCanvasModel().setDefaultToolContentID(this); }
@@ -219,6 +224,7 @@ class ToolActivity extends Activity{
 		
 		//class props
 		n.authoringURL = _authoringURL;
+		n.helpURL = _helpURL;
 		n.toolDisplayName = _toolDisplayName;
 		n.toolContentID = _toolContentID;
 		n.toolID = _toolID;
@@ -251,7 +257,7 @@ class ToolActivity extends Activity{
 		return _authoringURL;
 	}
 
-/**
+	/**
 	 * 
 	 * @usage   
 	 * @param   newtoolDisplayName 
@@ -410,6 +416,25 @@ class ToolActivity extends Activity{
 	 */
 	public function get contributeUrl ():String {
 		return _contributeURL;
+	}
+	
+		
+	/**
+	 * 
+	 * @usage   
+	 * @param   newhelpurl 
+	 * @return  
+	 */
+	public function set helpURL (newhelpurl:String):Void {
+		_helpURL = newhelpurl;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get helpURL ():String {
+		return _helpURL;
 	}
 
 }
