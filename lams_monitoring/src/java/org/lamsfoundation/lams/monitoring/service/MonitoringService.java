@@ -1012,7 +1012,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		Iterator iterator = lesson.getLessonClass().getLearners().iterator();
     		while(iterator.hasNext()){
     			User user = (User)iterator.next();
-    			lessonLearners.add(user.getUserDTO());
+    			lessonLearners.add(user.getUserFlashDTO());
     		}    		
     		flashMessage = new FlashMessage("getLessonLearners",lessonLearners);
     	}else
@@ -1034,7 +1034,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		Iterator iterator = lesson.getLessonClass().getStaffGroup().getUsers().iterator();
     		while(iterator.hasNext()){
     			User user = (User)iterator.next();
-    			lessonStaff.add(user.getUserDTO());
+    			lessonStaff.add(user.getUserFlashDTO());
     		}    		
     		flashMessage = new FlashMessage("getLessonStaff",lessonStaff);
     	}else
