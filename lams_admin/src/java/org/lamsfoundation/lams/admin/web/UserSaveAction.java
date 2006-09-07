@@ -27,9 +27,7 @@ package org.lamsfoundation.lams.admin.web;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,12 +49,11 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -128,6 +125,7 @@ public class UserSaveAction extends Action {
 
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 		IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+		MessageService messageService = (MessageService)ctx.getBean("adminMessageService");
 		
 		if (errors.isEmpty()) {
 			String[] roles = (String[]) userForm.get("roles");
@@ -136,7 +134,10 @@ public class UserSaveAction extends Action {
 				User user = (User)getService().findById(User.class, userId);
 				if (passwordChanged) {
 					// make 'password changed' audit log entry
-					auditService.log(AdminConstants.MODULE_NAME, "Password changed for: "+user.getLogin()+"("+userId+")");
+					String[] args = new String[1];
+					args[0] = user.getLogin()+"("+userId+")";
+					String message = messageService.getMessage("audit.user.password.change",args);
+					auditService.log(AdminConstants.MODULE_NAME, message);
 					userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
 				} else {
 					userForm.set("password", user.getPassword());
@@ -177,8 +178,11 @@ public class UserSaveAction extends Action {
 					getService().save(user);
 					
 					// make 'create user' audit log entry
-					auditService.log(AdminConstants.MODULE_NAME, "Created user: "+user.getLogin()
-							+"("+user.getUserId()+"), Full Name: "+user.getFullName());
+					String[] args = new String[2];
+					args[0] = user.getLogin()+"("+user.getUserId()+")";
+					args[1] = user.getFullName();
+					String message = messageService.getMessage("audit.user.create", args);
+					auditService.log(AdminConstants.MODULE_NAME, message);
 					
 					log.debug("user: " + user.toString());
 					List<Organisation> orgs = new ArrayList<Organisation>();

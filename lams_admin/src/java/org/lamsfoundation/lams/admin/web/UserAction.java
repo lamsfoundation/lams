@@ -197,7 +197,10 @@ public class UserAction extends LamsDispatchAction {
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		getService().disableUser(userId);
-		getAuditService().log(AdminConstants.MODULE_NAME, "Disabled userId: "+userId);
+		String[] args = new String[1];
+		args[0] = userId.toString();
+		String message = getMessageService().getMessage("audit.user.disable", args);
+		getAuditService().log(AdminConstants.MODULE_NAME, message);
 		
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
@@ -223,7 +226,10 @@ public class UserAction extends LamsDispatchAction {
 			request.setAttribute("errorMessage",e.getMessage());
 			return mapping.findForward("error");
 		}
-		getAuditService().log(AdminConstants.MODULE_NAME, "Deleted userId: "+userId);
+		String[] args = new String[1];
+		args[0] = userId.toString();
+		String message = getMessageService().getMessage("audit.user.delete", args);
+		getAuditService().log(AdminConstants.MODULE_NAME, message);
 		
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");
