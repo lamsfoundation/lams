@@ -976,9 +976,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO= new VoteGeneralLearnerFlowDTO();
 	    voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
-	    voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
-        
-        request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+	    
+	    String reflectionSubject=voteContent.getReflectionSubject();
+	    reflectionSubject=VoteUtils.replaceNewLines(reflectionSubject);
+	    
+	    voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	    request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+	    
 		logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 		voteLearningForm.resetCommands();
         
