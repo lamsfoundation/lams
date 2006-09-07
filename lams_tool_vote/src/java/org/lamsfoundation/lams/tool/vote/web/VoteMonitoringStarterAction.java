@@ -197,6 +197,8 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 		/*...till here */
 		
+		voteMonitoringAction.prepareReflectionData(request, voteContent, voteService, null, false);
+		
 		logger.debug("calling submitSession with selectedToolSessionId" + voteMonitoringForm.getSelectedToolSessionId());
 		return voteMonitoringAction.submitSession(mapping, voteMonitoringForm,  request, response, voteService, voteGeneralMonitoringDTO);
 	}

@@ -376,6 +376,12 @@
         	redirect="false"
        	/>	      
 
+        <forward
+          name="learnerNotebook"
+          path="/monitoring/LearnerNotebook.jsp"
+          redirect="false"
+        />
+
 	  	<forward
 		    name="errorList"
 	        path="/VoteErrorBox.jsp"

@@ -23,6 +23,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
@@ -51,4 +52,48 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<jsp:include page="/monitoring/AllSessionsSummary.jsp" />								
 			</c:if> 	    	  
 		</c:if>						
+		
+			<table class="forms">
+					<tr>			
+							<td valign=top align=left>
+								<table align=center>
+								
+										<tr>			
+											<td colspan=2 valign=top align=left>
+												<b>  <bean:message key="label.reflection"/>  </b> 
+											 </td>
+										</tr>	
+								
+								
+									<c:forEach var="currentDto" items="${reflectionsContainerDTO}">
+							  	 		<c:set var="userName" scope="request" value="${currentDto.userName}"/>
+							  	 		<c:set var="userId" scope="request" value="${currentDto.userId}"/>
+							  	 		<c:set var="sessionId" scope="request" value="${currentDto.sessionId}"/>
+							  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
+										<tr>			
+											<td valign=top align=left>
+												 <c:out value="${userName}" escapeXml="false"/> 
+											 </td>
+
+											<td valign=top align=left>
+												<c:url value="/monitoring.do" var="openNotebook">
+													<c:param name="method" value="openNotebook" />
+													<c:param name="uid" value="${reflectionUid}" />
+													<c:param name="userId" value="${userId}" />
+													<c:param name="userName" value="${userName}" />
+													<c:param name="sessionId" value="${sessionId}" />													
+												</c:url>
+				
+												<html:link href="${fn:escapeXml(openNotebook)}" target="_blank">
+													<bean:message key="label.view" />
+												</html:link>
+
+											 </td>
+										</tr>	
+									</c:forEach>		
+								</table>  	
+							 </td>
+						</tr>	
+				</table>		  	 								
+		
 

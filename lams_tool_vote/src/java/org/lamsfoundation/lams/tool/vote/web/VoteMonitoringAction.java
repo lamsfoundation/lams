@@ -38,8 +38,11 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
+import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -51,6 +54,7 @@ import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
@@ -114,7 +118,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     {
     	VoteUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching unspecified...");
-	 	return null;
+    	return null;
     }
 
     
@@ -255,6 +259,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
 		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 		
+		prepareReflectionData(request, voteContent, voteService, null,false);
+		
 		logger.debug("end of commonSubmitSessionCode, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
     }
@@ -394,6 +400,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
 		}
 
+		prepareReflectionData(request, voteContent, voteService, null,false);
+		
 	    logger.debug("end of refreshSummaryData, voteGeneralMonitoringDTO" + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 	}
@@ -543,6 +551,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    		}
 			}
 		}
+	    
 	    logger.debug("finish getting user entries: " + listUserEntries);
 	    return listUserEntries;
 	}
@@ -585,6 +594,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 
+		prepareReflectionData(request, voteContent, voteService, null,false);
+		
 		voteGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
     	logger.debug("end  initSummaryContent...");
 	}
@@ -626,6 +637,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	refreshInstructionsData(request, voteContent, voteService, voteGeneralMonitoringDTO);
     	logger.debug("post refreshInstructionsData, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 
+    	prepareReflectionData(request, voteContent, voteService, null,false);
+    	
     	voteGeneralMonitoringDTO.setCurrentMonitoringTab("instructions");
     	logger.debug("ending  initInstructionsContent...");
 	}
@@ -659,6 +672,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
 	    voteGeneralMonitoringDTO.setListUploadedOnlineFileNames(listUploadedOnlineFileNames);
 
+	    prepareReflectionData(request, voteContent, voteService, null,false);
+	    
 	    logger.debug("end of refreshInstructionsData, voteGeneralMonitoringDTO" + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 	}
@@ -691,6 +706,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	refreshStatsData(request, voteService,voteGeneralMonitoringDTO);
     	logger.debug("post refreshStatsData, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO );
     	
+    	prepareReflectionData(request, voteContent, voteService, null,false);
+    	
     	voteGeneralMonitoringDTO.setCurrentMonitoringTab("stats");
     	logger.debug("ending  initStatsContent...");
 	}
@@ -722,6 +739,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		int countSessionComplete=voteService.countSessionComplete();
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		voteGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
+		
 		
 		logger.debug("end of refreshStatsData, voteGeneralMonitoringDTO" + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
@@ -832,6 +850,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
 		voteGeneralAuthoringDTO.setActiveModule(MONITORING);
 		
+		prepareReflectionData(request, voteContent, voteService, null,false);
+		
 		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
 		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 	    
@@ -897,6 +917,12 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 		voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
 		
+	    VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+		logger.debug("existing voteContent:" + voteContent);
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+		
 		logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 		
@@ -954,6 +980,12 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
 		voteGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 		
+		VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+		logger.debug("existing voteContent:" + voteContent);
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -1013,7 +1045,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 		voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
 		voteGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-		
+
+		VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+		logger.debug("existing voteContent:" + voteContent);
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -1070,7 +1108,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 		voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
 		voteGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-		
+
+		VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+		logger.debug("existing voteContent:" + voteContent);
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -1124,6 +1168,12 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 		voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
 		voteGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+		VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+		logger.debug("existing voteContent:" + voteContent);
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
 		
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
@@ -1246,6 +1296,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("ending editActivityQuestions, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+
 	    logger.debug("ending viewOpenVotes, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 	    logger.debug("fwd'ing to LOAD_MONITORING: " + LOAD_MONITORING);
     	return (mapping.findForward(LOAD_MONITORING));
@@ -1293,7 +1347,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-    	
+
+	    VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
+		logger.debug("existing voteContent:" + voteContent);
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+
     	logger.debug("ending closeOpenVotes, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
         
     	return (mapping.findForward(LOAD_MONITORING));
@@ -1370,6 +1430,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
+
 	    logger.debug("submitting session to refresh the data from the database: ");
     	return submitSession(mapping, form,  request, response, voteService, voteGeneralMonitoringDTO);
      }
@@ -1439,6 +1502,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 		voteGeneralMonitoringDTO.setCurrentMonitoredToolSession(currentMonitoredToolSession);
 		voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
+
+		if (voteContent != null)
+		    prepareReflectionData(request, voteContent, voteService, null,false);
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return submitSession(mapping, form,  request, response, voteService, voteGeneralMonitoringDTO);
@@ -1491,6 +1557,137 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		logger.debug("fdwing to: " + VOTE_NOMINATION_VIEWER);
 		return (mapping.findForward(VOTE_NOMINATION_VIEWER));          
     }
+    
+    
+	public void prepareReflectionData(HttpServletRequest request, VoteContent voteContent, 
+	        IVoteService mcService, String userID, boolean exportMode)
+	{
+	    logger.debug("starting prepareReflectionData: " + voteContent);
+	    logger.debug("exportMode: " + exportMode);
+	    List reflectionsContainerDTO= new LinkedList();
+	    
+	    if (userID == null)
+	    {
+	        logger.debug("all users mode");
+		    for (Iterator sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) 
+		    {
+		        VoteSession qaSession = (VoteSession) sessionIter.next();
+		        logger.debug("qaSession: " + qaSession);
+		       for (Iterator userIter = qaSession.getVoteQueUsers().iterator(); userIter.hasNext();) 
+		       {
+					VoteQueUsr user = (VoteQueUsr) userIter.next();
+					logger.debug("user: " + user);
+
+					NotebookEntry notebookEntry = mcService.getEntry(qaSession.getVoteSessionId(),
+							CoreNotebookConstants.NOTEBOOK_TOOL,
+							MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
+					
+					logger.debug("notebookEntry: " + notebookEntry);
+					
+					if (notebookEntry != null) {
+					    ReflectionDTO reflectionDTO = new ReflectionDTO();
+					    reflectionDTO.setUserId(user.getQueUsrId().toString());
+					    reflectionDTO.setSessionId(qaSession.getVoteSessionId().toString());
+					    reflectionDTO.setUserName(user.getUsername());
+					    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
+					    String notebookEntryPresentable=VoteUtils.replaceNewLines(notebookEntry.getEntry());
+					    reflectionDTO.setEntry(notebookEntryPresentable);
+					    reflectionsContainerDTO.add(reflectionDTO);
+					} 
+					
+		       }
+		   }
+	    }
+	    else
+	    {
+			logger.debug("single user mode");
+		    for (Iterator sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) 
+		    {
+		        VoteSession qaSession = (VoteSession) sessionIter.next();
+		        logger.debug("qaSession: " + qaSession);
+		       for (Iterator userIter = qaSession.getVoteQueUsers().iterator(); userIter.hasNext();) 
+		       {
+					VoteQueUsr user = (VoteQueUsr) userIter.next();
+					logger.debug("user: " + user);
+					
+					if (user.getQueUsrId().toString().equals(userID))
+					{
+						NotebookEntry notebookEntry = mcService.getEntry(qaSession.getVoteSessionId(),
+								CoreNotebookConstants.NOTEBOOK_TOOL,
+								MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
+						
+						logger.debug("notebookEntry: " + notebookEntry);
+						
+						if (notebookEntry != null) {
+						    ReflectionDTO reflectionDTO = new ReflectionDTO();
+						    reflectionDTO.setUserId(user.getQueUsrId().toString());
+						    reflectionDTO.setSessionId(qaSession.getVoteSessionId().toString());
+						    reflectionDTO.setUserName(user.getUsername());
+						    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
+						    String notebookEntryPresentable=VoteUtils.replaceNewLines(notebookEntry.getEntry());
+						    reflectionDTO.setEntry(notebookEntryPresentable);
+						    reflectionsContainerDTO.add(reflectionDTO);
+						} 
+					    
+					}
+		       }
+		   }	        
+	        
+	    }
+	    
+	    
+	   logger.debug("reflectionsContainerDTO: " + reflectionsContainerDTO);
+	   request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   
+	   if (exportMode)
+	   {
+	       request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	   }
+	}
+	
+	public ActionForward openNotebook(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException,
+            ServletException, ToolException
+    {
+        logger.debug("dispatching openNotebook...");
+    	IVoteService qaService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("qaService: " + qaService);
+
+		
+		String uid=request.getParameter("uid");
+		logger.debug("uid: " + uid);
+		
+		String userId=request.getParameter("userId");
+		logger.debug("userId: " + userId);
+		
+		String userName=request.getParameter("userName");
+		logger.debug("userName: " + userName);
+
+		String sessionId=request.getParameter("sessionId");
+		logger.debug("sessionId: " + sessionId);
+		
+		
+		NotebookEntry notebookEntry = qaService.getEntry(new Long(sessionId),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userId));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+        VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO= new VoteGeneralLearnerFlowDTO();
+		if (notebookEntry != null) {
+		    String notebookEntryPresentable=VoteUtils.replaceNewLines(notebookEntry.getEntry());
+		    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+		    voteGeneralLearnerFlowDTO.setUserName(userName);
+		}
+
+		logger.debug("voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
+		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+		
+		logger.debug("fwding to : " + LEARNER_NOTEBOOK);
+		return mapping.findForward(LEARNER_NOTEBOOK);
+	}
+	
     
     
     protected void repopulateRequestParameters(HttpServletRequest request, VoteMonitoringForm voteMonitoringForm, 

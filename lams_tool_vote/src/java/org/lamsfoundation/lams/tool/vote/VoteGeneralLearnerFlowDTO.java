@@ -45,6 +45,8 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     
     protected String userEntry;
     
+    protected String userName;
+    
     protected String castVoteCount;
     
     protected String maxNominationCountReached;
@@ -569,6 +571,19 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
      */
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
+    }
+    
+    /**
+     * @return Returns the userName.
+     */
+    public String getUserName() {
+        return userName;
+    }
+    /**
+     * @param userName The userName to set.
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
     
 }

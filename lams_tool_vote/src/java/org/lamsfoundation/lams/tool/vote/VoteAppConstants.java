@@ -80,6 +80,7 @@ public interface VoteAppConstants {
 	public static final String ACTIVITY_TITLE_KEY						= "activityTitleKey";
 	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
 	public static final String VOTE_GENERAL_MONITORING_DTO				= "voteGeneralMonitoringDTO";
+	public static final String LEARNER_NOTEBOOK							="learnerNotebook";
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
@@ -104,6 +105,7 @@ public interface VoteAppConstants {
 	public static final String NOTEBOOK									="notebook";
 	public static final String ENTRY_TEXT								="entryText";
 	public static final String REFLECTION_SUBJECT						="reflectionSubject";
+	public static final String REFLECTIONS_CONTAINER_DTO				="reflectionsContainerDTO";
 	
     
     /*
