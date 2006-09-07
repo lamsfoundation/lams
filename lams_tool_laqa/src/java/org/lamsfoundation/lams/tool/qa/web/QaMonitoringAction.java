@@ -82,8 +82,6 @@
 
 /* $$Id$$ */
 
-// Fix public ActionForward editActivityQuestions(ActionMapping mapping,...)
-
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
@@ -107,6 +105,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.qa.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -224,6 +223,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
     	refreshStatsData(request, qaMonitoringForm, qaService, generalMonitoringDTO);
     	generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
+
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
     	
         prepareReflectionData(request, qaContent, qaService, null, false);
 
@@ -232,8 +240,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("ending  initStatsContent...");
 	}
 
-    
-    
     
     /**
      * switches to instructions tab of the monitoring url.
@@ -324,7 +330,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
 		
         prepareReflectionData(request, qaContent, qaService,null, false);
-    	
+
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
@@ -396,7 +411,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
 			logger.debug("student activity occurred on this content:" + qaContent);
-			//request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
 			generalMonitoringDTO.setUserExceptionContentInUse(new Boolean(true).toString());
 			logger.debug("forwarding to: " + LOAD_MONITORING);
 			return (mapping.findForward(LOAD_MONITORING));
@@ -415,7 +429,19 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
-	    
+
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
+		logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
+		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
+		
         prepareReflectionData(request, qaContent, qaService,null, false);
 		
 	    /* note that we are casting monitoring form subclass into Authoring form*/
@@ -514,7 +540,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		}
 
 		generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
-		
+
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
         prepareReflectionData(request, qaContent, qaService,null, false);
 		
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
@@ -537,12 +572,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 		
-		//ATTENTION HERE: obtain strToolContentID
 		String strToolContentID= null;
-    	//request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 		generalMonitoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
-
-		//request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true).toString());
+		
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+	    editActivityDTO.setMonitoredContentInUse(new Boolean(false).toString());
+	    request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+		
 		generalMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 		
         logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
@@ -556,7 +592,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     throws IOException, ServletException 
 	{
     	logger.debug("dispatching proxy editActivityQuestions...");
-    	QaAction qaAction= new QaAction(); 
+    	QaAction qaAction= new QaAction();
+    	
     	return qaAction.addNewQuestion(mapping, form, request, response);
 	}
 
@@ -568,7 +605,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("qaMonitoringForm: " + qaMonitoringForm);
 		String questionIndex=qaMonitoringForm.getQuestionIndex();
 		logger.debug("questionIndex: " + questionIndex);
-		//request.getSession().setAttribute(REMOVABLE_QUESTION_INDEX, questionIndex);
     	
         QaAction qaAction= new QaAction(); 
     	return qaAction.removeQuestion(mapping, form, request, response);
@@ -577,7 +613,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
     	logger.debug("dispatching proxy submitAllContent...");
-    	//request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
     	
 		GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 		generalMonitoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
@@ -585,8 +620,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
-    	
-    	//request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false).toString());
     	QaAction qaAction= new QaAction(); 
     	return qaAction.submitAllContent(mapping, form, request, response);
     	
@@ -664,7 +697,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
 	    prepareReflectionData(request, qaContent, qaService,null, false);
-        
+
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
 		refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
 		
     	return (mapping.findForward(LOAD_MONITORING));	
@@ -750,9 +792,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, true);
-	    
+
         prepareReflectionData(request, qaContent, qaService,null, false);
-	    
+
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+        
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
     
@@ -799,8 +850,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaUsrResp qaUsrResp= qaService.retrieveQaUsrResp(new Long(responseId).longValue());
 	    logger.debug("qaUsrResp: " + qaUsrResp);
 	    
-	    // write out the audit log entry. If you move this after the update of the response,
-	    // then make sure you update the audit call to use a copy of the original answer
+	    /* write out the audit log entry. If you move this after the update of the response,
+	     then make sure you update the audit call to use a copy of the original answer */
 	    qaService.getAuditService().logChange(QAConstants.TOOL_SIGNATURE,
 	    		qaUsrResp.getQaQueUser().getQueUsrId(),qaUsrResp.getQaQueUser().getUsername(),
 	    		qaUsrResp.getAnswer(), updatedResponse);
@@ -849,6 +900,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
 	    
         prepareReflectionData(request, qaContent, qaService,null, false);
+        
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+		
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
 
@@ -937,6 +998,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false);
 	    
         prepareReflectionData(request, qaContent, qaService,null, false);
+        
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+		
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
@@ -974,6 +1045,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 		
 		prepareReflectionData(request, qaContent, qaService,null, false);
+		
+
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);		
+
+
 		request.setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
     }
     
@@ -1001,7 +1084,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
     {
     	QaUtils.cleanUpSessionAbsolute(request);
-    	/*check this again */
     	return (mapping.findForward(LOAD_MONITORING)); 
     }
 
@@ -1116,11 +1198,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		{
 			logger.debug("monitoring url does not allow editActivity since the content is in use.");
 	    	persistError(request,"error.content.inUse");
-	    	//request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
 	    	generalMonitoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 		}
 
-	    	    
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+		
 	    Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 		request.setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
@@ -1250,7 +1337,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		generalMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 		
 		prepareReflectionData(request, qaContent, qaService,null, false);
-		
+
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
 		logger.debug("ending refreshStatsData with generalMonitoringDTO: " + generalMonitoringDTO);
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 	}
@@ -1328,6 +1423,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		prepareReflectionData(request, qaContent, qaService,null, false);
 
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+		
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
      }
@@ -1402,6 +1506,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    
 	    prepareReflectionData(request, qaContent, qaService,null, false);
 	    
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+		
+		
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
      }

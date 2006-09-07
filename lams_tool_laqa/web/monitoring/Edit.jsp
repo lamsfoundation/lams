@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<c:if test="${qaGeneralMonitoringDTO.monitoredContentInUse != 'true'}"> 			
+		<c:if test="${editActivityDTO.monitoredContentInUse != 'true'}"> 			
 			<c:if test="${defineLaterInEditMode != 'true'}"> 			
 				<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
 			</c:if> 				
@@ -41,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if> 											
 
 
-		<c:if test="${qaGeneralMonitoringDTO.monitoredContentInUse == 'true'}"> 			
+		<c:if test="${editActivityDTO.monitoredContentInUse == 'true'}"> 			
 		        	<table class="forms"> 	  
 						<tr> <td NOWRAP valign=top>
 								 <bean:message key="error.content.inUse"/> 

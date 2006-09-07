@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.qa.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -890,8 +891,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, QaAuthoringForm qaAuthoringForm)
             
     {
-    	//qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-    	
 		String richTextTitle = request.getParameter(TITLE);
         String richTextInstructions = request.getParameter(INSTRUCTIONS);
         logger.debug("richTextTitle: " + richTextTitle);
@@ -1322,19 +1321,21 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 	    	persistError(request,"error.content.inUse");
 	    	qaGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 		}
-     	
+		
+	    EditActivityDTO editActivityDTO = new EditActivityDTO();
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
 		QaUtils.setDefineLater(request, true, strToolContentID, qaService);
 
-		//QaUtils.setFormProperties(request, qaService, qaContent, 
-	    //         qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-		
-
 		qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		//qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 		qaGeneralAuthoringDTO.setActiveModule(activeModule);
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
 		qaAuthoringForm.setToolContentID(strToolContentID);
-		//qaAuthoringForm.setHttpSessionID(httpSessionID);
 		qaAuthoringForm.setActiveModule(activeModule);
 		qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 		qaAuthoringForm.setCurrentTab("1");

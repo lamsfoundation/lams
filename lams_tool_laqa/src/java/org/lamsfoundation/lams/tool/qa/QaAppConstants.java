@@ -184,6 +184,7 @@ public interface QaAppConstants {
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
     public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
+    public static final String EDIT_ACTIVITY_DTO						="editActivityDTO";
     
     public static final String ACTIVITY_TITLE							="activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS					="activityInstructions";

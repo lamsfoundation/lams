@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.qa.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -54,7 +55,7 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction; 
+import org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction;
 
 /**
  * 
@@ -204,6 +205,16 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
         generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
         /** ...till here **/
 
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
+        
         qaMonitoringAction.prepareReflectionData(request, qaContent, qaService, null, false);
         
 		logger.debug("final qaMonitoringForm: " + qaMonitoringForm);
