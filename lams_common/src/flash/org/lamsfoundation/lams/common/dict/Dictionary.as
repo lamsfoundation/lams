@@ -220,7 +220,7 @@ dynamic class Dictionary {
     public function openFromDisk():Void{
         Debugger.log('opening Dictionary from Shared Object',Debugger.CRITICAL,'openFromDisk','Dictionary');		
 	   
-		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage,true);
+		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage + '.' + app.module,true);
         createFromData(dataObj);
     }
     
