@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -42,6 +43,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -109,18 +111,16 @@ public class OrgSaveAction extends Action {
 				org = (Organisation)getService().findById(Organisation.class,orgId);
 				writeAuditLog(org, orgForm, state, locale);
 				BeanUtils.copyProperties(org,orgForm);
-				org.setLocale(locale);
 			}else{
 				org = new Organisation();
 				BeanUtils.copyProperties(org,orgForm);
-				org.setLocale(locale);
 				org.setParentOrganisation((Organisation)getService().findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)getService().findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 				writeAuditLog(org, orgForm, org.getOrganisationState(), org.getLocale());
 			}
-			
-			log.debug("orgId:"+org.getOrganisationId()+" locale:"+org.getLocale()+" create date:"+org.getCreateDate());
+			org.setLocale(locale);
 			org.setOrganisationState(state);
+			log.debug("orgId:"+org.getOrganisationId()+" locale:"+org.getLocale()+" create date:"+org.getCreateDate());
 			org = getService().saveOrganisation(org, user.getUserID());
 			
 			request.setAttribute("org",orgForm.get("parentId"));
@@ -135,50 +135,85 @@ public class OrgSaveAction extends Action {
 		
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 		IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+		MessageService messageService = (MessageService)ctx.getBean("adminMessageService");
+		
+		String message;
 		
 		// audit log entries for organisation attribute changes	
 		if((Integer)orgForm.get("orgId")!=0) {
+			final String key = "audit.organisation.change";
+			String[] args = new String[4];
+			args[1] = org.getName()+"("+org.getOrganisationId()+")";
 			if(!org.getOrganisationState().getOrganisationStateId().equals((Integer)orgForm.get("stateId"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed state for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getOrganisationState().getDescription()
-						+" to: "+newState.getDescription());
+				args[0] = "state";
+				args[2] = org.getOrganisationState().getDescription();
+				args[3] = newState.getDescription();
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
-			if(!org.getName().equals((String)orgForm.get("name"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed name for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getName()+" to: "+orgForm.get("name"));
+			if(!StringUtils.equals(org.getName(),(String)orgForm.get("name"))) {
+				args[0] = "name";
+				args[2] = org.getName();
+				args[3] = (String)orgForm.get("name");
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
-			if(!org.getCode().equals((String)orgForm.get("code"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed code for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getCode()+" to: "+orgForm.get("code"));
+			if(!StringUtils.equals(org.getCode(),(String)orgForm.get("code"))) {
+				args[0] = "code";
+				args[2] = org.getCode();
+				args[3] = (String)orgForm.get("code");
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
-			if(!org.getDescription().equals((String)orgForm.getString("description"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed description for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getDescription()+" to: "+orgForm.getString("description"));
+			if(!StringUtils.equals(org.getDescription(),(String)orgForm.getString("description"))) {
+				args[0] = "description";
+				args[2] = org.getDescription();
+				args[3] = (String)orgForm.get("description");
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
 			if(!org.getCourseAdminCanAddNewUsers().equals((Boolean)orgForm.get("courseAdminCanAddNewUsers"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanAddNewUsers for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanAddNewUsers()+" to: "+orgForm.get("courseAdminCanAddNewUsers"));
+				args[0] = "courseAdminCanAddNewUsers";
+				args[2] = org.getCourseAdminCanAddNewUsers() ? "true" : "false";
+				args[3] = (Boolean)orgForm.get("courseAdminCanAddNewUsers") ? "true" : "false";
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
 			if(!org.getCourseAdminCanBrowseAllUsers().equals((Boolean)orgForm.get("courseAdminCanBrowseAllUsers"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanBrowseAllUsers for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanBrowseAllUsers()+" to: "+orgForm.get("courseAdminCanBrowseAllUsers"));
+				args[0] = "courseAdminCanBrowseAllUsers";
+				args[2] = org.getCourseAdminCanBrowseAllUsers() ? "true" : "false";
+				args[3] = (Boolean)orgForm.get("courseAdminCanBrowseAllUsers") ? "true" : "false";
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
 			if(!org.getCourseAdminCanChangeStatusOfCourse().equals((Boolean)orgForm.get("courseAdminCanChangeStatusOfCourse"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanChangeStatusOfCourse for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanChangeStatusOfCourse()+" to: "+orgForm.get("courseAdminCanChangeStatusOfCourse"));
+				args[0] = "courseAdminCanChangeStatusOfCourse";
+				args[2] = org.getCourseAdminCanChangeStatusOfCourse() ? "true" : "false";
+				args[3] = (Boolean)orgForm.get("courseAdminCanChangeStatusOfCourse") ? "true" : "false";
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
 			/* this field not set yet 
 			if(!org.getCourseAdminCanCreateGuestAccounts().equals((Boolean)orgForm.get("courseAdminCanCreateGuestAccounts"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed courseAdminCanCreateGuestAccounts for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getCourseAdminCanCreateGuestAccounts()+" to: "+orgForm.get("courseAdminCanCreateGuestAccounts"));
+				args[0] = "courseAdminCanCreateGuestAccounts";
+				args[2] = org.getCourseAdminCanCreateGuestAccounts() ? "true" : "false";
+				args[3] = (Boolean)orgForm.get("courseAdminCanCreateGuestAccounts") ? "true" : "false";
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}*/
 			if(!org.getLocale().getLocaleId().equals((Byte)orgForm.get("localeId"))) {
-				auditService.log(AdminConstants.MODULE_NAME, "Changed locale for organisation: "+org.getName()
-						+"("+org.getOrganisationId()+") from: "+org.getLocale().getDescription()+" to: "+newLocale.getDescription());
+				args[0] = "locale";
+				args[2] = org.getLocale().getDescription();
+				args[3] = newLocale.getDescription();
+				message = messageService.getMessage(key, args);
+				auditService.log(AdminConstants.MODULE_NAME, message);
 			}
 		} else {
-			auditService.log(AdminConstants.MODULE_NAME, "Created organisation: "+org.getName()
-					+"("+org.getOrganisationId()+") of type: "+org.getOrganisationType().getName());
+			String[] args = new String[2];
+			args[0] = org.getName()+"("+org.getOrganisationId()+")";
+			args[1] = org.getOrganisationType().getName();
+			message = messageService.getMessage("audit.organisation.create", args);
+			auditService.log(AdminConstants.MODULE_NAME, message);
 		}
 	}
 	
