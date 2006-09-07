@@ -539,19 +539,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		return folder;
 	}
-	/**
-	 * Import tool content 
-	 * TODO Remove once all tools converted to supply user id. 
-	 */
-	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
-		log.error("importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
-		return importToolContent(toolContentPath, toolContentHandler, new Integer(1));
-	}
 
 	/**
 	 * Import tool content 
 	 */
-	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler, Integer userId ) throws ImportToolContentException{
+	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
 		Object toolPOJO = null;
 //		change xml to Tool POJO 
 		XStream toolXml = new XStream();
@@ -630,10 +622,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					//upload to repository: file or pacakge
 					NodeKey key;
 					if(!isPackage)
-						key = toolContentHandler.uploadFile(is,fileName,mimeType,fileProperty, userId);
+						key = toolContentHandler.uploadFile(is,fileName,mimeType,fileProperty);
 					else{
 						String packageDirectory = ZipFileUtil.expandZip(is, realFileName);
-						key = toolContentHandler.uploadPackage(packageDirectory,initalItem, userId);
+						key = toolContentHandler.uploadPackage(packageDirectory,initalItem);
 					}
 					
 					//refresh file node Uuid and Version value to latest.

@@ -436,7 +436,7 @@ public class TestSimpleRepository extends BaseTestCase {
 		try {
 			if ( uuid == null ) {
 				// new file
-				keys = repository.addFileItem(ticket, file, filename, null, v1Description, mmmUser);
+				keys = repository.addFileItem(ticket, file, filename, null, v1Description);
 				assertTrue("File save returns uuid",keys != null && keys.getUuid() != null);
 				assertTrue("File save got expected version "+expectedVersion,
 					keys != null && keys.getVersion() != null 
@@ -444,7 +444,7 @@ public class TestSimpleRepository extends BaseTestCase {
 			} else {
 				// update existing node
 				keys = repository.updateFileItem(ticket, uuid, filename, 
-				        file, null, v2Description, mmmUser);
+				        file, null, v2Description);
 				assertTrue("File save returns same uuid",keys != null && keys.getUuid().equals(uuid));
 				assertTrue("File save got expected version "+expectedVersion,
 					keys != null && keys.getVersion() != null 
@@ -484,8 +484,8 @@ public class TestSimpleRepository extends BaseTestCase {
 
 	   // copy each version of the file node
 		try {
-			NodeKey copy1 = repository.copyNodeVersion(ticket, keys.getUuid(), one, mmmUser);
-			NodeKey copylatest = repository.copyNodeVersion(ticket, keys.getUuid(), null, mmmUser);
+			NodeKey copy1 = repository.copyNodeVersion(ticket, keys.getUuid(), one);
+			NodeKey copylatest = repository.copyNodeVersion(ticket, keys.getUuid(), null);
 
 			assertNotSame("Copy 1 is a different uuid to the original.", copy1.getUuid(), keys.getUuid());
 			checkFileNodeExist(fileDAO, copy1.getUuid(), one, 1, v1Description);
@@ -562,13 +562,13 @@ public class TestSimpleRepository extends BaseTestCase {
 			directory.list();
 
 			if ( uuid == null ) {
-				keys = repository.addPackageItem(ticket,  tempDir, "index.html", v1Description, mmmUser);
+				keys = repository.addPackageItem(ticket,  tempDir, "index.html", v1Description);
 				assertTrue("Package save returns uuid",keys != null && keys.getUuid() != null);
 				assertTrue("Package save got version 1",
 						keys != null && keys.getVersion() != null 
 						&& keys.getVersion().longValue() == 1);
 			} else {
-				keys = repository.updatePackageItem(ticket, uuid, tempDir, "index.html", v2Description, mmmUser);
+				keys = repository.updatePackageItem(ticket, uuid, tempDir, "index.html", v2Description);
 				assertTrue("Package save returns uuid",keys != null && keys.getUuid() != null);
 				assertTrue("Package save got version >1",
 						keys != null && keys.getVersion() != null 
@@ -606,7 +606,7 @@ public class TestSimpleRepository extends BaseTestCase {
 
 	    // copy the package node
 		try {
-			NodeKey copy = repository.copyNodeVersion(ticket, keys.getUuid(), null, mmmUser);
+			NodeKey copy = repository.copyNodeVersion(ticket, keys.getUuid(), null);
 
 			assertNotSame("Copy 1 is a different uuid to the original.", copy.getUuid(), keys.getUuid());
 			checkPackage(copy);

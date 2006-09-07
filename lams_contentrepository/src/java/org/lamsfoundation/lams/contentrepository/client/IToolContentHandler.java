@@ -87,9 +87,6 @@ public interface IToolContentHandler {
     /**
      * Save a file in the content repository.
      * 
-     * TODO To be removed from the system and replaced with the call with the user id.
-	 * @Deprecated
-     * 
      * @param stream Input filestream. Mandatory.
      * @param fileName Input filename. Mandatory.
      * @param mimeType Mimetype of file. Optional.
@@ -105,33 +102,6 @@ public interface IToolContentHandler {
             RepositoryCheckedException;
 
     /**
-     * Save a file in the content repository.
-     * 
-     * @param stream Input filestream. Mandatory.
-     * @param fileName Input filename. Mandatory.
-     * @param mimeType Mimetype of file. Optional.
-     * @param fileProperty is this for online or offline instructions? Should be TYPE_ONLINE or TYPE_OFFLINE. Mandatory.
-     * @return key to the new content repository node
-     * @throws InvalidParameterException One of the mandatory parameters is missing.
-     * @throws FileException An error occured writing the input stream to disk.
-     * @throws RepositoryCheckedException Some other error occured.
-     */
-    public abstract NodeKey uploadFile(InputStream stream, String fileName,
-            String mimeType, String fileProperty, Integer userId)
-            throws RepositoryCheckedException, InvalidParameterException,
-            RepositoryCheckedException;
-
-    /**
-     * Save a directory of files in the content repository.
-     * 
-     * TODO To be removed from the system and replaced with the call with the user id.
-	 * @Deprecated
-	 */
-    public abstract NodeKey uploadPackage(String dirPath, String startFile) 
-    throws RepositoryCheckedException, InvalidParameterException, 
-    RepositoryCheckedException;
-
-    /**
      * Save a directory of files in the content repository.
      * 
 	 * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
@@ -142,7 +112,7 @@ public interface IToolContentHandler {
      * @throws FileException An error occured writing the files to disk.
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public abstract NodeKey uploadPackage(String dirPath, String startFile, Integer userId) 
+    public abstract NodeKey uploadPackage(String dirPath, String startFile) 
     		throws RepositoryCheckedException, InvalidParameterException, 
     		RepositoryCheckedException;
  
@@ -157,24 +127,12 @@ public interface IToolContentHandler {
 
     /**
      * Copy an entry in the content repository.
-     * TODO To be removed from the system and replaced with the call with the user id.
-	 * @Deprecated
-	 *
-     * @param uuid id of the file node. Mandatory
-     * @throws ItemNotFoundException Node to copy cannot be found 
-     * @throws RepositoryCheckedException Some other error occured.
-     */
-    public abstract NodeKey copyFile(Long uuid) 
-    		throws ItemNotFoundException, RepositoryCheckedException;
-
-    /**
-     * Copy an entry in the content repository.
      * 
      * @param uuid id of the file node. Mandatory
      * @throws ItemNotFoundException Node to copy cannot be found 
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public abstract NodeKey copyFile(Long uuid, Integer userId) 
+    public abstract NodeKey copyFile(Long uuid) 
     		throws ItemNotFoundException, RepositoryCheckedException;
 
     /** Get a file node. 

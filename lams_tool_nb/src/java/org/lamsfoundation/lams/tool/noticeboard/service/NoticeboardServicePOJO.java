@@ -745,6 +745,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    {
 			attachment.setNbContent(null);
 			content.getNbAttachments().remove(attachment);
+			nbToolContentHandler.deleteFile(attachment.getUuid());
 			saveNoticeboard(content);
 	    }
 	    catch (DataAccessException e)
@@ -755,10 +756,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 	
 	/** @throws RepositoryCheckedException 
-	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#uploadFile(java.io.InputStream, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer) */
-	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType, Integer userId) throws RepositoryCheckedException
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#uploadFile(java.io.InputStream, java.lang.String, java.lang.String, java.lang.String) */
+	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException
 	{
-	    return nbToolContentHandler.uploadFile(istream, filename, contentType, fileType, userId); 
+	    return nbToolContentHandler.uploadFile(istream, filename, contentType, fileType); 
 	}
 	
 	/* ===============Methods implemented from ToolContentManager =============== */
@@ -925,7 +926,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 				exportContentService.registerFileClassForImport(NoticeboardAttachment.class.getName()
 						,"uuid","versionId","filename","fileProperty",null,null);
 				
-				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,nbToolContentHandler,newUserUid);
+				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,nbToolContentHandler);
 				if(!(toolPOJO instanceof NoticeboardContent))
 					throw new ImportToolContentException("Import Noteice board tool content failed. Deserialized object is " + toolPOJO);
 				NoticeboardContent toolContentObj = (NoticeboardContent) toolPOJO;
@@ -936,7 +937,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 			} catch (ImportToolContentException e) {
 				throw new ToolException(e);
 			}
-	}	
+	}
 	/* ===============Methods implemented from ToolSessionManager =============== */
 	
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */

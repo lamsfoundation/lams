@@ -38,6 +38,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
@@ -62,14 +64,15 @@ import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -115,6 +118,20 @@ public class SimpleRepository implements IRepositoryAdmin {
 
 	/* ********** Whole of repository methods - login, logout, addWorkspace, etc ****/
 	
+	/** 
+	 * Get the current user from the user's session. This is used to record the user
+	 * who creates piece of content in the content repository. By doing it here, the 
+	 * tools do not have to be modified nor do we rely on other web-apps to tell 
+	 * us the correct user.
+	 */
+	private Integer getCurrentUserId() throws AccessDeniedException {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		if ( user == null ) {
+			throw new AccessDeniedException("Cannot get user details for content repository. User may not be logged in.");
+		}
+		return user.getUserID();
+	}
 	/**
 	 * @param workspaceName
 	 * @return
@@ -361,29 +378,17 @@ public class SimpleRepository implements IRepositoryAdmin {
 		return ( ticket != null &&  ticketIdSet.contains(ticket.getTicketId()) );
     }
 
-	/**
-	 * Import tool content 
-	 * TODO Remove once all tools converted to supply user id. 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public NodeKey addFileItem(ITicket ticket, InputStream istream,
 			String filename, String mimeType, String versionDescription)
 			throws FileException, AccessDeniedException,
 			InvalidParameterException {
-		log.error("addFileItem() to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
-		return addFileItem(ticket, istream,
-				filename, mimeType, versionDescription, new Integer(1));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	public NodeKey addFileItem(ITicket ticket, InputStream istream,
-			String filename, String mimeType, String versionDescription, Integer userId)
-			throws FileException, AccessDeniedException,
-			InvalidParameterException {
 		
-    	try { 
+    	try {
     		CrWorkspace workspace = getWorkspace(ticket.getWorkspaceId());
+    		Integer userId = getCurrentUserId();
     		SimpleVersionedNode initialNodeVersion = nodeFactory.createFileNode(workspace, 
     				 null, null, istream, filename, mimeType, versionDescription, userId); 
        		initialNodeVersion.save();
@@ -404,7 +409,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addPackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public NodeKey addPackageItem(ITicket ticket, String dirPath,
-			String startFile, String versionDescription, Integer userId)
+			String startFile, String versionDescription)
 			throws AccessDeniedException, InvalidParameterException,
 			FileException {
 		
@@ -418,6 +423,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 					+e.getMessage(), e);
 		}
 
+		Integer userId = getCurrentUserId();
     	SimpleVersionedNode packageNode = null;
    		packageNode = nodeFactory.createPackageNode(workspace, startFile, versionDescription, userId); 
     	
@@ -525,10 +531,11 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updateFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.io.InputStream, java.lang.String, java.lang.String)
 	 */
 	public NodeKey updateFileItem(ITicket ticket, Long uuid, String filename,
-			InputStream istream, String mimeType, String versionDescription, Integer userId)
+			InputStream istream, String mimeType, String versionDescription)
 			throws AccessDeniedException, ItemNotFoundException, FileException,
 			InvalidParameterException {
 	   	
+		Integer userId = getCurrentUserId();
 		SimpleVersionedNode newNodeVersion = nodeFactory.getNodeNewVersion(ticket.getWorkspaceId(), 
 				uuid, null, versionDescription, userId);
 
@@ -550,10 +557,11 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public NodeKey updatePackageItem(ITicket ticket, Long uuid, String dirPath,
-			String startFile, String versionDescription, Integer userId)
+			String startFile, String versionDescription)
 			throws AccessDeniedException, ItemNotFoundException, FileException,
 			InvalidParameterException {
 		
+		Integer userId = getCurrentUserId();
 		SimpleVersionedNode newNodeVersion = nodeFactory.getNodeNewVersion(ticket.getWorkspaceId(), 
 				uuid, null, versionDescription, userId);
 
@@ -604,9 +612,10 @@ public class SimpleRepository implements IRepositoryAdmin {
     /* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#copyNodeVersion(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.Long)
 	 */
-    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId, Integer userId) throws AccessDeniedException, ItemNotFoundException {
+    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId) throws AccessDeniedException, ItemNotFoundException {
 
         
+		Integer userId = getCurrentUserId();
     	try { 
             SimpleVersionedNode originalNode = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,versionId);
            	SimpleVersionedNode newNode = nodeFactory.copy(originalNode, userId);

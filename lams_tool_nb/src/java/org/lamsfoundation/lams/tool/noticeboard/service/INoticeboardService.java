@@ -84,16 +84,14 @@ public interface INoticeboardService {
 	
 	/**
      * <p>Delete the given instance of NoticeboardContent with the
-     * given tool content id <code>nbContentId</code>. Does not remove
-     * any attachments as they may be shared with another design.
+     * given tool content id <code>nbContentId</code>
      * 
      * @param nbContentId The tool content Id. 
      */
 	public void removeNoticeboard(Long nbContentId);
 	
 	/**
-     * <p>Delete the given instance of NoticeboardContent. Does not remove
-     * any attachments as they may be shared with another design.</p>
+     * <p>Delete the given instance of NoticeboardContent</p>
      * 
      * @param nbContent The instance of NoticeboardContent to delete. 
      */
@@ -304,8 +302,7 @@ public interface INoticeboardService {
     public void saveAttachment(NoticeboardContent content, NoticeboardAttachment attachment);
     
     /**
-     * Removes the NoticeboardAttachment object from the database. Does not remove
-     * the actual file from the content repository as they may be shared with another design.
+     * Removes the NoticeboardAttachment object from the database.
      * @param content The overall noticeboard content object to which the attachment is to be added
      * @param attachment The instance of NoticeboardAttachment to delete.
      */
@@ -315,7 +312,7 @@ public interface INoticeboardService {
 	 * Add a file to the content repository. Does not add a record to the noticeboard tables.
 	 * @throws RepositoryCheckedException 
 	 */
-	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType, Integer userId) throws RepositoryCheckedException;
+	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
 
     /**
      * This method retrieves the default content id.

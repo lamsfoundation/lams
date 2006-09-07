@@ -351,8 +351,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			checkContentId(content_id);
 			NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);
 	    	
-			UserDTO user = getUser(request);
-			
 	    	//check if the file uploaded is an online instructions file or offline instructions file.
 	    	//if one of the types is null, then the other one must have been uploaded. 
 	    	//here we check if the file is an online one
@@ -375,7 +373,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		    	{
 	    	        // This is a new file and so is saved to the content repository. Add it to the 
 		    		// attachments collection, but don't add it to the tool's tables yet.
-		    		NodeKey node = nbService.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType, user.getUserID());
+		    		NodeKey node = nbService.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType);
 	    	        NoticeboardAttachment file = new NoticeboardAttachment();
 		    	    file.setFilename(theFile.getFileName());
 		    	   	file.setOnlineFile(isOnlineFile);

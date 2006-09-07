@@ -96,18 +96,8 @@ public interface IExportToolContentService {
 	/** 
 	 * Import the tool content. This is called by tools to do the actual content import, once the tool
 	 * has set up whatever it needs to do. 
-     * TODO To be removed from the system and replaced with the call with the user id.
-	 * @Deprecated
 	 */
 	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler)
-	throws ImportToolContentException;
-
-	/** 
-	 * Import the tool content. This is called by tools to do the actual content import, once the tool
-	 * has set up whatever it needs to do. To be removed from the system and replaced with the call with the 
-	 * user id.
-	 */
-	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler, Integer userId)
 		throws ImportToolContentException;
 	
 	/**
