@@ -170,7 +170,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
      * value is null in the database, returns 0
      */
     public Integer getMinNumberOfOptionsNotNull() {
-    	return maxNumberOfOptions!=null ? maxNumberOfOptions : new Integer(0);
+    	return minNumberOfOptions!=null ? minNumberOfOptions : new Integer(0);
     }
 
     public void setMinNumberOfOptions(Integer minNumberOfOptions) {
