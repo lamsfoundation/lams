@@ -203,6 +203,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    voteGeneralAuthoringDTO.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
 	    voteGeneralAuthoringDTO.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
 
+	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
+	    
 	    String maxNomcount= defaultVoteContent.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);
 	    if (maxNomcount.equals(""))

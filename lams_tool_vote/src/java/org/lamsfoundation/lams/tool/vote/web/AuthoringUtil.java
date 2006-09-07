@@ -878,8 +878,12 @@ public class AuthoringUtil implements VoteAppConstants {
         String allowTextEntry=voteAuthoringForm.getAllowText();
         logger.debug("allowTextEntry: " + allowTextEntry);
 
-        String reflect=voteAuthoringForm.getReflect();
-        logger.debug("reflect: " + reflect);
+        //String reflect=voteAuthoringForm.getReflect();
+        //logger.debug("reflect: " + reflect);
+        
+		String reflect=request.getParameter(REFLECT);
+		logger.debug("reflect: " + reflect);
+
         
         String reflectionSubject=voteAuthoringForm.getReflectionSubject();
         logger.debug("reflectionSubject: " + reflectionSubject);
@@ -919,7 +923,10 @@ public class AuthoringUtil implements VoteAppConstants {
             if (allowTextEntry.equalsIgnoreCase(ON))
                 allowTextBoolean=true;
             
-            if (reflect.equalsIgnoreCase(ON))
+            //if (reflect.equalsIgnoreCase(ON))
+            //    reflectBoolean=true;
+            
+            if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
                 reflectBoolean=true;
         }
         

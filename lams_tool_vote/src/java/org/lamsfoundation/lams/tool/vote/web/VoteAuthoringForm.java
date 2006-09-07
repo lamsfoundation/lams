@@ -202,7 +202,8 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     	this.voteChangable		 =OPTION_OFF;
 		this.lockOnFinish		 =OPTION_OFF;
 		this.allowText			 =OPTION_OFF;
-		this.reflect			 =OPTION_OFF;
+		//this.reflect			 =OPTION_OFF;
+		this.reflect			 ="0";
 	}
 
 	
