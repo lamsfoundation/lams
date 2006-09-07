@@ -1,0 +1,166 @@
+Deployed Libraries
+
+Folder            Library                                  Version                License                       Vendor                           Description
+
+annotation        annogen-0.1.0.jar                        0.1.0                                                                                 
+
+axis              axiom-api-1.0.jar                        1.0                    Apache License 2.0                                             
+                  axiom-impl-1.0.jar                       1.0                                                                                   
+                  axis2-adb-1.0.jar                        1.0                                                  Apache Software Foundation       Axis 2.0
+                  axis2-codegen-1.0.jar                    1.0                                                  Apache Software Foundation       Axis 2.0
+                  axis2-java2wsdl-1.0.jar                  1.0                                                  Apache Software Foundation       Axis 2.0
+                  axis2-jibx-1.0.jar                       1.0                                                  Apache Software Foundation       Axis 2.0
+                  axis2-kernel-1.0.jar                     1.0                                                                                   
+                  axis2-soapmonitor-1.0.jar                1.0                                                  Apache Software Foundation       Axis 2.0
+                  axis2-xmlbeans-1.0.jar                   1.0                                                  Apache Software Foundation       Axis 2.0
+
+cglib             cglib-nodep-2.1_2.jar                    2.1_2                                                                                 
+
+concurrent        backport-util-concurrent-2.1.jar         2.1                                                                                   
+                  concurrent-1.3.4.jar                     1.3.4                                                                                 
+
+dom4j             dom4j-1.5.2.jar                          1.5.2                                                MetaStuff Ltd.                   dom4j : XML framework for Java
+
+ehcache           ehcache-1.1.jar                          1.1                                                                                   
+
+fckeditor         FCKeditor-2.3.jar                        2.3                                                                                   
+
+geronimo          geronimo-spec-activation-1.0.2-rc4.jar   1.0.2-rc4              Apache License 2.0            Apache Software Foundation       Java Activation Framework
+                  geronimo-spec-javamail-1.3.1-rc5.jar     1.3.1-rc5              Apache License 2.0            Apache Software Foundation       JavaMail API 1.3.1
+                  geronimo-spec-jms-1.1-rc4.jar            1.1-rc4                Apache License 2.0            Apache Software Foundation       J2EE JMS Specification
+
+hibernate         hibernate3.jar                           3.1.3                                                                                 
+
+j2ee              jstl.jar                                 1.1.2                                                Sun Microsystems, Inc.           JavaServer Pages Standard Tag Library (JSTL)
+
+jakarta-commons   commons-beanutils.jar                    1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Beanutils
+                  commons-codec-1.3.jar                    1.3                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Codec
+                  commons-collections.jar                  3.1                    Apache License 2.0            Apache Software Foundation       Commons Collections
+                  commons-digester.jar                     1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Digester
+                  commons-fileupload.jar                   1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
+                  commons-httpclient.jar                   3.0.1                  Apache License 2.0            Apache Software Foundation       Jakarta Commons HttpClient
+                  commons-lang-2.0.jar                     2.0                    Apache Software License 1.1   Apache Software Foundation       Jakarta Commons Lang
+                  commons-logging.jar                      1.0.4                  Apache License 2.0            Apache Software Foundation       
+                  commons-validator.jar                    1.1.4                  Apache License 2.0            The Apache Software Foundation   Commons Validator
+
+jakarta-poi       poi-2.5.1-final-20040804.jar             2.5.1-final-20040804                                                                  
+
+jakarta-taglibs   standard.jar                             1.1.2                                                Apache Software Foundation       JavaServer Pages Standard Tag Library (JSTL)
+
+jboss             jboss-cache.jar                          4.0.2                                                JBoss Inc.                       JBoss
+                  jboss-common.jar                         4.0.2                                                JBoss Inc.                       JBoss
+                  jboss-jmx.jar                            4.0.2                                                JBoss Inc.                       JBoss
+                  jboss-system.jar                         4.0.2                                                JBoss Inc.                       JBoss
+                  jgroups.jar                              4.0.2                                                JBoss Inc.                       JBoss
+
+jdom              jdom.jar                                                                                                                       
+
+jfreechart        gnujaxp.jar                                                     GPL                           Free Software Foundation         
+                  jcommon-1.0.0.jar                        1.0.0                                                                                 
+                  jfreechart-1.0.1.jar                     1.0.1                                                                                 
+
+log4j             log4j-1.2.13.jar                         1.2.13                                                                                
+
+mysql             mysql-connector-java-3.1.12-bin.jar      3.1.12-bin                                                                            
+
+odmg              odmg-3.0.jar                             3.0                                                                                   
+
+quartz            quartz.jar                               1.5.2                                                OpenSymphony                     
+
+smack             smack.jar                                                                                                                      
+                  smackx.jar                                                                                                                     
+
+spring            spring.jar                               1.2.8                                                                                 
+
+struts            antlr.jar                                                                                                                      
+                  jakarta-oro.jar                          oro                    Apache Software License 1.1                                    
+                  struts-el.jar                            el                                                                                    
+                  struts.jar                               1.2.7                  Apache License 2.0            The Apache Software Foundation   Struts Framework
+
+wddx              wddx.jar                                 1.1                                                                                   
+
+wsdl4j            wsdl4j-1.5.2.jar                         1.5.2                                                IBM                              JWSDL
+
+wspolicy          neethi-1.0.1.jar                         1.0.1                  Apache License 2.0            Apache Software Foundation       
+
+xml               jaxen-1.1-beta-8.jar                     1.1-beta-8                                           Codehaus                         Universal Java XPath Engine
+                  jibx-run-1.1-beta3.jar                   1.1-beta3                                                                             
+                  xbean-2.1.0.jar                          2.1.0                                                                                 
+                  xercesImpl-2.7.1.jar                     2.7.1                                                                                 
+                  xml-apis-1.3.02.jar                      1.3.02                                                                                
+                  XmlSchema-1.0.2.jar                      1.0.2                  Apache License 2.0            Apache Software Foundation       XmlSchema API
+
+xstream           jmock-2004-03-19.jar                     2004-03-19                                                                            
+                  joda-time-0.98.jar                       0.98                   Joda Software License 1.0     Joda.org                         Joda Time
+                  stax-1.1.1-dev.jar                       1.1.1-dev                                                                             StAX is the reference implementation of the St...
+                  stax-api-1.0.jar                         1.0                                                                                   
+                  wstx-asl-2.9.3.jar                       2.9.3                                                woodstox.codehaus.org            StAX 1.0 API
+                  xml-writer-0.2.jar                       0.2                                                                                   
+                  xom-1.0b3.jar                            1.0b3                                                                                 
+                  xpp3-1.1.3.4d_b4_min.jar                 1.1.3.4d_b4_min                                                                       
+                  xstream-1.1.jar                          1.1                                                                                   
+
+
+
+Build Related Libraries
+
+Folder           Library                                Version              License   Vendor       Description
+
+catalina         catalina.jar                           4.0.2                          JBoss Inc.   JBoss
+
+httpunit         httpunit.jar                           1.6                                         
+                 js.jar                                                                             
+                 nekohtml.jar                                                                       
+                 Tidy.jar                                                                           
+                 xercesImpl.jar                                                                     
+                 xmlParserAPIs.jar                                                                  
+
+junit            junit.jar                                                                          
+
+middlegen        middlegen-2.1.jar                      2.1                                         
+                 middlegen-hibernate-plugin-2.1.jar     2.1                                         
+                 velocity-1.4-dev.jar                   1.4-dev                                     
+
+strutstestcase   strutstest-2.1.3.jar                   2.1.3                                       
+
+xdoclet          maven-xdoclet-plugin-1.2.3.jar         1.2.3                                       
+                 xdoclet-1.2.3.jar                      1.2.3                                       
+                 xdoclet-apache-module-1.2.3.jar        1.2.3                                       
+                 xdoclet-bea-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-borland-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-caucho-module-1.2.3.jar        1.2.3                                       
+                 xdoclet-de-locale-1.2.3.jar            1.2.3                                       
+                 xdoclet-ejb-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-exolab-module-1.2.3.jar        1.2.3                                       
+                 xdoclet-fr_FR-locale-1.2.3.jar         1.2.3                                       
+                 xdoclet-hibernate-module-1.2.3.jar     1.2.3                                       
+                 xdoclet-hp-module-1.2.3.jar            1.2.3                                       
+                 xdoclet-ibm-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-java-module-1.2.3.jar          1.2.3                                       
+                 xdoclet-jboss-module-1.2.3.jar         1.2.3                                       
+                 xdoclet-jdo-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-jmx-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-jsf-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-libelis-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-macromedia-module-1.2.3.jar    1.2.3                                       
+                 xdoclet-mockobjects-module-1.2.3.jar   1.2.3                                       
+                 xdoclet-mvcsoft-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-mx4j-module-1.2.3.jar          1.2.3                                       
+                 xdoclet-objectweb-module-1.2.3.jar     1.2.3                                       
+                 xdoclet-openejb-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-oracle-module-1.2.3.jar        1.2.3                                       
+                 xdoclet-orion-module-1.2.3.jar         1.2.3                                       
+                 xdoclet-portlet-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-pramati-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-pt_BR-locale-1.2.3.jar         1.2.3                                       
+                 xdoclet-solarmetric-module-1.2.3.jar   1.2.3                                       
+                 xdoclet-spring-module-1.2.3.jar        1.2.3                                       
+                 xdoclet-sun-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-sybase-module-1.2.3.jar        1.2.3                                       
+                 xdoclet-tjdo-module-1.2.3.jar          1.2.3                                       
+                 xdoclet-web-module-1.2.3.jar           1.2.3                                       
+                 xdoclet-webwork-module-1.2.3.jar       1.2.3                                       
+                 xdoclet-wsee-module-1.2.3.jar          1.2.3                                       
+                 xdoclet-xdoclet-module-1.2.3.jar       1.2.3                                       
+                 xjavadoc-1.5-snapshot050611.jar        1.5-snapshot050611                          
+
