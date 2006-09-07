@@ -145,7 +145,9 @@ public class AuthoringUtil implements McAppConstants {
 			logger.debug("setting sln to false");				
 		}
 		
+		mcAuthoringForm.setReflect(mcContent.isReflect()?"1":"0");
 
+		/*
 		if (mcContent.isReflect())
 		{
 			mcAuthoringForm.setReflect(ON);	
@@ -154,6 +156,7 @@ public class AuthoringUtil implements McAppConstants {
 		{
 			mcAuthoringForm.setReflect(OFF);	
 		}
+		*/
 	}
 
     
@@ -1436,10 +1439,32 @@ public class AuthoringUtil implements McAppConstants {
 		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
 			isSln=true;
     	
+		/*
 		logger.debug("isReflect" +  mcAuthoringForm.getReflect());
 		if (mcAuthoringForm.getReflect().equalsIgnoreCase(ON))
-		    isReflect=true;		
+		    isReflect=true;
+		*/
 		
+		
+		/*
+		logger.debug("isReflect:" +  mcAuthoringForm.getReflect());
+		if (mcAuthoringForm.getReflect() != null)
+		{
+			if (mcAuthoringForm.getReflect().equalsIgnoreCase("1"))
+				isReflect=true;
+		}
+		logger.debug("isReflect:" +  isReflect);
+		*/
+		
+		String isReflectStr=request.getParameter("reflect");
+		logger.debug("isReflectStr:" +  isReflectStr);
+		if (isReflectStr != null)
+		{
+		    if (isReflectStr.equals("1"))
+		        isReflect=true;
+		}
+
+
 		
     	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
     	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 

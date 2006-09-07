@@ -2056,12 +2056,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
 				isSln=true;
 		}
-		
-		logger.debug("isReflect" +  mcAuthoringForm.getReflect());
+
+		/*
+		logger.debug("isReflect:" +  mcAuthoringForm.getReflect());
 		if (mcAuthoringForm.getReflect() != null)
 		{
-			if (mcAuthoringForm.getReflect().equalsIgnoreCase(ON))
+			if (mcAuthoringForm.getReflect().equalsIgnoreCase("1"))
 				isReflect=true;
+		}
+		*/
+		String isReflectStr=request.getParameter("reflect");
+		logger.debug("isReflectStr:" +  isReflectStr);
+		if (isReflectStr != null)
+		{
+		    if (isReflectStr.equals("1"))
+		        isReflect=true;
 		}
 
 		
@@ -2251,8 +2260,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			if (mcAuthoringForm.getSln() != null)
 				mcContent.setShowReport(isSln);
 			
-			if (mcAuthoringForm.getReflect() != null)
-				mcContent.setReflect(isReflect);
+			logger.debug("isReflect:" + isReflect);
+			mcContent.setReflect(isReflect);
 			
 
 		    mcContent.setPassMark(new Integer(passmark));
@@ -2349,6 +2358,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
 		mcAuthoringForm.resetUserAction();
+		mcAuthoringForm.resetRadioBoxes();
 		
 		int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));

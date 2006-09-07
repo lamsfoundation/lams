@@ -84,13 +84,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			      			<bean:message key="label.reflect"/>:
 					</td>
 					<td>							
-						<html:radio property="reflect" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
+		      			<html:checkbox property="reflect" value="1"
+							styleClass="noBorder" styleId="reflect">
+						</html:checkbox>
 
-						<html:radio property="reflect" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
 	      			</td>
 		        </tr>
 

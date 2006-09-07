@@ -230,7 +230,7 @@ public class AuthoringUtil implements QaAppConstants {
             if (usernameVisible.equalsIgnoreCase(ON))
             	usernameVisibleBoolean=true;
             
-            if (reflect.equalsIgnoreCase(ON))
+            if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
                 reflectBoolean=true;
         }
         

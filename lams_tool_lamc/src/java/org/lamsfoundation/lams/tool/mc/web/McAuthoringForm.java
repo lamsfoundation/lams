@@ -208,7 +208,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     	this.sln				 =OPTION_OFF;
     	this.showFeedback 		 =OPTION_OFF;
     	this.usernameVisible	 =OPTION_OFF;
-    	this.reflect			 =OPTION_OFF;
+    	this.reflect			 ="0";
 	}
 
 	

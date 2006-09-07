@@ -412,7 +412,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
 	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
 	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
-	    qaAuthoringForm.setReflect(qaContent.isReflect()?ON:OFF);
+	    
+	    logger.debug("QaContent isReflect: " + qaContent.isReflect());
+	    qaAuthoringForm.setReflect(qaContent.isReflect()?"1":"0");
 	    
 	    qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
 	    
