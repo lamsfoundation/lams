@@ -45,12 +45,13 @@ public class AuthoringToolDTO {
 	private Boolean supportsModeration;
 	private Boolean supportsContribute;	
 	private String authoringURL;
+	private String helpURL;
 	
 	public AuthoringToolDTO(Long toolID, Long toolContentID,
 			String description, String toolDisplayName,
 			Boolean supportsDefineLater, Boolean supportsRunOffline,
 			Boolean supportsModeration, Boolean supportsContribute,
-			String authoringURL) {
+			String authoringURL, String helpURL) {
 		super();
 		this.toolID = toolID;
 		this.toolContentID = toolContentID;
@@ -61,6 +62,7 @@ public class AuthoringToolDTO {
 		this.supportsModeration = supportsModeration;
 		this.supportsContribute = supportsContribute;
 		this.authoringURL = authoringURL;
+		this.helpURL = helpURL;
 	}
 	public AuthoringToolDTO(Tool tool){
 		this.toolID = tool.getToolId();
@@ -72,12 +74,20 @@ public class AuthoringToolDTO {
 		this.supportsModeration = new Boolean(tool.getSupportsModeration());
 		this.supportsContribute = new Boolean(tool.getSupportsContribute());
 		this.authoringURL = tool.getAuthorUrl();
+		this.helpURL = tool.getHelpUrl();
 	}
 	/**
 	 * @return Returns the authoringURL.
 	 */
 	public String getAuthoringURL() {
 		return authoringURL;
+	}
+	/**
+	 * 
+	 * @return Return the helpURL.
+	 */
+	public String getHelpURL() {
+		return helpURL;
 	}
 	/**
 	 * @return Returns the description.

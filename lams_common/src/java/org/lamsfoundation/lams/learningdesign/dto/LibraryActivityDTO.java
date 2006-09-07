@@ -55,6 +55,7 @@ public class LibraryActivityDTO extends BaseDTO
 	private String description;
 	private String activityTitle;
 	private String helpText;
+	private String helpURL;
 	private Integer xCoord;
 	private Integer yCoord;
 	private String libraryActivityUIImage;
@@ -175,6 +176,7 @@ public class LibraryActivityDTO extends BaseDTO
 			this.supportsModeration = new Boolean(tool.getSupportsModeration());
 			this.supportsContribute = new Boolean(tool.getSupportsContribute());
 			this.authoringURL = tool.getAuthorUrl();
+			this.helpURL = tool.getHelpUrl();
 	    }
 	     
 	}
@@ -272,6 +274,13 @@ public class LibraryActivityDTO extends BaseDTO
      */
     public String getHelpText() {
         return helpText;
+    }
+    /**
+     * 
+     * @return Return the helpURL
+     */
+    public String getHelpURL() {
+    	return helpURL;
     }
     /**
      * @return Returns the learningDesignID.
@@ -468,6 +477,14 @@ public class LibraryActivityDTO extends BaseDTO
 	/** Set the activity's help text */
 	public void setHelpText(String helpText) {
 		this.helpText = helpText;
+	}
+	
+	/**
+	 * Set the activity's help url
+	 * @param helpURL
+	 */
+	public void setHelpURL(String helpURL) {
+		this.helpURL = helpURL;
 	}
 
 	/** Set the activity's title */

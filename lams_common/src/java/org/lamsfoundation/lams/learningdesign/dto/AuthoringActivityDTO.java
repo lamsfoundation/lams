@@ -63,6 +63,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** Help text for the activity*/
 	private String helpText;
 
+	/** Help URL for the activity */
+	private String helpURL;
+	
 	/** UI specific attribute indicating the
 	 * position of the activity*/
 	private Integer xCoord;
@@ -908,6 +911,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setModerationURL(String moderationURL) {
 		this.moderationURL = moderationURL;
+	}
+	public String getHelpURL(){
+		return helpURL;
+	}
+	public void setHelpURL(String helpURL) {
+		this.helpURL = helpURL;
 	}
 	public String getToolSignature() {
 		return toolSignature;
