@@ -71,13 +71,14 @@ j_security_login_page
 						</div>
 					</c:if>	
 				 <p class="first"><fmt:message key="label.username"/>: 
-				   <input name="j_username" type="text" size="16" width="130px" tabindex="1"/>
+				   <input name="j_username" type="text" size="16" style="width:125px" tabindex="1"/>
 				  </p>
 				 <p><fmt:message key="label.password"/>: 
-				   <input name="j_password" type="password" size="16" width="130px" autocomplete="off" tabindex="2"/>
+				   <input name="j_password" type="password" size="16" style="width:125px" autocomplete="off" tabindex="2"/>
 				  </p>
-					
-					 <p><input type="submit" class="button" value="<fmt:message key="button.login"/>" onClick="javascript:submitForm()" tabindex="3"/></p>
+					<p class="login-button">
+					 <input type="submit" class="button" value="<fmt:message key="button.login"/>" onClick="javascript:submitForm()" tabindex="3"/>
+					 </p>
 				</form>	 
 				</div><!--closes right col-->
 	 
