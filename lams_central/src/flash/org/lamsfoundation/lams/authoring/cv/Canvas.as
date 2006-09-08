@@ -1154,6 +1154,26 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	}
 	
+	/**
+	 * Open the Help page for the selected Tool (Canvas) Activity
+	 *  
+	 * @param   ca 	CanvasActivity
+	 * @return  
+	 */
+	
+	public function getHelp(ca:CanvasActivity) {
+
+		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
+			Debugger.log("Opening help page with locale " + _root.lang + _root.country + ": " + ca.activity.helpURL,Debugger.GEN,'getHelp','Canvas');
+			
+			var locale:String = _root.lang + _root.country;
+			
+			getURL(ca.activity.helpURL + "#" + ca.activity.toolSignature + "-" + locale, '_blank');
+		} else {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_helpURL_undefined', [ca.activity.toolDisplayName]));
+		}
+	}
+	
 	public function get toolActivityWidth():Number{
 		return toolActWidth;
 	}
