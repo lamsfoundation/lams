@@ -167,7 +167,7 @@ VALUES (1, 'en', 'AU', 'English (Australia)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (2, 'es', 'ES', 'Español', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (3, 'mi', 'NZ', 'M�?ori', 'LTR');
+VALUES (3, 'mi', 'NZ', 'Māori', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (4, 'de', 'DE', 'Deutsch', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
@@ -189,7 +189,7 @@ VALUES (12, 'pt', 'BR', 'Português (Brasil)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (13, 'hu', 'HU', 'Magyar', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
-VALUES (14, 'bg', 'BG', 'Българ�?ки', 'LTR');
+VALUES (14, 'bg', 'BG', 'Български', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (15, 'cy', 'GB', 'Cymraeg (Cymru)', 'LTR');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
@@ -216,3 +216,4 @@ INSERT INTO lams_tool_import_support VALUES (12, 'lantbk11', 'journal');
 -- external server mapping to a lams organisation
 INSERT INTO lams_ext_server_org_map VALUES
   (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','http://dummy','\0',7);
+
