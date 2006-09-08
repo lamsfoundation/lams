@@ -580,7 +580,7 @@ public class LD102Importer implements ApplicationContextAware{
 		
 	}
 
-	/** Assume that this is either a "do something on one task/multi-task, reflect on it another multitask" 
+	/** Assume that this is either a "do something on one task/multi-task, 	 on it another multitask" 
 	 * e.g. Chat & Scribe + Notebook Scribe + Notebook
 	 * or a "do something and view the results on another page" e.g. Voting.
 	 * <p>
@@ -593,7 +593,7 @@ public class LD102Importer implements ApplicationContextAware{
 	 */ 
 	private Activity createTwoPartActivity(Hashtable activityDetails, Integer activityUIID, Long nextTransition, Integer xCoOrd, Integer yCoOrd, String title, String description, List taskTransitions) throws WDDXProcessorConversionException {
 		Activity realTask = null;
-		Activity reflectiveTask = null;
+		Activity protentialReflectiveTask = null;
 		String[] reflectiveText = null; // 2 entries: 0 title, 1 description
 
 		Integer firstTaskId = getFirstTaskId(activityDetails, title, taskTransitions);
@@ -619,7 +619,7 @@ public class LD102Importer implements ApplicationContextAware{
 					// create the activity that we keep
 					realTask = createActivityFromTask(task, nextTransition, xCoOrd, yCoOrd, activityUIID, title, description);
 					// one of the sub-activities may be reflective
-					reflectiveTask = findReflectiveTask(realTask, reflectiveTask, task, objectType, toolType);
+					protentialReflectiveTask = findPotentialReflectiveTask(realTask, task, objectType, toolType);
 					
 				} else {
 					
@@ -635,9 +635,9 @@ public class LD102Importer implements ApplicationContextAware{
 			String message = "Couldn't find the \"real\" activity inside "+title+". This activity will be missing from the sequence. Activity "+activityDetails;
 			log.warn(message);
 			toolsErrorMsgs.add(message);
-		} else if ( reflectiveTask != null ) {
+		} else if ( protentialReflectiveTask != null && reflectiveText != null ) {
 	    	try {
-	    		ToolActivity toolActivity = (ToolActivity) reflectiveTask;
+	    		ToolActivity toolActivity = (ToolActivity) protentialReflectiveTask;
 			    ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(toolActivity.getTool().getServiceName());
 		    	toolService.setReflectiveData(toolActivity.getToolContentId(), reflectiveText[0], reflectiveText[1]);
 	    	} catch ( Exception e ) {
@@ -650,7 +650,20 @@ public class LD102Importer implements ApplicationContextAware{
 		return realTask;
 	}
 
-	private Activity findReflectiveTask(Activity realTask, Activity reflectiveTask, Hashtable task, String objectType, String toolType) throws WDDXProcessorConversionException {
+	
+	/** Find the task that may be a reflective task. Finds the task that has output content - this will be to display it on a noticeboard.
+	 * Q&A always displays on a noticeboard, irrespective of whether or not there is reflection, hence it is a potentially reflective task. 
+	 * 
+	 * @param realTask
+	 * @param reflectiveTask
+	 * @param task
+	 * @param objectType
+	 * @param toolType
+	 * @return
+	 * @throws WDDXProcessorConversionException
+	 */
+	private Activity findPotentialReflectiveTask(Activity realTask, Hashtable task, String objectType, String toolType) throws WDDXProcessorConversionException {
+		Activity reflectiveTask = null; 
 		Integer outputContentTaskId  = null;
 		if ( isMultiTask(objectType, toolType) ) {
 			outputContentTaskId = WDDXProcessor.convertToInteger(task, WDDXTAGS102.MTASK_OUTPUT_CONTENT_TASK);
@@ -670,9 +683,9 @@ public class LD102Importer implements ApplicationContextAware{
 		return reflectiveTask;
 	}
 
-	/** If a journal entry exists, return the title and description. If it doesn't, return ["",""] */
+	/** If a journal entry exists, return the title and description. If it doesn't, return null */
 	private String[] getReflectiveText(String title, Hashtable task) throws WDDXProcessorConversionException {
-		String[] reflectiveText = new String[2];
+		String[] reflectiveText = null;
 		List subTasks = (List) task.get(WDDXTAGS102.MTASK_SUBTASKS);
 		Integer journalTaskInputContentId = null;
 		if ( subTasks != null ) {
@@ -691,12 +704,10 @@ public class LD102Importer implements ApplicationContextAware{
 		} 
 		
 		if ( journalContent != null ) {
+			reflectiveText = new String[2];
 			reflectiveText[0] = (String) journalContent.get(WDDXTAGS102.TITLE);
 			reflectiveText[1] = (String) journalContent.get(WDDXTAGS102.CONTENT_BODY);
-		} else {
-			reflectiveText[0] = "";
-			reflectiveText[1] = "";
-		}
+		} 
 		return reflectiveText;
 	}
 
