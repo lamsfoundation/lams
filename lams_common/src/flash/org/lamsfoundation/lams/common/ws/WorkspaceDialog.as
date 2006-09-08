@@ -113,7 +113,7 @@ class WorkspaceDialog extends MovieClip{
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         _resultDTO = new Object();
-		this.tabEnabled = true
+		//this.tabEnabled = true
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
