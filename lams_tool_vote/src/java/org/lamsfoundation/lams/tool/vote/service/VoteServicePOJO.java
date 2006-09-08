@@ -2642,9 +2642,8 @@ public class VoteServicePOJO implements
     	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
-    	// TODO add reflection
-    	//toolContentObj.setReflectInstructions(null);
-    	//toolContentObj.setReflectOnActivity(Boolean.FALSE);
+    	toolContentObj.setReflectionSubject(null);
+    	toolContentObj.setReflect(Boolean.FALSE);
     	toolContentObj.setRunOffline(Boolean.FALSE);
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	
@@ -2702,9 +2701,8 @@ public class VoteServicePOJO implements
 	       			+" as the tool content does not exist.");
     	}
     	
-    	// TODO add reflection
-    	// qaContent.setReflectOnActivity(Boolean.TRUE);
-    	// qaContent.setReflectInstructions(description);
+    	toolContentObj.setReflect(Boolean.TRUE);
+    	toolContentObj.setReflectionSubject(description);
     }
     
 	public Long createNotebookEntry(Long id, Integer idType, String signature,

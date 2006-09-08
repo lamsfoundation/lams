@@ -2092,9 +2092,8 @@ public class QaServicePOJO
     	toolContentObj.setInstructions(null);
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
-    	// TODO add reflection
-    	//toolContentObj.setReflectInstructions(null);
-    	//toolContentObj.setReflectOnActivity(Boolean.FALSE);
+ 	    toolContentObj.setReflect(Boolean.FALSE);
+    	toolContentObj.setReflectionSubject(null);
     	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	toolContentObj.setQaContentId(toolContentId);
@@ -2143,9 +2142,8 @@ public class QaServicePOJO
 	       			+" as the tool content does not exist.");
     	}
     	
-    	// TODO add reflection
-    	// qaContent.setReflectOnActivity(Boolean.TRUE);
-    	// qaContent.setReflectInstructions(description);
+    	qaContent.setReflect(Boolean.TRUE);
+    	qaContent.setReflectionSubject(description);
     }
     
     //=========================================================================================

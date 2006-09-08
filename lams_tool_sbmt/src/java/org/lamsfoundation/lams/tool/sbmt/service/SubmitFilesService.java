@@ -795,7 +795,9 @@ public class SubmitFilesService implements ToolContentManager,
     	toolContentObj.setUpdated(now);
     	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
     	toolContentObj.setLockOnFinished(Boolean.TRUE);  
-    	
+		toolContentObj.setReflectOnActivity(Boolean.FALSE);
+	    toolContentObj.setReflectInstructions(null);
+
 		SubmitUser suser = createContentUser(user, toolContentId);
     	toolContentObj.setCreatedBy(suser);
     	
@@ -816,9 +818,8 @@ public class SubmitFilesService implements ToolContentManager,
 	       			+" as the tool content does not exist.");
     	}
 
-    	// TODO Share Resources doesn't support reflection yet!
-    	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
-    	// toolContentObj.setReflectInstructions(description);
+    	toolContentObj.setReflectOnActivity(Boolean.TRUE);
+    	toolContentObj.setReflectInstructions(description);
     }
 
     public SubmitUser getUserByUid(Long learnerID){

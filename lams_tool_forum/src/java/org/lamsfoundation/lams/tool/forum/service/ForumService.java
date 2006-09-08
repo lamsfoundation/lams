@@ -851,7 +851,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	    	toolContentObj.setDefineLater(Boolean.FALSE);
 	    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
 	    	toolContentObj.setLimitedChar(5000); // this is the default value
-	    	
+   	    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
+	    	toolContentObj.setReflectInstructions(null);
+
 	    	// lockOnFinsh = ! isReusable
 	    	Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_MB_REUSABLE);
 	    	toolContentObj.setLockWhenFinished(bool != null ? ! bool.booleanValue() : false);
@@ -919,7 +921,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
    /** Set the description, throws away the title value as this is not supported in 2.0 */
-   public void setReflectiveData(Long toolContentId, String title, String defaultInputValues) 
+   public void setReflectiveData(Long toolContentId, String title, String description) 
     		throws ToolException, DataMissingException {
    
 	   Forum toolContentObj = getForumByContentId(toolContentId);
@@ -929,9 +931,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	       			+" as the tool content does not exist.");
     	}
 
-       	// TODO Forum doesn't support reflection yet!
-    	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
-    	// toolContentObj.setReflectInstructions(description);
+    	toolContentObj.setReflectOnActivity(Boolean.TRUE);
+    	toolContentObj.setReflectInstructions(description);
     }
 
     //***************************************************************************************************************

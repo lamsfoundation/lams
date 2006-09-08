@@ -1006,6 +1006,8 @@ public class ResourceServiceImpl implements
 	    	toolContentObj.setOnlineInstructions(null);
 	    	toolContentObj.setRunOffline(Boolean.FALSE);
 	    	toolContentObj.setUpdated(now);
+   	    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
+	    	toolContentObj.setReflectInstructions(null);
 
 	    	toolContentObj.setRunAuto(Boolean.FALSE);
 	    	Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_FILE);
@@ -1106,9 +1108,8 @@ public class ResourceServiceImpl implements
 	       			+" as the tool content does not exist.");
     	}
 
-    	// TODO Share Resources doesn't support reflection yet!
-    	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
-    	// toolContentObj.setReflectInstructions(description);
+    	toolContentObj.setReflectOnActivity(Boolean.TRUE);
+    	toolContentObj.setReflectInstructions(description);
     }
 
     
