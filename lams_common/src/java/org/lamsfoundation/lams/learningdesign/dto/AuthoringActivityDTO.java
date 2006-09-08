@@ -348,6 +348,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.monitoringURL = toolActivity.getTool().getMonitorUrl();
 		this.contributeURL = toolActivity.getTool().getContributeUrl();
 		this.moderationURL = toolActivity.getTool().getModerationUrl();
+		this.helpURL = toolActivity.getTool().getHelpUrl();
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 	}
 	private void addGateActivityAttributes(Object activity){

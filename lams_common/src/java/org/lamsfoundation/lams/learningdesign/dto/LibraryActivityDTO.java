@@ -73,6 +73,7 @@ public class LibraryActivityDTO extends BaseDTO
 	private Long toolContentID;
 	private String toolDisplayName;
 	private String toolLanguageFile;
+	private String toolSignature;
 	private Boolean supportsDefineLater;
 	private Boolean supportsRunOffline;
 	private Boolean supportsModeration;
@@ -171,6 +172,7 @@ public class LibraryActivityDTO extends BaseDTO
 			this.toolContentID = new Long(tool.getDefaultToolContentId());
 			this.toolDisplayName = tool.getToolDisplayName();
 			this.toolLanguageFile = tool.getLanguageFile();
+			this.toolSignature = tool.getToolSignature();
 			this.supportsDefineLater = new Boolean(tool.getSupportsDefineLater());
 			this.supportsRunOffline = new Boolean(tool.getSupportsRunOffline());
 			this.supportsModeration = new Boolean(tool.getSupportsModeration());
@@ -400,6 +402,14 @@ public class LibraryActivityDTO extends BaseDTO
     }
     
     /**
+     * 
+     * @return Returns the toolSignature
+     */
+    public String getToolSignature() {
+		return toolSignature;
+	}
+    
+    /**
      * @return Returns the gateActivityLevelID.
      */
     public Integer getGateActivityLevelID() {
@@ -495,6 +505,14 @@ public class LibraryActivityDTO extends BaseDTO
 	/** Set the tool's display name (similar to title) */
 	public void setToolDisplayName(String toolDisplayName) {
 		this.toolDisplayName = toolDisplayName;
+	}
+	
+	/** Set the tool's signature 
+	 *	@param toolSignature 
+	 */
+	
+	public void setToolSignature(String toolSignature) {
+		this.toolSignature = toolSignature;
 	}
 
 

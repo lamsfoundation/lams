@@ -89,7 +89,7 @@ class CustomContextMenu {
 		menuArr[1] = ["Copy Activity", getCopy, false, v, true];
 		menuArr[2] = ["Paste Activity",getPaste, false, v, true];
 		menuArr[3] = ["Property Inspector...",getPI, true, true, true];
-		menuArr[4] = ["Author Help",getPaste, true, false, true];
+		menuArr[4] = ["Author Help",getHelp, true, v, true];
 		
 		for (var i=0; i<menuArr.length; i++){
 			var myObj:Object = new Object();
@@ -144,4 +144,8 @@ class CustomContextMenu {
 		Application.getInstance().expandPI();
 		
 	}		
+	
+	public function getHelp(){
+		Application.getInstance().help();
+	}
 }
