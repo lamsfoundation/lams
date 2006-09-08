@@ -88,10 +88,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				trace("Parallel Children are: "+ parentAct.activityTypeID.length)
 				
-				 _canvasModel.selectedItem = ca;
+				 //_canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = false;
 			} else {
-				_canvasModel.selectedItem = ca;
+				//_canvasModel.selectedItem = ca;
 				_canvasModel.isDragging = true;
 				ca.startDrag(false);
 			}
@@ -129,6 +129,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
     public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
 	    _canvasModel.getCanvas().stopActiveTool();
+		_canvasModel.selectedItem = ca;
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
