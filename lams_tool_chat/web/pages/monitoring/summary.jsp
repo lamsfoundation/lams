@@ -46,7 +46,8 @@
 					<c:otherwise>
 						<c:forEach var="message" items="${session.messageDTOs}">
 							<span style="font-weight: bold"> ${message.from}</span>
-								${message.body}
+								<lams:out value="${message.body}"></lams:out>
+								
 								<br />
 						</c:forEach>
 

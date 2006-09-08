@@ -114,11 +114,6 @@ public class LearningAction extends LamsDispatchAction {
 		}
 
 		request.setAttribute("MODE", mode.toString());
-		
-		// check runOffline
-		if (chat.getRunOffline()) {
-			return mapping.findForward("runOffline");
-		}
 
 		// Create the room if it doesnt exist
 		if (chatSession.getJabberRoom() == null) {
@@ -151,8 +146,14 @@ public class LearningAction extends LamsDispatchAction {
 			chat.setContentInUse(new Boolean(true));
 			chatService.saveOrUpdateChat(chat);
 		}
-
+		
+		// check runOffline
+		if (chat.getRunOffline()) {
+			return mapping.findForward("runOffline");
+		}
+		
 		return mapping.findForward("chat_client");
+		
 	}
 
 	private ChatUser getCurrentUser(Long toolSessionId) {
