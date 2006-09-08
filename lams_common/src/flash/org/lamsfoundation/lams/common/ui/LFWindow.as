@@ -54,6 +54,7 @@ class LFWindow extends Window{
     
     //Private vars
     private var resize_mc:MovieClip;					//Clip clicked on for resize 
+	private var viewResize:Boolean;
     private var _scrollContentPath:String;				//Main content of the LFWindow within a scrollpane
     private var _helpButtonHandler:Function;            //Called when help button clicked
     private var _help_btn:Button;                        //Help button reference
@@ -65,9 +66,11 @@ class LFWindow extends Window{
     function LFWindow() {
     }
     
-	public function init(Void):Void {
+	public function init():Void {
         //trace('init');
  	    super.init();
+		
+		
 		//LFWindow contains a scroll pane which contains the content.
         contentPath = 'ScrollPane';
 
@@ -88,6 +91,10 @@ class LFWindow extends Window{
 
 		//Assign scroll pane content
 		content.contentPath = _scrollContentPath;
+		
+		if (_scrollContentPath = "AboutLams"){
+			resize_mc._visible = false
+		}
 
 		//Assign reference to container (this) acessible in dialog
 		content.content.container = this;
@@ -109,6 +116,7 @@ class LFWindow extends Window{
         //Add extra buttons as required
         
         //Attach resize and set up resize handling 
+		//resize_mc._visible = viewResize
         resize_mc = this.createChildAtDepth('resize',DepthManager.kTop);
         resize_mc.resize_btn.useHandCursor = false;
 
