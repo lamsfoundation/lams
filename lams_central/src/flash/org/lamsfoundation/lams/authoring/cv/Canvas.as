@@ -183,7 +183,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     */
     public function openAboutLams() {
 		
-        var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS Author",closeButton:true,scrollContentPath:'AboutLams', sNumber:ApplicationParent.SERIAL_NO});
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS",closeButton:true,scrollContentPath:'AboutLams', sNumber:ApplicationParent.SERIAL_NO});
 		var lo = new Object();
 		lo.click = function(){
 		  dialog.deletePopUp();
