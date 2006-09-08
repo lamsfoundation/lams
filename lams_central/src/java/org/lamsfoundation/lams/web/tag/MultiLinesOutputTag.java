@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
  *
  */
 public class MultiLinesOutputTag extends SimpleTagSupport{
-	private static String os = (String) System.getProperties().get("os.name");
+//	private static String os = (String) System.getProperties().get("os.name");
 	
 	private String value;
 	
@@ -27,9 +27,9 @@ public class MultiLinesOutputTag extends SimpleTagSupport{
 			getJspContext().getOut().write(value);
 		
 		//change back
-		if(os.toLowerCase().indexOf("win") != -1)
-			value = value.replaceAll("\r\n","<BR>");
-		else
+//		if(os.toLowerCase().indexOf("win") != -1)
+//			value = value.replaceAll("\r\n","<BR>");
+//		else
 			value = value.replaceAll("\n","<BR>");
 		getJspContext().getOut().write(value.toString());
 	}
