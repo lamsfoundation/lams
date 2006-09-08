@@ -388,7 +388,8 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.helpItem :
 				break;
 			case eventObj.menu.aboutItem :
-				LFMessage.showMessageAlert("Serial No: " + ApplicationParent.SERIAL_NO);
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().openAboutLams();
+				//LFMessage.showMessageAlert("Serial No: " + ApplicationParent.SERIAL_NO);
 				break;
 		}
 	}
