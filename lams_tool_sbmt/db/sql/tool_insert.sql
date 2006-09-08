@@ -23,6 +23,7 @@ export_pfolio_learner_url,
 export_pfolio_class_url,
 contribute_url,
 moderation_url,
+help_url,
 language_file,
 create_date_time
 )
@@ -49,6 +50,7 @@ NULL,
 'tool/lasbmt11/exportPortfolio?mode=teacher',
 'tool/lasbmt11/contribute.do',
 'tool/lasbmt11/moderation.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/lasbmt11',
 'org.lamsfoundation.lams.tool.sbmt.ApplicationResources',
 NOW()
 );

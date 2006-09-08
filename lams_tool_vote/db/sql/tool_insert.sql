@@ -44,6 +44,7 @@ export_pfolio_learner_url,
 export_pfolio_class_url,
 contribute_url,
 moderation_url,
+help_url,
 language_file,
 create_date_time
 )
@@ -70,6 +71,7 @@ NULL,
 'tool/lavote11/exportPortfolio?mode=teacher',
 'tool/lavote11/monitoringStarter.do',
 'tool/lavote11/monitoringStarter.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/lavote11',
 'org.lamsfoundation.lams.tool.vote.ApplicationResources',
 NOW()
 )

@@ -25,6 +25,7 @@ export_pfolio_learner_url,
 export_pfolio_class_url,
 contribute_url,
 moderation_url,
+help_url,
 language_file,
 create_date_time
 )
@@ -51,6 +52,7 @@ NULL,
 'tool/larsrc11/exportPortfolio?mode=teacher',
 'tool/larsrc11/contribute.do',
 'tool/larsrc11/moderate.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11',
 'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',
 NOW()
 )

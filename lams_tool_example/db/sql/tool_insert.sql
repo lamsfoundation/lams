@@ -23,6 +23,7 @@ export_pfolio_learner_url,
 export_pfolio_class_url,
 contribute_url,
 moderation_url,
+help_url,
 language_file,
 create_date_time
 )
@@ -49,6 +50,7 @@ NULL,
 'tool/laex11/exportPortfolio?mode=teacher',
 'tool/laex11/contribute.do',
 'tool/laex11/moderate.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/laex11',
 'org.lamsfoundation.lams.tool.example.ApplicationResources',
 NOW()
 )

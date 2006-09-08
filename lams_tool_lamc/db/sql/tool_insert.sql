@@ -23,6 +23,7 @@ export_pfolio_learner_url,
 export_pfolio_class_url,
 contribute_url,
 moderation_url,
+help_url,
 language_file,
 create_date_time
 )
@@ -49,6 +50,7 @@ NULL,
 'tool/lamc11/exportPortfolio?mode=teacher',
 'tool/lamc11/monitoringStarter.do',
 'tool/lamc11/monitoringStarter.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/lamc11',
 'org.lamsfoundation.lams.tool.mc.ApplicationResources',
 NOW()
 )
