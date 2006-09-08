@@ -74,7 +74,7 @@
 
 			<br />
 			<c:if test="${MODE == 'learner' || MODE == 'author'}">
-				<%@ include file="part/finishButton.jsp"%>
+				<%@ include file="parts/finishButton.jsp"%>
 
 			</c:if>
 		</div>
