@@ -45,10 +45,10 @@
 					</c:when>
 					<c:otherwise>
 						<c:forEach var="message" items="${session.messageDTOs}">
-							<span style="font-weight: bold"> ${message.from}</span>
+							<div class="message">
+								<div class="messageFrom"> ${message.from} </div>
 								<lams:out value="${message.body}"></lams:out>
-								
-								<br />
+							</div>
 						</c:forEach>
 
 					</c:otherwise>

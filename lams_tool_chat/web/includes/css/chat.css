@@ -1,4 +1,19 @@
-/* LEARNING PAGE STYLES */
+/* ==================== COMMON ==================== */
+.message {
+	padding-bottom: 4px;
+}
+
+.private_message {
+	font-style: italic;
+	background-color: #e6e6fa;
+}
+
+.messageFrom {
+	font-weight: bold;
+}
+
+
+/* ==================== LEARNING PAGE STYLES ==================== */
 
 #chat_content {
 	width: 560px;
@@ -32,19 +47,6 @@
 	padding: 2px;
 }
 
-.message {
-	padding-bottom: 4px;
-}
-
-.private_message {
-	font-style: italic;
-	background-color: #e6e6fa;
-}
-
-.messageFrom {
-	font-weight: bold;
-}
-
 .selected {
 	background-color: lime;
 	padding: 2px;
@@ -60,5 +62,3 @@
 #msgArea {
 	width: 410px;
 }
-
-/* END LEARNING PAGE STYLES */

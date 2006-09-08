@@ -41,13 +41,13 @@ function closeEditPane() {
 				<c:if test="${message.hidden}">
 					<c:set var="hiddenStyle" value="color: graytext" />
 				</c:if>
-
-				<div onclick="javascript:toggleEditPane('u${message.uid}')" style="${hiddenStyle}">
-					<span style="font-weight: bold;"> ${message.from}</span>
-					<br />
-					${message.body}
-					<img src="${tool}images/edit.gif" alt="edit" />
+				
+				<div class="message" onclick="javascript:toggleEditPane('u${message.uid}')" style="${hiddenStyle}">
+					<div class="messageFrom"> ${message.from} </div>
+					<lams:out value="${message.body}"></lams:out>
+					<img src="images/edit.gif" alt="edit" />
 				</div>
+				
 				<div id="u${message.uid}" style="display: none;border: thin solid; background: infoBackground ;padding: 8px;">
 					<html:form action="/monitoring" method="post">
 						<html:hidden property="dispatch" value="editMessage" />
