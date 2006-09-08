@@ -17,7 +17,7 @@ function toggleEditPane(paneID) {
 	if (!(currentPaneID == null)) {
 		closeEditPane();
 	}
-	document.getElementById(paneID).style.display = "";
+	document.getElementById(paneID).style.display = "block";
 	currentPaneID = paneID;
 }
 
@@ -52,8 +52,7 @@ function closeEditPane() {
 					<img src="images/edit.gif" alt="edit" />
 				</div>
 
-				<div id="u${message.uid}"
-					style="display: none;border: thin solid; background: infoBackground ;padding: 8px;">
+				<div id="u${message.uid}" class="edit-pane">
 					<html:form action="/monitoring" method="post">
 						<html:hidden property="dispatch" value="editMessage" />
 						<html:hidden property="toolSessionID" value="${session.sessionID}" />
