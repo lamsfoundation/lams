@@ -178,7 +178,19 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         }
     }
 	
-	
+	/**
+    * Opens the help->about dialog
+    */
+    public function openAboutLams() {
+		
+        var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS Author",closeButton:true,scrollContentPath:'AboutLams', sNumber:ApplicationParent.SERIAL_NO});
+		var lo = new Object();
+		lo.click = function(){
+		  dialog.deletePopUp();
+		}
+		dialog.addEventListener("click", lo);
+	}
+
 	
 	/**
 	* Opens a design using workspace and user to select design ID
