@@ -41,36 +41,50 @@ function closeEditPane() {
 				<c:if test="${message.hidden}">
 					<c:set var="hiddenStyle" value="color: graytext" />
 				</c:if>
-				
-				<div class="message" onclick="javascript:toggleEditPane('u${message.uid}')" style="${hiddenStyle}">
-					<div class="messageFrom"> ${message.from} </div>
+
+				<div class="message"
+					onclick="javascript:toggleEditPane('u${message.uid}')"
+					style="${hiddenStyle}">
+					<div class="messageFrom">
+						${message.from}
+					</div>
 					<lams:out value="${message.body}"></lams:out>
 					<img src="images/edit.gif" alt="edit" />
 				</div>
-				
-				<div id="u${message.uid}" style="display: none;border: thin solid; background: infoBackground ;padding: 8px;">
+
+				<div id="u${message.uid}"
+					style="display: none;border: thin solid; background: infoBackground ;padding: 8px;">
 					<html:form action="/monitoring" method="post">
 						<html:hidden property="dispatch" value="editMessage" />
 						<html:hidden property="toolSessionID" value="${session.sessionID}" />
 						<html:hidden property="messageUID" value="${message.uid}" />
 
-						<c:set var="checked" value="" />
-						<c:if test="${message.hidden}">
-							<c:set var="checked" value="checked='checked'" />
-						</c:if>
-						<input id="cb${message.uid}" name="messageHidden" type="checkbox" <c:out value="${checked}"/> />
+						<c:choose>
+							<c:when test="${message.hidden}">
+								<input id="cb${message.uid}" name="messageHidden"
+									type="checkbox" checked="checked" />
+							</c:when>
+							<c:otherwise>
+								<input id="cb${message.uid}" name="messageHidden"
+									type="checkbox" />
+							</c:otherwise>
+						</c:choose>
+
 						<label for="cb${message.uid}">
 							<fmt:message>chatHistory.hideMessage</fmt:message>
 						</label>
 						<br />
 
-						<html:textarea property="messageBody" value="${message.body}" cols="80" rows="3" />
+						<html:textarea property="messageBody" value="${message.body}"
+							cols="80" rows="3" />
 						<br />
 
 						<html:submit styleClass="button">
 							<fmt:message>button.save</fmt:message>
 						</html:submit>
-						<html:button property="dispatch" onclick="javascript:toggleEditPane('u${message.uid}')" styleClass="button">
+						<html:button property="dispatch"
+							onclick="javascript:toggleEditPane('u${message.uid}')"
+							styleClass="button">
 							<fmt:message>button.cancel</fmt:message>
 						</html:button>
 					</html:form>
