@@ -1,9 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div id="header">
-
-	<!--  TITLE KEY PAGE GOES HERE -->
-
 	<lams:Tabs>
 		<lams:Tab id="1" key="button.summary" />
 		<lams:Tab id="2" key="button.instructions" />
