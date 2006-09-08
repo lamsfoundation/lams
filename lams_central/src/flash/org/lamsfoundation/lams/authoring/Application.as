@@ -637,6 +637,13 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			_canvas.model.setPIHeight(_PI.piFullHeight());
 		}
 	}
+	
+	public function help():Void{
+		var ca = _canvas.model.selectedItem
+		if (CanvasActivity(ca) != null){
+			_canvas.getHelp(ca);
+		}
+	}
     
 	/**
 	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
@@ -676,7 +683,14 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         return _workspace;
     }
 
-   
+   /**
+    * Opens the help->about dialog
+    */
+    public function showAboutDialog() {
+        var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS Author",closeButton:true,scrollContentPath:'helpaboutDialog'});
+		//dialog.addEventListener('contentLoaded',);
+		// dict: title:Dictionary.getValue('ls_win_helpabout_title')
+    }
     
 	 /**
     * Returns the Dialogue conatiner mc
