@@ -130,8 +130,6 @@ class PropertyInspectorNew extends MovieClip{
 		
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
-		
-		
 		//_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
 	
@@ -186,6 +184,9 @@ class PropertyInspectorNew extends MovieClip{
 		
 		this.onEnterFrame = setupLabels;
 		
+		this.tabChildren = true;
+		setTabIndex();
+		
 	}
 	
 	public function setupLabels(){
@@ -231,7 +232,7 @@ class PropertyInspectorNew extends MovieClip{
 		//hide all the controls at startup
 		
 		delimitLine._visible = false;
-		hideAllSpeppers(false);
+		hideAllSteppers(false);
 		showGroupingControls(false);
 		showGeneralControls(false);
 		showOptionalControls(false);
@@ -242,7 +243,7 @@ class PropertyInspectorNew extends MovieClip{
 		
 		dispatchEvent({type:'load',target:this});
 	}
-	private function hideAllSpeppers(v):Void{ 
+	private function hideAllSteppers(v):Void{ 
 		hours_stp.visible = v
 		mins_stp.visible = v
 		endHours_stp.visible = v
@@ -252,6 +253,39 @@ class PropertyInspectorNew extends MovieClip{
 		numLearners_stp.visible = v
 		minAct_stp.visible = v
 		maxAct_stp.visible = v
+	}
+	
+	private function setTabIndex(selectedTab:String){
+		
+		//Tool Activities
+		title_txt.tabIndex = 1
+		applied_grouping_lbl.tabIndex = 2
+		appliedGroupingActivity_cmb.tabIndex = 2
+		runOffline_chk.tabIndex = 3
+		defineLater_chk.tabIndex = 4
+		
+		//Optional Activities
+		desc_txt.tabIndex = 2
+		minAct_stp.tabIndex = 3
+		maxAct_stp.tabIndex = 4
+		
+		//Gate Activities
+		//gateType_cmb.enabled = true
+		gateType_cmb.tabIndex = 2
+		hours_stp.tabIndex = 3
+		mins_stp.tabIndex = 4
+		endHours_stp.tabIndex = 5
+		endMins_stp.tabIndex = 6
+		
+		//Grouping Activities
+		//groupType_cmb.enabled = true
+		groupType_cmb.tabIndex = 2
+		numGroups_stp.tabIndex = 3
+		numGroups_rdo.tabIndex = 4
+		numRandomGroups_stp.tabIndex = 5
+		numLearners_rdo.tabIndex = 6
+		numLearners_stp.tabIndex = 7
+		
 	}
 	
 	public function localOnRelease():Void{
@@ -296,7 +330,9 @@ class PropertyInspectorNew extends MovieClip{
 	   
 	   switch (event.updateType){
             case 'SELECTED_ITEM' :
+				title_txt.setFocus();
                 updateItemProperties(cm);
+
                 break;
                    
 				
