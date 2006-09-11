@@ -47,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<%@ include file="/common/header.jsp"%>
 		<%@ include file="/common/fckeditorheader.jsp"%>
-		
+
 		<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
 			<script language="JavaScript" type="text/JavaScript">
 		        function init(){
@@ -72,8 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if> 
 
 		<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-			   (sessionScope.defineLaterInEditMode == 'true') &&  
-			   (sessionScope.editOptionsMode != 1)   			
+			   (sessionScope.defineLaterInEditMode == 'false') 
 			  }"> 			
 			<script language="JavaScript" type="text/JavaScript">
 		        function init(){
@@ -85,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			    		selectTab(tag.value);
 		            else
 		                selectTab(1); //select the default tab;
-		            
+		        
 		            initEditor("richTextTitle");
 		            initEditor("richTextInstructions");
 			   }     
@@ -93,8 +92,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if> 
 
 		<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-			   (sessionScope.defineLaterInEditMode == 'true') &&  
-			   (sessionScope.editOptionsMode == 1)   			   
+			   (sessionScope.defineLaterInEditMode == 'true') &&
+   			   (sessionScope.editOptionsMode != 1)   			
 			  }"> 			
 			<script language="JavaScript" type="text/JavaScript">
 			  function init(){
@@ -106,7 +105,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			    		selectTab(tag.value);
 		            else
 		                selectTab(1); //select the default tab;
+		                
+			   }     
+			</script>
+		</c:if> 			
+			
+		<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+			   (sessionScope.defineLaterInEditMode == 'true') &&
+   			   (sessionScope.editOptionsMode == 1)   			
+			  }"> 			
+			<script language="JavaScript" type="text/JavaScript">
+			  function init(){
+		        
+		            initTabSize(1);
 		            
+		            var tag = document.getElementById("currentTab");
+			    	if(tag.value != "")
+			    		selectTab(tag.value);
+		            else
+		                selectTab(1); //select the default tab;
+		                
 		            initEditor("richTextIncorrectFeedback");                                                
 		            initEditor("richTextCorrectFeedback");                                                            
 			   }     

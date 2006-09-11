@@ -368,6 +368,17 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("will return to jsp with: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
+		
+		logger.debug("activeModule: " + request.getSession().getAttribute("activeModule"));
+		logger.debug("defineLaterInEditMode: " + request.getSession().getAttribute("defineLaterInEditMode"));
+		logger.debug("editOptionsMode: " + request.getSession().getAttribute("editOptionsMode"));
+		logger.debug("richTextTitle: " + request.getSession().getAttribute("richTextTitle"));
+		logger.debug("richTextInstructions: " + request.getSession().getAttribute("richTextInstructions"));
+		logger.debug("mapQuestionsContent: " + request.getSession().getAttribute("mapQuestionsContent"));
+		logger.debug("mapWeights: " + request.getSession().getAttribute("mapWeights"));
+		logger.debug("queIndex: " + request.getSession().getAttribute("queIndex"));
+		logger.debug("maxQuestionIndex: " + request.getSession().getAttribute("maxQuestionIndex"));
+		
 		return (mapping.findForward(destination));
 	} 
 
@@ -592,6 +603,11 @@ public class McStarterAction extends Action implements McAppConstants {
     	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    	
+		int maxQuestionIndex=mapQuestionsContent.size();
+		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    	
     	
 	    AuthoringUtil.refreshMaps(request, toolContentId, mcService);
 	    AuthoringUtil.assignStaterMapsToCurrentMaps(request);
