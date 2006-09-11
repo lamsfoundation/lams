@@ -32,14 +32,7 @@
 									<c:set var="downloadURL">
 										<html:rewrite page="/download/?uuid=${file.fileUuid}&amp;versionID=${file.fileVersionId}&amp;preferDownload=true" />
 									</c:set>
-									<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a> &nbsp;
-
-									<c:set var="deleteonline">
-										<html:rewrite page="/authoring/deleteOnline.do?toolContentID=${dto.toolContentId}&amp;uuID=${file.fileUuid}&amp;versionID=${file.fileVersionId}" />
-									</c:set>
-									<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
-										<fmt:message key="link.delete" />
-									</html:link>
+									<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a>
 								</li>
 							</c:forEach>
 						</ul>
@@ -83,14 +76,7 @@
 									<c:set var="downloadURL">
 										<html:rewrite page="/download/?uuid=${file.fileUuid}&amp;versionID=${file.fileVersionId}&amp;preferDownload=true" />
 									</c:set>
-									<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a> &nbsp;
-
-									<c:set var="deleteoffline">
-										<html:rewrite page="/authoring/deleteOffline.do?toolContentID=${dto.toolContentId}&amp;uuID=${file.fileUuid}&amp;versionID=${file.fileVersionId}" />
-									</c:set>
-									<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
-										<fmt:message key="link.delete" />
-									</html:link>
+									<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a>
 								</li>
 							</c:forEach>
 						</ul>
