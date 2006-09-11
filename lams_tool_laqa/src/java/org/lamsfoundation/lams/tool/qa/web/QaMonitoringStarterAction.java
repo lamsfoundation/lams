@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -111,6 +112,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	return validateParameters;
 	    }
 
+		
 	    GeneralMonitoringDTO  generalMonitoringDTO= new GeneralMonitoringDTO();
 		boolean initData=initialiseMonitoringData(mapping, qaMonitoringForm, request, response, qaService, generalMonitoringDTO);
 		logger.debug("initData: " + initData);
@@ -205,6 +207,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
         generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
         /** ...till here **/
 
+        
     	EditActivityDTO editActivityDTO = new EditActivityDTO();
 		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
 		logger.debug("isContentInUse:" + isContentInUse);
@@ -221,6 +224,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 		
+		
+		/*for Edit Activity screen, BasicTab-ViewOnly*/
+		qaMonitoringAction.preparEditActivityScreenData(request, qaContent);
+		
+		
+		logger.debug("fwding to : " + LOAD_MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	
 	}
 

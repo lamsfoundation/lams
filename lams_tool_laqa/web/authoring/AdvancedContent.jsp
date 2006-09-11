@@ -34,13 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			      			<bean:message key="radiobox.synchInMonitor"/>:
 					</td>
 					<td>							
-						<html:radio property="synchInMonitor" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="synchInMonitor" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+		      			<html:checkbox property="synchInMonitor" value="1"
+							styleClass="noBorder" styleId="synchInMonitor">
+						</html:checkbox>
+						
 	      			</td>
 		         </tr>
 		         
@@ -49,13 +46,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			      			<bean:message key="radiobox.usernameVisible"/>:
 					</td>
 					<td>							
-						<html:radio property="usernameVisible" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
+		      			<html:checkbox property="usernameVisible" value="1"
+							styleClass="noBorder" styleId="usernameVisible">
+						</html:checkbox>
 
-						<html:radio property="usernameVisible" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
 	      			</td>
 		         </tr>
 		         
@@ -80,20 +74,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		        </tr>
 		        
 
-		        
-
    				<tr>
 					<td class="field-name">							
 			      			<bean:message key="radiobox.questionsSequenced"/>:
 					</td>
 					<td>							
-						<html:radio property="questionsSequenced" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="questionsSequenced" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+		      			<html:checkbox property="questionsSequenced" value="1"
+							styleClass="noBorder" styleId="questionsSequenced">
+						</html:checkbox>
 	      			</td>
 		        </tr>
 		        

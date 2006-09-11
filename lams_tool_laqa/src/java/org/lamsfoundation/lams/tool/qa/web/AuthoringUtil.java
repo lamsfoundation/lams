@@ -191,8 +191,11 @@ public class AuthoringUtil implements QaAppConstants {
         logger.debug("richTextInstructions: " + richTextInstructions);
 
 		String synchInMonitor=request.getParameter(SYNC_IN_MONITOR);
+		logger.debug("synchInMonitor: " + synchInMonitor);
 		String usernameVisible=request.getParameter(USERNAME_VISIBLE);
+		logger.debug("usernameVisible: " + usernameVisible);
 		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
+		logger.debug("questionsSequenced: " + questionsSequenced);
 		String reportTitle=request.getParameter(REPORT_TITLE);
 		String monitoringReportTitle=request.getParameter(MONITORING_REPORT_TITLE);
 		String richTextOfflineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
@@ -208,7 +211,8 @@ public class AuthoringUtil implements QaAppConstants {
         
         
         boolean setCommonContent=true; 
-        if ((questionsSequenced == null) || (synchInMonitor == null) || (usernameVisible == null))
+        if ((questionsSequenced == null) || (synchInMonitor == null) || 
+             (usernameVisible == null) || (reflect == null))
         {
         	setCommonContent=false;
         }
@@ -218,22 +222,26 @@ public class AuthoringUtil implements QaAppConstants {
         boolean synchInMonitorBoolean=false;
         boolean usernameVisibleBoolean=false;
         boolean reflectBoolean=false;
-        if (setCommonContent)
-        {
-            if (questionsSequenced.equalsIgnoreCase(ON))
-            	questionsSequencedBoolean=true;
+        //if (setCommonContent)
+        //{
+            if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
+                questionsSequencedBoolean=true;            
             
-            if (synchInMonitor.equalsIgnoreCase(ON))
-            	synchInMonitorBoolean=true;
+            if ((synchInMonitor != null) && (synchInMonitor.equalsIgnoreCase("1")))
+                synchInMonitorBoolean=true;            
             
-            
-            if (usernameVisible.equalsIgnoreCase(ON))
-            	usernameVisibleBoolean=true;
-            
+            if ((usernameVisible != null) && (usernameVisible.equalsIgnoreCase("1")))
+                usernameVisibleBoolean=true;            
+
             if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
                 reflectBoolean=true;
-        }
-        
+        //}
+            
+            
+        logger.debug("questionsSequencedBoolean: " + questionsSequencedBoolean);
+        logger.debug("synchInMonitorBoolean: " + synchInMonitorBoolean);
+        logger.debug("usernameVisibleBoolean: " + usernameVisibleBoolean);
+        logger.debug("reflectBoolean: " + reflectBoolean);
         
         long userId=0;
         if (toolUser != null)
@@ -277,7 +285,8 @@ public class AuthoringUtil implements QaAppConstants {
      	logger.debug("end of setting common content values...");
 
      	
-        if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
+        //if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
+     	if (activeModule.equals(AUTHORING))
 		{
         	logger.debug("setting other content values...");
          	qaContent.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/

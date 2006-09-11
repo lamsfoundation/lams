@@ -409,9 +409,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		QaUtils.populateAuthoringDTO(request, qaContent, qaGeneralAuthoringDTO);
 		
-	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
-	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
-	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
+	    //qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
+	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?"1":"0");
+	    
+	    //qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
+	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?"1":"0");	    
+	    
+	    //qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
+	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?"1":"0");
 	    
 	    logger.debug("QaContent isReflect: " + qaContent.isReflect());
 	    qaAuthoringForm.setReflect(qaContent.isReflect()?"1":"0");
