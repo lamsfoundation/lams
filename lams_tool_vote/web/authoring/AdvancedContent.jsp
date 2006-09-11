@@ -73,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td>
 
 					<td>							
-			 			<html:text property="maxNominationCount" size="60" maxlength="3"/>
+			 			<html:text property="maxNominationCount" size="8" maxlength="3"/>
 			 		</td>
 			  	</tr>
 
