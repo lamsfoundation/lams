@@ -38,7 +38,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -1039,16 +1041,17 @@ public class ResourceServiceImpl implements
 			createUser(ruser);
 		    toolContentObj.setCreatedBy(ruser);
 	
-	    	//resource Items
+	    	// Resource Items. They are ordered on the screen by create date so they need to be saved in the right order.
+		    // So read them all in first, then go through and assign the dates in the correct order and then save.
 	    	Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
+	    	SortedMap<Integer,ResourceItem> items = new TreeMap<Integer,ResourceItem>();
 	    	if ( urls != null ) {
 	    		Iterator iter = urls.iterator();
 	    		while ( iter.hasNext() ) {
 	    			Hashtable urlMap = (Hashtable) iter.next();
-	    			
+					Integer itemOrder = WDDXProcessor.convertToInteger(urlMap, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
 	    			ResourceItem item = new ResourceItem();
 	    			item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    			item.setCreateDate(now);
 	    			item.setCreateBy(ruser);
 	    			item.setCreateByAuthor(true);
 	    			item.setHide(false);
@@ -1060,10 +1063,10 @@ public class ResourceServiceImpl implements
 	    				while (insIter.hasNext()) {
 	    					Hashtable instructionEntry = (Hashtable) insIter.next();
 							String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-							Integer order = WDDXProcessor.convertToInteger(instructionEntry, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+							Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
 							ResourceItemInstruction instruction = new ResourceItemInstruction();
 							instruction.setDescription(instructionText);
-							instruction.setSequenceId(order);
+							instruction.setSequenceId(instructionOrder);
 							item.getItemInstructions().add(instruction);
 						}
 	    			}
@@ -1080,11 +1083,24 @@ public class ResourceServiceImpl implements
 	    			} else {
 	    				throw new ToolException("Invalid shared resources type. Type was "+resourceType);
 	    			}
-	
-	    			// TODO add the order field - no support for it in forum at present.
-	    			// public static final String CONTENT_URL_URL_VIEW_ORDER = "order";
-	    			toolContentObj.getResourceItems().add(item);
+
+	    			items.put(itemOrder, item);
 	    		}
+	    	}
+	    	
+    		Iterator iter = items.values().iterator();
+		    Date itemDate = null;
+    		while ( iter.hasNext() ) {
+       			if ( itemDate != null ) {
+    				try {
+    					Thread.sleep(1000);
+    				} catch (Exception e) {}
+    			}
+       			itemDate = new Date();
+       			
+       			ResourceItem item = (ResourceItem) iter.next();
+    			item.setCreateDate(itemDate);
+    			toolContentObj.getResourceItems().add(item);
 	    	}
 	    	
     	} catch (WDDXProcessorConversionException e) {
