@@ -32,6 +32,21 @@
  %>
 <%@ tag body-content="empty" %>
 <%@ attribute name="value" required="true" rtexprvalue="true" type="java.util.Date" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<fmt:formatDate value="${value}" type="both" dateStyle="long" timeStyle="full" />
+<%@ attribute name="style" required="false" rtexprvalue="true"%>
+<%@ attribute name="type" required="false" rtexprvalue="true"%>
 
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+
+<c:if test="${empty type}">
+	<c:set var="type" value="both" scope="request"/>
+</c:if>
+
+<c:choose>
+	<c:when test="${style=='short'}">
+		<fmt:formatDate value="${value}" type="${type}" dateStyle="short" timeStyle="short" />
+	</c:when>
+	<c:otherwise>
+		<fmt:formatDate value="${value}" type="${type}" dateStyle="long" timeStyle="full" />
+	</c:otherwise>
+</c:choose>
