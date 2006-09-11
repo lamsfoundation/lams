@@ -66,23 +66,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content-learner">
 		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}"> 			
-			<c:if test="${ generalLearnerFlowDTO.requestLearningReportViewOnly != 'true'}"> 			
-		     	<table> 	  
-					<tr> <td>
-						 <c:out value="${generalLearnerFlowDTO.reportTitleLearner}" escapeXml="false"/> 
-					 </td>
-					</tr>
-				</table>		
-			</c:if> 				    
-		
-			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true'}"> 			
+
 		       	<table> 	  
 					<tr> <td>
-						<b> <bean:message key="label.learnerReport"/> </b>
+						<b> <bean:message key="label.other.answers"/> </b>
 					 </td>
 					</tr>
 				</table>				
-			</c:if> 				    
+
 		
 			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		  		<html:hidden property="method"/>	 
