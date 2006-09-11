@@ -895,6 +895,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				+" tool content id "+toolContentObj.getContentId());
 		
     	Vector topics = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_MB_TOPICS);
+		Date msgDate = null;
     	if ( topics != null ) {
     		Iterator iter = topics.iterator();
     		while ( iter.hasNext() ) {
@@ -902,17 +903,24 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     			
     			Message message = new Message();
     			message.setIsAuthored(true);
-    			message.setCreated(now);
+    			
+    			// topics are ordered by date, so I need to try to assign each entry a different date. Won't work if this is too quick.
+    			if ( msgDate != null ) {
+    				try {
+    					Thread.sleep(1000);
+    				} catch (Exception e) {}
+    			}
+				msgDate = new Date();
+
+				message.setCreated(msgDate);
     			message.setCreatedBy(forumUser);
-    			message.setUpdated(now);
-    			message.setLastReplyDate(now);
+    			message.setUpdated(msgDate);
+    			message.setLastReplyDate(msgDate);
     			message.setSubject((String)messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
     			message.setBody((String)messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE));
     			// ignore the old subject field - it wasn't updated by the old interface.
     			message.setHideFlag(Boolean.FALSE);
     			message.setIsAnonymous(Boolean.FALSE);
-    			
-    			// TODO add the order field - no support for it in forum at present.
     			
     			createRootTopic(toolContentObj.getUid(),null,message);
     		}
