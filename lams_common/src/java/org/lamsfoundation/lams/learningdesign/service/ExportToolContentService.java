@@ -373,9 +373,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
 				String ldContentDir = FileUtil.getFullPath(secureDir,ldDto.getContentFolderID());
 				
-				log.debug("Create export Learning Design content target zip file. File name is " + targetContentZipFileName);
+				if(FileUtil.directoryExist(ldContentDir)) {
+					log.debug("Create export Learning Design content target zip file. File name is " + targetContentZipFileName);
+					ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
+				} else {
+					log.error("No such directory:" + ldContentDir);
+				}
 				
-				ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
 			} catch (Exception e) {
 				log.error("Exception:" + e.toString());
 				throw new ExportToolContentException(e);
@@ -532,9 +536,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			try {
 				String contentZipFileName = EXPORT_LDCONTENT_ZIP_PREFIX + ldDto.getContentFolderID() + EXPORT_LDCONTENT_ZIP_SUFFIX;
 				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator + ldDto.getContentFolderID();
+				File contentZipFile = new File(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
 				
-				InputStream is = new FileInputStream(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
-				ZipFileUtil.expandZipToFolder(is, secureDir);
+				// unzip file to target secure dir if exists
+				if(contentZipFile.exists()) {
+					InputStream is = new FileInputStream(contentZipFile);
+					ZipFileUtil.expandZipToFolder(is, secureDir);
+				}
 				
 			} catch (Exception e) {
 				throw new ImportToolContentException(e);
