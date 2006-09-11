@@ -88,7 +88,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				trace("Parallel Children are: "+ parentAct.activityTypeID.length)
 				
-				 //_canvasModel.selectedItem = ca;
+				// _canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = false;
 			} else {
 				//_canvasModel.selectedItem = ca;
@@ -128,7 +128,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
+	   if (_canvasModel.isTransitionToolActive()){
+				_canvasModel.getCanvas().stopTransitionTool();
+				//_canvasModel.resetTransitionTool();
+				_canvasModel.getCanvas().view.removeTempTrans();
+				var msg:String = Dictionary.getValue('cv_same_trans_target');
+				LFMessage.showMessageAlert(msg);
+			}
 	    _canvasModel.getCanvas().stopActiveTool();
+		
 		_canvasModel.selectedItem = ca;
 		 
 	    if(_canvasModel.isDragging){
@@ -231,6 +239,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
 			
+		}else {
+			if (_canvasModel.isTransitionToolActive()){
+				_canvasModel.getCanvas().stopTransitionTool();
+				//_canvasModel.resetTransitionTool();
+				_canvasModel.getCanvas().view.removeTempTrans();
+				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
+			}
 		}
 	}
    
