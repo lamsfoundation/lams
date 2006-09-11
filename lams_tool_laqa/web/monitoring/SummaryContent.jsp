@@ -34,6 +34,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>			
 					
 		<c:if test="${(qaGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }"> 	
+		
+				<table class="forms">
+					<tr> 
+						<td NOWRAP valign=top align=center> 
+							<b> <bean:message key="label.learners.answers"/> </b>
+						</td> 
+					<tr>
+				</table>
+		
+		
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
