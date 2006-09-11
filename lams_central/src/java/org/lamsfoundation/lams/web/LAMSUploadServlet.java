@@ -31,6 +31,7 @@ import org.apache.commons.fileupload.*;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 
 
 import javax.xml.parsers.*;
@@ -98,7 +99,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		if(baseDir==null)
 			baseDir="secure";
 		
-		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + baseDir;
+		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
 		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
@@ -151,7 +152,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		String currentDirPath=realBaseDir + currentFolderStr;
 		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		String currentWebPath= "/" + AuthoringConstants.LAMS_LAMS_FOLDER + AuthoringConstants.LAMS_WWW_FOLDER + AuthoringConstants.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr;
+		String currentWebPath= "/" + AuthoringConstants.LAMS_LAMS_FOLDER + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr;
 		
 		File currentContentDir=new File(validCurrentDirPath);
 		if(!currentContentDir.exists()){

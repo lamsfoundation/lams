@@ -38,6 +38,9 @@ public class FileUtil {
 
 	private static Logger log = Logger.getLogger(FileUtil.class);
 	
+	public static final String LAMS_WWW_SECURE_DIR = "secure";
+	public static final String LAMS_WWW_DIR = "lams-www.war";
+	
 	protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
 	public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 

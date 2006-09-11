@@ -38,8 +38,6 @@ public class AuthoringConstants {
 	public static final String LAMS_AUTHORING_SUCCESS_FLAG = "LAMS_AUTHORING_SUCCESS_FLAG";
 	
 	// used for tool content folder creation.
-	public static final String LAMS_WWW_DIR = "lams-www.war";
 	public static final String LAMS_WWW_FOLDER = "www/";
-	public static final String LAMS_WWW_SECURE_DIR = "secure";
 	public static final String LAMS_LAMS_FOLDER = "lams/";
 }

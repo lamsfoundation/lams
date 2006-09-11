@@ -43,6 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
@@ -94,7 +95,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		if(baseDir==null)
 			baseDir="secure";
 		
-		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + AuthoringConstants.LAMS_WWW_DIR + File.separator + baseDir;
+		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
 		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
@@ -126,7 +127,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String currentDirPath=realBaseDir + currentFolderStr;
 		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		String currentWebPath= "/" + AuthoringConstants.LAMS_LAMS_FOLDER + AuthoringConstants.LAMS_WWW_FOLDER + AuthoringConstants.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
+		String currentWebPath= "/" + AuthoringConstants.LAMS_LAMS_FOLDER + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
 		
 		File currentContentDir=new File(validCurrentDirPath);
 		if(!currentContentDir.exists()){

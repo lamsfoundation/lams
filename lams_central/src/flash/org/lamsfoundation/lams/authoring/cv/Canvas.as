@@ -715,6 +715,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			checkReadOnlyDesign();
 			canvasModel.setDirty();
 			
+			
 			createContentFolder();
 			
 			return true;
@@ -1028,7 +1029,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	private function createContentFolder():Void{
-		Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
 		var callback:Function = Proxy.create(this,setNewContentFolderID);
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=createUniqueContentFolder&userID='+_root.userID,callback, false);
 		
@@ -1038,7 +1038,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(o instanceof LFError){
 			o.showMessageConfirm();
 		}else{
-			_ddm.contentFolderID = String(o);
+			if(StringUtils.isNull(_ddm.contentFolderID)) { _ddm.contentFolderID = String(o); }
 		}
 		
 	}

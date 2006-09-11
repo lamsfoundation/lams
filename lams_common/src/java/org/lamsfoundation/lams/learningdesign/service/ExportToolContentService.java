@@ -55,6 +55,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -100,6 +101,8 @@ import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -123,12 +126,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 	//export tool content zip file prefix
 	public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
+	public static final String EXPORT_LDCONTENT_ZIP_PREFIX = "lams_ldcontent_";
 	public static final String EXPORT_TOOLCONTNET_FOLDER_SUFFIX = "export_toolcontent";
 	public static final String EXPORT_TOOLCONTNET_ZIP_SUFFIX = ".zip";
+	public static final String EXPORT_LDCONTENT_ZIP_SUFFIX = ".zip";
 	public static final String LEARNING_DESIGN_FILE_NAME = "learning_design.xml";
 	public static final String TOOL_FILE_NAME = "tool.xml";
 	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
-	
 	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
@@ -363,6 +367,20 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				} 
 			}
 			
+			//create zip file for fckeditor unique content folder
+			try {
+				String targetContentZipFileName = EXPORT_LDCONTENT_ZIP_PREFIX + ldDto.getContentFolderID() + EXPORT_LDCONTENT_ZIP_SUFFIX;
+				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
+				String ldContentDir = FileUtil.getFullPath(secureDir,ldDto.getContentFolderID());
+				
+				log.debug("Create export Learning Design content target zip file. File name is " + targetContentZipFileName);
+				
+				ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
+			} catch (Exception e) {
+				log.error("Exception:" + e.toString());
+				throw new ExportToolContentException(e);
+			}
+			
 			log.debug("Create export content target zip file. File name is " + targetZipFileName);
 			//create zip file and return zip full file name
 			return ZipFileUtil.createZipFile(targetZipFileName, contentDir,rootDir);
@@ -508,6 +526,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					log.error(error);
 					toolsErrorMsgs.add(error);
 				}
+			}
+			
+			// begin fckeditor content folder import
+			try {
+				String contentZipFileName = EXPORT_LDCONTENT_ZIP_PREFIX + ldDto.getContentFolderID() + EXPORT_LDCONTENT_ZIP_SUFFIX;
+				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator + ldDto.getContentFolderID();
+				
+				InputStream is = new FileInputStream(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
+				ZipFileUtil.expandZipToFolder(is, secureDir);
+				
+			} catch (Exception e) {
+				throw new ImportToolContentException(e);
 			}
 			
 			WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);

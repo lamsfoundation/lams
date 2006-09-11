@@ -78,6 +78,10 @@ public class ZipFileUtil {
 	    extractZipFile(is, tempDirName);
 	    return tempDirName;
 	}
+	
+	public static void expandZipToFolder(InputStream is, String destFolder) throws ZipFileUtilException {
+		extractZipFile(is, destFolder);
+	}
 
 	/**
 	 * Create a temporary directory in which the zip file contents will go.
