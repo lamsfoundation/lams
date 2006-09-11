@@ -23,11 +23,10 @@
 
 package org.lamsfoundation.lams.build;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.InputStreamReader;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -42,20 +41,19 @@ import java.util.zip.ZipEntry;
  */
 public class Jar implements Comparable {
 
-	static final String[] VERSION_ATT_NAMES = 
-		{ "Implementation-Version", "HttpUnit-Version", "Hibernate-Version" };
+	static final String[] VERSION_ATT_NAMES = { "Implementation-Version", "HttpUnit-Version",
+			"Hibernate-Version" };
 
 	static final String[] VENDOR_ATT_NAMES = { "Implementation-Vendor" };
 
-	static final String[] LICENSE_FILE_NAMES = 
-		{ "LICENSE", "LICENSE.txt", "License", "License.txt", "license.txt" };
+	static final String[] LICENSE_FILE_NAMES = { "LICENSE", "LICENSE.txt", "License",
+			"License.txt", "license.txt" };
 
 	static final String[] DESC_ATT_NAMES = { "Specification-Title", "Implementation-Title" };
 
-	static final String[] LICENSES = 
-		{ "Apache License", "Apache Software License", "Joda Software License", "GPL", "LGPL", 
-		"GNU General Public License", "GNU Lesser General Public License", 
-		"Open Software License","Academic Free License" };
+	static final String[] LICENSES = { "Apache License", "Apache Software License",
+			"Joda Software License", "GPL", "LGPL", "GNU General Public License",
+			"GNU Lesser General Public License", "Open Software License", "Academic Free License" };
 
 	String name;
 
@@ -101,7 +99,7 @@ public class Jar implements Comparable {
 						jar.version = jar.name.substring(index + 1, index2);
 					}
 				}
-				if(jar.version.indexOf('.') == -1){
+				if (jar.version.indexOf('.') == -1) {
 					jar.version = null;
 				}
 			}
@@ -119,29 +117,23 @@ public class Jar implements Comparable {
 		ZipEntry licenseZipEntry = null;
 		for (String licenseFilename : LICENSE_FILE_NAMES) {
 			licenseZipEntry = jarFile.getEntry("META-INF/" + licenseFilename);
-			if(licenseZipEntry == null){
+			if (licenseZipEntry == null) {
 				licenseZipEntry = jarFile.getEntry(licenseFilename);
 			}
 			if (licenseZipEntry != null && !licenseZipEntry.isDirectory())
 				break;
 		}
 		if (licenseZipEntry != null && !licenseZipEntry.isDirectory()) {
-			BufferedInputStream is = new BufferedInputStream(jarFile
-					.getInputStream(licenseZipEntry));
-			List<Byte> bytes = new LinkedList<Byte>();
-			byte b;
-			while ((b = (byte) is.read()) != -1) {
-				bytes.add(b);
+			BufferedReader br = new BufferedReader(new InputStreamReader(jarFile
+					.getInputStream(licenseZipEntry)));
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
 			}
-			byte[] bs = new byte[bytes.size()];
-			int i = 0;
-			for (Byte B : bytes) {
-				bs[i] = B;
-				i++;
-			}
-			String licenseTxt = new String(bs);
+			String licenseTxt = sb.toString();
 			jar.license = parse(licenseTxt);
-			is.close();
+			br.close();
 		}
 		if (jar.version != null)
 			jar.version = cleanQuotes(jar.version);
