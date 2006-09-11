@@ -41,8 +41,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr> <td NOWRAP valign=top>
 						 <bean:message key="error.question.weight.total"/> 
 			</td> </tr>
-		</c:if> 				    
+		</c:if> 		
+		
 
+		<c:if test="${userExceptionPassmarkGreater100 == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						 <bean:message key="error.passMark.greater100"/> 
+			</td> </tr>
+		</c:if> 		
+				    
 		<c:if test="${userExceptionOptionsCountZero == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						 <bean:message key="options.count.zero"/> 
