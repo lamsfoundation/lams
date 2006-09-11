@@ -57,7 +57,7 @@ j_security_login_page
 	  
 			  <div id="login-left-col"><h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
 			  	<c:set var="url"><lams:LAMSURL/>www/news.html</c:set>
-		  		<c:import url="${url}" />
+		  		<c:import url="${url}" charEncoding="utf-8" />
 			  </div>
 				<!--closes left col-->
 				
