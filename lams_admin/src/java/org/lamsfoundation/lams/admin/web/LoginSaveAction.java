@@ -27,10 +27,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
@@ -113,10 +115,6 @@ public class LoginSaveAction extends LamsDispatchAction {
 				updateLoginPage(buildURL(fileName));
 			}
 			updateNewsPage(loginMaintainForm.getString("news"));
-			BufferedWriter bWriter = new BufferedWriter(new FileWriter(NEWS_PAGE_PATH));
-			bWriter.write(loginMaintainForm.getString("news"));
-			bWriter.flush();
-			bWriter.close();
 		} else {
 			saveErrors(request, errors);
 			return mapping.findForward("loginmaintain");
@@ -148,7 +146,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 	private void updateNewsPage(String news) throws IOException {
 		BufferedWriter bWriter = null;
 		try {
-			bWriter = new BufferedWriter(new FileWriter(NEWS_PAGE_PATH));
+			OutputStreamWriter ow = new OutputStreamWriter(new FileOutputStream(NEWS_PAGE_PATH),Charset.forName("UTF-8"));
+			bWriter = new BufferedWriter(ow);
 			bWriter.write(news);
 			bWriter.flush();
 		} finally {

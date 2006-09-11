@@ -24,8 +24,10 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,7 +78,8 @@ public class LoginMaintainAction extends Action {
 	private String loadNews() throws IOException {
 		BufferedReader bReader = null;
 		try {
-			bReader = new BufferedReader(new FileReader(NEWS_PAGE_PATH));
+			InputStreamReader ir = new InputStreamReader(new FileInputStream(NEWS_PAGE_PATH),Charset.forName("UTF-8"));
+			bReader = new BufferedReader(ir);
 			StringBuilder news = new StringBuilder();
 			String line = bReader.readLine();
 			while (line != null) {
