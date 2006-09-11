@@ -132,8 +132,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.getCanvas().stopTransitionTool();
 				//_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().view.removeTempTrans();
-				var msg:String = Dictionary.getValue('cv_same_trans_target');
-				LFMessage.showMessageAlert(msg);
+				//var msg:String = Dictionary.getValue('cv_same_trans_target');
+				//LFMessage.showMessageAlert(msg);
 			}
 	    _canvasModel.getCanvas().stopActiveTool();
 		
