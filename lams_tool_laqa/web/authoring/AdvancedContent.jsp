@@ -29,16 +29,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 			<table class="forms">
-				<tr>
-					<td class="field-name">							
-			      			<bean:message key="radiobox.synchInMonitor"/>:
-					</td>
-					<td>							
-		      			<html:checkbox property="synchInMonitor" value="1"
-							styleClass="noBorder" styleId="synchInMonitor">
-						</html:checkbox>
-	      			</td>
-		         </tr>
 		         
 				<tr>
 					<td class="field-name">							
@@ -83,25 +73,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</html:checkbox>
 	      			</td>
 		        </tr>
-		        
-		        
-		         
-		         <tr> 
-					<td class="field-name">							
-				 		<bean:message key="label.report.title"/>: 
-			 		</td>
-					<td>							
-			 			<html:text property="reportTitle" value="${qaGeneralAuthoringDTO.reportTitle}" size="60" maxlength="100"/>
-			 		</td>
-			  	</tr>
-			  	
-			  	<tr> 
-					<td class="field-name">							
-				 		<bean:message key="label.monitoringReport.title"/>: </td>
-					<td>							
-			 			<html:text property="monitoringReportTitle" value="${qaGeneralAuthoringDTO.monitoringReportTitle}" size="60" maxlength="100"/>
-			 		</td>
-			  	</tr>
 			  	
 			</table>	  	
 
