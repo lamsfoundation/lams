@@ -629,7 +629,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    saveErrors(request,errors);
 
-	    
 	    voteAuthoringForm.resetUserAction();
 	    
 		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
@@ -649,8 +648,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		voteAuthoringForm.setDefineLaterInEditMode(new Boolean(false).toString());
 		voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 
-		
-		
 		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
 		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 		

@@ -199,10 +199,9 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	public void resetRadioBoxes()
 	{
-    	this.voteChangable		 =OPTION_OFF;
-		this.lockOnFinish		 =OPTION_OFF;
-		this.allowText			 =OPTION_OFF;
-		//this.reflect			 =OPTION_OFF;
+	    this.voteChangable		 ="0";
+		this.lockOnFinish		 ="0";
+		this.allowText			 ="0";
 		this.reflect			 ="0";
 	}
 

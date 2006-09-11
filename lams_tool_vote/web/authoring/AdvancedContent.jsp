@@ -38,13 +38,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			      			<bean:message key="label.vote.changable"/>:
 					</td>
 					<td>							
-						<html:radio property="voteChangable" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="voteChangable" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+		      			<html:checkbox property="voteChangable" value="1"
+							styleClass="noBorder" styleId="voteChangable">
+						</html:checkbox>
 	      			</td>
 		         </tr>
 		         
@@ -53,13 +49,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			      			<bean:message key="label.vote.lockedOnFinish"/>:
 					</td>
 					<td>							
-						<html:radio property="lockOnFinish" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="lockOnFinish" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+		      			<html:checkbox property="lockOnFinish" value="1"
+							styleClass="noBorder" styleId="lockOnFinish">
+						</html:checkbox>
 	      			</td>
 		         </tr>
 		         
@@ -68,13 +60,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			      			<bean:message key="label.allowText"/>:
 					</td>
 					<td>							
-						<html:radio property="allowText" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="allowText" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+		      			<html:checkbox property="allowText" value="1"
+							styleClass="noBorder" styleId="allowText">
+						</html:checkbox>
+						
 	      			</td>
 		        </tr>
 		         

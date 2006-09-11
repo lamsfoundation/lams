@@ -188,22 +188,25 @@ public abstract class VoteUtils implements VoteAppConstants {
         
         voteGeneralAuthoringDTO.setActivityTitle(defaultVoteContent.getTitle());
         voteGeneralAuthoringDTO.setActivityInstructions(defaultVoteContent.getInstructions());
-
-	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
-	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?ON:OFF);
-	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
-	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
-	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?ON:OFF);
+	    
+	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?"1":"0");
+	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?"1":"0");
+	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?"1":"0");
+	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?"1":"0");
+	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
+	    
         voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
 	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
 	    
-	    voteGeneralAuthoringDTO.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
-	    voteGeneralAuthoringDTO.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
-	    voteGeneralAuthoringDTO.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
+
+	    voteGeneralAuthoringDTO.setAllowText(defaultVoteContent.isAllowText()?"1":"0");
+	    voteGeneralAuthoringDTO.setVoteChangable(defaultVoteContent.isVoteChangable()?"1":"0");
+	    voteGeneralAuthoringDTO.setLockOnFinish(defaultVoteContent.isLockOnFinish()?"1":"0");
+	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
+	    
 	    voteGeneralAuthoringDTO.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
 	    voteGeneralAuthoringDTO.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
 
-	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
 	    
 	    String maxNomcount= defaultVoteContent.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);

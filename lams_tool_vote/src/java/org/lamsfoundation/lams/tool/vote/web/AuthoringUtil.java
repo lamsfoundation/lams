@@ -869,22 +869,18 @@ public class AuthoringUtil implements VoteAppConstants {
         logger.debug("richTextTitle: " + richTextTitle);
         logger.debug("richTextInstructions: " + richTextInstructions);
         
-        String voteChangable = voteAuthoringForm.getVoteChangable();
+        String voteChangable = request.getParameter("voteChangable");
         logger.debug("voteChangable: " + voteChangable);
-        
-        String lockOnFinish=voteAuthoringForm.getLockOnFinish();
+
+        String lockOnFinish = request.getParameter("lockOnFinish");
         logger.debug("lockOnFinish: " + lockOnFinish);
-        
-        String allowTextEntry=voteAuthoringForm.getAllowText();
+
+        String allowTextEntry = request.getParameter("allowText");
         logger.debug("allowTextEntry: " + allowTextEntry);
 
-        //String reflect=voteAuthoringForm.getReflect();
-        //logger.debug("reflect: " + reflect);
-        
 		String reflect=request.getParameter(REFLECT);
 		logger.debug("reflect: " + reflect);
 
-        
         String reflectionSubject=voteAuthoringForm.getReflectionSubject();
         logger.debug("reflectionSubject: " + reflectionSubject);
         
@@ -912,24 +908,19 @@ public class AuthoringUtil implements VoteAppConstants {
         boolean allowTextBoolean=false;
         boolean reflectBoolean=false;
         
-        if (setCommonContent)
-        {
-            if (voteChangable.equalsIgnoreCase(ON))
-                voteChangableBoolean=true;
             
-            if (lockOnFinish.equalsIgnoreCase(ON))
-                lockedOnFinishBoolean=true;
-
-            if (allowTextEntry.equalsIgnoreCase(ON))
-                allowTextBoolean=true;
-            
-            //if (reflect.equalsIgnoreCase(ON))
-            //    reflectBoolean=true;
-            
-            if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
-                reflectBoolean=true;
-        }
+        if ((voteChangable != null) && (voteChangable.equalsIgnoreCase("1")))
+            voteChangableBoolean=true;
         
+        if ((lockOnFinish != null) && (lockOnFinish.equalsIgnoreCase("1")))
+            lockedOnFinishBoolean=true;
+        
+        if ((allowTextEntry != null) && (allowTextEntry.equalsIgnoreCase("1")))
+            allowTextBoolean=true;
+        
+        if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
+            reflectBoolean=true;
+
         
         long userId=0;
         if (toolUser != null)
@@ -980,7 +971,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
      	logger.debug("activeModule: " + activeModule);
      	
-        if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
+     	if (activeModule.equals(AUTHORING))
 		{
         	logger.debug("setting other content values...");
          	voteContent.setVoteChangable(voteChangableBoolean);
@@ -1008,7 +999,7 @@ public class AuthoringUtil implements VoteAppConstants {
         voteContent=voteService.retrieveVote(new Long(toolContentID));
      	logger.debug("voteContent: " + voteContent);
         
-        voteContent=createOptiosContent(mapOptionsContent, voteService, voteContent);
+        voteContent=createOptionsContent(mapOptionsContent, voteService, voteContent);
         
         return voteContent;
     }
@@ -1021,7 +1012,7 @@ public class AuthoringUtil implements VoteAppConstants {
      * @param voteContent
      * @return
      */
-    protected VoteContent createOptiosContent(Map mapOptionsContent, IVoteService voteService, VoteContent voteContent)
+    protected VoteContent createOptionsContent(Map mapOptionsContent, IVoteService voteService, VoteContent voteContent)
     {    
         logger.debug("starting createOptiosContent: " + voteContent);
         logger.debug("content uid is: " + voteContent.getUid());
