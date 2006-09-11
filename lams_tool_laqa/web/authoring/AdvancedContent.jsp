@@ -37,7 +37,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		      			<html:checkbox property="synchInMonitor" value="1"
 							styleClass="noBorder" styleId="synchInMonitor">
 						</html:checkbox>
-						
 	      			</td>
 		         </tr>
 		         
