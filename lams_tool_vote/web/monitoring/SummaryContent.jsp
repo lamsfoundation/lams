@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${voteGeneralMonitoringDTO.currentMonitoredToolSession == 'All'}"> 							
 					<jsp:include page="/monitoring/AllSessionsSummary.jsp" />								
 			</c:if> 	    	  
-		</c:if>						
+
 		
 			<table class="forms">
 					<tr>			
@@ -95,5 +95,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							 </td>
 						</tr>	
 				</table>		  	 								
-		
+
+		</c:if>								
 
