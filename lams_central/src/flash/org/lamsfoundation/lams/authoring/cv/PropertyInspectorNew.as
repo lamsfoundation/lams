@@ -330,7 +330,7 @@ class PropertyInspectorNew extends MovieClip{
 	   
 	   switch (event.updateType){
             case 'SELECTED_ITEM' :
-				title_txt.setFocus();
+				//title_txt.setFocus();
                 updateItemProperties(cm);
 
                 break;
