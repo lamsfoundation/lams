@@ -24,6 +24,46 @@
    </tag>
    <tag>
 
+      <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+      <display-name>converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
+      <icon>    
+      </icon>
+      <name>out</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>value</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Render html tag with direction and language</description>
+      <display-name>Render html tag with direction and language</display-name>
+      <icon>    
+      </icon>
+      <name>html</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Render html tag with direction and language</description>
+         <name>xhtml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
       <display-name>generate unique ID</display-name>
       <icon>    
@@ -287,12 +327,8 @@
        <path>/WEB-INF/tags/TabBody.tag</path>
    	</tag-file>
    	<tag-file>
-       <name>HTMLEditor</name>
-       <path>/WEB-INF/tags/HTMLEditor.tag</path>
-   	</tag-file>
-   	<tag-file>
-       <name>SetEditor</name>
-       <path>/WEB-INF/tags/SetEditor.tag</path>
+       <name>FCKEditor</name>
+       <path>/WEB-INF/tags/FCKEditor.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AuthoringButton</name>
@@ -310,8 +346,13 @@
 	    <name>ExportPortOutput</name>
 		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
-	<tag-file>
+   	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
    	</tag-file>  
+   	<tag-file>
+	    <name>DefineLater</name>
+		<path>/WEB-INF/tags/DefineLater.tag</path>
+   	</tag-file>  
+
 </taglib>
