@@ -31,10 +31,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
-					<h2><bean:message key="label.authoring.mc.basic"/>  </h2>	
-				</c:if> 				
-				
 				<table class="forms">
 					<tr>   
 					<td NOWRAP class=error>

@@ -38,13 +38,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				      			 <bean:message key="radiobox.sln"/>: 
 						</td>
 						<td>							
-								<html:radio property="sln"  value="ON">
-								 <bean:message key="option.on"/>
-								</html:radio>
-		
-								<html:radio property="sln"  value="OFF">
-								 <bean:message key="option.off"/>
-								</html:radio>
+			      			<html:checkbox property="sln" value="1"
+								styleClass="noBorder" styleId="sln">
+							</html:checkbox>
 		      			</td>
 			         </tr>
 			         
@@ -53,13 +49,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				      			 <bean:message key="radiobox.onepq"/>: 
 						</td>
 						<td>							
-								<html:radio property="questionsSequenced" value="ON">
-								 <bean:message key="option.on"/>
-								</html:radio>
-		
-								<html:radio property="questionsSequenced" value="OFF">
-								 <bean:message key="option.off"/>
-								</html:radio>
+			      			<html:checkbox property="questionsSequenced" value="1"
+								styleClass="noBorder" styleId="questionsSequenced">
+							</html:checkbox>
 		      			</td>
 			         </tr>
 			         
@@ -68,13 +60,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				      			 <bean:message key="radiobox.retries"/>:
 						</td>
 						<td>							
-								<html:radio property="retries" value="ON">
-								 <bean:message key="option.on"/>
-								</html:radio>
-		
-								<html:radio property="retries" value="OFF">
-								 <bean:message key="option.off"/>
-								</html:radio>
+			      			<html:checkbox property="retries" value="1"
+								styleClass="noBorder" styleId="retries">
+							</html:checkbox>
 		      			</td>
 			        </tr>
 			        

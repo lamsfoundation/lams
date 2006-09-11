@@ -111,52 +111,10 @@ public class AuthoringUtil implements McAppConstants {
 	 */
 	protected static void setRadioboxes(McContent mcContent, McAuthoringForm mcAuthoringForm)
 	{
-		if (mcContent.isQuestionsSequenced())
-		{
-			mcAuthoringForm.setQuestionsSequenced(ON);
-			logger.debug("setting questionsSequenced to true");
-		}
-		else
-		{
-			mcAuthoringForm.setQuestionsSequenced(OFF);	
-			logger.debug("setting questionsSequenced to false");				
-		}
-
-		if (mcContent.isRetries())
-		{
-			mcAuthoringForm.setRetries(ON);	
-			logger.debug("setting retries to true");
-		}
-		else
-		{
-			mcAuthoringForm.setRetries(OFF);	
-			logger.debug("setting retries to false");				
-		}
-
-		
-		if (mcContent.isShowReport())
-		{
-			mcAuthoringForm.setSln(ON);	
-			logger.debug("setting sln to true");
-		}
-		else
-		{
-			mcAuthoringForm.setSln(OFF);	
-			logger.debug("setting sln to false");				
-		}
-		
+		mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
+		mcAuthoringForm.setRetries(mcContent.isRetries()?"1":"0");
+		mcAuthoringForm.setSln(mcContent.isShowReport()?"1":"0");
 		mcAuthoringForm.setReflect(mcContent.isReflect()?"1":"0");
-
-		/*
-		if (mcContent.isReflect())
-		{
-			mcAuthoringForm.setReflect(ON);	
-		}
-		else
-		{
-			mcAuthoringForm.setReflect(OFF);	
-		}
-		*/
 	}
 
     
@@ -1419,42 +1377,22 @@ public class AuthoringUtil implements McAppConstants {
     	boolean isSln=false;
     	boolean isReflect=false;
     	
-    	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
-    	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
-    		isQuestionsSequenced=true;
-    	
-    	logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
-    	if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
-    		isSynchInMonitor=true;
-    	
-    	logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
-    	if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
-    		isUsernameVisible=true;
-    	
-    	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
-    	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
-    		isRetries=true;
-    	
-		logger.debug("isSln" +  mcAuthoringForm.getSln());
-		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
-			isSln=true;
-    	
-		/*
-		logger.debug("isReflect" +  mcAuthoringForm.getReflect());
-		if (mcAuthoringForm.getReflect().equalsIgnoreCase(ON))
-		    isReflect=true;
-		*/
-		
-		
-		/*
-		logger.debug("isReflect:" +  mcAuthoringForm.getReflect());
-		if (mcAuthoringForm.getReflect() != null)
-		{
-			if (mcAuthoringForm.getReflect().equalsIgnoreCase("1"))
-				isReflect=true;
-		}
-		logger.debug("isReflect:" +  isReflect);
-		*/
+		String questionsSequenced=request.getParameter("questionsSequenced");
+		logger.debug("questionsSequenced: " +  questionsSequenced);
+        if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
+            isQuestionsSequenced=true;            
+
+
+		String retries=request.getParameter("retries");
+		logger.debug("retries: " +  retries);
+        if ((retries != null) && (retries.equalsIgnoreCase("1")))
+            isRetries=true;            
+
+		String sln=request.getParameter("sln");
+		logger.debug("sln: " +  sln);
+        if ((sln != null) && (sln.equalsIgnoreCase("1")))
+            isSln=true;            
+        
 		
 		String isReflectStr=request.getParameter("reflect");
 		logger.debug("isReflectStr:" +  isReflectStr);
@@ -1464,8 +1402,6 @@ public class AuthoringUtil implements McAppConstants {
 		        isReflect=true;
 		}
 
-
-		
     	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
     	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
     		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
@@ -1477,18 +1413,6 @@ public class AuthoringUtil implements McAppConstants {
 		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
 		logger.debug("reflectionSubject: " + reflectionSubject);
 
-    	
-    	/*
-    	String richTextTitle="";
-    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
-    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
-    	if (richTextTitle == null) richTextTitle="";
-    	
-    	String richTextInstructions="";
-    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
-    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
-    	if (richTextInstructions == null) richTextInstructions="";
-    	*/
     	
 		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
 		logger.debug("richTextTitle: " + richTextTitle);
@@ -1510,9 +1434,6 @@ public class AuthoringUtil implements McAppConstants {
     	
     	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
 		logger.debug("richTextReportTitle: " + richTextReportTitle);
-		
-		//String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-		///logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
     	
 		creationDate=(Date)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
@@ -1547,11 +1468,9 @@ public class AuthoringUtil implements McAppConstants {
 	    mc.setDefineLater(false);
 	    mc.setSynchInMonitor(isSynchInMonitor);
 	    mc.setContentInUse(isContentInUse);
-	    //mc.setEndLearningMessage("Thanks");
 	    mc.setRunOffline(isRunOffline);
 	    mc.setReportTitle(richTextReportTitle);
 	    mc.setMonitoringReportTitle(monitoringReportTitle);
-	    //mc.setEndLearningMessage(richTextEndLearningMessage);
 	    mc.setRetries(isRetries);
 	    mc.setPassMark(new Integer(passmark));
 	    mc.setShowReport(isSln);

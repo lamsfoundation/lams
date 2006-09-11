@@ -696,14 +696,13 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 		logger.debug("getting default content");
 	    
-	    /* this is already done in  mcAuthoringForm.resetRadioBoxes()*/ 
-	    mcAuthoringForm.setUsernameVisible(OFF);
-	    mcAuthoringForm.setQuestionsSequenced(OFF);
-		mcAuthoringForm.setSynchInMonitor(OFF);
-		mcAuthoringForm.setRetries(OFF);
-		mcAuthoringForm.setShowFeedback(OFF);
-		mcAuthoringForm.setSln(OFF);
-		mcAuthoringForm.setReflect(OFF);
+		mcAuthoringForm.setUsernameVisible("0");
+	    mcAuthoringForm.setQuestionsSequenced("0");
+		mcAuthoringForm.setSynchInMonitor("0");
+		mcAuthoringForm.setRetries("0");
+		mcAuthoringForm.setShowFeedback("0");
+		mcAuthoringForm.setSln("0");
+		mcAuthoringForm.setReflect("0");
 				
 		/* collect options for the default question content into a Map*/
 		McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());

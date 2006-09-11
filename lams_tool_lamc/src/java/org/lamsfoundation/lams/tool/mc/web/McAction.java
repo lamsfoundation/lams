@@ -2020,51 +2020,25 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String endLearningMessage="";
 		int passmark=0;
 		
-		logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
 		
-		if (mcAuthoringForm.getQuestionsSequenced() != null)
-		{
-			if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
-				isQuestionsSequenced=true;	
-		}
+		String questionsSequenced=request.getParameter("questionsSequenced");
+		logger.debug("questionsSequenced: " +  questionsSequenced);
+        if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
+            isQuestionsSequenced=true;            
 		
 		
-		logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
-		if (mcAuthoringForm.getSynchInMonitor() != null)
-		{
-			if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
-				isSynchInMonitor=true;
-		}
+		String retries=request.getParameter("retries");
+		logger.debug("retries: " +  retries);
+        if ((retries != null) && (retries.equalsIgnoreCase("1")))
+            isRetries=true;            
 		
-		logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
-		if (mcAuthoringForm.getUsernameVisible() != null)
-		{
-			if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
-				isUsernameVisible=true;
-		}
-		
-		logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
-		if (mcAuthoringForm.getRetries() != null)
-		{
-			if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
-				isRetries=true;
-		}
-		
-		logger.debug("isSln" +  mcAuthoringForm.getSln());
-		if (mcAuthoringForm.getSln() != null)
-		{
-			if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
-				isSln=true;
-		}
 
-		/*
-		logger.debug("isReflect:" +  mcAuthoringForm.getReflect());
-		if (mcAuthoringForm.getReflect() != null)
-		{
-			if (mcAuthoringForm.getReflect().equalsIgnoreCase("1"))
-				isReflect=true;
-		}
-		*/
+        String sln=request.getParameter("sln");
+		logger.debug("sln: " +  sln);
+        if ((sln != null) && (sln.equalsIgnoreCase("1")))
+            isSln=true;            
+
+
 		String isReflectStr=request.getParameter("reflect");
 		logger.debug("isReflectStr:" +  isReflectStr);
 		if (isReflectStr != null)
@@ -2163,46 +2137,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    	return (mapping.findForward(destination));
 		}
 		request.getSession().setAttribute(PASSMARK, new Integer(passmark).toString());
-				
-		logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
-		if (mcAuthoringForm.getShowFeedback() != null)
-		{
-			if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
-				isShowFeedback=true;
-		}
-		
-		/*
-		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
-		logger.debug("richTextTitle: " + richTextTitle);
-		
-		String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
-		logger.debug("richTextInstructions: " + richTextInstructions);
-		*/
 		
 		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
 		logger.debug("richTextTitle: " + richTextTitle);
 		
 		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
 		logger.debug("richTextInstructions: " + richTextInstructions);
-		
-
-		/*
-		if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
-		{
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
-			logger.debug("add title to ActionMessages");
-		}
-	
-		if ((richTextInstructions == null) || (richTextInstructions.length() == 0) || richTextInstructions.equalsIgnoreCase(RICHTEXT_BLANK))
-		{
-			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
-			logger.debug("add instructions to ActionMessages: ");
-		}
-		*/
 	
 		if (errors.size() > 0)  
 		{
-			//logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
 			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -2227,9 +2170,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
 		logger.debug("richTextReportTitle: " + richTextReportTitle);
 		
-		//String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-		//logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
-		
 		logger.debug("existing mcContent:" + mcContent);
 		
 		String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
@@ -2241,38 +2181,19 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("updating mcContent title and instructions:" + mcContent);
 			mcContent.setTitle(richTextTitle);
 			mcContent.setInstructions(richTextInstructions);
-			
-			if (mcAuthoringForm.getQuestionsSequenced() != null)
-				mcContent.setQuestionsSequenced(isQuestionsSequenced);
-			
-			if (mcAuthoringForm.getSynchInMonitor() != null)
-				mcContent.setSynchInMonitor(isSynchInMonitor);
-		
-			if (mcAuthoringForm.getUsernameVisible() != null)
-				mcContent.setUsernameVisible(isUsernameVisible);
-			
-			if (mcAuthoringForm.getRetries() != null)
-				mcContent.setRetries(isRetries);
-			
-			if (mcAuthoringForm.getShowFeedback() != null)
-				mcContent.setShowFeedback(isShowFeedback);
-			
-			if (mcAuthoringForm.getSln() != null)
-				mcContent.setShowReport(isSln);
-			
-			logger.debug("isReflect:" + isReflect);
-			mcContent.setReflect(isReflect);
-			
-
 		    mcContent.setPassMark(new Integer(passmark));
-		    mcContent.setReflectionSubject(reflectionSubject);
+		    
 		    if (activeModule.equals(AUTHORING))
 		    {
+				mcContent.setQuestionsSequenced(isQuestionsSequenced);
+				mcContent.setRetries(isRetries);
+				mcContent.setShowReport(isSln);
+				mcContent.setReflect(isReflect);
+				mcContent.setReflectionSubject(reflectionSubject);
 		    	mcContent.setOfflineInstructions(richTextOfflineInstructions);
 			    mcContent.setOnlineInstructions(richTextOnlineInstructions);
 			    mcContent.setReportTitle(richTextReportTitle);
 			    mcContent.setMonitoringReportTitle("Monitoring Report");
-			    //mcContent.setEndLearningMessage(richTextEndLearningMessage);
 		    }
 			    
 		}
