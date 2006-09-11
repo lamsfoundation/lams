@@ -697,7 +697,7 @@ class WorkspaceDialog extends MovieClip{
     *</code>
 	*/
     private function ok(){
-		Cursor.showCursor(ApplicationParent.C_HOURGLASS);
+		
         trace('OK');
 		_global.breakpoint();
 	
@@ -713,11 +713,14 @@ class WorkspaceDialog extends MovieClip{
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		var tempTitle = StringUtils.replace(resourceTitle_txi.text, " ", "");
 		if (tempTitle == "" || tempTitle == undefined){
+			Cursor.showCursor(ApplicationParent.C_DEFAULT);
 			var sendMsg:String = Dictionary.getValue('ws_file_name_empty')+"\n"+Dictionary.getValue('ws_entre_file_name')+"\n\n";
 			LFMessage.showMessageAlert(sendMsg,null);
 			resourceTitle_txi.setFocus();
 		}else{
+			
 			if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
+				Cursor.showCursor(ApplicationParent.C_HOURGLASS);
 				saveFile(snode);
 			} else {
 				openFile(snode);
