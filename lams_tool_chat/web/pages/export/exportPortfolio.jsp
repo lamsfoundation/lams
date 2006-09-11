@@ -72,7 +72,7 @@
 										<span style="font-weight: bold">${user.firstName}
 											${user.lastName} </span>
 										<br />
-										${user.notebookEntry}
+										<lams:out value="${user.notebookEntry}"/>
 									</p>
 								</c:if>
 							</c:forEach>

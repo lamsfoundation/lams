@@ -22,10 +22,10 @@
 		<c:if test="${chatDTO.reflectOnActivity }">
 			<div>
 				<h4 style="margin-left: 12px;">
-					${chatDTO.reflectInstructions}
+					<lams:out value="${chatDTO.reflectInstructions}"/>
 				</h4>
 				<p>
-					${chatUserDTO.notebookEntry}
+					<lams:out value="${chatUserDTO.notebookEntry}"/>
 				</p>
 			</div>
 		</c:if>

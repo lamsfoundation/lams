@@ -9,7 +9,7 @@
 		<table>
 			<tr>
 				<td>
-					${chatDTO.reflectInstructions}
+					<lams:out value="${chatDTO.reflectInstructions}"/>				
 				</td>
 			</tr>
 

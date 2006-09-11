@@ -10,7 +10,9 @@
 	</tr>
 	<tr>
 		<td>
-			<p>${chatUserDTO.notebookEntry}</p>
+			<p>
+				<lams:out value="${chatUserDTO.notebookEntry}" />
+			</p>
 		</td>
 	</tr>
 </table>

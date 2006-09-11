@@ -113,7 +113,7 @@
 		<tr>
 			<td colspan="3">
 				<div>
-					<html:form action="/monitoring" method="post" target="_blank"
+					<html:form action="/monitoring" method="get" target="_blank"
 						style="float:left; margin-right: 4px">
 						<div>
 							<html:hidden property="dispatch" value="openChatHistory" />
@@ -125,7 +125,7 @@
 						</div>
 					</html:form>
 
-					<html:form action="/learning" method="post" target="_blank">
+					<html:form action="/learning" method="get" target="_blank">
 						<div>
 							<html:hidden property="toolSessionID"
 								value="${session.sessionID}" />
