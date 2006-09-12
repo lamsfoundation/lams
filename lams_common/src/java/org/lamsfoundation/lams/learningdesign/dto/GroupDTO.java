@@ -30,6 +30,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.usermanagement.User;
 
+/** Grouping object, suitable for sending to Flash */
 public class GroupDTO {
 	
 	private Long groupID;
@@ -46,7 +47,7 @@ public class GroupDTO {
 		if(group.getUsers() != null){
 			Iterator iter = group.getUsers().iterator();
 			while(iter.hasNext()){
-				userList.add(((User)iter.next()).getUserDTO());
+				userList.add(((User)iter.next()).getUserFlashDTO());
 			}
 		}
 	}
