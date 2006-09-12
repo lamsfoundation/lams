@@ -320,6 +320,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if((_ddm.learningDesignID == undefined || _ddm.learningDesignID == "" || _ddm.learningDesignID == null || _ddm.learningDesignID =="undefined") && (_ddm.title == "" || _ddm.title == undefined || _ddm.title == null)){
 			// raise alert if design is empty
 			if (canvasModel.activitiesDisplayed.size() < 1){
+				Cursor.showCursor(Application.C_DEFAULT);
 				var msg:String = Dictionary.getValue('al_empty_design');
 				LFMessage.showMessageAlert(msg);
 			}else {
@@ -412,6 +413,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function onStoreDesignResponse(r):Void{
 		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
 		if(r instanceof LFError){
+			Cursor.showCursor(Application.C_DEFAULT);
 			r.showErrorAlert();
 		}else{
 			//_global.breakpoint();
