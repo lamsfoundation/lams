@@ -71,14 +71,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
  						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
 	      			</td>
 		        </tr>
-
-			        
-			        
-		         <tr> 
-						<td>							
-							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
-				 		</td>
-				  	</tr>
 		</table>
 
 
