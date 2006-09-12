@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Fiona Malikoff
  * 
  * @web:servlet name="flashCrashDump"
- * @web:servlet-mapping url-pattern="/flashCrashDump"
+ * @web:servlet-mapping url-pattern="/servlet/flashCrashDump"
 
  */
 public class FlashCrashDumpServlet extends AbstractStoreWDDXPacketServlet {

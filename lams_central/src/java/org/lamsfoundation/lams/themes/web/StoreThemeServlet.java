@@ -37,7 +37,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fiona Malikoff
  *
  * @web:servlet name="storeTheme"
- * @web:servlet-mapping url-pattern="/themes/storeTheme"
+ * @web:servlet-mapping url-pattern="/themes/servlet/storeTheme"
  */
 public class StoreThemeServlet extends AbstractStoreWDDXPacketServlet {
 

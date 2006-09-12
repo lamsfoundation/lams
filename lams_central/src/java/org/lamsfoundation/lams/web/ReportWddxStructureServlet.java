@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Fiona Malikoff
  * 
  * @web:servlet name="dumpWDDX"
- * @web:servlet-mapping url-pattern="/dumpWDDX"
+ * @web:servlet-mapping url-pattern="/servlet/dumpWDDX"
 
  */
 public class ReportWddxStructureServlet extends AbstractStoreWDDXPacketServlet {
