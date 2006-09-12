@@ -82,7 +82,7 @@
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:learning">
 		<put name="header" value="tiles:/header:default" />
-		<put name="body" value="/pages/learning/chat_ui.jsp" />
+		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 
 	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:learning">
@@ -112,7 +112,7 @@
 	<definition name="tiles:/monitoring/chat_client" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
 		<put name="header" value="tiles:/header:default" />
-		<put name="body" value="/pages/learning/chat_ui.jsp" />
+		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 
 	<definition name="tiles:/monitoring/chat_history" extends="tiles:/layout:default">
