@@ -1,104 +1,81 @@
 Deployed Libraries
 
-Folder            Library                                  Version                License                       Vendor                           Description
+Folder            Library                               Version                License                       Vendor                           Description
 
-annotation        annogen-0.1.0.jar                        0.1.0                                                                                 
+axis              axis-ant.jar                                                                                                                
+                  axis.jar                                                                                                                    
+                  jaxrpc.jar                                                                                                                  
+                  saaj.jar                                                                                                                    
+                  wsdl4j-1.5.1.jar                      1.5.1                                                IBM                              JWSDL
 
-axis              axiom-api-1.0.jar                        1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0                                 
-                  axiom-impl-1.0.jar                       1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0                                 
-                  axis2-adb-1.0.jar                        1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0
-                  axis2-codegen-1.0.jar                    1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0
-                  axis2-java2wsdl-1.0.jar                  1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0
-                  axis2-jibx-1.0.jar                       1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0
-                  axis2-kernel-1.0.jar                     1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0                                 
-                  axis2-soapmonitor-1.0.jar                1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0
-                  axis2-xmlbeans-1.0.jar                   1.0                    Apache License 2.0            Apache Software Foundation       Axis 2.0
+cglib             cglib-nodep-2.1_2.jar                 2.1_2                  Apache License 2.0                                             
 
-cglib             cglib-nodep-2.1_2.jar                    2.1_2                  Apache License 2.0                                             
+concurrent        concurrent-1.3.4.jar                  1.3.4                                                                                 
 
-concurrent        backport-util-concurrent-2.1.jar         2.1                                                                                   
-                  concurrent-1.3.4.jar                     1.3.4                                                                                 
+dom4j             dom4j-1.5.2.jar                       1.5.2                                                MetaStuff Ltd.                   dom4j : XML framework for Java
 
-dom4j             dom4j-1.5.2.jar                          1.5.2                                                MetaStuff Ltd.                   dom4j : XML framework for Java
+ehcache           ehcache-1.1.jar                       1.1                    Apache Software License 1.1                                    
 
-ehcache           ehcache-1.1.jar                          1.1                    Apache Software License 1.1                                    
+fckeditor         FCKeditor-2.3.jar                     2.3                                                                                   
 
-fckeditor         FCKeditor-2.3.jar                        2.3                                                                                   
+hibernate         hibernate3.jar                        3.1.3                                                                                 
 
-geronimo          geronimo-spec-activation-1.0.2-rc4.jar   1.0.2-rc4              Apache License 2.0            Apache Software Foundation       Java Activation Framework
-                  geronimo-spec-javamail-1.3.1-rc5.jar     1.3.1-rc5              Apache License 2.0            Apache Software Foundation       JavaMail API 1.3.1
-                  geronimo-spec-jms-1.1-rc4.jar            1.1-rc4                Apache License 2.0            Apache Software Foundation       J2EE JMS Specification
+j2ee              jstl.jar                              1.1.2                                                Sun Microsystems, Inc.           JavaServer Pages Standard Tag Library (JSTL)
 
-hibernate         hibernate3.jar                           3.1.3                                                                                 
+jakarta-commons   commons-beanutils.jar                 1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Beanutils
+                  commons-codec-1.3.jar                 1.3                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Codec
+                  commons-collections.jar               3.1                    Apache License 2.0            Apache Software Foundation       Commons Collections
+                  commons-digester.jar                  1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Digester
+                  commons-discovery-0.2.jar             0.2                    Apache Software License 1.1   Apache Software Foundation       
+                  commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
+                  commons-lang-2.0.jar                  2.0                    Apache Software License 1.1   Apache Software Foundation       Jakarta Commons Lang
+                  commons-logging.jar                   1.0.4                  Apache License 2.0            Apache Software Foundation       
+                  commons-validator.jar                 1.1.4                  Apache License 2.0            The Apache Software Foundation   Commons Validator
 
-j2ee              jstl.jar                                 1.1.2                                                Sun Microsystems, Inc.           JavaServer Pages Standard Tag Library (JSTL)
+jakarta-poi       poi-2.5.1-final-20040804.jar          2.5.1-final-20040804                                                                  
 
-jakarta-commons   commons-beanutils.jar                    1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Beanutils
-                  commons-codec-1.3.jar                    1.3                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Codec
-                  commons-collections.jar                  3.1                    Apache License 2.0            Apache Software Foundation       Commons Collections
-                  commons-digester.jar                     1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Digester
-                  commons-fileupload.jar                   1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
-                  commons-httpclient.jar                   3.0.1                  Apache License 2.0            Apache Software Foundation       Jakarta Commons HttpClient
-                  commons-lang-2.0.jar                     2.0                    Apache Software License 1.1   Apache Software Foundation       Jakarta Commons Lang
-                  commons-logging.jar                      1.0.4                  Apache License 2.0            Apache Software Foundation       
-                  commons-validator.jar                    1.1.4                  Apache License 2.0            The Apache Software Foundation   Commons Validator
+jakarta-taglibs   standard.jar                          1.1.2                                                Apache Software Foundation       JavaServer Pages Standard Tag Library (JSTL)
 
-jakarta-poi       poi-2.5.1-final-20040804.jar             2.5.1-final-20040804                                                                  
+jboss             jboss-cache.jar                       4.0.2                                                JBoss Inc.                       JBoss
+                  jboss-common.jar                      4.0.2                                                JBoss Inc.                       JBoss
+                  jboss-jmx.jar                         4.0.2                                                JBoss Inc.                       JBoss
+                  jboss-system.jar                      4.0.2                                                JBoss Inc.                       JBoss
+                  jgroups.jar                           4.0.2                                                JBoss Inc.                       JBoss
 
-jakarta-taglibs   standard.jar                             1.1.2                                                Apache Software Foundation       JavaServer Pages Standard Tag Library (JSTL)
+jdom              jdom.jar                                                                                                                    
 
-jboss             jboss-cache.jar                          4.0.2                                                JBoss Inc.                       JBoss
-                  jboss-common.jar                         4.0.2                                                JBoss Inc.                       JBoss
-                  jboss-jmx.jar                            4.0.2                                                JBoss Inc.                       JBoss
-                  jboss-system.jar                         4.0.2                                                JBoss Inc.                       JBoss
-                  jgroups.jar                              4.0.2                                                JBoss Inc.                       JBoss
+jfreechart        gnujaxp.jar                                                  GPL                           Free Software Foundation         GNU JAXP
+                  jcommon-1.0.0.jar                     1.0.0                                                                                 
+                  jfreechart-1.0.1.jar                  1.0.1                                                                                 
 
-jdom              jdom.jar                                                                                                                       
+log4j             log4j-1.2.13.jar                      1.2.13                                                                                
 
-jfreechart        gnujaxp.jar                                                     GPL                           Free Software Foundation         GNU JAXP
-                  jcommon-1.0.0.jar                        1.0.0                                                                                 
-                  jfreechart-1.0.1.jar                     1.0.1                                                                                 
+mysql             mysql-connector-java-3.1.12-bin.jar   3.1.12-bin                                                                            
 
-log4j             log4j-1.2.13.jar                         1.2.13                                                                                
+odmg              odmg-3.0.jar                          3.0                                                                                   
 
-mysql             mysql-connector-java-3.1.12-bin.jar      3.1.12-bin                                                                            
+quartz            quartz.jar                            1.5.2                                                OpenSymphony                     Quartz Enterprise Job Scheduler
 
-odmg              odmg-3.0.jar                             3.0                                                                                   
+smack             smack.jar                                                                                                                   
+                  smackx.jar                                                                                                                  
 
-quartz            quartz.jar                               1.5.2                                                OpenSymphony                     Quartz Enterprise Job Scheduler
+spring            spring.jar                            1.2.8                                                                                 Spring Framework
 
-smack             smack.jar                                                                                                                      
-                  smackx.jar                                                                                                                     
+struts            antlr.jar                                                                                                                   
+                  jakarta-oro.jar                                              Apache Software License 1.1                                    
+                  struts-el.jar                                                                                                               
+                  struts.jar                            1.2.7                  Apache License 2.0            The Apache Software Foundation   Struts Framework
 
-spring            spring.jar                               1.2.8                                                                                 Spring Framework
+wddx              wddx.jar                              1.1                                                                                   WDDX
 
-struts            antlr.jar                                                                                                                      
-                  jakarta-oro.jar                                                 Apache Software License 1.1                                    
-                  struts-el.jar                                                                                                                  
-                  struts.jar                               1.2.7                  Apache License 2.0            The Apache Software Foundation   Struts Framework
-
-wddx              wddx.jar                                 1.1                                                                                   WDDX Modified by LAMS
-
-wsdl4j            wsdl4j-1.5.2.jar                         1.5.2                                                IBM                              JWSDL
-
-wspolicy          neethi-1.0.1.jar                         1.0.1                  Apache License 2.0            Apache Software Foundation       WS-Policy
-
-xml               jaxen-1.1-beta-8.jar                     1.1-beta-8                                           Codehaus                         Universal Java XPath Engine
-                  jibx-run-1.1-beta3.jar                   1.1-beta3                                                                             
-                  xbean-2.1.0.jar                          2.1.0                  Apache License 2.0                                             
-                  xercesImpl-2.7.1.jar                     2.7.1                                                                                 
-                  xml-apis-1.3.02.jar                      1.3.02                                                                                
-                  XmlSchema-1.0.2.jar                      1.0.2                  Apache License 2.0            Apache Software Foundation       XmlSchema API
-
-xstream           jmock-2004-03-19.jar                                                                                                           
-                  joda-time-0.98.jar                       0.98                   Joda Software License 1.0     Joda.org                         Joda Time
-                  stax-1.1.1-dev.jar                       1.1.1-dev                                                                             StAX is the reference implementation of the St...
-                  stax-api-1.0.jar                         1.0                                                                                   
-                  wstx-asl-2.9.3.jar                       2.9.3                                                woodstox.codehaus.org            StAX 1.0 API
-                  xml-writer-0.2.jar                       0.2                                                                                   
-                  xom-1.0b3.jar                            1.0b3                                                                                 
-                  xpp3-1.1.3.4d_b4_min.jar                 1.1.3.4d_b4_min                                                                       
-                  xstream-1.1.jar                          1.1                                                                                   
+xstream           jmock-2004-03-19.jar                                                                                                        
+                  joda-time-0.98.jar                    0.98                   Joda Software License 1.0     Joda.org                         Joda Time
+                  stax-1.1.1-dev.jar                    1.1.1-dev                                                                             StAX is the reference implementation of the St...
+                  stax-api-1.0.jar                      1.0                                                                                   
+                  xml-writer-0.2.jar                    0.2                                                                                   
+                  xom-1.0b3.jar                         1.0b3                                                                                 
+                  xpp3-1.1.3.4d_b4_min.jar              1.1.3.4d_b4_min                                                                       
+                  xstream-1.1.jar                       1.1                                                                                   
 
 
 
