@@ -36,6 +36,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<lams:headItems />
 	<title><bean:message key="activity.title" /></title>
+
+	<script language="JavaScript" type="text/JavaScript">
+		function submitLearningMethod(actionMethod) 
+		{
+			document.QaLearningForm.method.value=actionMethod; 
+			document.QaLearningForm.submit();
+		}
+		
+		function submitMethod(actionMethod) 
+		{
+			submitLearningMethod(actionMethod);
+		}
+	</script>		
+	
 </head>
 
 <body>
@@ -60,14 +74,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<td>
 				<div class="right-buttons">
 
-					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-						<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
+					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+						<html:submit property="endLearning" onclick="javascript:submitMethod('endLearning');" styleClass="button">
 							<bean:message key="button.endLearning"/>
 						</html:submit>	 				
 				  	</c:if> 				    					
 	
-					<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-						<html:submit property="forwardtoReflection"  styleClass="button">
+					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+						<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"  styleClass="button">
 							<bean:message key="label.continue"/>
 						</html:submit>	 				
 				  	</c:if> 				    					
