@@ -32,66 +32,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 		
-			<table>
+	<table cellpadding="0">
 				<tr>
-					<td class="field-name">							
-			      			<bean:message key="label.vote.changable"/>:
-					</td>
 					<td>							
-		      			<html:checkbox property="voteChangable" value="1"
-							styleClass="noBorder" styleId="voteChangable">
+						<html:checkbox property="voteChangable"  value="1" styleClass="noBorder">
+							<bean:message key="label.vote.changable" />
 						</html:checkbox>
 	      			</td>
 		         </tr>
 		         
 				<tr>
-					<td class="field-name">							
-			      			<bean:message key="label.vote.lockedOnFinish"/>:
-					</td>
 					<td>							
-		      			<html:checkbox property="lockOnFinish" value="1"
-							styleClass="noBorder" styleId="lockOnFinish">
+						<html:checkbox property="lockOnFinish"  value="1" styleClass="noBorder">
+							<bean:message key="label.vote.lockedOnFinish" />
 						</html:checkbox>
 	      			</td>
 		         </tr>
 		         
    				<tr>
-					<td class="field-name">							
-			      			<bean:message key="label.allowText"/>:
-					</td>
 					<td>							
-		      			<html:checkbox property="allowText" value="1"
-							styleClass="noBorder" styleId="allowText">
+						<html:checkbox property="allowText"  value="1" styleClass="noBorder">
+							<bean:message key="label.allowText" />
 						</html:checkbox>
-						
 	      			</td>
 		        </tr>
 		         
 		         <tr> 
-					<td class="field-name">							
-					 		<bean:message key="label.maxNomCount"/>: 
-					</td>
-
 					<td>							
-			 			<html:text property="maxNominationCount" size="8" maxlength="3"/>
+						<bean:message key="label.maxNomCount"/>: <html:text property="maxNominationCount" size="8" maxlength="3"/>
 			 		</td>
 			  	</tr>
 
    				<tr>
-					<td class="field-name">							
-			      			<bean:message key="label.reflect"/>:
-					</td>
-					<td>							
-		      			<html:checkbox property="reflect" value="1"
-							styleClass="noBorder" styleId="reflect">
+					<td>							   				
+						<html:checkbox property="reflect"  value="1" styleClass="noBorder">
+							<bean:message key="label.reflect" />
 						</html:checkbox>
-	      			</td>
+			 		</td>						
 		        </tr>
 
    				<tr>
-					<td class="field-name">							
-							&nbsp
-					</td>
 					<td>							
  						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
 	      			</td>
