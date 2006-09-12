@@ -40,15 +40,15 @@
 	<servlet-name>AxisServlet</servlet-name>
 	<display-name>Apache-Axis Servlet</display-name>
 	<servlet-class>
-		org.apache.axis2.transport.http.AxisServlet
+		org.apache.axis.transport.http.AxisServlet
 	</servlet-class>
-	<load-on-startup>2</load-on-startup>
 </servlet>
 
 <servlet>
-	<servlet-name>AxisRESTServlet</servlet-name>
-	<display-name>Apache-Axis Servlet (REST)</display-name>
+	<servlet-name>AdminServlet</servlet-name>
+	<display-name>Axis Admin Servlet</display-name>
 	<servlet-class>
-		org.apache.axis2.transport.http.AxisRESTServlet
+		org.apache.axis.transport.http.AdminServlet
 	</servlet-class>
+	<load-on-startup>100</load-on-startup>
 </servlet>

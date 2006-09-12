@@ -110,15 +110,11 @@
 				<patternset id="lib.jars">
 					<!--  the desired jars are nominated explicitly so -->
 					<!--  we don't release a build only one by accident -->
-					<include name="annotation/*.jar" />					
-					<include name="aopalliance/*.jar" />
 					<include name="axis/*.jar" />
 					<include name="cglib/*.jar" />
-					<include name="concurrent/*.jar" />					
 					<include name="dom4j/*.jar" />
 					<include name="ehcache/*.jar" />
 					<include name="fckeditor/*.jar" />
-					<include name="geronimo/*.jar" />
 					<include name="hibernate/*.jar" />
 					<include name="j2ee/*.jar" />
 					<include name="jakarta-commons/*.jar" />
@@ -136,13 +132,8 @@
 					<include name="spring/*.jar" />
 					<include name="struts/*.jar" />
 					<include name="wddx/*.jar" />
-					<include name="wsdl4j/*.jar" />
-					<include name="wspolicy/*.jar" />
-					<include name="xml/*.jar" />
-					<include name="xstream/*.jar" />
-					<!-- exclude it since it's included in ${j2eelibs} -->
-					<!-- we don't include it here because jboss always load it from ${j2eelibs} -->
-					<exclude name="jakarta-commons/commons-httpclient.jar" />
+					<include name="concurrent/*.jar" />					
+					<include name="xstream/*.jar" />					
 				</patternset>
 			</fileset> 
 			<fileset dir="..">
@@ -308,8 +299,6 @@
 				<include name="web.xml" />
 			</fileset>
 		</copy>
-		<!-- replace commons-httpclient 2 in jboss 4.0.2 with commons-httpclient 3 for Axis2 -->
-		<copy overwrite="yes" file="${lib}/jakarta-commons/commons-httpclient.jar" todir="${j2eelibs}" />
 		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
 		<echo message="Please copy jboss-cache.jar and jgroups.jar from server/all/lib to server/default/lib"
 			level="warning"/>

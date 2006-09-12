@@ -121,6 +121,7 @@
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="*.tld"/>
+				<include name="*.wsdd"/>
 				<include name="conf/**"/>
 				<include name="modules/**"/>
 				<include name="services/**"/>
