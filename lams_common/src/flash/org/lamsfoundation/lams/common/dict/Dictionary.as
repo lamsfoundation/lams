@@ -189,9 +189,14 @@ dynamic class Dictionary {
         for(var i=0;i<dataObj.length;i++){
             //Create hashKey object and then prune hashkey from dataObject before adding dictionary item to hashtable 
             var hashKey = dataObj[i].key;
-            delete dataObj[i].key;
-            //Create the dictionary item from the data object
-            var dictItem:DictionaryItem = DictionaryItem.createFromData(dataObj[i])
+            //delete dataObj[i].key;
+            
+			var newDataObj = new Object();
+			newDataObj.value = dataObj[i].value;
+			newDataObj.description = dataObj[i].description;
+			
+			//Create the dictionary item from the data object
+            var dictItem:DictionaryItem = DictionaryItem.createFromData(newDataObj)
             items.put(hashKey,dictItem);
         }
         //Dispatch load event 
@@ -221,7 +226,8 @@ dynamic class Dictionary {
         Debugger.log('opening Dictionary from Shared Object',Debugger.CRITICAL,'openFromDisk','Dictionary');		
 	   
 		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage + '.' + app.module,false);
-        createFromData(dataObj);
+		createFromData(dataObj);
+		
     }
     
     /**
