@@ -395,7 +395,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		var callback:Function = Proxy.create(this,onStoreDesignResponse);
 		
-		Application.getInstance().getComms().sendAndReceive(dto,"authoring/storeLearningDesignDetails",callback,false);
+		Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
 		//Application.getInstance().getComms().sendAndReceive(dto,"http://dolly.uklams.net:8080/lams/authoring/authorServlet",onStoreDesignResponse,true);
 		//Application.getInstance().getComms().sendAndReceive(dto,"http://geo.uklams.net/testing/printPost.php",onStoreDesignResponse,true);
 		
