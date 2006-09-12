@@ -44,75 +44,57 @@
         <web>
             <web-uri>lams-central.war</web-uri>
             <context-root>/lams</context-root>
-		</web>
+	</web>
     </module>
     <module>
         <web>
             <web-uri>lams-admin.war</web-uri>
             <context-root>/lams/admin</context-root>
-		</web>
+	</web>
     </module>
     <module>
         <web>
             <web-uri>lams-monitoring.war</web-uri>
             <context-root>/lams/monitoring</context-root>
-		</web>
+	</web>
     </module>
     <module>
         <web>
             <web-uri>lams-learning.war</web-uri>
             <context-root>/lams/learning</context-root>
-		</web>
+	</web>
     </module> 
+	<module>
+		<java>lams-dictionary.jar</java>
+	</module>
     <module>
         <web>
             <web-uri>lams-www.war</web-uri>
             <context-root>/lams/www</context-root>
 		</web>
     </module>
-	<module>
-		<java>lams-dictionary.jar</java>
-	</module>
 
     <!--  Third Party JAR Files -->
 	<module>
-		<java>annogen-0.1.0.jar</java>
+		<java>axis.jar</java>
 	</module>
 	<module>
-		<java>axiom-api-1.0.jar</java>
-	</module>
-	<module>
-		<java>axiom-impl-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-adb-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-codegen-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-java2wsdl-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-jibx-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-kernel-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-soapmonitor-1.0.jar</java>
-	</module>
-	<module>
-		<java>axis2-xmlbeans-1.0.jar</java>
-	</module>
-	<module>
-		<java>antlr.jar</java>
-	</module>
-	<module>
-		<java>backport-util-concurrent-2.1.jar</java>
+		<java>axis-ant.jar</java>
 	</module>
 	<module>
 		<java>cglib-nodep-2.1_2.jar</java>
+	</module>
+	<module>
+		<java>dom4j-1.5.2.jar</java>
+	</module>
+	<module>
+		<java>ehcache-1.1.jar</java>
+	</module>
+	<module>
+		<java>hibernate3.jar</java>
+	</module>
+	<module>
+		<java>jstl.jar</java>
 	</module>
 	<module>
 		<java>commons-beanutils.jar</java>
@@ -127,6 +109,9 @@
 		<java>commons-digester.jar</java>
 	</module>
 	<module>
+		<java>commons-discovery-0.2.jar</java>
+	</module>
+	<module>
 		<java>commons-fileupload.jar</java>
 	</module>
 	<module>
@@ -139,34 +124,16 @@
 		<java>commons-validator.jar</java>
 	</module>
 	<module>
-		<java>dom4j-1.5.2.jar</java>
-	</module>
-	<module>
-		<java>ehcache-1.1.jar</java>
-	</module>
-	<module>
 		<java>FCKeditor-2.3.jar</java>
-	</module>
-	<module>
-		<java>geronimo-spec-activation-1.0.2-rc4.jar</java>
-	</module>
-	<module>
-		<java>geronimo-spec-javamail-1.3.1-rc5.jar</java>
-	</module>
-	<module>
-		<java>geronimo-spec-jms-1.1-rc4.jar</java>
-	</module>
-	<module>
-		<java>hibernate3.jar</java>
-	</module>
-	<module>
-		<java>jstl.jar</java>
 	</module>
 	<module>
 		<java>poi-2.5.1-final-20040804.jar</java>
 	</module>
 	<module>
 		<java>standard.jar</java>
+	</module>
+	<module>
+		<java>jaxrpc.jar</java>
 	</module>
 	<module>
 		<java>jboss-cache.jar</java>
@@ -196,6 +163,9 @@
 		<java>odmg-3.0.jar</java>
 	</module>
 	<module>
+		<java>antlr.jar</java>
+	</module>
+	<module>
 		<java>jakarta-oro.jar</java>
 	</module>
 	<module>
@@ -208,34 +178,10 @@
 		<java>wddx.jar</java>
 	</module>
 	<module>
-		<java>wsdl4j-1.5.2.jar</java>
-	</module>
-	<module>
-		<java>neethi-1.0.1.jar</java>
-	</module>
-	<module>
-		<java>jaxen-1.1-beta-8.jar</java>
-	</module>
-	<module>
-		<java>jibx-run-1.1-beta3.jar</java>
-	</module>
-	<module>
-		<java>xbean-2.1.0.jar</java>
-	</module>
-	<module>
-		<java>xercesImpl-2.7.1.jar</java>
-	</module>
-	<module>
-		<java>xml-apis-1.3.02.jar</java>
-	</module>
-	<module>
-		<java>XmlSchema-1.0.2.jar</java>
-	</module>
-	<module>
-		<java>wstx-asl-2.9.3.jar</java>
-	</module>
-	<module>
 		<java>quartz.jar</java>
+	</module>
+	<module>
+		<java>saaj.jar</java>
 	</module>
 	<module>
 		<java>smack.jar</java>
@@ -261,7 +207,10 @@
 	</module>	
 	<module>
 		<java>stax-api-1.0.jar</java>
-	</module>	
+	</module>
+	<module>
+		<java>wsdl4j-1.5.1.jar</java>
+	</module>
 	<module>
 		<java>xml-writer-0.2.jar</java>
 	</module>	
@@ -286,5 +235,7 @@
             <context-root>/lams/tool/survey</context-root>
 		</web>
     </module>
+
+
     -->
  </application>
