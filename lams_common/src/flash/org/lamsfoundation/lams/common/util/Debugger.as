@@ -158,7 +158,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 		var callback:Function = Proxy.create(Debugger,onCrashDumpResponse);
 		
 		var comms = ApplicationParent.getInstance().getComms();
-        comms.sendAndReceive(dto, 'flashCrashDump',callback,false)
+        comms.sendAndReceive(dto, 'servlet/flashCrashDump',callback,false)
 		
     }	
 			

@@ -43,7 +43,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Mitchell Seaton
  *
  * @web:servlet name="storeNotebookEntry"
- * @web:servlet-mapping url-pattern="/notebook/storeNotebookEntry"
+ * @web:servlet-mapping url-pattern="/servlet/notebook/storeNotebookEntry"
  */
 public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 

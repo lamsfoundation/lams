@@ -44,7 +44,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fiona Malikoff
  *
  * @web:servlet name="storeLD"
- * @web:servlet-mapping url-pattern="/authoring/storeLearningDesignDetails"
+ * @web:servlet-mapping url-pattern="/servlet/authoring/storeLearningDesignDetails"
  */
 public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 

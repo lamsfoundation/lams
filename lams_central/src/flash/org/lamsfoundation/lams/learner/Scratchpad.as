@@ -220,7 +220,7 @@ class Scratchpad extends MovieClip {
 		
 		var callback:Function = Proxy.create(this,onStoreEntryResponse);
 		
-		Application.getInstance().getComms().sendAndReceive(dto,"notebook/storeNotebookEntry",callback,false);
+		Application.getInstance().getComms().sendAndReceive(dto,"servlet/notebook/storeNotebookEntry",callback,false);
 		
 	}
 	

@@ -205,7 +205,7 @@ dynamic class Dictionary {
     public function saveToDisk():Void{
         //Convert to data object and then serialize before saving to a cookie
         var dataObj = toData();
-        CookieMonster.save(dataObj,'dictionary.' + _currentLanguage + '.' + app.module,true);
+        CookieMonster.save(dataObj,'dictionary.' + _currentLanguage + '.' + app.module,false);
 		var success = CookieMonster.save(_root.langDate, 'dictionary.date', true);
 		
 		if (!success) {
@@ -220,7 +220,7 @@ dynamic class Dictionary {
     public function openFromDisk():Void{
         Debugger.log('opening Dictionary from Shared Object',Debugger.CRITICAL,'openFromDisk','Dictionary');		
 	   
-		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage + '.' + app.module,true);
+		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage + '.' + app.module,false);
         createFromData(dataObj);
     }
     
