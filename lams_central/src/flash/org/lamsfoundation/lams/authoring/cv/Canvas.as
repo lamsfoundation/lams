@@ -317,7 +317,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	public function saveDesign(){
-		if(_ddm.learningDesignID == undefined){
+		if((_ddm.learningDesignID == undefined || _ddm.learningDesignID == "" || _ddm.learningDesignID == null || _ddm.learningDesignID =="undefined") && (_ddm.title == "" || _ddm.title == undefined || _ddm.title == null)){
 			// raise alert if design is empty
 			if (canvasModel.activitiesDisplayed.size() < 1){
 				var msg:String = Dictionary.getValue('al_empty_design');
