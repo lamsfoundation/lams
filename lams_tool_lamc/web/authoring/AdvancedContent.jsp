@@ -32,57 +32,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 			
-			<table class="forms">
+	<table cellpadding="0">
 					<tr>
-						<td class="field-name">							
-				      			 <bean:message key="radiobox.sln"/>: 
-						</td>
 						<td>							
-			      			<html:checkbox property="sln" value="1"
-								styleClass="noBorder" styleId="sln">
+							<html:checkbox property="sln"  value="1" styleClass="noBorder">
+								<bean:message key="radiobox.sln" />
 							</html:checkbox>
-		      			</td>
+		      			</td>		      			
 			         </tr>
 			         
 					<tr>
-						<td class="field-name">							
-				      			 <bean:message key="radiobox.onepq"/>: 
-						</td>
 						<td>							
-			      			<html:checkbox property="questionsSequenced" value="1"
-								styleClass="noBorder" styleId="questionsSequenced">
+							<html:checkbox property="questionsSequenced" value="1" styleClass="noBorder">
+								<bean:message key="radiobox.onepq" />
 							</html:checkbox>
-		      			</td>
+		      			</td>		      			
 			         </tr>
 			         
 	   				<tr>
-						<td class="field-name">							
-				      			 <bean:message key="radiobox.retries"/>:
-						</td>
 						<td>							
-			      			<html:checkbox property="retries" value="1"
-								styleClass="noBorder" styleId="retries">
+							<html:checkbox property="retries" value="1" styleClass="noBorder">
+								<bean:message key="radiobox.retries" />
 							</html:checkbox>
-		      			</td>
+		      			</td>		      			
 			        </tr>
 			        
 
    				<tr>
-					<td class="field-name">							
-			      			<bean:message key="label.reflect"/>:
-					</td>
-					<td>							
-		      			<html:checkbox property="reflect" value="1"
-							styleClass="noBorder" styleId="reflect">
-						</html:checkbox>
-
-	      			</td>
+						<td>							
+							<html:checkbox property="reflect" value="1" styleClass="noBorder">
+								<bean:message key="label.reflect" />
+							</html:checkbox>
+		      			</td>		      			
 		        </tr>
 
    				<tr>
-					<td class="field-name">							
-							&nbsp
-					</td>
 					<td>							
  						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
 	      			</td>
@@ -91,8 +75,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			        
 			        
 		         <tr> 
-						<td colspan=2>							
-								<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
+						<td>							
+							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true" key="label.report.title.col"/>							
 				 		</td>
 				  	</tr>
 		</table>
