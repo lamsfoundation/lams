@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.survey.web.action;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,12 +41,9 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.survey.dto.Summary;
-import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
-import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -69,12 +65,7 @@ public class MonitoringAction extends Action {
 		if (param.equals("listuser")) {
 			return listuser(mapping, form, request, response);
 		}
-		if (param.equals("showitem")) {
-			return showitem(mapping, form, request, response);
-		}
-		if (param.equals("hideitem")) {
-			return hideitem(mapping, form, request, response);
-		}
+
 		if (param.equals("viewReflection")) {
 			return viewReflection(mapping, form, request, response);
 		}
@@ -83,57 +74,6 @@ public class MonitoringAction extends Action {
 		return mapping.findForward(SurveyConstants.ERROR);
 	}
 
-
-	private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		Long itemUid = WebUtil.readLongParam(request, SurveyConstants.PARAM_RESOURCE_ITEM_UID);
-		ISurveyService service = getSurveyService();
-		service.setItemVisible(itemUid,false);
-		
-		//get back SessionMap
-		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		
-		//update session value
-		List<List> groupList = (List<List>) sessionMap.get(SurveyConstants.ATTR_SUMMARY_LIST);
-		if(groupList != null)
-			for(List<Summary> group : groupList){
-				for(Summary sum: group){
-					if(itemUid.equals(sum.getItemUid())){
-						sum.setItemHide(true);
-						break;
-					}
-				}
-			}
-
-		return mapping.findForward(SurveyConstants.SUCCESS);
-	}
-
-	private ActionForward showitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		Long itemUid = WebUtil.readLongParam(request, SurveyConstants.PARAM_RESOURCE_ITEM_UID);
-		ISurveyService service = getSurveyService();
-		service.setItemVisible(itemUid,true);
-		
-		//get back SessionMap
-		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		
-		//update session value
-		List<List> groupList = (List<List>) sessionMap.get(SurveyConstants.ATTR_SUMMARY_LIST);
-		if(groupList != null)
-			for(List<Summary> group : groupList){
-				for(Summary sum: group){
-					if(itemUid.equals(sum.getItemUid())){
-						sum.setItemHide(false);
-						break;
-					}
-				}
-			}
-		return mapping.findForward(SurveyConstants.SUCCESS);
-	}
 
 	private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -144,18 +84,18 @@ public class MonitoringAction extends Action {
 		
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		ISurveyService service = getSurveyService();
-		List<List<Summary>> groupList = service.getSummary(contentId);
-		
-		Survey survey = service.getSurveyByContentId(contentId);
-		survey.toDTO();
-		
+//		List<List<Summary>> groupList = service.getSummary(contentId);
+//		
+//		Survey survey = service.getSurveyByContentId(contentId);
+//		survey.toDTO();
+//		
 		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);
-		
-		//cache into sessionMap
-		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
-		sessionMap.put(SurveyConstants.PAGE_EDITABLE, new Boolean(SurveyWebUtils.isSurveyEditable(survey)));
-		sessionMap.put(SurveyConstants.ATTR_RESOURCE, survey);
-		sessionMap.put(SurveyConstants.ATTR_TOOL_CONTENT_ID, contentId);
+//		
+//		//cache into sessionMap
+//		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
+//		sessionMap.put(SurveyConstants.PAGE_EDITABLE, new Boolean(SurveyWebUtils.isSurveyEditable(survey)));
+//		sessionMap.put(SurveyConstants.ATTR_RESOURCE, survey);
+//		sessionMap.put(SurveyConstants.ATTR_TOOL_CONTENT_ID, contentId);
 		sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, relectList);
 		
 		return mapping.findForward(SurveyConstants.SUCCESS);
@@ -168,10 +108,10 @@ public class MonitoringAction extends Action {
 
 		//get user list by given item uid
 		ISurveyService service = getSurveyService();
-		List list = service.getUserListBySessionItem(sessionId, itemUid);
+//		List list = service.getUserListBySessionItem(sessionId, itemUid);
 		
 		//set to request
-		request.setAttribute(SurveyConstants.ATTR_USER_LIST, list);
+//		request.setAttribute(SurveyConstants.ATTR_USER_LIST, list);
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 	

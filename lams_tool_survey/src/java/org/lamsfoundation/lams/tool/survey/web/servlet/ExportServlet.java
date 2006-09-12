@@ -25,9 +25,7 @@
 
 package org.lamsfoundation.lams.tool.survey.web.servlet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.survey.SurveyConstants;
-import org.lamsfoundation.lams.tool.survey.dto.Summary;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
@@ -116,13 +112,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		
-		List<Summary> group = service.exportBySessionId(toolSessionID,true);
-		
-		List<List> groupList = new ArrayList<List>();
-		if(group.size() > 0)
-			groupList.add(group);
-		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
+//		List<Summary> group = service.exportBySessionId(toolSessionID,true);
+//		
+//		List<List> groupList = new ArrayList<List>();
+//		if(group.size() > 0)
+//			groupList.add(group);
+//		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
+//		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
@@ -143,11 +139,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SurveyApplicationException(error);
 		}
-		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-		
-		// put it into HTTPSession
-		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
+//		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
+//		
+//		// put it into HTTPSession
+//		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
+//		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 }

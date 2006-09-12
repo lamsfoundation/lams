@@ -143,7 +143,7 @@ public class LearningAction extends Action {
 		//save toolContentID into HTTPSession
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, true);
 		
-		Long sessionId =  new Long(request.getParameter(SurveyConstants.PARAM_TOOL_SESSION_ID));
+		Long sessionId =  new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 		
 		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
@@ -161,22 +161,6 @@ public class LearningAction extends Action {
 		//check whehter finish lock is on/off
 		boolean lock = survey.getLockWhenFinished() && surveyUser.isSessionFinished();
 		
-		
-		//check whether there is only one survey item and run auto flag is true or not.
-		boolean runAuto = false;
-		int itemsNumber = 0;
-		if(survey.getSurveyItems() != null){
-			itemsNumber = survey.getSurveyItems().size();
-			if(survey.isRunAuto() && itemsNumber == 1){
-				SurveyQuestion item = (SurveyQuestion) survey.getSurveyItems().iterator().next();
-				//only visible item can be run auto.
-				if(!item.isHide()){
-					runAuto = true;
-					request.setAttribute(SurveyConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
-				}
-			}
-		}
-		
 		//basic information
 		sessionMap.put(SurveyConstants.ATTR_TITLE,survey.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_RESOURCE_INSTRUCTION,survey.getInstructions());
@@ -187,7 +171,6 @@ public class LearningAction extends Action {
 		//reflection information
 		sessionMap.put(SurveyConstants.ATTR_REFLECTION_ON,survey.isReflectOnActivity());
 		sessionMap.put(SurveyConstants.ATTR_REFLECTION_INSTRUCTION,survey.getReflectInstructions());
-		sessionMap.put(SurveyConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
 		
 		//add define later support
 		if(survey.isDefineLater()){
@@ -264,16 +247,6 @@ public class LearningAction extends Action {
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
-		//auto run mode, when use finish the only one survey item, mark it as complete then finish this activity as well.
-		String surveyItemUid = request.getParameter(SurveyConstants.PARAM_RESOURCE_ITEM_UID);
-		if(surveyItemUid != null){
-			doComplete(request);
-			//NOTE:So far this flag is useless(31/08/2006).
-			//set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-			request.setAttribute(SurveyConstants.ATTR_RUN_AUTO,true);
-		}else
-			request.setAttribute(SurveyConstants.ATTR_RUN_AUTO,false);
-		
 		if(!validateBeforeFinish(request, sessionMapID))
 			return mapping.getInputForward();
 		
@@ -310,7 +283,7 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		
-		Long sessionId = (Long) sessionMap.get(SurveyConstants.ATTR_TOOL_SESSION_ID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		SurveyItemForm itemForm = (SurveyItemForm)form;
@@ -434,17 +407,6 @@ public class LearningAction extends Action {
 		Long userID = new Long(user.getUserID().longValue());
 		
 		ISurveyService service = getSurveyService();
-		int miniViewFlag = service.checkMiniView(sessionId,userID);
-		//if current user view less than reqired view count number, then just return error message.
-		//if it is runOffline content, then need not check minimum view count
-		Boolean runOffline = (Boolean) sessionMap.get(SurveyConstants.PARAM_RUN_OFFLINE);
-		if(miniViewFlag > 0 && !runOffline){
-			ActionErrors errors = new ActionErrors();
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
-			this.addErrors(request,errors);
-			return false;
-		}
-		
 		return true;
 	}
 	private ISurveyService getSurveyService() {
@@ -480,33 +442,6 @@ public class LearningAction extends Action {
 		return list;
 	}
 
-	/**
-	 * Return <code>ActionForward</code> according to survey item type.
-	 * @param type
-	 * @param mapping
-	 * @return
-	 */
-	private ActionForward findForward(short type, ActionMapping mapping) {
-		ActionForward forward;
-		switch (type) {
-		case SurveyConstants.RESOURCE_TYPE_URL:
-			forward = mapping.findForward("url");
-			break;
-		case SurveyConstants.RESOURCE_TYPE_FILE:
-			forward = mapping.findForward("file");
-			break;
-		case SurveyConstants.RESOURCE_TYPE_WEBSITE:
-			forward = mapping.findForward("website");
-			break;
-		case SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-			forward = mapping.findForward("learningobject");
-			break;
-		default:
-			forward = null;
-			break;
-		}
-		return forward;
-	}
 
 	private SurveyUser getCurrentUser(ISurveyService service, Long sessionId) {
 		//try to get form system session
@@ -531,56 +466,10 @@ public class LearningAction extends Action {
 		if(StringUtils.isBlank(itemForm.getTitle()))
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_TITLE_BLANK));
 		
-		if(itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_URL){
-			if(StringUtils.isBlank(itemForm.getUrl()))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_URL_BLANK));
-			//URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port format!!!
-//			UrlValidator validator = new UrlValidator();
-//			if(!validator.isValid(itemForm.getUrl()))
-//				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_INVALID_URL));
-		}
-//		if(itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_WEBSITE 
-//				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-			if(StringUtils.isBlank(itemForm.getDescription()))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
-//		}
-		if(itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_WEBSITE 
-				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT
-				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_FILE){
-			//for edit validate: file already exist
-			if(!itemForm.isHasFile() &&
-				(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName())))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_FILE_BLANK));
-		}
+		if(StringUtils.isBlank(itemForm.getDescription()))
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
 		return errors;
 	}
-	/**
-	 * Set complete flag for given survey item.
-	 * @param request
-	 * @param sessionId 
-	 */
-	private void doComplete(HttpServletRequest request) {
-		//get back sessionMap
-		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		
-		Long surveyItemUid = new Long(request.getParameter(SurveyConstants.PARAM_RESOURCE_ITEM_UID));
-		ISurveyService service = getSurveyService();
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		
-		Long sessionId =  (Long) sessionMap.get(SurveyConstants.ATTR_TOOL_SESSION_ID);
-		service.setItemComplete(surveyItemUid,new Long(user.getUserID().intValue()),sessionId);
-		
-		//set survey item complete tag
-		SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
-		for(SurveyQuestion item:surveyItemList){
-			if(item.getUid().equals(surveyItemUid)){
-				item.setComplete(true);
-				break;
-			}
-		}
-	}
+
 
 }
