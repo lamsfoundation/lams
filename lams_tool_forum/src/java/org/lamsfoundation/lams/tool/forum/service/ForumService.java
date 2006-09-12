@@ -479,8 +479,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			//only forum has content topics, clone happens 
 			if(contentTopcis != null && contentTopcis.size() > 0){
 				for(Message msg : contentTopcis){
-					Message newMsg = Message.newInstance(msg, forumToolContentHandler);
-					createRootTopic(contentID, sessionID, newMsg);
+					if(msg.getIsAuthored()){
+						Message newMsg = Message.newInstance(msg, forumToolContentHandler);
+						createRootTopic(contentID, sessionID, newMsg);
+					}
 				}
 			}
 		}
