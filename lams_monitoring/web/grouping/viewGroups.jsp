@@ -42,22 +42,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><fmt:message key="label.grouping.no.groups.created"/></p>
 	</c:when>
 	<c:otherwise>
-		<table width="100%" border="0" cellpadding="3" cellspacing="4" class="body" summary="This table is being used for layout purposes">
+	
+	
+		<table class="alternative-color">
 			<c:forEach items="${groups}" var="group">
 			<tr>
-				<td align="right" class="bodyBold" style="{border-right: solid #CCCCCC 1px; border-bottom: solid #CCCCCC 1px; }">
+				<td width="25%" class="first">
 					<c:out value="${group.groupName}"/>
 				</td>
-				<td width="85%" align="left" class="body"  style="{border-bottom: solid #CCCCCC 1px; }">
-					<table width="100%" border="0" cellpadding="0" cellspacing="0">
-						<c:forEach items="${group.users}" var="user">
-						<tr>
-							<td class="bodyBold">
-								<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
-							</td>
-						</tr>
-						</c:forEach>
-					</table>		
+				<td>
+					<c:forEach items="${group.users}" var="user">
+						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
+					</c:forEach>
 				</td>
 			</tr>
 			</c:forEach>
