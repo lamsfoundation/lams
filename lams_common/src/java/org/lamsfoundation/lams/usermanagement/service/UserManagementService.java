@@ -643,12 +643,13 @@ public class UserManagementService implements IUserManagementService {
 			for (String roleId : rolesList) { 
 				for (UserOrganisationRole uor : uors) {
 					if (uor.getRole().getRoleId().toString().equals(roleId)) {
+						// remove from the Copys the ones we are keeping
 						rolesCopy.remove(roleId);
 						uorsCopy.remove(uor);
-						log.debug("removing role: "+uor.getRole().getName());
 					}
 				}
 			}
+			log.debug("removing roles: "+uorsCopy);
 			uors.removeAll(uorsCopy);
 		} else {
 			uors = new HashSet<UserOrganisationRole>();
