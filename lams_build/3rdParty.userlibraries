@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <eclipse-userlibraries version="2">
 <library name="3rdParty" systemlibrary="false">
+<archive path="/lams_build/lib/axis/axis.jar"/>
+<archive path="/lams_build/lib/axis/jaxrpc.jar"/>
 <archive path="/lams_build/lib/cglib/cglib-nodep-2.1_2.jar"/>
 <archive path="/lams_build/lib/dom4j/dom4j-1.5.2.jar"/>
 <archive path="/lams_build/lib/ehcache/ehcache-1.1.jar"/>
