@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="${product}" basedir="." default="usage">
+<project name="jsMath" basedir="." default="usage">
 
 	<property file="build.properties" />
 	<property file="../lams_build/common.properties" />
@@ -14,14 +14,19 @@
 		<echo message="Among the available targets are:"/>
 		<echo message=""/>
 		<echo message="build-war  --> Make war archive for deployment"/>
-		<echo message="deploy-war  --> Copy war archive to deploy folder"/>
+		<echo message="deploy-war  --> Copy war archive to deploy folder (~7-8MB, takes longer to deploy)"/>
 		<echo message="delete-exploded-folder  --> Delete war tree from deploy folder"/>
-		<echo message="explode-war  --> Create exploded war folder in deploy folder"/>
+		<echo message="explode-war  --> Create exploded war folder in deploy folder (~80-160MB, doesn't take too long to deploy)"/>
 		<echo message=""/>
 	</target>
 	
-	<target name="build-war" description="creates war file">
-		<delete file="build/jsMath.war"/>
+	<target name="preparedirs">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.lib}" />
+	</target>
+	
+	<target name="build-war" depends="preparedirs" description="creates war file">
+		<delete file="build/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" webxml="${conf.webinf.dir}/web.xml">
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
@@ -33,8 +38,12 @@
 		</war>
 	</target>
 	
-	<target name="deploy-war" depends="build-war">
-		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}"/>
+	<target name="delete-war" description="deletes compressed war">
+		<delete file="${jboss.ear.deploy}/${product}.war"/>
+	</target>
+	
+	<target name="deploy-war" depends="build-war,delete-exploded-folder">
+		<copy file="${build.lib}/${product}.war" todir="${jboss.ear.deploy}"/>
 	</target>
 	
 	<target name="delete-exploded-folder" description="delete old exploded war folder">
@@ -52,7 +61,7 @@
 		</delete>
 	</target>
 		
-	<target name="explode-war" depends="delete-exploded-folder" description="copy files to deploy war folder">
+	<target name="explode-war" depends="delete-exploded-folder,delete-war" description="copy files to deploy war folder">
 		<copy overwrite="yes" todir="${jboss.ear.deploy}/${product}.war">
 			<fileset dir="${conf.web.dir}">
 				<include name="*/**"/>
