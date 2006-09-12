@@ -28,35 +28,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-			<table class="forms">
-		         
-				<tr>
-					<td class="field-name">							
-			      			<bean:message key="radiobox.usernameVisible"/>:
-					</td>
-					<td>							
-		      			<html:checkbox property="usernameVisible" value="1"
-							styleClass="noBorder" styleId="usernameVisible">
-						</html:checkbox>
+<table cellpadding="0">
 
+				<tr>
+					<td>							
+						<html:checkbox property="usernameVisible"  value="1" styleClass="noBorder">
+							<bean:message key="radiobox.usernameVisible" />
+						</html:checkbox>
 	      			</td>
 		         </tr>
 		         
    				<tr>
-					<td class="field-name">							
-			      			<bean:message key="label.reflect"/>:
-					</td>
 					<td>							
-		      			<html:checkbox property="reflect" value="1"
-							styleClass="noBorder" styleId="reflect">
+						<html:checkbox property="reflect"  value="1" styleClass="noBorder">
+							<bean:message key="label.reflect" />
 						</html:checkbox>
 	      			</td>
 		        </tr>
 
    				<tr>
-					<td class="field-name">							
-							&nbsp
-					</td>
 					<td>							
  						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea>
 	      			</td>
@@ -64,17 +54,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		        
 
    				<tr>
-					<td class="field-name">							
-			      			<bean:message key="radiobox.questionsSequenced"/>:
-					</td>
 					<td>							
-		      			<html:checkbox property="questionsSequenced" value="1"
-							styleClass="noBorder" styleId="questionsSequenced">
+						<html:checkbox property="questionsSequenced"  value="1" styleClass="noBorder">
+							<bean:message key="radiobox.questionsSequenced" />
 						</html:checkbox>
 	      			</td>
 		        </tr>
 			  	
-			</table>	  	
+</table>	  	
 
 
 
