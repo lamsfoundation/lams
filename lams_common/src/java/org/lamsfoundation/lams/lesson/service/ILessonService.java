@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * Access the general lesson details and access to grouping.
  * 
- * A lesson has three different "lists" of learners.
+ * A lesson has two different "lists" of learners.
  * <OL>
  * <LI>The learners who are in the learner group attached to the lesson. This is fixed 
  * when the lesson is started and is a list of all the learners who could ever participate in
@@ -44,25 +44,15 @@ import org.lamsfoundation.lams.usermanagement.User;
  * <LI>The learners who have started the lesson. They may or may not be logged in currently,
  * or if they are logged in they may or may not be doing this lesson. This is available
  * via getActiveLessonLearners().
- * <LI>The learners who are currently logged in and doing this lesson. This is available
- * via getLoggedInLessonLearners(). Note - learners in this list may actually have left but
- * we don't know unless they use the actual logout/exit buttons.
- *
+ * </OL>
+ * 
+ * There used to be a list of all the learners who were logged into a lesson. This has been
+ * removed as we do not need the functionality at present. If this is required later it should
+ * be combined with the user's shared session logic and will need to purge users who haven't
+ * done anything for a while - otherwise a user whose PC has crashed and then never returns
+ * to a lesson will staying in the cache forever.
  */
 public interface ILessonService {
-
-	/**
-	 *  Cache the user in the list of "currently logged in users"
-	 */
-	public abstract void cacheLessonUser(Lesson lesson, User learner);
-
-	/**
-	 *  Remove the user from the list of "currently logged in users"
-	 */
-	public abstract void removeLessonUserFromCache(Lesson lesson, User learner);
-
-	/** Get all the learners who are currently using the lesson */
-	public abstract Collection getLoggedInLessonLearners(Long lessonId);
 
 	/** Get all the learners who have started the lesson. They may not be currently online.*/
 	public abstract List getActiveLessonLearners(Long lessonId);

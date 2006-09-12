@@ -257,7 +257,6 @@ public class LearnerService implements ICoreLearnerService
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
         }
         
-        lessonService.cacheLessonUser(lesson, learner);
         return learnerProgress;
     }
     
@@ -441,7 +440,6 @@ public class LearnerService implements ICoreLearnerService
        if ( progress != null ) {
     	   progress.setRestarting(true);
     	   learnerProgressDAO.updateLearnerProgress(progress);
-           lessonService.removeLessonUserFromCache(progress.getLesson(),progress.getUser());
        } else { 
     	   String error = "Learner Progress "+progressId+" does not exist. Cannot exit lesson successfully.";
     	   log.error(error);

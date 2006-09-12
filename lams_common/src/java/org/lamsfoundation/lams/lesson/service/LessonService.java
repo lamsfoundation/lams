@@ -24,19 +24,12 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.lesson.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -44,7 +37,6 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 
@@ -59,14 +51,14 @@ import org.lamsfoundation.lams.util.MessageService;
  * <LI>The learners who have started the lesson. They may or may not be logged in currently,
  * or if they are logged in they may or may not be doing this lesson. This is available
  * via getActiveLessonLearners().
- * <LI>The learners who are currently logged in and doing this lesson. This is available
- * via getLoggedInLessonLearners(). Note - learners in this list may actually have left but
- * we don't know unless they use the actual logout/exit buttons.
+ * </OL>
+ * 
+ * There used to be a list of all the learners who were logged into a lesson. This has been
+ * removed as we do not need the functionality at present. If this is required later it should
+ * be combined with the user's shared session logic and will need to purge users who haven't
+ * done anything for a while - otherwise a user whose PC has crashed and then never returns
+ * to a lesson will staying in the cache forever.
  *
- */
-/* TODO improve caching of current learners.
- * The caching is based on the LearnerDataManager cache written by Jacky Fang
- * but it has been moved out of the servlet context to this singleton. 
  */
 public class LessonService implements ILessonService
 {
@@ -75,7 +67,6 @@ public class LessonService implements ILessonService
 	private ILessonDAO lessonDAO;
 	private IGroupingDAO groupingDAO;
 	private MessageService messageService;
-    private HashMap<Long,HashMap> lessonMaps = new HashMap<Long,HashMap>(); // contains maps of lesson users
 
     /* ******* Spring injection methods ***************************************/
 	public void setLessonDAO(ILessonDAO lessonDAO) {
@@ -93,55 +84,6 @@ public class LessonService implements ILessonService
 
 
 	/* *********** Service methods ***********************************************/
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#cacheLessonUser(org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.usermanagement.User)
-	 */
-    public void cacheLessonUser(Lesson lesson, User learner)
-    {
-		synchronized (lesson)
-		{
-			//retrieve the map for this lesson
-			HashMap<Integer,User> lessonUsersMap = lessonMaps.get(lesson.getLessonId());
-			//create new if never created before
-			if (lessonUsersMap == null) {
-			    lessonUsersMap = new HashMap<Integer,User>();
-			    lessonMaps.put(lesson.getLessonId(),lessonUsersMap);
-			}
-			if (!lessonUsersMap.containsKey(learner.getUserId())) {
-				    lessonUsersMap.put(learner.getUserId(), learner);
-			}
-    	}
-    }
-    
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#removeLessonUserFromCache(org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.usermanagement.User)
-	 */
-    public void removeLessonUserFromCache(Lesson lesson, User learner)
-    {
-		synchronized (lesson)
-		{
-			HashMap<Integer,User> lessonUsersMap = lessonMaps.get(lesson.getLessonId());
-			if (lessonUsersMap != null) {
-				lessonUsersMap.remove(learner.getUserId());
-				if (lessonUsersMap.size()==0) {
-					// no one active in lesson? get rid of lesson from cache 
-					lessonMaps.remove(lesson.getLessonId());
-				}
-			}
-		}
-    }
-
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#getLoggedInLessonLearners(java.lang.Long)
-	 */
-    public Collection getLoggedInLessonLearners(Long lessonId)
-    {
-		HashMap<Integer,User> lessonUsersMap = lessonMaps.get(lessonId);
-		if ( lessonUsersMap != null )
-			return lessonUsersMap.values();
-		return new ArrayList();
-    }
-
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#getActiveLessonLearners(java.lang.Long)
 	 */

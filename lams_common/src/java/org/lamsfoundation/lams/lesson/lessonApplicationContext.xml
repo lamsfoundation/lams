@@ -35,7 +35,6 @@
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
-				<prop key="cacheLessonUser">PROPAGATION_REQUIRED</prop>
 				<prop key="perform*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
