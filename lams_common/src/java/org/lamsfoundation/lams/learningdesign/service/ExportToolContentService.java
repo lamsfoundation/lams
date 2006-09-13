@@ -40,6 +40,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -322,12 +323,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs) throws ExportToolContentException{
 		try {
 			//root temp directory, put target zip file
+			String targetZipFileName = null;
 			String rootDir = FileUtil.createTempDirectory(EXPORT_TOOLCONTNET_FOLDER_SUFFIX);
 			String contentDir = FileUtil.getFullPath(rootDir, "content");
 			FileUtil.createDirectory(contentDir);
-			
-			//zip file name with full path
-			String targetZipFileName = EXPORT_TOOLCONTNET_ZIP_PREFIX + learningDesignId + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
 			
 			//learing design file name with full path
 			String ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
@@ -383,6 +382,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				log.error("Exception:" + e.toString());
 				throw new ExportToolContentException(e);
 			}
+			
+			// zip file name with full path
+			targetZipFileName = URLEncoder.encode(ldDto.getTitle() + EXPORT_TOOLCONTNET_ZIP_SUFFIX, "UTF-8");
 			
 			log.debug("Create export content target zip file. File name is " + targetZipFileName);
 			//create zip file and return zip full file name
