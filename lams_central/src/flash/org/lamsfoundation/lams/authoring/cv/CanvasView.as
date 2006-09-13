@@ -71,6 +71,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	
 	private var startTransX:Number;
 	private var startTransY:Number;
+	private var lastScreenWidth:Number = 1024;
+	private var lastScreenHeight:Number = 768;
 	
 	private var _transitionPropertiesOK:Function;
     private var _canvasView:CanvasView;
@@ -479,18 +481,22 @@ public function viewUpdate(event:Object):Void{
 	private function setSize(cm:CanvasModel):Void{
 		//positionTitleBar();
         var s:Object = cm.getSize();
+		var newWidth:Number = Math.max(s.w, lastScreenWidth)
+		var newHeight:Number = Math.max(s.h, lastScreenHeight)
 		canvas_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(s.w,s.h);
-
+		bkg_pnl.setSize(newWidth,newHeight);
+		
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
-		//Debugger.log('grid_mc depth:'+grid_mc.getDepth(),4,'setSize','CanvasView');
-		//Debugger.log('_activityLayer_mc depth:'+_activityLayer_mc.getDepth(),4,'setSize','CanvasView');
+		//var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
+		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(newWidth),Math.round(newHeight),V_GAP,H_GAP);
+		
 		//position bin in canvas.  
 		var bin = cm.getCanvas().bin;
 		bin._x = (s.w - bin._width) - 20;
 		bin._y = (s.h - bin._height) - 20;
-		
+		canvas_scp.redraw(true);
+		lastScreenWidth = newWidth
+		lastScreenHeight = newHeight
 	}
 	
 	/**
