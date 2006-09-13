@@ -144,7 +144,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = true;
 						hideMainExp(mm);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						if (mm.activitiesDisplayed.isEmpty()){
+						if (mm.activitiesDisplayed.isEmpty() || mm.transitionsDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
 						}else {
 							
