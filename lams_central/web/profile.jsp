@@ -2,6 +2,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/prototype.js"></script>
 	<script type="text/javascript" language="javascript">
@@ -67,9 +68,32 @@
 
 <h2><fmt:message key="index.myprofile" /></h2>
 
-<p><fmt:message key="label.name" />: <bean:write name="fullName" /><br />
-<fmt:message key="label.email" />: <bean:write name="email" />
-</p>
+<table border="0">
+	<col align="left" /><col align="left" />
+	<tr>
+		<td><fmt:message key="label.name" />: 
+		</td>
+		<td><bean:write name="fullName" />
+		</td>
+	</tr>
+	<tr>
+		<td><fmt:message key="label.email" />: 
+		</td>
+		<td><bean:write name="email" />
+		</td>
+	</tr>
+	<tr>
+		<td><fmt:message key="label.portrait.current" />:
+		</td>
+		<td><logic:notEqual name="portraitUuid" value="0">
+				<img src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />
+			</logic:notEqual>
+			<logic:equal name="portraitUuid" value="0">
+				<i><fmt:message key="msg.portrait.none" /></i>
+			</logic:equal>
+		</td>
+	</tr>
+</table>
 
 <p><a href="profile.do?method=edit"><fmt:message key="title.profile.edit.screen" /></a><br />
 <a href="password.do"><fmt:message key="title.password.change.screen" /></a><br />

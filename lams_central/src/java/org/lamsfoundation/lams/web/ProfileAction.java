@@ -79,6 +79,7 @@ public class ProfileAction extends LamsDispatchAction {
 		
 		request.setAttribute("fullName", fullName);
 		request.setAttribute("email", requestor.getEmail());
+		request.setAttribute("portraitUuid", (requestor.getPortraitUuid()==null ? 0 : requestor.getPortraitUuid()));
 		return mapping.findForward("view");
 	}
 	
