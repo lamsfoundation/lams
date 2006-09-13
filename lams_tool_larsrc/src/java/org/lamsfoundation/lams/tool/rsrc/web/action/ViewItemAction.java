@@ -30,6 +30,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +50,7 @@ import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -211,7 +214,7 @@ public class ViewItemAction extends Action {
 		if(ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)){
 			int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),0);
 			//authoring: does not save item yet, so only has ItemList from session and identity by Index
-			List<ResourceItem> resourceList = getResourceItemList(sessionMap);
+			List<ResourceItem>  resourceList = new ArrayList<ResourceItem>(getResourceItemList(sessionMap));
 			item = resourceList.get(itemIdx);
 		}else{
 			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
@@ -276,23 +279,13 @@ public class ViewItemAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getResourceItemList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
-	}	
-	/**
-	 * Get <code>java.util.List</code> from HttpSession by given name.
-	 * 
-	 * @param request
-	 * @param name
-	 * @return
-	 */
-	private List getListFromSession(SessionMap sessionMap,String name) {
-		List list = (List) sessionMap.get(name);
+	private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
+		SortedSet<ResourceItem> list = (SortedSet) sessionMap.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 		if(list == null){
-			list = new ArrayList();
-			sessionMap.put(name,list);
+			list = new TreeSet<ResourceItem>(new ResourceItemComparator());
+			sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST,list);
 		}
 		return list;
-	}
+	}	
 	
 }

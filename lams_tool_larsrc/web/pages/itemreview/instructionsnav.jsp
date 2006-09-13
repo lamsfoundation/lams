@@ -2,6 +2,23 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<%-- runAuto and reflectOn does not set when  authoring preview mode then set false as default value --%>
+<c:choose>
+	<c:when test="${empty sessionMap.runAuto}">
+		<c:set var="runAuto" value="false"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="runAuto" value="${sessionMap.runAuto}"/>
+	</c:otherwise>
+</c:choose>
+<c:choose>
+	<c:when test="${empty sessionMap.reflectOn}">
+		<c:set var="reflectOn" value="false"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="reflectOn" value="${sessionMap.reflectOn}"/>
+	</c:otherwise>
+</c:choose>
 
 <html>
 	<head>
@@ -19,7 +36,7 @@
 				//learner and author(preview mode) will mark the finish
 					if(${mode == "learner"} || ${mode == "author"}){
 					   var reqIDVar = new Date();
-					   if(${sessionMap.runAuto}){
+					   if(${runAuto}){
 					  		//set complete flag and finish this activity as well.
 					        window.parent.location.href='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
 					   }else{
@@ -66,7 +83,7 @@
 									<fmt:message key='label.next.instruction'/>
 								</a>
 							</c:when>
-							<c:when test="${sessionMap.reflectOn && sessionMap.runAuto}">
+							<c:when test="${reflectOn && runAuto}">
 								<a href="#" id="FinishInstruction" onClick="javascript:continueReflect()" class="button">
 									<fmt:message key='label.continue'/>
 								</a>
