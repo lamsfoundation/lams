@@ -7,7 +7,7 @@
 
 <form>
 <logic:equal name="method" value="disable">
-<h2>Disable User</h2>
+<h2><fmt:message key="admin.user.disable"/></h2>
 <p>&nbsp;</p>
 <p>This user has lesson and/or sequence data associated with it and cannot be deleted.&nbsp;&nbsp;
 User will be disabled instead, maintaining their data, but the account will
@@ -26,7 +26,7 @@ You can enable the user account again by editing the user's profile.</p>
 </logic:equal>
 
 <logic:equal name="method" value="delete">
-<h2>Delete User</h2>
+<h2><fmt:message key="admin.user.delete"/></h2>
 <p>&nbsp;</p>
 <p>User has no associated data and can be safely removed.&nbsp;&nbsp;Are you sure you want to delete this account?</p>
 <c:url var="deleteaction" value="user.do">
