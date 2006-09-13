@@ -254,7 +254,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 							<tr>			
 								<td colspan=2 valign=top align=left>
-									<b>  <bean:message key="label.reflection"/>  </b> 
+									<b>  <bean:message key="label.reflection"/>  <bean:message key="label.include.runOffline"/></b> 
 								 </td>
 							</tr>	
 					

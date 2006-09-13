@@ -607,6 +607,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		preparEditActivityScreenData(request, qaContent);
 		
+		prepareReflectionData(request, qaContent, qaService, null, false);
 		
 		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
@@ -736,6 +737,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
+		prepareReflectionData(request, qaContent, qaService, null, false);
 		
 		logger.debug("fwd ing to LOAD_MONITORING: " + LOAD_MONITORING);
         return (mapping.findForward(LOAD_MONITORING));    	
@@ -845,6 +847,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
+		prepareReflectionData(request, qaContent, qaService, null, false);
+		
 		logger.debug("fwd ing to LOAD_MONITORING: " + LOAD_MONITORING);
         return (mapping.findForward(LOAD_MONITORING));    	
     }
@@ -978,6 +982,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
+		prepareReflectionData(request, qaContent, qaService, null, false);
+		
         return mapping.findForward(LOAD_MONITORING);
     }
 
