@@ -46,9 +46,11 @@ import mx.events.*
 class LessonView extends AbstractView {
 	
 	private static var ACTIVITY_OFFSET = 65;
-	private static var LESSON_NAME_LIMIT = 15;
+	private static var LESSON_NAME_LENGTH_LIMIT = 20;
+	private static var ACT_TITLE_LENGTH_LIMIT = 20;
 	private static var SCROLL_CHECK_INTERVAL:Number = 10;
 	private static var SCROLL_LOOP_FACTOR:Number = 2;
+	private static var STRING_CONT:String = "...";
 	
 	private var ScrollCheckIntervalID:Number;
 	
@@ -67,6 +69,7 @@ class LessonView extends AbstractView {
 	private var _dictionary:Dictionary;
 	
 	private var ACT_X:Number = -20;
+	private static var ACT_X_OFFSET:Number = 65;
 	private var ACT_Y:Number = 32.5;
 	
 	
@@ -175,8 +178,8 @@ class LessonView extends AbstractView {
 	}
     
 	private function setLessonName(lessonName:String){
-		if (lessonName.length > 15){
-			lessonName = lessonName.substr(0, LESSON_NAME_LIMIT)+".."
+		if (lessonName.length > LESSON_NAME_LENGTH_LIMIT){
+			lessonName = lessonName.substr(0, LESSON_NAME_LENGTH_LIMIT)+STRING_CONT;
 		}
 		Application.getInstance().getHeader().setLessonName(lessonName);
 	}
@@ -241,15 +244,20 @@ class LessonView extends AbstractView {
 		var lv:LessonView = LessonView(this);
 		var lc = getController();
 		
+		var activityTitle:String = a.title;
+		if(activityTitle.length > ACT_TITLE_LENGTH_LIMIT) {
+			activityTitle = activityTitle.substr(0,ACT_TITLE_LENGTH_LIMIT) + STRING_CONT;
+		}
+		
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData, _complex:false});
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			//_activityList.push(newActivity_mc);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		} else if(a.isGateActivity()){
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData, _complex:false});
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			//_activityList.push(newActivity_mc);
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
@@ -257,7 +265,7 @@ class LessonView extends AbstractView {
 			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is parellel (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, learner:lm.progressData});
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			//_activityList.push(newActivity_mc);
 		}else{
