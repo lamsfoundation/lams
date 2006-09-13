@@ -39,44 +39,34 @@
 					<%@ include file="/common/messages.jsp"%>
 					<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="surveyItemForm">
 						<html:hidden property="sessionMapID" />
-						<input type="hidden" name="instructionList" id="instructionList" />
-						<input type="hidden" name="itemType" id="itemType" value="1" />
+						<html:hidden property="instructionList" styleId="instructionList" />
 						<html:hidden property="itemIndex" />
 						<table class="innerforms">
 							<tr>
 								<td colspan="2">
 									<h2>
-										<fmt:message key="label.authoring.basic.add.url" />
+										<fmt:message key="label.authoring.basic.add.question" />
 									</h2>
 								</td>
 							</tr>
-							<tr>
-								<td width="75px">
-									<fmt:message key="label.authoring.basic.survey.title.input" />
-								</td>
-								<td>
-									<html:text property="title" size="55" />
-								</td>
-							</tr>
-						  <%--  Remove description in as LDEV-617
 							<tr>
 								<td>
 									<fmt:message key="label.authoring.basic.survey.description.input" />
 								</td>
 								<td>
-									<lams:STRUTS-textarea rows="5" cols="55" property="description" />
-								</td>
-							</tr>
-						 --%>
-							<tr>
-								<td valign="top">
-									<fmt:message key="label.authoring.basic.survey.url.input" />
-								</td>
-								<td>
-									<html:text property="url" size="55" /><BR><BR>
-									<html:checkbox property="openUrlNewWindow">
-										<fmt:message key="open.in.new.window" />
-									</html:checkbox>
+									<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+									<c:set var="language"><lams:user property="localeLanguage"/></c:set>
+									<fck:editor id="message.body" basePath="/lams/fckeditor/"
+										imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
+										linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+										flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
+										imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
+										linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
+										flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+											toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
+										<c:out value="${formBean.description}" escapeXml="false" />
+									</fck:editor>							
+														
 								</td>
 							</tr>
 						</table>
@@ -92,7 +82,7 @@
 			</tr>
 			<tr>
 				<td align="center" valign="bottom">
-					 <a href="#" onclick="submitSurveyItem()" class="button-add-item"><fmt:message key="label.authoring.basic.add.url" /></a>  <a href="javascript:;" onclick="cancelSurveyItem()" class="button"><fmt:message key="label.cancel" /></a>
+					 <a href="#" onclick="submitSurveyItem()" class="button-add-item"><fmt:message key="label.authoring.basic.add.question" /></a>  <a href="javascript:;" onclick="cancelSurveyItem()" class="button"><fmt:message key="label.cancel" /></a>
 				</td>
 			</tr>
 			<tr>

@@ -4,25 +4,25 @@
 
 <beans>
 
-	<bean id="messageSource" class="org.springframework.context.support.SurveyBundleMessageSource">
-		<property name="basename"><value>org.lamsfoundation.lams.tool.survey.ApplicationSurveys</value></property>
+	<bean id="lasurvMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.survey.ApplicationResources</value></property>
 	</bean>
-	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
-		<property name="messageSource"><ref local="messageSource"/></property>										
+	<bean id="lasurvMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource"><ref local="lasurvMessageSource"/></property>										
 	</bean>
     <!-- Hibernate SessionFactory -->
-    <bean id="surveySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <bean id="lasurvSurveySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 
         <!-- Must references all OR mapping files. -->
-        <property name="mappingSurveys">
+        <property name="mappingResources">
             <list>
                <value>org/lamsfoundation/lams/tool/survey/model/SurveyUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/survey/model/Survey.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyItem.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyItemInstruction.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyItemVisitLog.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/survey/model/SurveyQuestion.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/survey/model/SurveyOption.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/survey/model/SurveyAnswer.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/survey/model/SurveyAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/survey/model/SurveySession.hbm.xml</value>
             </list>
@@ -30,67 +30,67 @@
     </bean>
 
     <!-- core beans -->
-    <bean id="surveyDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyDAOHibernate">
+    <bean id="lasurvSurveyDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyDAOHibernate">
         <property name="sessionFactory">
-            <ref local="surveySessionFactory"/>
+            <ref local="lasurvSurveySessionFactory"/>
         </property>
     </bean>
-    <bean id="surveyItemDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyItemDAOHibernate">
+    <bean id="lasurvSurveyQuestionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyQuestionDAOHibernate">
         <property name="sessionFactory">
-            <ref local="surveySessionFactory"/>
+            <ref local="lasurvSurveySessionFactory"/>
         </property>
     </bean>
-    <bean id="surveyItemVisitDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyItemVisitDAOHibernate">
+    <bean id="lasurvSurveyAnswerDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyAnswerDAOHibernate">
         <property name="sessionFactory">
-            <ref local="surveySessionFactory"/>
-        </property>
-    </bean>
-
-   <bean id="surveyAttachmentDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyAttachmentDAOHibernate">
-        <property name="sessionFactory">
-            <ref local="surveySessionFactory"/>
+            <ref local="lasurvSurveySessionFactory"/>
         </property>
     </bean>
 
-   <bean id="surveyUserDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyUserDAOHibernate">
+   <bean id="lasurvSurveyAttachmentDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyAttachmentDAOHibernate">
         <property name="sessionFactory">
-            <ref local="surveySessionFactory"/>
+            <ref local="lasurvSurveySessionFactory"/>
         </property>
     </bean>
 
-   <bean id="surveySessionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveySessionDAOHibernate">
+   <bean id="lasurvSurveyUserDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyUserDAOHibernate">
         <property name="sessionFactory">
-            <ref local="surveySessionFactory"/>
+            <ref local="lasurvSurveySessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="lasurvSurveySessionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveySessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lasurvSurveySessionFactory"/>
         </property>
     </bean>
 
 
     <!-- Managers -->
-	<bean id="surveyToolContentHandler" class="org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler">
+	<bean id="lasurvSurveyToolContentHandler" class="org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler">
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
-    <bean id="surveyManagerTarget" class="org.lamsfoundation.lams.tool.survey.service.SurveyServiceImpl">
+    <bean id="lasurvSurveyManagerTarget" class="org.lamsfoundation.lams.tool.survey.service.SurveyServiceImpl">
         <property name="surveyDao">
-            <ref local="surveyDao"/>
+            <ref local="lasurvSurveyDao"/>
         </property>
-        <property name="surveyItemDao">
-            <ref local="surveyItemDao"/>
+        <property name="surveyQuestionDao">
+            <ref local="lasurvSurveyQuestionDao"/>
         </property>
-        <property name="surveyItemVisitDao">
-            <ref local="surveyItemVisitDao"/>
+        <property name="surveyAnswerDao">
+            <ref local="lasurvSurveyAnswerDao"/>
         </property>
         <property name="surveyAttachmentDao">
-            <ref local="surveyAttachmentDao"/>
+            <ref local="lasurvSurveyAttachmentDao"/>
         </property>
         <property name="surveyUserDao">
-            <ref local="surveyUserDao"/>
+            <ref local="lasurvSurveyUserDao"/>
         </property>
         <property name="surveySessionDao">
-            <ref local="surveySessionDao"/>
+            <ref local="lasurvSurveySessionDao"/>
         </property>
         <property name="surveyToolContentHandler">
-            <ref local="surveyToolContentHandler"/>
+            <ref local="lasurvSurveyToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>
@@ -110,14 +110,14 @@
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
    		</property>
-   		<property name="messageService"><ref bean="messageService"/></property>
+   		<property name="messageService"><ref bean="lasurvMessageService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
     </bean>
 
-    <bean id="surveyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="lasurvSurveyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="surveyManagerTarget"/>
+            <ref local="lasurvSurveyManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>
@@ -128,11 +128,9 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

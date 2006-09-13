@@ -45,8 +45,6 @@ public class SurveySession{
 	private Survey survey;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
-	//survey question
-	private Set<SurveyQuestion> surveyQuestions;
 
   	
 //  **********************************************************
@@ -123,25 +121,5 @@ public class SurveySession{
 	public void setSessionName(String sessionName) {
 		this.sessionName = sessionName;
 	}
-
-	/**
-	 * 
-	 * 
-	 * @hibernate.set lazy="true"
-	 *                inverse="false"
-	 *                cascade="all"
-	 *                order-by="create_date desc"
-	 * @hibernate.collection-key column="session_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
-	 * 
-	 * @return
-	 */
-	public Set<SurveyQuestion> getSurveyQuestions() {
-		return surveyQuestions;
-	}
-	public void setSurveyQuestions(Set<SurveyQuestion> surveyItems) {
-		this.surveyQuestions= surveyItems;
-	}
-
 
 }

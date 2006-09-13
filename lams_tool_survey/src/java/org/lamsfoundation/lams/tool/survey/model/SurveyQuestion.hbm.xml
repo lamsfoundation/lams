@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
+        table="tl_lasurv11_question"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-SurveyQuestion.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="description"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="description"
+        />
+
+        <set
+            name="options"
+            lazy="false"
+            inverse="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+            order-by="sequence_id asc"
+        >
+
+            <key
+                column="answer_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.survey.model.SurveyOption"
+            />
+
+        </set>
+
+        <many-to-one
+            name="createBy"
+            class="org.lamsfoundation.lams.tool.survey.model.SurveyUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="create_by"
+        />
+
+        <property
+            name="createDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
+        <property
+            name="type"
+            type="short"
+            update="true"
+            insert="true"
+            column="question_type"
+        />
+
+        <property
+            name="appendText"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="append_text"
+        />
+
+        <property
+            name="compulsory"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="compulsory"
+        />
+
+        <property
+            name="maxAnswsers"
+            type="int"
+            update="true"
+            insert="true"
+            column="max_answers"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-SurveyQuestion.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>

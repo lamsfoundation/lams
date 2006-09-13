@@ -32,10 +32,10 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
  */
 public class SurveyToolContentHandler extends ToolContentHandler {
 
-    private static String repositoryWorkspaceName = "sharedsurveysworkspace";
-    private static String repositoryUser = "sharedsurveys";
+    private static String repositoryWorkspaceName = "lasruvSurveyWorkspace";
+    private static String repositoryUser = "lasruvSurveys";
     //sharedsurveys
-    private static char[] repositoryId = {'l','a','m','s','-','s','h','a','r','e','d','r','e','s','o','u','r','c','e','s'};
+    private static char[] repositoryId = {'l','a','m','s','-','s','u','r','v','e','y'};
 
     /**
      * 

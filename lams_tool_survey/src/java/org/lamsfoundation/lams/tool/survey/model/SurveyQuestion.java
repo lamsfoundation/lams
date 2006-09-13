@@ -42,11 +42,12 @@ public class SurveyQuestion  implements Cloneable{
 	private static final Logger log = Logger.getLogger(SurveyQuestion.class);
 	
 	private Long uid;
-	//Survey Type:1=Single Choice,2=Multiple Choice,3=Test Entry
+	//Survey Type:1=Single Choice,2=Multiple Choice,3=Text Entry
 	private short type;
 	
 	private String description;
 	
+	//option of Question
 	private boolean appendText;
 	private boolean compulsory;
 	private int maxAnswsers;
@@ -119,7 +120,7 @@ public class SurveyQuestion  implements Cloneable{
 	     * 					cascade="all-delete-orphan"
 	     * 					inverse="false"
 	     * 					order-by="sequence_id asc"
-	     * @hibernate.collection-key column="option_uid"
+	     * @hibernate.collection-key column="answer_uid"
 	     * @hibernate.collection-one-to-many
 	     * 			class="org.lamsfoundation.lams.tool.survey.model.SurveyOption"
 	     * @return

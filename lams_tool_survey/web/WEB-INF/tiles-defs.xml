@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!-- B: Authoring -->
 	<definition name="tiles:authoring/main" extends="tiles:layout">
-    	<put name="pageTitleKey" value="Shared survey authoring"/>
+    	<put name="pageTitleKey" value="Survey authoring"/>
     	<put name="body" value="/pages/authoring/authoring.jsp"/>
 	</definition>
 	<!-- E: Authoring -->

@@ -50,9 +50,6 @@ public class SurveyUser implements Cloneable{
 	private SurveySession session;
 	private Survey survey;
 	
-	//=============== NON Persisit value: for display use ===========
-	//the user access some reousrce item date time. Use in monitoring summary page
-	private Date accessDate;
 	
 	public SurveyUser(){
 	}
@@ -209,12 +206,7 @@ public class SurveyUser implements Cloneable{
 		.append(lastName).append(loginName)
 		.toHashCode();
 	}
-	public Date getAccessDate() {
-		return accessDate;
-	}
-	public void setAccessDate(Date accessDate) {
-		this.accessDate = accessDate;
-	}
+
 
 
 }

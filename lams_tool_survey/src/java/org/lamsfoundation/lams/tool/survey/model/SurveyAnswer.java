@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.survey.model;
 
 import java.util.Date;
-import java.util.Set;
 /**
  * Survey
  * @author Dapeng Ni
@@ -36,22 +35,17 @@ import java.util.Set;
 public class SurveyAnswer {
 
 	private Long uid;
+	
 	private Long sessionId;
 	private SurveyUser user;
-	private SurveyQuestion surveyQuestion;
-	private Set<SurveyOption> surveyOptions;
-	private Date accessDate;
 	
-	/**
-	 * @hibernate.property column="access_date"
-	 * @return
-	 */
-	public Date getAccessDate() {
-		return accessDate;
-	}
-	public void setAccessDate(Date accessDate) {
-		this.accessDate = accessDate;
-	}
+	private SurveyQuestion surveyQuestion;
+	//options choice string: conjunction by &. Such as 2&5&3
+	private String answerChoices;
+	private String answerText;
+	private Date updateDate;
+	
+
 	/**
 	 * @hibernate.many-to-one  column="survey_item_uid"
  	 * cascade="none"
@@ -95,12 +89,37 @@ public class SurveyAnswer {
 	public void setSessionId(Long sessionId) {
 		this.sessionId = sessionId;
 	}
-	public Set<SurveyOption> getSurveyOptions() {
-		return surveyOptions;
+	/**
+	 * @hibernate.property column="answer_choices"
+	 * @return
+	 */
+	public String getAnswerChoices() {
+		return answerChoices;
 	}
-	public void setSurveyOptions(Set<SurveyOption> surveyOptions) {
-		this.surveyOptions = surveyOptions;
+	public void setAnswerChoices(String answers) {
+		this.answerChoices = answers;
 	}
+	/**
+	 * @hibernate.property column="udpate_date"
+	 * @return
+	 */
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+	/**
+	 * @hibernate.property column="answer_text"
+	 * @return
+	 */
+	public String getAnswerText() {
+		return answerText;
+	}
+	public void setAnswerText(String textEntry) {
+		this.answerText = textEntry;
+	}
+	
 
 
 	

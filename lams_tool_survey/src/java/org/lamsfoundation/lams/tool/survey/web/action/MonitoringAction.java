@@ -149,6 +149,6 @@ public class MonitoringAction extends Action {
 	private ISurveyService getSurveyService() {
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 				.getServletContext());
-		return (ISurveyService) wac.getBean(SurveyConstants.RESOURCE_SERVICE);
+		return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
 	}	
 }

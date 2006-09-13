@@ -8,7 +8,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
  * @author steven
  *
  */
-public class SurveyItemComparator implements Comparator<SurveyQuestion> {
+public class QuestionsComparator implements Comparator<SurveyQuestion> {
 
 	public int compare(SurveyQuestion o1, SurveyQuestion o2) {
 		if(o1 != null && o2 != null & o1.getCreateDate() !=null && o2.getCreateDate() != null){

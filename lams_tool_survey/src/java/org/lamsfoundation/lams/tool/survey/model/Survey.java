@@ -58,8 +58,12 @@ public class Survey implements Cloneable{
 	private String title;
 	private String instructions;
 	//advance
-	
+	private boolean showOnePage;
 	private boolean lockWhenFinished;
+	
+	private boolean reflectOnActivity;
+	private String reflectInstructions;
+	
 	private boolean defineLater;
 	private boolean runOffline;
 	private boolean contentInUse;
@@ -74,10 +78,8 @@ public class Survey implements Cloneable{
 	private SurveyUser createdBy;
 	
 	//survey Items
-	private Set surveyItems;
-	
-	private boolean reflectOnActivity;
-	private String reflectInstructions;
+	private Set questions;
+
 	
 	//*************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
@@ -90,7 +92,7 @@ public class Survey implements Cloneable{
 	 */
   	public Survey(){
   		attachments = new HashSet();
-  		surveyItems = new HashSet();
+  		questions = new HashSet();
   	}
 //  **********************************************************
   	//		Function method for Survey
@@ -104,7 +106,7 @@ public class Survey implements Cloneable{
 		//reset user info as well
 		if(toContent.getCreatedBy() != null){
 			toContent.getCreatedBy().setSurvey(toContent);
-			Set<SurveyQuestion> items = toContent.getSurveyItems();
+			Set<SurveyQuestion> items = toContent.getQuestions();
 			for(SurveyQuestion item:items){
 				item.setCreateBy(toContent.getCreatedBy());
 			}
@@ -117,15 +119,15 @@ public class Survey implements Cloneable{
   		try{
   			survey = (Survey) super.clone();
   			survey.setUid(null);
-  			if(surveyItems != null){
-  				Iterator iter = surveyItems.iterator();
+  			if(questions != null){
+  				Iterator iter = questions.iterator();
   				Set set = new HashSet();
   				while(iter.hasNext()){
   					SurveyQuestion item = (SurveyQuestion)iter.next(); 
   					SurveyQuestion newItem = (SurveyQuestion) item.clone();
 					set.add(newItem);
   				}
-  				survey.surveyItems = set;
+  				survey.questions = set;
   			}
   			//clone attachment
   			if(attachments != null){
@@ -417,15 +419,15 @@ public class Survey implements Cloneable{
 	 *                cascade="all"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="survey_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyItem"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
 	 * 
 	 * @return
 	 */
-	public Set getSurveyItems() {
-		return surveyItems;
+	public Set getQuestions() {
+		return questions;
 	}
-	public void setSurveyItems(Set surveyItems) {
-		this.surveyItems= surveyItems;
+	public void setQuestions(Set questions) {
+		this.questions= questions;
 	}
 
 
@@ -497,5 +499,15 @@ public class Survey implements Cloneable{
 	}
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
+	}
+	/**
+	 * @hibernate.property column="show_questions_on_one_page"
+	 * @return
+	 */	
+	public boolean isShowOnePage() {
+		return showOnePage;
+	}
+	public void setShowOnePage(boolean showOnePage) {
+		this.showOnePage = showOnePage;
 	}
 }

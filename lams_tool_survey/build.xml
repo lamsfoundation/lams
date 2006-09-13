@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="LAMS Share Surveys" basedir="." default="_build">
+<project name="LAMS Survey" basedir="." default="_build">
 	<!-- begin properties *******************************************************************************************-->
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
@@ -14,9 +14,6 @@
 	<!-- begin path *************************************************************************************************-->
 	<path id="all-libs">
 		<fileset dir="${sharedlib}">
-			<include name="**/*.jar"/>
-		</fileset>
-		<fileset dir="lib">
 			<include name="**/*.jar"/>
 		</fileset>
 		<fileset dir="${j2eelibs}">
@@ -276,12 +273,6 @@
 				<include name="common/**"/> 
 				<include name="layout/**"/> 
 			</fileset>
-			<lib dir="${weblib}/jaxen">  
-				<include name="*.jar"/> 
-			</lib> 
-			<lib dir="${weblib}/reload_2_0_1">
-				<include name="*.jar"/>
-			</lib>
 		</war>
 	</target>
 

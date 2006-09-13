@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.survey;
 
 public class SurveyConstants {
 	public static final String TOOL_SIGNATURE = "lasurv11";
-	public static final String RESOURCE_SERVICE = "lasurvSurveyService";
+	public static final String SURVEY_SERVICE = "lasurvSurveyService";
 	
 	public static final int COMPLETED = 1;
 	
@@ -64,5 +64,18 @@ public class SurveyConstants {
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
+	public static final String ATTR_SURVEY_FORM = "surveyForm";
+	
+	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
+	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
+	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
+	public static final String ATTR_QUESTION_LIST = "questionList";
+	public static final String ATTR_DELETED_QUESTION_LIST = "deletedQuestionList";
+	
+	public static final String ATTR_TITLE = "title";
+	public static final String ATTR_SURVEY_INSTRUCTION = "instructions";
+	public static final String ATTR_FINISH_LOCK = "finishedLock";
+	public static final String ATTR_SURVEY = "survey";
+	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
 }

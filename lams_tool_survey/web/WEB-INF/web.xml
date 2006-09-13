@@ -30,11 +30,11 @@
     <filter>
     <filter-name>hibernateFilter</filter-name>
     <filter-class>
-      org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter
+       org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
     </filter-class>
     <init-param>
       <param-name>sessionFactoryBeanName</param-name>
-      <param-value>surveySessionFactory</param-value>
+      <param-value>lasurvSurveySessionFactory</param-value>
     </init-param>
    </filter>
    <!-- System session filter -->
@@ -206,10 +206,10 @@
 
    	<!--  Security Constraint -->
 	<security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>Secure Content</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>TEACHER</role-name>
@@ -221,29 +221,29 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>Authoring Update</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
 		    <url-pattern>/authoring.do</url-pattern>
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>Staff Content</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/monitoring.do</url-pattern>
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>Staff Content</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/definelater.do</url-pattern>
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
@@ -251,29 +251,29 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>Adminstrator Content</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Adminstrator Content</web-resource-name>
 		    <url-pattern>/admin.do</url-pattern> 
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>LAMS System Adminstrator Content</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
 		    <url-pattern>/sysadmin.do</url-pattern> 
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 	<!--  some combine role security setting -->
     <security-constraint>
-	   	<web-survey-collection>
-	    	<web-survey-name>Download Files</web-survey-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
 		    <url-pattern>/download/</url-pattern>
-    	</web-survey-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>MONITOR</role-name>

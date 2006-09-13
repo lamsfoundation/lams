@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.survey.web.form;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
 /**
  *  Survey Item  Form.
  *	@struts.form name="surveyItemForm"
@@ -32,48 +31,21 @@ import org.apache.struts.upload.FormFile;
  * 
  * @version $Revision$
  */
-public class SurveyItemForm extends ActionForm {
+public class QuestionForm extends ActionForm {
 	private String itemIndex;
 	private String sessionMapID;
 	
 	//tool access mode;
 	private String mode;
 	
-	private String title;
 	private short itemType;
 	private String description;
-	private String url;
-	private boolean openUrlNewWindow;
-	//flag of this item has attachment or not
-	private boolean hasFile;
-	private Long fileUuid;
-	private Long fileVersionId;
-	private String fileName;
-	private FormFile file;
 	
 	public String getDescription() {
 		return description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	public FormFile getFile() {
-		return file;
-	}
-	public void setFile(FormFile file) {
-		this.file = file;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
 	}
 	public String getItemIndex() {
 		return itemIndex;
@@ -86,36 +58,6 @@ public class SurveyItemForm extends ActionForm {
 	}
 	public void setItemType(short type) {
 		this.itemType = type;
-	}
-	public String getFileName() {
-		return fileName;
-	}
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-	public Long getFileUuid() {
-		return fileUuid;
-	}
-	public void setFileUuid(Long fileUuid) {
-		this.fileUuid = fileUuid;
-	}
-	public Long getFileVersionId() {
-		return fileVersionId;
-	}
-	public void setFileVersionId(Long fileVersionId) {
-		this.fileVersionId = fileVersionId;
-	}
-	public boolean isHasFile() {
-		return hasFile;
-	}
-	public void setHasFile(boolean hasFile) {
-		this.hasFile = hasFile;
-	}
-	public boolean isOpenUrlNewWindow() {
-		return openUrlNewWindow;
-	}
-	public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-		this.openUrlNewWindow = openUrlNewWindow;
 	}
 	public String getSessionMapID() {
 		return sessionMapID;

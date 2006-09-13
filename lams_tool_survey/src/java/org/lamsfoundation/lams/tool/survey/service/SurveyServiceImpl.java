@@ -22,11 +22,8 @@
  */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.service;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,7 +42,6 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -68,6 +64,7 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
+import org.lamsfoundation.lams.tool.survey.dao.SurveyAnswerDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyAttachmentDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyQuestionDAO;
@@ -99,11 +96,15 @@ public class SurveyServiceImpl implements
                
 {
 	static Logger log = Logger.getLogger(SurveyServiceImpl.class.getName());
+	
+	//DAO
 	private SurveyDAO surveyDao;
-	private SurveyQuestionDAO surveyItemDao;
+	private SurveyQuestionDAO surveyQuestionDao;
+	private SurveyAnswerDAO surveyAnswerDao;
 	private SurveyAttachmentDAO surveyAttachmentDao;
 	private SurveyUserDAO surveyUserDao;
 	private SurveySessionDAO surveySessionDao;
+	
 	//tool service
 	private SurveyToolContentHandler surveyToolContentHandler;
 	private MessageService messageService;
@@ -131,75 +132,6 @@ public class SurveyServiceImpl implements
 	//*******************************************************************************
 	// Service method
 	//*******************************************************************************
-	/** Try to get the file. If forceLogin = false and an access denied exception occurs, call this method
-	 * again to get a new ticket and retry file lookup. If forceLogin = true and it then fails 
-	 * then throw exception.
-	 * @param uuid
-	 * @param versionId
-	 * @param relativePath
-	 * @param attemptCount
-	 * @return file node
-	 * @throws ImscpApplicationException
-	 */
-	private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws SurveyApplicationException {
-		
-		ITicket tic = getRepositoryLoginTicket();
-		
-		try {
-			
-			return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-			
-		} catch (AccessDeniedException e) {
-			
-			String error = "Unable to access repository to get file uuid "+uuid
-				+" version id "+versionId
-				+" path " + relativePath+".";
-			
-			error = error+"AccessDeniedException: "+e.getMessage()+" Unable to retry further.";
-			log.error(error);
-			throw new SurveyApplicationException(error,e);
-			
-		} catch (Exception e) {
-			
-			String error = "Unable to access repository to get file uuid "+uuid
-			+" version id "+versionId
-			+" path " + relativePath+"."
-			+" Exception: "+e.getMessage();
-			log.error(error);
-			throw new SurveyApplicationException(error,e);
-			
-		} 
-	}
-	/**
-	 * This method verifies the credentials of the Share Survey Tool and gives it
-	 * the <code>Ticket</code> to login and access the Content Repository.
-	 * 
-	 * A valid ticket is needed in order to access the content from the
-	 * repository. This method would be called evertime the tool needs to
-	 * upload/download files from the content repository.
-	 * 
-	 * @return ITicket The ticket for repostory access
-	 * @throws SurveyApplicationException
-	 */
-	private ITicket getRepositoryLoginTicket() throws SurveyApplicationException {
-		ICredentials credentials = new SimpleCredentials(
-				surveyToolContentHandler.getRepositoryUser(),
-				surveyToolContentHandler.getRepositoryId());
-		try {
-			ITicket ticket = repositoryService.login(credentials,
-					surveyToolContentHandler.getRepositoryWorkspaceName());
-			return ticket;
-		} catch (AccessDeniedException ae) {
-			throw new SurveyApplicationException("Access Denied to repository."
-					+ ae.getMessage());
-		} catch (WorkspaceNotFoundException we) {
-			throw new SurveyApplicationException("Workspace not found."
-					+ we.getMessage());
-		} catch (LoginException e) {
-			throw new SurveyApplicationException("Login failed." + e.getMessage());
-		}
-	}
-
 
 	public Survey getSurveyByContentId(Long contentId) {
 		Survey rs = surveyDao.getByContentId(contentId);
@@ -283,33 +215,6 @@ public class SurveyServiceImpl implements
 		
 	}
 
-
-	public void saveOrUpdateSurveyItem(SurveyQuestion item) {
-		surveyItemDao.saveObject(item);
-	}
-
-
-	public void deleteSurveyItem(Long uid) {
-		surveyItemDao.removeObject(SurveyQuestion.class,uid);
-	}
-
-	public List<SurveyQuestion> getSurveyItemsBySessionId(Long sessionId) {
-		SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
-		if(session == null){
-			log.error("Failed get SurveySession by ID [" +sessionId + "]");
-			return null;
-		}
-		//add survey items from Authoring
-		Survey survey = session.getSurvey();
-		List<SurveyQuestion> items = new ArrayList<SurveyQuestion>(); 
-		items.addAll(survey.getSurveyItems());
-		
-		//add survey items from SurveySession
-		items.addAll(session.getSurveyQuestions());
-		
-		return items;
-	}
-	
 	public Survey getSurveyBySessionId(Long sessionId){
 		SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
 		//to skip CGLib problem
@@ -346,10 +251,6 @@ public class SurveyServiceImpl implements
 		return nextUrl;
 	}
 
-
-	public SurveyQuestion getSurveyItemByUid(Long itemUid) {
-		return surveyItemDao.getByUid(itemUid);
-	}
 	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
 		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -386,6 +287,20 @@ public class SurveyServiceImpl implements
 	public SurveyUser getUser(Long uid){
 		return (SurveyUser) surveyUserDao.getObject(SurveyUser.class, uid);
 	}
+	
+
+
+	public void deleteQuestion(Long uid) {
+		//TODO
+		
+	}
+
+	public List<SurveyQuestion> getQuestionsBySessionId(Long sessionId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
@@ -441,87 +356,36 @@ public class SurveyServiceImpl implements
           }
         return node;
     }
-	private NodeKey processPackage(String packageDirectory, String initFile) throws UploadSurveyFileException {
-		NodeKey node = null;
-		try {
-			node = surveyToolContentHandler.uploadPackage(packageDirectory, initFile);
-		} catch (InvalidParameterException e) {
-			throw new UploadSurveyFileException (messageService.getMessage("error.msg.invaid.param.upload"));
-		} catch (RepositoryCheckedException e) {
-			throw new UploadSurveyFileException (messageService.getMessage("error.msg.repository"));
-		}
-        return node;
-	}
-
-	
 
 	/**
-	 * Find out default.htm/html or index.htm/html in the given directory folder
-	 * @param packageDirectory
-	 * @return
+	 * This method verifies the credentials of the Share Survey Tool and gives it
+	 * the <code>Ticket</code> to login and access the Content Repository.
+	 * 
+	 * A valid ticket is needed in order to access the content from the
+	 * repository. This method would be called evertime the tool needs to
+	 * upload/download files from the content repository.
+	 * 
+	 * @return ITicket The ticket for repostory access
+	 * @throws SurveyApplicationException
 	 */
-	private String findWebsiteInitialItem(String packageDirectory) {
-		File file = new File(packageDirectory);
-		if(!file.isDirectory())
-			return null;
-		
-		File[] initFiles = file.listFiles(new FileFilter(){
-			public boolean accept(File pathname) {
-				if(pathname == null || pathname.getName() == null)
-					return false;
-				String name = pathname.getName();
-				if(name.endsWith("default.html")
-					||name.endsWith("default.htm")
-					||name.endsWith("index.html")
-					||name.endsWith("index.htm"))
-					return true;
-				return false;
-			}
-		});
-		if(initFiles != null && initFiles.length > 0)
-			return initFiles[0].getName();
-		else
-			return null;
+	private ITicket getRepositoryLoginTicket() throws SurveyApplicationException {
+		ICredentials credentials = new SimpleCredentials(
+				surveyToolContentHandler.getRepositoryUser(),
+				surveyToolContentHandler.getRepositoryId());
+		try {
+			ITicket ticket = repositoryService.login(credentials,
+					surveyToolContentHandler.getRepositoryWorkspaceName());
+			return ticket;
+		} catch (AccessDeniedException ae) {
+			throw new SurveyApplicationException("Access Denied to repository."
+					+ ae.getMessage());
+		} catch (WorkspaceNotFoundException we) {
+			throw new SurveyApplicationException("Workspace not found."
+					+ we.getMessage());
+		} catch (LoginException e) {
+			throw new SurveyApplicationException("Login failed." + e.getMessage());
+		}
 	}
-
-
-	//*****************************************************************************
-	// set methods for Spring Bean
-	//*****************************************************************************
-	public void setAuditService(IAuditService auditService) {
-		this.auditService = auditService;
-	}
-	public void setLearnerService(ILearnerService learnerService) {
-		this.learnerService = learnerService;
-	}
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
-	public void setRepositoryService(IRepositoryService repositoryService) {
-		this.repositoryService = repositoryService;
-	}
-	public void setSurveyAttachmentDao(SurveyAttachmentDAO surveyAttachmentDao) {
-		this.surveyAttachmentDao = surveyAttachmentDao;
-	}
-	public void setSurveyDao(SurveyDAO surveyDao) {
-		this.surveyDao = surveyDao;
-	}
-	public void setSurveyItemDao(SurveyQuestionDAO surveyItemDao) {
-		this.surveyItemDao = surveyItemDao;
-	}
-	public void setSurveySessionDao(SurveySessionDAO surveySessionDao) {
-		this.surveySessionDao = surveySessionDao;
-	}
-	public void setSurveyToolContentHandler(SurveyToolContentHandler surveyToolContentHandler) {
-		this.surveyToolContentHandler = surveyToolContentHandler;
-	}
-	public void setSurveyUserDao(SurveyUserDAO surveyUserDao) {
-		this.surveyUserDao = surveyUserDao;
-	}
-	public void setToolService(ILamsToolService toolService) {
-		this.toolService = toolService;
-	}
-
 
 	//*******************************************************************************
 	//ToolContentManager, ToolSessionManager methods
@@ -575,7 +439,7 @@ public class SurveyServiceImpl implements
 			toolContentObj.setCreatedBy(user);
 			
 			//reset all surveyItem createBy user
-			Set<SurveyQuestion> items = toolContentObj.getSurveyItems();
+			Set<SurveyQuestion> items = toolContentObj.getQuestions();
 			for(SurveyQuestion item:items){
 				item.setCreateBy(user);
 			}
@@ -606,7 +470,7 @@ public class SurveyServiceImpl implements
 		surveyDao.saveObject(toContent);
 		
 		//save survey items as well
-		Set items = toContent.getSurveyItems();
+		Set items = toContent.getQuestions();
 		if(items != null){
 			Iterator iter = items.iterator();
 			while(iter.hasNext()){
@@ -687,7 +551,6 @@ public class SurveyServiceImpl implements
 	}
 
 	/* ===============Methods implemented from ToolContentImport102Manager =============== */
-	
 
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
@@ -749,7 +612,7 @@ public class SurveyServiceImpl implements
 	
 	    			// TODO add the order field - no support for it in forum at present.
 	    			// public static final String CONTENT_URL_URL_VIEW_ORDER = "order";
-	    			toolContentObj.getSurveyItems().add(item);
+	    			toolContentObj.getQuestions().add(item);
 	    		}
 	    	}
 	    	
@@ -779,13 +642,46 @@ public class SurveyServiceImpl implements
     	// toolContentObj.setReflectInstructions(description);
     }
 
-    
-	/* =================================================================================== */
+	//*****************************************************************************
+	// set methods for Spring Bean
+	//*****************************************************************************
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
+	}
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+	public void setRepositoryService(IRepositoryService repositoryService) {
+		this.repositoryService = repositoryService;
+	}
+	public void setSurveyAttachmentDao(SurveyAttachmentDAO surveyAttachmentDao) {
+		this.surveyAttachmentDao = surveyAttachmentDao;
+	}
+	public void setSurveyDao(SurveyDAO surveyDao) {
+		this.surveyDao = surveyDao;
+	}
+	public void setSurveyQuestionDao(SurveyQuestionDAO surveyItemDao) {
+		this.surveyQuestionDao = surveyItemDao;
+	}
+	public void setSurveySessionDao(SurveySessionDAO surveySessionDao) {
+		this.surveySessionDao = surveySessionDao;
+	}
+	public void setSurveyToolContentHandler(SurveyToolContentHandler surveyToolContentHandler) {
+		this.surveyToolContentHandler = surveyToolContentHandler;
+	}
+	public void setSurveyUserDao(SurveyUserDAO surveyUserDao) {
+		this.surveyUserDao = surveyUserDao;
+	}
+	public void setToolService(ILamsToolService toolService) {
+		this.toolService = toolService;
+	}
 
     public IExportToolContentService getExportContentService() {
 		return exportContentService;
 	}
-
 
 	public void setExportContentService(IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
@@ -812,5 +708,8 @@ public class SurveyServiceImpl implements
 	}
 
 
+	public void setSurveyAnswerDao(SurveyAnswerDAO surveyAnswerDao) {
+		this.surveyAnswerDao = surveyAnswerDao;
+	}
 
 }

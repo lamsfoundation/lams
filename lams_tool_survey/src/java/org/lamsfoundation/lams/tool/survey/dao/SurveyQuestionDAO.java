@@ -27,6 +27,6 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 
 public interface SurveyQuestionDAO extends DAO {
 
-	SurveyQuestion getByUid(Long surveyItemUid);
+	SurveyQuestion getByUid(Long questionUid);
 
 }

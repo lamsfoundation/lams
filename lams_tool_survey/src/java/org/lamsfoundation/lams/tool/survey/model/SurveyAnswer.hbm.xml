@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.survey.model.SurveySession"
-        table="tl_lasurv11_session"
+        name="org.lamsfoundation.lams.tool.survey.model.SurveyAnswer"
+        table="tl_lasurv11_answer"
     >
 
         <id
@@ -19,36 +19,30 @@
             <generator class="identity">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-SurveySession.xml 
+                  hibernate-generator-params-SurveyAnswer.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
-        <property
-            name="sessionEndDate"
-            type="java.util.Date"
-            update="true"
-            insert="true"
-            column="session_end_date"
-        />
-
-        <property
-            name="sessionStartDate"
-            type="java.util.Date"
-            update="true"
-            insert="true"
-            column="session_start_date"
-        />
-
         <many-to-one
-            name="survey"
-            class="org.lamsfoundation.lams.tool.survey.model.Survey"
+            name="surveyQuestion"
+            class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
             cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
-            column="survey_uid"
+            column="survey_item_uid"
+        />
+
+        <many-to-one
+            name="user"
+            class="org.lamsfoundation.lams.tool.survey.model.SurveyUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="user_uid"
         />
 
         <property
@@ -60,17 +54,32 @@
         />
 
         <property
-            name="sessionName"
+            name="answerChoices"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="session_name"
-            length="250"
+            column="answer_choices"
+        />
+
+        <property
+            name="updateDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="udpate_date"
+        />
+
+        <property
+            name="answerText"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="answer_text"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-SurveySession.xml
+                hibernate-properties-SurveyAnswer.xml
             containing the additional properties and place it in your merge dir.
         -->
 

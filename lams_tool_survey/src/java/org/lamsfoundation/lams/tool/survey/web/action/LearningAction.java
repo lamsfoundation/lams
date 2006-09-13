@@ -58,9 +58,9 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
 import org.lamsfoundation.lams.tool.survey.service.UploadSurveyFileException;
-import org.lamsfoundation.lams.tool.survey.util.SurveyItemComparator;
+import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.web.form.ReflectionForm;
-import org.lamsfoundation.lams.tool.survey.web.form.SurveyItemForm;
+import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -86,22 +86,9 @@ public class LearningAction extends Action {
 		if(param.equals("start")){
 			return start(mapping, form, request, response);
 		}
-		if(param.equals("complete")){
-			return complete(mapping, form, request, response);
-		}
-
 		if(param.equals("finish")){
 			return finish(mapping, form, request, response);
 		}
-		if (param.equals("addfile")) {
-			return addItem(mapping, form, request, response);
-		}
-		if (param.equals("addurl")) {
-			return addItem(mapping, form, request, response);
-		}
-        if (param.equals("saveOrUpdateItem")) {
-        	return saveOrUpdateItem(mapping, form, request, response);
-        }
         
 		//================ Reflection =======================
 		if (param.equals("newReflection")) {
@@ -113,20 +100,7 @@ public class LearningAction extends Action {
 		
 		return  mapping.findForward(SurveyConstants.ERROR);
 	}
-	/**
-	 * Initial page for add survey item (single file or URL).
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward addItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		SurveyItemForm itemForm = (SurveyItemForm) form;
-		itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-		itemForm.setSessionMapID(WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID));
-		return mapping.findForward(SurveyConstants.SUCCESS);
-	}
+
 	/**
 	 * Read survey data from database and put them into HttpSession. It will redirect to init.do directly after this
 	 * method run successfully. 
@@ -155,7 +129,7 @@ public class LearningAction extends Action {
 
 		List<SurveyQuestion> items = null;
 		Survey survey;
-		items = service.getSurveyItemsBySessionId(sessionId);
+		items = service.getQuestionsBySessionId(sessionId);
 		survey = service.getSurveyBySessionId(sessionId);
 
 		//check whehter finish lock is on/off
@@ -163,7 +137,7 @@ public class LearningAction extends Action {
 		
 		//basic information
 		sessionMap.put(SurveyConstants.ATTR_TITLE,survey.getTitle());
-		sessionMap.put(SurveyConstants.ATTR_RESOURCE_INSTRUCTION,survey.getInstructions());
+		sessionMap.put(SurveyConstants.ATTR_SURVEY_INSTRUCTION,survey.getInstructions());
 		sessionMap.put(SurveyConstants.ATTR_FINISH_LOCK,lock);
 		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
@@ -198,37 +172,15 @@ public class LearningAction extends Action {
 				//becuase in webpage will use this login name. Here is just 
 				//initial it to avoid session close error in proxy object. 
 				item.getCreateBy().getLoginName();
-				if(!item.isHide()){
-					surveyItemList.add(item);
-				}
+				surveyItemList.add(item);
 			}
 		}
 		
-		//set complete flag for display purpose
-		service.retrieveComplete(surveyItemList, surveyUser);
-		
-		sessionMap.put(SurveyConstants.ATTR_RESOURCE,survey);
+		sessionMap.put(SurveyConstants.ATTR_SURVEY,survey);
 		
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
-	/**
-	 * Mark survey item as complete status. 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
-		
-		doComplete(request);
-		
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID,sessionMapID);
-		return  mapping.findForward(SurveyConstants.SUCCESS);
-	}
+
 	/**
 	 * Finish learning session. 
 	 * @param mapping
@@ -268,80 +220,7 @@ public class LearningAction extends Action {
 	}
 
 	
-	/**
-	 * Save file or url survey item into database.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		//get back SessionMap
-		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-		
-		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		SurveyItemForm itemForm = (SurveyItemForm)form;
-		ActionErrors errors = validateSurveyItem(itemForm);
-		
-		if(!errors.isEmpty()){
-			this.addErrors(request,errors);
-			return findForward(itemForm.getItemType(),mapping);
-		}
-		short type = itemForm.getItemType();
-		
-		//create a new SurveyItem
-		SurveyQuestion item = new SurveyQuestion(); 
-		ISurveyService service = getSurveyService();
-		SurveyUser surveyUser = getCurrentUser(service,sessionId);
-		item.setType(type);
-		item.setTitle(itemForm.getTitle());
-		item.setDescription(itemForm.getDescription());
-		item.setCreateDate(new Timestamp(new Date().getTime()));
-		item.setCreateByAuthor(false);
-		item.setCreateBy(surveyUser);
-		
-		//special attribute for URL or FILE
-		if(type == SurveyConstants.RESOURCE_TYPE_FILE){
-			try {
-				service.uploadSurveyItemFile(item, itemForm.getFile());
-			} catch (UploadSurveyFileException e) {
-				log.error("Failed upload Survey File " + e.toString());
-				return  mapping.findForward(SurveyConstants.ERROR);
-			}
-		}else if(type == SurveyConstants.RESOURCE_TYPE_URL){
-			item.setUrl(itemForm.getUrl());
-			item.setAppendText(itemForm.isOpenUrlNewWindow());
-		}
-		//save and update session
-		
-		SurveySession resSession = service.getSurveySessionBySessionId(sessionId);
-		if(resSession == null){
-			log.error("Failed update SurveySession by ID[" + sessionId + "]");
-			return  mapping.findForward(SurveyConstants.ERROR);
-		}
-		Set<SurveyQuestion> items = resSession.getSurveyQuestions();
-		if(items == null){
-			items = new HashSet<SurveyQuestion>();
-			resSession.setSurveyQuestions(items);
-		}
-		items.add(item);
-		service.saveOrUpdateSurveySession(resSession);
-		
-		//update session value
-		SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
-		surveyItemList.add(item);
-		
-		//URL or file upload
-		request.setAttribute(SurveyConstants.ATTR_ADD_RESOURCE_TYPE,new Short(type));
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		return  mapping.findForward(SurveyConstants.SUCCESS);
-	}
+	
 	/**
 	 * Display empty reflection form.
 	 * @param mapping
@@ -411,7 +290,7 @@ public class LearningAction extends Action {
 	}
 	private ISurveyService getSurveyService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-	      return (ISurveyService) wac.getBean(SurveyConstants.RESOURCE_SERVICE);
+	      return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
 	}
 	/**
 	 * List save current survey items.
@@ -419,10 +298,10 @@ public class LearningAction extends Action {
 	 * @return
 	 */
 	private SortedSet<SurveyQuestion> getSurveyItemList(SessionMap sessionMap) {
-		SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_RESOURCE_ITEM_LIST);
+		SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
 		if(list == null){
-			list = new TreeSet<SurveyQuestion>(new SurveyItemComparator());
-			sessionMap.put(SurveyConstants.ATTR_RESOURCE_ITEM_LIST,list);
+			list = new TreeSet<SurveyQuestion>(new QuestionsComparator());
+			sessionMap.put(SurveyConstants.ATTR_QUESTION_LIST,list);
 		}
 		return list;
 	}	
@@ -457,19 +336,5 @@ public class LearningAction extends Action {
 		}
 		return surveyUser;
 	}
-	/**
-	 * @param itemForm
-	 * @return
-	 */
-	private ActionErrors validateSurveyItem(SurveyItemForm itemForm) {
-		ActionErrors errors = new ActionErrors();
-		if(StringUtils.isBlank(itemForm.getTitle()))
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_TITLE_BLANK));
-		
-		if(StringUtils.isBlank(itemForm.getDescription()))
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
-		return errors;
-	}
-
 
 }

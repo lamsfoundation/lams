@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
+import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 
@@ -43,12 +44,21 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 public interface ISurveyService 
 {
 	
+	//******************************************************************************************
+	// Content methods
+	//******************************************************************************************
 	/**
 	 * Get <code>Survey</code> by toolContentID.
 	 * @param contentId
 	 * @return
 	 */
 	Survey getSurveyByContentId(Long contentId);
+	/**
+	 * Get survey which is relative with the special toolSession.
+	 * @param sessionId
+	 * @return
+	 */
+	Survey getSurveyBySessionId(Long sessionId);
 	/**
 	 * Get a cloned copy of  tool default tool content (Survey) and assign the toolContentId of that copy as the 
 	 * given <code>contentId</code> 
@@ -60,6 +70,15 @@ public interface ISurveyService
 	
 
 	/**
+	 * Save or update survey into database.
+	 * @param Survey
+	 */
+	void saveOrUpdateSurvey(Survey Survey);
+	
+	//******************************************************************************************
+	//*************** Instruction file methods **********************
+	//******************************************************************************************
+	/**
 	 * Upload instruciton file into repository.
 	 * @param file
 	 * @param type
@@ -68,8 +87,29 @@ public interface ISurveyService
 	 */
 	SurveyAttachment uploadInstructionFile(FormFile file, String type) throws UploadSurveyFileException;
 	
+	/**
+	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
+	 * delete the file from repository.
+	 * 
+	 * @param attachmentUid
+	 */
+	void deleteSurveyAttachment(Long attachmentUid);
 	
-	//********** for user methods *************
+	//******************************************************************************************
+	//*************** Questions  methods **********************
+	//******************************************************************************************
+	
+	/**
+	 * Delete resoruce item from database.
+	 * @param uid
+	 */
+	void deleteQuestion(Long uid);
+
+	List<SurveyQuestion> getQuestionsBySessionId(Long sessionId);
+
+	//******************************************************************************************
+	//********** user methods *************
+	//******************************************************************************************
 	/**
 	 * Create a new user in database.
 	 */
@@ -89,37 +129,24 @@ public interface ISurveyService
 	 */
 	SurveyUser getUserByIDAndSession(Long long1, Long sessionId); 
 
-
+	/**
+	 * Get user by UID
+	 * @param uid
+	 * @return
+	 */
+	SurveyUser getUser(Long uid);
+	//******************************************************************************************
 	//********** Repository methods ***********************
+	//******************************************************************************************
 	/**
 	 * Delete file from repository.
 	 */
 	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException ;
 
-	/**
-	 * Save or update survey into database.
-	 * @param Survey
-	 */
-	void saveOrUpdateSurvey(Survey Survey);
-	/**
-	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
-	 * delete the file from repository.
-	 * 
-	 * @param attachmentUid
-	 */
-	void deleteSurveyAttachment(Long attachmentUid);
-	/**
-	 * Delete resoruce item from database.
-	 * @param uid
-	 */
-	void deleteSurveyItem(Long uid);
+	//******************************************************************************************
+	//********** Session methods ***********************
+	//******************************************************************************************
 
-	/**
-	 * Get survey which is relative with the special toolSession.
-	 * @param sessionId
-	 * @return
-	 */
-	Survey getSurveyBySessionId(Long sessionId);
 	/**
 	 * Get survey toolSession by toolSessionId
 	 * @param sessionId
@@ -141,25 +168,6 @@ public interface ISurveyService
 	 */
 	String finishToolSession(Long toolSessionId, Long userId)  throws SurveyApplicationException;
 
-//
-//	/**
-//	 * Return monitoring summary list. The return value is list of survey summaries for each groups.
-//	 * @param contentId
-//	 * @return
-//	 */
-//	List<List<Summary>> getSummary(Long contentId);
-//	/**
-//	 * Get survey item <code>Summary</code> list according to sessionId and skipHide flag.
-//	 *  
-//	 * @param sessionId
-//	 * @param skipHide true, don't get survey item if its <code>isHide</code> flag is true.
-//	 * 				  Otherwise, get all survey item  
-//	 * @return
-//	 */
-//	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-//	public List<List<Summary>> exportByContentId(Long contentId);
-//
-//	List<SurveyUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 
 	//******************************************************************************************
 	//  	NOTEBOOK Functions
@@ -191,11 +199,5 @@ public interface ISurveyService
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
 
-	/**
-	 * Get user by UID
-	 * @param uid
-	 * @return
-	 */
-	SurveyUser getUser(Long uid);
 }
 

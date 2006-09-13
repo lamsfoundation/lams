@@ -2,7 +2,6 @@
 <html>
 <body>
 <html:form action="/authoring/init.do?mode=${mode}" method="post" styleId="startForm">
-	<html:hidden property="survey.contentId"/>
 	<html:hidden property="sessionMapID"/>
 </html:form>
 

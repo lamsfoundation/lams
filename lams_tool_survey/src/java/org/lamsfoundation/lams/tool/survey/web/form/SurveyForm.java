@@ -23,11 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.web.form;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
-import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 
 /**
  *
@@ -62,7 +55,7 @@ public class SurveyForm extends ActionForm  {
     
     public SurveyForm(){
     	survey = new Survey();
-    	survey.setTitle("Shared Survey");
+    	survey.setTitle("Survey");
     	currentTab = 1;
     }
 	
@@ -82,6 +75,8 @@ public class SurveyForm extends ActionForm  {
 	    	survey.setDefineLater(false);
 	    	survey.setRunOffline(false);
 	    	survey.setReflectOnActivity(false);
+	    	survey.setShowOnePage(false);
+	    	
     	}
     }
 

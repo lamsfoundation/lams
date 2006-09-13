@@ -67,10 +67,10 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
 import org.lamsfoundation.lams.tool.survey.service.UploadSurveyFileException;
-import org.lamsfoundation.lams.tool.survey.util.SurveyItemComparator;
+import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.tool.survey.web.form.SurveyForm;
-import org.lamsfoundation.lams.tool.survey.web.form.SurveyItemForm;
+import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -221,10 +221,10 @@ public class AuthoringAction extends Action {
 			List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
 			item = rList.get(itemIdx);
 			if(item != null){
-				populateItemToForm(itemIdx, item,(SurveyItemForm) form,request);
+				populateItemToForm(itemIdx, item,(QuestionForm) form,request);
 			}
 		}		
-		return findForward(item==null?-1:item.getType(),mapping);
+		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 	/**
 	 * Display empty page for new survey item.
@@ -236,7 +236,7 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-		((SurveyItemForm)form).setSessionMapID(sessionMapID);
+		((QuestionForm)form).setSessionMapID(sessionMapID);
 		
 		short type = (short) NumberUtils.stringToInt(request.getParameter(ITEM_TYPE));
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
@@ -244,7 +244,7 @@ public class AuthoringAction extends Action {
 			instructionList.add("");
 		}
 		request.setAttribute("instructionList",instructionList);
-		return findForward(type,mapping);
+		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 	/**
 	 * This method will get necessary information from survey item form and save or update into 
@@ -264,13 +264,13 @@ public class AuthoringAction extends Action {
 		//get instructions:
 		List<String> instructionList = getInstructionsFromRequest(request);
 		
-		SurveyItemForm itemForm = (SurveyItemForm)form;
+		QuestionForm itemForm = (QuestionForm)form;
 		ActionErrors errors = validateSurveyItem(itemForm);
 		
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
 //			request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructionList);
-			return findForward(itemForm.getItemType(),mapping);
+			return mapping.findForward(SurveyConstants.SUCCESS);
 		}
 		
 		try {
@@ -294,15 +294,15 @@ public class AuthoringAction extends Action {
 	 * @throws ServletException 
 	 * 
 	 */
-	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//save toolContentID into HTTPSession
-		Long contentId = new Long(WebUtil.readLongParam(request,SurveyConstants.PARAM_TOOL_CONTENT_ID));
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
 //		get back the survey and item list and display them on page
 		ISurveyService service = getSurveyService();
 
-		List items = null;
+		List questions = null;
 		Survey survey = null;
 		SurveyForm surveyForm = (SurveyForm)form;
 		
@@ -315,39 +315,34 @@ public class AuthoringAction extends Action {
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		surveyForm.setSessionMapID(sessionMap.getSessionID());
 		
-		try {
-			survey = service.getSurveyByContentId(contentId);
-			//if survey does not exist, try to use default content instead.
-			if(survey == null){
-				survey = service.getDefaultContent(contentId);
-				if(survey.getSurveyItems() != null){
-					items = new ArrayList(survey.getSurveyItems());
-				}else
-					items = null;
+		survey = service.getSurveyByContentId(contentId);
+		//if survey does not exist, try to use default content instead.
+		if(survey == null){
+			survey = service.getDefaultContent(contentId);
+			if(survey.getQuestions() != null){
+				questions = new ArrayList(survey.getQuestions());
 			}else
-				items = service.getAuthoredItems(survey.getUid());
-			
-			surveyForm.setSurvey(survey);
+				questions = null;
+		}else
+			questions = new ArrayList(survey.getQuestions());
+		
+		surveyForm.setSurvey(survey);
 
-			//initialize instruction attachment list
-			List attachmentList = getAttachmentList(sessionMap);
-			attachmentList.clear();
-			attachmentList.addAll(survey.getAttachments());
-		} catch (Exception e) {
-			log.error(e);
-			throw new ServletException(e);
-		}
+		//initialize instruction attachment list
+		List attachmentList = getAttachmentList(sessionMap);
+		attachmentList.clear();
+		attachmentList.addAll(survey.getAttachments());
 		
 		//init it to avoid null exception in following handling
-		if(items == null)
-			items = new ArrayList();
+		if(questions == null)
+			questions = new ArrayList();
 		
 		//init survey item list
 		SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
 		surveyItemList.clear();
-		surveyItemList.addAll(items);
+		surveyItemList.addAll(questions);
 		
-		sessionMap.put(SurveyConstants.ATTR_RESOURCE_FORM, surveyForm);
+		sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, surveyForm);
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 
@@ -365,7 +360,7 @@ public class AuthoringAction extends Action {
 			HttpServletResponse response) throws ServletException {
 		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-		SurveyForm existForm = (SurveyForm) sessionMap.get(SurveyConstants.ATTR_RESOURCE_FORM);
+		SurveyForm existForm = (SurveyForm) sessionMap.get(SurveyConstants.ATTR_SURVEY_FORM);
 		
 		SurveyForm surveyForm = (SurveyForm )form;
 		try {
@@ -487,9 +482,9 @@ public class AuthoringAction extends Action {
 		
 		//copy back
 		surveyPO.setAttachments(attPOSet);
-		//************************* Handle survey items *******************
+		//************************* Handle survey questions *******************
 		//Handle survey items
-		Set itemList = new LinkedHashSet();
+		Set questionList = new LinkedHashSet();
 		SortedSet topics = getSurveyItemList(sessionMap);
     	iter = topics.iterator();
     	while(iter.hasNext()){
@@ -497,10 +492,10 @@ public class AuthoringAction extends Action {
     		if(item != null){
 				//This flushs user UID info to message if this user is a new user. 
 				item.setCreateBy(surveyUser);
-				itemList.add(item);
+				questionList.add(item);
     		}
     	}
-    	surveyPO.setSurveyItems(itemList);
+    	surveyPO.setQuestions(questionList);
     	//delete instructino file from database.
     	List delSurveyItemList = getDeletedSurveyItemList(sessionMap);
     	iter = delSurveyItemList.iterator();
@@ -508,23 +503,9 @@ public class AuthoringAction extends Action {
     		SurveyQuestion item = (SurveyQuestion) iter.next();
     		iter.remove();
     		if(item.getUid() != null)
-    			service.deleteSurveyItem(item.getUid());
-    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
-    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
+    			service.deleteQuestion(item.getUid());
     	}
-    	//handle survey item attachment file:
-    	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
-		iter = delItemAttList.iterator();
-		while(iter.hasNext()){
-			SurveyQuestion delAtt = (SurveyQuestion) iter.next();
-			iter.remove();
-			//delete from repository
-			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
-		}
-		
-		//if miniview number is bigger than available items, then set it topics size
-		if(surveyPO.getMiniViewSurveyNumber() > topics.size())
-			surveyPO.setMiniViewSurveyNumber((topics.size()));
+    	
 		//**********************************************
 		//finally persist surveyPO again
 		service.saveOrUpdateSurvey(surveyPO);
@@ -683,7 +664,7 @@ public class AuthoringAction extends Action {
 	 */
 	private ISurveyService getSurveyService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-	      return (ISurveyService) wac.getBean(SurveyConstants.RESOURCE_SERVICE);
+	      return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
 	}
 	/**
 	 * @param request
@@ -705,10 +686,10 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private SortedSet<SurveyQuestion> getSurveyItemList(SessionMap sessionMap) {
-		SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_RESOURCE_ITEM_LIST);
+		SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
 		if(list == null){
-			list = new TreeSet<SurveyQuestion>(new SurveyItemComparator());
-			sessionMap.put(SurveyConstants.ATTR_RESOURCE_ITEM_LIST,list);
+			list = new TreeSet<SurveyQuestion>(new QuestionsComparator());
+			sessionMap.put(SurveyConstants.ATTR_QUESTION_LIST,list);
 		}
 		return list;
 	}	
@@ -718,19 +699,8 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private List getDeletedSurveyItemList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,SurveyConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
+		return getListFromSession(sessionMap,SurveyConstants.ATTR_DELETED_QUESTION_LIST);
 	}
-	/**
-	 * If a survey item has attahment file, and the user edit this item and change the attachment
-	 * to new file, then the old file need be deleted when submitting the whole authoring page.
-	 * Save the file uuid and version id into SurveyItem object for temporarily use.
-	 * @param request
-	 * @return
-	 */
-	private List getDeletedItemAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,SurveyConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
-	}
-
 
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
@@ -779,33 +749,6 @@ public class AuthoringAction extends Action {
 		}
 		return instructionList;
 	}
-	/**
-	 * Get back relative <code>ActionForward</code> from request.
-	 * @param type
-	 * @param mapping
-	 * @return
-	 */
-	private ActionForward findForward(short type, ActionMapping mapping) {
-		ActionForward forward;
-		switch (type) {
-		case SurveyConstants.RESOURCE_TYPE_URL:
-			forward = mapping.findForward("url");
-			break;
-		case SurveyConstants.RESOURCE_TYPE_FILE:
-			forward = mapping.findForward("file");
-			break;
-		case SurveyConstants.RESOURCE_TYPE_WEBSITE:
-			forward = mapping.findForward("website");
-			break;
-		case SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-			forward = mapping.findForward("learningobject");
-			break;
-		default:
-			forward = null;
-			break;
-		}
-		return forward;
-	}
 
 
 	/**
@@ -815,11 +758,8 @@ public class AuthoringAction extends Action {
 	 * @param form
 	 * @param request
 	 */
-	private void populateItemToForm(int itemIdx, SurveyQuestion item, SurveyItemForm form, HttpServletRequest request) {
+	private void populateItemToForm(int itemIdx, SurveyQuestion item, QuestionForm form, HttpServletRequest request) {
 		form.setDescription(item.getDescription());
-		form.setTitle(item.getTitle());
-		form.setUrl(item.getUrl());
-		form.setOpenUrlNewWindow(item.isAppendText());
 		if(itemIdx >=0)
 			form.setItemIndex(new Integer(itemIdx).toString());
 		
@@ -832,13 +772,6 @@ public class AuthoringAction extends Action {
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
 			instructions.add("");
 		}
-		if(item.getFileUuid() != null){
-			form.setFileUuid(item.getFileUuid());
-			form.setFileVersionId(item.getFileVersionId());
-			form.setFileName(item.getFileName());
-			form.setHasFile(true);
-		}else
-			form.setHasFile(false);
 		
 		request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructions);
 		
@@ -850,7 +783,7 @@ public class AuthoringAction extends Action {
 	 * @param itemForm
 	 * @throws SurveyApplicationException 
 	 */
-	private void extractFormToSurveyItem(HttpServletRequest request, List<String> instructionList, SurveyItemForm itemForm) 
+	private void extractFormToSurveyItem(HttpServletRequest request, List<String> instructionList, QuestionForm itemForm) 
 		throws Exception {
 		/* BE CAREFUL: This method will copy nessary info from request form to a old or new SurveyItem instance.
 		 * It gets all info EXCEPT SurveyItem.createDate and SurveyItem.createBy, which need be set when persisting 
@@ -873,52 +806,7 @@ public class AuthoringAction extends Action {
 		}
 		short type = itemForm.getItemType();	
 		item.setType(itemForm.getItemType());
-		/* Set following fields regards to the type:
-	    item.setFileUuid();
-		item.setFileVersionId();
-		item.setFileType();
-		item.setFileName();
-		
-		item.getInitialItem()
-		item.setImsSchema()
-		item.setOrganizationXml()
-		 */
-		//if the item is edit (not new add) then the getFile may return null
-		//it may throw exception, so put it as first, to avoid other invlidate update: 
-		if(itemForm.getFile() != null){
-			if(type == SurveyConstants.RESOURCE_TYPE_WEBSITE 
-					||type == SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT
-					||type == SurveyConstants.RESOURCE_TYPE_FILE){
-				//if it has old file, and upload a new, then save old to deleteList
-				SurveyQuestion delAttItem = new SurveyQuestion();
-				boolean hasOld = false;
-				if(item.getFileUuid() != null){
-					hasOld = true;
-					//be careful, This new SurveyItem object never be save into database
-					//just temporarily use for saving fileUuid and versionID use:
-					delAttItem.setFileUuid(item.getFileUuid());
-					delAttItem.setFileVersionId(item.getFileVersionId());
-				}
-				ISurveyService service = getSurveyService();
-				try {
-					service.uploadSurveyItemFile(item, itemForm.getFile());
-				} catch (UploadSurveyFileException e) {
-					//if it is new add , then remove it!
-					if(itemIdx == -1){ 
-						surveyList.remove(item);
-					}
-					throw e;
-				}
-				//put it after "upload" to ensure deleted file added into list only no exception happens during upload 
-				if(hasOld){
-					List delAtt = getDeletedItemAttachmentList(sessionMap);
-					delAtt.add(delAttItem);
-				}
-			}
-		}
-		item.setTitle(itemForm.getTitle());
-		item.setCreateByAuthor(true);
-		item.setHide(false);
+
 		//set instrcutions
 		Set instructions = new LinkedHashSet();
 		int idx=0;
@@ -930,14 +818,7 @@ public class AuthoringAction extends Action {
 		}
 		item.setOptions(instructions);
 
-		if(type == SurveyConstants.RESOURCE_TYPE_URL){
-			item.setUrl(itemForm.getUrl());
-			item.setAppendText(itemForm.isOpenUrlNewWindow());
-		}
-//		if(type == SurveyConstants.RESOURCE_TYPE_WEBSITE 
-//				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-			item.setDescription(itemForm.getDescription());
-//		}
+		item.setDescription(itemForm.getDescription());
 		
 	}
 
@@ -946,32 +827,10 @@ public class AuthoringAction extends Action {
 	 * @param itemForm
 	 * @return
 	 */
-	private ActionErrors validateSurveyItem(SurveyItemForm itemForm) {
+	private ActionErrors validateSurveyItem(QuestionForm itemForm) {
 		ActionErrors errors = new ActionErrors();
-		if(StringUtils.isBlank(itemForm.getTitle()))
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_TITLE_BLANK));
-		
-		if(itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_URL){
-			if(StringUtils.isBlank(itemForm.getUrl()))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_URL_BLANK));
-			//URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port format!!!
-//			UrlValidator validator = new UrlValidator();
-//			if(!validator.isValid(itemForm.getUrl()))
-//				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_INVALID_URL));
-		}
-//		if(itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_WEBSITE 
-//				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-//			if(StringUtils.isBlank(itemForm.getDescription()))
-//				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
-//		}
-		if(itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_WEBSITE 
-				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_LEARNING_OBJECT
-				||itemForm.getItemType() == SurveyConstants.RESOURCE_TYPE_FILE){
-			//for edit validate: file already exist
-			if(!itemForm.isHasFile() &&
-				(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName())))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_FILE_BLANK));
-		}
+		if(StringUtils.isBlank(itemForm.getDescription()))
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
 		return errors;
 	}
 

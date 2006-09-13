@@ -120,7 +120,7 @@
         </set>
 
         <set
-            name="surveyItems"
+            name="questions"
             lazy="true"
             inverse="false"
             cascade="all"
@@ -134,7 +134,7 @@
             </key>
 
             <one-to-many
-                  class="org.lamsfoundation.lams.tool.survey.model.SurveyItem"
+                  class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
             />
 
         </set>
@@ -165,38 +165,6 @@
         />
 
         <property
-            name="allowAddFiles"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_add_files"
-        />
-
-        <property
-            name="allowAddUrls"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_add_urls"
-        />
-
-        <property
-            name="miniViewSurveyNumber"
-            type="int"
-            update="true"
-            insert="true"
-            column="mini_view_survey_number"
-        />
-
-        <property
-            name="runAuto"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_auto_run"
-        />
-
-        <property
             name="reflectInstructions"
             type="java.lang.String"
             update="true"
@@ -210,6 +178,14 @@
             update="true"
             insert="true"
             column="reflect_on_activity"
+        />
+
+        <property
+            name="showOnePage"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_questions_on_one_page"
         />
 
         <!--
