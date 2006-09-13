@@ -249,9 +249,9 @@
 </attribute>
 </tag>
 <tag>
-<name>survey</name>
-<tagclass>org.apache.struts.taglib.bean.SurveyTag</tagclass>
-<teiclass>org.apache.struts.taglib.bean.SurveyTei</teiclass>
+<name>resource</name>
+<tagclass>org.apache.struts.taglib.bean.ResourceTag</tagclass>
+<teiclass>org.apache.struts.taglib.bean.ResourceTei</teiclass>
 <bodycontent>empty</bodycontent>
 <attribute>
 <name>id</name>
