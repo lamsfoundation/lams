@@ -147,9 +147,19 @@ class Lesson {
 	}
 	
 	public function exitLesson():Boolean {
-		getURL('javascript:top.window.close();');
+		var callback:Function = Proxy.create(this, exitConfirm);
+		
+		// call action
+		var lessonId:Number = lessonModel.ID;
+		
+		// do request
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(lessonId), callback, false);
 		
 		return true;
+	}
+	
+	public function exitConfirm(pkt:Object){
+		if(pkt) { getURL('javascript:top.window.close();'); }
 	}
 	
 	public function exportLesson(){

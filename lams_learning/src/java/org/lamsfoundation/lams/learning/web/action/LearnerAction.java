@@ -223,15 +223,15 @@ public class LearnerAction extends LamsDispatchAction
         FlashMessage message = null;
     	try {
 	
-	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
-	        
+    		Long lessonID = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    		
 	        if(log.isDebugEnabled())
-	            log.debug("Exiting lesson, lesson id is: "+learnerProgress.getLesson().getLessonId());
+	            log.debug("Exiting lesson, lesson id is: "+lessonID);
 	        
-	        learnerService.exitLesson(learnerProgress.getLearnerProgressId());
+	        learnerService.exitLesson(lessonID);
 	        
 	        //send acknowledgment to flash as it is triggered by flash
-	        message = new FlashMessage("exitLesson",true);
+	        message = new FlashMessage("exitLesson", true);
 
     	} catch (Exception e ) {
     		message = handleException(e, "exitLesson", learnerService);

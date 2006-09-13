@@ -434,14 +434,14 @@ public class LearnerService implements ICoreLearnerService
      * Exit a lesson.
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
      */
-    public void exitLesson(Long progressId)
+    public void exitLesson(Long lessonId)
     {
-       LearnerProgress progress = learnerProgressDAO.getLearnerProgress(progressId);
+       LearnerProgress progress = learnerProgressDAO.getLearnerProgress(lessonId);
        if ( progress != null ) {
     	   progress.setRestarting(true);
     	   learnerProgressDAO.updateLearnerProgress(progress);
        } else { 
-    	   String error = "Learner Progress "+progressId+" does not exist. Cannot exit lesson successfully.";
+    	   String error = "Learner Progress "+lessonId+" does not exist. Cannot exit lesson successfully.";
     	   log.error(error);
     	   throw new LearnerServiceException(error);
        }
