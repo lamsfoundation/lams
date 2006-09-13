@@ -43,7 +43,7 @@ CREATE TABLE `lams_ext_course_class_map` (
 DROP TABLE IF EXISTS `lams_ext_user_userid_map`;
 CREATE TABLE `lams_ext_user_userid_map` (
   `sid` int(11) NOT NULL auto_increment,
-  `foreign_username` varchar(250) NOT NULL,
+  `external_username` varchar(250) NOT NULL,
   `user_id` bigint(20) NOT NULL,
   `ext_server_org_map_id` int(11) NOT NULL,
   PRIMARY KEY  (`sid`),

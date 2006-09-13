@@ -18,7 +18,7 @@ public class ExtUserUseridMap implements Serializable {
     private Integer sid;
 
     /** persistent field */
-    private String foreignUsername;
+    private String extUsername;
 
     /** persistent field */
     private User user;
@@ -27,8 +27,8 @@ public class ExtUserUseridMap implements Serializable {
     private ExtServerOrgMap extServerOrgMap;
 
     /** full constructor */
-    public ExtUserUseridMap(String foreignUsername, User user, org.lamsfoundation.lams.integration.ExtServerOrgMap extServerOrgMap) {
-        this.foreignUsername = foreignUsername;
+    public ExtUserUseridMap(String extUsername, User user, ExtServerOrgMap extServerOrgMap) {
+        this.extUsername = extUsername;
         this.user = user;
         this.extServerOrgMap = extServerOrgMap;
     }
@@ -54,17 +54,17 @@ public class ExtUserUseridMap implements Serializable {
 
     /** 
      *            @hibernate.property
-     *             column="foreign_username"
+     *             column="external_username"
      *             length="250"
      *             not-null="true"
      *         
      */
-    public String getForeignUsername() {
-        return this.foreignUsername;
+    public String getExtUsername() {
+        return this.extUsername;
     }
 
-    public void setForeignUsername(String foreignUsername) {
-        this.foreignUsername = foreignUsername;
+    public void setExtUsername(String extUsername) {
+        this.extUsername = extUsername;
     }
 
     /** 
@@ -87,18 +87,18 @@ public class ExtUserUseridMap implements Serializable {
      *            @hibernate.column name="ext_server_org_map_id"         
      *         
      */
-    public org.lamsfoundation.lams.integration.ExtServerOrgMap getExtServerOrgMap() {
+    public ExtServerOrgMap getExtServerOrgMap() {
         return this.extServerOrgMap;
     }
 
-    public void setExtServerOrgMap(org.lamsfoundation.lams.integration.ExtServerOrgMap extServerOrgMap) {
+    public void setExtServerOrgMap(ExtServerOrgMap extServerOrgMap) {
         this.extServerOrgMap = extServerOrgMap;
     }
 
     public String toString() {
         return new ToStringBuilder(this)
             .append("sid", getSid())
-            .append("foreignUsername", getForeignUsername())
+            .append("extUsername", getExtUsername())
             .toString();
     }
 
