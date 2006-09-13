@@ -24,9 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,8 +35,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -46,8 +42,6 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -75,6 +69,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="userlist" path="/usermanage.do"
  * @struts:action-forward name="remove" path=".remove"
  * @struts:action-forward name="disabledlist" path="/disabledmanage.do"
+ * @struts:action-forward name="usersearch" path="/usersearch.do"
  */
 public class UserAction extends LamsDispatchAction {
 
@@ -82,80 +77,58 @@ public class UserAction extends LamsDispatchAction {
 	private static IUserManagementService service;
 	private static MessageService messageService;
 	private static IAuditService auditService;
-	private static List<Role> rolelist;
 	private static List<SupportedLocale> locales;
 	
 	public ActionForward edit(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-		// retain orgId to return to userlist
-		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
-		OrganisationType orgType = org.getOrganisationType();
+		
+		DynaActionForm userForm = (DynaActionForm)form;
+		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		
+		// test requestor's permission
+		Organisation org = null;
+		Boolean requestorHasRole = false;
+		if (orgId!=null) {
+			org = (Organisation)getService().findById(Organisation.class,orgId);
+			OrganisationType orgType = org.getOrganisationType();
+			Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
+				? org.getParentOrganisation().getOrganisationId() : orgId;
+			User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
+			requestorHasRole = getService().isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
+				|| getService().isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
+		}
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		Boolean hasRole = getService().isUserInRole(requestor.getUserId(), orgId, Role.COURSE_ADMIN)
-							|| getService().isUserInRole(requestor.getUserId(), orgId, Role.COURSE_MANAGER);
-		Boolean canEdit = org.getCourseAdminCanAddNewUsers() && hasRole;
 		
-		ActionMessages errors = new ActionMessages();
-		
-		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin, orgType));
-		// set canEdit for whether user should be able to edit anything other than roles
-		request.setAttribute("canEdit",isSysadmin || canEdit);
-		request.setAttribute("locales",locales);
+		if (!(requestorHasRole || isSysadmin)) {
+			request.setAttribute("errorName", "UserAction");
+			request.setAttribute("errorMessage", getMessageService().getMessage("error.authorisation"));
+			return mapping.findForward("error");
+		}
 
 		// editing a user
-		Integer userId = WebUtil.readIntParam(request,"userId",true);
-		DynaActionForm userForm = (DynaActionForm)form;
-		if(userId != null) {
+		if (userId!=null) {
+			User user = (User)getService().findById(User.class, userId);
 			log.debug("got userid to edit: "+userId);
-			User user = (User)getService().findById(User.class,userId);
 			BeanUtils.copyProperties(userForm, user);
-			userForm.set("password",null);
-			
-			String[] roles = null;
-		    UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
-		    if (uo != null) {
-		    	Iterator iter2 = uo.getUserOrganisationRoles().iterator();
-		    	roles = new String[uo.getUserOrganisationRoles().size()];
-		    	int i=0;
-		    	while(iter2.hasNext()){
-		    		UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
-		    		roles[i]=uor.getRole().getRoleId().toString();
-		    		log.debug("got roleid: "+roles[i]);
-		    		i++;
-		    	}
-		    } else {
-		    	errors.add("roles", new ActionMessage("error.not.member"));
-		    	saveErrors(request,errors);
-		    }
-	        userForm.set("roles",roles);
+			userForm.set("password", null);
 	        SupportedLocale locale = user.getLocale();
-			userForm.set("localeId",locale.getLocaleId());
-			
-		}else{
-			String[] roles = new String[0];
-			userForm.set("roles",roles);
-			try{
+			userForm.set("localeId", locale.getLocaleId());
+		} else {  // create a user
+			try {
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-				log.debug("defaultLocale: "+defaultLocale);
+				log.debug("using defaultLocale: "+defaultLocale);
 				SupportedLocale locale = getService().getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
-				userForm.set("localeId",locale.getLocaleId());
-			}catch(Exception e){
+				userForm.set("localeId", locale.getLocaleId());
+			} catch(Exception e) {
                 log.debug(e);				
 			}
 		}
-		userForm.set("orgId", org.getOrganisationId());
+		userForm.set("orgId", (org==null ? null : org.getOrganisationId()));
+		request.setAttribute("locales",locales);
 
-		Organisation parentOrg = org.getParentOrganisation();
-		if(parentOrg!=null){
-			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
-			request.setAttribute("pOrgName", parentOrg.getName());
-		}
-		request.setAttribute("orgName",org.getName());
-		request.setAttribute("orgType",orgType.getOrganisationTypeId());
 		return mapping.findForward("user");
 	}
 	
@@ -171,8 +144,8 @@ public class UserAction extends LamsDispatchAction {
 			return mapping.findForward("error");
 		}
 		
-		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+		Integer userId = WebUtil.readIntParam(request,"userId");
 		User user = (User)getService().findById(User.class,userId);
 		
 		Boolean hasData = getService().userHasData(user);
@@ -194,16 +167,20 @@ public class UserAction extends LamsDispatchAction {
 			return mapping.findForward("error");
 		}
 		
-		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+		Integer userId = WebUtil.readIntParam(request,"userId");
 		getService().disableUser(userId);
 		String[] args = new String[1];
 		args[0] = userId.toString();
 		String message = getMessageService().getMessage("audit.user.disable", args);
 		getAuditService().log(AdminConstants.MODULE_NAME, message);
 		
-		request.setAttribute("org",orgId);
-		return mapping.findForward("userlist");
+		if (orgId==null || orgId==0) {
+			return mapping.findForward("usersearch");
+		} else {
+			request.setAttribute("org",orgId);
+			return mapping.findForward("userlist");
+		}
 	}
 	
 	public ActionForward delete(ActionMapping mapping,
@@ -217,8 +194,8 @@ public class UserAction extends LamsDispatchAction {
 			return mapping.findForward("error");
 		}
 		
-		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		Integer userId = WebUtil.readIntParam(request,"userId",true);
+		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+		Integer userId = WebUtil.readIntParam(request,"userId");
 		try {
 			getService().removeUser(userId);
 		} catch (Exception e) {
@@ -231,8 +208,12 @@ public class UserAction extends LamsDispatchAction {
 		String message = getMessageService().getMessage("audit.user.delete", args);
 		getAuditService().log(AdminConstants.MODULE_NAME, message);
 		
-		request.setAttribute("org",orgId);
-		return mapping.findForward("userlist");
+		if (orgId==null || orgId==0) {
+			return mapping.findForward("usersearch");
+		} else {
+			request.setAttribute("org",orgId);
+			return mapping.findForward("userlist");
+		}
 	}
 	
 	// called from disabled users screen
@@ -257,23 +238,6 @@ public class UserAction extends LamsDispatchAction {
 		return mapping.findForward("disabledlist");
 	}
 	
-	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
-		List<Role> allRoles = new ArrayList<Role>();
-		allRoles.addAll(rolelist);
-		Role role = new Role();
-		if(!isSysadmin) {
-			role.setRoleId(Role.ROLE_SYSADMIN);
-			allRoles.remove(role);
-		}
-		if(orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-			role.setRoleId(Role.ROLE_COURSE_ADMIN);
-			allRoles.remove(role);
-			role.setRoleId(Role.ROLE_COURSE_MANAGER);
-			allRoles.remove(role);
-		}
-		return allRoles;
-	}
-	
 	@SuppressWarnings("unchecked")
 	private IUserManagementService getService(){
 		if(service==null){
@@ -281,8 +245,8 @@ public class UserAction extends LamsDispatchAction {
 			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
 			locales = service.findAll(SupportedLocale.class);
 			Collections.sort(locales);
-			rolelist = service.findAll(Role.class);
-			Collections.sort(rolelist);
+			//rolelist = service.findAll(Role.class);
+			//Collections.sort(rolelist);
 		}
 		return service;
 	}

@@ -6,7 +6,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<h2>Find Users</h2>
+<h2><fmt:message key="admin.user.find"/></h2>
 
 <logic:notEqual name="isSysadmin" value="false">
 <html-el:form action="/usersearch.do" method="post">
@@ -21,10 +21,10 @@
 	<th width="15%"></th>
 </tr>
 <tr>
-	<td><html-el:text property="userId" size="5" /></td>
-	<td><html-el:text property="login" size="10" /></td>
-	<td><html-el:text property="firstName" size="10" /></td>
-	<td><html-el:text property="lastName" size="10" /></td>
+	<td><html-el:text property="sUserId" size="5" /></td>
+	<td><html-el:text property="sLogin" size="10" /></td>
+	<td><html-el:text property="sFirstName" size="10" /></td>
+	<td><html-el:text property="sLastName" size="10" /></td>
 	<td></td>
 </tr>
 
@@ -44,9 +44,9 @@
 				<bean:write name="user" property="lastName" />
 			</td>
 			<td>
-				<a href="user.do?method=edit&userId=<bean:write name='user' property='userId' />&orgId=1"><fmt:message key="admin.edit"/></a>
+				<a href="user.do?method=edit&userId=<bean:write name='user' property='userId' />"><fmt:message key="admin.edit"/></a>
 				&nbsp;
-				<a href="user.do?method=remove&userId=<bean:write name='user' property='userId' />&orgId=1"><fmt:message key="admin.user.delete"/></a>
+				<a href="user.do?method=remove&userId=<bean:write name='user' property='userId' />"><fmt:message key="admin.user.delete"/></a>
 			</td>
 		</tr>
 	</logic:iterate>

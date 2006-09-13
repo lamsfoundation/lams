@@ -13,6 +13,12 @@
 	<form-property name="courseAdminCanChangeStatusOfCourse" type="java.lang.Boolean" initial="false"/>
 </form-bean>
 
+<form-bean name="UserRolesForm" type="org.apache.struts.action.DynaActionForm">
+    <form-property name="orgId" type="java.lang.Integer" />
+	<form-property name="userId" type="java.lang.Integer" />
+    <form-property name="roles" type="java.lang.String[]" />
+</form-bean>
+
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
     <form-property name="orgId" type="java.lang.Integer" />
 	<form-property name="userId" type="java.lang.Integer" />
@@ -35,7 +41,6 @@
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Byte" />
-    <form-property name="roles" type="java.lang.String[]" />
 </form-bean>
 
 <form-bean name="UserOrgForm" type="org.apache.struts.action.DynaActionForm">
@@ -45,10 +50,10 @@
 </form-bean>
 
 <form-bean name="UserSearchForm" type="org.apache.struts.action.DynaActionForm">
-	<form-property name="userId" type="java.lang.String" />
-    <form-property name="login" type="java.lang.String" />
-    <form-property name="firstName" type="java.lang.String" />
-    <form-property name="lastName" type="java.lang.String" />
+	<form-property name="sUserId" type="java.lang.String" />
+    <form-property name="sLogin" type="java.lang.String" />
+    <form-property name="sFirstName" type="java.lang.String" />
+    <form-property name="sLastName" type="java.lang.String" />
     <form-property name="searched" type="java.lang.Boolean" initial="false" />
 </form-bean>
 

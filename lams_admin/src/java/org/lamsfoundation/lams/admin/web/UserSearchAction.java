@@ -32,7 +32,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -44,7 +43,6 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -86,10 +84,10 @@ public class UserSearchAction extends Action {
 
 		DynaActionForm userSearchForm = (DynaActionForm)form;
 		
-		String userId = ((String)userSearchForm.get("userId")).trim();
-		String login = ((String)userSearchForm.get("login")).trim();
-		String firstName = ((String)userSearchForm.get("firstName")).trim();
-		String lastName = ((String)userSearchForm.get("lastName")).trim();
+		String userId = ((String)userSearchForm.get("sUserId")).trim();
+		String login = ((String)userSearchForm.get("sLogin")).trim();
+		String firstName = ((String)userSearchForm.get("sFirstName")).trim();
+		String lastName = ((String)userSearchForm.get("sLastName")).trim();
 		
 		log.debug("got userId: '"+userId+"'");
 		log.debug("got login: '"+login+"'");
@@ -114,7 +112,7 @@ public class UserSearchAction extends Action {
 		
 		if(userList.isEmpty() && (Boolean)userSearchForm.get("searched")){
 			ActionMessages messages = new ActionMessages();
-			messages.add("results",new ActionMessage("error.results.none"));
+			messages.add("results",new ActionMessage("msg.results.none"));
 			saveMessages(request,messages);
 		}
 		

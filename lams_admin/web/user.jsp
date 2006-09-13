@@ -10,23 +10,17 @@
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
 <h2 align="left">
-    <logic:notEmpty name="pOrgId">
-        <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
-    </logic:notEmpty>
-    <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserForm" property="orgId" />">
-      <bean:write name="orgName"/></a> ::
 	<logic:notEmpty name="UserForm" property="userId">
-		<fmt:message key="admin.edit"/> User
+		<fmt:message key="admin.user.edit"/>
 	</logic:notEmpty>
 	<logic:empty name="UserForm" property="userId">
-		<fmt:message key="admin.create"/> User
+		<fmt:message key="admin.user.create"/>
 	</logic:empty>
 </h2>
 
 <div align="center"><html-el:errors/></div>
 <table>
   <col align="right" /><col align="left" />
-  <logic:equal name="canEdit" value="true">
 	<tr>
 		<td><fmt:message key="admin.user.login"/> *:</td>
 		<td><html-el:text property="login" size="20" maxlength="20" /></td>
@@ -110,44 +104,6 @@
 				</c:forEach>	
 			</html-el:select>
 		</td>
-	</tr>
-  </logic:equal>
-  <logic:notEqual name="canEdit" value="true">
-    <tr>
-		<td><fmt:message key="admin.user.login"/>:</td>
-		<td><bean:write name="UserForm" property="login" /></td>
-	</tr>
-	<tr>
-	<td>Name:</td>
-		<td><bean:write name="UserForm" property="title" /> <bean:write name="UserForm" property="firstName" /> <bean:write name="UserForm" property="lastName" /></td>
-	</tr>
-	<html-el:hidden property="login" />
-	<html-el:hidden property="password" />
-	<html-el:hidden property="password2" />
-	<html-el:hidden property="title" />
-	<html-el:hidden property="firstName" />
-	<html-el:hidden property="lastName" />
-	<html-el:hidden property="addressLine1" />
-	<html-el:hidden property="addressLine2" />
-	<html-el:hidden property="addressLine3" />
-	<html-el:hidden property="city" />
-	<html-el:hidden property="state" />
-	<html-el:hidden property="country" />
-	<html-el:hidden property="dayPhone" />
-	<html-el:hidden property="eveningPhone" />
-	<html-el:hidden property="mobilePhone" />
-	<html-el:hidden property="fax" />
-	<html-el:hidden property="email" />
-	<html-el:hidden property="localeId" />
-  </logic:notEqual>
-	<tr>
-	    <td><fmt:message key="admin.user.roles"/>:</td>
-	    <td>
-            <c:forEach items="${rolelist}" var="role">
-                <html-el:multibox name="UserForm" property="roles" value="${role.roleId}"/>
-                <c:out value="${role.name}"/><br/>
-            </c:forEach>
-	    </td>
 	</tr>
 	<tr>
 		<td colspan=2 align="right">
