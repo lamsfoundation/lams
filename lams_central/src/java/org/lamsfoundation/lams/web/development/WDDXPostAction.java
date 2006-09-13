@@ -36,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -43,10 +44,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
- * Takes a action ( URL ) and a file containing a WDDX packet
+ * Takes an action ( URL ) and a file containing a WDDX packet
  * and forwards the contents of the WDDX packet to the action.
  * <p>
  * This is used to simulate Flash sending a WDDX packet to
@@ -55,10 +59,9 @@ import org.apache.struts.upload.FormFile;
  * The error handling just throws a RuntimeException if something
  * goes wrong. Not nice but this is only run during development....
  * <p>
- * @struts:action name="WDDXPostActionForm"
- * 				  path="/WDDXPost"
- * 				  validate="false"
- * 				  parameter="method"
+ * This action is commented out in the struts-action.xml and hence  
+ * in thestruts-config.xml so if you want to run this, you will need 
+ * to uncomment it in the struts-config.xml.
  */
 public class WDDXPostAction extends Action {
 	
@@ -80,12 +83,22 @@ public class WDDXPostAction extends Action {
 			throw e;
 		}
 		
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		if ( user == null ) {
+			RuntimeException e = new RuntimeException("WDDXPostAction called with url "+action
+					+" but user details are missing from shared session. Not processing the WDDX file.");
+			log.error(e);
+			throw e;
+		}
+		
 		FormFile file = postForm.getWddxFile();
 		if ( file == null ) {
 			RuntimeException e = new RuntimeException("Unable to process WDDX file, file is missing.");
 			log.error(e);
 			throw e;
 		}
+
 		Cookie[] cookies = req.getCookies();
 		// we've got the URL action and the WDDX input. Now try sending the WDDX to the URL
 	  	URL url = new URL(action);
@@ -113,7 +126,8 @@ public class WDDXPostAction extends Action {
 	    if ( ! packetStart.equalsIgnoreCase("<wddxPacket") ) {
 	    	throw new ServletException("Input file did not start with <wddxPacket> tag. Invalid format.");
 	    }
-	    log.debug("Sending packet "+packet);
+	    
+		log.warn("WDDXPostAction Processing action "+action+" for user "+user+" packet is "+packet);
 
 	    // POST requests are required to have Content-Length
 	    String lengthString = String.valueOf(byteStream.size());

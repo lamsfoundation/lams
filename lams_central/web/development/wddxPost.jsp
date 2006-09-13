@@ -25,7 +25,7 @@
 		</div><!--closes header-->
 
 		<div id="content-learner">
-			<html:form action="/WDDXPost.do" target="_self" method="POST" enctype="multipart/form-data">
+			<html:form action="/servlet/WDDXPost.do" target="_self" method="POST" enctype="multipart/form-data">
 			
 			  <p>Test posting file to form - this should be WDDX XML to a URL expecting 
 			  the XML in the post body.</p>
@@ -42,6 +42,8 @@
 			  </p>
 			</html:form>
 	
+			<p>If this call doesn't work, check your struts-config.xml file. The struts action and form
+			for this page is normally commented out and will need to be uncommented. Look for WDDXPost.</p>
 		</div>
 	   
 		<div id="footer-learner">

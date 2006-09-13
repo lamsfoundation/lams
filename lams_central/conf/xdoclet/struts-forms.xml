@@ -19,3 +19,10 @@
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Byte" />
 </form-bean>
+
+<!--  uncomment to use wddxPost   
+ <form-bean
+      name="WDDXPostActionForm"
+      type="org.lamsfoundation.lams.web.development.WDDXPostActionForm"
+/>
+-->

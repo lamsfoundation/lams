@@ -14,25 +14,53 @@
   <form-beans>
 
     <form-bean
-      name="WDDXPostActionForm"
-      type="org.lamsfoundation.lams.web.development.WDDXPostActionForm"
+      name="PortraitActionForm"
+      type="org.lamsfoundation.lams.web.PortraitActionForm"
     />
     <form-bean
       name="PasswordChangeActionForm"
       type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
     />
 
-    <!--
-         If you have non XDoclet forms, define them in a file called struts-forms.xml and
-         place it in your merge directory.
-    -->
+   <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="userId" type="java.lang.Integer" />
+	<form-property name="login" type="java.lang.String" />
+	<form-property name="password" type="java.lang.String" />
+	<form-property name="title" type="java.lang.String" />
+	<form-property name="firstName" type="java.lang.String" />
+	<form-property name="lastName" type="java.lang.String" />
+	<form-property name="addressLine1" type="java.lang.String" />
+	<form-property name="addressLine2" type="java.lang.String" />
+	<form-property name="addressLine3" type="java.lang.String" />
+	<form-property name="city" type="java.lang.String" />
+	<form-property name="state" type="java.lang.String" />
+	<form-property name="postcode" type="java.lang.String" />
+	<form-property name="country" type="java.lang.String" />
+	<form-property name="dayPhone" type="java.lang.String" />
+	<form-property name="eveningPhone" type="java.lang.String" />
+	<form-property name="mobilePhone" type="java.lang.String" />
+	<form-property name="fax" type="java.lang.String" />
+	<form-property name="email" type="java.lang.String" />
+	<form-property name="localeId" type="java.lang.Byte" />
+</form-bean>
+
+<!--  uncomment to use wddxPost   
+ <form-bean
+      name="WDDXPostActionForm"
+      type="org.lamsfoundation.lams.web.development.WDDXPostActionForm"
+/>
+-->
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
-  <!--
-    Define your exceptions in a file called global-exceptions.xml and place
-    it in your merge directory.
-  -->
+  <global-exceptions>
+  <exception
+    handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+    key="error.system"
+    path="/error.jsp"
+    scope="request"
+    type="java.lang.Exception"/>
+</global-exceptions>
 
   <!-- ========== Global Forward Definitions =================================== -->
   <!--
@@ -49,7 +77,7 @@
       scope="request"
       input=".passwordChange"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
         name="okay"
@@ -58,7 +86,7 @@
       />
       <forward
         name="cancelled"
-        path="/index.jsp"
+        path="/profile.do?method=view"
         redirect="false"
       />
     </action>
@@ -84,12 +112,89 @@
     <action
       path="/profile"
       type="org.lamsfoundation.lams.web.ProfileAction"
+      name="UserForm"
+      scope="request"
+      parameter="method"
       unknown="false"
-      validate="true"
+      validate="false"
+    >
+      <forward
+        name="view"
+        path=".profile"
+        redirect="false"
+      />
+      <forward
+        name="edit"
+        path=".editprofile"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/workspace"
+      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/index"
+      type="org.lamsfoundation.lams.web.IndexAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="index"
+        path="/indexContent.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/saveprofile"
+      type="org.lamsfoundation.lams.web.ProfileSaveAction"
+      name="UserForm"
+      scope="request"
+      input=".editprofile"
+      unknown="false"
+      validate="false"
     >
       <forward
         name="profile"
-        path="/profile.jsp"
+        path="/profile.do?method=view"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/password"
+      type="org.lamsfoundation.lams.web.PasswordAction"
+      name="PasswordChangeActionForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="passwordChange"
+        path=".passwordChange"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/saveportrait"
+      type="org.lamsfoundation.lams.web.PortraitSaveAction"
+      name="PortraitActionForm"
+      scope="request"
+      input=".portrait"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="profile"
+        path="/profile.do?method=view"
         redirect="false"
       />
     </action>
@@ -142,6 +247,16 @@
       />
     </action>
     <action
+      path="/theme"
+      type="org.lamsfoundation.lams.themes.web.ThemeAction"
+      name="ThemeAction"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/authoring/exportToolContent"
       type="org.lamsfoundation.lams.authoring.web.ExportToolContentAction"
       name="ExportAction"
@@ -161,29 +276,6 @@
       />
     </action>
     <action
-      path="/theme"
-      type="org.lamsfoundation.lams.themes.web.ThemeAction"
-      name="ThemeAction"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/workspace"
-      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/index.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/authoring/author"
       type="org.lamsfoundation.lams.authoring.web.AuthoringAction"
       name="AuthoringAction"
@@ -199,19 +291,23 @@
       />
     </action>
     <action
-      path="/index"
-      type="org.lamsfoundation.lams.web.IndexAction"
+      path="/portrait"
+      type="org.lamsfoundation.lams.web.PortraitAction"
+      name="PortraitActionForm"
+      scope="request"
       unknown="false"
       validate="false"
     >
       <forward
-        name="index"
-        path="/indexContent.jsp"
+        name="portrait"
+        path=".portrait"
         redirect="false"
       />
     </action>
-    <action
-      path="/WDDXPost"
+
+    <!--  uncomment to use wddxPost   
+ 	<action
+      path="/servlet/WDDXPost"
       type="org.lamsfoundation.lams.web.development.WDDXPostAction"
       name="WDDXPostActionForm"
       scope="request"
@@ -220,13 +316,12 @@
       validate="false"
     >
     </action>
-
-    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+     -->
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-    <message-resources    parameter="org.lamsfoundation.lams.ApplicationResources"/>
+    <message-resources    parameter="org.lamsfoundation.lams.central.ApplicationResources"/>
 
   <plug-in className="org.apache.struts.tiles.TilesPlugin">
 	<set-property property="definitions-config"

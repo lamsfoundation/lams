@@ -32,10 +32,6 @@ import org.apache.struts.upload.FormFile;
 
 /**
  * @author fmalikoff
- * 
- * @struts:form name="WDDXPostActionForm"
- * 		include-pk="true"
- * 		include-all="true"
  */
 public class WDDXPostActionForm extends ActionForm {
 
