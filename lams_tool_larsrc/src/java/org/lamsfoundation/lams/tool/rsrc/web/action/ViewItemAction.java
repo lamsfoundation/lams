@@ -131,7 +131,6 @@ public class ViewItemAction extends Action {
 			ins.setDescription(item.getDescription());
 			navItems.add(ins);
 			navDto.setAllInstructions(navItems);
-			instructions.clear();
 			instructions.add(ins);
 		}else{
 			navDto.setAllInstructions(new ArrayList(instructions));
