@@ -87,17 +87,7 @@ public class AuthoringUtil implements QaAppConstants {
     	 	String questionIndex =qaAuthoringForm.getQuestionIndex();
     	 	logger.debug("pre-delete map content:  " + mapQuestionContent);
     	 	logger.debug("questionIndex: " + questionIndex);
-    	 	
-    	 	// watch here and remove request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
-    	 	String removableQuestionIndex=null;
-    	 	if (activeModule.equals(MONITORING))
-    	 	{
-       	 		removableQuestionIndex=(String)request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
-        	 	logger.debug("removableQuestionIndex: " + removableQuestionIndex);
-        	 	questionIndex=removableQuestionIndex;
-    	 	}
     	 	logger.debug("final removableQuestionIndex: " + questionIndex);
-    	 	
     	 	
     	 	long longQuestionIndex= new Long(questionIndex).longValue();
     	 	logger.debug("pre-delete count: " + mapQuestionContent.size());
@@ -222,20 +212,18 @@ public class AuthoringUtil implements QaAppConstants {
         boolean synchInMonitorBoolean=false;
         boolean usernameVisibleBoolean=false;
         boolean reflectBoolean=false;
-        //if (setCommonContent)
-        //{
-            if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
-                questionsSequencedBoolean=true;            
-            
-            if ((synchInMonitor != null) && (synchInMonitor.equalsIgnoreCase("1")))
-                synchInMonitorBoolean=true;            
-            
-            if ((usernameVisible != null) && (usernameVisible.equalsIgnoreCase("1")))
-                usernameVisibleBoolean=true;            
 
-            if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
-                reflectBoolean=true;
-        //}
+    	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
+            questionsSequencedBoolean=true;            
+        
+        if ((synchInMonitor != null) && (synchInMonitor.equalsIgnoreCase("1")))
+            synchInMonitorBoolean=true;            
+        
+        if ((usernameVisible != null) && (usernameVisible.equalsIgnoreCase("1")))
+            usernameVisibleBoolean=true;            
+
+        if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
+            reflectBoolean=true;
             
             
         logger.debug("questionsSequencedBoolean: " + questionsSequencedBoolean);
@@ -285,7 +273,8 @@ public class AuthoringUtil implements QaAppConstants {
      	logger.debug("end of setting common content values...");
 
      	
-        //if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
+
+     	logger.debug("activeModule:" + activeModule);
      	if (activeModule.equals(AUTHORING))
 		{
         	logger.debug("setting other content values...");
@@ -385,6 +374,7 @@ public class AuthoringUtil implements QaAppConstants {
         			logger.debug("removeableQaQueContent"  + removeableQaQueContent);
         			if (removeableQaQueContent != null)
         			{
+        			    //qaContent.getQaQueContents().remove(removeableQaQueContent);
         				qaService.removeQaQueContent(removeableQaQueContent);
             			logger.debug("removed removeableQaQueContent from the db: " + removeableQaQueContent);	
         			}

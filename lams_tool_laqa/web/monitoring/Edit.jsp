@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 		<c:if test="${editActivityDTO.monitoredContentInUse != 'true'}"> 			
-			<c:if test="${defineLaterInEditMode != 'true'}"> 			
+			<c:if test="${qaGeneralMonitoringDTO.defineLaterInEditMode != 'true'}"> 			
 				<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
 			</c:if> 				
 			<c:if test="${qaGeneralMonitoringDTO.defineLaterInEditMode == 'true'}"> 			

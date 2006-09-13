@@ -180,7 +180,7 @@ public abstract class QaUtils implements QaAppConstants {
     	
     	qaAuthoringForm.setToolContentID(strToolContentID);
     	
-    	if (defaultContentIdStr != null)
+    	if ((defaultContentIdStr != null) && (defaultContentIdStr.length() > 0)) 
     	    qaAuthoringForm.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
     	
     	qaAuthoringForm.setActiveModule(activeModule);

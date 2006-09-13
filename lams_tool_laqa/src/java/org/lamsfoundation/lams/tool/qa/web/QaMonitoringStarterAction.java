@@ -50,13 +50,12 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
@@ -229,6 +228,16 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		qaMonitoringAction.preparEditActivityScreenData(request, qaContent);
 		
 		
+		
+		SessionMap sessionMap = new SessionMap();
+	    sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
+	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
+	    sessionMap.put(MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
+	    
+	    qaMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	    
+		
 		logger.debug("fwding to : " + LOAD_MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -260,7 +269,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (qaContent == null)
 		{
 			QaUtils.cleanUpSessionAbsolute(request);
-			//persistError(request, "error.content.doesNotExist");
 			return false;
 		}
 		
@@ -299,7 +307,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	    	//persistError(request, "error.contentId.required");
 	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
@@ -314,7 +321,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		//persistError(request, "error.contentId.numberFormatException");
 	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
 	    		QaUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));

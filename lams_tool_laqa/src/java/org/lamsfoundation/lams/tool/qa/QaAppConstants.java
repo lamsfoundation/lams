@@ -47,6 +47,7 @@ public interface QaAppConstants {
 	public static final String TARGET_MODE_MONITORING					="Monitoring";
 	public static final String TARGET_MODE_EXPORT_PORTFOLIO				="ExportPortfolio";
 	
+	public static final String TOOL_SERVICE								="toolService";
 	public static final String AUTHORING_STARTER						="starter";
 	public static final String TITLE									="title";
 	public static final String INSTRUCTIONS								="instructions";
@@ -58,6 +59,7 @@ public interface QaAppConstants {
 	public static final String INDIVIDUAL_LEARNER_RESULTS				="individualLearnerResults";
 	public static final String MAP_ALL_RESULTS_KEY						="mapAllResultsKey";
 	public static final String LOAD_MONITORING							="refreshMonitoring";
+	public static final String SOURCE_QA_STARTER						="sourceQaStarter";
 	public static final String LOAD_VIEW_ONLY							="loadViewOnly";
 	public static final String EDIT_RESPONSE							="editResponse";
 	public static final String EDITABLE_RESPONSE_ID						="editableResponseId";
