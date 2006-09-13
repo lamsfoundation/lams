@@ -563,6 +563,18 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
         checkOwnerOrStaffMember(userId, requestedLesson, "start lesson on schedule");
         
+        if ( requestedLesson.isLessonStarted() ) {
+        	// can't schedule it as it is already started. If the UI is correct, this should never happen.
+        	log.error("Lesson for id="+lessonId+" has been started. Unable to schedule lesson start.");
+        	return;
+        }
+        
+    	if ( requestedLesson.getScheduleStartDate() != null) {
+    		// can't reschedule!
+        	log.error("Lesson for id="+lessonId+" is already scheduled and cannot be rescheduled.");
+        	return;
+        }
+
         JobDetail startLessonJob = getStartScheduleLessonJob();
         //setup the message for scheduling job
         startLessonJob.setName("startLessonOnSchedule:" + lessonId);
@@ -579,9 +591,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         //start the scheduling job
         try
         {
-        	requestedLesson.setScheduleStartDate(startDate);
-        	setLessonState(requestedLesson,Lesson.NOT_STARTED_STATE);
-            scheduler.scheduleJob(startLessonJob, startLessonTrigger);
+    		requestedLesson.setScheduleStartDate(startDate);
+    		scheduler.scheduleJob(startLessonJob, startLessonTrigger);
+    		setLessonState(requestedLesson,Lesson.NOT_STARTED_STATE);
         }
         catch (SchedulerException e)
         {
@@ -651,6 +663,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if ( requestedLesson == null) {
         	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
         }
+
+        if ( requestedLesson.isLessonStarted() ) {
+        	log.warn("Lesson for id="+lessonId+" has been started. No need to start the lesson. The lesson was probably scheduled, and then the staff used \"Start now\". This message would have then been created by the schedule start");
+        	return;
+        }
+
         checkOwnerOrStaffMember(userId, requestedLesson, "create lesson class");
 
         Date lessonStartTime = new Date();
@@ -976,14 +994,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
     }
     
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
-     */
-    public List getAllLessons(Integer userID)throws IOException{
-    	return lessonDAO.getLessonsForMonitoring(userID);
-    }
-
     /**
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
@@ -1557,12 +1567,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    return table;
     }
   
-    /** Get all the learning designs for this user */
-    public List getLearningDesigns(Long userId) {
-    	
-    	return learningDesignDAO.getLearningDesignByUserId(userId);
-    }
-    
    //---------------------------------------------------------------------
    // Preview related methods
    //---------------------------------------------------------------------

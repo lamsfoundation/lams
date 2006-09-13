@@ -215,20 +215,6 @@ public interface IMonitoringService
     public GateActivity closeGate(Long gateId);
     
     /**
-     * This method returns a list of all available Lessons. This is all the lessons
-     * created by the current user and all the lessons for which the user is in the
-     * staff group. It does not return removed lessons.
-     * 
-     * TODO This is to be removed when the dummy interface is no longer needed.
-     *
-     * @param userID The user_id of the user for whom the lessons 
-     * 				 are being fetched.
-     * @return List The requested list of Lessons
-     * @throws IOException
-     */
-    public List getAllLessons(Integer userID) throws IOException;
-    
-    /**
      * This method returns the details for the given Lesson in
      * WDDX format. Object inside the packet is a LessonDetailsDTO.
      * 
@@ -467,10 +453,5 @@ public interface IMonitoringService
 	/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
 	 * @throws LessonServiceException */
 	public abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
-
-    /* TODO Dummy methods - to be removed */
-    public List getLearningDesigns(Long userId);
-	
-    
 
 }
