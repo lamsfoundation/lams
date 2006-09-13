@@ -926,6 +926,11 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 		
+		VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
+		voteGeneralAuthoringDTO.setActiveModule(MONITORING);
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+
         return (mapping.findForward(destination));	
     }
     
@@ -988,6 +993,11 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
+		
+		VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
+		voteGeneralAuthoringDTO.setActiveModule(MONITORING);
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
         return (mapping.findForward(destination));
     }
@@ -1054,7 +1064,11 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	    logger.debug("voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
+		
+		VoteGeneralAuthoringDTO voteGeneralAuthoringDTO= new VoteGeneralAuthoringDTO();
+		voteGeneralAuthoringDTO.setActiveModule(MONITORING);
+		logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
 		return (mapping.findForward(destination));
     }
