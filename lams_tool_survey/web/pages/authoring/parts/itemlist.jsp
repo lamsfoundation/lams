@@ -9,6 +9,19 @@
 
 <c:forEach var="survey" items="${sessionMap.questionList}" varStatus="status">
 	<tr>
+		<td width="20px" align="center">
+			<c:choose>
+				<c:when test="${survey.type == 1}">
+					<img src="${ctxPath}/includes/images/icon_single.gif"/>
+				</c:when>
+				<c:when test="${survey.type == 2}">
+					<img src="${ctxPath}/includes/images/icon_multiple.gif"/>
+				</c:when>
+				<c:when test="${survey.type == 3}">
+					<img src="${ctxPath}/includes/images/icon_text.gif"/>
+				</c:when>
+			</c:choose>
+		</td>
 		<td>${survey.shortTitle}</td>
 		<td width="80px" align="center">
 			<a href="#" onclick="editItem(${status.index},'${sessionMapID}')" class="button">
