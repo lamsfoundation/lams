@@ -4,11 +4,10 @@
 <div id="instructionArea">
 	<form id="instructionForm">
 	<input type="hidden" name="instructionCount" id="instructionCount">
-	<table border="0" style="width:400px">
+	<table border="0" style="width:400px" id="questionTable">
 		<tr>
 			<td colspan="5">
-				<fmt:message key="label.authoring.basic.survey.instructions"/>
-				<a href="javascript:;" onclick="addInstruction()" class="button"><fmt:message key="label.authoring.basic.survey.add.instruction"/></a>
+				<a href="javascript:;" onclick="addInstruction()" class="button"><fmt:message key="label.authoring.basic.add.option"/></a>
 				<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="instructionArea_Busy" />
 			</td>
 		</tr>
@@ -47,6 +46,6 @@
 <%-- This script will adjust survey item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
 	$("instructionCount").value="${listSize}";
-	var obj = window.top.document.getElementById('reourceInputArea');
+	var obj = window.top.document.getElementById('questionInputArea');
 	obj.style.height=obj.contentWindow.document.body.scrollHeight+'px';
 </script>

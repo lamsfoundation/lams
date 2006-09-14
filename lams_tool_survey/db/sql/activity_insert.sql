@@ -44,8 +44,8 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Share Surveys'
-, 'Share Surveys'
+, 'Survey'
+, 'Survey'
 , 'Put some help text here.'
 , NULL
 , NULL
@@ -78,5 +78,5 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'org.lamsfoundation.lams.tool.survey.ApplicationSurveys'
+, 'org.lamsfoundation.lams.tool.survey.ApplicationResources'
 )

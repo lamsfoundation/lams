@@ -7,6 +7,28 @@ drop table if exists tl_lasurv11_session;
 drop table if exists tl_lasurv11_survey;
 drop table if exists tl_lasurv11_user;
 
+
+create table tl_lasurv11_survey (
+uid bigint not null auto_increment, 
+title varchar(255), 
+run_offline smallint, 
+lock_on_finished smallint, 
+instructions text, 
+online_instructions text, 
+offline_instructions text, 
+content_in_use smallint, 
+define_later smallint, 
+content_id bigint unique, 
+reflect_instructions varchar(255), 
+reflect_on_activity smallint, 
+show_questions_on_one_page smallint, 
+create_date datetime, 
+update_date datetime, 
+create_by bigint, 
+primary key (uid)
+);
+
+
 create table tl_lasurv11_answer (
 uid bigint not null auto_increment, 
 survey_item_uid bigint, 
@@ -31,7 +53,7 @@ primary key (uid)
 
 create table tl_lasurv11_option (
 uid bigint not null auto_increment, 
-description varchar(255), 
+description text,
 sequence_id integer, 
 answer_uid bigint, 
 primary key (uid)
@@ -39,7 +61,7 @@ primary key (uid)
 
 create table tl_lasurv11_question (
 uid bigint not null auto_increment, 
-description varchar(255), 
+description text,
 create_by bigint, 
 create_date datetime, 
 question_type smallint, 
@@ -57,26 +79,6 @@ session_start_date datetime,
 survey_uid bigint, 
 session_id bigint, 
 session_name varchar(250), 
-primary key (uid)
-);
-
-create table tl_lasurv11_survey (
-uid bigint not null auto_increment, 
-title varchar(255), 
-run_offline smallint, 
-lock_on_finished smallint, 
-instructions text, 
-online_instructions text, 
-offline_instructions text, 
-content_in_use smallint, 
-define_later smallint, 
-content_id bigint unique, 
-reflect_instructions varchar(255), 
-reflect_on_activity smallint, 
-show_questions_on_one_page smallint, 
-create_date datetime, 
-update_date datetime, 
-create_by bigint, 
 primary key (uid)
 );
 

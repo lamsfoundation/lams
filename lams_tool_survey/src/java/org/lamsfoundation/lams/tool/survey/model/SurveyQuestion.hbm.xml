@@ -27,7 +27,7 @@
 
         <property
             name="description"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="description"
@@ -96,7 +96,7 @@
         />
 
         <property
-            name="maxAnswsers"
+            name="maxAnswers"
             type="int"
             update="true"
             insert="true"

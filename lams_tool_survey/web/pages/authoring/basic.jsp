@@ -7,7 +7,7 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
-		var area=document.getElementById("reourceInputArea");
+		var area=document.getElementById("questionInputArea");
 		if(area != null){
 			area.style.width="670px";
 			area.style.height="100%";
@@ -16,7 +16,7 @@
 		}
 	}
 	function hideMessage(){
-		var area=document.getElementById("reourceInputArea");
+		var area=document.getElementById("questionInputArea");
 		if(area != null){
 			area.style.width="0px";
 			area.style.height="0px";
@@ -24,12 +24,6 @@
 		}
 	}
 
-	function previewItem(type,idx,sessionMapID){
-		//1:url, 2:file, 3:website,4:learning object
-		//This mode is special for unsaved author page. It is different with the author mode in preview 
-		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
-		launchPopup(myUrl,"Review");
-	}
 	
 	function editItem(idx,sessionMapID){
 		 var reqIDVar = new Date();
@@ -95,23 +89,8 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');">
-								<fmt:message key="label.authoring.basic.add.url" />
-							</a>
-						</td>
-						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>');">
-								<fmt:message key="label.authoring.basic.add.file" />
-							</a>
-						</td>
-						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=3"/>');">
-								<fmt:message key="label.authoring.basic.add.website" />
-							</a>
-						</td>
-						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');">
-								<fmt:message key="label.authoring.basic.add.learning.object"/>
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');">
+								<fmt:message key="label.authoring.basic.add.survey" />
 							</a>
 						</td>
 					</tr>
@@ -121,7 +100,7 @@
 		<tr>
 			<td  colspan="2">
 				<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" 
-					id="reourceInputArea" name="reourceInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
+					id="questionInputArea" name="questionInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
 				</iframe>
 			</td>
 		</tr>

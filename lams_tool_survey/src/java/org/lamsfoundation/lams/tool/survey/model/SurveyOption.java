@@ -67,7 +67,7 @@ public class SurveyOption  implements Cloneable{
 			this.uid = userID;
 		}
 		/**
-		 * @hibernate.property column="description"
+		 * @hibernate.property column="description" type="text"
 		 * @return
 		 */
 		public String getDescription() {

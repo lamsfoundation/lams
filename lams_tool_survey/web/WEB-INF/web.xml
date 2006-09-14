@@ -123,7 +123,7 @@
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	    <init-param>
 	      <param-name>toolContentHandlerBeanName</param-name>
-	      <param-value>surveyToolContentHandler</param-value>
+	      <param-value>lasurvSurveyToolContentHandler</param-value>
 	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>

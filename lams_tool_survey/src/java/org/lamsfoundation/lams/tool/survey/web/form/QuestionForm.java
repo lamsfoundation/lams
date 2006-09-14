@@ -23,7 +23,12 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.web.form;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 /**
  *  Survey Item  Form.
  *	@struts.form name="surveyItemForm"
@@ -38,14 +43,16 @@ public class QuestionForm extends ActionForm {
 	//tool access mode;
 	private String mode;
 	
-	private short itemType;
-	private String description;
+	private SurveyQuestion question;
 	
-	public String getDescription() {
-		return description;
+	public QuestionForm(){
+		question = new SurveyQuestion();
 	}
-	public void setDescription(String description) {
-		this.description = description;
+	public void reset(ActionMapping mapping, HttpServletRequest request){
+		if(question != null){
+			question.setAppendText(false);
+			question.setCompulsory(false);
+		}
 	}
 	public String getItemIndex() {
 		return itemIndex;
@@ -53,12 +60,7 @@ public class QuestionForm extends ActionForm {
 	public void setItemIndex(String itemIndex) {
 		this.itemIndex = itemIndex;
 	}
-	public short getItemType() {
-		return itemType;
-	}
-	public void setItemType(short type) {
-		this.itemType = type;
-	}
+	
 	public String getSessionMapID() {
 		return sessionMapID;
 	}
@@ -70,5 +72,11 @@ public class QuestionForm extends ActionForm {
 	}
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+	public SurveyQuestion getQuestion() {
+		return question;
+	}
+	public void setQuestion(SurveyQuestion question) {
+		this.question = question;
 	}
 }

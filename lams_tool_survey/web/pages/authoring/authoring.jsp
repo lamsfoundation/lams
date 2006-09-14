@@ -43,10 +43,6 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
-	    	
-	    	//for advanceTab
-	    	if(tabId == 2)
-	    		changeViewNum(-1);	    	
         } 
 
         function doUploadOnline() {
@@ -60,38 +56,6 @@
         	myForm.submit();
         }
         
-        function changeViewNum(initVal){
-			var tb = document.getElementById("itemTable");
-			var num = tb.getElementsByTagName("tr");
-			var sel = document.getElementById("viewNumList");
-			var newField = sel.options;
-			var len = sel.length;
-			
-			//when first enter, it should get value from Survey
-			var selIdx=initVal < 0?-1:initVal;
-			//there is bug in Opera8.5: if add alert before this loop, it will work,weird.
-			for (var idx=0;idx<len;idx++)
-			{
-				if(newField[0].selected && selIdx == -1 ){
-					selIdx = newField[0].value;
-				}
-				sel.removeChild(newField[0]);
-			}
-		
-			for(var i=0;i<=num.length;i++){
-				var opt = document.createElement("option");
-				var optT =document.createTextNode(i);
-				opt.value=i;
-				//get back user choosen value
-				if(selIdx > 0 && selIdx==i){
-					opt.selected = true;
-				}else{
-					opt.selected = false;
-				}
-				opt.appendChild(optT);
-				sel.appendChild(opt);
-			}
-	}
         
     </script>
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
@@ -152,9 +116,5 @@
 <div id="footer"></div>
 <!-- end page div -->
 </div>
-
-<script type="text/javascript">
-	changeViewNum(${formBean.survey.miniViewSurveyNumber});
-</script>
 </body>
 </html:html>

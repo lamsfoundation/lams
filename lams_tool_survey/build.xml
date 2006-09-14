@@ -146,7 +146,7 @@
 	</target>
 	
 	<!-- =================================================================== -->
-	<!-- Share Surveys Database tasks                                       -->
+	<!-- Survey Database tasks                                       -->
 	<!-- =================================================================== -->
 	<target name="clean-db"	description="clean share surveys database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
@@ -381,7 +381,7 @@
 			</fileset>
 		</path> 
 
-		<echo>Deploying the Share Surveys tool</echo>
+		<echo>Deploying the Survey tool</echo>
 	
 		<java
 			classname="org.lamsfoundation.lams.tool.deploy.Deploy"

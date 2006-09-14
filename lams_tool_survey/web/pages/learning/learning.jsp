@@ -21,18 +21,7 @@
 	
 	<script type="text/javascript">
 	<!--
-		function gotoURL(){
- 		    var reqIDVar = new Date();
-			var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-	      	showMessage(gurl);
-	      	return false;
-		}
-		function gotoFile(){
- 		    var reqIDVar = new Date();
- 		    var gurl = "<c:url value="/learning/addfile.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-	      	showMessage(gurl);
-	      	return false;
-		}
+
 		function checkNew(){
  		    var reqIDVar = new Date();
 			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
@@ -54,15 +43,6 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
-		function showMessage(url) {
-			var area=document.getElementById("reourceInputArea");
-			if(area != null){
-				area.style.width="100%";
-				area.style.height="100%";
-				area.src=url;
-				area.style.display="block";
-			}
-		}
 	-->        
     </script>
 </head>
@@ -153,61 +133,7 @@
 				</div>
 			</c:if>
 			<div style="height: 70px"></div> 
-			<c:if test="${mode != 'teacher' && (not finishedLock)}">
-				<c:if test="${survey.allowAddFiles || survey.allowAddUrls}">
-					<table border="0" width="100%">
-						<tr>
-							<td style="align:left">
-								<fmt:message key="label.suggest.new" />
-								<c:choose>
-									<c:when test="${survey.allowAddFiles && survey.allowAddUrls}">
-										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()" >
-										<fmt:message key="label.authoring.basic.survey.url.input" /> |
-										<input type="radio" name="suggest" value="file" onclick="gotoFile()">
-										<fmt:message key="label.authoring.basic.survey.file.input" />
-									</c:when>
-									<c:when test="${survey.allowAddFiles && !survey.allowAddUrls}">
-										<input type="radio" name="suggest" value="file" checked="true" onclick="gotoFile()">
-										<fmt:message key="label.authoring.basic.survey.file.input" />
-									</c:when>
-									<c:when test="${!survey.allowAddFiles && survey.allowAddUrls}">
-										<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()">
-										<fmt:message key="label.authoring.basic.survey.url.input" />
-									</c:when>
-								</c:choose>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" id="reourceInputArea" name="reourceInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
-								</iframe>
-							</td>
-						</tr>
-					</table>
-				</c:if>
-				<c:choose>
-					<c:when test="${survey.allowAddFiles && survey.allowAddUrls}">
-						<script type="text/javascript">
-					<!--
-						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
-					</c:when>
-					<c:when test="${survey.allowAddFiles && !survey.allowAddUrls}">
-						<script type="text/javascript">
-					<!--
-						showMessage("<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
-					</c:when>
-					<c:when test="${!survey.allowAddFiles && survey.allowAddUrls}">
-						<script type="text/javascript">
-					<!--
-						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
-					</c:when>
-				</c:choose>
+			
 				<%-- end mode != teacher --%>
 			</c:if>
 		</div>  <!--closes content-->

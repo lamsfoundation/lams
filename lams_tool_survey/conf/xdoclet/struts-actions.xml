@@ -76,10 +76,7 @@
 			scope="request" 
 			validate="false"			
 			parameter="newItemInit">
-			<forward name="url" path="/pages/authoring/parts/addurl.jsp" />
-			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
-			<forward name="website" path="/pages/authoring/parts/addwebsite.jsp" />
-			<forward name="learningobject" path="/pages/authoring/parts/addlearningobject.jsp" />
+			<forward name="success" path="/pages/authoring/parts/addsurvey.jsp" />
 		</action>
 		
 		<action path="/authoring/editItemInit"
@@ -88,10 +85,7 @@
 			scope="request" 
 			parameter="editItemInit" 
 			validate="false">
-			<forward name="url" path="/pages/authoring/parts/addurl.jsp" />
-			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
-			<forward name="website" path="/pages/authoring/parts/addwebsite.jsp" />
-			<forward name="learningobject" path="/pages/authoring/parts/addlearningobject.jsp" />
+			<forward name="success" path="/pages/authoring/parts/addsurvey.jsp" />
 		</action>
 		
 		<action path="/authoring/saveOrUpdateItem"
@@ -99,11 +93,8 @@
 			parameter="saveOrUpdateItem"
 			name="surveyItemForm" 
 			scope="request" 
+			input="/pages/authoring/parts/addsurvey.jsp"
 			validate="false">
-			<forward name="url" path="/pages/authoring/parts/addurl.jsp" />
-			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
-			<forward name="website" path="/pages/authoring/parts/addwebsite.jsp" />
-			<forward name="learningobject" path="/pages/authoring/parts/addlearningobject.jsp" />
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		<action path="/authoring/removeItem"
@@ -167,35 +158,6 @@
 			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
 		
-		
-		<action path="/learning/addfile"
-			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
-			parameter="addfile"
-			name="surveyItemForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/learning/addfile.jsp" />
-		</action>
-		
-		<action path="/learning/addurl"
-			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
-			parameter="addurl"
-			name="surveyItemForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/learning/addurl.jsp" />
-		</action>
-		
-		<action path="/learning/saveOrUpdateItem"
-			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
-			parameter="saveOrUpdateItem"
-			name="surveyItemForm" 
-			scope="request" 
-			validate="false">
-			<forward name="url" path="/pages/learning/addurl.jsp" />
-			<forward name="file" path="/pages/learning/addfile.jsp" />
-			<forward name="success" path="/pages/learning/success.jsp" />
-		</action>
 		
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"

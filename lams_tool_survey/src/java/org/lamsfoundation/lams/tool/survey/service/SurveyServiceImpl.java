@@ -637,7 +637,6 @@ public class SurveyServiceImpl implements
 	       			+" as the tool content does not exist.");
     	}
 
-    	// TODO Share Surveys doesn't support reflection yet!
     	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
     	// toolContentObj.setReflectInstructions(description);
     }

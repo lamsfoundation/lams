@@ -61,16 +61,16 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
-import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
+import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
 import org.lamsfoundation.lams.tool.survey.service.UploadSurveyFileException;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
-import org.lamsfoundation.lams.tool.survey.web.form.SurveyForm;
 import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
+import org.lamsfoundation.lams.tool.survey.web.form.SurveyForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -88,7 +88,7 @@ public class AuthoringAction extends Action {
 	private static final int INIT_INSTRUCTION_COUNT = 2;
 	private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
 	private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
-	private static final String ITEM_TYPE = "itemType";
+	private static final int SHORT_TITLE_LENGTH = 60;
 	
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 	
@@ -238,7 +238,6 @@ public class AuthoringAction extends Action {
 		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
 		((QuestionForm)form).setSessionMapID(sessionMapID);
 		
-		short type = (short) NumberUtils.stringToInt(request.getParameter(ITEM_TYPE));
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
 			instructionList.add("");
@@ -267,10 +266,17 @@ public class AuthoringAction extends Action {
 		QuestionForm itemForm = (QuestionForm)form;
 		ActionErrors errors = validateSurveyItem(itemForm);
 		
+		//reset maxAnswer according to the real number of options
+		if(instructionList != null){
+			int max = itemForm.getQuestion().getMaxAnswers();
+			if(max > instructionList.size()){
+				itemForm.getQuestion().setMaxAnswers(instructionList.size());
+			}
+		}
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
-//			request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructionList);
-			return mapping.findForward(SurveyConstants.SUCCESS);
+			request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructionList);
+			return mapping.getInputForward();
 		}
 		
 		try {
@@ -340,6 +346,7 @@ public class AuthoringAction extends Action {
 		//init survey item list
 		SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
 		surveyItemList.clear();
+		retriveQuestionListForDisplay(questions);
 		surveyItemList.addAll(questions);
 		
 		sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, surveyForm);
@@ -759,18 +766,17 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 */
 	private void populateItemToForm(int itemIdx, SurveyQuestion item, QuestionForm form, HttpServletRequest request) {
-		form.setDescription(item.getDescription());
 		if(itemIdx >=0)
 			form.setItemIndex(new Integer(itemIdx).toString());
 		
+		//set questions
+		form.setQuestion(item);
+		
+		//set options
 		Set<SurveyOption> instructionList = item.getOptions();
 		List instructions = new ArrayList();
 		for(SurveyOption in : instructionList){
 			instructions.add(in.getDescription());
-		}
-		//add extra blank line for instructions
-		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
-			instructions.add("");
 		}
 		
 		request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructions);
@@ -794,18 +800,33 @@ public class AuthoringAction extends Action {
 		//check whether it is "edit(old item)" or "add(new item)"
 		SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
 		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
-		SurveyQuestion item = null;
+		SurveyQuestion item = itemForm.getQuestion();
 		
 		if(itemIdx == -1){ //add
-			item = new SurveyQuestion();
 			item.setCreateDate(new Timestamp(new Date().getTime()));
 			surveyList.add(item);
 		}else{ //edit
 			List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
 			item = rList.get(itemIdx);
+			item.setDescription(itemForm.getQuestion().getDescription());
+			item.setCompulsory(itemForm.getQuestion().isCompulsory());
+			item.setAppendText(itemForm.getQuestion().isAppendText());
+			item.setMaxAnswers(itemForm.getQuestion().getMaxAnswers());
+			
 		}
-		short type = itemForm.getItemType();	
-		item.setType(itemForm.getItemType());
+		retriveQuestionForDisplay(item);
+		//set question type
+		int max  = item.getMaxAnswers();
+		short type = SurveyConstants.SURVEY_TYPE_SINGLE_CHOICE; 
+		if(instructionList == null || instructionList.size() == 0)
+			type = SurveyConstants.SURVEY_TYPE_TEXT_ENTRY;
+		else if( max > 1)
+				type = SurveyConstants.SURVEY_TYPE_MULTIPLE_CHOICES;
+		else if(max <= 1)
+				type = SurveyConstants.SURVEY_TYPE_SINGLE_CHOICE;
+		else
+			log.error("Unexpected survey question type for index : " + itemIdx);
+		item.setType(type);
 
 		//set instrcutions
 		Set instructions = new LinkedHashSet();
@@ -818,8 +839,19 @@ public class AuthoringAction extends Action {
 		}
 		item.setOptions(instructions);
 
-		item.setDescription(itemForm.getDescription());
 		
+		
+	}
+	
+	private void retriveQuestionListForDisplay(List<SurveyQuestion> list) {
+		for(SurveyQuestion item: list){
+			retriveQuestionForDisplay(item);
+		}
+	}
+	private void retriveQuestionForDisplay(SurveyQuestion item) {
+		String desc = item.getDescription();
+		desc = desc.replaceAll("<(.|\n)*?>", "");
+		item.setShortTitle(StringUtils.abbreviate(desc,SHORT_TITLE_LENGTH));
 	}
 
 	/**
@@ -829,7 +861,7 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionErrors validateSurveyItem(QuestionForm itemForm) {
 		ActionErrors errors = new ActionErrors();
-		if(StringUtils.isBlank(itemForm.getDescription()))
+		if(StringUtils.isBlank(itemForm.getQuestion().getDescription()))
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
 		return errors;
 	}

@@ -77,5 +77,8 @@ public class SurveyConstants {
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SURVEY = "survey";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
+	public static final short SURVEY_TYPE_TEXT_ENTRY = 3;
+	public static final short SURVEY_TYPE_MULTIPLE_CHOICES = 2;
+	public static final short SURVEY_TYPE_SINGLE_CHOICE = 1;
 
 }

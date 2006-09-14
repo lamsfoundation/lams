@@ -27,7 +27,7 @@
 
         <property
             name="description"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="description"

@@ -50,7 +50,7 @@ public class SurveyQuestion  implements Cloneable{
 	//option of Question
 	private boolean appendText;
 	private boolean compulsory;
-	private int maxAnswsers;
+	private int maxAnswers;
 	
 	private Set<SurveyOption> options;
 	
@@ -59,7 +59,7 @@ public class SurveyQuestion  implements Cloneable{
 	
 	//***********************************************
 	//DTO fields:
-	private boolean complete;
+	private String shortTitle;
 	
     public Object clone(){
     	SurveyQuestion obj = null;
@@ -105,7 +105,7 @@ public class SurveyQuestion  implements Cloneable{
 		}
 		
 		/**
-		 * @hibernate.property column="description"
+		 * @hibernate.property column="description" type="text"
 		 * @return
 		 */
 		public String getDescription() {
@@ -192,10 +192,16 @@ public class SurveyQuestion  implements Cloneable{
 	     * @hibernate.property  column="max_answers" 
 	     * @return
 	     */		
-		public int getMaxAnswsers() {
-			return maxAnswsers;
+		public int getMaxAnswers() {
+			return maxAnswers;
 		}
-		public void setMaxAnswsers(int maxAnswsers) {
-			this.maxAnswsers = maxAnswsers;
+		public void setMaxAnswers(int maxAnswers) {
+			this.maxAnswers = maxAnswers;
+		}
+		public String getShortTitle() {
+			return shortTitle;
+		}
+		public void setShortTitle(String shortTitle) {
+			this.shortTitle = shortTitle;
 		}
 }
