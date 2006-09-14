@@ -333,13 +333,13 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 				throw new ImportToolContentException(
 						"Import Chat tool content failed. Deserialized object is "
 								+ toolPOJO);
-			Chat toolContentObj = (Chat) toolPOJO;
+			Chat chat = (Chat) toolPOJO;
 
 			// reset it to new toolContentId
-			toolContentObj.setToolContentId(toolContentId);
-			toolContentObj.setCreateBy(new Long(newUserUid.longValue()));
+			chat.setToolContentId(toolContentId);
+			chat.setCreateBy(new Long(newUserUid.longValue()));
 
-			chatDAO.saveOrUpdate(toolContentObj);
+			chatDAO.saveOrUpdate(chat);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}
