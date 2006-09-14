@@ -105,11 +105,9 @@
 		<!-- start tabs -->
 <div id="content">
 		<!-- end tab buttons -->
-		<table>
-		<tr><td>
+		
 		<%@ include file="/common/messages.jsp"%>
-		</td></tr>
-		</table>
+
 		<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="resource.contentId" />
