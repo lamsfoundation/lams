@@ -46,8 +46,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script type="text/javascript">
-		var imgRoot="${lams}images/";
-		var themeName="aqua";
 	
         function init(){
         

@@ -91,11 +91,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaMonitoringForm.currentUid.value=currentUid;
 	        submitMethod(actionMethod);
 		}
-
-
-
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
         
         function init(){
         

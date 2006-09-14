@@ -133,8 +133,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
 
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
 		{

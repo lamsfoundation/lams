@@ -49,9 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 	<script type="text/javascript">
-		var imgRoot="${lams}images/";
-		var themeName="aqua";
-
+	
         function init(){
 			if (document.VoteAuthoringForm.activeModule.value != 'defineLater')
 			{

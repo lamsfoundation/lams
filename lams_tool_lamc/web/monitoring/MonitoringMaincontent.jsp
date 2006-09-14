@@ -79,10 +79,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
-		
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff

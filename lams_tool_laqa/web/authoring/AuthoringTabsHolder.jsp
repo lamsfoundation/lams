@@ -57,10 +57,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaAuthoringForm.dispatch.value=actionMethod; 
 			document.QaAuthoringForm.submit();
 		}
-
-
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
         
         function init(){
 			if (document.QaAuthoringForm.activeModule.value != 'defineLater')
