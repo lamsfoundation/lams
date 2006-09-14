@@ -43,6 +43,9 @@ dynamic class Dictionary {
     
     //Application instance is stored as a static in the application class
     private static var _instance:Dictionary = null;    
+	private static var DICT_PREFIX:String = "dictionary.";
+	private static var DICT_DATE:String = "dictionary.date";
+	private static var SO_SEPARATOR:String = ".";
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -83,18 +86,21 @@ dynamic class Dictionary {
 		
 		var _oldDate:Object = null;
 		
-        //Cookie or server?
+        // Cookie or server?
 		Debugger.log('Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
 		Debugger.log('Config.USE_CACHE:'+Config.USE_CACHE,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
-        if(CookieMonster.cookieExists('dictionary.date')){
-			_oldDate = CookieMonster.open('dictionary.date', true);
+        if(CookieMonster.cookieExists(DICT_DATE)){
+			_oldDateCookie = CookieMonster.open(DICT_DATE, true);
 		}
 		
 		Debugger.log('Existing date:'+String(_oldDate) + ' Current date:' + String(_currentDate),Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
         
-		if(CookieMonster.cookieExists('dictionary.'+language+'.'+app.module) && Config.USE_CACHE && _oldDate != null) {
+		// determine if dictionary should be loaded from cookie file or from server request
+		if(CookieMonster.cookieExists(DICT_PREFIX+language+SO_SEPARATOR+app.module) && Config.USE_CACHE && _oldDateCookie.date != null) {
 			
-			if(this._currentDate != _oldDate){
+			// clear all data if dictionaries have been updated
+			if(this._currentDate != _oldDateCookie.date){
+				clearAll(_oldDateCookie);
 				openFromServer();
 			} else {
 				openFromDisk();
@@ -112,6 +118,23 @@ dynamic class Dictionary {
 		dispatchEvent({type:'init',target:this});		
 	}
  
+	/**
+	 * Remove all stored dictionary data and old dictionary date cookie
+	 * 
+	 * @param   obj Array of language/module combination strings
+	 *
+	 */
+	public function clearAll(obj:Object) {
+		for(var i=0; i<obj.data.length; i++){
+			if(CookieMonster.cookieExists(DICT_PREFIX + obj.data[i])){
+				CookieMonster.deleteCookie(DICT_PREFIX + obj.data[i]);
+			}
+		}
+		
+		if(CookieMonster.cookieExists(DICT_DATE)){
+			CookieMonster.deleteCookie(DICT_DATE);
+		}
+	}
     /**
     * @returns a string holding the text requested
     */
@@ -208,10 +231,32 @@ dynamic class Dictionary {
     * @return  
     */
     public function saveToDisk():Void{
+		
         //Convert to data object and then serialize before saving to a cookie
         var dataObj = toData();
-        CookieMonster.save(dataObj,'dictionary.' + _currentLanguage + '.' + app.module,false);
-		var success = CookieMonster.save(_root.langDate, 'dictionary.date', true);
+		var success = CookieMonster.save(dataObj,DICT_PREFIX + _currentLanguage + SO_SEPARATOR + app.module,false);
+	
+		if (!success) {
+			//TODO DI 30/05/05 raise error if config data can't be saved
+			Debugger.log('Config item could not be saved: ' + _root.langDate ,Debugger.CRITICAL,'saveToDisk','Dictionary');
+		}
+	
+		// open date cookie if exists
+		var dateCookie:Object = null;
+		if(CookieMonster.cookieExists(DICT_DATE)){
+			dateCookie = CookieMonster.open(DICT_DATE, true);
+		}
+	
+		// create new date cookie object
+		var dateObj = new Object();
+		dateObj.date = _root.langDate;
+		dateObj.data = (dateCookie == null) ? new Array() : getDateArray(dateCookie.data);
+		
+		var dataItem:String = _currentLanguage + SO_SEPARATOR + app.module;
+		dateObj.data.push(dataItem);
+		
+		// save to file
+		success = CookieMonster.save(dateObj, DICT_DATE, true);
 		
 		if (!success) {
 			//TODO DI 30/05/05 raise error if config data can't be saved
@@ -219,13 +264,29 @@ dynamic class Dictionary {
 		}
     }
     
+	/**
+	 * Get the string array of loaded dictionaries
+	 * 
+	 * 
+	 * @param   data 	dictionary date cookie
+	 * @return  		array of loaded dictionaries
+	 */
+	
+	private function getDateArray(data:Array):Array {
+		var arr:Array = new Array();
+		for(var i=0; i<data.length; i++){
+			arr[i] = data[i];
+		}
+		return arr;
+	}
+	
     /**
     * Open the Dictionary from disk 
     */
     public function openFromDisk():Void{
         Debugger.log('opening Dictionary from Shared Object',Debugger.CRITICAL,'openFromDisk','Dictionary');		
 	   
-		var dataObj:Object = CookieMonster.open('dictionary.' + _currentLanguage + '.' + app.module,false);
+		var dataObj:Object = CookieMonster.open(DICT_PREFIX + _currentLanguage + SO_SEPARATOR + app.module,false);
 		createFromData(dataObj);
 		
     }
