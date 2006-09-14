@@ -1095,27 +1095,27 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
-    	Chat toolContentObj = new Chat();
-    	toolContentObj.setContentInUse(Boolean.FALSE);
-    	toolContentObj.setCreateBy(new Long(user.getUserID().longValue()));
-    	toolContentObj.setCreateDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE);
-    	toolContentObj.setFilterKeywords(null);
-    	toolContentObj.setFilteringEnabled(Boolean.FALSE);
-    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
-    	toolContentObj.setLockOnFinished(Boolean.FALSE);
-    	toolContentObj.setOfflineInstructions(null);
-    	toolContentObj.setOnlineInstructions(null);
-    	toolContentObj.setReflectInstructions(null);
-    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
-    	toolContentObj.setRunOffline(Boolean.FALSE);
-    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-    	toolContentObj.setToolContentId(toolContentId);
-    	toolContentObj.setUpdateDate(now);
+    	Chat chat = new Chat();
+    	chat.setContentInUse(Boolean.FALSE);
+    	chat.setCreateBy(new Long(user.getUserID().longValue()));
+    	chat.setCreateDate(now);
+    	chat.setDefineLater(Boolean.FALSE);
+    	chat.setFilterKeywords(null);
+    	chat.setFilteringEnabled(Boolean.FALSE);
+    	chat.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	chat.setLockOnFinished(Boolean.FALSE);
+    	chat.setOfflineInstructions(null);
+    	chat.setOnlineInstructions(null);
+    	chat.setReflectInstructions(null);
+    	chat.setReflectOnActivity(Boolean.FALSE);
+    	chat.setRunOffline(Boolean.FALSE);
+    	chat.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	chat.setToolContentId(toolContentId);
+    	chat.setUpdateDate(now);
     	// leave as empty, no need to set them to anything.
     	//setChatAttachments(Set chatAttachments);
     	//setChatSessions(Set chatSessions);
-    	chatDAO.saveOrUpdate(toolContentObj);
+    	chatDAO.saveOrUpdate(chat);
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
