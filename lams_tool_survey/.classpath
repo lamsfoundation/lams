@@ -9,5 +9,5 @@
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-monitoring.jar"/>
-	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
