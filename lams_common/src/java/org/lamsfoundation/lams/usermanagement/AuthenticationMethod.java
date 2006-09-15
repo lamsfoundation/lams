@@ -36,7 +36,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *         table="lams_authentication_method"
  *     
 */
+@SuppressWarnings("serial")
 public class AuthenticationMethod implements Serializable {
+	
+	public static final Integer DB = 1;
+	public static final Integer WEBAUTH = 2;
+	public static final Integer LDAP = 3;
 	
     /** identifier field */
     private Integer authenticationMethodId;
