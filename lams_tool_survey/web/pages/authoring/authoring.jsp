@@ -21,9 +21,6 @@
 	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script>
-    
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
         
         function init(){
         

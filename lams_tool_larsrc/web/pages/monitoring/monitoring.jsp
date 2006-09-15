@@ -7,9 +7,7 @@
 	<head>
 		 <%@ include file="/common/header.jsp" %>
 	 <script>
-	    
-	    	var imgRoot="${lams}images/";
-		    var themeName="aqua";
+
 	        function init(){
 	            initTabSize(4);
                 selectTab(1); //select the default tab;

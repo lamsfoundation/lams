@@ -18,9 +18,6 @@
 	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script>
-    
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
         
         function init(){
         
@@ -66,11 +63,7 @@
 		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
 </div>
 <div id="content">
-		<table>
-		<tr><td>
 		<%@ include file="/common/messages.jsp"%>
-		</td></tr>
-		</table>
 
 		<!-- end tab buttons -->
 		<div class="tabbody">
