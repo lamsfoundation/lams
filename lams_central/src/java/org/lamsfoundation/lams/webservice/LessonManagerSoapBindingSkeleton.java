@@ -1,8 +1,24 @@
-/**
- * LessonManagerSoapBindingSkeleton.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+/****************************************************************
+ * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 package org.lamsfoundation.lams.webservice;
@@ -14,6 +30,12 @@ import javax.xml.namespace.QName;
 import org.apache.axis.wsdl.Skeleton;
 import org.apache.axis.description.*;
 
+/**
+ * LessonManagerSoapBindingSkeleton.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
 @SuppressWarnings( { "serial", "unchecked" })
 public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton {
 	private LessonManager impl;
@@ -64,9 +86,15 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 						false, false),
 				new ParameterDesc(new QName("", "desc"), ParameterDesc.IN, new QName(
 						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+				new ParameterDesc(new QName("", "countryIsoCode"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+				new ParameterDesc(new QName("", "langIsoCode"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
 						false, false), };
 		_oper = new OperationDesc("startLesson", _params, new QName("", "startLessonReturn"));
-		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "int"));
+		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "long"));
 		_oper.setElementQName(new QName("", "startLesson"));
 		_oper.setSoapAction("");
 		_myOperationsList.add(_oper);
@@ -100,9 +128,15 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 						false, false),
 				new ParameterDesc(new QName("", "startDate"), ParameterDesc.IN, new QName(
 						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+				new ParameterDesc(new QName("", "countryIsoCode"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+				new ParameterDesc(new QName("", "langIsoCode"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
 						false, false), };
 		_oper = new OperationDesc("scheduleLesson", _params, new QName("", "scheduleLessonReturn"));
-		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "int"));
+		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "long"));
 		_oper.setElementQName(new QName("", "scheduleLesson"));
 		_oper.setSoapAction("");
 		_myOperationsList.add(_oper);
@@ -145,18 +179,19 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 		this.impl = impl;
 	}
 
-	public Integer startLesson(String serverId, String datetime, String hashValue, String username,
-			long ldId, String courseId, String title, String desc) throws RemoteException {
-		Integer ret = impl.startLesson(serverId, datetime, hashValue, username, ldId, courseId,
-				title, desc);
+	public Long startLesson(String serverId, String datetime, String hashValue, String username,
+			long ldId, String courseId, String title, String desc, String countryIsoCode,
+			String langIsoCode) throws RemoteException {
+		Long ret = impl.startLesson(serverId, datetime, hashValue, username, ldId, courseId, title,
+				desc, countryIsoCode, langIsoCode);
 		return ret;
 	}
 
-	public Integer scheduleLesson(String serverId, String datetime, String hashValue,
-			String username, long ldId, String courseId, String title, String desc, String startDate)
-			throws RemoteException {
-		Integer ret = impl.scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId,
-				title, desc, startDate);
+	public Long scheduleLesson(String serverId, String datetime, String hashValue, String username,
+			long ldId, String courseId, String title, String desc, String startDate,
+			String countryIsoCode, String langIsoCode) throws RemoteException {
+		Long ret = impl.scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId,
+				title, desc, startDate, countryIsoCode, langIsoCode);
 		return ret;
 	}
 
