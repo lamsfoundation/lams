@@ -167,7 +167,7 @@ public interface ICoreLearnerService extends ILearnerService
      * @param userId
      * @param lessonId
      */
-    public void exitLesson(Long progressId);
+    public void exitLesson(Integer learnerId, Long lessonId);
     
     /**
      * Returns an activity according to the activity id.

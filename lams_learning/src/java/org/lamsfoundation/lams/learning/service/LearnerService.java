@@ -434,9 +434,13 @@ public class LearnerService implements ICoreLearnerService
      * Exit a lesson.
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
      */
-    public void exitLesson(Long lessonId)
+    public void exitLesson(Integer learnerId, Long lessonId)
     {
-       LearnerProgress progress = learnerProgressDAO.getLearnerProgress(lessonId);
+    	
+       User learner = (User)userManagementService.findById(User.class,learnerId);
+    	
+       LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(),lessonId);
+    	
        if ( progress != null ) {
     	   progress.setRestarting(true);
     	   learnerProgressDAO.updateLearnerProgress(progress);

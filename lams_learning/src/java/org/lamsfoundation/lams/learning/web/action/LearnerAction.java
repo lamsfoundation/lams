@@ -222,13 +222,14 @@ public class LearnerAction extends LamsDispatchAction
 
         FlashMessage message = null;
     	try {
-	
+    		// get user and lesson based on request.
+	        Integer learner = LearningWebUtil.getUserId();
     		Long lessonID = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     		
 	        if(log.isDebugEnabled())
 	            log.debug("Exiting lesson, lesson id is: "+lessonID);
 	        
-	        learnerService.exitLesson(lessonID);
+	        learnerService.exitLesson(learner, lessonID);
 	        
 	        //send acknowledgment to flash as it is triggered by flash
 	        message = new FlashMessage("exitLesson", true);
