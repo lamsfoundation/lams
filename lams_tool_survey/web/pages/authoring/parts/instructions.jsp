@@ -5,12 +5,6 @@
 	<form id="instructionForm">
 	<input type="hidden" name="instructionCount" id="instructionCount">
 	<table border="0" style="width:400px" id="questionTable">
-		<tr>
-			<td colspan="5">
-				<a href="javascript:;" onclick="addInstruction()" class="button"><fmt:message key="label.authoring.basic.add.option"/></a>
-				<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="instructionArea_Busy" />
-			</td>
-		</tr>
 		<c:forEach var="item" items="${instructionList}" varStatus="status">
 			<tr id="instructionItem${status.index}">
 				<td width="3px">${status.index+1}</td>

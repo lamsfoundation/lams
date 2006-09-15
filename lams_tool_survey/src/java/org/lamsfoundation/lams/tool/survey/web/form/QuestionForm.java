@@ -38,6 +38,9 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
  */
 public class QuestionForm extends ActionForm {
 	private String itemIndex;
+	
+	//1: single or multiple choice question;3:open text question
+	private short itemType;
 	private String sessionMapID;
 	
 	//tool access mode;
@@ -51,7 +54,7 @@ public class QuestionForm extends ActionForm {
 	public void reset(ActionMapping mapping, HttpServletRequest request){
 		if(question != null){
 			question.setAppendText(false);
-			question.setCompulsory(false);
+			question.setOptional(false);
 		}
 	}
 	public String getItemIndex() {
@@ -78,5 +81,11 @@ public class QuestionForm extends ActionForm {
 	}
 	public void setQuestion(SurveyQuestion question) {
 		this.question = question;
+	}
+	public short getItemType() {
+		return itemType;
+	}
+	public void setItemType(short itemType) {
+		this.itemType = itemType;
 	}
 }

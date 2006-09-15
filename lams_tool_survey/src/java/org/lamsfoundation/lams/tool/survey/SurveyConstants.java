@@ -52,7 +52,8 @@ public class SurveyConstants {
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.survey.item.title.blank";
 	public static final String ERROR_MSG_URL_BLANK = "error.survey.item.url.blank";
-	public static final String ERROR_MSG_DESC_BLANK = "error.survey.item.desc.blank";
+	public static final String ERROR_MSG_DESC_BLANK = "error.survey.item.question.blank";
+	public static final String ERROR_MSG_LESS_OPTIONS = "error.survey.item.question.less.option";
 	public static final String ERROR_MSG_FILE_BLANK = "error.survey.item.file.blank";
 	public static final String ERROR_MSG_INVALID_URL = "error.survey.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
@@ -80,5 +81,7 @@ public class SurveyConstants {
 	public static final short SURVEY_TYPE_TEXT_ENTRY = 3;
 	public static final short SURVEY_TYPE_MULTIPLE_CHOICES = 2;
 	public static final short SURVEY_TYPE_SINGLE_CHOICE = 1;
+	public static final String FORWARD_OPEN_QUESTION = "opentext";
+	public static final String FORWARD_CHOICE_QUESTION = "question";
 
 }

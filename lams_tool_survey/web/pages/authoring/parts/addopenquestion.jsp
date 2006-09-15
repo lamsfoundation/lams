@@ -41,54 +41,24 @@
 						<html:hidden property="itemIndex" />
 						<table >
 							<tr>
-								<td colspan="3">
+								<td colspan="2">
 									<h2>
-										<fmt:message key="label.authoring.basic.add.survey" />
+										<fmt:message key="label.authoring.basic.add.survey.question" />
 									</h2>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<html:checkbox property="question.compulsory" styleClass="noBorder">
-										<fmt:message key="label.authoring.basic.question.compulsory" />
-									</html:checkbox>
+									<fmt:message key="label.question" />
 								</td>
 								<td>
-									<html:checkbox property="question.appendText" styleClass="noBorder">
-										<fmt:message key="label.authoring.basic.question.append.text" />
+									<html:checkbox property="question.optional" styleClass="noBorder">
+										<fmt:message key="label.authoring.basic.question.optional" />
 									</html:checkbox>
-								</td>
-								<td>
-									<fmt:message key="label.authoring.basic.question.max.answer" />
-									<html:select property="question.maxAnswers"
-										styleClass="noBorder" styleId="maxAnswerSelect">
-										<c:forEach begin="1" end="${fn:length(instructionList)}"
-											varStatus="status">
-											<c:choose>
-												<c:when
-													test="${formBean.question.maxAnswers== status.index}">
-													<option value="${status.index}" selected="true">
-														${status.index}
-													</option>
-												</c:when>
-												<c:otherwise>
-													<option value="${status.index}">
-														${status.index}
-													</option>
-												</c:otherwise>
-											</c:choose>
-										</c:forEach>
-									</html:select>
-								</td>
+								</td>								
 							</tr>
 							<tr>
-								<td colspan="3">
-									<hr size="1" style="width:630px;border-top: 1px solid #ccc;margin: 0px 10px 10px 0px;"/>
-									<fmt:message key="label.description" />
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3">
+								<td colspan="2">
 									<c:set var="language">
 										<lams:user property="localeLanguage" />
 									</c:set>
@@ -111,14 +81,6 @@
 				</td>
 			</tr>
 			<tr>
-
-				<!-- Instructions -->
-				<td>
-					<%@ include file="instructions.jsp"%>
-				</td>
-			</tr>
-
-			<tr>
 				<td align="center" valign="bottom">
 					<a href="#" onclick="submitSurveyItem()" class="button-add-item">
 						<fmt:message key="label.authoring.basic.add.question" /> 
@@ -135,8 +97,5 @@
 				</td>
 			</tr>
 		</table>
-<script type="text/javascript">
-	changeMaxAnswerOptions(${formBean.question.maxAnswers});
-</script>		
 	</body>
 </html>

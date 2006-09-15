@@ -88,19 +88,19 @@
         />
 
         <property
-            name="compulsory"
+            name="optional"
             type="boolean"
             update="true"
             insert="true"
-            column="compulsory"
+            column="optional"
         />
 
         <property
-            name="maxAnswers"
-            type="int"
+            name="allowMultipleAnswer"
+            type="boolean"
             update="true"
             insert="true"
-            column="max_answers"
+            column="allow_multiple_answer"
         />
 
         <!--

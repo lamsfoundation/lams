@@ -76,7 +76,8 @@
 			scope="request" 
 			validate="false"			
 			parameter="newItemInit">
-			<forward name="success" path="/pages/authoring/parts/addsurvey.jsp" />
+			<forward name="question" path="/pages/authoring/parts/addchoicequestion.jsp" />
+			<forward name="opentext" path="/pages/authoring/parts/addopenquestion.jsp" />
 		</action>
 		
 		<action path="/authoring/editItemInit"
@@ -85,7 +86,8 @@
 			scope="request" 
 			parameter="editItemInit" 
 			validate="false">
-			<forward name="success" path="/pages/authoring/parts/addsurvey.jsp" />
+			<forward name="question" path="/pages/authoring/parts/addchoicequestion.jsp" />
+			<forward name="opentext" path="/pages/authoring/parts/addopenquestion.jsp" />
 		</action>
 		
 		<action path="/authoring/saveOrUpdateItem"
@@ -93,9 +95,10 @@
 			parameter="saveOrUpdateItem"
 			name="surveyItemForm" 
 			scope="request" 
-			input="/pages/authoring/parts/addsurvey.jsp"
 			validate="false">
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+			<forward name="question" path="/pages/authoring/parts/addchoicequestion.jsp" />
+			<forward name="opentext" path="/pages/authoring/parts/addopenquestion.jsp" />
 		</action>
 		<action path="/authoring/removeItem"
 			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"

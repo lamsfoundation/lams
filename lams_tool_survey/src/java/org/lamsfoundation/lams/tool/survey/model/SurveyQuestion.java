@@ -49,8 +49,8 @@ public class SurveyQuestion  implements Cloneable{
 	
 	//option of Question
 	private boolean appendText;
-	private boolean compulsory;
-	private int maxAnswers;
+	private boolean optional;
+	private boolean allowMultipleAnswer;
 	
 	private Set<SurveyOption> options;
 	
@@ -178,30 +178,34 @@ public class SurveyQuestion  implements Cloneable{
 	    }
 	    
 	    /**
-	     * @hibernate.property  column="compulsory" 
+	     * @hibernate.property  column="optional" 
 	     * @return
 	     */
-		public boolean isCompulsory() {
-			return compulsory;
+		public boolean isOptional() {
+			return optional;
 		}
-		public void setCompulsory(boolean compulsory) {
-			this.compulsory = compulsory;
+		public void setOptional(boolean compulsory) {
+			this.optional = compulsory;
 		}
-	    
 	    /**
-	     * @hibernate.property  column="max_answers" 
+	     * @hibernate.property  column="allow_multiple_answer" 
 	     * @return
-	     */		
-		public int getMaxAnswers() {
-			return maxAnswers;
+	     */
+		public boolean isAllowMultipleAnswer() {
+			return allowMultipleAnswer;
 		}
-		public void setMaxAnswers(int maxAnswers) {
-			this.maxAnswers = maxAnswers;
+		public void setAllowMultipleAnswer(boolean allowMultipleAnswer) {
+			this.allowMultipleAnswer = allowMultipleAnswer;
 		}
+		
+		//****************************************************************
+		// DTO fields
+		//****************************************************************
 		public String getShortTitle() {
 			return shortTitle;
 		}
 		public void setShortTitle(String shortTitle) {
 			this.shortTitle = shortTitle;
 		}
+
 }

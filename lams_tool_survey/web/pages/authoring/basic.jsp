@@ -89,8 +89,13 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');">
-								<fmt:message key="label.authoring.basic.add.survey" />
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1&sessionMapID=${formBean.sessionMapID}"/>');">
+								<fmt:message key="label.authoring.basic.add.survey.question" />
+							</a>
+						</td>
+						<td>
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&sessionMapID=${formBean.sessionMapID}"/>');">
+								<fmt:message key="label.authoring.basic.add.survey.open.question" />
 							</a>
 						</td>
 					</tr>

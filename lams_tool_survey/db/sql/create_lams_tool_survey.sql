@@ -66,8 +66,8 @@ create_by bigint,
 create_date datetime, 
 question_type smallint, 
 append_text smallint, 
-compulsory smallint, 
-max_answers integer, 
+optional smallint, 
+allow_multiple_answer smallint,
 survey_uid bigint, 
 primary key (uid)
 );

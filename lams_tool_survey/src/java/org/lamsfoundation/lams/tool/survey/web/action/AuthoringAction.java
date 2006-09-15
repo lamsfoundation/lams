@@ -210,6 +210,7 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		
+		QuestionForm itemForm = (QuestionForm) form;
 //		get back sessionMAP
 		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
@@ -221,10 +222,13 @@ public class AuthoringAction extends Action {
 			List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
 			item = rList.get(itemIdx);
 			if(item != null){
-				populateItemToForm(itemIdx, item,(QuestionForm) form,request);
+				populateItemToForm(itemIdx, item,itemForm,request);
 			}
 		}		
-		return mapping.findForward(SurveyConstants.SUCCESS);
+		if(itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+			return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+		else
+			return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
 	}
 	/**
 	 * Display empty page for new survey item.
@@ -235,15 +239,19 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		QuestionForm questionForm = (QuestionForm)form;
 		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-		((QuestionForm)form).setSessionMapID(sessionMapID);
+		questionForm.setSessionMapID(sessionMapID);
 		
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
 			instructionList.add("");
 		}
 		request.setAttribute("instructionList",instructionList);
-		return mapping.findForward(SurveyConstants.SUCCESS);
+		if(questionForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+			return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+		else
+			return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
 	}
 	/**
 	 * This method will get necessary information from survey item form and save or update into 
@@ -264,19 +272,15 @@ public class AuthoringAction extends Action {
 		List<String> instructionList = getInstructionsFromRequest(request);
 		
 		QuestionForm itemForm = (QuestionForm)form;
-		ActionErrors errors = validateSurveyItem(itemForm);
+		ActionErrors errors = validateSurveyItem(itemForm,instructionList);
 		
-		//reset maxAnswer according to the real number of options
-		if(instructionList != null){
-			int max = itemForm.getQuestion().getMaxAnswers();
-			if(max > instructionList.size()){
-				itemForm.getQuestion().setMaxAnswers(instructionList.size());
-			}
-		}
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
 			request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructionList);
-			return mapping.getInputForward();
+			if(itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+				return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+			else
+				return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
 		}
 		
 		try {
@@ -809,23 +813,13 @@ public class AuthoringAction extends Action {
 			List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
 			item = rList.get(itemIdx);
 			item.setDescription(itemForm.getQuestion().getDescription());
-			item.setCompulsory(itemForm.getQuestion().isCompulsory());
+			item.setOptional(itemForm.getQuestion().isOptional());
 			item.setAppendText(itemForm.getQuestion().isAppendText());
-			item.setMaxAnswers(itemForm.getQuestion().getMaxAnswers());
+			item.setAllowMultipleAnswer(itemForm.getQuestion().isAllowMultipleAnswer());
 			
 		}
 		retriveQuestionForDisplay(item);
-		//set question type
-		int max  = item.getMaxAnswers();
-		short type = SurveyConstants.SURVEY_TYPE_SINGLE_CHOICE; 
-		if(instructionList == null || instructionList.size() == 0)
-			type = SurveyConstants.SURVEY_TYPE_TEXT_ENTRY;
-		else if( max > 1)
-				type = SurveyConstants.SURVEY_TYPE_MULTIPLE_CHOICES;
-		else if(max <= 1)
-				type = SurveyConstants.SURVEY_TYPE_SINGLE_CHOICE;
-		else
-			log.error("Unexpected survey question type for index : " + itemIdx);
+		short type = getQuestionType(itemForm);
 		item.setType(type);
 
 		//set instrcutions
@@ -842,6 +836,19 @@ public class AuthoringAction extends Action {
 		
 		
 	}
+
+
+	private short getQuestionType(QuestionForm itemForm) {
+		//set question type
+		short type;
+		if(itemForm.getItemType() == SurveyConstants.SURVEY_TYPE_TEXT_ENTRY)
+			type = SurveyConstants.SURVEY_TYPE_TEXT_ENTRY;
+		else if( itemForm.getQuestion().isAllowMultipleAnswer())
+			type = SurveyConstants.SURVEY_TYPE_MULTIPLE_CHOICES;
+		else 
+			type = SurveyConstants.SURVEY_TYPE_SINGLE_CHOICE;
+		return type;
+	}
 	
 	private void retriveQuestionListForDisplay(List<SurveyQuestion> list) {
 		for(SurveyQuestion item: list){
@@ -857,12 +864,20 @@ public class AuthoringAction extends Action {
 	/**
 	 * Vaidate survey item regards to their type (url/file/learning object/website zip file)
 	 * @param itemForm
+	 * @param instructionList 
 	 * @return
 	 */
-	private ActionErrors validateSurveyItem(QuestionForm itemForm) {
+	private ActionErrors validateSurveyItem(QuestionForm itemForm, List<String> instructionList) {
 		ActionErrors errors = new ActionErrors();
 		if(StringUtils.isBlank(itemForm.getQuestion().getDescription()))
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
+		
+		short type = getQuestionType(itemForm);
+		if(type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
+			if(instructionList == null || instructionList.size() < 3)
+				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
+		}
+		
 		return errors;
 	}
 
