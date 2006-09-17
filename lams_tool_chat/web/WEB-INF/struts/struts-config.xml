@@ -55,7 +55,7 @@
       validate="true"
     >
       <forward
-        name="chat_client"
+        name="learning"
         path="tiles:/learning/main"
         redirect="false"
       />

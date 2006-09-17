@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -775,8 +775,14 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 	}
 	private void buildToolActivity(ToolActivity toolActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+		if ( log.isDebugEnabled() ) {
+			log.debug("In tool activity UUID"+activityDetails.get(WDDXTAGS.TO_ACTIVITY_UIID)
+					+" tool content id=" +activityDetails.get(WDDXTAGS.TOOL_CONTENT_ID));
+		}
+		
 	    if (keyExists(activityDetails, WDDXTAGS.TOOL_CONTENT_ID))
 	        toolActivity.setToolContentId(WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.TOOL_CONTENT_ID));
+	    
 	    if (keyExists(activityDetails, WDDXTAGS.TOOL_ID))
 	    {
 			Tool tool =toolDAO.getToolByID(WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.TOOL_ID));
@@ -997,4 +1003,3 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 }
 	
-
