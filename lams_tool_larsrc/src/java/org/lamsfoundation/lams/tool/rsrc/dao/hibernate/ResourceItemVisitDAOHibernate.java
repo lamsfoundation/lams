@@ -67,15 +67,18 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
 		if(list == null || list.size() ==0)
 			return 0;
-		return ((Integer) list.get(0)).intValue();
+		return ((Number) list.get(0)).intValue();
 	}
 
 	public Map<Long,Integer> getSummary(Long contentId) {
-		
+
+		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
 		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
 		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
 		for(Object[] list : result){
-			summaryList.put((Long)list[0],(Integer)list[1]);
+			if ( list[1] != null ) {
+				summaryList.put((Long)list[0],new Integer(((Number)list[1]).intValue()));
+			} 
 		}
 		return summaryList;
 		

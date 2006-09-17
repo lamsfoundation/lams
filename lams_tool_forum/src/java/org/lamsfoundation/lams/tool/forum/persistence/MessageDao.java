@@ -126,14 +126,14 @@ public class MessageDao extends HibernateDaoSupport {
 	public int getTopicsNum(Long userID, Long sessionId) {
 		List list = this.getHibernateTemplate().find(SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION,new Object[]{userID,sessionId});
 		if(list != null && list.size() > 0)
-			return ((Integer)list.get(0)).intValue();
+			return ((Number)list.get(0)).intValue();
 		else
 			return 0;
 	}
 	public boolean hasAuthoredTopics(Long sessionId) {
 		List list = this.getHibernateTemplate().find(SQL_QUERY_COUNT_SESSION_TOPICS_FROM_AUTHOR,new Object[]{sessionId});
 		if(list != null && list.size() > 0)
-			return ((Integer)list.get(0)).intValue() > 0 ? true:false;
+			return ((Number)list.get(0)).longValue() > 0 ? true:false;
 		else
 			return false;
 	}
