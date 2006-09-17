@@ -72,7 +72,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 		return null;
 	}
 	
-	public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Long userID){
+	public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Integer userID){
 		
 		return this.getHibernateTemplate().find(FIND_BY_SESSION_LEARNER, new Object[]{sessionID,userID});
 		

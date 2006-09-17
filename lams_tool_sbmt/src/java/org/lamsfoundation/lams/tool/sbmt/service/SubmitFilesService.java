@@ -619,7 +619,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
 	public List getFilesUploadedByUser(Integer userID, Long sessionID){
-		List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, new Long(userID.intValue()));
+		List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
 		SortedSet details = new TreeSet(this.new FileDtoComparator());
 		if(list ==null)
 			return new ArrayList(details);

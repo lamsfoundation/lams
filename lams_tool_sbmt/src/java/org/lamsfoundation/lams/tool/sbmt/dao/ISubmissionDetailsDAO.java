@@ -58,5 +58,5 @@ public interface ISubmissionDetailsDAO extends IBaseDAO {
 	 */
 	public List getSubmissionDetailsBySession(Long sessionID);
 	
-	public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Long userID);
+	public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Integer userID);
 }
