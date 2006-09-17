@@ -170,6 +170,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
+     * Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
      */
     public Integer getCountActiveLearnerByLesson(final long lessonId)
     {
@@ -179,11 +180,12 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
                     throws HibernateException {
     	    	Query query = session.createQuery(COUNT_ACTIVE_LEARNERS);
     	    	query.setLong("lessonId", lessonId);
-                return query.uniqueResult();
+    	    	Object value = query.uniqueResult();
+    	    	return new Integer (((Number)value).intValue()); 
             }
         });
     }
-/**
+/**f
      * Saves or Updates a Lesson.
      * @param lesson
      */
@@ -224,31 +226,6 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     	return lessons;
     }
    
-   /**
-    * Gets all lessons for which this user is in the staff group. Does not return 
-    * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
-    * TODO remove once the dummy interface is removed - it is replaced by getLessonsForMonitoring(userId, organisationId)
-    * TODO remove the matching query in the Hibernate file.
-    * @param user a User that identifies the teacher/staff member.
-    * @return a List with all appropriate lessons in it.
-    */
-   public List getLessonsForMonitoring(final int userID)
-   {
-	   List lessons = null;
-   	
-       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-   		lessons = (List)hibernateTemplate.execute(
-           new HibernateCallback() {
-               public Object doInHibernate(Session session) throws HibernateException {
-       	    	Query query = session.getNamedQuery("lessonsForMonitoringByUser");
-       	    	query.setInteger("userId", userID);
-       	    	List result = query.list();
-                   return result;
-               }
-           }
-       );
-       return lessons;
-   }
    /**
     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return 
     * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
