@@ -82,7 +82,7 @@
 		<java>axis-ant.jar</java>
 	</module>
 	<module>
-		<java>cglib-nodep-2.1_2.jar</java>
+		<java>cglib_jboss404GA.jar</java>
 	</module>
 	<module>
 		<java>dom4j-1.5.2.jar</java>
