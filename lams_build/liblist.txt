@@ -8,7 +8,8 @@ axis              axis-ant.jar
                   saaj.jar                                                                                                                    
                   wsdl4j-1.5.1.jar                      1.5.1                                                IBM                              JWSDL
 
-cglib             cglib-nodep-2.1_2.jar                 2.1_2                  Apache License 2.0                                             
+cglib             cglib-nodep-2.1_2.jar                 2.1_2                  Apache License 2.0 											 (old one - to be deleted soon!)                                            
+                  cglib_jboss404GA.jar                  4.0.4.GA               Apache License 2.0            JBoss Inc.                       JBoss
 
 concurrent        concurrent-1.3.4.jar                  1.3.4                                                                                 
 
@@ -18,7 +19,7 @@ ehcache           ehcache-1.1.jar                       1.1                    A
 
 fckeditor         FCKeditor-2.3.jar                     2.3                                                                                   
 
-hibernate         hibernate3.jar                        3.1.3                                                                                 
+hibernate         hibernate3.jar                        3.2.0.cr2                                            hibernate.org                    JBoss
 
 j2ee              jstl.jar                              1.1.2                                                Sun Microsystems, Inc.           JavaServer Pages Standard Tag Library (JSTL)
 
