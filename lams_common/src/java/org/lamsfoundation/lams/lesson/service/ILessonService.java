@@ -135,4 +135,18 @@ public interface ILessonService {
      */
     public void removeGroup(GroupingActivity groupingActivity, Long groupId) throws LessonServiceException;
     
+    /** 
+     * Add a learner to the lesson class. Checks for duplicates.
+     * @paran user new learner 
+     * @return true if added user, returns false if the user already a learner and hence not added.
+     */ 
+    public boolean addLearner(Long lessonId, User user);
+
+    /** 
+     * Add a new staff member to the lesson class. Checks for duplicates.
+     * @paran user new learner 
+     * @return true if added user, returns false if the user already a staff member and hence not added.
+     */ 
+    public boolean addStaffMember(Long lessonId, User user);
+ 	
 }

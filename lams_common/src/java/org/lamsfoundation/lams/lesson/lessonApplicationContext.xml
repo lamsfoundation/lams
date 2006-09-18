@@ -25,6 +25,7 @@
 	
 	<bean id="lessonServiceTarget" class="org.lamsfoundation.lams.lesson.service.LessonService">
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>

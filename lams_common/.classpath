@@ -4,8 +4,10 @@
 	<classpathentry kind="src" path="conf/hibernate/mappings"/>
 	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
+	<classpathentry kind="lib" path="D:/jboss-4.0.2/server/default/lib/jboss-j2ee.jar"/>
+	<classpathentry kind="lib" path="D:/jboss-4.0.2/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="D:/jboss-4.0.2/server/default/lib/javax.servlet.jsp.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

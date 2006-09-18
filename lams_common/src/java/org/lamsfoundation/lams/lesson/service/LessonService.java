@@ -33,6 +33,8 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -65,6 +67,7 @@ public class LessonService implements ILessonService
 	private static Logger log = Logger.getLogger(LessonService.class);
 	 
 	private ILessonDAO lessonDAO;
+	private ILessonClassDAO lessonClassDAO;        
 	private IGroupingDAO groupingDAO;
 	private MessageService messageService;
 
@@ -73,6 +76,10 @@ public class LessonService implements ILessonService
 		this.lessonDAO = lessonDAO;
 	}
     
+	public void setLessonClassDAO(ILessonClassDAO lessonClassDAO) {
+		this.lessonClassDAO = lessonClassDAO;
+	}
+	
 	public void setGroupingDAO(IGroupingDAO groupingDAO) {
 		this.groupingDAO = groupingDAO;
 	}
@@ -293,5 +300,50 @@ public class LessonService implements ILessonService
 		}
 	}
     
+    /** 
+     * Add a learner to the lesson class. Checks for duplicates.
+     * @param user new learner 
+     * @return true if added user, returns false if the user already a learner and hence not added.
+     */ 
+    public boolean addLearner(Long lessonId, User user) throws LessonServiceException {
+		Lesson lesson = lessonDAO.getLesson(lessonId);
+		if ( lesson == null ) {
+			throw new LessonServiceException("Lesson "+lessonId+" does not exist. Unable to add learner to lesson.");
+		}
+		
+		LessonClass lessonClass = lesson.getLessonClass();
+		if ( lessonClass == null ) {
+			throw new LessonServiceException("Lesson class for "+lessonId+" does not exist. Unable to add learner to lesson.");
+		}
+
+		boolean ret = lessonClass.addLearner(user);
+		if ( ret ) {
+			lessonClassDAO.updateLessonClass(lessonClass);
+		}
+		return ret;
+}
+
+    /** 
+     * Add a new staff member to the lesson class. Checks for duplicates.
+     * @param user new learner 
+     * @return true if added user, returns false if the user already a staff member and hence not added.
+     */ 
+    public boolean addStaffMember(Long lessonId, User user) {
+		Lesson lesson = lessonDAO.getLesson(lessonId);
+		if ( lesson == null ) {
+			throw new LessonServiceException("Lesson "+lessonId+" does not exist. Unable to add staff member to lesson.");
+		}
+		
+		LessonClass lessonClass = lesson.getLessonClass();
+		if ( lessonClass == null ) {
+			throw new LessonServiceException("Lesson class for "+lessonId+" does not exist. Unable to add staff member to lesson.");
+		}
+
+		boolean ret = lessonClass.addStaffMember(user);
+		if ( ret ) {
+			lessonClassDAO.updateLessonClass(lessonClass);
+		}
+		return ret;
+    }
     
 }

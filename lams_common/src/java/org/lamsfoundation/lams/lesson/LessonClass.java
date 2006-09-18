@@ -23,10 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -37,6 +41,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class LessonClass extends Grouping {
     
+	private static Logger log = Logger.getLogger(LessonClass.class);
+
     private Group staffGroup;
 
 	private Lesson lesson;
@@ -102,6 +108,85 @@ public class LessonClass extends Grouping {
     	
     	Group staff = getStaffGroup();
     	return staff!=null && staff.hasLearner(user); 
+    }
+
+    /** 
+     * Add a learner to the lesson class. Checks for duplicates.
+     * 
+     * @return true if added user, returns false if the user already a learner and hence not added.
+     */ 
+    public boolean addLearner(User user) {
+    	if ( user == null )
+    		return false;
+
+    	// should be one ordinary group for lesson class, and this is all the learners in the lesson class
+    	Group learnersGroup = null; 
+    	Iterator iter = getGroups().iterator();
+    	if (iter.hasNext()) {
+			learnersGroup = (Group) iter.next();
+		}
+    	if ( learnersGroup == null ) {
+    		Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
+    		if ( lessonOrganisation == null ) {
+    			log.warn("Adding a learner to a lesson class with no related organisation. Learner group name will be \'learners'.");
+    		}
+    		String learnerGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
+    		learnerGroupName = learnerGroupName + "learners";
+    		Set<User> users = new HashSet<User>();
+    		users.add(user);
+    		getGroups().add(Group.createLearnerGroup(this, learnerGroupName,users));
+    	}
+
+    	if ( ! learnersGroup.hasLearner(user) ) {
+    		if ( log.isDebugEnabled() ) {
+    			log.debug("Adding learner "+user.getLogin()+" to LessonClass "+getGroupingId());
+    		}
+    		learnersGroup.getUsers().add(user);
+    		return true;
+    	}
+    	if ( log.isDebugEnabled() ) {
+			log.debug("Not adding learner "+user.getLogin()+" to LessonClass "+getGroupingId()+". User is already a learner.");
+		}
+    	return false;
+    }
+    
+    /** 
+     * Add a staff member to the lesson class. Checks for duplicates.
+     * 
+     * @return true if added user, returns false if the user already a staff member and hence not added.
+     */ 
+    public boolean addStaffMember(User user) {
+    	
+    	if ( user == null )
+    		return false;
+
+    	// should be one ordinary group for lesson class, and this is all the learners in the lesson class
+    	Group staffGroup = getStaffGroup(); 
+    	if ( staffGroup == null ) {
+    		Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
+    		if ( lessonOrganisation == null ) {
+    			log.warn("Adding a staff member to a lesson class with no related organisation. Staff group name will be \'staff\'.");
+    		}
+    		String staffGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
+    		staffGroupName = staffGroupName + "staff";
+    		Set<User> users = new HashSet<User>();
+    		users.add(user);
+    		setStaffGroup(Group.createStaffGroup(this, staffGroupName,users));
+    		staffGroup = getStaffGroup();
+    	}
+
+    	if ( ! staffGroup.hasLearner(user) ) {
+    		if ( log.isDebugEnabled() ) {
+    			log.debug("Adding staff member "+user.getLogin()+" to LessonClass "+getGroupingId());
+    		}
+    		staffGroup.getUsers().add(user);
+    		return true;
+    	}
+    	if ( log.isDebugEnabled() ) {
+			log.debug("Not adding staff member "+user.getLogin()+" to LessonClass "+getGroupingId()+". User is already a staff member.");
+		}
+    	return false;
+
     }
 
 }
