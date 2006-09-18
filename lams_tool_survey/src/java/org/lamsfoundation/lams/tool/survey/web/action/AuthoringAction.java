@@ -276,6 +276,9 @@ public class AuthoringAction extends Action {
 		
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
+			//add at least 2 instruction list
+			for(int idx=instructionList.size();idx < 2;idx++)
+				instructionList.add("");
 			request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST,instructionList);
 			if(itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
 				return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
@@ -736,6 +739,11 @@ public class AuthoringAction extends Action {
 	 */
 	private List<String> getInstructionsFromRequest(HttpServletRequest request) {
 		String list = request.getParameter("instructionList");
+		List<String> instructionList = new ArrayList<String>();
+		//for open text entry question
+		if(list == null)
+			return instructionList;
+		
 		String[] params = list.split("&");
 		Map<String,String> paramMap = new HashMap<String,String>();
 		String[] pair;
@@ -751,7 +759,6 @@ public class AuthoringAction extends Action {
 		}
 		
 		int count = NumberUtils.stringToInt(paramMap.get(INSTRUCTION_ITEM_COUNT));
-		List<String> instructionList = new ArrayList<String>();
 		for(int idx=0;idx<count;idx++){
 			String item = paramMap.get(INSTRUCTION_ITEM_DESC_PREFIX+idx);
 			if(item == null)
@@ -874,7 +881,7 @@ public class AuthoringAction extends Action {
 		
 		short type = getQuestionType(itemForm);
 		if(type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
-			if(instructionList == null || instructionList.size() < 3)
+			if(instructionList == null || instructionList.size() < 2)
 				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
 		}
 		

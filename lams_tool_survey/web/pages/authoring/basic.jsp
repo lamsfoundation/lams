@@ -25,9 +25,9 @@
 	}
 
 	
-	function editItem(idx,sessionMapID){
+	function editItem(idx,itemType,sessionMapID){
 		 var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&itemType="+itemType+"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		showMessage(url);
 	}
 	//The panel of survey list panel

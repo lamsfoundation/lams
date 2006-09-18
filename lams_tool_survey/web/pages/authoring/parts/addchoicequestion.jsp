@@ -39,6 +39,8 @@
 						<input type="hidden" name="instructionList" id="instructionList" />
 						<html:hidden property="sessionMapID" />
 						<html:hidden property="itemIndex" />
+						<%-- This value should be 1 or 2 --%>
+						<html:hidden property="itemType" value="1" />
 						<table >
 							<tr>
 								<td colspan="3">

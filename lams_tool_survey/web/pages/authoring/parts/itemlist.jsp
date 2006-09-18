@@ -24,7 +24,12 @@
 		</td>
 		<td>${survey.shortTitle}</td>
 		<td width="80px" align="center">
-			<a href="#" onclick="editItem(${status.index},'${sessionMapID}')" class="button">
+			<c:if test="${survey.optional}">
+				<fmt:message key="label.optional"/>
+			</c:if>
+		</td>
+		<td width="80px" align="center">
+			<a href="#" onclick="editItem(${status.index},${survey.type},'${sessionMapID}')" class="button">
 				<fmt:message key="label.authoring.basic.survey.edit" />
 			</a>
 		</td>

@@ -35,10 +35,9 @@
 					<%@ include file="/common/messages.jsp"%>
 					<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="surveyItemForm">
 						<c:set var="formBean"	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-						<%-- This field is not belong STRUTS form --%>
-						<input type="hidden" name="instructionList" id="instructionList" />
 						<html:hidden property="sessionMapID" />
 						<html:hidden property="itemIndex" />
+						<html:hidden property="itemType" value="3" />
 						<table >
 							<tr>
 								<td colspan="2">
