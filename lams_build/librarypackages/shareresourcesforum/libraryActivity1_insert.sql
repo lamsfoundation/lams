@@ -12,4 +12,4 @@ values
 null,${learning_library_id},now(),0,
 null,null,null,null,
 null,null,null,'images/icon_urlcontentmessageboard.swf',
-2,0,1);
+2,0,5);
