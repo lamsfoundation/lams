@@ -78,7 +78,7 @@ class Config {
 	
 	private var _build:String;
 
-	private var removeCache:Boolean = false;
+	private var _removeCache:Boolean = false;
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -433,5 +433,13 @@ class Config {
 	 */
 	public function get mode ():Number {
 		return _mode;
+	}
+	
+	public function get removeCache():Boolean {
+		return _removeCache;
+	}
+	
+	public function set removeCache(b:Boolean) {
+		_removeCache = b;
 	}
 }

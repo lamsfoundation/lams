@@ -93,13 +93,18 @@ dynamic class Dictionary {
 			_oldDateCookie = CookieMonster.open(DICT_DATE, true);
 		}
 		
-		Debugger.log('Existing date:'+String(_oldDate) + ' Current date:' + String(_currentDate),Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+		Debugger.log('Existing date:'+String(_oldDateCookie.date) + ' Current date:' + String(_currentDate),Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
         
 		// determine if dictionary should be loaded from cookie file or from server request
 		if(CookieMonster.cookieExists(DICT_PREFIX+language+SO_SEPARATOR+app.module) && Config.USE_CACHE && _oldDateCookie.date != null) {
 			
 			// clear all data if dictionaries have been updated
 			if(this._currentDate != _oldDateCookie.date){
+				Debugger.log('Removing all dictionary cookies (updated date).',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+				clearAll(_oldDateCookie);
+				openFromServer();
+			} else if(Config.getInstance().removeCache) {
+				Debugger.log('Removing all dictionary cookies (clear cache)',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
 				clearAll(_oldDateCookie);
 				openFromServer();
 			} else {
