@@ -957,9 +957,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			 
 			var designID = _ddm.learningDesignID
 			var uID = Config.getInstance().userID;
+			var previewTitle = Dictionary.getValue('preview_lesson_title');
 			Debugger.log('Launching Preview Window',Debugger.GEN,'launchPreviewWindow','Canvas');
 			var callback:Function = Proxy.create(this,onLaunchPreviewResponse); 
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=preview&description=started%20automatically ',callback, false);
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=' + previewTitle + '&description=started%20automatically ',callback, false);
 			
 			
 		}//Cursor.showCursor(Application.C_GATE);
