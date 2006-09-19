@@ -105,6 +105,7 @@ public class ImportToolContentAction extends LamsAction {
 	 */
 	private void importLD(HttpServletRequest request) {
 		List<String> ldErrorMsgs = new ArrayList<String>();
+        List<String> toolsErrorMsgs = new ArrayList<String>();
         Long ldId = null;
 
         try {
@@ -152,7 +153,6 @@ public class ImportToolContentAction extends LamsAction {
             } else {
 	            
 	            // if it is a .las file then it must be a 1.0.x file. Otherwise assume it is a 2.0 formatting zip file.
-	            List<String> toolsErrorMsgs = new ArrayList<String>();
 	            String extension = filename != null && filename.length() >= 4 ? filename.substring(filename.length()-4) : "";
 	            
 	            if ( extension.equalsIgnoreCase(".las") ) {
@@ -172,9 +172,6 @@ public class ImportToolContentAction extends LamsAction {
 	            	ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
 	            }
 
-	            if ( toolsErrorMsgs.size() > 0 ) {
-	            	request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
-	            }
             }
             
         } catch (Exception e) {
@@ -191,6 +188,10 @@ public class ImportToolContentAction extends LamsAction {
         if ( ldErrorMsgs.size() > 0 ) {
         	request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
         }
+        if ( toolsErrorMsgs.size() > 0 ) {
+        	request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
+        }
+
 
 	}
 	
