@@ -168,7 +168,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
-		//Cursor.addCursor(C_WHITEARROW);
+		Cursor.addCursor(C_LICON);
 		//Cursor.addCursor(C_OPTIONAL);
 		//Cursor.addCursor(C_TRANSITION);
 		//Cursor.addCursor(C_GATE);
