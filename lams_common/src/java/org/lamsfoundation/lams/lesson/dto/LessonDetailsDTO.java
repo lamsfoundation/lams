@@ -41,6 +41,7 @@ public class LessonDetailsDTO {
 	private Integer lessonStateID;
 	private Date createDateTime;
 	private Date startDateTime;
+	private String startDateTimeStr;
     private Date scheduleStartDate;
     private String scheduleStartDateStr;
     private Date scheduleEndDate;
@@ -65,12 +66,14 @@ public class LessonDetailsDTO {
 		this.lessonStateID = lesson.getLessonStateId();
 		this.createDateTime = lesson.getCreateDateTime();
 		this.startDateTime = lesson.getStartDateTime();
+		this.startDateTimeStr = null;
 		this.scheduleStartDate = lesson.getScheduleStartDate();
-		if(this.scheduleStartDate != null) {
-			this.scheduleStartDateStr = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.scheduleStartDate);
-		} else {
-			this.scheduleStartDateStr = null;
-		}
+		//if(this.scheduleStartDate != null) {
+		//	this.scheduleStartDateStr = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.scheduleStartDate);
+			
+		//} else {
+		this.scheduleStartDateStr = null;
+		//}
 		this.scheduleEndDate = lesson.getScheduleEndDate();
 		
 		this.duration = lesson.getLearningDesign().getDuration();
@@ -188,6 +191,15 @@ public class LessonDetailsDTO {
 	public Date getStartDateTime() {
 		return startDateTime!=null?startDateTime:WDDXTAGS.DATE_NULL_VALUE;
 	}
+	
+	public String getStartDateTimeStr() {
+		return startDateTimeStr!=null?startDateTimeStr:WDDXTAGS.STRING_NULL_VALUE;
+	}
+	
+	public void setStartDateTimeStr(String startDateTimeStr) {
+		this.startDateTimeStr = startDateTimeStr;
+	}
+	
 	/**
 	 * @return Returns the workspaceFolderID.
 	 */

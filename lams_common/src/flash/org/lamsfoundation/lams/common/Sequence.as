@@ -55,6 +55,7 @@ class Sequence {
 	// sequence dates
 	private var _seqCreatedDate:Date;
 	private var _seqStartDate:Date;
+	private var _seqStartDateStr:String;
 	private var _seqScheduleStartDate:Date;
 	private var _seqScheduleStartDateStr:String;
 	
@@ -120,6 +121,7 @@ class Sequence {
 		
 		_seqCreatedDate = dto.createDateTime;
 		_seqStartDate = dto.startDateTime;
+		_seqStartDateStr = dto.startDateTimeStr;
 		_seqScheduleStartDate = dto.scheduleStartDate;
 		_seqScheduleStartDateStr = dto.scheduleStartDateStr;
 		
@@ -286,18 +288,29 @@ class Sequence {
 	}
 	
 	public function getStartDateTime():String{
-		var dateFormated:String
+		/**var dateFormated:String
 		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null){
 			//dateFormated = "Not Started"
 			return null;
 		}else{
 			var dateFormated:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()))+" "+_seqStartDate.getFullYear());;
 		}
+		
 		return dateFormated;
+		*/
+		return this.startdatestr;
+	}
+	
+	public function setStartDateTimeStr(seqStartDateStr:String){
+		_seqStartDateStr = seqStartDateStr;
 	}
 	
 	public function get startdate():Date{
 		return _seqStartDate;
+	}
+	
+	public function get startdatestr():String {
+		return _seqStartDateStr;
 	}
 	
 	public function get isStarted():Boolean{

@@ -141,7 +141,7 @@ class Monitor {
 		}
 		dialog.addEventListener("click", lo);
 	}
-	
+
 	/**
     * Called when Users loaded for role type
 	* @param evt:Object	the event object
@@ -189,7 +189,7 @@ class Monitor {
 	
 	private function loadLessonToMonitor(lessonID:Number){
 		var callback:Function = Proxy.create(monitorModel,monitorModel.loadSequence);
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID),callback, false);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID) + '&userID=' + _root.userID,callback, false);
 	}
 	
 	public function reloadLessonToMonitor(){

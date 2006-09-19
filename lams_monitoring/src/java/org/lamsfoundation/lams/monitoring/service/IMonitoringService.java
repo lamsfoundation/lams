@@ -220,10 +220,11 @@ public interface IMonitoringService
      * 
      * @param lessonID The lesson_id of the Lesson for which the details have 
      * 				   to be fetched
-     * @return String The requested details in wddx format
+     * @param userID   The user who is fetching the Lesson details
+     * @return String  The requested details in wddx format
      * @throws IOException
      */
-    public String getLessonDetails(Long lessonID)throws IOException;
+    public String getLessonDetails(Long lessonID, Integer userID)throws IOException;
         
     /**
      * Returns a list of learners participating in the given Lesson

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.text.DateFormat;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -998,15 +1000,26 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
      */
-    public String getLessonDetails(Long lessonID)throws IOException{
+    public String getLessonDetails(Long lessonID, Integer userID)throws IOException{
+    	User user = (User)baseDAO.find(User.class,userID);
     	LessonDetailsDTO dto = lessonService.getLessonDetails(lessonID);
+    	
+    	Locale userLocale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
+    	
+    	if(dto.getStartDateTime() != null)
+    		dto.setStartDateTimeStr(DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, userLocale).format(dto.getStartDateTime()));
+	    
+    	if(dto.getScheduleStartDate() != null)
+    		dto.setScheduleStartDateStr(DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, userLocale).format(dto.getScheduleStartDate()));
+    		
     	FlashMessage flashMessage;
-    	if(dto!=null){
-    		flashMessage = new FlashMessage("getLessonDetails",dto);
-    	}else
-    		flashMessage = new FlashMessage("getLessonDetails",
-    										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
-											FlashMessage.ERROR);
+	    if(dto!=null){
+	    	flashMessage = new FlashMessage("getLessonDetails",dto);
+	    }else
+	    	flashMessage = new FlashMessage("getLessonDetails",
+	    										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
+												FlashMessage.ERROR);
+    	
     	return flashMessage.serializeMessage();    	
     }
     

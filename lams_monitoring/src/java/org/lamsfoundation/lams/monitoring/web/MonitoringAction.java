@@ -573,7 +573,7 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	try{
 	    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-	    	wddxPacket = monitoringService.getLessonDetails(lessonID);
+	    	wddxPacket = monitoringService.getLessonDetails(lessonID, getUserId(request));
      	}catch (Exception e) {
      		wddxPacket = handleException(e, "getLessonDetails", monitoringService).serializeMessage();
     	}
