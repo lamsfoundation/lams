@@ -24,9 +24,18 @@
 						<html:form action="/learner" target="_self">
 								<html:hidden property="toolSessionID" />
 								<html:hidden property="mode" />
-								<html:submit property="method" styleClass="button">
-									<fmt:message key="button.finish" />
-								</html:submit>
+								<c:choose>
+									<c:when test="${reflectOnActivity}">
+										<html:submit property="method" styleClass="button">
+											<fmt:message key="button.continue" />
+										</html:submit>
+									</c:when>
+									<c:otherwise>
+										<html:submit property="method" styleClass="button">
+											<fmt:message key="button.finish" />
+										</html:submit>
+									</c:otherwise>
+								</c:choose>
 						</html:form>
 					</div>
 				</td>

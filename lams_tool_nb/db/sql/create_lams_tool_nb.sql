@@ -9,6 +9,8 @@ CREATE TABLE tl_lanb11_content (
      , offline_instructions TEXT
      , define_later TINYINT(1)
      , force_offline TINYINT(1)
+     , reflect_on_activity TINYINT(1)
+     , reflect_instructions TEXT
      , content_in_use TINYINT(1)
      , creator_user_id BIGINT(20)
      , date_created DATETIME
@@ -66,6 +68,8 @@ INSERT INTO tl_lanb11_content ( nb_content_id,
 								offline_instructions,
 								define_later,
 								force_offline,
+								reflect_on_activity,
+								reflect_instructions,
 								content_in_use,
 								date_created) 
 VALUES (${default_content_id},
@@ -75,5 +79,7 @@ VALUES (${default_content_id},
 		'Enter the offline instructions here',
 		0,
 		0,
+		0,
+		'Reflect on noticeboard',
 		0,
 		now());

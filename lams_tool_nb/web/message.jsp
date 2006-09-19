@@ -7,7 +7,18 @@
 	</logic:messagesPresent>
 
 	<p align="right">
-		<html:button property="closeWindow" onclick="window.close()" styleClass="button">
-				<fmt:message key="button.next" />
-		</html:button>
+		<html:form action="/learner" target="_self">
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="mode" />
+		<html:submit property="method" styleClass="button">
+			<c:choose>
+				<c:when test="${reflectOnActivity}">
+					<fmt:message key="button.continue" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="button.finish" />
+				</c:otherwise>
+			</c:choose>
+		</html:submit>
+		</html:form>
 	</p>

@@ -68,6 +68,10 @@ public class NoticeboardContent implements Serializable {
 	/** nullable persistent field */
 	private boolean forceOffline;
 
+	private Boolean reflectOnActivity;
+	
+	private String reflectInstructions;
+	
 	/** nullable persistent field */
 	private boolean contentInUse;
 	
@@ -98,6 +102,8 @@ public class NoticeboardContent implements Serializable {
 							  String offlineInstructions,
 							  boolean defineLater,
 							  boolean forceOffline,
+							  boolean reflectOnActivity,
+							  String reflectInstructions,
 							  boolean contentInUse,
 							  Long creatorUserId,
 							  Date dateCreated,
@@ -110,6 +116,8 @@ public class NoticeboardContent implements Serializable {
 		this.offlineInstructions = offlineInstructions;
 		this.defineLater = defineLater;
 		this.forceOffline = forceOffline;
+		this.reflectOnActivity = reflectOnActivity;
+		this.reflectInstructions = reflectInstructions;
 		this.contentInUse = contentInUse;
 		this.creatorUserId = creatorUserId;
 		this.dateCreated = dateCreated;
@@ -135,6 +143,7 @@ public class NoticeboardContent implements Serializable {
 		this.offlineInstructions = offlineInstructions;
 		this.defineLater = false;
 		this.forceOffline = false;
+		this.reflectOnActivity = false;
 		this.contentInUse = false;
 		this.creatorUserId = null;
 		this.dateCreated = dateCreated;
@@ -223,6 +232,32 @@ public class NoticeboardContent implements Serializable {
 	
 	public void setForceOffline(boolean forceOffline) {
 		this.forceOffline = forceOffline;
+	}
+	
+	/** 
+	 *		@hibernate.property
+     *		column="reflect_on_activity"
+     *		length="1"
+     */
+	public boolean getReflectOnActivity() {
+		return reflectOnActivity;
+	}
+	
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+	
+	/**
+	 *		 @hibernate.property
+     *       column="reflect_instructions"
+     *       length="65535"
+	 */
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
 	}
 	
 	 /** 
@@ -382,6 +417,8 @@ public class NoticeboardContent implements Serializable {
 														nb.getOfflineInstructions(),
 														nb.isDefineLater(),
 														nb.isForceOffline(),
+														nb.getReflectOnActivity(),
+														nb.getReflectInstructions(),
 														nb.isContentInUse(),
 														nb.getCreatorUserId(),
 														nb.getDateCreated(),

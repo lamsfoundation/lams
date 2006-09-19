@@ -48,11 +48,13 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
    
   
 	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByID(java.lang.Long) */
-	public NoticeboardUser getNbUserByID(Long userId)
+	public NoticeboardUser getNbUser(Long userId, Long sessionId)
 	{
-	    String query = "from NoticeboardUser user where user.userId=?";
-	    List users = getHibernateTemplate().find(query,userId);
-		
+	    String query = "from NoticeboardUser user where user.userId=? and user.nbSession.nbSessionId=?";
+	    Object[] values = new Object[2];
+	    values[0] = userId;
+	    values[1] = sessionId;
+	    List users = getHibernateTemplate().find(query,values);
 		if(users!=null && users.size() == 0)
 		{			
 			return null;
@@ -126,5 +128,8 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 				nbSession)).size();
     }
     
-    
+    public List getNbUsersBySession(Long sessionId) {
+    	String query = "from NoticeboardUser user where user.nbSession.nbSessionId=?";
+	    return getHibernateTemplate().find(query,sessionId);
+    }
 }

@@ -25,37 +25,38 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -74,6 +75,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
  * @struts:action path="/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
  *                input=".learnerContent" validate="false" parameter="method"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
+ * @struts:action-forward name="reflectOnActivity" path=".reflectOnActivity"
  * ----------------XDoclet Tags--------------------
  */
 public class NbLearnerAction extends LamsLookupDispatchAction {
@@ -84,6 +86,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 	{
 		Map map = new HashMap();
 		map.put(NoticeboardConstants.BUTTON_FINISH, "finish");
+		map.put(NoticeboardConstants.BUTTON_CONTINUE, "reflect");
 		return map;
 	}
     
@@ -137,6 +140,13 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  nbService.updateNoticeboardSession(nbSession);
 		  nbService.updateNoticeboardUser(nbUser);
 		  
+		  // Create the notebook entry if reflection is set.
+		  NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
+		  if (nbContent.getReflectOnActivity()) {
+			  nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, 
+					  NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), learnerForm.getReflectionText());
+		  }
+		  
 		  String nextActivityUrl;
 			try
 			{
@@ -164,4 +174,26 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 	  return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
 	  
 	}
+    
+    /**
+     * Indicates that the user has finished viewing the noticeboard, and will be
+     * passed onto the Notebook reflection screen.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward reflect(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
+    	
+    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+    	
+    	NbLearnerForm learnerForm = (NbLearnerForm)form;
+    	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
+    	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
+    	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
+    	request.setAttribute("title", nbContent.getTitle());
+	  
+    	return mapping.findForward(NoticeboardConstants.REFLECT_ON_ACTIVITY);
+    }
 }

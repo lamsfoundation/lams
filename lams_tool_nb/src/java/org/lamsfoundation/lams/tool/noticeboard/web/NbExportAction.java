@@ -24,6 +24,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,10 +38,14 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
@@ -106,6 +117,18 @@ public class NbExportAction extends LamsDispatchAction {
             logger.error(error);
             throw new NbApplicationException(error);
         }
+        
+        // Get user's reflection if exists
+        if (content.getReflectOnActivity()) {
+        	log.debug(content.getReflectOnActivity());
+        	request.setAttribute("learner", true);
+        	NotebookEntry nbEntry = nbService.getEntry(userInThisSession.getNbSession().getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+    			NoticeboardConstants.TOOL_SIGNATURE, userId.intValue());
+        	log.debug(nbEntry);
+        	if (nbEntry!=null) {
+        		request.setAttribute("nbEntry", nbEntry.getEntry());
+        	}
+        }
                
         exportForm.populateForm(content);
        
@@ -135,6 +158,30 @@ public class NbExportAction extends LamsDispatchAction {
             String error="Data is missing from the database. Unable to Continue";
             logger.error(error);
             throw new NbApplicationException(error);
+        }
+        
+        // Get class's reflections if exists
+        if (content.getReflectOnActivity()) {
+        	Set sessions = content.getNbSessions();
+            Iterator i = sessions.iterator();
+            List<ReflectionDTO> reflections = new ArrayList<ReflectionDTO>();
+            while (i.hasNext())
+            {
+            	NoticeboardSession session = (NoticeboardSession) i.next();
+                List sessionUsers = nbService.getUsersBySession(session.getNbSessionId());
+                for (int j=0; j<sessionUsers.size(); j++) {
+                	NoticeboardUser nbUser = (NoticeboardUser)sessionUsers.get(j);
+                	NotebookEntry nbEntry = nbService.getEntry(nbUser.getNbSession().getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+                   			NoticeboardConstants.TOOL_SIGNATURE, nbUser.getUserId().intValue());
+                	log.debug(nbEntry);
+                	if (nbEntry!=null) {
+                		ReflectionDTO dto = new ReflectionDTO(nbEntry);
+                		dto.setFullName(nbUser.getFullname());
+                		reflections.add(dto);
+                	}
+                }
+            }
+            request.setAttribute("reflections", reflections);
         }
         
         exportForm.populateForm(content);

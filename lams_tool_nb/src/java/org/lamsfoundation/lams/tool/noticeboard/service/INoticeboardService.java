@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
@@ -171,7 +172,7 @@ public interface INoticeboardService {
 	 * @param nbUserId The user id of the instance of NoticeboardUser
 	 * @return the persistent instance of a NoticeboardUser or null if not found.
 	 */
-	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId);
+	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId, Long toolSessionId);
 	
 	/**
 	 * <p> Return the persistent instance of a NoticeboardUser
@@ -204,9 +205,10 @@ public interface INoticeboardService {
 	 * that specified in the argument.
 	 * 
 	 * @param nbUserId The id of the requested noticeboard object
+	 * @param toolSessionId The id of the nbUser's associated nbSession
 	 *
 	 */	
-	public void removeUser(Long nbUserId);
+	public void removeUser(Long nbUserId, Long toolSessionId);
 	
 	 /**
      * <p>Delete the given instance of NoticeboardUser</p>
@@ -321,4 +323,9 @@ public interface INoticeboardService {
      */
     public Long getToolDefaultContentIdBySignature(String toolSignature);
     
+    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+    
+    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
+    
+    public List getUsersBySession(Long sessionId);
 }

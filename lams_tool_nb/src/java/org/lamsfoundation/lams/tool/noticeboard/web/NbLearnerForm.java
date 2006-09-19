@@ -56,6 +56,8 @@ public class NbLearnerForm extends ActionForm{
     
     private Boolean readOnly;
     
+    private String reflectionText;
+    
     /**
      * @return Returns the toolSessionID.
      */
@@ -142,4 +144,12 @@ public class NbLearnerForm extends ActionForm{
 	public void setReadOnly(Boolean readOnly) {
 		this.readOnly = readOnly;
 	}
+	
+	public String getReflectionText() {
+        return reflectionText;
+    }
+
+    public void setReflectionText(String reflectionText) {
+        this.reflectionText = reflectionText;
+    }
 }

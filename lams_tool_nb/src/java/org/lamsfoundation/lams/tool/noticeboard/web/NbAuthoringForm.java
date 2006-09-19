@@ -79,6 +79,9 @@ public class NbAuthoringForm extends ActionForm {
 	private String contentFolderID;
 	private String defineLater;
 	
+	private boolean reflectOnActivity;
+	private String reflectInstructions;
+	
 	private FormFile onlineFile;
 	private FormFile offlineFile;
 
@@ -123,6 +126,23 @@ public class NbAuthoringForm extends ActionForm {
     public void setDefineLater(String defineLater) {
         this.defineLater = defineLater;
     }
+    
+    public boolean getReflectOnActivity() {
+    	return reflectOnActivity;
+    }
+    
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+    	this.reflectOnActivity = reflectOnActivity;
+    }
+    
+    public String getReflectInstructions() {
+    	return reflectInstructions;
+    }
+    
+    public void setReflectInstructions(String reflectInstructions) {
+    	this.reflectInstructions = reflectInstructions;
+    }
+    
 	/**
 	 * @return Returns the content.
 	 */
@@ -253,6 +273,10 @@ public class NbAuthoringForm extends ActionForm {
 	    nbContent.setContent(getContent());
 		nbContent.setOnlineInstructions(getOnlineInstructions());
 		nbContent.setOfflineInstructions(getOfflineInstructions());
+		nbContent.setReflectOnActivity(getReflectOnActivity());
+		if (getReflectOnActivity()) {
+			nbContent.setReflectInstructions(getReflectInstructions());
+		}
 		nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
 	}
 	

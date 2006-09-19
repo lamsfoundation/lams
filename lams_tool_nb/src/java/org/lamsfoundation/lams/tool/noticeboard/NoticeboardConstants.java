@@ -58,8 +58,10 @@ public class NoticeboardConstants
     
     public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
+    public static final String REFLECT_ON_ACTIVITY = "reflectOnActivity";
     
     public static final String MONITOR_PAGE = "monitorPage";
+    public static final String MONITOR_REFLECTION_PAGE ="monitorReflectionPage";
     
     // ------------------------------
     // Action Names
@@ -114,6 +116,7 @@ public class NoticeboardConstants
     public static final String BUTTON_EDIT = "button.edit";
     public static final String BUTTON_UPLOAD = "button.upload";
     public static final String LINK_DELETE="link.delete";
+    public static final String BUTTON_CONTINUE = "button.continue";
     
     
    //--------------

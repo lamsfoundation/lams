@@ -47,6 +47,8 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -89,6 +91,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	
 	private IExportToolContentService exportContentService;
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
+	
+	private ICoreNotebookService coreNotebookService;
 
 	
 	/* ==============================================================================
@@ -421,7 +425,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/**
 	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboardUser(java.lang.Long)
 	 */
-	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId)
+	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId, Long nbSessionId)
 	{
 	    if (nbUserId == null)
 	    {
@@ -432,7 +436,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    
 	    try
 		{
-			nbUser = nbUserDAO.getNbUserByID(nbUserId);
+			nbUser = nbUserDAO.getNbUser(nbUserId, nbSessionId);
 		}
 		catch (DataAccessException e)
 		{
@@ -523,7 +527,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/**
 	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeUser(java.lang.Long)
 	 */
-	public void removeUser(Long nbUserId)
+	public void removeUser(Long nbUserId, Long toolSessionId)
 	{
 	    if (nbUserId == null)
 	    {
@@ -533,7 +537,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    }
 		try
 		{
-		    NoticeboardUser user = retrieveNoticeboardUser(nbUserId);
+		    NoticeboardUser user = retrieveNoticeboardUser(nbUserId, toolSessionId);
 		    NoticeboardSession session = user.getNbSession();
 		    session.getNbUsers().remove(user);
 			nbUserDAO.removeNbUser(nbUserId);
@@ -638,6 +642,21 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 					+ e.getMessage(), e);
 	    }
 	    return totalNumberOfUsers;
+	}
+	
+	public List getUsersBySession(Long sessionId) {
+		
+		if (sessionId!=null) {
+			try {
+				return nbUserDAO.getNbUsersBySession(sessionId);
+			} catch (DataAccessException e) {
+		        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to get the list of users in the session: "
+						+ e.getMessage(), e);
+		    }
+		} else {
+			log.error("Unable to continue. Session id is missing");
+		}
+		return null;
 	}
 	
 	/* ==============================================================================
@@ -1046,6 +1065,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	toolContentObj.setReflectOnActivity(false);
     	// leave as empty, no need to set them to anything.
     	//toolContentObj.setNbSessions(nbSessions);
     	//toolContentObj.setNbAttachments(nbAttachments);
@@ -1074,7 +1094,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    return contentId;
     }
 
-	/* getter setter methods to obtain the service bean */
+    /* =============== Used by Spring to "inject" the linked objects =============== */
+    
 	/*public INoticeboardContentDAO getNbContentDAO()
 	{
 		return nbContentDAO;
@@ -1138,12 +1159,38 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	public void setNbToolContentHandler(IToolContentHandler nbToolContentHandler) {
 		this.nbToolContentHandler = nbToolContentHandler;
 	}
+	
 	public IExportToolContentService getExportContentService() {
 		return exportContentService;
 	}
 
-
 	public void setExportContentService(IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
+	}
+	
+	public ICoreNotebookService getCoreNotebookService() {
+		return coreNotebookService;
+	}
+
+	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+		this.coreNotebookService = coreNotebookService;
+	}
+	
+	/* =============== Wrappers Methods for Notebook Service (Reflective Option) =============== */
+	
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry) {
+		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+	}
+
+	public NotebookEntry getEntry(Long id, Integer idType, String signature,
+			Integer userID) {
+		
+		List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
 	}
 }

@@ -24,8 +24,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,10 +38,14 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
@@ -63,6 +69,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts:action path="/monitoring" name="NbMonitoringForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
  *                input=".monitoringContent" validate="false" parameter="method"
  * @struts:action-forward name="monitorPage" path="/monitoring/monitoring.jsp"
+ * @struts:action-forward name="monitorReflectionPage" path=".monitorReflectionPage"
  * ----------------XDoclet Tags--------------------
  */
 public class NbMonitoringAction extends LamsDispatchAction {
@@ -120,19 +127,58 @@ public class NbMonitoringAction extends LamsDispatchAction {
         Set sessions = content.getNbSessions();
         Iterator i = sessions.iterator();
         Map map = new HashMap();
+        List<ReflectionDTO> reflections = new ArrayList<ReflectionDTO>();
         while (i.hasNext())
         {
         	NoticeboardSession session = (NoticeboardSession) i.next();
             int numUsersInSession = nbService.getNumberOfUsersInSession(session);
             map.put(session.getNbSessionName(), new Integer(numUsersInSession));
+            // Get list of users that have made a reflection entry 
+            if (content.getReflectOnActivity()) {
+            	List sessionUsers = nbService.getUsersBySession(session.getNbSessionId());
+            	for (int j=0; j<sessionUsers.size(); j++) {
+            		NoticeboardUser nbUser = (NoticeboardUser)sessionUsers.get(j);
+            		NotebookEntry nbEntry = nbService.getEntry(session.getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+                			NoticeboardConstants.TOOL_SIGNATURE, nbUser.getUserId().intValue());
+            		if (nbEntry!=null) {
+            			ReflectionDTO dto = new ReflectionDTO(nbEntry);
+            			dto.setExternalId(session.getNbSessionId());
+            			dto.setUserId(nbUser.getUserId());
+            			dto.setUsername(nbUser.getUsername());
+            			reflections.add(dto);
+            		}
+            	}
+            }
         }
         monitorForm.setGroupStatsMap(map);
+        
+        // Set reflection statistics, if reflection is set
+        request.setAttribute("reflectOnActivity", content.getReflectOnActivity());
+        request.setAttribute("reflections", reflections);
         
    		monitorForm.setCurrentTab(SUMMARY_TABID);
         request.setAttribute(FORM, monitorForm);
    		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
 	    
-   
+    public ActionForward viewReflection (
+    		ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response) throws NbApplicationException
+    {
+    	Long userId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.USER_ID));
+    	Long toolSessionId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
+    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+    	NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userId, toolSessionId);
+    	NotebookEntry nbEntry = nbService.getEntry(nbUser.getNbSession().getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+    			NoticeboardConstants.TOOL_SIGNATURE, userId.intValue());
+    	if (nbEntry!=null) {
+    		request.setAttribute("nbEntry", nbEntry.getEntry());
+    		request.setAttribute("name", nbUser.getFullname());
+    	}
+    	
+    	return mapping.findForward(NoticeboardConstants.MONITOR_REFLECTION_PAGE);
+    }
    
 }

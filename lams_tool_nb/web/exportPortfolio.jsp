@@ -1,6 +1,5 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/includes/taglibs.jsp"%>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
@@ -26,10 +25,33 @@
 				<p>
 					<c:out value="${NbExportForm.content}" escapeXml="false" />
 				</p>
+				
 			</div>
 
 			<div id="footer-learner">
 			</div>
+
+			<c:if test="${learner}">
+				<h2><fmt:message key="titleHeading.reflection" /></h2>
+				<logic:empty name="nbEntry"><p><fmt:message key="message.no.reflection" /></p></logic:empty>
+				<p><c:out value="${nbEntry}" /></p>
+			</c:if>
+			<logic:empty name="learner">
+				<h2><fmt:message key="titleHeading.reflections" /></h2>
+				<table>
+					<logic:empty name="reflections">
+						<tr>
+							<td colspan="2"><fmt:message key="message.no.reflections" /></td>
+						</tr>
+					</logic:empty>
+					<c:forEach var="reflection" items="${reflections}">
+						<tr>
+							<td><c:out value="${reflection.fullName}" /></td>
+							<td><c:out value="${reflection.entry}" /></td>
+						</tr>
+					</c:forEach>
+				</table>
+			</logic:empty>
 
 		</div>
 

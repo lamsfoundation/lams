@@ -24,6 +24,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.noticeboard.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
@@ -44,7 +46,7 @@ public interface INoticeboardUserDAO {
 	 * @param userId The id of a NoticeboardUser
 	 * @return the persistent instance of a NoticeboardUser or null if not found.
 	 */
-    public NoticeboardUser getNbUserByID(Long userId);
+    public NoticeboardUser getNbUser(Long userId, Long toolSessionId);
     
     /**
 	 * <p> Return the persistent instance of a NoticeboardUser
@@ -96,4 +98,5 @@ public interface INoticeboardUserDAO {
      */
     public int getNumberOfUsers(NoticeboardSession nbSession);
    
+    public List getNbUsersBySession(Long sessionId);
 }

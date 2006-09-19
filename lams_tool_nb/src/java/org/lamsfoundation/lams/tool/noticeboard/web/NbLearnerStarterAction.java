@@ -79,10 +79,9 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
     
     static Logger logger = Logger.getLogger(NbLearnerStarterAction.class.getName());
    
-    /** Get the user id from the shared session */
-	public Long getUserID(HttpServletRequest request) {
-		// set up the user details
-		HttpSession ss = SessionManager.getSession();
+	private UserDTO getUserDTO(HttpServletRequest request) {
+    	// set up the user details
+    	HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		if ( user == null )
 		{
@@ -91,6 +90,12 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 		    logger.error(error);
 			throw new NbApplicationException(error);
 		}
+		return user;
+    }
+    
+    /** Get the user id from the shared session */
+	public Long getUserID(HttpServletRequest request) {
+		UserDTO user = getUserDTO(request);
         return new Long(user.getUserID().longValue());
 	}
 
@@ -136,24 +141,11 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 			throw new NbApplicationException(error);
 		}   
 
-	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
+	    request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
 	    
-	    if ( isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER) ) {
-            return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
-	    }
+	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
 
-	    /*
-         * Checks to see if the runOffline flag is set.
-         * If the particular flag is set, control is forwarded to jsp page
-         * displaying to the user the message according to what flag is set.
-         */
-        if (displayMessageToUser(nbContent, message))
-        {
-            saveMessages(request, message);
-            return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
-        }
-        
-        boolean readOnly = false;
+	    boolean readOnly = false;
         ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
         if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR )
         {
@@ -172,14 +164,33 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             else
             {
             	//create a new user with this session id
-            	NoticeboardUser newUser = new NoticeboardUser(userID);
-            	nbService.addUser(toolSessionID, newUser);
+            	nbUser = new NoticeboardUser(userID);
+            	UserDTO user = getUserDTO(request);
+      		  	nbUser.setUsername(user.getLogin());
+      		  	nbUser.setFullname(user.getFirstName()+" "+user.getLastName());
+            	nbService.addUser(toolSessionID, nbUser);
             }
         } else {
     		readOnly = true;
         }
         
         learnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
+        
+        if ( isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER) ) {
+            return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
+	    }
+
+	    /*
+         * Checks to see if the runOffline flag is set.
+         * If the particular flag is set, control is forwarded to jsp page
+         * displaying to the user the message according to what flag is set.
+         */
+        if (displayMessageToUser(nbContent, message))
+        {
+            saveMessages(request, message);
+            return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
+        }
+        
         return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
     
     }
