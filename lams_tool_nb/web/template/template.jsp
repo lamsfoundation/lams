@@ -26,7 +26,7 @@
 		<div id="header-no-tabs-learner">
 		</div>
 
-		<div id="content">
+		<div id="content-learner">
 			<tiles:insert attribute="content" />
 		</div>
 
