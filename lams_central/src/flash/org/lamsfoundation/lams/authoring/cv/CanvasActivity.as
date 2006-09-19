@@ -76,7 +76,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var stopSign_mc:MovieClip;	
 	private var clickTarget_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
-	private var canvasActivityGrouped_mc:MovieClip;	private var _dcStartTime:Number = 0;
+	private var canvasActivityGrouped_mc:MovieClip;
+	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	private var _visibleWidth:Number;
 	private var _visibleHeight:Number;
@@ -548,6 +549,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		var transPositive = {ra:100, ga:100, ba:100, rb:0, gb:0, bb:0};
 		styleObj = _tm.getStyleObject('CALabel');
 		title_lbl.setStyle('styleName',styleObj);
+		title_lbl.setStyle("textAlign", "center")
 		if (bgNegative == "true"){
 			my_color.setTransform(transNegative);
 		}else if(bgNegative == "false"){
