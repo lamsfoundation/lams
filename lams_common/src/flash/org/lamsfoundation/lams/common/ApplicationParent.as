@@ -41,6 +41,7 @@ class ApplicationParent {
 	public static var C_GATE:String = "c_gate";
 	public static var C_GROUP:String = "c_group";
 	public static var C_DEFAULT:String = "default";
+	public static var C_LICON:String = "c_licon";
 	
 	public static var SERIAL_NO = "0000-0000-0000-0001-AAAA";
 	
