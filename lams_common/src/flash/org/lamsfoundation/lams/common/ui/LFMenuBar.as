@@ -235,7 +235,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
             HELP MENU
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
-        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpItem"});
+        //help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpItem"});
 		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
         //set up listeners
@@ -400,7 +400,11 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.helpItem :
 				break;
 			case eventObj.menu.aboutItem :
+			if (env != "Monitoring"){
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().openAboutLams();
+			}else {
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().openAboutLams();
+			}
 				//LFMessage.showMessageAlert("Serial No: " + ApplicationParent.SERIAL_NO);
 				break;
 		}
