@@ -74,7 +74,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	function init():Void{		
 		_instance = this;
 				var tkv = ToolkitView(_toolkitView);
-		setStyles();
+		
 		
 		//Set up this class to use the Flash event delegation model  
         EventDispatcher.initialize(this);  
@@ -203,17 +203,45 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		icon_mc._height = 20;
 		icon_mc._x = ICON_OFFSETX;
 		icon_mc._y = ICON_OFFSETY;
-		
+		setStyles();
 		//initTT()
 		//toolTip.text = _mainActivity.title;
 		//Debugger.log('icon_mc._width:'+icon_mc._width,4,'draw','TemplateActivity');
 		//Debugger.log('icon_mc._height:'+icon_mc._height,4,'draw','TemplateActivity');
 	}
 	
+	private function getAssociatedStyle():Object{
+		trace("Category ID for Activity "+_mainActivity.title +": "+_mainActivity.activityCategoryID)
+		var styleObj:Object = new Object();
+		switch (String(_mainActivity.activityCategoryID)){
+			case '0' :
+				styleObj = _tm.getStyleObject('ACTPanel0')
+                break;
+            case '1' :
+			    styleObj = _tm.getStyleObject('ACTPanel1')
+                break;
+			case '2' :
+				styleObj = _tm.getStyleObject('ACTPanel2')
+				break;
+			case '3' :
+				styleObj = _tm.getStyleObject('ACTPanel3')
+				break;
+			case '4' :
+				styleObj = _tm.getStyleObject('ACTPanel4')
+				break;
+			case '5' :
+				styleObj = _tm.getStyleObject('ACTPanel5')
+				break;
+            default :
+                styleObj = _tm.getStyleObject('ACTPanel0')
+		}
+		return styleObj;
+	}
+	
 	private function setStyles():Void{
 		Debugger.log('Running....',Debugger.GEN,'setStyles','TemplateActivity');
 		var styleObj;
-		_taPanelStyle = _tm.getStyleObject('TAPanel');
+		_taPanelStyle = _tm.getStyleObject('TAPanel');  //getAssociatedStyle()
 		bkg_pnl.setStyle('styleName',_taPanelStyle);
 		styleObj = _tm.getStyleObject('label');
 		title_lbl.setStyle('styleName',styleObj);
