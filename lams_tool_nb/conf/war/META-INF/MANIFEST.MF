@@ -1,1 +1,4 @@
+Implementation-Title: LAMS - Noticeboard Tool
+Implementation-Version: 2.0 RC1
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
 Class-Path: ./lams.jar ./lams-tool-lanb11.jar ./lams-contentrepository.jar ./lams-learning.jar
