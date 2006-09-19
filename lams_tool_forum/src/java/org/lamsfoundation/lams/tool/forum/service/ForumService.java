@@ -683,6 +683,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			if(item.getIsAuthored()){
 				authorItems.add(item);
 				item.setCreatedBy(null);
+				item.setModifiedBy(null);
 				item.setToolSession(null);
 				item.setForum(null);
 				item.setToolContentHandler(null);
