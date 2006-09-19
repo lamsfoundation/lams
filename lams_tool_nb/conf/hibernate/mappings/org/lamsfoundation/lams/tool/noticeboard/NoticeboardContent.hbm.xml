@@ -80,6 +80,24 @@
             length="1"
         />
 
+       <property
+            name="reflectOnActivity"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="reflect_on_activity"
+            length="1"
+        />
+
+       <property
+            name="reflectInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="reflect_instructions"
+            length="65535"
+        />
+
         <property
             name="contentInUse"
             type="boolean"
