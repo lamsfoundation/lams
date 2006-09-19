@@ -51,6 +51,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
 	private var _monitorTabView : MonitorTabView;
+	private var _tm:ThemeManager;
 	//Set by the init obj
 	private var _activity:Activity;
 	private var _children:Array;
@@ -88,6 +89,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	function CanvasParallelActivity(){
 		Debugger.log("_activity:"+_activity.title+'uiID:'+_activity.activityUIID+' children:'+_children.length,Debugger.GEN,'Constructor','CanvasParallelActivity');
 		_visible = false;
+		_tm = ThemeManager.getInstance();
 		_ddm = new DesignDataModel()
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
@@ -167,17 +169,45 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		_activity = a;
 	}
 	
+	
+	private function getAssociatedStyle():Object{
+		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
+		var styleObj:Object = new Object();
+		switch (String(_activity.activityCategoryID)){
+			case '0' :
+				styleObj = _tm.getStyleObject('ACTPanel0')
+                break;
+            case '1' :
+			    styleObj = _tm.getStyleObject('ACTPanel1')
+                break;
+			case '2' :
+				styleObj = _tm.getStyleObject('ACTPanel2')
+				break;
+			case '3' :
+				styleObj = _tm.getStyleObject('ACTPanel3')
+				break;
+			case '4' :
+				styleObj = _tm.getStyleObject('ACTPanel4')
+				break;
+			case '5' :
+				styleObj = _tm.getStyleObject('ACTPanel5')
+				break;
+            default :
+                styleObj = _tm.getStyleObject('ACTPanel0')
+		}
+		return styleObj;
+	}
+	
+	
 	private function draw(){			
 		//write text
 		title_lbl.text = _activity.title;
-		actCount_lbl.text = _children.length+ Dictionary.getValue('lbl_num_activities'); //" activities";
+		//actCount_lbl.text = _children.length+ Dictionary.getValue('lbl_num_activities'); //" activities";
 		
 //			_global.breakpoint();
 		
-		header_pnl.borderType='outset';
-		container_pnl.setStyle("backgroundColor",0x4289FF);
-		
-		
+		//header_pnl.borderType='outset';
+			
 		if(fromModuleTab == "monitorMonitorTab"){
 			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 		trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
@@ -211,9 +241,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		_y = _activity.yCoord
 	
 		setLocking()
+		setStyles()
 		_visible = true;
 		//child1_mc._visible = true;
 					
+	}
+	
+	private function setStyles():Void {
+		var styleObj = _tm.getStyleObject ('label');
+		title_lbl.setStyle (styleObj);
+		styleObj = getAssociatedStyle();
+		container_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject ('OptHeadPanel');
+		header_pnl.setStyle('styleName',styleObj);
+		//container_pnl.setStyle("backgroundColor",0x4289FF);
 	}
 	
 	private function setLocking():Void{

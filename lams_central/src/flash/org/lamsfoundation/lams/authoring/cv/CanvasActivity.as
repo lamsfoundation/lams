@@ -44,10 +44,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
-	public static var GATE_ACTIVITY_HEIGHT:Number =30;
-	public static var GATE_ACTIVITY_WIDTH:Number = 30;
-	public static var ICON_WIDTH:Number = 30;
-	public static var ICON_HEIGHT:Number = 30;
+	public static var GATE_ACTIVITY_HEIGHT:Number =28;
+	public static var GATE_ACTIVITY_WIDTH:Number = 28;
+	public static var ICON_WIDTH:Number = 25;
+	public static var ICON_HEIGHT:Number = 25;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
@@ -233,7 +233,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private function setUpActIcon(icon_mc):Void{
 		icon_mc._x = (CanvasActivity.TOOL_ACTIVITY_WIDTH / 2) - (icon_mc._width / 2);
-		icon_mc._y = (CanvasActivity.TOOL_ACTIVITY_HEIGHT / 2) - (icon_mc._height / 2) - 5;
+		icon_mc._y = (CanvasActivity.TOOL_ACTIVITY_HEIGHT / 2) - (icon_mc._height / 2) - 6;
 	}
 	
 	/**
@@ -501,6 +501,35 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	public function setActivity(a:Activity){
 		_activity = a;
 	}
+	
+	
+	private function getAssociatedStyle():Object{
+		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
+		var styleObj:Object = new Object();
+		switch (String(_activity.activityCategoryID)){
+			case '0' :
+				styleObj = _tm.getStyleObject('ACTPanel0')
+                break;
+            case '1' :
+			    styleObj = _tm.getStyleObject('ACTPanel1')
+                break;
+			case '2' :
+				styleObj = _tm.getStyleObject('ACTPanel2')
+				break;
+			case '3' :
+				styleObj = _tm.getStyleObject('ACTPanel3')
+				break;
+			case '4' :
+				styleObj = _tm.getStyleObject('ACTPanel4')
+				break;
+			case '5' :
+				styleObj = _tm.getStyleObject('ACTPanel5')
+				break;
+            default :
+                styleObj = _tm.getStyleObject('ACTPanel0')
+		}
+		return styleObj;
+	}
 
 
 	/**
@@ -509,20 +538,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @usage   
 	 * @return  
 	 */
+	 
+	
 	private function setStyles() {
 		var my_color:Color = new Color(this);
 		var styleObj;
 		
 		var transNegative = {ra:-100, ga:-100, ba:-100, rb:255, gb:255, bb:255};
 		var transPositive = {ra:100, ga:100, ba:100, rb:0, gb:0, bb:0};
-		title_lbl.setStyle('textAlign', 'center');
+		styleObj = _tm.getStyleObject('CALabel');
+		title_lbl.setStyle('styleName',styleObj);
 		if (bgNegative == "true"){
 			my_color.setTransform(transNegative);
 		}else if(bgNegative == "false"){
 			my_color.setTransform(transPositive);
 		}else if(bgNegative == "original"){
-			styleObj = _tm.getStyleObject('label');
-			title_lbl.setStyle('styleName',styleObj);
+			
 			if (this.activity.parentUIID != null || this.activity.parentUIID != undefined){
 				if (_module != "monitoring"){
 					var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(this.activity.parentUIID)
@@ -534,11 +565,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 					styleObj = _tm.getStyleObject('OptActPanel')
 					act_pnl.setStyle('styleName',styleObj);
 				}else {
-					styleObj = _tm.getStyleObject('ACTPanel')
+					
+					styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
 					act_pnl.setStyle('styleName',styleObj);
 				}
 			}else {
-					styleObj = _tm.getStyleObject('ACTPanel')
+					styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
 					act_pnl.setStyle('styleName',styleObj);
 				}
 			

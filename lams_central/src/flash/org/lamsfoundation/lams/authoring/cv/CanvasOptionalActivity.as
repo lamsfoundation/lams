@@ -98,6 +98,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		_ca = new ComplexActivity(_activity.activityUIID)
+		_activity.activityCategoryID = Activity.CATEGORY_SYSTEM
 		//_activity.title = Dictionary.getValue('opt_activity_title')
 		//init();
 		MovieClipUtils.doLater (Proxy.create (this, init));
@@ -309,14 +310,44 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	public function get getpanelHeight():Number {
 		return panelHeight;
 	}
+	
+	private function getAssociatedStyle():Object{
+		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
+		var styleObj:Object = new Object();
+		switch (String(_activity.activityCategoryID)){
+			case '0' :
+				styleObj = _tm.getStyleObject('ACTPanel0')
+                break;
+            case '1' :
+			    styleObj = _tm.getStyleObject('ACTPanel1')
+                break;
+			case '2' :
+				styleObj = _tm.getStyleObject('ACTPanel2')
+				break;
+			case '3' :
+				styleObj = _tm.getStyleObject('ACTPanel3')
+				break;
+			case '4' :
+				styleObj = _tm.getStyleObject('ACTPanel4')
+				break;
+			case '5' :
+				styleObj = _tm.getStyleObject('ACTPanel5')
+				break;
+            default :
+                styleObj = _tm.getStyleObject('ACTPanel0')
+		}
+		return styleObj;
+	}
+	
 	private function setStyles():Void {
 		var styleObj = _tm.getStyleObject ('label');
 		title_lbl.setStyle (styleObj);
-		styleObj = _tm.getStyleObject ('smlLabel');
+		styleObj = _tm.getStyleObject ('PIlabel');
 		actCount_lbl.setStyle ('styleName', styleObj);
-		styleObj = _tm.getStyleObject ('OptHeadPanel');
-		header_pnl.setStyle ('styleName', styleObj);
-		styleObj = _tm.getStyleObject ('OptActContainerPanel');
+		//styleObj = _tm.getStyleObject ('OptHeadPanel');
+		//header_pnl.setStyle ('styleName', styleObj);
+		//styleObj = _tm.getStyleObject ('OptActContainerPanel');
+		styleObj = getAssociatedStyle();
 		container_pnl.setStyle ('styleName', styleObj);
 	}
 }
