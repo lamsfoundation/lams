@@ -280,42 +280,6 @@ public class NbAuthoringForm extends ActionForm {
 		nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
 	}
 	
-	public ActionErrors validate(ActionMapping mapping, HttpServletRequest request)
-	{
-	    ActionErrors errors = new ActionErrors();
-	    //check the tool content id
-	    //check the title and instructions
-	    
-	    float maxFileSize = UploadFileUtil.getMaxFileSize();
-	  
-	   if (this.offlineFile != null && offlineFile.getFileSize()!= 0) 
-	    {
-	        float sizeOfOfflineUpload = offlineFile.getFileSize() / 1024 / 1024;
-	        //check the file size
-	       if (sizeOfOfflineUpload  > maxFileSize)
-	        {
-	            logger.error("file size " + sizeOfOfflineUpload + " Max File Size allowed: " + maxFileSize);
-	            errors.add("filesize", new ActionMessage("error.exceedMaxFileSize"));
-	            this.setMethod("Instructions");
-	        }
-	       
-	    } 
-	   else if ( this.onlineFile != null && onlineFile.getFileSize() != 0)
-	   {
-	       float sizeOfOnlineUpload = onlineFile.getFileSize() / 1024 / 1024; //getFileSize() returns the file size in bytes, but we are comparing the filesize using units MBs
-		   
-	     if (sizeOfOnlineUpload > maxFileSize) 
-	     {
-
-	         	logger.error("file size " + sizeOfOnlineUpload + " Max File Size allowed: " + maxFileSize);
-	            errors.add("filesize", new ActionMessage("error.exceedMaxFileSize"));
-	            this.setMethod("Instructions");
-	     }
-	   }
-	   
-	    return errors; 
-	    
-	}
 	public String getCurrentTab() {
 		return currentTab;
 	}

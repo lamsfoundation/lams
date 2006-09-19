@@ -37,13 +37,17 @@
         	return true;
         }
         
-		function deleteAttachment(dispatch, uuid) {
-			document.authoringForm.dispatch.value = dispatch;
-			document.authoringForm.deleteFileUuid.value = uuid;
-			document.authoringForm.submit();
+		function deleteAttachment(uuid) {
+			document.NbAuthoringForm.method.value = '<fmt:message key="link.delete"/>';
+			document.NbAuthoringForm.deleteFileUuid.value = uuid;
+			document.NbAuthoringForm.submit();
 		}        
 		
-     </script>
+		function doUpload() {
+			document.NbAuthoringForm.method.value = '<fmt:message key="button.upload" />';
+			document.NbAuthoringForm.submit();
+		}        
+     </script>  
 </head>
 
 <body onLoad="init()">
@@ -57,8 +61,7 @@
 			<html:hidden property="sessionMapID" />
 
 			<c:set var="formBean"
-				value="<%=request
-											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<c:set var="sessionMap"
 				value="${sessionScope[formBean.sessionMapID]}" scope="request" />
 

@@ -10,6 +10,7 @@
 		<c:set var="offlineExist" value="true" />
 	</c:if>
 </c:forEach>
+<html:hidden property="deleteFileUuid" />
 
 <!-- Instructions Tab Content  -->
 <table>
@@ -47,7 +48,7 @@
 									</a> &nbsp;
 
 									<html:link
-										href="javascript:deleteAttachment('Delete','${attachment.uuid}')">
+										href="javascript:deleteAttachment('${attachment.uuid}')">
 										<fmt:message key="link.delete" />
 									</html:link>
 								</li>
@@ -69,9 +70,10 @@
 	<tr>
 		<td>
 			<html:file property="onlineFile" />
-			<html:submit property="method" styleClass="button">
+			<html:link href="javascript:doUpload();"
+				property="submit" styleClass="button">
 				<fmt:message key="button.upload" />
-			</html:submit>
+			</html:link>
 		</td>
 	</tr>
 </table>
@@ -113,7 +115,7 @@
 									</a> &nbsp;
 
 									<html:link
-										href="javascript:deleteAttachment('Delete','${attachment.uuid}')">
+										href="javascript:deleteAttachment('${attachment.uuid}')">
 										<fmt:message key="link.delete" />
 									</html:link>
 								</li>
@@ -135,9 +137,10 @@
 	<tr>
 		<td>
 			<html:file property="offlineFile" />
-			<html:submit property="method" styleClass="button">
+			<html:link href="javascript:doUpload();"
+				property="submit" styleClass="button">
 				<fmt:message key="button.upload" />
-			</html:submit>
+			</html:link>
 		</td>
 	</tr>
 </table>
