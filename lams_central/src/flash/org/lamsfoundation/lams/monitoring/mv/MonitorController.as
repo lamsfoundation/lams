@@ -68,6 +68,8 @@ class MonitorController extends AbstractController {
 			act.startDrag(false);
 			//Cursor.showCursor(Application.C_WHITEARROW);
 			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
+		}else {
+			_monitorModel.selectedItem = act;
 		}
    }
    

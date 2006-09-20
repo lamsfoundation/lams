@@ -136,6 +136,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 				case 'SIZE' :
 					setSize(mm);
 					break;
+				case 'SELECTED_ITEM' :
+					highlightActivity(mm);
+					break;
 				case 'TABCHANGE' :
 					//trace("isChanged value in monitorModel is: "+mm.getIsProgressChanged())
 					if (infoObj.tabID == _tabID){
@@ -296,6 +299,27 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true)
+	}
+	
+	private function highlightActivity(mm:MonitorModel){
+		Debugger.log('running..',Debugger.CRITICAL,'highlightActivity','MonitorTabView');
+		//deselect everything else
+		var CAsArray:Array = mm.activitiesDisplayed.values();
+		Debugger.log('CAsArray:'+CAsArray.length,Debugger.CRITICAL,'highlightActivity','MonitorTabView');
+		for(var i=0; i < CAsArray.length; i++){
+			CAsArray[i].setSelected(false);
+		}
+		//try to cast the selected item to see what we have (instance of des not seem to work)
+		if(CanvasActivity(mm.selectedItem) != null){
+			Debugger.log('Its a canvas activity',4,'highlightActivity','MonitorTabView');
+			var ca = CanvasActivity(mm.selectedItem);
+			var a:Activity = ca.activity;			
+			ca.setSelected(true);
+					
+		}else{
+			Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','MonitorTabView');
+		
+		}
 	}
 	
 	/**
