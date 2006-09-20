@@ -1170,8 +1170,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			Debugger.log("Opening help page with locale " + _root.lang + _root.country + ": " + ca.activity.helpURL,Debugger.GEN,'getHelp','Canvas');
 			
 			var locale:String = _root.lang + _root.country;
-			
-			getURL(ca.activity.helpURL + "#" + ca.activity.toolSignature + "-" + locale, '_blank');
+			getURL(ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale, '_blank');
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_helpURL_undefined', [ca.activity.toolDisplayName]));
 		}
