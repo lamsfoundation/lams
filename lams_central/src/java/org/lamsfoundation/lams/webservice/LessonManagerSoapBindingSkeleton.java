@@ -159,16 +159,16 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 						false, false),
 				new ParameterDesc(new QName("", "lsId"), ParameterDesc.IN, new QName(
 						"http://www.w3.org/2001/XMLSchema", "long"), long.class, false, false), };
-		_oper = new OperationDesc("deleteLearningSession", _params, new QName("",
-				"deleteLearningSessionReturn"));
+		_oper = new OperationDesc("deleteLesson", _params, new QName("",
+				"deleteLessonReturn"));
 		_oper.setReturnType(new QName("http://www.w3.org/2001/XMLSchema", "boolean"));
-		_oper.setElementQName(new QName("", "deleteLearningSession"));
+		_oper.setElementQName(new QName("", "deleteLesson"));
 		_oper.setSoapAction("");
 		_myOperationsList.add(_oper);
-		if (_myOperations.get("deleteLearningSession") == null) {
-			_myOperations.put("deleteLearningSession", new ArrayList());
+		if (_myOperations.get("deleteLesson") == null) {
+			_myOperations.put("deleteLesson", new ArrayList());
 		}
-		((List) _myOperations.get("deleteLearningSession")).add(_oper);
+		((List) _myOperations.get("deleteLesson")).add(_oper);
 	}
 
 	public LessonManagerSoapBindingSkeleton() {
@@ -195,9 +195,9 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 		return ret;
 	}
 
-	public boolean deleteLearningSession(String serverId, String datetime, String hashValue,
+	public boolean deleteLesson(String serverId, String datetime, String hashValue,
 			String username, long lsId) throws RemoteException {
-		boolean ret = impl.deleteLearningSession(serverId, datetime, hashValue, username, lsId);
+		boolean ret = impl.deleteLesson(serverId, datetime, hashValue, username, lsId);
 		return ret;
 	}
 

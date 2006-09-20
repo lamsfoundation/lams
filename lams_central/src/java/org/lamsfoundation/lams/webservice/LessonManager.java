@@ -40,6 +40,6 @@ public interface LessonManager extends Remote {
 			String username, long ldId, String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode)
 			throws RemoteException;
 
-	public boolean deleteLearningSession(String serverId, String datetime, String hashValue,
+	public boolean deleteLesson(String serverId, String datetime, String hashValue,
 			String username, long lsId) throws RemoteException;
 }

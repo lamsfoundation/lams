@@ -29,15 +29,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServlet;
+
+import org.apache.axis.MessageContext;
+import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
@@ -53,12 +58,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRepository {
 
-	private static IntegrationService integrationService = (IntegrationService) WebApplicationContextUtils
-			.getRequiredWebApplicationContext(HttpSessionManager.getInstance().getServletContext())
+	private static Logger log = Logger.getLogger(LearningDesignRepositorySoapBindingImpl.class);
+
+	private static MessageContext context = MessageContext.getCurrentContext();
+	
+	private static IntegrationService integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
 			.getBean("integrationService");
 
-	private static IWorkspaceManagementService service = (IWorkspaceManagementService) WebApplicationContextUtils
-			.getRequiredWebApplicationContext(HttpSessionManager.getInstance().getServletContext())
+	private static IWorkspaceManagementService service = (IWorkspaceManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
 			.getBean("workspaceManagementService");
 
 	private static MessageService msgService = service.getMessageService();
@@ -96,51 +103,36 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 		void addChild(ContentTreeNode node) {
 			children.add(node);
 		}
-		
+
 		/**
-		 * the format should be something like this:
-		 	[
-				['My Workspace', null,
-					['Mary Morgan Folder', null,
-						['3 activity sequence','1024']
-					],
-					['Organisations', null,
-						['Developers Playpen',   null,
-							['Lesson Sequence Folder', null,
-								['',null]
-							]
-						],
-						['MATH111',  null,
-							['Lesson Sequence Folder', null,
-								['',null]
-							]
-						]
-					]
-				]
-			]
+		 * the format should be something like this: [ ['My Workspace', null,
+		 * ['Mary Morgan Folder', null, ['3 activity sequence','1024'] ],
+		 * ['Organisations', null, ['Developers Playpen', null, ['Lesson
+		 * Sequence Folder', null, ['',null] ] ], ['MATH111', null, ['Lesson
+		 * Sequence Folder', null, ['',null] ] ] ] ] ]
 		 */
-		public String toString(){
-			return '['+convert()+']';
+		public String toString() {
+			return '[' + convert() + ']';
 		}
-		
-		String convert(){
+
+		String convert() {
 			StringBuilder sb = new StringBuilder();
-			if(content.getResourceType().equals(FolderContentDTO.FOLDER)){
-				sb.append('[');
-				sb.append(content.getName()).append(',').append("null").append(',');
-				if(children.size() == 0){
+			if (content.getResourceType().equals(FolderContentDTO.FOLDER)) {
+				sb.append("['");
+				sb.append(content.getName()).append("',").append("null").append(',');
+				if (children.size() == 0) {
 					sb.append("['',null]");
-				}else{
+				} else {
 					sb.append(children.get(0).convert());
-					for(int i=1; i<children.size(); i++){
-						sb.append(',').append(children.get(0).convert());
+					for (int i = 1; i < children.size(); i++) {
+						sb.append(',').append(children.get(i).convert());
 					}
 				}
 				sb.append(']');
-			}else if(content.getResourceType().equals(FolderContentDTO.DESIGN)){
+			} else if (content.getResourceType().equals(FolderContentDTO.DESIGN)) {
 				sb.append('[');
-				sb.append('\'').append(content.getName()).append('\'').append(',')
-				.append('\'').append(content.getResourceID()).append('\'');
+				sb.append('\'').append(content.getName()).append('\'').append(',').append('\'')
+						.append(content.getResourceID()).append('\'');
 				sb.append(']');
 			}
 			return sb.toString();
@@ -149,49 +141,56 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 
 	/**
 	 * <p>
-	 * The returned string is formatted this way for convenience of tigra tree menu javascript library.
-	 * This is bad design since it make client and server coupled together a bit too tightly. If we change
-	 * javascript library on client side. The returned value may be not very easy to parse.
-	 * </p> 
+	 * The returned string is formatted this way for convenience of tigra tree
+	 * menu javascript library. This is bad design since it make client and
+	 * server coupled together a bit too tightly. If we change javascript
+	 * library on client side, the returned value may be not very easy to parse.
+	 * </p>
 	 * The main reason is:
 	 * <ul>
-	 * <li>String as return type make webservice client end easier to implement. 
-	 * 	   Some webservice lib in some language(like SOAP::Lite in Perl) may haven't support 
-	 *     complicated data structure as return type
-	 * </li>
+	 * <li>String as return type make webservice client end easier to be
+	 * implemented. Some webservice lib in some language(like SOAP::Lite in
+	 * Perl) may haven't support for complicated data structure as return type
+	 * yet </li>
 	 * </ul>
 	 */
 	public String getLearningDesigns(String serverId, String datetime, String hashValue,
-			String username, Integer mode) throws RemoteException {
+			String username,  String courseId, Integer mode, String country, String lang) throws RemoteException {
 		try {
 			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-			Authenticator.authenticate(serverMap,datetime,username,hashValue);
+			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-			return buildContentTree(userMap.getUser().getUserId()).toString();
+			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang);
+			return buildContentTree(userMap.getUser()).toString();
 		} catch (Exception e) {
+			log.debug(e.getMessage(),e);
 			throw new RemoteException(e.getMessage(), e);
 		}
 
 	}
 
-	private ContentTreeNode buildContentTree(Integer userId) throws IOException,
+	private ContentTreeNode buildContentTree(User user) throws IOException,
 			UserAccessDeniedException, RepositoryCheckedException {
+		log.debug("User Id - "+user.getUserId());
 		FolderContentDTO rootFolder = new FolderContentDTO(msgService
 				.getMessage("label.workspace.root_folder"), msgService.getMessage("folder"), null,
 				null, FolderContentDTO.FOLDER, WorkspaceAction.BOOTSTRAP_FOLDER_ID.longValue(),
 				WorkspaceFolder.READ_ACCESS, null);
 		ContentTreeNode root = new ContentTreeNode(rootFolder);
-		FolderContentDTO userFolder = service.getUserWorkspaceFolder(userId);
-		root.addChild(buildContentTreeNode(userFolder, userId));
+		FolderContentDTO userFolder = service.getUserWorkspaceFolder(user.getUserId());
+		root.addChild(buildContentTreeNode(userFolder, user.getUserId()));
 		FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService
 				.getMessage("organisations"), msgService.getMessage("folder"), null, null,
 				FolderContentDTO.FOLDER, new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()),
 				WorkspaceFolder.READ_ACCESS, null);
 		ContentTreeNode dummyOrgNode = new ContentTreeNode(dummyOrgFolder);
-		Vector orgFolders = service.getAccessibleOrganisationWorkspaceFolders(userId);
+		//tried using service.getAccessibleOrganisationWorkspaceFolders(userId) api, 
+		//but it doesn't work, the userOrganisations set of the user 
+		// got from workspaceManagementService with the userId supplied is empty, which is not true.
+		Vector orgFolders = service.getAccessibleOrganisationWorkspaceFolders(user);
 		for (int i = 0; i < orgFolders.size(); i++) {
 			FolderContentDTO orgFolder = (FolderContentDTO) orgFolders.get(i);
-			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId));
+			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, user.getUserId()));
 		}
 		root.addChild(dummyOrgNode);
 		return root;
@@ -199,6 +198,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 
 	private ContentTreeNode buildContentTreeNode(FolderContentDTO folder, Integer userId)
 			throws UserAccessDeniedException, RepositoryCheckedException {
+		log.debug("build content tree node for folder - "+folder.getName());
 		ContentTreeNode node = new ContentTreeNode(folder);
 		if (folder.getResourceType().equals(FolderContentDTO.FOLDER)) {
 			WorkspaceFolder wsfolder = service

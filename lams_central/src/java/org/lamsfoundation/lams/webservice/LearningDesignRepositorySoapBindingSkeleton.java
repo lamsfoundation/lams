@@ -77,9 +77,18 @@ public class LearningDesignRepositorySoapBindingSkeleton implements LearningDesi
 				new ParameterDesc(new QName("", "username"), ParameterDesc.IN, new QName(
 						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
 						false, false),
+				new ParameterDesc(new QName("", "courseId"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
 				new ParameterDesc(new QName("", "mode"), ParameterDesc.IN, new QName(
 						"http://schemas.xmlsoap.org/soap/encoding/", "int"), Integer.class, false,
-						false), };
+						false),
+				new ParameterDesc(new QName("", "country"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+				new ParameterDesc(new QName("", "lang"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false), };
 		_oper = new OperationDesc("getLearningDesigns", _params, new QName("",
 				"getLearningDesignsReturn"));
 		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "string"));
@@ -101,8 +110,10 @@ public class LearningDesignRepositorySoapBindingSkeleton implements LearningDesi
 	}
 
 	public String getLearningDesigns(String serverId, String datetime, String hashValue,
-			String username, Integer mode) throws RemoteException {
-		String ret = impl.getLearningDesigns(serverId, datetime, hashValue, username, mode);
+			String username, String courseId, Integer mode, String country, String lang)
+			throws RemoteException {
+		String ret = impl.getLearningDesigns(serverId, datetime, hashValue, username, courseId,
+				mode, country, lang);
 		return ret;
 	}
 

@@ -34,5 +34,5 @@ import java.rmi.RemoteException;
 public interface LearningDesignRepository extends Remote {
 	
 	public String getLearningDesigns(String serverId, String datetime, String hashValue,
-			String username, Integer mode) throws RemoteException;
+			String username, String courseId, Integer mode, String country, String lang) throws RemoteException;
 }
