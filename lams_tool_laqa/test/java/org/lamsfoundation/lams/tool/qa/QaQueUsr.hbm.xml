@@ -41,6 +41,20 @@
         length="100"
     >
     </property>
+    
+   <property
+            name="responseFinalized"
+            type="boolean"
+            access="property"
+            column="responseFinalized"
+   />
+
+   <property
+            name="learnerFinished"
+            type="boolean"
+            access="property"
+            column="learnerFinished"
+   />
 
     <property
         name="qaSessionId"

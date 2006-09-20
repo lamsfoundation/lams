@@ -15,7 +15,7 @@
         type="java.lang.Long"
         column="submissionId"
     >
-	    <generator class="increment"/>
+	    <generator class="native"/>
     </id>
 
 
@@ -38,18 +38,9 @@
             name="fileName"
             type="java.lang.String"
             access="property"
-            column="fileName"
+            column="filename"
    />
    
-       <!--  property
-        name="qaContentId"
-        type="java.lang.Long"
-        update="false"
-        insert="false"
-        access="property"
-        column="qa_content_id"
-        length="20"
-    / -->
    
 
    <many-to-one
