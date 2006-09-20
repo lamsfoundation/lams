@@ -22,7 +22,8 @@
  */
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.*;
-import org.lamsfoundation.lams.authoring.cv.*
+//import org.lamsfoundation.lams.authoring.cv.*
+import org.lamsfoundation.lams.common.ApplicationParent;
 /**
 * DTO  Generic data transfer obj
 */
@@ -33,6 +34,7 @@ class CustomContextMenu {
 	private var rootMenu:ContextMenu;
 	private var authorMenu:ContextMenu;
 	private var menuArr:Array;
+	private var app:ApplicationParent;
 	//private var _pi:PropertyInspectorNew;
 	
 	//ContextMenu instance is stored as a static in the CustomContextMenu class
@@ -51,6 +53,7 @@ class CustomContextMenu {
 		rootMenu = new ContextMenu();
 		
 		rootMenu.hideBuiltInItems();  
+		app = ApplicationParent.getInstance();
 		_root.menu = rootMenu;
 		authorMenu = new ContextMenu();
 		authorMenu.hideBuiltInItems();
@@ -78,18 +81,29 @@ class CustomContextMenu {
 	
        trace("Value for this: "+this)
 		var v:Boolean; 
+		var monitorC:Boolean;
+		var authorC:Boolean;
 		var myCopy:Array = new Array();
 		var menuArr:Array = new Array();
 		if (cmType == "activity"){
-			var v = true;
+			v = true;
 		}else {
-			var v = false;
+			v = false;
 		}
-		menuArr[0] = ["Open/Edit Activity Content", getOpenEditActivtiyContent, false, v, true];
-		menuArr[1] = ["Copy Activity", getCopy, false, v, true];
-		menuArr[2] = ["Paste Activity",getPaste, false, v, true];
-		menuArr[3] = ["Property Inspector...",getPI, true, true, true];
-		menuArr[4] = ["Author Help",getHelp, true, v, true];
+		if (app.module == "authoring"){
+			authorC = true;
+			monitorC = false
+		}else{
+			authorC = false;
+			monitorC = true;
+		}
+		menuArr[0] = ["Open/Edit Activity Content", getOpenEditActivityContent, false, v, authorC];
+		menuArr[1] = ["Copy Activity", getCopy, false, v, authorC];
+		menuArr[2] = ["Monitor Activity", getOpenMonitorActivityContent, false, v, monitorC];
+		menuArr[3] = ["Monitor Activity Help",getHelp, true, v, monitorC];
+		menuArr[4] = ["Paste Activity",getPaste, false, v, authorC];
+		menuArr[5] = ["Property Inspector...",getPI, true, true, authorC];
+		menuArr[6] = ["Author Activity Help",getHelp, true, v, authorC];
 		
 		for (var i=0; i<menuArr.length; i++){
 			var myObj:Object = new Object();
@@ -106,7 +120,7 @@ class CustomContextMenu {
 		return myCopy;
 		
 	}
-	
+		
 	public function showCustomCM(cmItems:Object){
 		//authorMenu.customItems = new Array();
 		//trace("CM Item label: "+cmItems.length)
@@ -115,9 +129,6 @@ class CustomContextMenu {
 			authorMenu.customItems.splice(0)
 		}
 		for (var i=0; i<cmItems.length; i++){
-			trace("CM seperater: "+cmItems[i].isSeparator)
-			trace("CM enabled: "+cmItems[i].isEnable)
-			trace("CM visible: "+cmItems[i].isVisible)
 			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler, cmItems[i].isSeparator, cmItems[i].isEnable, cmItems[i].isVisible);
 			authorMenu.customItems.push(menuItem_cmi);
 		}
@@ -130,22 +141,49 @@ class CustomContextMenu {
 	
 	//---------------------------------
 	
-	public function getOpenEditActivtiyContent(){
-		Application.getInstance().openEditActivtiyContent();
+	private function appReference():Object{
+		switch (app.module){
+			case 'authoring' :
+				return  org.lamsfoundation.lams.authoring.Application(app)
+                break;
+            case 'monitoring' :
+				return  org.lamsfoundation.lams.monitoring.Application(app)
+                break;
+			case 'learner' :
+				return org.lamsfoundation.lams.learner.Application(app)
+				break;
+			default :
+                //styleObj = _tm.getStyleObject('ACTPanel0')
+		}
+		return null;
+	}
+	
+	public function getOpenEditActivityContent(){
+		//appReference().openEditActivtiyContent();
+		org.lamsfoundation.lams.authoring.Application(app).openEditActivtiyContent();
+	}
+	
+	public function getOpenMonitorActivityContent(){
+		//appReference().openMonitorActivityContent();
+		
 	}
 	public function getCopy(){
+		//appReference().copy();
 		Application.getInstance().copy();
 	}
 	public function getPaste(){
+		//appReference().paste();
 		Application.getInstance().paste();
 	}
 	
 	public function getPI(){
+		//appReference().expandPI();
 		Application.getInstance().expandPI();
 		
 	}		
 	
 	public function getHelp(){
+		//appReference().help();
 		Application.getInstance().help();
 	}
 }
