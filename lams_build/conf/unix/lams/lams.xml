@@ -35,6 +35,7 @@
 	<ServerLanguage>en_AU</ServerLanguage>
 	<ServerPageDirection>LTR</ServerPageDirection>
 	<DictionaryDateCreated>2006-01-02</DictionaryDateCreated>
+	<HelpURL>http://wiki.lamsfoundation.org/display/lamsdocs/</HelpURL>
 	<XmppDomain>shaun.melcoe.mq.edu.au</XmppDomain>
 	<XmppConference>conference.shaun.melcoe.mq.edu.au</XmppConference>
 	<XmppAdmin>admin</XmppAdmin>

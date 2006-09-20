@@ -124,6 +124,8 @@ public class ConfigurationKeys {
 	/** deprecated */
 	public static String DICTIONARY_LANGUAGE = "language";
 	
+	public static String HELP_URL = "HelpURL";
+	
 	public static String XMPP_DOMAIN = "XmppDomain";
 
 	public static String XMPP_CONFERENCE = "XmppConference";
