@@ -101,7 +101,7 @@ public class JspRedirectStrategy {
 			log.debug("===>INDEX PAGE: session not found, simply stop here.");
 			return;
 		}
-		if (!session.getAttribute(AUTH_OBJECT_NAME).equals(SECURITY_CHECK_PASSED))
+		if (!SECURITY_CHECK_PASSED.equals(session.getAttribute(AUTH_OBJECT_NAME)))
 			session.setAttribute(AUTH_OBJECT_NAME, new String(SECURITY_CHECK_PASSED));
 
 	}
