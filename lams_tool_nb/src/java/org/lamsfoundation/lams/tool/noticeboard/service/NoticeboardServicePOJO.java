@@ -1072,11 +1072,19 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     	nbContentDAO.saveNbContent(toolContentObj);
     }
 
-    /** Set the reflective title - does nothing as Noticeboard is not reflective */
-    public void  setReflectiveData(Long toolContentId, String title, String defaultInputValues) 
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
     		throws ToolException, DataMissingException {
-    	log.error("Was asked to set reflective data "+title+" to activity toolContentId "+toolContentId
-    			+". Noticeboard does not support reflection");
+    	
+    	NoticeboardContent toolContentObj = retrieveNoticeboard(toolContentId);
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+
+    	toolContentObj.setReflectOnActivity(Boolean.TRUE);
+    	toolContentObj.setReflectInstructions(description);
     }
     
     //=========================================================================================
