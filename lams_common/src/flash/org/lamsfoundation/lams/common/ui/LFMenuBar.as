@@ -171,7 +171,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
             HELP MENU
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
-        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help'), instanceName:"helpGenItem"});
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpGenItem"});
 		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
 		
@@ -236,7 +236,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
             HELP MENU
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
-        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help'), instanceName:"helpGenItem"});
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpGenItem"});
 		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
         //set up listeners
