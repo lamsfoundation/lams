@@ -171,7 +171,8 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
             HELP MENU
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
-        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help'), instanceName:"helpGenItem"});
+		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
 		
         //set up listeners
@@ -234,9 +235,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		/*=================
             HELP MENU
         =================*/
-        //help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
-        //help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpItem"});
-		//help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
+        help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help'), instanceName:"helpGenItem"});
+		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
         //set up listeners
         // register the listeners with the separate menus
@@ -398,6 +399,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     private function helpMenuClicked(eventObj:Object):Void{
 		switch (eventObj.menuItem) {
 			case eventObj.menu.helpItem :
+				break;
+			case eventObj.menu.helpGenItem :
+				app.getHelpURL();
 				break;
 			case eventObj.menu.aboutItem :
 			if (env != "Monitoring"){
