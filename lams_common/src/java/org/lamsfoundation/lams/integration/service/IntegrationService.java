@@ -31,7 +31,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,6 +42,7 @@ import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -50,6 +50,9 @@ import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -92,11 +95,30 @@ public class IntegrationService implements IIntegrationService{
 		properties.put("extServerOrgMap.sid", serverMap.getSid());
 		List list = service.findByProperties(ExtCourseClassMap.class, properties);
 		if(list==null || list.size()==0){
-			return createExtCourseClassMap(serverMap, userMap.getUser().getUserId(), extCourseId, countryIsoCode, langIsoCode);
+			return createExtCourseClassMap(serverMap, userMap.getUser(), extCourseId, countryIsoCode, langIsoCode);
 		}else{
-			return (ExtCourseClassMap)list.get(0);
+			ExtCourseClassMap map = (ExtCourseClassMap)list.get(0);
+			User user = userMap.getUser();
+			Organisation org = map.getOrganisation();
+			if(service.getUserOrganisation(user.getUserId(), org.getOrganisationId())==null){
+				addMemberships(user, org);
+			}
+			return map;
 		}
 		
+	}
+	
+	private void addMemberships(User user, Organisation org){
+		UserOrganisation uo = new UserOrganisation(user,org);
+		service.save(uo);
+		Integer[] roles = new Integer[]{Role.ROLE_AUTHOR, Role.ROLE_COURSE_MANAGER, Role.ROLE_LEARNER};
+		for(Integer roleId:roles){
+			UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)service.findById(Role.class,roleId));
+			service.save(uor);
+			uo.addUserOrganisationRole(uor);
+		}
+		user.addUserOrganisation(uo);
+		service.save(user);
 	}
 
 	public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
@@ -111,15 +133,16 @@ public class IntegrationService implements IIntegrationService{
 		}
 	}
 
-	private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, Integer userId, String extCourseId, String countryIsoCode, String langIsoCode) {
+	private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, User user, String extCourseId, String countryIsoCode, String langIsoCode) {
 		Organisation org = new Organisation();
 		org.setName(buildName(serverMap.getPrefix(), extCourseId));
 		org.setCode(extCourseId);
 		org.setParentOrganisation(serverMap.getOrganisation());
-		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.CLASS_TYPE));
+		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
 		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
 		org.setLocale(getLocale(countryIsoCode, langIsoCode));
-		service.saveOrganisation(org, userId);
+		service.saveOrganisation(org, user.getUserId());
+		addMemberships(user,org);
 		ExtCourseClassMap map = new ExtCourseClassMap();
 		map.setCourseid(extCourseId);
 		map.setExtServerOrgMap(serverMap);
@@ -154,6 +177,7 @@ public class IntegrationService implements IIntegrationService{
 		String[] userData = getUserDataFromExtServer(serverMap, extUsername);
 		User user = new User();
 		user.setLogin(buildName(serverMap.getPrefix(),extUsername));
+		user.setPassword(HashUtil.sha1(RandomPasswordGenerator.nextPassword(10)));
 		user.setTitle(userData[0]);
         user.setFirstName(userData[1]);
         user.setLastName(userData[2]);
@@ -243,12 +267,7 @@ public class IntegrationService implements IIntegrationService{
         String serverId = serverMap.getServerid();
         String serverKey = serverMap.getServerkey();
         String plaintext = timestamp.trim().toLowerCase()+extUsername.trim().toLowerCase()+serverId.trim().toLowerCase()+serverKey.trim().toLowerCase();
-        try {
-			return HashUtil.sha1(plaintext);
-		} catch (NoSuchAlgorithmException e) {
-			log.debug(e);
-			throw new RuntimeException(e);
-		}
+		return HashUtil.sha1(plaintext);
 	}
 
 	private String buildName(String prefix, String name){
