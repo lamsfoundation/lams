@@ -88,7 +88,7 @@ INSERT INTO lams_organisation (organisation_id, name, code, description, parent_
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
 	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),1,null,2,1);
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
-	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,2,NOW(),1,50,1,1);
+	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,1,NOW(),1,50,1,1);
 
 
 -- users
