@@ -14,7 +14,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
   USA
 
   http://www.gnu.org/licenses/gpl.txt
@@ -133,6 +133,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
 
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
 		{
@@ -175,7 +177,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	document.McAuthoringForm.dispatch.value=method;
         	document.McAuthoringForm.submit();
         }
-	
+        
+        
+		function showMessage(url) {
+			var area=document.getElementById("messageArea");
+			if(area != null){
+				area.style.width="670px";
+				area.style.height="100%";
+				area.src=url;
+				area.style.display="block";
+			}
+		}
+		function hideMessage(){
+			var area=document.getElementById("messageArea");
+			if(area != null){
+				area.style.width="0px";
+				area.style.height="0px";
+				area.style.display="none";
+			}
+		}
+
 	</script>
 	
 </head>
@@ -198,6 +219,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="dispatch" value="submitQuestions"/>
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
+		<html:hidden property="contentFolderID"/>												
 		
 		<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->
