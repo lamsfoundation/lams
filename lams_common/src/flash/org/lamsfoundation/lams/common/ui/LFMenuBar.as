@@ -234,9 +234,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		/*=================
             HELP MENU
         =================*/
-        help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
+        //help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
         //help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpItem"});
-		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
+		//help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
         //set up listeners
         // register the listeners with the separate menus
