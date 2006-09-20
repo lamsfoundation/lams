@@ -52,3 +52,11 @@
 	</servlet-class>
 	<load-on-startup>100</load-on-startup>
 </servlet>
+
+<servlet>
+	<servlet-name>LoginRequest</servlet-name>
+	<display-name>LoginRequest Servlet For Integration</display-name>
+	<servlet-class>
+		org.lamsfoundation.lams.web.LoginRequestServlet
+	</servlet-class>
+</servlet>

@@ -23,3 +23,7 @@
 	<url-pattern>/services/*</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+	<servlet-name>LoginRequest</servlet-name>
+	<url-pattern>/LoginRequest</url-pattern>
+</servlet-mapping>
