@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="header-no-tabs-learner"></div>
 	
 	<div id="content-learner">
-		<lams:DefineLater/>		
+		<lams:DefineLater defineLaterMessageKey="error.defineLater"/>		
 	</div>
 	
 	<div id="footer-learner"></div>
