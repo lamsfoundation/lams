@@ -20,7 +20,7 @@
 	<tr>
 		<td>
 			<p>
-				<c:out value="${nbEntry}" escapeXml="false" />
+				<lams:out value="${nbEntry}" />
 			</p>
 		</td>
 	</tr>

@@ -34,7 +34,7 @@
 			<c:if test="${learner}">
 				<h2><fmt:message key="titleHeading.reflection" /></h2>
 				<logic:empty name="nbEntry"><p><fmt:message key="message.no.reflection" /></p></logic:empty>
-				<p><c:out value="${nbEntry}" /></p>
+				<p><lams:out value="${nbEntry}" /></p>
 			</c:if>
 			<logic:empty name="learner">
 				<h2><fmt:message key="titleHeading.reflections" /></h2>
@@ -47,7 +47,7 @@
 					<c:forEach var="reflection" items="${reflections}">
 						<tr>
 							<td><c:out value="${reflection.fullName}" /></td>
-							<td><c:out value="${reflection.entry}" /></td>
+							<td><lams:out value="${reflection.entry}" /></td>
 						</tr>
 					</c:forEach>
 				</table>

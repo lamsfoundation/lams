@@ -9,7 +9,7 @@
 		<table>
 			<tr>
 				<td>
-					<c:out value="${reflectInstructions}" escapeXml="false" />				
+					<lams:out value="${reflectInstructions}" />				
 				</td>
 			</tr>
 
