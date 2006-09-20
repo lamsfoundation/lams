@@ -51,6 +51,14 @@
         column="session_status"
         length="100"
     />
+
+    <property
+        name="session_name"
+        type="java.lang.String"
+        access="property"
+        column="session_name"
+        length="100"
+    />
     
     <property
         name="qaContentId"

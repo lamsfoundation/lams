@@ -40,6 +40,14 @@
         length="10"
     >
     </property>
+    
+   <property
+        name="visible"
+        type="boolean"
+        access="property"
+        column="visible"
+        length="1"        
+   />
 
     <property
         name="timezone"
