@@ -13,7 +13,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
   USA
 
   http://www.gnu.org/licenses/gpl.txt
@@ -42,7 +42,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="activity.title" /></title>
 
 	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 	
 	 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
@@ -79,6 +80,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
+		
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
+        
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
@@ -108,8 +113,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		            else
 		                selectTab(1); //select the default tab;
 		
-		            initEditor("richTextTitle");
-		            initEditor("richTextInstructions");
+		            //initEditor("richTextTitle");
+		            //initEditor("richTextInstructions");
 		        }     
 		</c:if> 
 
@@ -124,8 +129,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		            else
 		                selectTab(1); //select the default tab;
 		
-		            initEditor("richTextIncorrectFeedback");                                                
-		            initEditor("richTextCorrectFeedback");                                                            		            
+		            //initEditor("richTextIncorrectFeedback");                                                
+		            //initEditor("richTextCorrectFeedback");                                                            		            
 		        }     
 		</c:if> 
 
