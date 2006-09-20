@@ -60,11 +60,13 @@
     <set
         name="userOrganisationRoles"
         inverse="true"
+        lazy = "false"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
             inverse="true"
+            lazy = "false"
             cascade="all-delete-orphan"
 
            @hibernate.collection-key
@@ -73,8 +75,6 @@
            @hibernate.collection-one-to-many
             class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
         </meta>
-        
-        <cache usage="transactional" />
         
         <key>
             <column name="user_organisation_id" />
@@ -88,11 +88,13 @@
         name="organisation"
         class="org.lamsfoundation.lams.usermanagement.Organisation"
         not-null="true"
+        lazy="false"
     >
         <meta attribute="use-in-equals">true</meta>
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
+	        lazy="false"
            @hibernate.column name="organisation_id"         
         </meta>
         <column name="organisation_id" />

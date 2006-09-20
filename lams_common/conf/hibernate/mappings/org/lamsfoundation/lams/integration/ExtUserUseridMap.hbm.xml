@@ -60,10 +60,12 @@
         name="user"
         class="org.lamsfoundation.lams.usermanagement.User"
         not-null="true"
+        lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
+           	lazy="false"
            @hibernate.column name="user_id"         
         </meta>
         <column name="user_id" />

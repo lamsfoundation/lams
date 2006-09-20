@@ -80,13 +80,13 @@
     <!-- bi-directional one-to-many association to WorkspaceFolder -->
     <set
         name="childWorkspaceFolders"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="none"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="true"
+            lazy="false"
             inverse="true"
             cascade="none"
 
