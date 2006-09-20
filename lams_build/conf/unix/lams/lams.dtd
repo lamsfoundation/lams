@@ -27,16 +27,12 @@
 <!ELEMENT ServerLanguage (#PCDATA)>
 <!ELEMENT ServerPageDirection (#PCDATA)>
 <!ELEMENT DictionaryDateCreated (#PCDATA) >
-<!ELEMENT language (#PCDATA)>
-<!ELEMENT createDate (#PCDATA)>
 <!ELEMENT XmppDomain (#PCDATA)>
 <!ELEMENT XmppConference (#PCDATA)>
 <!ELEMENT XmppAdmin (#PCDATA)>
 <!ELEMENT XmppPassword (#PCDATA)>
 <!ELEMENT DefaultFlashTheme (#PCDATA)>
 <!ELEMENT DefaultHTMLTheme (#PCDATA)>
-
-
 
 
 

@@ -2,7 +2,7 @@
 <!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///usr/local/lamsconf/lams.dtd">
 <Lams>
 	<ServerURL>http://shaun.melcoe.mq.edu.au/lams/</ServerURL>
-	<Version>2.0</Version>
+	<Version>2.0 RC1</Version>
 	<LamsHome>/var/opt/lams</LamsHome>
 	<TempDir>/var/opt/lams/temp</TempDir>
 	<DumpDir>/var/opt/lams/dump</DumpDir>
