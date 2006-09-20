@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
@@ -84,6 +85,11 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String statsMonitoring;
 
 	protected String edit;
+	private String contentFolderID;
+	private String addSingleQuestion;
+	private String editableQuestionIndex;
+	private String feedback;
+	private String editQuestionBoxRequest;
 	
 	protected String defineLaterInEditMode;
 	protected String defaultContentIdStr;
@@ -674,5 +680,68 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
+    }
+    
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+    /**
+     * @return Returns the addSingleQuestion.
+     */
+    public String getAddSingleQuestion() {
+        return addSingleQuestion;
+    }
+    /**
+     * @param addSingleQuestion The addSingleQuestion to set.
+     */
+    public void setAddSingleQuestion(String addSingleQuestion) {
+        this.addSingleQuestion = addSingleQuestion;
+    }
+    /**
+     * @return Returns the editableQuestionIndex.
+     */
+    public String getEditableQuestionIndex() {
+        return editableQuestionIndex;
+    }
+    /**
+     * @param editableQuestionIndex The editableQuestionIndex to set.
+     */
+    public void setEditableQuestionIndex(String editableQuestionIndex) {
+        this.editableQuestionIndex = editableQuestionIndex;
+    }
+    
+    /**
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+    /**
+     * @param feedback The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+    
+    /**
+     * @return Returns the editQuestionBoxRequest.
+     */
+    public String getEditQuestionBoxRequest() {
+        return editQuestionBoxRequest;
+    }
+    /**
+     * @param editQuestionBoxRequest The editQuestionBoxRequest to set.
+     */
+    public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
+        this.editQuestionBoxRequest = editQuestionBoxRequest;
     }
 }

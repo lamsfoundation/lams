@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,9 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
+
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
@@ -148,6 +150,8 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 			List list = getSession().createQuery(strGetUser)
 				.list();
 			logger.debug("strGetUser: " + strGetUser);
+			logger.debug("qa: " + qa);
+			logger.debug("list: " + list);
 			
 			int totalUserCount=0;
 			if(list != null && list.size() > 0){

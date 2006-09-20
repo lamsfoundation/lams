@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.qa;
 
@@ -60,6 +61,8 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     /** nullable persistent field */
     private int displayOrder;
     
+    private String feedback;
+    
     /** nullable persistent field */
     private org.lamsfoundation.lams.tool.qa.QaContent qaContent;
     
@@ -87,7 +90,7 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     	logger.debug(logger + " " + this.getClass().getName() +  "in constructor: QaQueContent()");	
     }
     
-    /** full constructor */
+    
     public QaQueContent(String question, 
     					int displayOrder, 
 						org.lamsfoundation.lams.tool.qa.QaContent qaContent,
@@ -103,13 +106,30 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     
     public QaQueContent(String question, 
 			int displayOrder, 
+			String feedback,
+			org.lamsfoundation.lams.tool.qa.QaContent qaContent,
 			Set qaQueUsers,
 			Set qaUsrResps)  
-{
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.qaQueUsers=qaQueUsers;
-	this.qaUsrResps=qaUsrResps;
+	{
+		this.question = question;
+		this.displayOrder = displayOrder;
+		this.feedback = feedback;
+		this.qaContent = qaContent;
+		this.qaQueUsers=qaQueUsers;
+		this.qaUsrResps=qaUsrResps;
+	}
+
+    
+    
+    public QaQueContent(String question, 
+			int displayOrder, 
+			Set qaQueUsers,
+			Set qaUsrResps)  
+    {
+		this.question = question;
+		this.displayOrder = displayOrder;
+		this.qaQueUsers=qaQueUsers;
+		this.qaUsrResps=qaUsrResps;
 	}
     
     
@@ -122,12 +142,7 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     }
     
     
-    /**
-     * Copy constructor
-     * @param queContent the original qa question content
-     * @return the new qa question content object
-     */
-    //part of the contract: make sure that this works!
+    /*
     public static QaQueContent newInstance(QaQueContent queContent,
     										QaContent newQaContent,
     										QaQueContent parentQuestion)
@@ -140,6 +155,22 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     	logger.debug(logger + " " + "QaQueContent" +  " " + "returning newQueContent: " + newQueContent);
     	return newQueContent;
     }
+    
+    */
+    public static QaQueContent newInstance(QaQueContent queContent,
+			QaContent newQaContent,
+			QaQueContent parentQuestion)
+    {
+		QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(),
+							  queContent.getDisplayOrder(),
+							  queContent.getFeedback(),
+							  newQaContent,
+		                      new TreeSet(),
+		                      new TreeSet());
+		logger.debug(logger + " " + "QaQueContent" +  " " + "returning newQueContent: " + newQueContent);
+		return newQueContent;
+	}
+
     
     
     public String toString() {
@@ -360,4 +391,23 @@ public class QaQueContent implements Serializable,Comparable, Nullable
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
+    
+    /**
+     * @param isOptional The isOptional to set.
+     */
+    public void setOptional(boolean isOptional) {
+        this.isOptional = isOptional;
+    }
+    /**
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+    /**
+     * @param feedback The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
 }

@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 
 /**
  * @author Ozgur Demirtas
@@ -153,9 +154,11 @@ import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -178,9 +181,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    logger.debug("init authoring mode.");
 		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 		logger.debug("qaAuthoringForm: " + qaAuthoringForm);
-
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		qaAuthoringForm.setContentFolderID(contentFolderID);
+	
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
-
+		qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+		
 		Map mapQuestionContent= new TreeMap(new QaComparator());
 		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		
@@ -300,8 +308,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    if ((strToolContentID == null) || (strToolContentID.equals(""))) 
 	    {
 	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	//persistError(request,"error.contentId.required");
-			logger.debug("forwarding to: " + ERROR_LIST);
+	    	logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -349,15 +356,20 @@ public class QaStarterAction extends Action implements QaAppConstants {
         	logger.debug("post retrive content :" + sessionMap);        	
         }
 		
+		logger.debug("qaGeneralAuthoringDTO.getOnlineInstructions() :" + qaGeneralAuthoringDTO.getOnlineInstructions());
+		logger.debug("qaGeneralAuthoringDTO.getOfflineInstructions():" + qaGeneralAuthoringDTO.getOfflineInstructions());
+		
 	    if ((qaGeneralAuthoringDTO.getOnlineInstructions() == null) || (qaGeneralAuthoringDTO.getOnlineInstructions().length() == 0))
 	    {
 	        qaGeneralAuthoringDTO.setOnlineInstructions(DEFAULT_ONLINE_INST);
+	        qaAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
 		    sessionMap.put(ONLINE_INSTRUCTIONS_KEY, DEFAULT_ONLINE_INST);
 	    }
 	        
 	    if ((qaGeneralAuthoringDTO.getOfflineInstructions() == null) || (qaGeneralAuthoringDTO.getOfflineInstructions().length() == 0))
 	    {
 	        qaGeneralAuthoringDTO.setOfflineInstructions(DEFAULT_OFFLINE_INST);
+	        qaAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
 	        sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, DEFAULT_OFFLINE_INST);
 	    }
 
@@ -370,6 +382,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		Map mapQuestionContentLocal=qaGeneralAuthoringDTO.getMapQuestionContent(); 
 		logger.debug("mapQuestionContentLocal: " + mapQuestionContentLocal);
 		
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		sessionMap.put(MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
 		
 		logger.debug("persisting sessionMap into session: " + sessionMap);
@@ -409,19 +422,16 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		QaUtils.populateAuthoringDTO(request, qaContent, qaGeneralAuthoringDTO);
 		
-	    //qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
 	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?"1":"0");
-	    
-	    //qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
 	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?"1":"0");	    
-	    
-	    //qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
 	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?"1":"0");
+	    qaGeneralAuthoringDTO.setReflect(qaContent.isReflect()?"1":"0");
 	    
 	    logger.debug("QaContent isReflect: " + qaContent.isReflect());
 	    qaAuthoringForm.setReflect(qaContent.isReflect()?"1":"0");
 	    
 	    qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
+	    qaGeneralAuthoringDTO.setReflectionSubject(qaContent.getReflectionSubject());
 	    
         List attachmentList = qaService.retrieveQaUploadedFiles(qaContent); 
         qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
@@ -436,25 +446,31 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		if (qaContent.getTitle() == null)
 		{
 			qaGeneralAuthoringDTO.setActivityTitle(DEFAULT_QA_TITLE);
+			qaAuthoringForm.setTitle(DEFAULT_QA_TITLE);
 		}
 		else
 		{
 			qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+			qaAuthoringForm.setTitle(qaContent.getTitle());
 		}
 
 		
 		if (qaContent.getInstructions() == null)
 		{
 		    qaGeneralAuthoringDTO.setActivityInstructions(DEFAULT_QA_INSTRUCTIONS);
+		    qaAuthoringForm.setInstructions(DEFAULT_QA_INSTRUCTIONS);
 		}
 		else
 		{
 			qaGeneralAuthoringDTO.setActivityInstructions( qaContent.getInstructions());
+			qaAuthoringForm.setInstructions(qaContent.getInstructions());
 		}
 		
 		sessionMap.put(ACTIVITY_TITLE_KEY, qaGeneralAuthoringDTO.getActivityTitle());
 	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaGeneralAuthoringDTO.getActivityInstructions());
 
+	    
+	    List listQuestionContentDTO= new  LinkedList();
 		
 	    /*
 		 * get the existing question content
@@ -466,11 +482,21 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		while (queIterator.hasNext())
 		{
+		    QaQuestionContentDTO qaQuestionContentDTO=new QaQuestionContentDTO();
+		    
 			QaQueContent qaQueContent=(QaQueContent) queIterator.next();
 			if (qaQueContent != null)
 			{
 				logger.debug("question: " + qaQueContent.getQuestion());
-	    		mapQuestionContent.put(mapIndex.toString(),qaQueContent.getQuestion());
+				logger.debug("displayorder: " + new Integer(qaQueContent.getDisplayOrder()).toString());
+				logger.debug("feedback: " + qaQueContent.getFeedback());
+	    		
+				mapQuestionContent.put(mapIndex.toString(),qaQueContent.getQuestion());
+				
+	    		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
+	    		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
+	    		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
+	    		listQuestionContentDTO.add(qaQuestionContentDTO);
 	    		/**
 	    		 * make the first entry the default(first) one for jsp
 	    		 */
@@ -480,6 +506,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			}
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
+		
+		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(mapQuestionContent.size()));
+		
+		
+		logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
+		sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 		
 		
 		if (isDefaultContent)
@@ -492,6 +525,19 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		logger.debug("mapQuestionContent is:" + mapQuestionContent);
 		qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
 
+		
+		logger.debug("qaContent.getOnlineInstructions():" + qaContent.getOnlineInstructions());
+		logger.debug("qaContent.getOfflineInstructions():" + qaContent.getOfflineInstructions());
+		qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
+		qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
+		
+		qaAuthoringForm.setOnlineInstructions(qaContent.getOnlineInstructions());
+		qaAuthoringForm.setOfflineInstructions(qaContent.getOfflineInstructions());
+		sessionMap.put(ONLINE_INSTRUCTIONS_KEY, qaContent.getOnlineInstructions());
+		sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, qaContent.getOfflineInstructions());
+	    
+		logger.debug("ACTIVITY_TITLE_KEY set to:" +  sessionMap.get(ACTIVITY_TITLE_KEY ));
+		
 		qaAuthoringForm.resetUserAction();
 		logger.debug("returning qaContent:" + qaContent);
 		return qaContent;
@@ -525,7 +571,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			{
 				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("default content id has not been setup");
-				//persistError(request,"error.defaultContent.notSetup");
 				return (mapping.findForward(ERROR_LIST));	
 			}
 		}

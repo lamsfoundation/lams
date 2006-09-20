@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.qa;
 
@@ -67,15 +68,16 @@ public abstract class QaUtils implements QaAppConstants {
         qaGeneralAuthoringDTO.setActivityTitle(defaultQaContent.getTitle());
 		qaGeneralAuthoringDTO.setActivityInstructions(defaultQaContent.getInstructions());
 		
-	    qaGeneralAuthoringDTO.setReportTitle(defaultQaContent.getReportTitle());
-	    qaGeneralAuthoringDTO.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
 	    qaGeneralAuthoringDTO.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
 	    qaGeneralAuthoringDTO.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
 		
          /* set the status of radio boxes */
+	    /*
 	    qaGeneralAuthoringDTO.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
 	    qaGeneralAuthoringDTO.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
 	    qaGeneralAuthoringDTO.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
+	    qaGeneralAuthoringDTO.setReflect(defaultQaContent.isReflect()?ON:OFF);
+	    */
 	}
     
     
@@ -88,88 +90,13 @@ public abstract class QaUtils implements QaAppConstants {
         return newText;
     }
     
-
-    
-    public static QaGeneralAuthoringDTO buildGeneralAuthoringDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent, 
-            QaAuthoringForm  qaAuthoringForm)
-	{
-        logger.debug("start buildGeneralAuthoringDTO: " + qaContent);
-        QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
         
-        qaGeneralAuthoringDTO.setToolContentID(qaContent.getQaContentId().toString());
-        qaAuthoringForm.setToolContentID(qaContent.getQaContentId().toString());
-
-	    Map mapQuestionContent= new TreeMap(new QaComparator());
-		Iterator queIterator=qaContent.getQaQueContents().iterator();
-		Long mapIndex=new Long(1);
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
-		while (queIterator.hasNext())
-		{
-			QaQueContent qaQueContent=(QaQueContent) queIterator.next();
-			if (qaQueContent != null)
-			{
-				logger.debug("question: " + qaQueContent.getQuestion());
-	    		mapQuestionContent.put(mapIndex.toString(),qaQueContent.getQuestion());
-
-	    		mapIndex=new Long(mapIndex.longValue()+1);
-			}
-		}
-
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
-		qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-		qaAuthoringForm.setMapQuestionContent(mapQuestionContent);
-	    
-		long defaultContentID=0;
-		logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
-        defaultContentID=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-		logger.debug("retrieved tool default contentId: " + defaultContentID);
-		
-		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
-		
-		if (qaContent.getTitle() == null)
-		{
-			qaGeneralAuthoringDTO.setActivityTitle("Q&A Title");
-		}
-		else
-		{
-			qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
-		}
-
-		if (qaContent.getInstructions() == null)
-		{
-		    qaGeneralAuthoringDTO.setActivityInstructions("Q&A Instructions");
-		}
-		else
-		{
-		    qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
-		}
-		
-		
-		qaGeneralAuthoringDTO.setReportTitle(qaContent.getReportTitle());
-	    qaGeneralAuthoringDTO.setMonitoringReportTitle(qaContent.getMonitoringReportTitle());
-	    qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	    qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-	    
-	    qaGeneralAuthoringDTO.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
-	    qaGeneralAuthoringDTO.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
-	    qaGeneralAuthoringDTO.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
-
-	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?ON:OFF);
-	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?ON:OFF);
-	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?ON:OFF);
-	    
-        
-	    logger.debug("ending buildGeneralAuthoringDTO with qaGeneralAuthoringDTO : " + qaGeneralAuthoringDTO);
-	    logger.debug("ending buildGeneralAuthoringDTO with qaAuthoringForm: " + qaAuthoringForm);
-	    return qaGeneralAuthoringDTO;
-	}
     
-    
-    public static void setFormProperties(HttpServletRequest request, IQaService qaService, QaContent qaContent, 
+    public static void setFormProperties(HttpServletRequest request, IQaService qaService,  
             QaAuthoringForm  qaAuthoringForm, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, String strToolContentID, String defaultContentIdStr, 
             String activeModule, SessionMap sessionMap, String httpSessionID)
     {
-    	logger.debug("starting setFormProperties: " + qaContent);
+    	logger.debug("setFormProperties: ");
     	logger.debug("using strToolContentID: " + strToolContentID);
     	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
     	logger.debug("using activeModule: " + activeModule);
@@ -201,22 +128,6 @@ public abstract class QaUtils implements QaAppConstants {
 		qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
 		qaGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
 		
-		String reportTitle=request.getParameter(REPORT_TITLE);
-		logger.debug("reportTitle: " + reportTitle);
-		qaAuthoringForm.setReportTitle(reportTitle);
-		qaGeneralAuthoringDTO.setReportTitle(reportTitle);
-		
-		String monitoringReportTitle=request.getParameter(MONITORING_REPORT_TITLE);
-		logger.debug("monitoringReportTitle: " + monitoringReportTitle);
-		qaAuthoringForm.setMonitoringReportTitle(monitoringReportTitle);
-		qaGeneralAuthoringDTO.setMonitoringReportTitle(monitoringReportTitle);
-		
-		String endLearningMessage=request.getParameter(END_LEARNING_MESSSAGE);
-		logger.debug("endLearningMessage: " + endLearningMessage);
-		qaAuthoringForm.setEndLearningMessage(endLearningMessage);
-		qaGeneralAuthoringDTO.setEndLearningMessage(endLearningMessage);
-		
-		
 		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
 		logger.debug("offlineInstructions: " + offlineInstructions);
 		qaAuthoringForm.setOfflineInstructions(offlineInstructions);
@@ -227,10 +138,24 @@ public abstract class QaUtils implements QaAppConstants {
 		qaAuthoringForm.setOnlineInstructions(onlineInstructions);
 		qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
+		/*
 		String defineLaterInEditMode=request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
 		logger.debug("defineLaterInEditMode: " + defineLaterInEditMode);
 		qaAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
 		qaGeneralAuthoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
+		*/
+		
+
+		String reflect=request.getParameter(REFLECT);
+		logger.debug("reflect: " + reflect);
+		qaAuthoringForm.setReflect(reflect);
+		qaGeneralAuthoringDTO.setReflect(reflect);
+		
+
+		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
+		logger.debug("reflectionSubject: " + reflectionSubject);
+		qaAuthoringForm.setReflectionSubject(reflectionSubject);
+		qaGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
 		
 		logger.debug("ending setFormProperties with qaAuthoringForm: " + qaAuthoringForm);
 		logger.debug("ending setFormProperties with qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);

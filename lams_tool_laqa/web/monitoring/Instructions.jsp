@@ -1,9 +1,9 @@
-<%-- 
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
+  it under the terms of the GNU General Public License version 2 as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -13,20 +13,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
+<%@ include file="/common/taglibs.jsp"%>
 
 
 		<table class="forms">
@@ -68,13 +60,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													            	<html:link page="<%=download%>" styleClass="button">
 													                	<bean:message key="link.download" />
 													                </html:link>
-																	&nbsp&nbsp
-													            	<html:link page="/authoring.do?dispatch=deleteFile" 
-													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
-													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
-													                         	target="_self" styleClass="button">
-													                	<bean:message key="link.delete" />
-													                </html:link> 
 													            </td>
 												           	</tr>
 											            </table>
@@ -130,13 +115,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													            	<html:link page="<%=download%>" styleClass="button">
 													                	<bean:message key="link.download" />
 													                </html:link>
-																	&nbsp&nbsp
-													            	<html:link page="/authoring.do?dispatch=deleteFile" 
-													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
-													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
-													                         	target="_self" styleClass="button">
-													                	<bean:message key="link.delete" />
-													                </html:link> 
 													            </td>
 												           	</tr>
 											            </table>

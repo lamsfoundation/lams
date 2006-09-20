@@ -1,10 +1,9 @@
-
-<%-- 
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
+  it under the terms of the GNU General Public License version 2 as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -14,8 +13,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
@@ -42,14 +40,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		pageContext.setAttribute("tabsBasic", tabsBasic);
 	%>
 
-	<html:html locale="true">
+<html:html locale="true">		
 	<head>
 	<title><fmt:message key="activity.title" /></title>
-	
-	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
-	
 
+	<%@ include file="/common/header.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
+
+	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -57,6 +56,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaAuthoringForm.dispatch.value=actionMethod; 
 			document.QaAuthoringForm.submit();
 		}
+		
+		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) 
+		{
+			document.QaAuthoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+
+
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
         
         function init(){
 			if (document.QaAuthoringForm.activeModule.value != 'defineLater')
@@ -69,8 +78,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	            else
 	                selectTab(1); //select the default tab;
 	            
-	            initEditor("onlineInstructions");                                    
-		        initEditor("offlineInstructions");                                    
 			}
 			else
 			{
@@ -82,16 +89,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	            else
 	                selectTab(1); //select the default tab;
 			}
-			
-	            initEditor("title");
-	            initEditor("instructions");
-	            
-	            initEditor("questionContent0");
-	            <c:set var="queIndex" scope="request" value="1"/>
-	            <c:forEach var="questionEntry" items="${qaGeneralAuthoringDTO.mapQuestionContent}">
-	                <c:set var="queIndex" scope="request" value="${queIndex+1}"/>
-	                initEditor("<c:out value="questionContent${queIndex-1}"/>");
-	            </c:forEach>			
+	       
         }     
         
         
@@ -107,10 +105,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	document.QaAuthoringForm.dispatch.value=method;
         	document.QaAuthoringForm.submit();
         }
-	
 	</script>
-	
 </head>
+
+
 <body onLoad="init();">
 
 <div id="page">
@@ -137,6 +135,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="httpSessionID"/>								
 		<html:hidden property="defaultContentIdStr"/>								
 		<html:hidden property="defineLaterInEditMode"/>										
+		<html:hidden property="contentFolderID"/>												
+		
+		<%@ include file="/common/messages.jsp"%>
 		
 		
 		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
@@ -167,10 +168,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</html:form>		
 	</div>
 
-<div id="footer"></div>
-<lams:HTMLEditor />
+	<div id="footer"></div>
 
 </div>
 
+
 </body>
 </html:html>
+
+
+

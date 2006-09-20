@@ -113,7 +113,20 @@
 			path="/authoring/AuthoringTabsHolder.jsp"
 			redirect="false"
 	    />
-	  
+	    
+	    <forward
+			name="newQuestionBox"
+			path="/authoring/newQuestionBox.jsp"
+			redirect="false"
+	    />
+
+	    <forward
+			name="editQuestionBox"
+			path="/authoring/editQuestionBox.jsp"
+			redirect="false"
+	    />
+
+
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
@@ -306,7 +319,7 @@
 		type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
 		name="QaMonitoringForm"
 		scope="request"
-		parameter="method"
+		parameter="dispatch"
 		unknown="false"
 		validate="true">
 		
@@ -334,7 +347,7 @@
 	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
 	      name="QaMonitoringForm"
 	      scope="request"
-	      parameter="method"
+	      parameter="dispatch"
 	      unknown="false"
 	      validate="true">
 	      
@@ -361,6 +374,18 @@
           path="/authoring/AuthoringTabsHolder.jsp"
           redirect="false"
         />
+
+	    <forward
+			name="newQuestionBox"
+			path="/monitoring/newQuestionBox.jsp"
+			redirect="false"
+	    />
+
+	    <forward
+			name="editQuestionBox"
+			path="/monitoring/editQuestionBox.jsp"
+			redirect="false"
+	    />
 	  	
 	    <forward
 	        name="starter"

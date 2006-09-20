@@ -1,3 +1,4 @@
+
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -13,7 +14,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
   USA
 
   http://www.gnu.org/licenses/gpl.txt
@@ -22,11 +23,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp" %>
 
 		<table class="forms">
-          		<tr> 
+
+				<tr>
 					<td NOWRAP colspan=2 valign=top>
-						<lams:SetEditor id="onlineInstructions" text="${qaGeneralAuthoringDTO.onlineInstructions}" small="true" key="label.onlineInstructions.col"/>								
-					</td> 
+						<div class="field-name" style="text-align: left;">
+							<fmt:message key="label.onlineInstructions.col"></fmt:message>
+						</div>
+						<html:textarea property="onlineInstructions" rows="3" cols="80"></html:textarea>
+					</td>
 				</tr>
+				
 				
 				<tr>
 				<td NOWRAP colspan=2 valign=top>
@@ -58,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                	<bean:message key="link.download" />
 													                </html:link>
 																	&nbsp&nbsp
-													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reportTitle=${qaGeneralAuthoringDTO.reportTitle}&monitoringReportTitle=${qaGeneralAuthoringDTO.monitoringReportTitle}&endLearningMessage=${qaGeneralAuthoringDTO.endLearningMessage}"
+													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
 													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
@@ -99,10 +105,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td> 
 				
 				</tr>
-				<tr> 
-					<td colspan=2 NOWRAP> 
-						<lams:SetEditor id="offlineInstructions" text="${qaGeneralAuthoringDTO.offlineInstructions}" small="true" key="label.offlineInstructions.col"/>								
-					</td> 
+
+
+				<tr>
+					<td NOWRAP colspan=2 valign=top>
+						<div class="field-name" style="text-align: left;">
+							<fmt:message key="label.offlineInstructions.col"></fmt:message>
+						</div>
+						<html:textarea property="offlineInstructions" rows="3" cols="80"></html:textarea>
+					</td>
 				</tr>
 
 
@@ -136,7 +147,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                	<bean:message key="link.download" />
 													                </html:link>
 																	&nbsp&nbsp
-													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reportTitle=${qaGeneralAuthoringDTO.reportTitle}&monitoringReportTitle=${qaGeneralAuthoringDTO.monitoringReportTitle}&endLearningMessage=${qaGeneralAuthoringDTO.endLearningMessage}"
+													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
 													            	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">

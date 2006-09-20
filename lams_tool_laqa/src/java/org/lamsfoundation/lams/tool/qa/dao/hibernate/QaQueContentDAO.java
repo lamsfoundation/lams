@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,23 +18,19 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-
 import org.apache.log4j.Logger;
-
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -58,18 +54,6 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	
 	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
 	    {
-	 	    /*
-	 	    logger.debug("running getToolDefaultQuestionContent: "  + qaContentId);
-	        return (QaQueContent) getHibernateTemplate().execute(new HibernateCallback()
-	         {
-	             public Object doInHibernate(Session session) throws HibernateException
-	             {
-	                 return session.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-	                               .setLong("qaContentId", qaContentId)
-	                               .uniqueResult();
-	             }
-	         });
-	         */
 
 	 	    HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)

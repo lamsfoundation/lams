@@ -1,4 +1,4 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
@@ -87,6 +88,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     protected Map mapAnswersPresentable;
     
     protected Map mapQuestions;
+    
+    protected Map mapFeedback;
     
     protected Map mapQuestionContentLearner;
     
@@ -241,6 +244,7 @@ public class GeneralLearnerFlowDTO implements Comparable
             .append("mapQuestionContentLearner: ", mapQuestionContentLearner)            
             .append("listMonitoredAnswersContainerDTO: ", listMonitoredAnswersContainerDTO)            
             .append("currentMonitoredToolSession: ", currentMonitoredToolSession)
+            .append("mapFeedback: ", mapFeedback)
             .toString();
     }
     
@@ -492,5 +496,17 @@ public class GeneralLearnerFlowDTO implements Comparable
      */
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+    /**
+     * @return Returns the mapFeedback.
+     */
+    public Map getMapFeedback() {
+        return mapFeedback;
+    }
+    /**
+     * @param mapFeedback The mapFeedback to set.
+     */
+    public void setMapFeedback(Map mapFeedback) {
+        this.mapFeedback = mapFeedback;
     }
 }

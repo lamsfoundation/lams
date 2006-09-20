@@ -1,9 +1,9 @@
-<%-- 
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
+  it under the terms of the GNU General Public License version 2 as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -13,12 +13,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
@@ -72,7 +70,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 				  <tr><td align=center colspan=2>
 					  	<b> <bean:message key="label.learning.reportMessage"/> </b>
-		    	  	</th>
+		    	  	</td>
 				  </tr>
 
 			
@@ -104,10 +102,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												  <c:out value="${answerEntry.value}" escapeXml="false"/>						  																	
 										  	</td>
 										  </tr>
-										  
 									  	</c:if> 				    
 									</c:forEach>
 									
+
+				  			  		<c:forEach var="feedbackEntry" items="${generalLearnerFlowDTO.mapFeedback}">
+										<c:if test="${feedbackEntry.key == questionEntry.key}"> 						  			  		
+										  <tr>
+											<td colspan=2> <b> <bean:message key="label.feedback"/>:  </b>  
+										  	</td>
+										  </tr>
+										  
+										  <tr>
+											<td colspan=2> 
+												  <c:out value="${feedbackEntry.value}" escapeXml="false"/>						  																	
+										  	</td>
+										  </tr>
+									  	</c:if> 				    
+									</c:forEach>
+									
+									
+							  	  <tr><td> &nbsp </td> </tr>
 							  	  <tr><td> &nbsp </td> </tr>
 							</c:forEach>
 						</table>

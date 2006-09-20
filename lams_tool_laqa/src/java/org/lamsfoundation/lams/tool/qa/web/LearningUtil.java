@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
@@ -101,6 +102,7 @@ public class LearningUtil implements QaAppConstants{
         logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
         
         Map mapQuestions= new TreeMap(new QaComparator());
+        Map mapFeedback= new TreeMap(new QaComparator());
         
     	Iterator contentIterator=qaContent.getQaQueContents().iterator();
     	while (contentIterator.hasNext())
@@ -115,10 +117,14 @@ public class LearningUtil implements QaAppConstants{
     	    		 *  add the question to the questions Map in the displayOrder
     	    		 */
             		mapQuestions.put(new Integer(displayOrder).toString(),qaQueContent.getQuestion());
+            		mapFeedback.put(new Integer(displayOrder).toString(),qaQueContent.getFeedback());
         		}
     		}
     	}
 		
+    	logger.debug("mapFeedback: " + mapFeedback);
+    	
+    	generalLearnerFlowDTO.setMapFeedback(mapFeedback);
     	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
         return generalLearnerFlowDTO;
     }

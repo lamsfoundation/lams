@@ -1,4 +1,4 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -18,7 +18,9 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
+
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
@@ -49,15 +51,14 @@ public class QaGeneralAuthoringDTO implements Comparable
     
     protected String activityTitle;
     protected String activityInstructions;
-    protected String reportTitle;
-    protected String monitoringReportTitle;
-    protected String endLearningMessage;
     protected String onlineInstructions;
     protected String offlineInstructions;
     protected String usernameVisible;
+    protected String reflect;
     protected String synchInMonitor;
     protected String questionsSequenced;
     protected String editActivityEditMode;
+    protected String reflectionSubject;
     
     protected String monitoredContentInUse;
 
@@ -65,16 +66,23 @@ public class QaGeneralAuthoringDTO implements Comparable
     protected String requestedModule;
     protected String isDefineLater;
     protected Map mapQuestionContent;
+
     protected List attachmentList;
     protected List deletedAttachmentList;
     
     protected String sbmtSuccess;
     protected String userExceptionQuestionsDuplicate;
     
+    protected String contentFolderID;
+    protected String editableQuestionText;
+    protected String editableQuestionFeedback;
+    
+    
 
 	public String toString() {
         return new ToStringBuilder(this)
             .append("toolContentID: ", toolContentID)
+            .append("contentFolderID: ", contentFolderID)
             .append("httpSessionID: ", httpSessionID)
             .append("currentTab: ", currentTab)
             .append("activeModule: ", activeModule)
@@ -86,15 +94,14 @@ public class QaGeneralAuthoringDTO implements Comparable
             .append("defaultContentIdStr: ", defaultContentIdStr)
             .append("activityTitle: ", activityTitle)
             .append("activityInstructions: ", activityInstructions)
-            .append("reportTitle: ", reportTitle)
-            .append("monitoringReportTitle: ", monitoringReportTitle)
-            .append("endLearningMessage: ", endLearningMessage)
+            .append("reflect: ", reflect)
             .append("onlineInstructions: ", onlineInstructions)
             .append("offlineInstructions: ", offlineInstructions)
             .append("usernameVisible: ", usernameVisible)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
             .append("editActivityEditMode: ", editActivityEditMode)
+            .append("reflectionSubject: ", reflectionSubject)
             .append("requestedModule: ", requestedModule)
             .append("isDefineLater: ", isDefineLater)
             .append("monitoredContentInUse: ", monitoredContentInUse)
@@ -357,31 +364,6 @@ public class QaGeneralAuthoringDTO implements Comparable
         this.activityTitle = activityTitle;
     }
     /**
-     * @return Returns the endLearningMessage.
-     */
-    public String getEndLearningMessage() {
-        return endLearningMessage;
-    }
-    /**
-     * @param endLearningMessage The endLearningMessage to set.
-     */
-    public void setEndLearningMessage(String endLearningMessage) {
-        this.endLearningMessage = endLearningMessage;
-    }
-
-    /**
-     * @return Returns the monitoringReportTitle.
-     */
-    public String getMonitoringReportTitle() {
-        return monitoringReportTitle;
-    }
-    /**
-     * @param monitoringReportTitle The monitoringReportTitle to set.
-     */
-    public void setMonitoringReportTitle(String monitoringReportTitle) {
-        this.monitoringReportTitle = monitoringReportTitle;
-    }
-    /**
      * @return Returns the offlineInstructions.
      */
     public String getOfflineInstructions() {
@@ -417,18 +399,7 @@ public class QaGeneralAuthoringDTO implements Comparable
     public void setQuestionsSequenced(String questionsSequenced) {
         this.questionsSequenced = questionsSequenced;
     }
-    /**
-     * @return Returns the reportTitle.
-     */
-    public String getReportTitle() {
-        return reportTitle;
-    }
-    /**
-     * @param reportTitle The reportTitle to set.
-     */
-    public void setReportTitle(String reportTitle) {
-        this.reportTitle = reportTitle;
-    }
+ 
     /**
      * @return Returns the synchInMonitor.
      */
@@ -479,4 +450,67 @@ public class QaGeneralAuthoringDTO implements Comparable
         this.sbmtSuccess = sbmtSuccess;
     }
     
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+
+    /**
+     * @return Returns the editableQuestionText.
+     */
+    public String getEditableQuestionText() {
+        return editableQuestionText;
+    }
+    /**
+     * @param editableQuestionText The editableQuestionText to set.
+     */
+    public void setEditableQuestionText(String editableQuestionText) {
+        this.editableQuestionText = editableQuestionText;
+    }
+    
+    /**
+     * @return Returns the editableQuestionFeedback.
+     */
+    public String getEditableQuestionFeedback() {
+        return editableQuestionFeedback;
+    }
+    /**
+     * @param editableQuestionFeedback The editableQuestionFeedback to set.
+     */
+    public void setEditableQuestionFeedback(String editableQuestionFeedback) {
+        this.editableQuestionFeedback = editableQuestionFeedback;
+    }
+    
+    /**
+     * @return Returns the reflect.
+     */
+    public String getReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(String reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
+    }
 }

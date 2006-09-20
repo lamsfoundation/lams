@@ -1,9 +1,9 @@
-<%-- 
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
+  it under the terms of the GNU General Public License version 2 as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -13,8 +13,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
@@ -42,14 +41,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="activity.title" /></title>
 
 	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
 
 		function submitMonitoringMethod(actionMethod) 
 		{
-			document.QaMonitoringForm.method.value=actionMethod; 
+			document.QaMonitoringForm.dispatch.value=actionMethod; 
 			document.QaMonitoringForm.submit();
 		}
 		
@@ -91,6 +91,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaMonitoringForm.currentUid.value=currentUid;
 	        submitMethod(actionMethod);
 		}
+
+		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) 
+		{
+			document.QaMonitoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+
+
+
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
         
         function init(){
         
@@ -101,17 +112,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-                
-
-            initEditor("title");
-            initEditor("instructions");
-            initEditor("questionContent0");
-            
-            <c:set var="queIndex" scope="request" value="1"/>
-            <c:forEach var="questionEntry" items="${requestScope.mapQuestionContent}">
-                <c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-                initEditor("<c:out value="questionContent${queIndex-1}"/>");
-            </c:forEach>
         }     
         
         function doSelectTab(tabId) {
@@ -141,15 +141,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<div id="content">		
 	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="method"/>
+		<html:hidden property="dispatch"/>
 		<html:hidden property="currentUid"/>
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="activeModule"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="editResponse"/>		
 		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="defaultContentIdStr"/>												
-		
+		<html:hidden property="defaultContentIdStr"/>						
+		<html:hidden property="contentFolderID"/>						
+
 		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
@@ -158,9 +159,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>	
 	
 	<div id="footer"></div>
-		<lams:HTMLEditor />
-	</div>
 
+	</div>
 	
 </body>
 </html:html>

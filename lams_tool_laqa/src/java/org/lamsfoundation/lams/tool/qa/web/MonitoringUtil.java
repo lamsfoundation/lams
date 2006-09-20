@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
@@ -31,6 +32,8 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaMonitoredAnswersDTO;
@@ -38,6 +41,7 @@ import org.lamsfoundation.lams.tool.qa.QaMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaStatsDTO;
 import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
@@ -597,6 +601,101 @@ public class MonitoringUtil implements QaAppConstants{
 		}
 		return map;
 	}
+	
+	
+	
+	public static boolean notebookEntriesExist(IQaService qaService, QaContent qaContent)
+	{
+		logger.debug("finding out about content level notebook entries: " + qaContent);
+		Iterator iteratorSession= qaContent.getQaSessions().iterator();
+		while (iteratorSession.hasNext())
+		{
+		    QaSession qaSession=(QaSession) iteratorSession.next();
+		    logger.debug("qaSession: " + qaSession);
+		    
+		    if (qaSession != null)
+		    {
+			    logger.debug("qaSession id: " + qaSession.getQaSessionId());
+			    
+			    Iterator iteratorUser=qaSession.getQaQueUsers().iterator();
+			    while (iteratorUser.hasNext())
+				{
+			        QaQueUsr qaQueUsr=(QaQueUsr) iteratorUser.next();
+			        logger.debug("qaQueUsr: " + qaQueUsr);
+			        
+			        if (qaQueUsr != null)
+			        {
+				        logger.debug("qaQueUsr id: " + qaQueUsr.getQueUsrId());
+				        
+						logger.debug("attempt getting notebookEntry: ");
+						NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
+								CoreNotebookConstants.NOTEBOOK_TOOL,
+								MY_SIGNATURE, new Integer(qaQueUsr.getQueUsrId().intValue()));
+						
+				        logger.debug("notebookEntry: " + notebookEntry);			 
+						if (notebookEntry != null)
+						{
+						    logger.debug("found at least one notebookEntry: " + notebookEntry.getEntry());
+						    return true;
+						}
+						    
+			        }
+				}		        
+		    }
+		}
+		return false;
+	}
+	
+	
+	public static void buildQaStatsDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent)
+	{
+		logger.debug("building qaStatsDTO: " + qaContent);
+		QaStatsDTO qaStatsDTO= new QaStatsDTO();
+		
+		int countSessionComplete=0;
+		int countAllUsers=0;
+		logger.debug("finding out about content level notebook entries: " + qaContent);
+		Iterator iteratorSession= qaContent.getQaSessions().iterator();
+		while (iteratorSession.hasNext())
+		{
+		    QaSession qaSession=(QaSession) iteratorSession.next();
+		    logger.debug("qaSession: " + qaSession);
+		    
+		    if (qaSession != null)
+		    {
+			    logger.debug("qaSession id: " + qaSession.getQaSessionId());
+			    
+			    if (qaSession.getSession_status().equals(COMPLETED))
+			    {
+			        ++countSessionComplete;
+			    }
+			        
+			    Iterator iteratorUser=qaSession.getQaQueUsers().iterator();
+			    while (iteratorUser.hasNext())
+				{
+			        QaQueUsr qaQueUsr=(QaQueUsr) iteratorUser.next();
+			        logger.debug("qaQueUsr: " + qaQueUsr);
+			        
+			        if (qaQueUsr != null)
+			        {
+				        logger.debug("qaQueUsr foundid");
+				        ++countAllUsers;
+			        }
+				}		        
+		    }
+		}
+		logger.debug("countAllUsers: " + countAllUsers);
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		
+		
+		qaStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
+		qaStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
+		
+		logger.debug("qaStatsDTO: " + qaStatsDTO);
+
+		request.setAttribute(QA_STATS_DTO, qaStatsDTO);
+	}
+	
 }
 
 

@@ -1,4 +1,4 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -18,7 +18,8 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
@@ -61,6 +62,8 @@ public class GeneralMonitoringDTO implements Comparable
 
     protected List attachmentList;
     protected List deletedAttachmentList;
+    
+    protected String contentFolderID;
     
 	
 	public String toString() {
@@ -288,5 +291,17 @@ public class GeneralMonitoringDTO implements Comparable
      */
     public void setActivityTitle(String activityTitle) {
         this.activityTitle = activityTitle;
+    }
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
     }
 }

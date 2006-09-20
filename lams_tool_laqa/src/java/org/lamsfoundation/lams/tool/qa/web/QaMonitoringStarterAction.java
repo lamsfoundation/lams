@@ -4,8 +4,8 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,9 +27,8 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,12 +47,13 @@ import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
-import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -103,6 +103,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		logger.debug("qaService: " + qaService);
 		qaMonitoringForm.setQaService(qaService);
 		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		qaMonitoringForm.setContentFolderID(contentFolderID);
+
+		
 		
 	    ActionForward validateParameters=validateParameters(request, mapping, qaMonitoringForm);
 	    logger.debug("validateParamaters: " + validateParameters);
@@ -122,6 +127,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		logger.debug("setting current tab to 1: ");
 		
 		generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+		generalMonitoringDTO.setContentFolderID(contentFolderID);
+		
 		
 		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 		logger.debug("calling initSummaryContent.");
@@ -137,36 +144,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    
 	    QaContent qaContent=qaService.loadQa(new Long(toolContentID).longValue());
 		logger.debug("existing qaContent:" + qaContent);
-		
-		Map mapQuestionContent= new TreeMap(new QaComparator());
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
-	    /*
-		 * get the existing question content
-		 */
-		logger.debug("setting existing content data from the db");
-		mapQuestionContent.clear();
-		Iterator queIterator=qaContent.getQaQueContents().iterator();
-		Long mapIndex=new Long(1);
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
-		while (queIterator.hasNext())
-		{
-			QaQueContent qaQueContent=(QaQueContent) queIterator.next();
-			if (qaQueContent != null)
-			{
-				logger.debug("question: " + qaQueContent.getQuestion());
-	    		mapQuestionContent.put(mapIndex.toString(),qaQueContent.getQuestion());
-	    		/**
-	    		 * make the first entry the default(first) one for jsp
-	    		 */
-	    		if (mapIndex.longValue() == 1)
-	    		    generalMonitoringDTO.setDefaultQuestionContent(qaQueContent.getQuestion());
-	    		mapIndex=new Long(mapIndex.longValue()+1);
-			}
-		}
-		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
-		logger.debug("callling presentInitialUserInterface for the existing content.");
-		
-		generalMonitoringDTO.setMapQuestionContent(mapQuestionContent);
 		
 		/*true means there is at least 1 response*/
 		if (qaService.studentActivityOccurredGlobal(qaContent))
@@ -190,16 +167,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
 		generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 		
-	    if ((generalMonitoringDTO.getOnlineInstructions() == null) || (generalMonitoringDTO.getOnlineInstructions().length() == 0))
-	    {
-	        generalMonitoringDTO.setOnlineInstructions(DEFAULT_ONLINE_INST);
-	    }
-	        
-	    if ((generalMonitoringDTO.getOfflineInstructions() == null) || (generalMonitoringDTO.getOfflineInstructions().length() == 0))
-	    {
-	        generalMonitoringDTO.setOfflineInstructions(DEFAULT_OFFLINE_INST);
-	    }
-
         List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
         logger.debug("attachmentList: " + attachmentList);
         generalMonitoringDTO.setAttachmentList(attachmentList);
@@ -225,18 +192,59 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		
 		/*for Edit Activity screen, BasicTab-ViewOnly*/
-		qaMonitoringAction.preparEditActivityScreenData(request, qaContent);
+		qaMonitoringAction.prepareEditActivityScreenData(request, qaContent);
 		
 		
 		
 		SessionMap sessionMap = new SessionMap();
 	    sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
 	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
-	    sessionMap.put(MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
-	    
+	    	    
 	    qaMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
 	    
+	    List listQuestionContentDTO= new  LinkedList();
+
+		Iterator queIterator=qaContent.getQaQueContents().iterator();
+		while (queIterator.hasNext())
+		{
+		    QaQuestionContentDTO qaQuestionContentDTO=new QaQuestionContentDTO();
+		    
+			QaQueContent qaQueContent=(QaQueContent) queIterator.next();
+			if (qaQueContent != null)
+			{
+				logger.debug("question: " + qaQueContent.getQuestion());
+				logger.debug("displayorder: " + new Integer(qaQueContent.getDisplayOrder()).toString());
+				logger.debug("feedback: " + qaQueContent.getFeedback());
+	    		
+	    		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
+	    		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
+	    		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
+	    		listQuestionContentDTO.add(qaQuestionContentDTO);
+			}
+		}
+		logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
+		sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+		
+		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+		
+		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(qaService, qaContent);
+		logger.debug("notebookEntriesExist : " + notebookEntriesExist);
+		
+		if (notebookEntriesExist)
+		{
+		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		}
+		else
+		{
+		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
+		    
+		}
+		
+		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
+		
 		
 		logger.debug("fwding to : " + LOAD_MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	

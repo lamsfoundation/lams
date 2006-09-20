@@ -1,11 +1,11 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,9 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
+
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
@@ -40,6 +42,8 @@ public interface QaAppConstants {
 	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
 	public static final String ACTIVITY_TITLE_KEY						= "activityTitleKey";
 	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
+	public static final String LIST_QUESTION_CONTENT_DTO				= "listQuestionContentDTO";
+	public static final String LIST_QUESTION_CONTENT_DTO_KEY			= "listQuestionContentDTOKey";
 
 	public static final String TARGET_MODE								="targetMode";
 	public static final String TARGET_MODE_AUTHORING					="Authoring";
@@ -78,6 +82,8 @@ public interface QaAppConstants {
 	public static final String ENTRY_TEXT								="entryText";
 	public static final String REFLECTIONS_CONTAINER_DTO				="reflectionsContainerDTO";
 	public static final String LEARNER_NOTEBOOK							="learnerNotebook";
+	public static final String NOTEBOOK_ENTRIES_EXIST					="notebookEntriesExist";
+	public static final String QA_STATS_DTO								="qaStatsDTO";
 	
 	public static final String ACTIVE_MODULE							="activeModule";
 	public static final String AUTHORING								="authoring";
