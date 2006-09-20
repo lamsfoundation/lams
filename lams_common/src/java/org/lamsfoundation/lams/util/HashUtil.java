@@ -40,14 +40,22 @@ import org.apache.commons.codec.binary.Hex;
  */
 public class HashUtil {
 
-    public static String sha1(String plaintext) throws NoSuchAlgorithmException{
-        MessageDigest md = MessageDigest.getInstance("SHA1");
-        return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+    public static String sha1(String plaintext){
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA1");
+	        return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
     }
 
-    public static String md5(String plaintext) throws NoSuchAlgorithmException{
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));       
+    public static String md5(String plaintext){
+        try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}       
     }
     
 }

@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.integration.security;
 
-import java.security.NoSuchAlgorithmException;
-
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.util.HashUtil;
 
@@ -59,13 +57,9 @@ public class Authenticator {
 	}
 	
 	private static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
-		try{
 			if(!hashValue.equals(HashUtil.sha1(plaintext))){
 			    throw new AuthenticationException("Authentication failed!");
 			}
-		}catch(NoSuchAlgorithmException e){
-			throw new AuthenticationException("The system does not support the required algorithm to do authentication!");
-		}
 	}
 
 }
