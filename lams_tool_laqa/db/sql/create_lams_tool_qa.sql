@@ -1,3 +1,25 @@
+-- Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+-- =============================================================
+-- License Information: http://lamsfoundation.org/licensing/lams/2.0/
+--
+-- This program is free software; you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License version 2.0 as
+-- published by the Free Software Foundation.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301-- USA
+--
+-- http://www.gnu.org/licenses/gpl.txt
+-- ****************************************************************
+--
+-- $Id$
+
 CREATE TABLE tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , qa_content_id BIGINT(20) NOT NULL
@@ -52,7 +74,8 @@ CREATE TABLE tl_laqa11_que_usr (
 CREATE TABLE tl_laqa11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , question TEXT
-     , display_order INT(5)
+     , feedback TEXT
+     , display_order INT(5) DEFAULT 1
      , qa_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
@@ -95,5 +118,7 @@ INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date
 
 -- data for content questions table
 INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
+
+
 
 
