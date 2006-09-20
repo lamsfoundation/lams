@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -163,6 +163,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -179,6 +180,11 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("init authoring mode. removed attributes...");
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 		
 		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("mcService: " + mcService);
