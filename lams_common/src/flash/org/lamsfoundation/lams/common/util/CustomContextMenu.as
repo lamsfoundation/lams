@@ -20,10 +20,9 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.authoring.*;
-//import org.lamsfoundation.lams.authoring.cv.*
+ 
 import org.lamsfoundation.lams.common.ApplicationParent;
+import org.lamsfoundation.lams.common.util.*
 /**
 * DTO  Generic data transfer obj
 */
@@ -46,7 +45,7 @@ class CustomContextMenu {
     public var removeEventListener:Function;
 	//Constructor
 	
-	private function CustomContextMenu (){
+	public function CustomContextMenu (){
 		
 		
 		//To hide builtin menu for root
@@ -141,49 +140,35 @@ class CustomContextMenu {
 	
 	//---------------------------------
 	
-	private function appReference():Object{
-		switch (app.module){
-			case 'authoring' :
-				return  org.lamsfoundation.lams.authoring.Application(app)
-                break;
-            case 'monitoring' :
-				return  org.lamsfoundation.lams.monitoring.Application(app)
-                break;
-			case 'learner' :
-				return org.lamsfoundation.lams.learner.Application(app)
-				break;
-			default :
-                //styleObj = _tm.getStyleObject('ACTPanel0')
-		}
-		return null;
-	}
-	
 	public function getOpenEditActivityContent(){
 		//appReference().openEditActivtiyContent();
-		org.lamsfoundation.lams.authoring.Application(app).openEditActivtiyContent();
+		org.lamsfoundation.lams.authoring.Application.getInstance().openEditActivtiyContent();
 	}
 	
 	public function getOpenMonitorActivityContent(){
-		//appReference().openMonitorActivityContent();
+		//org.lamsfoundation.lams.monitoring.Application.getInstance().openMonitorActivityContent();
 		
 	}
 	public function getCopy(){
 		//appReference().copy();
-		Application.getInstance().copy();
+		org.lamsfoundation.lams.authoring.Application.getInstance().copy();
 	}
 	public function getPaste(){
 		//appReference().paste();
-		Application.getInstance().paste();
+		org.lamsfoundation.lams.authoring.Application.getInstance().paste();
 	}
 	
 	public function getPI(){
 		//appReference().expandPI();
-		Application.getInstance().expandPI();
+		org.lamsfoundation.lams.authoring.Application.getInstance().expandPI();
 		
 	}		
 	
 	public function getHelp(){
-		//appReference().help();
-		Application.getInstance().help();
+		if(app.module != 'monitoring') {
+			org.lamsfoundation.lams.authoring.Application.getInstance().help();
+		} else {
+			org.lamsfoundation.lams.monitoring.Application.getInstance().help();
+		}
 	}
 }
