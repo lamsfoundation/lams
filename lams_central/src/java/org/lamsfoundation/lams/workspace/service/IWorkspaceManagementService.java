@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -279,6 +279,8 @@ public interface IWorkspaceManagementService {
 	 * @throws IOException
 	 */
 	public Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)throws IOException;
+	
+	public Vector getAccessibleOrganisationWorkspaceFolders(User user)throws IOException;
 	
 	/**
 	 * This method returns the root workspace folder for a particular user. 

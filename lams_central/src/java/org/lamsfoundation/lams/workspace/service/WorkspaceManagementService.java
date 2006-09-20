@@ -53,16 +53,15 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -71,7 +70,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
-import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.dto.UpdateContentDTO;
 
@@ -185,7 +183,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public String deleteFolder(Integer folderID, Integer userID)throws IOException{		
 		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,folderID);
-		User user = (User)baseDAO.find(User.class,userID);
+		User user = (User)userMgmtService.findById(User.class,userID);
 		if(user!=null){
 			if(!getPermissions(workspaceFolder,user).equals(WorkspaceFolder.OWNER_ACCESS)){
 				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
@@ -378,8 +376,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public Integer getPermissions(WorkspaceFolder workspaceFolder, User user){
 		Integer permission = null;
 
-		WorkspaceFolder userDefaultFolder = user.getWorkspace().getDefaultFolder();
-
 		if  ( workspaceFolder==null || user==null ) {
 			permission = WorkspaceFolder.NO_ACCESS;
 		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
@@ -393,7 +389,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	}
 	/** This method checks if the given workspaceFolder is a subFolder of the
 	 * given rootFolder. Returns false if they are the same folder. */
-	private boolean isSubFolder(WorkspaceFolder workspaceFolder,WorkspaceFolder rootFolder){
+/*	private boolean isSubFolder(WorkspaceFolder workspaceFolder,WorkspaceFolder rootFolder){
 		if ( rootFolder != null ) {
 			// is it the same folder?
 			if ( rootFolder.getWorkspaceFolderId().equals(workspaceFolder.getWorkspaceFolderId()) ) { 
@@ -409,7 +405,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return false;
 		
 	}
-	
+*/	
 	private Vector getFolderContentDTO(List designs, Integer permissions,Vector<FolderContentDTO> folderContent){		
 		Iterator iterator = designs.iterator();
 		while(iterator.hasNext()){
@@ -1072,7 +1068,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleOrganisationWorkspaceFolders(java.lang.Integer)
 	 */
 	public Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)	throws IOException {
-		User user = (User)baseDAO.find(User.class,userID);
+		log.debug("User - "+userID);
+		User user = (User)userMgmtService.findById(User.class,userID);
+		return getAccessibleOrganisationWorkspaceFolders(user);
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleOrganisationWorkspaceFolders(java.lang.Integer)
+	 */
+	public Vector getAccessibleOrganisationWorkspaceFolders(User user)	throws IOException {
 		Vector<FolderContentDTO> folders = new Vector<FolderContentDTO>();
 		
 		if (user != null) {
@@ -1092,21 +1097,22 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 						if(!(OrganisationState.HIDDEN.equals(orgStateId) || OrganisationState.REMOVED.equals(orgStateId))) {
 							
 							// Only courses have folders - classes don't!
-							Workspace workspace = member.getOrganisation().getWorkspace();
+							Workspace workspace = org.getWorkspace();
 							
 							if ( workspace != null ) {
 								// TODO  get all the folders for the workspace but only return those that are at the "top" of the hierarchy
 								// for this user. Not needed at present but will be needed when we have multiple folders in a user's workspace (ie shared folders)
 								WorkspaceFolder orgFolder = workspace.getDefaultFolder();
 								if ( orgFolder != null ) {
-								
 									// Check if the user has write access, which is available
 								    // only if the user has an AUTHOR, TEACHER or STAFF role. If
 									// user has access add that folder to the list. 
 									Set roles = member.getUserOrganisationRoles();
 									if (hasWriteAccess(roles)) {
 										Integer permission = getPermissions(orgFolder,user);
-										if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) { 
+										log.debug("Permission - "+permission);
+										if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) {
+											log.debug("folder added");
 											folders.add(new FolderContentDTO(orgFolder,permission));
 										}
 									}
@@ -1118,15 +1124,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					
 				}
 			} else {
-				log.warn("getAccessibleOrganisationWorkspaceFolders: Trying to get user memberships for user "+userID+". User doesn't belong to any organisations. Returning no folders.");
+				log.warn("getAccessibleOrganisationWorkspaceFolders: Trying to get user memberships for user "+user.getUserId()+". User doesn't belong to any organisations. Returning no folders.");
 			}
 		} else {
-			log.warn("getAccessibleOrganisationWorkspaceFolders: User "+userID+" does not exist. Returning no folders.");
+			log.warn("getAccessibleOrganisationWorkspaceFolders: User "+user.getUserId()+" does not exist. Returning no folders.");
 		}
 		
 		return folders;
 	}
-	
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUserWorkspaceFolder(java.lang.Integer)
