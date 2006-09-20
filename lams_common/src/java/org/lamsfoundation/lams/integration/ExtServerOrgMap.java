@@ -223,7 +223,8 @@ public class ExtServerOrgMap implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
-     *            @hibernate.column name="orgid"         
+     *            @hibernate.column name="orgid"
+     *             lazy="true"         
      *         
      */
     public Organisation getOrganisation() {

@@ -84,7 +84,8 @@ public class ExtCourseClassMap implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
-     *            @hibernate.column name="classid"         
+     *            @hibernate.column name="classid"
+     *             lazy="true"         
      *         
      */
     public Organisation getOrganisation() {

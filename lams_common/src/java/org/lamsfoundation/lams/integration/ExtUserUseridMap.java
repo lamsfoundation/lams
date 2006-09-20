@@ -70,7 +70,8 @@ public class ExtUserUseridMap implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
-     *            @hibernate.column name="user_id"         
+     *            @hibernate.column name="user_id"
+     *             lazy="true"         
      *         
      */
     public User getUser() {
