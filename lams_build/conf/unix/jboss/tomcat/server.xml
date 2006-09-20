@@ -115,6 +115,9 @@
                 cachedConnectionManagerObjectName="jboss.jca:service=CachedConnectionManager"
                 transactionManagerObjectName="jboss:service=TransactionManager" />
             -->
+            <!-- LAMS Login Request Valve -->
+			<Valve className="org.lamsfoundation.lams.integration.security.LoginRequestValve" />
+			
 			<Valve className="org.apache.catalina.authenticator.SingleSignOn" debug="0"/>
          </Host>
 
