@@ -2032,11 +2032,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
                 }
                 catch (RepositoryCheckedException e) {
                     logger.error("Unable to delete file",e);
+                    /*
                     ActionMessages am = new ActionMessages(); 
                     am.add( ActionMessages.GLOBAL_MESSAGE,  
                            new ActionMessage( "error.contentrepository" , 
                                               attachment.getFileName())); 
-                    saveErrors( request, am ); 
+                    saveErrors( request, am );
+                    */ 
                 }
 
                 if ( attachment.getSubmissionId() != null ) {

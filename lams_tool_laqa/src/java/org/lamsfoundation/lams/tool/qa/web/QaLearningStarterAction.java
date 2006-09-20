@@ -406,11 +406,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
-
+	    	generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
+	    	
 	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, toolSessionID, learnerProgressUserId, 
 	    	        generalLearnerFlowDTO, false);
     		
-    		logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
+	    	logger.debug("presenting teacher's report");
+	    	logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
+    		
     		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		}
     	
 		/* by now, we know that the mode is learner*/

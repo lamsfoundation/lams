@@ -63,6 +63,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String currentAnswer;
     
+    protected String teacherViewOnly;
+    
     protected String notebookEntriesVisible;
     
     protected String reflection;
@@ -229,6 +231,7 @@ public class GeneralLearnerFlowDTO implements Comparable
             .append("activityOffline: ", activityOffline)
             .append("totalQuestionCount : ", totalQuestionCount)
             .append("activityInstructions: ", activityInstructions)
+            .append("teacherViewOnly: ", teacherViewOnly)
             .append("activityTitle: ", activityTitle)
             .append("countSessionComplete: ", countSessionComplete)
             .append("toolSessionID: ", toolSessionID)
@@ -508,5 +511,17 @@ public class GeneralLearnerFlowDTO implements Comparable
      */
     public void setMapFeedback(Map mapFeedback) {
         this.mapFeedback = mapFeedback;
+    }
+    /**
+     * @return Returns the teacherViewOnly.
+     */
+    public String getTeacherViewOnly() {
+        return teacherViewOnly;
+    }
+    /**
+     * @param teacherViewOnly The teacherViewOnly to set.
+     */
+    public void setTeacherViewOnly(String teacherViewOnly) {
+        this.teacherViewOnly = teacherViewOnly;
     }
 }

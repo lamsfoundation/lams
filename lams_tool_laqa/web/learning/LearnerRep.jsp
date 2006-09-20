@@ -141,35 +141,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>														  					 					
 
 
-				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
-			       	<table> 	  
-							<tr> 
-	  	   		  		<td>
-                               <html:submit property="refreshAnswers" 
-                                             styleClass="button" 
-                                             onclick="submitMethod('viewAllResults');">
-                                    <bean:message key="label.refresh"/>
-                                </html:submit>
-					  	 </td>
-
-							<td  valign=top>
-								<div class="right-buttons">							
-									<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-										<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
-											<bean:message key="button.endLearning"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					
-									<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-											<bean:message key="label.continue"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-								</div> 		  															 		  												  	
-							</td> 
-							
-							</tr>
-					</table>
+				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 
+					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }"> 				
+				       	<table> 	  
+								<tr> 
+		  	   		  		<td>
+	                               <html:submit property="refreshAnswers" 
+	                                             styleClass="button" 
+	                                             onclick="submitMethod('viewAllResults');">
+	                                    <bean:message key="label.refresh"/>
+	                                </html:submit>
+						  	 </td>
+	
+								<td  valign=top>
+									<div class="right-buttons">							
+										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+											<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
+												<bean:message key="button.endLearning"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+						
+										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+											<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+												<bean:message key="label.continue"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+									</div> 		  															 		  												  	
+								</td> 
+								
+								</tr>
+						</table>
+				  	</c:if> 				    				  					
 			  	</c:if> 				    				  
 		
 		
@@ -252,33 +254,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
-			       	<table> 	  
-						<tr> 
-	  	   		  		<td>
-                               <html:submit property="refreshAnswers" 
-                                             styleClass="button" 
-                                             onclick="submitMethod('viewAllResults');">
-                                    <bean:message key="label.refresh"/>
-                                </html:submit>
-					  	 </td>
+					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }"> 								
+				       	<table> 	  
+							<tr> 
+		  	   		  		<td>
+	                               <html:submit property="refreshAnswers" 
+	                                             styleClass="button" 
+	                                             onclick="submitMethod('viewAllResults');">
+	                                    <bean:message key="label.refresh"/>
+	                                </html:submit>
+						  	 </td>
+							
+								<td>
+									<div class="right-buttons">
+										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+											<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
+												<bean:message key="button.endLearning"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
 						
-							<td>
-								<div class="right-buttons">
-									<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-										<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
-											<bean:message key="button.endLearning"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					
-									<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-											<bean:message key="label.continue"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-								</div> 		  															 		  					
-								</td> 
-							</tr>
-					</table>
+										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+											<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+												<bean:message key="label.continue"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+									</div> 		  															 		  					
+									</td> 
+								</tr>
+						</table>
+					</c:if> 				    					
 				</c:if> 				    
 
 			</html:form>
