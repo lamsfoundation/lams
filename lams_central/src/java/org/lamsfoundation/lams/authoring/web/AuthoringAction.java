@@ -248,6 +248,24 @@ public class AuthoringAction extends LamsDispatchAction{
         writer.println(wddxPacket);
         return null;
  	}	
+	
+	public ActionForward getHelpURL(ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response)throws ServletException, Exception{
+
+		String wddxPacket;
+		IAuthoringService authoringService = getAuthoringService();
+		try {
+			wddxPacket = authoringService.getHelpURL();
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getHelpURL", authoringService).serializeMessage();
+		} 
+		
+		PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+	}
 	/**
 	 * Handle flash error.
 	 * @param e
@@ -265,6 +283,7 @@ public class AuthoringAction extends LamsDispatchAction{
 			authoringService.getMessageService().getMessage("error.system.error", msg),
 			FlashMessage.CRITICAL_ERROR);
     }
+	  
 	/**
 	 * Get AuditService bean.
 	 * @return

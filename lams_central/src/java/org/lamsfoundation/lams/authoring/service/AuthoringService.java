@@ -755,6 +755,20 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		
 		return flashMessage.serializeMessage();
 	}
+	
+	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getHelpURL() */
+	public String getHelpURL() throws Exception {
+		
+		String helpURL = Configuration.get(ConfigurationKeys.HELP_URL);
+		
+		if(helpURL != null)
+			flashMessage = new FlashMessage("getHelpURL", helpURL);
+		else 
+			throw new Exception();
+		
+		return flashMessage.serializeMessage();
+	}
+	
 
 	public MessageService getMessageService() {
 		return messageService;

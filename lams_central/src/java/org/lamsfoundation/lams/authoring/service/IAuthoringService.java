@@ -240,6 +240,13 @@ public interface IAuthoringService {
 	 */
 	public String generateUniqueContentFolder()  throws FileUtilException, IOException;
 		
+	/**
+	 * Returns the generic help url from configuration
+	 * 
+	 * @return String Generic help url
+	 * @throws Exception
+	 */
+	public String getHelpURL() throws Exception;
 
 	/** Get the message service, which gives access to the I18N text */
 	public MessageService getMessageService();
