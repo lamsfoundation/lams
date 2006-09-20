@@ -2,6 +2,7 @@
 
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO" %>
 <lams:html>
@@ -124,39 +125,7 @@ function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolba
 	//}
 }
 
-
-function closeWindow(win){
-	if(win == 'previewWin'){
-		previewWin.close();
-	}
-
-
-}
-
-/*function openPreview(args, title){
-var thePopup = null;
-	//alert('Opening Preview url')
-	thePopup = window.open(args,title,"height=600, width=800, resizable, scrollbar=yes, menubar=no, status=yes, toolbar=no");
-	
-}
-*/
-
 var learnWin = null;
-/*function openPreview(sessionId)	{
-	//debug: To check we are gettin a session Id to open
-	var welcomeLearnerOpen = false;
-	previewSessionId = sessionId;
-	var url = getHostURL() + '/lams/home.do?method=learner&sessionId='+sessionId;
-	//var url = 'home.do?method=learner&sessionId='+sessionId;
-	//alert('Opening Preview, url='+url);
-
-
-	learnWin = window.open(url,'lWindow','width=796,height=570,resizable,status=yes');
-	learnWin.focus();
-
-
-}*/
-
 
 function openFilePopUp(args){
 	//mozilla seems to want a full url
@@ -196,36 +165,21 @@ function setSaved(args){
 }
 
 function myOnBeforeUnload(){
-	if(!saved && !mac){
-		window.event.returnValue = "Your design is not saved, any changes you have made since you last saved will be lost.";
-	}
-}
-
-function endPreviewSession(){
-	if(previewSessionId != null){
-		//debug: alert('Opening URL:'+"staff/staff.do?method=removeSession&sid="+previewSessionId+"&session=preview");
-		document.location = "staff/staff.do?method=removeSession&sid="+previewSessionId+"&session=preview";
+//	alert("myOnBeforeUnload");
+	if(!saved){
+	  var message = '<fmt:message key="msg.design.not.saved"/>';
+	  if (typeof evt == 'undefined') {
+		 evt = window.event;
+	  }
+	  if (evt) {
+		evt.returnValue = message;
+	  }
+	  return message;
 	}
 }
 
 window.onbeforeunload = myOnBeforeUnload;
 
-
-/*
-function checkSaved(){
-	if(saved){
-		alert("closing");
-		return true;
-	}else{
-		var answer = confirm ("Your design is not saved, any changes you have made since you last saved will be lost.\nare you sure you want to close?")
-		if (answer)
-			//alert ("Oh yeah?")
-			return true;
-		else
-			return false;
-	}
-}
-*/
 //-->
 </script>
 <TITLE>Author :: LAMS</TITLE>
