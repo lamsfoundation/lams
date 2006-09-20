@@ -120,6 +120,26 @@ class ApplicationParent {
 		
     }
 	
+	/**
+	 * Retrieve the help url from config.
+	 * 
+	 */
+	public function getHelpURL() {
+		var callback:Function = Proxy.create(this,openHelp);
+           
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getHelpURL',callback, false);
+		
+	}
+	
+	/**
+	 * Open the generic help page
+	 * @param url generic help url
+	 */
+	public function openHelp(url:String) {
+		var locale:String = _root.lang + _root.country;
+		var target:String = this.module + '#' + this.module + '-' + locale;
+		getURL(url + target, '_blank');
+	}
 	
 	 /**
     * returns the the Comms instance
