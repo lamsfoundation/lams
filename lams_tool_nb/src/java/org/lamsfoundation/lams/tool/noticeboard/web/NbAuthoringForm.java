@@ -265,6 +265,8 @@ public class NbAuthoringForm extends ActionForm {
 		setContent(nbContent.getContent());
 		setOnlineInstructions(nbContent.getOnlineInstructions());
 		setOfflineInstructions(nbContent.getOfflineInstructions());
+		setReflectOnActivity(nbContent.getReflectOnActivity());
+		setReflectInstructions(nbContent.getReflectInstructions());
 	}
 	
 	public void copyValuesIntoNbContent(NoticeboardContent nbContent)
