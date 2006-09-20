@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -52,7 +52,9 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * * @author Ozgur Demirtas
@@ -188,6 +190,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	AuthoringUtil.readData(request, mcAuthoringForm, false);	 	
 	 	mcAuthoringForm.resetUserAction();
 	 	
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	 	
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
     }
@@ -226,6 +233,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 		
 		AuthoringUtil.readData(request, mcAuthoringForm, false);
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 	 	
     	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
@@ -373,6 +385,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 	 	
 		AuthoringUtil.readData(request, mcAuthoringForm, false);
+
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 	 	
  		Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
@@ -481,10 +498,18 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
 		/* determine whether the request is from Monitoring url Edit Activity*/
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    	logger.debug("mcAuthoringForm : " + mcAuthoringForm);
+    	
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 
 	    IMcService mcService =McUtils.getToolService(request);
     	if (mcService == null)
@@ -545,6 +570,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm, requestByStarter);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 	 	
     	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
     	logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
@@ -972,6 +1001,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm, false);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+	 	
 	 	
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
@@ -1120,6 +1153,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm, false);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 	 	
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
@@ -1257,6 +1294,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 
 		AuthoringUtil.readData(request, mcAuthoringForm, false);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+		
 	 	
     	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
@@ -1416,6 +1457,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 	 	
 		AuthoringUtil.readData(request, mcAuthoringForm, false);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+		
 	 	
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
@@ -1549,11 +1594,18 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
         logger.debug("dispatching doneOptions...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    	logger.debug("mcAuthoringForm: " + mcAuthoringForm);
+    	
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
+
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
 
 		IMcService mcService =McUtils.getToolService(request);
     	if (mcService == null)
@@ -1565,7 +1617,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	    logger.debug("mcService : " + mcService);
         
-		
+	    
         boolean performDoneOptions=performDoneOptions(mapping, form, request, response, false, false);
         logger.debug("performDoneOptions: " + performDoneOptions);
 
@@ -1614,7 +1666,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm, requestByStarter);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
 
+	 	
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1810,6 +1866,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
+
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
     	
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
@@ -1868,6 +1929,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
@@ -2356,6 +2422,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	 	
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
@@ -2417,6 +2488,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
@@ -2478,6 +2554,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
@@ -2570,6 +2651,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 
 		AuthoringUtil.readData(request, mcAuthoringForm, false);
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+
 	 	
 		logger.debug("will uploadFile for online file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, false);
@@ -2644,6 +2730,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+	 	
+	 	
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
@@ -2702,6 +2793,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("destination: " + destination);
 
 		AuthoringUtil.readData(request, mcAuthoringForm, false);
+		
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
 	 	
 		mcAuthoringForm.resetUserAction();
 		
@@ -2750,6 +2845,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+
+    	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		logger.debug("contentFolderID: " + contentFolderID);
+		mcAuthoringForm.setContentFolderID(contentFolderID);
+    	
 	 	
 	 	/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);

@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -22,7 +22,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
-import org.lamsfoundation.lams.tool.mc.web.McLearningForm; 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
@@ -113,6 +112,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	protected String statsMonitoring;
 
 	protected String edit;
+	private String contentFolderID;
 	
 	public void resetUserAction()
     {
@@ -878,5 +878,18 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
     }
+    
 
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
 }
