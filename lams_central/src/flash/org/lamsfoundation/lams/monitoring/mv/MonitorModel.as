@@ -66,7 +66,7 @@ class MonitorModel extends Observable{
 	private var monitor_x:Number;
 	private var ttHolder:MovieClip;
 	private var _monitor:Monitor;
-	
+	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	// add model data
 	private var _activeSeq:Sequence;
 	private var _lastSelectedSeq:Sequence;
@@ -802,6 +802,31 @@ class MonitorModel extends Observable{
 		return _selectedTreeNode;
 	}
 	*/
+	
+	private function setSelectedItem(newselectItem:Object){
+		_selectedItem = newselectItem;
+		broadcastViewUpdate("SELECTED_ITEM");
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newselectItem 
+	 * @return  
+	 */
+	public function set selectedItem (newselectItem:Object):Void {
+		setSelectedItem(newselectItem);
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get selectedItem ():Object {
+		return _selectedItem;
+	}
+	
+	
 	public function setSelectedTab(tabID:Number){
 		selectedTab = tabID;
 	}

@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.monitoring.User;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
+import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*;
@@ -384,6 +385,25 @@ class Monitor {
 			//var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
 			//LFMessage.showMessageConfirm(Dictionary.getValue('new_confirm_msg'), fn,null);
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
+		}
+	}
+	
+	/**
+	 * Open the Help page for the selected Tool (Canvas) Activity
+	 *  
+	 * @param   ca 	CanvasActivity
+	 * @return  
+	 */
+	
+	public function getHelp(ca:CanvasActivity) {
+
+		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
+			Debugger.log("Opening help page with locale " + _root.lang + _root.country + ": " + ca.activity.helpURL,Debugger.GEN,'getHelp','Monitor');
+			
+			var locale:String = _root.lang + _root.country;
+			getURL(ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale, '_blank');
+		} else {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_helpURL_undefined', [ca.activity.toolDisplayName]));
 		}
 	}
 

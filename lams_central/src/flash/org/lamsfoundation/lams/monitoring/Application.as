@@ -23,6 +23,7 @@
 
 //import org.lamsfoundation.lams.monitoring.*
 import org.lamsfoundation.lams.monitoring.ls.*      //Lessons
+import org.lamsfoundation.lams.authoring.cv.CanvasActivity;      //Canvas Activity Used in Monitor Tab View 
 import org.lamsfoundation.lams.monitoring.mv.* 	 //Monitor
 import org.lamsfoundation.lams.common.ws.*          //Workspace
 import org.lamsfoundation.lams.common.comms.*       //communications
@@ -412,6 +413,14 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 		
     }
+	
+	
+	public function help():Void{
+		var ca = _monitor.getMM().selectedItem
+		if (CanvasActivity(ca) != null){
+			_monitor.getHelp(ca);
+		}
+	}
     
     /**
     * Runs when application setup has completed.  At this point the init/loading screen can be removed and the user can
