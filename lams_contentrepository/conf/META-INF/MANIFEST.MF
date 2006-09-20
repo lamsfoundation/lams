@@ -1,4 +1,4 @@
 Implementation-Title: LAMS Content Repository
-Implementation-Version: 0.8
+Implementation-Version: 2.0 RC1
 Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
 Class-Path:  lams.jar

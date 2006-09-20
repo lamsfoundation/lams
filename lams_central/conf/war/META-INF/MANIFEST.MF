@@ -1,1 +1,4 @@
+Implementation-Title: LAMS - Central
+Implementation-Version: 2.0 RC1
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
 Class-Path: ./lams.jar ./lams-contentrepository.jar 

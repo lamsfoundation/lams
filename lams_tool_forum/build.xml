@@ -218,7 +218,7 @@
 		<echo>| create jar file                          |</echo>
 		<echo>+------------------------------------------+</echo>
 		<delete file="${build.lib}/${product}.jar"/>
-		<jar destfile="${build.lib}/${product}.jar">
+		<jar destfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
 			</fileset>
 			<fileset dir="${conf.hibernate.mapping.dir}">

@@ -1,1 +1,4 @@
+Implementation-Title: LAMS - Admin
+Implementation-Version: 2.0 RC1
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
 Class-Path: ./lams.jar ./lams-central.jar ./lams-admin.jar

@@ -1,3 +1,4 @@
-Implementation-Title: LAMS Submit Files Tool
-Implementation-Version: 0.1
+Implementation-Title: LAMS - Submit Files Tool
+Implementation-Version: 2.0 RC1
 Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
+Class-Path: 
