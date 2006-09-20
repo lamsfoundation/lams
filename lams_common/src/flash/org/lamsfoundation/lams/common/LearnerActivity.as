@@ -67,9 +67,11 @@ class LearnerActivity extends MovieClip {
 	private var app:ApplicationParent;
 	private var _tip:ToolTip;
 	//locals
+	private var tooltipTitle:String;
 	private var actStatus:String;
 	private var actLabel:String;
 	private var learner:Progress;
+	private var clickTarget_mc:MovieClip;
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
 	private var todo_mc:MovieClip;
@@ -134,6 +136,11 @@ class LearnerActivity extends MovieClip {
 			LABEL_Y = 10
 			_autosize = "center";
 		}
+		if (actLabel == undefined){
+			tooltipTitle =  _activity.title
+		}else {
+			tooltipTitle = actLabel
+		}
 		
 		title_lbl = this.attachMovie("Label", "Label"+_activity.activityID, this.getNextHighestDepth(), {_x:LABEL_X , _y:LABEL_Y, _width:LABEL_W, _height:LABEL_H, autoSize:_autosize, styleName:styleObj});
 		
@@ -179,7 +186,7 @@ class LearnerActivity extends MovieClip {
 	 */
 	private function draw(){
 		
-		
+		var toolTitle:String
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
@@ -187,7 +194,7 @@ class LearnerActivity extends MovieClip {
 		//title_lbl._visible = true;
 		Debugger.log('activity status : ' + actStatus ,Debugger.CRITICAL,'draw','org.lamsfoundation.lams.LearnerActivity');
 	
-		//clickTarget_mc._visible = true;
+		clickTarget_mc._visible = true;
 		
 		switch (actStatus){
 		    case 'completed_mc' :
@@ -208,10 +215,19 @@ class LearnerActivity extends MovieClip {
 		//write text
 		trace("Title passed for Gate Activity: "+actLabel)
 		if (actLabel == undefined){
-			title_lbl.text = _activity.title;
+			toolTitle = _activity.title
+			if (toolTitle.length > 19){
+				toolTitle = toolTitle.substr(0, 17)+"..."
+			}
+			//title_lbl.text = toolTitle;
 		}else {
-			title_lbl.text = actLabel;
+			toolTitle = actLabel
+			if (toolTitle.length > 19){
+				toolTitle = toolTitle.substr(0, 17)+"..."
+			}
+			
 		}
+		title_lbl.text = toolTitle;
 		//this.completed_mc.onRollOver = Proxy.create(this,this['showToolTip'], this.completed_mc, "completed_act_tooltip");
 		//this.completed_mc.onRollOut = Proxy.create(this,this['hideToolTip']);
 		//this.current_mc.onRollOver = Proxy.create(this,this['showToolTip'], this.current_mc, "current_act_tooltip");
@@ -225,13 +241,21 @@ class LearnerActivity extends MovieClip {
 			var ttXpos = appData.compX + xPos;
 			var ttYpos = appData.compY + yPos;
 		} else {
-			var ttXpos = appData.compX + this._x;
+			if(app.module == 'learner'){
+				var ttXpos = appData.compX + this._x-10;
+			}else {
+				var ttXpos = appData.compX + this._x;
+			}
 			var ttYpos = appData.compY + this._y+btnObj._height;
 		}
 		
 		var ttHolder = appData.ttHolder;
 		trace("x pos: "+ttXpos+" and y pos: "+ttYpos+" and tt holder is: "+ttHolder)
-		var ttMessage = Dictionary.getValue(btnTT);
+		if (btnTT == undefined || btnTT == null || btnTT == "" || btnTT == "undefined"){
+			var ttMessage = "<b>"+ _activity.title+"</b>"
+		}else {
+			var ttMessage = "<b>"+ _activity.title +"</b> \n"+Dictionary.getValue(btnTT);
+		}
 		var ttWidth = 140;
 		_tip.DisplayToolTip(ttHolder, ttMessage, ttXpos, ttYpos, undefined, ttWidth);
 		
@@ -243,9 +267,13 @@ class LearnerActivity extends MovieClip {
 	
 	private function onRollOver(){
 		if (actStatus == "completed_mc"){
-			showToolTip(this.completed_mc, "completed_act_tooltip");
+			showToolTip(this.clickTarget_mc, "completed_act_tooltip");
 		}else if (actStatus == "current_mc"){
-			showToolTip(this.current_mc, "current_act_tooltip");
+			showToolTip(this.clickTarget_mc, "current_act_tooltip");
+		}else {
+			if (String(_activity.title).length > 19){
+				showToolTip(this.clickTarget_mc, "undefined");
+			}
 		}
 		
 	}

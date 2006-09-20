@@ -201,7 +201,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	private function draw (){
-		
+		var toolTitle:String;
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
@@ -228,19 +228,23 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 
 		//write text
-		if(_activity.title != undefined){
-			title_lbl.text = _activity.title;
-			containerPanelHeader.title_lbl.text = _activity.title;
-		} else {
-			if(_activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
-				title_lbl.text = 'Optional Activities';
-				containerPanelHeader.title_lbl.text = 'Optional Activities';
-			} else {
-				title_lbl.text = 'Parallel Activities';
-				containerPanelHeader.title_lbl.text = 'Parallel Activities';
-			}
+		//if(_activity.title != undefined){
+		toolTitle = _activity.title
+		if (toolTitle.length > 19){
+			toolTitle = toolTitle.substr(0, 17)+"..."
 		}
-		
+		//} 
+		//else {
+			//if(_activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+				//title_lbl.text = 'Optional Activities';
+				//containerPanelHeader.title_lbl.text = 'Optional Activities';
+			//} else {
+				//title_lbl.text = 'Parallel Activities';
+				//containerPanelHeader.title_lbl.text = 'Parallel Activities';
+			//}
+		//}
+		title_lbl.text = toolTitle;
+		containerPanelHeader.title_lbl.text = toolTitle;
 		container_pnl.setStyle ("backgroundColor", 0x4289FF);
 		
 		//position the container (this)
@@ -253,11 +257,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
 		var appData = getAppData();
-		var Xpos = appData.compX+ this._x;
+		var Xpos = appData.compX+ this._x - 10;
 		var Ypos = appData.compY+( (this._y+btnObj._height)-4);
 		var ttHolder = appData.ttHolder;
 		trace("x pos: "+Xpos+" and y pos: "+Ypos+" and tt holder is: "+ttHolder)
-		var ttMessage = Dictionary.getValue(btnTT);
+		if (btnTT == undefined || btnTT == null || btnTT == "" || btnTT == "undefined"){
+			var ttMessage = "<b>"+ _activity.title+"</b>"
+		}else {
+			var ttMessage = "<b>"+ _activity.title+"</b> \n"+Dictionary.getValue(btnTT);
+		}
 		var ttWidth = 140;
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, undefined, ttWidth);
 		
@@ -269,11 +277,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	private function localOnRollOver(){
 		if (actStatus == "completed_mc"){
-			showToolTip(this.completed_mc, "completed_act_tooltip");
+			showToolTip(this.clickTarget_mc, "completed_act_tooltip");
 		}else if (actStatus == "current_mc"){
-			showToolTip(this.current_mc, "current_act_tooltip");
+			showToolTip(this.clickTarget_mc, "current_act_tooltip");
 		}else if (actStatus == "attempted_mc"){
-			showToolTip(this.current_mc, "current_act_tooltip");
+			showToolTip(this.clickTarget_mc, "current_act_tooltip");
+		}else {
+			if (String(_activity.title).length > 19){
+				showToolTip(this.clickTarget_mc, "undefined");
+			}
 		}
 		
 	}
