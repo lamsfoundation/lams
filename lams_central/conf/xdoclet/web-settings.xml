@@ -10,6 +10,7 @@
 				classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 				classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+				classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/web/webApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/integrationContext.xml
