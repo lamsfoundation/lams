@@ -258,33 +258,33 @@ class PropertyInspectorNew extends MovieClip{
 	private function setTabIndex(selectedTab:String){
 		
 		//Tool Activities
-		title_txt.tabIndex = 1
-		applied_grouping_lbl.tabIndex = 2
-		appliedGroupingActivity_cmb.tabIndex = 2
-		runOffline_chk.tabIndex = 3
-		defineLater_chk.tabIndex = 4
+		title_txt.tabIndex = 401
+		applied_grouping_lbl.tabIndex = 402
+		appliedGroupingActivity_cmb.tabIndex = 402
+		runOffline_chk.tabIndex = 403
+		defineLater_chk.tabIndex = 404
 		
 		//Optional Activities
-		desc_txt.tabIndex = 2
-		minAct_stp.tabIndex = 3
-		maxAct_stp.tabIndex = 4
+		desc_txt.tabIndex = 402
+		minAct_stp.tabIndex = 403
+		maxAct_stp.tabIndex = 404
 		
 		//Gate Activities
 		//gateType_cmb.enabled = true
-		gateType_cmb.tabIndex = 2
-		hours_stp.tabIndex = 3
-		mins_stp.tabIndex = 4
-		endHours_stp.tabIndex = 5
-		endMins_stp.tabIndex = 6
+		gateType_cmb.tabIndex = 402
+		hours_stp.tabIndex = 403
+		mins_stp.tabIndex = 404
+		endHours_stp.tabIndex = 405
+		endMins_stp.tabIndex = 406
 		
 		//Grouping Activities
 		//groupType_cmb.enabled = true
-		groupType_cmb.tabIndex = 2
-		numGroups_stp.tabIndex = 3
-		numGroups_rdo.tabIndex = 4
-		numRandomGroups_stp.tabIndex = 5
-		numLearners_rdo.tabIndex = 6
-		numLearners_stp.tabIndex = 7
+		groupType_cmb.tabIndex = 402
+		numGroups_stp.tabIndex = 403
+		numGroups_rdo.tabIndex = 404
+		numRandomGroups_stp.tabIndex = 405
+		numLearners_rdo.tabIndex = 406
+		numLearners_stp.tabIndex = 407
 		
 	}
 	
