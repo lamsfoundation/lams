@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 
 /**
  * Survey
@@ -42,10 +41,12 @@ public class SurveyQuestion  implements Cloneable{
 	private static final Logger log = Logger.getLogger(SurveyQuestion.class);
 	
 	private Long uid;
+	
 	//Survey Type:1=Single Choice,2=Multiple Choice,3=Text Entry
 	private short type;
 	
 	private String description;
+	private int sequenceId;
 	
 	//option of Question
 	private boolean appendText;
@@ -60,6 +61,8 @@ public class SurveyQuestion  implements Cloneable{
 	//***********************************************
 	//DTO fields:
 	private String shortTitle;
+	//this is DTO field. For answer, which is user and session level. For question, which is content level.
+	private SurveyAnswer answer;
 	
     public Object clone(){
     	SurveyQuestion obj = null;
@@ -120,7 +123,7 @@ public class SurveyQuestion  implements Cloneable{
 	     * 					cascade="all-delete-orphan"
 	     * 					inverse="false"
 	     * 					order-by="sequence_id asc"
-	     * @hibernate.collection-key column="answer_uid"
+	     * @hibernate.collection-key column="question_uid"
 	     * @hibernate.collection-one-to-many
 	     * 			class="org.lamsfoundation.lams.tool.survey.model.SurveyOption"
 	     * @return
@@ -197,6 +200,18 @@ public class SurveyQuestion  implements Cloneable{
 		public void setAllowMultipleAnswer(boolean allowMultipleAnswer) {
 			this.allowMultipleAnswer = allowMultipleAnswer;
 		}
+		  /**
+	     * @hibernate.property  column="sequence_id" 
+	     * @return
+	     */
+		public int getSequenceId() {
+			return sequenceId;
+		}
+		public void setSequenceId(int sequenceId) {
+			this.sequenceId = sequenceId;
+		}
+
+	
 		
 		//****************************************************************
 		// DTO fields
@@ -207,5 +222,12 @@ public class SurveyQuestion  implements Cloneable{
 		public void setShortTitle(String shortTitle) {
 			this.shortTitle = shortTitle;
 		}
+		public SurveyAnswer getAnswer() {
+			return answer;
+		}
+		public void setAnswer(SurveyAnswer answer) {
+			this.answer = answer;
+		}
+
 
 }

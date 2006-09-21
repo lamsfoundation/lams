@@ -37,8 +37,6 @@ import org.apache.log4j.Logger;
  */
 public class SurveySession{
 	
-	private static Logger log = Logger.getLogger(SurveySession.class);
-	
 	private Long uid;
 	private Long sessionId;
 	private String sessionName;

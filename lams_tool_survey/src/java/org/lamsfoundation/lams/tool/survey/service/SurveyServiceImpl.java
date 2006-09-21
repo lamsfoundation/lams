@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.survey.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,12 +73,14 @@ import org.lamsfoundation.lams.tool.survey.dao.SurveySessionDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
+import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -291,13 +294,33 @@ public class SurveyServiceImpl implements
 
 
 	public void deleteQuestion(Long uid) {
-		//TODO
+		surveyQuestionDao.removeObject(SurveyQuestion.class, uid);
 		
 	}
 
-	public List<SurveyQuestion> getQuestionsBySessionId(Long sessionId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<SurveyQuestion> getQuestionAnswer(Long sessionId,Long userUid) {
+		List<SurveyQuestion> questions = null;
+		SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
+		if(session != null){
+			Survey survey = session.getSurvey();
+			if(survey != null)
+				questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
+		}
+		
+		//set answer for this question acoording
+		for(SurveyQuestion question:questions){
+			SurveyAnswer answer = surveyAnswerDao.getAnswer(question.getUid(),userUid);
+			if(answer != null)
+				answer.setChoices(SurveyWebUtils.getChoiceList(answer.getAnswerChoices()));
+			question.setAnswer(answer);
+		}
+		return questions;
+	}
+
+	public void updateAnswerList(List<SurveyAnswer> answerList) {
+		for(SurveyAnswer ans : answerList){
+			surveyAnswerDao.saveObject(ans);
+		}
 	}
 
 
@@ -710,5 +733,6 @@ public class SurveyServiceImpl implements
 	public void setSurveyAnswerDao(SurveyAnswerDAO surveyAnswerDao) {
 		this.surveyAnswerDao = surveyAnswerDao;
 	}
+
 
 }

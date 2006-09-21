@@ -27,11 +27,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 /**
  *  Survey Item  Form.
- *	@struts.form name="surveyItemForm"
+ *	@struts.form name="questionForm"
  * @author Steve.Ni
  * 
  * @version $Revision$

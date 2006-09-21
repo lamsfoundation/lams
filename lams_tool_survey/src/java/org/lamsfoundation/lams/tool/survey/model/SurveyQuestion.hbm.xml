@@ -43,7 +43,7 @@
         >
 
             <key
-                column="answer_uid"
+                column="question_uid"
             >
             </key>
 
@@ -101,6 +101,14 @@
             update="true"
             insert="true"
             column="allow_multiple_answer"
+        />
+
+        <property
+            name="sequenceId"
+            type="int"
+            update="true"
+            insert="true"
+            column="sequence_id"
         />
 
         <!--

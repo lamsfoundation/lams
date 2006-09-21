@@ -36,18 +36,22 @@ public class SurveyAnswer {
 
 	private Long uid;
 	
-	private Long sessionId;
 	private SurveyUser user;
 	
 	private SurveyQuestion surveyQuestion;
-	//options choice string: conjunction by &. Such as 2&5&3
+	//options choice string: option UIDs are conjunctioned by &. Such as 2&5&3
 	private String answerChoices;
 	private String answerText;
 	private Date updateDate;
 	
-
+	//************************************************
+	// DTO fields
+	//************************************************
+	//it is list of optionl UIDs
+	private String[] choices;
+	
 	/**
-	 * @hibernate.many-to-one  column="survey_item_uid"
+	 * @hibernate.many-to-one  column="question_uid"
  	 * cascade="none"
 	 * @return
 	 */
@@ -80,16 +84,6 @@ public class SurveyAnswer {
 		this.user = user;
 	}
 	/**
-	 * @hibernate.property column="session_id"
-	 * @return
-	 */
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
-	}
-	/**
 	 * @hibernate.property column="answer_choices"
 	 * @return
 	 */
@@ -118,6 +112,12 @@ public class SurveyAnswer {
 	}
 	public void setAnswerText(String textEntry) {
 		this.answerText = textEntry;
+	}
+	public String[] getChoices() {
+		return choices;
+	}
+	public void setChoices(String[] choices) {
+		this.choices = choices;
 	}
 	
 

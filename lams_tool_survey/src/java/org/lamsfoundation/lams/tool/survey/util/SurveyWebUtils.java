@@ -51,5 +51,18 @@ public class SurveyWebUtils {
 	        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
 	            return false;
 		}
+
+	public static String getChoicesStr(String[] choiceList) {
+		String choices = "";
+		for(String c: choiceList)
+			choices = choices + c + "&";
+		return choices;
+	}
 	
+	public static String[] getChoiceList(String choiceList) {
+		if(choiceList == null)
+			return new String[]{};
+		
+		return choiceList.split("&");
+	}
 }

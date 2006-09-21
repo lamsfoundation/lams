@@ -31,6 +31,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
@@ -105,8 +106,9 @@ public interface ISurveyService
 	 */
 	void deleteQuestion(Long uid);
 
-	List<SurveyQuestion> getQuestionsBySessionId(Long sessionId);
+	List<SurveyQuestion> getQuestionAnswer(Long sessionId, Long userUid);
 
+	void updateAnswerList(List<SurveyAnswer> answerList);
 	//******************************************************************************************
 	//********** user methods *************
 	//******************************************************************************************
@@ -198,6 +200,7 @@ public interface ISurveyService
 	 * @return
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+	
 
 }
 

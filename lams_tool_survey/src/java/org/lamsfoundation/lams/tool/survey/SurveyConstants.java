@@ -57,6 +57,7 @@ public class SurveyConstants {
 	public static final String ERROR_MSG_FILE_BLANK = "error.survey.item.file.blank";
 	public static final String ERROR_MSG_INVALID_URL = "error.survey.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
+	public static final String ERROR_MSG_MANDATORY_QUESTION = "error.mandatory.question";
 	
 	
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
@@ -76,12 +77,20 @@ public class SurveyConstants {
 	public static final String ATTR_TITLE = "title";
 	public static final String ATTR_SURVEY_INSTRUCTION = "instructions";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
-	public static final String ATTR_SURVEY = "survey";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 	public static final short SURVEY_TYPE_TEXT_ENTRY = 3;
 	public static final short SURVEY_TYPE_MULTIPLE_CHOICES = 2;
 	public static final short SURVEY_TYPE_SINGLE_CHOICE = 1;
 	public static final String FORWARD_OPEN_QUESTION = "opentext";
 	public static final String FORWARD_CHOICE_QUESTION = "question";
+	public static final String ATTR_SHOW_ON_ONE_PAGE = "showOnOnePage";
+	public static final String PREFIX_QUESTION_CHOICE = "optionChoice";
+	public static final String PREFIX_QUESTION_TEXT= "optionText";
+	public static final String ERROR_MSG_KEY = "questionError";
 
+	//POSITION
+	public static int POSITION_INSIDE = 0;
+	public static int POSITION_FIRST = 1;
+	public static int POSITION_LAST = 2;
+	public static int POSITION_ONLY_ONE = 3;
 }

@@ -70,7 +70,7 @@ public class Survey implements Cloneable{
 	//instructions
 	private String onlineInstructions;
 	private String offlineInstructions;
-	private Set attachments;
+	private Set<SurveyAttachment> attachments;
 	
 	//general infomation
 	private Date created;
@@ -78,7 +78,7 @@ public class Survey implements Cloneable{
 	private SurveyUser createdBy;
 	
 	//survey Items
-	private Set questions;
+	private Set<SurveyQuestion> questions;
 
 	
 	//*************** NON Persist Fields ********************
@@ -91,8 +91,8 @@ public class Survey implements Cloneable{
 	 *
 	 */
   	public Survey(){
-  		attachments = new HashSet();
-  		questions = new HashSet();
+  		attachments = new HashSet<SurveyAttachment>();
+  		questions = new HashSet<SurveyQuestion>();
   	}
 //  **********************************************************
   	//		Function method for Survey
@@ -121,7 +121,7 @@ public class Survey implements Cloneable{
   			survey.setUid(null);
   			if(questions != null){
   				Iterator iter = questions.iterator();
-  				Set set = new HashSet();
+  				Set<SurveyQuestion> set = new HashSet<SurveyQuestion>();
   				while(iter.hasNext()){
   					SurveyQuestion item = (SurveyQuestion)iter.next(); 
   					SurveyQuestion newItem = (SurveyQuestion) item.clone();
@@ -417,13 +417,13 @@ public class Survey implements Cloneable{
 	 * @hibernate.set lazy="true"
 	 *                inverse="false"
 	 *                cascade="all"
-	 *                order-by="create_date desc"
+	 *                order-by="sequence_id desc"
 	 * @hibernate.collection-key column="survey_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
 	 * 
 	 * @return
 	 */
-	public Set getQuestions() {
+	public Set<SurveyQuestion> getQuestions() {
 		return questions;
 	}
 	public void setQuestions(Set questions) {

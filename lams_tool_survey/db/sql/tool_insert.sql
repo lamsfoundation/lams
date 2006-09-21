@@ -31,10 +31,10 @@ create_date_time
 VALUES
 (
 'lasurv11',
-'surveyService',
-'Shared Surveys',
-'Shared Surveys',
-'sharedsurveys',
+'lasurvSurveyService',
+'Survey',
+'Survey',
+'survey',
 '1.1',
 NULL,
 NULL,
@@ -51,6 +51,6 @@ NULL,
 'tool/lasurv11/exportPortfolio?mode=teacher',
 'tool/lasurv11/contribute.do',
 'tool/lasurv11/moderate.do',
-'org.lamsfoundation.lams.tool.survey.ApplicationSurveys',
+'org.lamsfoundation.lams.tool.survey.ApplicationResources',
 NOW()
 )

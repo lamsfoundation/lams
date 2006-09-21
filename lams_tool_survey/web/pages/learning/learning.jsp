@@ -7,49 +7,34 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}"/>
-	<c:set var="survey" value="${sessionMap.survey}"/>
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}"/>
-	
 	<script type="text/javascript">
 	<!--
-
-		function checkNew(){
- 		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
- 		    return false;
+		
+		function previousQuestion(sessionMapID){
+			$("surveyForm").action = '<c:url value="/learning/previousQuestion.do"/>';
+			$("surveyForm").submit();
 		}
-		function viewItem(itemUid){
-			var myUrl = "<c:url value="/reviewItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
-			launchPopup(myUrl,"LearnerView");
-		}
-		function completeItem(itemUid){
-			document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=" + itemUid;
-			return false;
-		}
-		function finishSession(){
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
-		}
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		function nextQuestion(sessionMapID){
+			$("surveyForm").action = '<c:url value="/learning/nextQuestion.do"/>';
+			$("surveyForm").submit();
 		}
 		
 	-->        
     </script>
 </head>
 <body>
+	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm">
+	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<html:hidden property="questionSeqID"/>
+	<html:hidden property="sessionMapID"/>
+	<html:hidden property="position"/>
+	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<c:set var="position" value="${formBean.position}"/>
+	<c:set var="questionSeqID" value="${formBean.questionSeqID}"/>
 	<div id="page-learner">
 		<h1 class="no-tabs-below">
-			${survey.title}
+			${sessionMap.title}
 		</h1>
 		<div id="header-no-tabs-learner">
 		</div>
@@ -57,85 +42,59 @@
 
 		<div id="content-learner">
 			<h2>
-				${survey.instructions}
+				${sessionMap.instructions}
 			</h2>
-
+			<BR><BR>
 			<%@ include file="/common/messages.jsp"%>
-			<table cellpadding="0" cellspacing="0" class="alternative-color">
-				<tr>
-					<th width="255px">
-						<fmt:message key="label.resoruce.to.review" />
-					</th>
-					<th width="75px">
-						<fmt:message key="label.completed" />
-					</th>
-					<th align="center">
-
-					</th>
-				</tr>
-				<c:forEach var="item" items="${sessionMap.surveyList}">
-					<tr>
-						<td align="center">
-							${item.title}
-							<c:if test="${!item.createByAuthor}">
-								[${item.createBy.loginName}]
-							</c:if>
-						</td>
-						<td align="center">
-							<c:if test="${item.complete}">
-								<img src="<html:rewrite page='/includes/images/tick.gif'/>" border="0">
-							</c:if>
-
-						</td>
-
-						<td>
-							<c:if test="${mode != 'teacher' && (not finishedLock)}">
-								<a href="javascript:;" onclick="return completeItem(${item.uid})" class="button">
-									<fmt:message key="label.completed"/>
-								</a>
-							</c:if>
-							&nbsp;
-							<c:if test="${not finishedLock}">
-								<a href="javascript:;"  onclick="viewItem(${item.uid})" class="button">
-									<fmt:message key="label.view"/>
-								</a>
-							</c:if>
-						</td>
-					</tr>
-				</c:forEach>
-				<c:if test="${survey.miniViewSurveyNumber > 0}">
-					<tr>
-						<td colspan="3" align="left">
-							<b>${survey.miniViewNumberStr}</b>
-						</td>
-					</tr>
-				</c:if>
-			</table>
-			<div class="left-buttons">
-				<html:button property="checkNewButton" onclick="return checkNew()" disabled="${finishedLock}" styleClass="button">
-					<fmt:message key="label.check.for.new" />
-				</html:button>
-			</div>
-			<c:if test="${mode != 'teacher'}">
-				<div class="right-buttons">
+				
+				<table cellpadding="0" cellspacing="0" class="alternative-color">
 					<c:choose>
-						<c:when test="${sessionMap.reflectOn}">
-							<html:button property="FinishButton"  onclick="return continueReflect()" disabled="${finishedLock}"  styleClass="button">
-								<fmt:message key="label.continue" />
-							</html:button>
+						<%-- Show on one page or when learner does not choose edit one question --%>
+						<c:when test="${sessionMap.showOnOnePage && empty questionSeqID}">
+						<c:forEach var="element" items="${sessionMap.questionList}">
+							<c:set var="question" value="${element.value}" />
+							<%@ include file="/pages/learning/question.jsp"%>
+						</c:forEach>
 						</c:when>
 						<c:otherwise>
-							<html:button property="FinishButton"  onclick="return finishSession()" disabled="${finishedLock}"  styleClass="button">
-								<fmt:message key="label.finished" />
-							</html:button>
+							
+							<c:set var="question" value="${sessionMap.questionList[questionSeqID]}"/>
+							<%@ include file="/pages/learning/question.jsp"%>
 						</c:otherwise>
 					</c:choose>
-				</div>
-			</c:if>
-			<div style="height: 70px"></div> 
-			
-				<%-- end mode != teacher --%>
-			</c:if>
+				</table>
+				<%-- Display button according to different situation --%>
+				<c:if test="${sessionMap.mode != 'teacher'}">
+					<div class="right-buttons">
+						<c:choose>
+							<c:when test="${(sessionMap.showOnOnePage && empty questionSeqID) or position == 3}">
+								<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
+									<fmt:message key="label.submit.survey" />
+								</html:submit>
+							</c:when>
+							<c:otherwise>
+								<c:if test="${position == 1 || position == 0}">
+									<html:button property="NextButton"  onclick="nextQuestion()" styleClass="button">
+										<fmt:message key="label.next" />
+									</html:button>
+								</c:if>
+								&nbsp;&nbsp;
+								<c:if test="${position == 2 || position == 0}">
+									<html:button property="PreviousButton"  onclick="previousQuestion()" styleClass="button">
+										<fmt:message key="label.previous" />
+									</html:button> 
+								</c:if>
+								<c:if test="${position == 2}">
+									<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
+										<fmt:message key="label.submit.survey" />
+									</html:submit>										
+								</c:if>
+							</c:otherwise>
+						</c:choose>
+					</div>
+					<%-- end mode != teacher --%>
+				</c:if>
+		
 		</div>  <!--closes content-->
 		
 		<div id="footer-learner">
@@ -143,6 +102,7 @@
 		<!--closes footer-->
 
 	</div><!--closes page-->
+</html:form>	
 </body>
 </html:html>
 

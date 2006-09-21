@@ -7,29 +7,29 @@
 <table id="itemTable" style="align:left;width:650px" >
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
-<c:forEach var="survey" items="${sessionMap.questionList}" varStatus="status">
+<c:forEach var="question" items="${sessionMap.questionList}" varStatus="status">
 	<tr>
 		<td width="20px" align="center">
 			<c:choose>
-				<c:when test="${survey.type == 1}">
+				<c:when test="${question.type == 1}">
 					<img src="${ctxPath}/includes/images/icon_single.gif"/>
 				</c:when>
-				<c:when test="${survey.type == 2}">
+				<c:when test="${question.type == 2}">
 					<img src="${ctxPath}/includes/images/icon_multiple.gif"/>
 				</c:when>
-				<c:when test="${survey.type == 3}">
+				<c:when test="${question.type == 3}">
 					<img src="${ctxPath}/includes/images/icon_text.gif"/>
 				</c:when>
 			</c:choose>
 		</td>
-		<td>${survey.shortTitle}</td>
+		<td>${question.shortTitle}</td>
 		<td width="80px" align="center">
-			<c:if test="${survey.optional}">
+			<c:if test="${question.optional}">
 				<fmt:message key="label.optional"/>
 			</c:if>
 		</td>
 		<td width="80px" align="center">
-			<a href="#" onclick="editItem(${status.index},${survey.type},'${sessionMapID}')" class="button">
+			<a href="#" onclick="editItem(${status.index},${question.type},'${sessionMapID}')" class="button">
 				<fmt:message key="label.authoring.basic.survey.edit" />
 			</a>
 		</td>

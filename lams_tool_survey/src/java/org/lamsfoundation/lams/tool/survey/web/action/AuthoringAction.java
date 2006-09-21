@@ -815,6 +815,12 @@ public class AuthoringAction extends Action {
 		
 		if(itemIdx == -1){ //add
 			item.setCreateDate(new Timestamp(new Date().getTime()));
+			int maxSeq = 1;
+			if(surveyList != null && surveyList.size() > 0){
+				SurveyQuestion last = surveyList.last();
+				maxSeq = last.getSequenceId()+1;
+			}
+			item.setSequenceId(maxSeq);
 			surveyList.add(item);
 		}else{ //edit
 			List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);

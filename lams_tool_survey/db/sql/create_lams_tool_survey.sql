@@ -31,7 +31,7 @@ primary key (uid)
 
 create table tl_lasurv11_answer (
 uid bigint not null auto_increment, 
-survey_item_uid bigint, 
+question_uid bigint, 
 user_uid bigint, 
 session_id bigint, 
 answer_choices varchar(255), 
@@ -55,12 +55,13 @@ create table tl_lasurv11_option (
 uid bigint not null auto_increment, 
 description text,
 sequence_id integer, 
-answer_uid bigint, 
+question_uid bigint, 
 primary key (uid)
 );
 
 create table tl_lasurv11_question (
 uid bigint not null auto_increment, 
+sequence_id integer,
 description text,
 create_by bigint, 
 create_date datetime, 
@@ -95,9 +96,9 @@ primary key (uid)
 );
 
 alter table tl_lasurv11_answer add index FK6DAAFE3BB1423DC1 (user_uid), add constraint FK6DAAFE3BB1423DC1 foreign key (user_uid) references tl_lasurv11_user (uid);
-alter table tl_lasurv11_answer add index FK6DAAFE3BAE4CB69 (survey_item_uid), add constraint FK6DAAFE3BAE4CB69 foreign key (survey_item_uid) references tl_lasurv11_question (uid);
+alter table tl_lasurv11_answer add index FK6DAAFE3B25F3BB77 (question_uid), add constraint FK6DAAFE3B25F3BB77 foreign key (question_uid) references tl_lasurv11_question (uid);
 alter table tl_lasurv11_attachment add index FKD92A9120D14146E5 (survey_uid), add constraint FKD92A9120D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);
-alter table tl_lasurv11_option add index FK85AB46F282152886 (answer_uid), add constraint FK85AB46F282152886 foreign key (answer_uid) references tl_lasurv11_question (uid);
+alter table tl_lasurv11_option add index FK85AB46F26966134F (question_uid), add constraint FK85AB46F26966134F foreign key (question_uid) references tl_lasurv11_question (uid);
 alter table tl_lasurv11_question add index FK872D4F23D14146E5 (survey_uid), add constraint FK872D4F23D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);
 alter table tl_lasurv11_question add index FK872D4F23E4C99A5F (create_by), add constraint FK872D4F23E4C99A5F foreign key (create_by) references tl_lasurv11_user (uid);
 alter table tl_lasurv11_session add index FKF08793B9D14146E5 (survey_uid), add constraint FKF08793B9D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);

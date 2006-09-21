@@ -21,14 +21,39 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.survey.dao;
+package org.lamsfoundation.lams.tool.survey.web.form;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
-
-public interface SurveyQuestionDAO extends DAO {
-
-	SurveyQuestion getByUid(Long questionUid);
+import org.apache.struts.action.ActionForm;
+/**
+ *  Survey Item  Form.
+ *	@struts.form name="answerForm"
+ * @author Steve.Ni
+ * 
+ * @version $Revision$
+ */
+public class AnswerForm extends ActionForm {
+	private String sessionMapID;
+	private Integer questionSeqID;
+	private int position;
+	
+	public int getPosition() {
+		return position;
+	}
+	public void setPosition(int position) {
+		this.position = position;
+	}
+	public Integer getQuestionSeqID() {
+		return questionSeqID;
+	}
+	public void setQuestionSeqID(Integer questionSeqID) {
+		this.questionSeqID = questionSeqID;
+	}
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
+	}
+	
 
 }

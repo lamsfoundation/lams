@@ -11,8 +11,8 @@ create_date_time
 )
 VALUES
 (
-'Share surveys',
-'Share surveys',
+'Survey',
+'Survey',
 0,
 NOW()
 )
