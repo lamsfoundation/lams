@@ -97,7 +97,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
     private var _dictionary:Dictionary;
-	
+	private var _ccm:CustomContextMenu;
     private var _config:Config;
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
@@ -142,6 +142,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _lessonsLoaded = false;
 		_monitorLoaded = false;
 		_module = Application.MODULE;
+		_ccm = CustomContextMenu.getInstance();
 		//_toolbarLoaded = false;
 		//Mouse.addListener(someListener);
     }
@@ -376,7 +377,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     * Create all UI Elements
     */
     private function setupUI(){
-		
+		_ccm.showCustomCM(_ccm.loadMenu("application", "monitoring"))
         //Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
@@ -416,12 +417,25 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	
 	
 	public function help():Void{
+		Debugger.log("called help page for activity ",Debugger.CRITICAL,'getHelp','Monitor');
 		var ca = _monitor.getMM().selectedItem
 		if (CanvasActivity(ca) != null){
 			_monitor.getHelp(ca);
 		}
 	}
     
+	
+	public function MonitorActivityContent():Void{
+		trace("testing MonitorActivityContent");
+		var ca = _monitor.getMM().selectedItem
+		if (CanvasActivity(ca) != null){ 
+			_monitor.getMV().getController().activityDoubleClick(ca, "MonitorTabView");
+		}else {
+			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_openContent_invalid'));
+		}
+	}
+	
+	
     /**
     * Runs when application setup has completed.  At this point the init/loading screen can be removed and the user can
     * work with the application
