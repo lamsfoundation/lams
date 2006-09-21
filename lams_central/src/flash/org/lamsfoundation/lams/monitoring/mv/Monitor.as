@@ -79,7 +79,7 @@ class Monitor {
 		
 		// Set root movieclip
 		_root_mc = target_mc;
-		
+		app = Application.getInstance();
 		//Create the model
 		monitorModel = new MonitorModel(this);
 		_ddm = new DesignDataModel();
