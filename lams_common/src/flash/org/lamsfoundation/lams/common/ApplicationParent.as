@@ -122,12 +122,14 @@ class ApplicationParent {
 	
 	/**
 	 * Retrieve the help url from config.
-	 * 
+	 * @param callback (optional) 
 	 */
-	public function getHelpURL() {
-		var callback:Function = Proxy.create(this,openHelp);
-           
-		Application.getInstance().getComms().getRequest('authoring/author.do?method=getHelpURL',callback, false);
+	public function getHelpURL(callback:Function) {
+		var _callback:Function = callback;
+		if(callback == null || callback == undefined) {
+			_callback = Proxy.create(this,openHelp);	// default callback
+		}
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getHelpURL',_callback, false);
 		
 	}
 	
