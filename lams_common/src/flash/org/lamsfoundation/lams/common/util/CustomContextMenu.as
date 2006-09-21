@@ -23,6 +23,7 @@
  
 import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.dict.*
 /**
 * DTO  Generic data transfer obj
 */
@@ -76,7 +77,7 @@ class CustomContextMenu {
 	* Load the dictionary for the language specified
 	* @param language (string) language parameter.
 	*/
-	public function loadMenu(cmType:String):Array {
+	public function loadMenu(cmType:String, moduleType:String):Array {
 	
        trace("Value for this: "+this)
 		var v:Boolean; 
@@ -89,20 +90,20 @@ class CustomContextMenu {
 		}else {
 			v = false;
 		}
-		if (app.module == "authoring"){
+		if (moduleType == "authoring"){
 			authorC = true;
 			monitorC = false
 		}else{
 			authorC = false;
 			monitorC = true;
 		}
-		menuArr[0] = ["Open/Edit Activity Content", getOpenEditActivityContent, false, v, authorC];
-		menuArr[1] = ["Copy Activity", getCopy, false, v, authorC];
-		menuArr[2] = ["Monitor Activity", getOpenMonitorActivityContent, false, v, monitorC];
-		menuArr[3] = ["Monitor Activity Help",getHelp, true, v, monitorC];
-		menuArr[4] = ["Paste Activity",getPaste, false, v, authorC];
-		menuArr[5] = ["Property Inspector...",getPI, true, true, authorC];
-		menuArr[6] = ["Author Activity Help",getHelp, true, v, authorC];
+		menuArr[0] = [Dictionary.getValue('ccm_open_activitycontent'), getOpenEditActivityContent, false, v, authorC];
+		menuArr[1] = [Dictionary.getValue('ccm_copy_activity'), getCopy, false, v, authorC];
+		menuArr[2] = [Dictionary.getValue('ccm_monitor_activity'), MonitorActivityContent, false, v, monitorC];
+		menuArr[3] = [Dictionary.getValue('ccm_monitor_activityhelp'),getMonitorHelp, false, v, monitorC];
+		menuArr[4] = [Dictionary.getValue('ccm_paste_activity'),getPaste, false, v, authorC];
+		menuArr[5] = [Dictionary.getValue('ccm_pi'),getPI, true, true, authorC];
+		menuArr[6] = [Dictionary.getValue('ccm_author_activityhelp'),getHelp, false, v, authorC];
 		
 		for (var i=0; i<menuArr.length; i++){
 			var myObj:Object = new Object();
@@ -145,8 +146,8 @@ class CustomContextMenu {
 		org.lamsfoundation.lams.authoring.Application.getInstance().openEditActivtiyContent();
 	}
 	
-	public function getOpenMonitorActivityContent(){
-		//org.lamsfoundation.lams.monitoring.Application.getInstance().openMonitorActivityContent();
+	public function MonitorActivityContent(){
+		org.lamsfoundation.lams.monitoring.Application.getInstance().MonitorActivityContent();
 		
 	}
 	public function getCopy(){
@@ -162,13 +163,13 @@ class CustomContextMenu {
 		//appReference().expandPI();
 		org.lamsfoundation.lams.authoring.Application.getInstance().expandPI();
 		
-	}		
+	}	
+	
+	public function getMonitorHelp(){
+		org.lamsfoundation.lams.monitoring.Application.getInstance().help();
+	}
 	
 	public function getHelp(){
-		if(app.module != 'monitoring') {
-			org.lamsfoundation.lams.authoring.Application.getInstance().help();
-		} else {
-			org.lamsfoundation.lams.monitoring.Application.getInstance().help();
-		}
+		org.lamsfoundation.lams.authoring.Application.getInstance().help();
 	}
 }
