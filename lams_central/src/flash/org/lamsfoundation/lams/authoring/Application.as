@@ -191,7 +191,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         //Set up Key handler 
         //TODO take out after testing and uncomment same key handler in ready();
         Key.addListener(this);
-		
+		_container_mc.tabChildren = true;
     }
     
     /**
@@ -353,7 +353,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     */
     private function setupUI(){
 		//Make the base context menu hide built in items so we don't have zoom in etc 
-		_ccm.showCustomCM(_ccm.loadMenu("application"))
+		_ccm.showCustomCM(_ccm.loadMenu("application", "authoring"))
 		
         //Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
@@ -390,8 +390,19 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		
 		_pi_mc = _pi_mc.attachMovie('PropertyInspectorNew','_pi_mc',PI_DEPTH, {_x:PI_X,_y:PI_Y, _canvasModel:_canvas.model, _canvasController:_canvas.view.getController()});
 		_pi_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		
+		setTabIndex();
     }
     
+	private function setTabIndex(selectedTab:String){
+		
+		//All Buttons Tab Index
+		_menu_mc.tabIndex = 100;
+		_toolbarContainer_mc.tabIndex = 200;
+		//_toolkit.tabIndex = 3;
+		_pi_mc.tabIndex = 400;
+	}
+	
     /**
     * Runs when application setup has completed.  At this point the init/loading screen can be removed and the user can
     * work with the application
