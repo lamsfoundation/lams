@@ -72,6 +72,23 @@
       <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
       <body-content>empty</body-content>
 
+      <attribute>
+         <description>Help tag</description>
+         <name>module</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>toolSignature</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
    </tag>
    <tag>
 
@@ -364,6 +381,6 @@
    	<tag-file>
 	    <name>DefineLater</name>
 		<path>/WEB-INF/tags/DefineLater.tag</path>
-   	</tag-file>
+   	</tag-file>  
 
 </taglib>
