@@ -98,7 +98,7 @@ public class MockAdmin extends MockUser {
 			WebTable table = tables[0];
 			String idAsString = null;
 			for (int i = table.getRowCount()-1; i >= 0; i--){
-				if(table.getCellAsText(i,1).indexOf(courseName)!=-1){//found the organisation created just now
+				if(table.getCellAsText(i,0).indexOf(courseName)!=-1){//found the organisation created just now
 					TableCell cell = table.getTableCell(i+1,1);
 					WebLink link = cell.getLinks()[0];
 					String cellText = link.getAttribute("href");
@@ -132,6 +132,8 @@ public class MockAdmin extends MockUser {
 			
 			for(int i=0; i < users.length; i++){
 				delay();
+				
+				// create the user
 				String name = users[i].user.getUsername();
 				log.info(username+" creating user "+name);
 				WebResponse resp = (WebResponse)new Call(wc, test, username + " creating user "+name,url).execute();
@@ -145,18 +147,27 @@ public class MockAdmin extends MockUser {
 				params.put(PASSWORD2,name);
 				params.put(FIRST_NAME,name);
 				params.put(LAST_NAME,COMMON_LAST_NAME);
-				params.put(ROLES,users[i].roles);
 				resp = (WebResponse)new Call(wc, test, username + " submit user creation form",fillForm(resp,0,params)).execute();
+
+				// add the roles
+				log.info(username+" adding roles to user "+name);
+				params = new HashMap<String, Object>();
+				params.put(ROLES,users[i].roles);
+				resp = (WebResponse)new Call(wc, test, username + " submit user rolesform",fillForm(resp,0,params)).execute();
 				WebTable[] tables = resp.getTables();
 				if((tables==null)||(tables.length==0)){
 					log.debug(resp.getText());
-					throw new TestHarnessException(username + " failed to get an user table after submitting user creation form");
+					throw new TestHarnessException(username + " failed to get an user table after submitting user role form");
 				}
+				
 				WebTable table = tables[0];
 				String idAsString = null;
 				for(int j = table.getRowCount()-1; j >= 0; j--){
-					if(table.getCellAsText(j,1).indexOf(name)!=-1){
-						TableCell cell = table.getTableCell(j,6);
+					log.debug("1:"+table.getCellAsText(j,0));
+					log.debug("4:"+table.getCellAsText(j,4));
+					log.debug("5:"+table.getCellAsText(j,5));
+					if(table.getCellAsText(j,0).indexOf(name)!=-1){
+						TableCell cell = table.getTableCell(j,5);
 						WebLink link = cell.getLinks()[0];
 						String cellText = link.getAttribute("href");
 						int startIndex = cellText.indexOf(USER_ID_START_FLAG);
