@@ -369,12 +369,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 
 	
 	private function localOnRollOver():Void{
-		_ccm.showCustomCM(_ccm.loadMenu("activity"))
+		if (_module == "monitoring"){
+			_ccm.showCustomCM(_ccm.loadMenu("activity", "monitoring"))
+		}else {
+			_ccm.showCustomCM(_ccm.loadMenu("activity", "authoring"))
+		}
 	}
 	
 	private function localOnRollOut():Void{
-		_ccm.showCustomCM(_ccm.loadMenu("canvas"))
-	}
+		if (_module == "monitoring"){
+			_ccm.showCustomCM(_ccm.loadMenu("canvas", "monitoring"))
+		}else {
+			_ccm.showCustomCM(_ccm.loadMenu("canvas", "authoring"))
+		}
+	}	
 	
 	private function localOnPress():Void{
 		
