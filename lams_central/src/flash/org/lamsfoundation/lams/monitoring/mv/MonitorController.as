@@ -262,6 +262,9 @@ class MonitorController extends AbstractController {
 		}else if(tgt.indexOf("refresh_btn") != -1){
 			trace('you clicked refresh button..');
 			_monitorModel.refreshAllData();
+		}else if(tgt.indexOf("help_btn") != -1){
+			trace('you clicked help button..');
+			_monitorModel.tabHelp();
 		}
 	}
 

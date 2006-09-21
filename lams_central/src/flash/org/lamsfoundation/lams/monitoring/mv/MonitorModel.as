@@ -70,6 +70,7 @@ class MonitorModel extends Observable{
 	// add model data
 	private var _activeSeq:Sequence;
 	private var _lastSelectedSeq:Sequence;
+	private var app:Application;
 	
 	private var _org:Organisation;
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
@@ -124,6 +125,7 @@ class MonitorModel extends Observable{
 		monitor_y = Application.MONITOR_Y;
 		monitor_x = Application.MONITOR_X;
 		mx.events.EventDispatcher.initialize(this);
+		app = Application.getInstance();
 	}
 	
 	// add get/set methods
@@ -537,6 +539,39 @@ class MonitorModel extends Observable{
 		
 	}
 	
+	public function tabHelp(){
+		var callback:Function = Proxy.create(this, openTabHelp);
+		//selectedTab = getSelectedTab();
+		app.getHelpURL(callback)
+	}
+	
+	private function selectedTabName():String{
+		selectedTab = getSelectedTab();
+		var tabName:String
+		switch (String(selectedTab)){
+			case '0' :
+				tabName = "lesson"
+                break;
+            case '1' :
+			    tabName = "sequence"
+                break;
+			case '2' :
+				tabName = "learners"
+				break;
+            default :
+                //styleObj = _tm.getStyleObject('ACTPanel0')
+		}
+		return tabName;
+		
+		
+	}
+	
+	private function openTabHelp(url:String){
+		var tabName:String = selectedTabName();
+		var locale:String = _root.lang + _root.country;
+		var target:String = app.module +tabName+ '#' + app.module +tabName+ '-' + locale;
+		getURL(url + target, '_blank');
+	}
 	/**
 	* Periodically checks if users have been loaded
 	*/
