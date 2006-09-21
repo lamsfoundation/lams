@@ -24,19 +24,15 @@
 </p>
 <table class="alternative-color" width=100%>
 <tr>
-	<th></th>
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.title"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
 	<th><fmt:message key="admin.user.last_name"/></th>
 	<th><fmt:message key="admin.user.roles"/></th>
-	<th></th>
+	<th><fmt:message key="admin.user.actions"/></th>
 </tr>
 <logic:iterate id="userManageBean" name="UserManageForm" property="userManageBeans">
 	<tr>
-		<td>
-			<bean:write name="userManageBean" property="userId" />
-		</td>
 		<td>
 			<bean:write name="userManageBean" property="login" />
 		</td>
