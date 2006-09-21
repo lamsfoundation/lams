@@ -91,7 +91,7 @@
 			<div id="content">
 				<!-- show any error messages here -->
 				<%@ include file="../errorbox.jsp"%>
-
+				<lams:help toolSignature="lanb11" module="author"/>
 				<!--  Set up tabs  -->
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic"
 					page="basic.jsp" />

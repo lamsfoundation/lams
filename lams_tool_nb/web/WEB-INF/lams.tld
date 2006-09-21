@@ -64,6 +64,17 @@
    </tag>
    <tag>
 
+      <description>Help tag</description>
+      <display-name>Help tag</display-name>
+      <icon>    
+      </icon>
+      <name>help</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
       <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
       <display-name>generate unique ID</display-name>
       <icon>    
@@ -353,6 +364,6 @@
    	<tag-file>
 	    <name>DefineLater</name>
 		<path>/WEB-INF/tags/DefineLater.tag</path>
-   	</tag-file>  
+   	</tag-file>
 
 </taglib>
