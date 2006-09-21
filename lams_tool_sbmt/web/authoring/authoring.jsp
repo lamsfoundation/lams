@@ -68,6 +68,7 @@
 
 			<%@ include file="/common/messages.jsp"%>
 
+			<lams:help toolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" module="authoring"/>
 			
 			<html:form action="authoring" method="post" styleId="authoringForm" enctype="multipart/form-data">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />

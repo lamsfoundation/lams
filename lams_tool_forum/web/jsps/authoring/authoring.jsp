@@ -24,6 +24,8 @@
 	<div id="content">
 
 		<%@ include file="/common/messages.jsp"%>
+		
+		<lams:help toolSignature="<%= ForumConstants.TOOL_SIGNATURE %>" module="authoring"/>
 
 		<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
 		<lams:TabBody id="2" titleKey="authoring.tab.advanced"

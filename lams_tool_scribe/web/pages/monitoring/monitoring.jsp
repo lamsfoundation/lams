@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.scribe.util.ScribeConstants"%>
 
 <div id="header">
 	<lams:Tabs>
@@ -8,6 +9,8 @@
 		<lams:Tab id="4" key="button.statistics" />
 	</lams:Tabs>
 </div>
+
+<lams:help toolSignature="<%= ScribeConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 
 <div id="content">
 	<lams:TabBody id="1" titleKey="button.summary" page="summary.jsp" />

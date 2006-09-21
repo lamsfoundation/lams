@@ -381,6 +381,6 @@
    	<tag-file>
 	    <name>DefineLater</name>
 		<path>/WEB-INF/tags/DefineLater.tag</path>
-   	</tag-file>  
+   	</tag-file>
 
 </taglib>

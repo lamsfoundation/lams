@@ -115,6 +115,8 @@
 		<html:hidden property="contentFolderID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 
+		<lams:help toolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" module="authoring"/>
+
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 			<!-- end of content (Basic) -->

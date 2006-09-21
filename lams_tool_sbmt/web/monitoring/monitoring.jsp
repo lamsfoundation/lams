@@ -2,6 +2,8 @@
 
 <%@include file="/common/taglibs.jsp"%>
 
+<%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
+
 <html:html>
 <head>
 	<title><fmt:message key="activity.title" /></title>
@@ -94,6 +96,8 @@
 				<html:hidden property="method" />
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:errors />
+
+				<lams:help toolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 
 				<!-- tab content 1 (Summary) -->
 				<lams:TabBody id="1" titleKey="label.monitoring.heading.userlist.desc" page="parts/summary.jsp" />

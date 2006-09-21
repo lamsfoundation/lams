@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<%@ page import="org.lamsfoundation.lams.tool.notebook.util.NotebookConstants"%>
+
 <div id="header">
 
 	<!--  TITLE KEY PAGE GOES HERE -->
@@ -25,6 +27,8 @@
 			</c:if>
 		</div>
 
+		<lams:help toolSignature="<%= NotebookConstants.TOOL_SIGNATURE %>" module="authoring"/>
+		
 		<%-- Page tabs --%>
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
 		<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />

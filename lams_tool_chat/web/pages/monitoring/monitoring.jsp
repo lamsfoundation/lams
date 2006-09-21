@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.chat.util.ChatConstants"%>
 
 <div id="header">
 	<lams:Tabs>
@@ -10,6 +11,8 @@
 </div>
 
 <div id="content">
+	<lams:help toolSignature="<%= ChatConstants.TOOL_SIGNATURE %>" module="monitoring"/>
+
 	<lams:TabBody id="1" titleKey="button.summary" page="summary.jsp" />
 	<lams:TabBody id="2" titleKey="button.instructions" page="instructions.jsp" />
 	<lams:TabBody id="3" titleKey="button.editActivity" page="editActivity.jsp" />

@@ -3,6 +3,8 @@
 
 <%@ include file="/includes/taglibs.jsp"%>
 
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+
 <lams:html>
 <head>
 	<lams:headItems />
@@ -91,7 +93,7 @@
 			<div id="content">
 				<!-- show any error messages here -->
 				<%@ include file="../errorbox.jsp"%>
-				<lams:help toolSignature="lanb11" module="authoring"/>
+				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="authoring"/>
 				<!--  Set up tabs  -->
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic"
 					page="basic.jsp" />

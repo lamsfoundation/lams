@@ -5,7 +5,7 @@
 
 <%@ page import="java.util.HashMap"%>
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"%>
-
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -62,7 +62,9 @@
 				<c:set var="monitoringURL">
 					<html:rewrite page="/monitoring.do" />
 				</c:set>
-
+				
+				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="monitoring"/>
+				
 				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" />
 				<lams:TabBody id="2" titleKey="titleHeading.instructions" page="m_Instructions.jsp" />
 				<lams:TabBody id="3" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />

@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.scribe.util.ScribeConstants"%>
 
 <div id="header">
 	<lams:Tabs control="true">
@@ -25,6 +26,8 @@
 				<fmt:message key="message.unsavedChanges" />
 			</c:if>
 		</div>
+
+		<lams:help toolSignature="<%= ScribeConstants.TOOL_SIGNATURE %>" module="authoring"/>
 
 		<%-- Page tabs --%>
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />

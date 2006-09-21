@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<%@ page import="org.lamsfoundation.lams.tool.chat.util.ChatConstants"%>
 <div id="header">
 	<lams:Tabs control="true">
 		<lams:Tab id="1" key="button.basic" />
@@ -25,6 +25,8 @@
 				<fmt:message key="message.unsavedChanges" />
 			</c:if>
 		</div>
+
+		<lams:help toolSignature="<%= ChatConstants.TOOL_SIGNATURE %>" module="authoring"/>
 
 		<%-- Page tabs --%>
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />

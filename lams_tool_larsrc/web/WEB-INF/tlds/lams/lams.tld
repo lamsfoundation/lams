@@ -24,6 +24,26 @@
    </tag>
    <tag>
 
+      <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+      <display-name>converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
+      <icon>    
+      </icon>
+      <name>out</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>value</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Render html tag with direction and language</description>
       <display-name>Render html tag with direction and language</display-name>
       <icon>    
@@ -36,6 +56,34 @@
          <description>Render html tag with direction and language</description>
          <name>xhtml</name>
          <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Help tag</description>
+      <display-name>Help tag</display-name>
+      <icon>    
+      </icon>
+      <name>help</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Help tag</description>
+         <name>module</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>toolSignature</name>
+         <required>true</required>
 
            <rtexprvalue>true</rtexprvalue>
 
@@ -333,6 +381,6 @@
    	<tag-file>
 	    <name>DefineLater</name>
 		<path>/WEB-INF/tags/DefineLater.tag</path>
-   	</tag-file>  
+   	</tag-file>
 
 </taglib>
