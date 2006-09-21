@@ -85,7 +85,7 @@ dynamic class Dictionary {
 		this._currentDate = _root.langDate;
 		
 		var _oldDate:Object = null;
-		
+		var _removeCache:Boolean = Config.getInstance().removeCache;
         // Cookie or server?
 		Debugger.log('Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
 		Debugger.log('Config.USE_CACHE:'+Config.USE_CACHE,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
@@ -96,22 +96,21 @@ dynamic class Dictionary {
 		Debugger.log('Existing date:'+String(_oldDateCookie.date) + ' Current date:' + String(_currentDate),Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
         
 		// determine if dictionary should be loaded from cookie file or from server request
-		if(CookieMonster.cookieExists(DICT_PREFIX+language+SO_SEPARATOR+app.module) && Config.USE_CACHE && _oldDateCookie.date != null) {
+		if(CookieMonster.cookieExists(DICT_PREFIX+language+SO_SEPARATOR+app.module) && Config.USE_CACHE && _oldDateCookie.date != null && !_removeCache) {
 			
 			// clear all data if dictionaries have been updated
 			if(this._currentDate != _oldDateCookie.date){
 				Debugger.log('Removing all dictionary cookies (updated date).',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
 				clearAll(_oldDateCookie);
 				openFromServer();
-			} else if(Config.getInstance().removeCache) {
-				Debugger.log('Removing all dictionary cookies (clear cache)',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
-				clearAll(_oldDateCookie);
-				openFromServer();
 			} else {
 				openFromDisk();
 			}
-			
-        }else {
+		} else if(_removeCache) {
+			Debugger.log('Removing all dictionary cookies (clear cache)',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+			clearAll(_oldDateCookie);
+			openFromServer();
+		} else {
             openFromServer();
         }        
 	}

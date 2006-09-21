@@ -62,6 +62,8 @@ class ThemeManager {
 	//Declarations
     //This ensures that the ThemeManager is created
     private static var _instance:ThemeManager;
+	private static var THEME_PREFIX:String = "theme.";
+	private static var THEME_LOADED:String = THEME_PREFIX + "loaded";
 
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -94,18 +96,21 @@ class ThemeManager {
         //TODO DI 03/05/05 Stub for now but should query server to access themes
         //Set the selected theme to the default theme initially
         _currentThemeName = theme;
+        var _removeCache:Boolean = Config.getInstance().removeCache;
         
         //Cookie or server?
-        if(CookieMonster.cookieExists('theme.'+theme)&&Config.USE_CACHE) {
+        if(CookieMonster.cookieExists('theme.'+theme)&&Config.USE_CACHE&&!_removeCache) {
             //Whilst waiting for theme to load from disk - show busy
-			
 			Cursor.showCursor(ApplicationParent.C_HOURGLASS);  
 			openFromDisk(theme);
 			
 			// show default cursor
 			Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		
-        }else {
+		} else if(_removeCache) { 
+			clearAll(CookieMonster.open(THEME_LOADED, true));
+			openFromServer(theme);
+        } else {
 			//testing style creator
 			//createThemeFromCode(theme);
 			
@@ -527,8 +532,40 @@ class ThemeManager {
         //Convert to data object and then serialize before saving to a cookie
         var dataObj:Object = toData();
         CookieMonster.save(dataObj,'theme.' + _currentThemeName,true);
+		
+		// open theme cookie if exists
+		var themeCookie:Object = null;
+		if(CookieMonster.cookieExists(THEME_LOADED)){
+			themeCookie = CookieMonster.open(THEME_LOADED, true);
+		}
+		
+		// create new theme cookie object
+		var themeObj = new Object();
+		themeObj.data = (themeCookie == null) ? new Array() : getThemeArray(themeCookie.data);
+		
+		themeObj.data.push(_currentThemeName);
+		
+		// save to file
+		CookieMonster.save(themeObj, THEME_LOADED, true);
+		
     }
     
+	/**
+	 * Get the string array of loaded themes
+	 * 
+	 * 
+	 * @param   data 	theme loaded cookie
+	 * @return  		array of themes
+	 */
+	
+	private function getThemeArray(data:Array):Array {
+		var arr:Array = new Array();
+		for(var i=0; i<data.length; i++){
+			arr[i] = data[i];
+		}
+		return arr;
+	}
+	
     /**
     * Open the Theme manager data from disk 
     * @usage   
@@ -615,4 +652,22 @@ class ThemeManager {
         }
         return so;
     }    
+	
+		/**
+	 * Remove all stored theme data and theme tracking cookie
+	 * 
+	 * @param   obj Array of theme strings
+	 *
+	 */
+	public function clearAll(obj:Object) {
+		for(var i=0; i<obj.data.length; i++){
+			if(CookieMonster.cookieExists(THEME_PREFIX + obj.data[i])){
+				CookieMonster.deleteCookie(THEME_PREFIX + obj.data[i]);
+			}
+		}
+		
+		if(CookieMonster.cookieExists(THEME_LOADED)){
+			CookieMonster.deleteCookie(THEME_LOADED);
+		}
+	}
 }
