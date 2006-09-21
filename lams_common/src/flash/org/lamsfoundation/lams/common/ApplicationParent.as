@@ -128,6 +128,8 @@ class ApplicationParent {
 		var _callback:Function = callback;
 		if(callback == null || callback == undefined) {
 			_callback = Proxy.create(this,openHelp);	// default callback
+		}else {
+			Debugger.log('called from Monitor :',Debugger.CRITICAL,'getHelpURL','ApplicationParent');
 		}
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getHelpURL',_callback, false);
 		
