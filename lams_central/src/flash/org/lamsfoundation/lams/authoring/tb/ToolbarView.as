@@ -88,6 +88,8 @@ class ToolbarView extends AbstractView {
 		super (m, c);
 		//In one frame call createToolbar this gives components one frame to setup etc.
         MovieClipUtils.doLater(Proxy.create(this,createToolbar));		
+		this.tabChildren = true;
+		setTabIndex();
     }
 	
 	public function showHideAssets(v:Boolean){
@@ -195,6 +197,23 @@ class ToolbarView extends AbstractView {
 		group_btn.label = Dictionary.getValue('group_btn');
 		preview_btn.label = Dictionary.getValue('preview_btn');
 			}
+	
+	private function setTabIndex(selectedTab:String){
+		
+		//All Buttons Tab Index
+		new_btn.tabIndex = 201
+		open_btn.tabIndex = 202
+		save_btn.tabIndex = 203
+		copy_btn.tabIndex = 204
+		paste_btn.tabIndex = 205
+		trans_btn.tabIndex = 206
+		optional_btn.tabIndex = 207
+		flow_btn.tabIndex = 208
+		gate_btn.tabIndex = 209
+		branch_btn.tabIndex = 210
+		group_btn.tabIndex = 211
+		preview_btn.tabIndex = 212		
+	}
 	
 	public function setupButtons(tm:ToolbarModel, menuList:Array){
 		trace("setupButtons Called")
