@@ -438,6 +438,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.copyTypeID = r.copyTypeID;
 			
 			_ddm.modified = false;
+			getURL("javascript:setSaved('true');");
 			LFMenuBar.getInstance().enableExport(true);
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
@@ -1084,6 +1085,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 		
 		_ddm.modified = true;
+		getURL("javascript:setSaved('false');");
 	}
 	
 	
