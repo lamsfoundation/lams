@@ -109,7 +109,7 @@ public class UserAction extends LamsDispatchAction {
 		}
 
 		// editing a user
-		if (userId!=null) {
+		if (userId!=null && userId!=0) {
 			User user = (User)getService().findById(User.class, userId);
 			log.debug("got userid to edit: "+userId);
 			BeanUtils.copyProperties(userForm, user);
