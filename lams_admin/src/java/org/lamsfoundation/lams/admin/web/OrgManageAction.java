@@ -130,7 +130,7 @@ public class OrgManageAction extends Action {
 						continue;
 				}
 				if(type.equals(OrganisationType.CLASS_TYPE)){
-					if (parentOrg.getOrganisationId() != orgId)
+					if (!parentOrg.getOrganisationId().equals(orgId))
 						continue;
 				}
 				OrgManageBean orgManageBean = new OrgManageBean();
