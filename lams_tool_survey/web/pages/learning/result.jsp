@@ -13,13 +13,19 @@
 	<!--
 		
 		function finishSession(){
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
+			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		
+		function retakeSurvey(questionSeqId){
+			//retake for all questions
+			if(questionSeqId == -1)
+				document.location.href='<c:url value="/learning/start.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}"/>';
+			else
+				document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}&questionSeqID="/>' +questionSeqId ;
+		}
 	-->        
     </script>
 
@@ -48,6 +54,9 @@
 								<span style="color: #FF0000">*</span>
 							</c:if>
 							<c:out value="${question.description}" escapeXml="false"/>
+							<c:if test="${(not sessionMap.finishedLock) && (not sessionMap.showOnOnePage)}">
+								<a href="#" onclick="retakeSurvey(${question.sequenceId})"><fmt:message key="label.retake"/></a>
+							</c:if>
 						</th>
 					</tr>
 					<tr>
@@ -57,11 +66,11 @@
 								<c:set var="answerText" value="${question.answer.answerText}"/>
 							</c:if>
 							<c:forEach var="option" items="${question.options}">
-								<c:set var="checked" value="true"/>
+								<c:set var="checked" value="false"/>
 								<c:if test="${not empty question.answer}">
 									<c:forEach var="choice" items="${question.answer.choices}">
 										<c:if test="${choice == option.uid}">
-											<c:set var="checked" value="false"/>
+											<c:set var="checked" value="true"/>
 										</c:if>
 									</c:forEach>
 								</c:if>
@@ -72,7 +81,8 @@
 							<c:if test="${question.type == 3}">
 								<lams:out value="${answerText}"/>
 							</c:if>
-							<c:if test="${question.appendText}">
+							<c:if test="${question.appendText && (not empty answerText)}">
+								<B><fmt:message key="label.append.text"/></B><BR>
 								<lams:out value="${answerText}"/><BR><BR>
 							</c:if>
 						</td>
@@ -82,26 +92,33 @@
 				</c:forEach>
 					
 			</table>
-			<c:if test="${mode != 'teacher'}">
-				<div class="right-buttons">
-					<c:choose>
-						<c:when test="${sessionMap.reflectOn}">
-							<html:button property="ContinueButton"
-								onclick="return continueReflect()" disabled="${finishedLock}"
-								styleClass="button">
-								<fmt:message key="label.continue" />
-							</html:button>
-						</c:when>
-						<c:otherwise>
-							<html:button property="FinishButton"
-								onclick="return finishSession()" disabled="${finishedLock}"
-								styleClass="button">
-								<fmt:message key="label.finished" />
-							</html:button>
-						</c:otherwise>
-					</c:choose>
-				</div>
+			<c:if test="${not sessionMap.finishedLock}">
+				<span class="left-buttons">
+					<html:button property="RetakeButton"
+									onclick="return retakeSurvey(-1)"
+									styleClass="button">
+									<fmt:message key="label.retake.survey" />
+					</html:button>
+				</span>
 			</c:if>
+			<span class="right-buttons">
+				<c:choose>
+					<c:when test="${sessionMap.reflectOn && mode != 'teacher' && not sessionMap.finishedLock}">
+						<html:button property="ContinueButton"
+							onclick="return continueReflect()"
+							styleClass="button">
+							<fmt:message key="label.continue" />
+						</html:button>
+					</c:when>
+					<c:otherwise>
+						<html:button property="FinishButton"
+							onclick="return finishSession()"
+							styleClass="button">
+							<fmt:message key="label.finished" />
+						</html:button>
+					</c:otherwise>
+				</c:choose>
+			</span>
 
 		</div>
 		<!--closes content-->

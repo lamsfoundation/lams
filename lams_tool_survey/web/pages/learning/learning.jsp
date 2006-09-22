@@ -61,6 +61,7 @@
 					</c:choose>
 				</table>
 				<%-- Display button according to different situation --%>
+				<%--POSITION: 0=middle of survey, 1=first question, 2=last question, 3=Only one question available--%>
 					<c:choose>
 						<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
 							<div class="right-buttons">
@@ -88,9 +89,9 @@
 									<fmt:message key="label.next" />
 								</html:button>
 								<c:if test="${position == 2}">
-										<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
-											<fmt:message key="label.submit.survey" />
-										</html:submit>
+									<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
+										<fmt:message key="label.submit.survey" />
+									</html:submit>
 								</c:if>
 							</span>
 						</c:otherwise>

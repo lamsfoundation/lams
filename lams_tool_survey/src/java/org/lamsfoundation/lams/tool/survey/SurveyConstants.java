@@ -38,7 +38,9 @@ public class SurveyConstants {
 	public static final String SUCCESS = "success";
 	public static final String ERROR = "error";
 	public static final String DEFINE_LATER = "definelater";
-	
+	public static final String RUN_OFFLINE = "runOffline";
+	public static final String FORWARD_RESULT = "result";
+
 	//for parameters' name
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
 	public static final String PARAM_FILE_UUID = "fileUuid";
@@ -87,7 +89,7 @@ public class SurveyConstants {
 	public static final String PREFIX_QUESTION_CHOICE = "optionChoice";
 	public static final String PREFIX_QUESTION_TEXT= "optionText";
 	public static final String ERROR_MSG_KEY = "questionError";
-
+	
 	//POSITION
 	public static int POSITION_INSIDE = 0;
 	public static int POSITION_FIRST = 1;

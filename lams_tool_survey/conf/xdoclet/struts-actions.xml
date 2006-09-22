@@ -149,8 +149,9 @@
 			validate="false"
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
-			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
-			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
+			<forward name="definelater" path="/pages/learning/definelater.jsp" />
+			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />	
+			<forward name="result" path="/pages/learning/result.jsp" />	
 		</action>
 		
 		<action path="/learning/nextQuestion"
@@ -169,6 +170,16 @@
 			scope="request" 
 			validate="false"			
 			parameter="previousQuestion" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		
+		<action path="/learning/retake"
+			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			name="answerForm" 
+			scope="request" 
+			validate="false"			
+			parameter="retake" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>
 		

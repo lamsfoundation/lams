@@ -29,15 +29,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +47,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
@@ -63,13 +57,10 @@ import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
-import org.lamsfoundation.lams.tool.survey.service.UploadSurveyFileException;
 import org.lamsfoundation.lams.tool.survey.util.IntegerComparator;
-import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.tool.survey.web.form.AnswerForm;
 import org.lamsfoundation.lams.tool.survey.web.form.ReflectionForm;
-import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -77,7 +68,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.util.WebUtils;
 /**
  * 
  * @author Steve.Ni
@@ -105,6 +95,11 @@ public class LearningAction extends Action {
 		if(param.equals("doSurvey")){
 			return doSurvey(mapping, form, request, response);
 		}
+		
+		if(param.equals("retake")){
+			return retake(mapping, form, request, response);
+		}
+		
 		if(param.equals("finish")){
 			return finish(mapping, form, request, response);
 		}
@@ -120,7 +115,8 @@ public class LearningAction extends Action {
 		return  mapping.findForward(SurveyConstants.ERROR);
 	}
 
-	
+
+
 
 	/**
 	 * Read survey data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -140,7 +136,8 @@ public class LearningAction extends Action {
 		//save toolContentID into HTTPSession
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, true);
 		Long sessionId =  new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
-		
+		//it will be use when runOffline or lock on finish page.
+		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 		
 //		get back the survey and question list and display them on page
 		ISurveyService service = getSurveyService();
@@ -168,7 +165,7 @@ public class LearningAction extends Action {
 		
 		//add define later support
 		if(survey.isDefineLater()){
-			return mapping.findForward("defineLater");
+			return mapping.findForward(SurveyConstants.DEFINE_LATER);
 		}
 		
 		//set contentInUse flag to true!
@@ -179,7 +176,7 @@ public class LearningAction extends Action {
 		//add run offline support
 		if(survey.getRunOffline()){
 			sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, true);
-			return mapping.findForward("runOffline");
+			return mapping.findForward(SurveyConstants.RUN_OFFLINE);
 		}else
 			sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, false);
 				
@@ -203,6 +200,11 @@ public class LearningAction extends Action {
 			answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
 		else
 			answerForm.setPosition(SurveyConstants.POSITION_FIRST);
+		
+		//if page is locked, only go to result pages.
+		if(lock){
+			return mapping.findForward(SurveyConstants.FORWARD_RESULT);
+		}
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 
@@ -267,6 +269,13 @@ public class LearningAction extends Action {
 			answerForm.setPosition(SurveyConstants.POSITION_INSIDE);
 		}
 		answerForm.setQuestionSeqID(questionSeqID);
+		return mapping.findForward(SurveyConstants.SUCCESS);
+	}
+	
+
+	private ActionForward retake(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		AnswerForm answerForm = (AnswerForm) form;
+		answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 
