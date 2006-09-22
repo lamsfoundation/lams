@@ -135,6 +135,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring"});
 				
 		}else {
+			trace("called when seleting act")
 			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
 			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
 			
