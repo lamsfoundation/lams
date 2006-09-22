@@ -234,6 +234,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return actOptional
 	}
 	
+	public function findParallelActivities():Array{
+		
+		var actParallel:Array = new Array();
+		var k:Array = _activitiesDisplayed.values();
+		//trace("findOptionalActivities Called "+k.length )
+		for (var i=0; i<k.length; i++){
+			if (k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				actParallel.push(k[i]);
+				trace("find the Parallel with id:"+k[i].activity.activityUIID )
+			}
+			
+		}
+		return actParallel
+	}
+	
 	public function lockAllComplexActivities():Void{
 		var k:Array = _activitiesDisplayed.values();
 		//trace("findOptionalActivities Called "+k.length )
@@ -376,6 +391,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function createNewOptionalActivity(ActivityTypeID, pos:Point){
 		//Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
 		var optAct = new ComplexActivity(_cv.ddm.newUIID());
+		
 		optAct.learningDesignID = _cv.ddm.learningDesignID;
 		optAct.activityTypeID = Activity.OPTIONAL_ACTIVITY_TYPE;
 		optAct.title = Dictionary.getValue('opt_activity_title');
