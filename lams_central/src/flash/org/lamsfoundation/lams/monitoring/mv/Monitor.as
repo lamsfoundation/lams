@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.monitoring.User;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
+import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
@@ -403,8 +404,30 @@ class Monitor {
 			var locale:String = _root.lang + _root.country;
 			getURL(ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale, '_blank');
 		} else {
-			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_helpURL_undefined', [ca.activity.toolDisplayName]));
+			if (ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
+				var callback:Function = Proxy.create(this, openGroupHelp);
+				app.getHelpURL(callback)
+			}else if (ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
+				var callback:Function = Proxy.create(this, openGateHelp);
+				app.getHelpURL(callback)
+			}else {
+				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_helpURL_undefined', [ca.activity.toolDisplayName]));
+			}
 		}
+	}
+	
+	private function openGroupHelp(url:String){
+		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GROUP
+		var locale:String = _root.lang + _root.country;
+		var target:String = app.module +actToolSignature+ '#' + app.module +actToolSignature+ '-' + locale;
+		getURL(url + target, '_blank');
+	}
+	
+	private function openGateHelp(url:String){
+		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GATE
+		var locale:String = _root.lang + _root.country;
+		var target:String = app.module +actToolSignature+ '#' + app.module +actToolSignature+ '-' + locale;
+		getURL(url + target, '_blank');
 	}
 
 	/**
