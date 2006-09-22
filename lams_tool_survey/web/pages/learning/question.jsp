@@ -42,10 +42,10 @@
 			</c:choose>
 		</c:forEach>
 		<c:if test="${question.type == 3}">
-			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz">${answerText}</textarea><BR><BR>
+			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz"><lams:out value="${answerText}"/></textarea><BR><BR>
 		</c:if>
 		<c:if test="${question.appendText}">
-			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz">${answerText}</textarea><BR><BR>
+			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz"><lams:out value="${answerText}"/></textarea><BR><BR>
 		</c:if>
 	</td>
 </tr>

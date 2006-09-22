@@ -297,6 +297,8 @@ public class LearningAction extends Action {
 		
 		ISurveyService service = getSurveyService();
 		service.updateAnswerList(answerList);
+		
+		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 
@@ -431,9 +433,10 @@ public class LearningAction extends Action {
 			//for mandatory questions, answer can not be null.
 			if(!question.isOptional() && answer == null){
 				errors.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
-				addErrors(request, errors);
 			}
 		}
+		if(!errors.isEmpty())
+			addErrors(request, errors);
 		return errors;
 	}
 
