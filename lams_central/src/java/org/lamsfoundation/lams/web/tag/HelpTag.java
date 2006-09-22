@@ -42,11 +42,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Output the required css based in the user's details. Will output one or more
- * lines. If the user has a theme then exports the default and then the user's
- * style sheet. If the user doesn't have a theme then it just exports
- * the default. This way, if the user's entry points to a stylesheet that
- * doesn't exist, the default one is always available.  
+ * Generates a help link to a contextualised tool help page.
  * 
  * @jsp.tag name="help"
  * 			body-content="empty"
@@ -79,10 +75,17 @@ public class HelpTag extends TagSupport {
 		    String toolSig = getToolSignature();
 		    
         	JspWriter writer = pageContext.getOut();
+        	
+        	// retrieve help URL for tool
         	ILamsToolService toolService = (ILamsToolService) getContext().getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 			IToolVO tool = toolService.getToolBySignature(toolSig);
 			
 			helpURL = tool.getHelpUrl();
+			
+			if(helpURL == null)
+				return SKIP_BODY;
+			
+			// construct link
 			
 			Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 		    if ( locale != null ) {
@@ -91,9 +94,10 @@ public class HelpTag extends TagSupport {
 		    }
 			
 		    fullURL = helpURL + module + "#" + toolSig + module + "-" + language + country;
+			writer.println("<div class='right-buttons'>");
+		    writer.println("<a href='" + fullURL + "' target='_blank'>?</a>");
+		    writer.println("</div>");
 		    
-			writer.println("<a href='" + fullURL + "' target='_blank'>?</a>");
-
 		} catch (IOException e) {
 			log.error("HelpTag unable to write out due to IOException.", e);
 			// don't throw a JSPException as we want the system to still function.
