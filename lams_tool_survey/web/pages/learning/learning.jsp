@@ -45,55 +45,56 @@
 				${sessionMap.instructions}
 			</h2>
 			<BR><BR>
-			<%@ include file="/common/messages.jsp"%>
-				
 				<table cellpadding="0" cellspacing="0" class="alternative-color">
 					<c:choose>
 						<%-- Show on one page or when learner does not choose edit one question --%>
-						<c:when test="${sessionMap.showOnOnePage && empty questionSeqID}">
-						<c:forEach var="element" items="${sessionMap.questionList}">
-							<c:set var="question" value="${element.value}" />
-							<%@ include file="/pages/learning/question.jsp"%>
-						</c:forEach>
+						<c:when test="${sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)}">
+							<c:forEach var="element" items="${sessionMap.questionList}">
+								<c:set var="question" value="${element.value}" />
+								<%@ include file="/pages/learning/question.jsp"%>
+							</c:forEach>
 						</c:when>
 						<c:otherwise>
-							
 							<c:set var="question" value="${sessionMap.questionList[questionSeqID]}"/>
 							<%@ include file="/pages/learning/question.jsp"%>
 						</c:otherwise>
 					</c:choose>
 				</table>
 				<%-- Display button according to different situation --%>
-				<c:if test="${sessionMap.mode != 'teacher'}">
-					<div class="right-buttons">
-						<c:choose>
-							<c:when test="${(sessionMap.showOnOnePage && empty questionSeqID) or position == 3}">
+					<c:choose>
+						<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
+							<div class="right-buttons">
 								<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
 									<fmt:message key="label.submit.survey" />
 								</html:submit>
-							</c:when>
-							<c:otherwise>
-								<c:if test="${position == 1 || position == 0}">
-									<html:button property="NextButton"  onclick="nextQuestion()" styleClass="button">
-										<fmt:message key="label.next" />
-									</html:button>
-								</c:if>
-								&nbsp;&nbsp;
-								<c:if test="${position == 2 || position == 0}">
-									<html:button property="PreviousButton"  onclick="previousQuestion()" styleClass="button">
-										<fmt:message key="label.previous" />
-									</html:button> 
-								</c:if>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<c:set var="preChecked" value="true"/>
+							<c:if test="${position == 2 || position == 0}">
+								<c:set var="preChecked" value="false"/>
+							</c:if>
+							<c:set var="nextChecked" value="true"/>
+							<c:if test="${position == 1 || position == 0}">
+								<c:set var="nextChecked" value="false"/>
+							</c:if>
+							<span class="left-buttons">
+								<html:button property="PreviousButton"  onclick="previousQuestion()" styleClass="button" disabled="${preChecked}">
+									<fmt:message key="label.previous" />
+								</html:button> 
+							</span>
+							<span class="right-buttons">
+								<html:button property="NextButton"  onclick="nextQuestion()" styleClass="button"  disabled="${nextChecked}">
+									<fmt:message key="label.next" />
+								</html:button>
 								<c:if test="${position == 2}">
-									<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
-										<fmt:message key="label.submit.survey" />
-									</html:submit>										
+										<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
+											<fmt:message key="label.submit.survey" />
+										</html:submit>
 								</c:if>
-							</c:otherwise>
-						</c:choose>
-					</div>
-					<%-- end mode != teacher --%>
-				</c:if>
+							</span>
+						</c:otherwise>
+					</c:choose>
 		
 		</div>  <!--closes content-->
 		

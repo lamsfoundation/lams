@@ -54,6 +54,9 @@ public class SurveyWebUtils {
 
 	public static String getChoicesStr(String[] choiceList) {
 		String choices = "";
+		if(choiceList == null)
+			return choices;
+		
 		for(String c: choiceList)
 			choices = choices + c + "&";
 		return choices;

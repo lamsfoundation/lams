@@ -406,7 +406,7 @@ public class LearningAction extends Action {
 		question.setAnswer(answer);
 		//for mandatory questions, answer can not be null.
 		if(!question.isOptional() && answer == null){
-			errors.add(SurveyConstants.ERROR_MSG_KEY,new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
+			errors.add(SurveyConstants.ERROR_MSG_KEY+ question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
 			addErrors(request, errors);
 		}
 
@@ -430,7 +430,7 @@ public class LearningAction extends Action {
 			question.setAnswer(answer);
 			//for mandatory questions, answer can not be null.
 			if(!question.isOptional() && answer == null){
-				errors.add(SurveyConstants.ERROR_MSG_KEY,new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
+				errors.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
 				addErrors(request, errors);
 			}
 		}
@@ -442,7 +442,7 @@ public class LearningAction extends Action {
 		
 		String[] choiceList = request.getParameterValues(SurveyConstants.PREFIX_QUESTION_CHOICE+question.getUid());
 		String textEntry = request.getParameter(SurveyConstants.PREFIX_QUESTION_TEXT+question.getUid());
-		if(choiceList == null && textEntry == null)
+		if(choiceList == null && StringUtils.isBlank(textEntry))
 			return null;
 		
 		
