@@ -35,6 +35,7 @@ public class AnswerForm extends ActionForm {
 	private String sessionMapID;
 	private Integer questionSeqID;
 	private int position;
+	private int currentIdx;
 	
 	public int getPosition() {
 		return position;
@@ -53,6 +54,12 @@ public class AnswerForm extends ActionForm {
 	}
 	public void setSessionMapID(String sessionMapID) {
 		this.sessionMapID = sessionMapID;
+	}
+	public int getCurrentIdx() {
+		return currentIdx;
+	}
+	public void setCurrentIdx(int currentIdx) {
+		this.currentIdx = currentIdx;
 	}
 	
 

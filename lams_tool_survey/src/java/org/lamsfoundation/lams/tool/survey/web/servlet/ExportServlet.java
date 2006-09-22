@@ -56,7 +56,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "shared_surveys_main.html";
+	private final String FILENAME = "survey_main.html";
 
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 

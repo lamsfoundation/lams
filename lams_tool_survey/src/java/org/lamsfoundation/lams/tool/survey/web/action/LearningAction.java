@@ -196,11 +196,14 @@ public class LearningAction extends Action {
 				answerForm.setQuestionSeqID(surveyItemList.firstKey());
 			}
 		}
+		sessionMap.put(SurveyConstants.ATTR_TOTAL_QUESTIONS,surveyItemList.size());
+		answerForm.setCurrentIdx(1);
+		
 		if(surveyItemList.size() < 2)
 			answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
-		else
+		else{
 			answerForm.setPosition(SurveyConstants.POSITION_FIRST);
-		
+		}
 		//if page is locked, only go to result pages.
 		if(lock){
 			return mapping.findForward(SurveyConstants.FORWARD_RESULT);
@@ -215,6 +218,7 @@ public class LearningAction extends Action {
 		
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		SortedMap<Integer, SurveyQuestion> surveyItemMap = getQuestionList(sessionMap);
+		
 		
 		ActionErrors errors = getAnswer(request, surveyItemMap.get(questionSeqID));
 		if(!errors.isEmpty()){
@@ -235,6 +239,9 @@ public class LearningAction extends Action {
 				break;
 			}
 		}
+		//get current question index of total questions
+		int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID)  + 1;
+		answerForm.setCurrentIdx(currIdx);
 		//failure tolerance
 		if(questionSeqID.equals(surveyItemMap.lastKey()))
 			answerForm.setPosition(SurveyConstants.POSITION_LAST);
@@ -263,6 +270,11 @@ public class LearningAction extends Action {
 			questionSeqID = surveyItemMap.firstKey();
 		else
 			questionSeqID = subMap.lastKey();
+		
+		//get current question index of total questions
+		int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID)  + 1;
+		answerForm.setCurrentIdx(currIdx);
+		
 		if(questionSeqID.equals(surveyItemMap.firstKey())){
 			answerForm.setPosition(SurveyConstants.POSITION_FIRST);
 		}else{
@@ -275,7 +287,16 @@ public class LearningAction extends Action {
 
 	private ActionForward retake(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		AnswerForm answerForm = (AnswerForm) form;
+		Integer questionSeqID = answerForm.getQuestionSeqID();
 		answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
+		String sessionMapID = answerForm.getSessionMapID();
+		
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		SortedMap<Integer, SurveyQuestion> surveyItemMap = getQuestionList(sessionMap);
+		//get current question index of total questions
+		int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
+		answerForm.setCurrentIdx(currIdx);
+
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 

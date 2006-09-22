@@ -28,10 +28,12 @@
 	<html:hidden property="questionSeqID"/>
 	<html:hidden property="sessionMapID"/>
 	<html:hidden property="position"/>
+	<html:hidden property="currentIdx"/>
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	<c:set var="position" value="${formBean.position}"/>
 	<c:set var="questionSeqID" value="${formBean.questionSeqID}"/>
+	<c:set var="currentIdx" value="${formBean.currentIdx}"/>
 	<div id="page-learner">
 		<h1 class="no-tabs-below">
 			${sessionMap.title}
@@ -56,6 +58,8 @@
 						</c:when>
 						<c:otherwise>
 							<c:set var="question" value="${sessionMap.questionList[questionSeqID]}"/>
+							<fmt:message key="label.question"/> ${currentIdx} <fmt:message key="label.of"/> ${sessionMap.totalQuestions}
+							<BR><BR>
 							<%@ include file="/pages/learning/question.jsp"%>
 						</c:otherwise>
 					</c:choose>

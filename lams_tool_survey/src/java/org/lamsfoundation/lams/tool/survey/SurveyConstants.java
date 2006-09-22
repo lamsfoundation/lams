@@ -89,6 +89,8 @@ public class SurveyConstants {
 	public static final String PREFIX_QUESTION_CHOICE = "optionChoice";
 	public static final String PREFIX_QUESTION_TEXT= "optionText";
 	public static final String ERROR_MSG_KEY = "questionError";
+	public static final String ATTR_TOTAL_QUESTIONS = "totalQuestions";
+	public static final String ATTR_CURRENT_QUESTIONS_IDX = "currentIdx";
 	
 	//POSITION
 	public static int POSITION_INSIDE = 0;
