@@ -1,7 +1,7 @@
 /*
 *************************************************
 LAMS 2.0
-Date modified:  14/09/2006
+CVS ID $id$
 
 *************************************************
 General page styles
@@ -13,11 +13,14 @@ General page styles
 }
 
 body {
+	background-color:#fff;
+	line-height:16px;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
-	background: url('../images/css/page_bg.gif');
-	line-height:16px;
-	background-color:#fff;
+}
+
+body.stripes {
+	background: url('../images/css/diagonal_bg.gif');
 }
 
 .row {
