@@ -44,12 +44,15 @@ class ApplicationParent {
 	public static var C_LICON:String = "c_licon";
 	
 	public static var SERIAL_NO = "0000-0000-0000-0001-AAAA";
+	public static var FLASH_TOOLSIGNATURE_GATE:String = "lagat11";
+	public static var FLASH_TOOLSIGNATURE_GROUP:String = "lagrp11";
 	
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
     private var _dictionary:Dictionary;
     private var _config:Config;
     private var _workspace:Workspace;
+	
 	
 	private var _customCursor_mc:MovieClip;         //Cursor container
     
