@@ -405,25 +405,19 @@ public function viewUpdate(event:Object):Void{
 	
 	private function highlightActivity(cm:CanvasModel){
 		Debugger.log('running..',Debugger.CRITICAL,'highlightActivity','CanvasView');
+		var ca = CanvasActivity(cm.selectedItem);
+		var a:Activity = ca.activity;	
 		//deselect everything else
 		var CAsArray:Array = cm.activitiesDisplayed.values();
 		Debugger.log('CAsArray:'+CAsArray.length,Debugger.CRITICAL,'highlightActivity','CanvasView');
 		for(var i=0; i < CAsArray.length; i++){
 			CAsArray[i].setSelected(false);
 		}
+		
 		//try to cast the selected item to see what we have (instance of des not seem to work)
 		if(CanvasActivity(cm.selectedItem) != null){
 			Debugger.log('Its a canvas activity',4,'highlightActivity','CanvasView');
-			var ca = CanvasActivity(cm.selectedItem);
-			var a:Activity = ca.activity;			
 			ca.setSelected(true);
-			/*
-			if(a.isGateActivity()){
-				
-			}else{
-			
-			}
-			*/
 			
 		}else if(CanvasTransition(cm.selectedItem) != null){
 			var ct = CanvasTransition(cm.selectedItem);
