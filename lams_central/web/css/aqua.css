@@ -1,4 +1,12 @@
-/* last mod 2006-06-16-1318  */
+/*
+*************************************************
+LAMS 2.0
+Date modified:  14/09/2006
+
+*************************************************
+General page styles
+********************************************** */
+
 * {
 	margin: 0px;
 	padding: 0px;
@@ -9,6 +17,7 @@ body {
 	font-family: verdana, arial, helvetica, sans-serif;
 	background: url('../images/css/page_bg.gif');
 	line-height:16px;
+	background-color:#fff;
 }
 
 .row {
@@ -75,8 +84,6 @@ ul {
 	margin: 25px auto;
 	width: 707px;
 	background: url('../images/css/lams_logo.gif') no-repeat right 10px;
-	
-	
 }
 
 #header { /*layout of the header */
@@ -89,7 +96,15 @@ ul {
 width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat bottom; }
 
 
-/* layout of whole navigation section -------------------------------------*/
+
+
+
+/*
+*************************************************
+
+Layout of  tab navigation section
+
+********************************************** */
 #nav { /* layout of box that contains the main navigation */
 	margin-top: 15px;
 	width: auto;
@@ -114,7 +129,15 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 	color: #333;
 }
 
-/*------------------------------------- TAB STYLES -------------------------------------*/
+
+
+
+/*
+*************************************************
+
+Tab navigation styles
+
+********************************************** */
 .nav-box { /* layout of containers that surround the tab navigation */
 	height: 31px;
 	width: auto;
@@ -132,14 +155,10 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 
 .tab-middle-selected { /* defines middle of selected tab */
 	height: 31px;
-	width: auto;
+	width: 90px;
 	background: url('../images/css/selected_bg.jpg') repeat-x;
 	float: left;
-	width: 90px;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-top: 8px;
-	padding-bottom: 0px
+	padding:8px 5px 0px 5px;
 }
 
 #nav .tab-middle-link-selected {
@@ -162,14 +181,11 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 
 .tab-middle { /* defines middle of selected tab */
 	height: 31px;
-	width: auto;
+	width: 90px;
 	background: url('../images/css/button_bg.jpg') repeat-x;
 	float: left;
-	width: 90px;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-top: 8px;
-	padding-bottom: 0px
+
+	padding:8px 5px 0px 5px;
 }
 
 #nav .tab-middle-link {
@@ -183,7 +199,15 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 	float: left
 }
 
-/* end of navigation ------------------------------------------------------*/
+
+
+
+/*
+*************************************************
+
+Layout of main content section
+
+********************************************** */
 #content { /*box around the main content area */
 	width: 707px;
 	background: url('../images/css/body_bg.jpg') repeat-y;
@@ -208,13 +232,11 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 
 /*layout of a general button*/
 #content a.button {
-	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
 }
 
 /*  style to disbable input buttons */
@@ -222,42 +244,31 @@ width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat b
 	color: #999;
 	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px
-}
+	padding:25px 20px;
+	}
 
 #content a:hover.button {
-	background: url('../images/css/btn_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
 }
 
 /*layout of a general button*/
 a.button {
-	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px;
+	padding:5px 20px;
 	text-decoration: none;
 }
 
 a:hover.button {
-	background: url('../images/css/btn_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px;
+	padding:5px 20px;
 	text-decoration: none;
 }
 
@@ -267,10 +278,7 @@ a.button-add-item {
 	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
 	color: #333;
 	border: 0px none;
-	padding-left: 25px;
-	padding-right: 15px;
-	padding-top: 25px;
-	padding-bottom: 25px;
+	padding:25px 15px 25px 25px;
     text-decoration: none;
 }
 
@@ -278,10 +286,7 @@ a:hover.button-add-item {
 	background: url('../images/css/btn_add_over.gif') no-repeat 0px 20px;
 	color: #349018;
 	border: 0px none;
-	padding-left: 25px;
-	padding-right: 15px;
-	padding-top: 25px;
-	padding-bottom: 25px;
+	padding:25px 15px 25px 25px;
     text-decoration: none;
 }
 
@@ -291,20 +296,14 @@ a:hover.button-add-item {
 	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
 	color: #333;
 	border: 0px none;
-	padding-left: 25px;
-	padding-right: 15px;
-	padding-top: 25px;
-	padding-bottom: 25px
+	padding:25px 15px 25px 25px;
 }
 
 #content a:hover.button-add-item {
 	background: url('../images/css/btn_add_over.gif') no-repeat 0px 20px;
 	color: #349018;
 	border: 0px none;
-	padding-left: 25px;
-	padding-right: 15px;
-	padding-top: 25px;
-	padding-bottom: 25px
+	padding:25px 15px 25px 25px;
 }
 
 /*layout of html editor button */
@@ -312,20 +311,14 @@ a:hover.button-add-item {
 	background: url('../images/css/btn_htmled_off.gif') no-repeat 0px 20px;
 	color: #666;
 	border: 0px none;
-	padding-left: 28px;
-	padding-right: 15px;
-	padding-top: 25px;
-	padding-bottom: 25px
+	padding:25px 15px 25px 28px;
 }
 
 #content a:hover.button-html-editor {
 	background: url('../images/css/btn_htmled_off.gif') no-repeat 0px 20px;
 	color: #333;
 	border: 0px none;
-	padding-left: 28px;
-	padding-right: 15px;
-	padding-top: 25px;
-	padding-bottom: 25px
+	padding:25px 15px 25px 28px;
 }
 
 /* Hovering submit button */
@@ -333,10 +326,7 @@ input.button {
 	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
 	color: #333;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px;
+	padding:25px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
@@ -346,10 +336,7 @@ input:hover.button {
 	background: url('../images/css/btn_over.gif') no-repeat 0px 20px;
 	color: #349018;
 	border: 0px none;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 25px;
-	padding-bottom: 25px;
+	padding:25px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
@@ -392,7 +379,7 @@ table.alternative-color td {
 	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px
 }
 
-table.alternative-color td.first,table.alternative-color th.first {
+table.alternative-color td.first, table.alternative-color th.first {
 	border-left: none;
 	padding-left: 20px;
 }
@@ -423,9 +410,9 @@ table.forum td.posted-by {
 	background: url('../images/css/forum_postedby_bg.jpg') repeat-x; 
 	height:20px; 
 	padding-left:20px; 
+	padding-top:0px; 
 	font-size:10px;
 	vertical-align:top; 
-	padding-top:0px; 
 }
 
 
@@ -541,19 +528,17 @@ textarea {
 }
 
 hr {
-	border: none 0;
-	border-top: 1px solid #ccc;
+	border:0px; 
+	border-top:1px solid #ccc; 
 	width: 650px;
 	height: 1px;
-	margin: 15px 25px 10px 25px;
-}
+	margin-15px 25px 10px 25px;
+	}
 
 /* Warning message style */
 .warning {
 	color: #cc0000;
-	padding: 10px;
-	padding-top: 5px;
-	padding-left: 35px;
+	padding:25px 10px 10px 35px;
 	margin-top: 25px;
 	margin-left: 15px;
 	text-align: left;
@@ -565,9 +550,7 @@ hr {
 
 .warning-login {
 	color: #cc0000;
-	padding: 10px;
-	padding-top: 5px;
-	padding-left: 35px;
+	padding:5px 10px -10px 15px;
 	margin-top: -5px;
 	margin-bottom: -10px;
 	margin-left: 15px;
@@ -579,7 +562,12 @@ hr {
 }
 
 
-/* -------------------------------- login page styles -------------------------------------*/
+/*
+*************************************************
+
+Login page styles
+
+********************************************** */
 
 
 #login-page { /*whole layout of login page*/
@@ -691,20 +679,14 @@ text-align:right;
 background:url('../images/css/btn_off.gif') no-repeat 0px 20px; 
 color:#333; 
 border:0px none; 
-padding-left:20px; 
-padding-right:20px; 
-padding-top:25px; 
-padding-bottom:25px; 
+padding:25px 20px;
 text-decoration:none; }
 
 #login-right-col a:hover.button {
 background:url('../images/css/btn_over.gif') no-repeat 0px 20px; 
 color:#349018; 
 border:0px none; 
-padding-left:20px; 
-padding-right:20px; 
-padding-top:25px; 
-padding-bottom:25px;
+padding:25px 20px;
 text-decoration:none;}
 
 #login-page #footer { /*layout of the footer - the bottom of the box */
@@ -725,7 +707,14 @@ text-decoration:none;}
 clear:both
 }
 
-/******LEARNER PAGES *******/
+
+
+/*
+*************************************************
+
+Learner Pages
+
+********************************************** */
 #page-learner { /*whole layout of page*/
 margin:0px auto; 
 width:592px;
@@ -751,14 +740,283 @@ background:url('../images/css/footer_bg_learner.jpg') no-repeat bottom;
 }
 
 /*layout of a general button*/
-#content-learner a.button {background:url('../images/css/btn_off.gif') no-repeat 0px 20px; color:#333; border:0px none; padding-left:20px; padding-right:20px; padding-top:25px; padding-bottom:25px;text-decoration:none; }
-#content-learner a:hover.button {background:url('../images/css/btn_over.gif') no-repeat 0px 20px; color:#349018; border:0px none; padding-left:20px; padding-right:20px; padding-top:25px; padding-bottom:25px;text-decoration:none;}
+#content-learner a.button {
+background:url('../images/css/btn_off.gif') no-repeat 0px 20px; 
+color:#333; 
+border:0px none; 
+padding:25px 20px;
+text-decoration:none; 
+}
+#content-learner a:hover.button {
+background:url('../images/css/btn_over.gif') no-repeat 0px 20px; 
+color:#349018; 
+border:0px none; 
+padding:25px 20px;
+text-decoration:none;
+}
 
 /*layout of adding a topic button */
-#content-learner a.button-add-item {background:url('../images/css/btn_add_off.gif') no-repeat 0px 20px; color:#333; border:0px none; padding-left:25px; padding-right:15px; padding-top:25px; padding-bottom:25px; text-decoration:none;}
-#content-learner a:hover.button-add-item {background:url('../images/css/btn_add_over.gif') no-repeat 0px 20px; color:#349018; border:0px none; padding-left:25px; padding-right:15px; padding-top:25px; padding-bottom:25px;text-decoration:none;}
+#content-learner a.button-add-item {
+background:url('../images/css/btn_add_off.gif') no-repeat 0px 20px; 
+color:#333; 
+border:0px none; 
+padding:25px 15px 25px 25px;
+text-decoration:none;
+}
+#content-learner a:hover.button-add-item {
+background:url('../images/css/btn_add_over.gif') no-repeat 0px 20px; 
+color:#349018; 
+border:0px none; 
+padding:25px 15px 25px 25px;
+text-decoration:none;
+}
 
 
-/****** FLOATING BUTTON BOXES - TO ALIGN LEFT AND ALIGN RIGHT ON THE SAME LINE ********/
-.left-buttons {float:left; margin-left:20px;}
-.right-buttons {float:right; margin-right:20px;}
+
+
+/*
+*************************************************
+
+Floating button containers
+
+********************************************** */
+
+.left-buttons {float:left; padding-left:20px;}
+
+.right-buttons {float:right; padding-right:20px;}
+
+
+
+/*
+*************************************************
+
+My Courses Pages
+********************************************** */
+
+/* welcome user box */
+
+
+.welcome {margin-bottom:35px; margin-top:0px; background-color:#33FFFF; margin-left:20px;margin-right:20px;}
+
+.float-left {float:left;}
+
+.float-right {float:right;}
+
+
+
+/* layout for my-courses pages */
+
+.my-courses {
+	background: url('../images/css/diagonal_bg.gif') repeat;
+}
+
+
+#page-mycourses { /*whole layout of page*/
+	margin: 25px auto;
+	width: 707px;
+	background: url('../images/css/lams_logo.gif') no-repeat 10px -7px;
+
+}
+
+#page-mycourses #footer { /*layout of the footer - the bottom of the box */
+	width: 707px;
+	height: 14px;
+	background: url('../images/css/footer_bg.jpg') no-repeat top;
+}
+
+#page-mycourses #footer p{ 
+	padding:20px 0px 0px 10px;
+	text-align:center;
+    font-family: verdana, arial, helvetica, sans-serif;
+	font-size:.9em;
+	color:#999;
+}
+
+
+#header-my-courses { /*layout of the header */
+	width: 707px;
+	height:65px;
+	background: url('../images/css/top_bg.jpg') no-repeat bottom;
+}
+
+/* my courses nav */
+
+.nav-box-right {
+	height: 31px;
+	width: auto;
+	margin-right: 2px;
+	margin-top: 16px;
+	float: right;
+	text-align: center;}
+
+#nav-right { /* layout of box that contains the main navigation */
+	margin-top:30px;
+	width: auto;
+	height: 40px;
+	margin-right: 1px;
+}
+
+#nav-right a {
+	color: #0087e5;
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#nav-right a:hover {
+	color: #006bb6;
+	text-decoration: none;
+}
+
+#nav-right a.selected {
+	color: #333;
+}
+
+
+/* my courses grey buttons in the green bar */
+
+.mycourses-right-buttons {float:right; padding-right:20px;  margin-top:11px; height:24px; font-size:11px}
+
+#content a.add-lesson-button {
+	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	margin-top:6px;
+	margin-left:5px;
+}
+
+#content a:hover.add-lesson-button {
+	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	color: #47bc23;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	margin-top:0px;
+	margin-left:5px;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
+
+#content a.manage-group-button {
+	background: url('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	margin-top:6px;
+	margin-left:10px;
+}
+
+#content a:hover.manage-group-button {
+	background: url('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	color: #47bc23;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	margin-top:0px;
+	margin-left:10px;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
+
+/* my courses individual course boxes */
+
+.course-bg {  /*---- box around the green tabbed items -- */
+	margin-top:15px;
+	margin-bottom:20px;
+	width:100%;
+	background:#fff url('../images/css/mycourses_greentab.jpg') no-repeat top; 
+	margin-left:0px;
+
+}
+
+.course-bg h2 {
+	font-size:13px;
+	color:#47bc23;
+	padding-left:0px;
+	margin-top:12px;
+	margin-left:0px;
+}
+
+.course-bg h4 {
+	font-size:12px;
+	color:#47bc23;
+	padding-left:0px
+}
+
+.course-buttons {
+	margin-right:0px;
+}
+
+/************ The sequence name box **********/
+.sequence-name {
+	margin-top:5px;
+	margin-left:30px;
+	
+}
+
+.sequence-name p{
+	margin:0px;
+	
+}
+
+
+#content a.sequence-name-link {
+	color:#0087E5;
+	text-decoration: none;
+	border-bottom: 1px dotted #0087E5;
+	}
+	
+	
+#content a:hover.sequence-name-link {
+	color:#0087E5;
+	text-decoration: none;
+	border-bottom: 1px solid #0087E5;
+	
+}
+
+#content a.sequence-action-link {
+	color:#47bc23;
+	text-decoration: none;
+	border:0px;
+	font-variant:small-caps;
+	margin-left:20px;	
+}
+
+#content a:hover.sequence-action-link {
+	color:#47bc23;
+	text-decoration: none;
+	border-bottom:0px;
+	font-variant:small-caps;
+	margin-left:20px;
+	}
+
+
+/************ The group name box **********/
+
+.group-name {
+margin-top:5px;
+margin-left:80px;
+}
+
+.group-name p {
+padding-top:0px;
+margin-bottom:0px;
+padding-left:0px;
+margin-left:0px;
+}
+
+.group-name strong {
+color: #666;
+}
+
+/*aligns the image in the middle of the line - gives padding */
+.align-middle{
+vertical-align:middle;
+padding-right:0px;
+border:0px;
+}
+
+.small-space-top {margin-top:6px;}
