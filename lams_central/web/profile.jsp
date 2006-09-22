@@ -69,21 +69,20 @@
 <h2><fmt:message key="index.myprofile" /></h2>
 
 <table border="0">
-	<col align="left" /><col align="left" />
 	<tr>
-		<td><fmt:message key="label.name" />: 
+		<td align="right"><fmt:message key="label.name" />: 
 		</td>
 		<td><bean:write name="fullName" />
 		</td>
 	</tr>
 	<tr>
-		<td><fmt:message key="label.email" />: 
+		<td align="right"><fmt:message key="label.email" />: 
 		</td>
 		<td><bean:write name="email" />
 		</td>
 	</tr>
 	<tr>
-		<td><fmt:message key="label.portrait.current" />:
+		<td align="right"><fmt:message key="label.portrait.current" />:
 		</td>
 		<td><logic:notEqual name="portraitUuid" value="0">
 				<img src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />

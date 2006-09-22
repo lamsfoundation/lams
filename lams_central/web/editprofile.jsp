@@ -17,73 +17,72 @@
 	<p class="warning"><html:errors/></p>
 </logic:messagesPresent>
 <table>
-  <col align="right" /><col align="left" />
     <tr>
-		<td><fmt:message key="label.username"/>:</td>
+		<td align="right"><fmt:message key="label.username"/>:</td>
 		<td><bean:write name="UserForm" property="login" /></td>
 	</tr>
 	<tr>
-	<td><fmt:message key="label.title"/>:</td>
+		<td align="right"><fmt:message key="label.title"/>:</td>
 		<td><html:text property="title" size="20" maxlength="32" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="label.first_name"/>:</td>
+		<td align="right"><fmt:message key="label.first_name"/> *:</td>
 		<td><html:text property="firstName" size="20" maxlength="64" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="label.last_name"/>:</td>
+		<td align="right"><fmt:message key="label.last_name"/> *:</td>
 		<td><html:text property="lastName" size="20" maxlength="128" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="label.address_line_1"/>:</td>
-		<td><html:text property="addressLine1" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.address_line_2"/>:</td>
-		<td><html:text property="addressLine2" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.address_line_3"/>:</td>
-		<td><html:text property="addressLine3" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.city"/>:</td>
-		<td><html:text property="city" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.state"/>:</td>
-		<td><html:text property="state" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.postcode"/>:</td>
-		<td><html:text property="postcode" size="20" maxlength="10" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.country"/>:</td>
-		<td><html:text property="country" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.day_phone"/>:</td>
-		<td><html:text property="dayPhone" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.evening_phone"/>:</td>
-		<td><html:text property="eveningPhone" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.mobile_phone"/>:</td>
-		<td><html:text property="mobilePhone" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.fax"/>:</td>
-		<td><html:text property="fax" size="20" maxlength="64" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="label.email"/>:</td>
+		<td align="right"><fmt:message key="label.email"/> *:</td>
 		<td><html:text property="email" size="20" maxlength="128" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="label.language"/>:</td>
+		<td align="right"><fmt:message key="label.address_line_1"/>:</td>
+		<td><html:text property="addressLine1" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.address_line_2"/>:</td>
+		<td><html:text property="addressLine2" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.address_line_3"/>:</td>
+		<td><html:text property="addressLine3" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.city"/>:</td>
+		<td><html:text property="city" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.state"/>:</td>
+		<td><html:text property="state" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.postcode"/>:</td>
+		<td><html:text property="postcode" size="20" maxlength="10" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.country"/>:</td>
+		<td><html:text property="country" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.day_phone"/>:</td>
+		<td><html:text property="dayPhone" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.evening_phone"/>:</td>
+		<td><html:text property="eveningPhone" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.mobile_phone"/>:</td>
+		<td><html:text property="mobilePhone" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.fax"/>:</td>
+		<td><html:text property="fax" size="20" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.language"/>:</td>
 		<td>
 			<html:select property="localeId">
 				<c:forEach items="${locales}" var="locale">
