@@ -37,7 +37,8 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.service.*;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
-
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -95,7 +96,7 @@ public class HelpTag extends TagSupport {
 			
 		    fullURL = helpURL + module + "#" + toolSig + module + "-" + language + country;
 			writer.println("<div class='right-buttons'>");
-		    writer.println("<a href='" + fullURL + "' target='_blank'>?</a>");
+		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 		    writer.println("</div>");
 		    
 		} catch (IOException e) {
