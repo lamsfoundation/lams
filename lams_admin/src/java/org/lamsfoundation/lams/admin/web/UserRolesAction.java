@@ -88,7 +88,7 @@ public class UserRolesAction extends Action {
 			saveErrors(request,errors);
 			return mapping.findForward("userrole");
 		}
-		if (userId==null) userId = (Integer)request.getAttribute("userId");
+		if (userId==null || userId==0) userId = (Integer)request.getAttribute("userId");
 		if (userId==null) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.userid.invalid"));
 			saveErrors(request,errors);
@@ -118,6 +118,7 @@ public class UserRolesAction extends Action {
 		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin,orgType));
 		request.setAttribute("login", user.getLogin());
 		request.setAttribute("fullName", user.getFullName());
+		request.setAttribute("orgName", org.getName());
 		
 		String[] roles = null;
 		UserOrganisation uo = getService().getUserOrganisation(userId, orgId);

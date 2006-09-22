@@ -9,21 +9,20 @@
 <html-el:form action="/userrolessave.do" method="post">
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
-<h2 align="left"><fmt:message key="admin.user.assign.roles"/></h2>
+<h2 align="left"><fmt:message key="admin.user.assign.roles"/>: <bean:write name="orgName" /></h2>
 
 <div align="center"><html-el:errors/><html-el:messages id="roles" message="true"><bean:write name="roles" /></html-el:messages></div>
 <table>
-  <col align="right" /><col align="left" />
     <tr>
-		<td><fmt:message key="admin.user.login"/>:</td>
+		<td align="right"><fmt:message key="admin.user.login"/>:</td>
 		<td><bean:write name="login" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="admin.user.name"/>:</td>
+		<td align="right"><fmt:message key="admin.user.name"/>:</td>
 		<td><bean:write name="fullName" /></td>
 	</tr>
 	<tr>
-	    <td><fmt:message key="admin.user.roles"/>:</td>
+	    <td align="right"><fmt:message key="admin.user.roles"/>:</td>
 	    <td>
             <c:forEach items="${rolelist}" var="role">
                 <html-el:multibox name="UserRolesForm" property="roles" value="${role.roleId}"/>
