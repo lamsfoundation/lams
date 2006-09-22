@@ -136,7 +136,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_canvasModel = CanvasModel(_canvasController.getModel());
 		showAssets(false);
 		
-		
+		if (_activity.selectActivity == "false"){
+			_isSelected = false;
+			refresh();
+		}
 
 		
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){

@@ -132,6 +132,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	private var _groupingID:Number;			
 	private var _groupingUIID:Number;
+	private var _isActivitySelected:String
 	
 	
 	private var _title:String;					//*	
@@ -649,6 +650,25 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function get groupingUIID ():Number {
 		trace('returning:'+_groupingUIID);
 		return _groupingUIID;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   selected CA 
+	 * @return  
+	 */
+	public function set selectActivity (stat:String):Void {
+		_isActivitySelected = stat;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get selectActivity ():String {
+		trace('returning:'+_isActivitySelected);
+		return _isActivitySelected;
 	}
 
 	/**

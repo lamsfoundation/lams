@@ -64,29 +64,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var transitionTarget = createValidTransitionTarget(ca);
 		    if(transitionTarget instanceof LFError){
 				transitionTarget.showErrorAlert(null); 
-				//transitionTarget.showMessageConfirm()
-				//TODO: transitionTarget.showErrorAlertCrashDump(null); 
 		   }else{
-			   //Note Todo, do not delete the next three lines on code we need it later on for drawing transition with dotted line while dragging transition pen tool.
-				_canvasModel.addActivityToTransition(transitionTarget);
+			   	_canvasModel.addActivityToTransition(transitionTarget);
 				_canvasModel.getCanvas().view.initDrawTempTrans();
 			}
-			/*
-			_canvasModel.resetTransitionTool();
-			if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity ){
-				_canvasModel.addActivityToTransition(ca);
-			}
-			*/
+			
 	    }else{
 			
 		   //just select the activity
 			
 			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
-			trace("parent UIID: "+ ca.activity.parentUIID + " and parent's activity type ID: ")
-			trace("parentAct TypeID: "+ parentAct.activityTypeID + " and parent's activity type ID: ")
-			
+					
 			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				trace("Parallel Children are: "+ parentAct.activityTypeID.length)
 				
 				// _canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = false;
@@ -99,49 +88,34 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
    }
    
-	/**
-	 * called when user double click on the activity
-	 * 
-	 * @usage   
-	 * @param   ca 
-	 * @return  
-	 */
-	public function activityDoubleClick(ca:Object):Void{
-	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityDoubleClick','CanvasController');
-	    
-		_canvasModel.getCanvas().stopActiveTool();
-			
-		if(_canvasModel.getCanvas().ddm.readOnly){
-			// throw alert warning
-			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly'));
-		}else{
-			_canvasModel.selectedItem = ca;
-			if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
-				_canvasModel.openToolActivityContent(ca.activity);
-			}else if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
-				if (!_pi.isPIExpanded()){
-					_canvasModel.setPIHeight(_pi.piFullHeight());
-				}
-			}
-		}
-    }
+	
    
     public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
-	   if (_canvasModel.isTransitionToolActive()){
-				_canvasModel.getCanvas().stopTransitionTool();
-				//_canvasModel.resetTransitionTool();
-				_canvasModel.getCanvas().view.removeTempTrans();
-				//var msg:String = Dictionary.getValue('cv_same_trans_target');
-				//LFMessage.showMessageAlert(msg);
-			}
+	    if (_canvasModel.isTransitionToolActive()){
+			_canvasModel.getCanvas().stopTransitionTool();
+			_canvasModel.getCanvas().view.removeTempTrans();	
+		}
 	    _canvasModel.getCanvas().stopActiveTool();
-		
-		_canvasModel.selectedItem = ca;
+		//_canvasModel.selectedItem = ca;
+		var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
+		var parallelOnCanvas:Array  = _canvasModel.findParallelActivities();
+		for (var i=0; i<optionalOnCanvas.length; i++){
+			for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
+				optionalOnCanvas[i].actChildren[j].setSelected(false);
+			}
+			optionalOnCanvas[i].init()
+		}
+		for (var m=0; m<parallelOnCanvas.length; m++){
+			for(var n=0; n < parallelOnCanvas[m].actChildren.length; n++){
+				parallelOnCanvas[m].actChildren[n].selectActivity = "false";
+			}
+			parallelOnCanvas[m].init()
+		}
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
-			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
+			
 			
 			if (ca.activity.parentUIID != null){
 				trace ("testing Optional child on Canvas "+ca.activity.activityUIID)
@@ -149,11 +123,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				//trace ("testing Optional on Canvas "+i)
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
-							trace("parentAct children length: "+ optionalOnCanvas[i].actChildren.length)
-							for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
-								optionalOnCanvas[i].actChildren[j].setSelected(false);
-							}
-							_canvasModel.selectedItem = ca;
+							
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
 								//give it the new co-ords and 'drop' it
@@ -197,7 +167,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					}
 				}
 				
+				
 			}
+			
 			
 			//if we are on the bin - trash it
 			if (ca.hitTest(_canvasModel.getCanvas().bin)){
@@ -235,7 +207,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 					
 			_canvasModel.setDirty();
-			
+			_canvasModel.selectedItem = ca;
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
 			
@@ -246,6 +218,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.getCanvas().view.removeTempTrans();
 				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
+			_canvasModel.setDirty();
+			_canvasModel.selectedItem = ca;
 		}
 	}
    
@@ -254,6 +228,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		ca._x = ca.activity.xCoord;
 		ca._y = ca.activity.yCoord;
 	}
+	
+	/**
+	 * called when user double click on the activity
+	 * 
+	 * @usage   
+	 * @param   ca 
+	 * @return  
+	 */
+	public function activityDoubleClick(ca:Object):Void{
+	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityDoubleClick','CanvasController');
+	    
+		_canvasModel.getCanvas().stopActiveTool();
+			
+		if(_canvasModel.getCanvas().ddm.readOnly){
+			// throw alert warning
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly'));
+		}else{
+			_canvasModel.selectedItem = ca;
+			if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
+				_canvasModel.openToolActivityContent(ca.activity);
+			}else if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
+				if (!_pi.isPIExpanded()){
+					_canvasModel.setPIHeight(_pi.piFullHeight());
+				}
+			}
+		}
+    }
    
 	/**
 	 * Method to invoke when mouse is release outside on an anctivity
@@ -421,8 +422,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
 			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p);
 			_canvasModel.getCanvas().stopGateTool();
-			
 		}
+		
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
 			var p = new Point(canvas_mc._xmouse-(complexActWidth/2), canvas_mc._ymouse); 
 			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p);
