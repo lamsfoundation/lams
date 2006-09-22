@@ -24,6 +24,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +36,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -68,8 +73,35 @@ public class ProfileSaveAction extends Action {
 			return mapping.findForward("profile");
 		}
 		
+		ActionMessages errors = new ActionMessages();
 		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
 		DynaActionForm userForm = (DynaActionForm)form;
+		
+		// check requestor is same as user being edited
+		log.debug("requestor: "+requestor.getLogin()+", form login: "+userForm.get("login"));
+		if(!requestor.getLogin().equals(userForm.get("login"))){
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.authorisation"));
+			saveErrors(request,errors);
+			return (mapping.getInputForward());
+		}
+		
+		// (dyna)form validation
+		if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
+			errors.add("firstName", new ActionMessage("error.firstname.required"));
+		}
+		if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
+			errors.add("lastName", new ActionMessage("error.lastname.required"));
+		}
+		if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
+			errors.add("email", new ActionMessage("error.email.required"));
+		} else {
+			Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+			Matcher m = p.matcher(userForm.getString("email"));
+			if (!m.matches()) {
+				errors.add("email", new ActionMessage("error.valid.email.required"));
+			}
+		}
+		
 		BeanUtils.copyProperties(requestor,userForm);
 		SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
 		requestor.setLocale(locale);

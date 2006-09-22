@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,6 +83,7 @@ public class UserSaveAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
+		// action input
 		ActionMessages errors = new ActionMessages();
 		DynaActionForm userForm = (DynaActionForm) form;
 		Integer orgId = (Integer) userForm.get("orgId");
@@ -102,6 +105,7 @@ public class UserSaveAction extends Action {
 
 		if (userId != 0) edit = true;
 
+		// (dyna)form validation
 		if ((userForm.get("login") == null) || (userForm.getString("login").trim().length() == 0)) {
 			errors.add("login", new ActionMessage("error.login.required"));
 		}
@@ -111,6 +115,21 @@ public class UserSaveAction extends Action {
 		if ((userForm.get("password") == null) || (userForm.getString("password").trim().length() == 0)) {
 			passwordChanged = false;
 			if (!edit) errors.add("password", new ActionMessage("error.password.required"));
+		}
+		if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
+			errors.add("firstName", new ActionMessage("error.firstname.required"));
+		}
+		if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
+			errors.add("lastName", new ActionMessage("error.lastname.required"));
+		}
+		if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
+			errors.add("email", new ActionMessage("error.email.required"));
+		} else {
+			Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+			Matcher m = p.matcher(userForm.getString("email"));
+			if (!m.matches()) {
+				errors.add("email", new ActionMessage("error.valid.email.required"));
+			}
 		}
 		
 		User user = null;
