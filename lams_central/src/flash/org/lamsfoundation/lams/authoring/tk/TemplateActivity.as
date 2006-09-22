@@ -79,6 +79,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		//Set up this class to use the Flash event delegation model  
         EventDispatcher.initialize(this);  
 		//_global.breakpoint();
+		setStyles();
 		Debugger.log('_activities.length:'+_activities.length,Debugger.GEN,'init','TemplateActivity');
 		//find the 'main'/container activity
 		if(_activities.length > 1){
@@ -203,7 +204,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		icon_mc._height = 20;
 		icon_mc._x = ICON_OFFSETX;
 		icon_mc._y = ICON_OFFSETY;
-		setStyles();
+		
 		//initTT()
 		//toolTip.text = _mainActivity.title;
 		//Debugger.log('icon_mc._width:'+icon_mc._width,4,'draw','TemplateActivity');
