@@ -84,6 +84,8 @@ public interface QaAppConstants {
 	public static final String LEARNER_NOTEBOOK							="learnerNotebook";
 	public static final String NOTEBOOK_ENTRIES_EXIST					="notebookEntriesExist";
 	public static final String QA_STATS_DTO								="qaStatsDTO";
+	public static final String LIST_ALL_GROUPS_DTO						="listAllGroupsDTO";
+	public static final String CURRENT_SESSION_NAME						="currentSessionName";
 	
 	public static final String ACTIVE_MODULE							="activeModule";
 	public static final String AUTHORING								="authoring";

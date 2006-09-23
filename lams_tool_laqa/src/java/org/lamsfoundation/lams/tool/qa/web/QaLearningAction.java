@@ -22,61 +22,72 @@ http://www.gnu.org/licenses/gpl.txt
  /**
  * @author Ozgur Demirtas
  * 
- * 	<action
+	<action
       path="/learning"
       type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
       name="QaLearningForm"
-      scope="session"
+      scope="request"
       input="/learning/AnswersContent.jsp"
       parameter="method"
       unknown="false"
-      validate="true">
-
-		<exception
-			key="error.exception.QaApplication"
-			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
-			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
-			path="/SystemErrorContent.jsp"
-			scope="request"
-		/>
-		    
-		<exception
-		    key="error.exception.QaApplication"
-		    type="java.lang.NullPointerException"
-		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
-		    path="/SystemErrorContent.jsp"
-		    scope="request"
-		/>	         			
+      validate="false">
 
       	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"	        
-		    redirect="true"
+		    redirect="false"
 	      />
-
+	      
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+	      
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	      
 	    <forward
 	        name="learningStarter"
 	        path="/learningIndex.jsp"
-	        redirect="true"
+		    redirect="false"
 	      />
+      
+	      <forward
+	        name="individualLearnerRep"
+	        path="/learning/LearnerRep.jsp"
+		    redirect="false"
+	      />
+
       
 	     <forward
 	        name="learnerRep"
 	        path="/monitoring/LearnerRep.jsp"
-	        redirect="true"
+		    redirect="false"
 	      />
-	      
-	      <forward
-		    name="errorListLearner"
-		    path="/QaErrorBox.jsp"
-		    redirect="true"
-	  	/>      
+
+	     <forward
+	        name="individualLearnerResults"
+	        path="/learning/IndividualLearnerResults.jsp"
+		    redirect="false"
+	      />
+
+
+	     <forward
+	        name="viewAllResults"
+	        path="/learning/AllResults.jsp"
+		    redirect="false"
+	      />
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	  	
 	</action>
 
  * 
@@ -218,13 +229,28 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     		}
     		else 
     		{
+    		    logger.debug("the listing mode is sequential and there are multiple questions");
     		    logger.debug("populating mapAnswers...");
     		    mapAnswers=populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, true, true);
     		    logger.debug("mapAnswers: " + mapAnswers);
+
+    	 	    String httpSessionID=qaLearningForm.getHttpSessionID();
+    	 	    logger.debug("httpSessionID: " + httpSessionID);
+    	 	    
+    		    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+    		    logger.debug("sessionMap: " + sessionMap);
+    		    
+    		    mapAnswersPresentable=(Map)sessionMap.get(MAP_ALL_RESULTS_KEY);
+    		    logger.debug("mapAnswersPresentable, before new lines conversion: " + mapAnswersPresentable);
+    		    mapAnswersPresentable=MonitoringUtil.removeNewLinesMap(mapAnswersPresentable);
+    		    logger.debug("mapAnswersPresentable, after new lines conversion: " + mapAnswersPresentable);
     		}
-    		logger.debug("final mapAnswers for the sequential mode:" + mapAnswers);
+    		logger.debug("final mapAnswersPresentable for the sequential mode:" + mapAnswersPresentable);
     		
     	}
+    	
+    	
+    	
 		logger.debug("using mapAnswers:" + mapAnswers);
     	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
     	
@@ -470,7 +496,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, null, generalLearnerFlowDTO, false);
+    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, null, 
+    	        generalLearnerFlowDTO, false , toolSessionID);
 
 		generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 		generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());

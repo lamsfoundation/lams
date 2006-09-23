@@ -184,7 +184,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
 
         
-        qaMonitoringAction.prepareReflectionData(request, qaContent, qaService, null, false);
+        qaMonitoringAction.prepareReflectionData(request, qaContent, qaService, null, false, "All");
         
 		logger.debug("final qaMonitoringForm: " + qaMonitoringForm);
 		logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
@@ -245,6 +245,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
 		
+		request.setAttribute("currentMonitoredToolSession", "All");
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
 		
 		logger.debug("fwding to : " + LOAD_MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	
@@ -287,7 +289,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		
 	    qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, false, null, null, 
-		        generalLearnerFlowDTO, false);
+		        generalLearnerFlowDTO, false , "All");
 		
 		logger.debug("refreshing stats data...");
 		qaMonitoringAction.refreshStatsData(request, qaMonitoringForm, qaService, generalMonitoringDTO);

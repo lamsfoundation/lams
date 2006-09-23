@@ -71,6 +71,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMethod(actionMethod);
 		}
 		
+		function submitEditGroupResponse(sessionId, responseId, actionMethod) 
+		{
+			document.QaMonitoringForm.sessionId.value=sessionId; 
+			document.QaMonitoringForm.responseId.value=responseId; 
+			submitMethod(actionMethod);
+		}
+		
+		
 		function submitMethod(actionMethod) 
 		{
 			submitMonitoringMethod(actionMethod);
@@ -91,6 +99,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaMonitoringForm.currentUid.value=currentUid;
 	        submitMethod(actionMethod);
 		}
+
+		function submitGroupResponse(sessionId, currentUid, actionMethod)
+		{
+			document.QaMonitoringForm.sessionId.value=sessionId;
+			document.QaMonitoringForm.currentUid.value=currentUid;
+	        submitMethod(actionMethod);
+		}
+		
 
 		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) 
 		{

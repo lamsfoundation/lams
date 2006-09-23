@@ -114,34 +114,50 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 
 /**
- *	<!--Learning Starter  -->
-   <action 
-   		path="/learningStarter" 
-   		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
-   		name="QaLearningForm" input="/learningIndex.jsp"> 
-   			
+<!--Learning Starter  -->
+<action 
+		path="/learningStarter" 
+		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
+		name="QaLearningForm" 
+		scope="request"
+	    unknown="false"
+ 	validate="false"
+		input="/learningIndex.jsp"> 
+			
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"
-		    redirect="true"
+		    redirect="false"
 		  />
 	  	
 	      <forward
 	        name="learnerRep"
 	        path="/monitoring/LearnerRep.jsp"
-	        redirect="true"
+		    redirect="false"
+	      />
+
+	      <forward
+	        name="individualLearnerRep"
+	        path="/learning/LearnerRep.jsp"
+		    redirect="false"
 	      />
 
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	      
 	      <forward
 	        name="learningStarter"
 	        path="/learningIndex.jsp"
-	        redirect="true"
+		    redirect="false"
 	      />
 	      
 	  	<forward
@@ -149,16 +165,22 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 	        path="/learning/defineLater.jsp"
 		    redirect="false"
 	  	/>
-	      
-		<forward
-		    name="errorListLearner"
-		    path="/QaErrorBox.jsp"
-		    redirect="true"
-	  	/>      
-	</action>  
+	  	
+	  	<forward
+		    name="runOffline"
+	        path="/learning/RunOffline.jsp"
+		    redirect="false"
+	  	/>
+	  	
 
- *  
- */
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	  	   
+	</action>  
+ * */
 
 public class QaLearningStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
@@ -192,11 +214,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
 		
 	    /*validate learning mode parameters*/
-	    ActionForward validateParameters=validateParameters(request, mapping, qaLearningForm);
+	    boolean validateParameters=validateParameters(request, mapping, qaLearningForm);
 	    logger.debug("validateParamaters: " + validateParameters);
-	    if (validateParameters != null)
+	    if (!validateParameters)
 	    {
-	    	return validateParameters;
+	        logger.debug("error during validation");
 	    }
 	    
 	    String userID=qaLearningForm.getUserID();
@@ -409,7 +431,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 	    	
 	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, toolSessionID, learnerProgressUserId, 
-	    	        generalLearnerFlowDTO, false);
+	    	        generalLearnerFlowDTO, false, toolSessionID);
     		
 	    	logger.debug("presenting teacher's report");
 	    	logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
@@ -476,7 +498,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 		    		    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
-		    		    	        currentToolSessionID.toString(), null, generalLearnerFlowDTO, false);
+		    		    	        currentToolSessionID.toString(), null, generalLearnerFlowDTO, false, toolSessionID);
 		    		    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	
 		    		    	
@@ -524,7 +546,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 * @param mapping
 	 * @return ActionForward
 	 */
-	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping, QaLearningForm qaLearningForm)
+	protected boolean validateParameters(HttpServletRequest request, ActionMapping mapping, QaLearningForm qaLearningForm)
 	{
 		/*
 	     * obtain and setup the current user's data 
@@ -552,9 +574,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
-	    	QaUtils.cleanUpSessionAbsolute(request);
 	    	persistError(request, "error.toolSessionId.required");
-			return (mapping.findForward(ERROR_LIST_LEARNER));
+			return false;
 	    }
 	    else
 	    {
@@ -566,10 +587,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		QaUtils.cleanUpSessionAbsolute(request);
-	    		//persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-				return (mapping.findForward(ERROR_LIST_LEARNER));
+	    		return false;
 			}
 	    }
 	    
@@ -579,21 +598,17 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
-    		QaUtils.cleanUpSessionAbsolute(request);
-	    	//persistError(request, "error.mode.required");
-			return (mapping.findForward(ERROR_LIST_LEARNER));
+    		return false;
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
-	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	//persistError(request, "error.mode.invalid");
-			return (mapping.findForward(ERROR_LIST_LEARNER));
+	        return false;
 	    }
 
 	    logger.debug("session LEARNING_MODE set to:" + mode);
 		qaLearningForm.setMode(mode);	    
-	    return null;
+	    return true;
 	}
 	
 	

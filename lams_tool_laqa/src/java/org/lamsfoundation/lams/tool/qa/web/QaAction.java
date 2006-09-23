@@ -2161,7 +2161,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 	{
     	logger.debug("dispatching proxy getStats..." + request);
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	return qaMonitoringAction.getStats(mapping, form, request, response);
+    	//return qaMonitoringAction.getStats(mapping, form, request, response, "All");
+    	return null;
 	}
 
     

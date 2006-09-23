@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.qa.QaAllGroupsDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaMonitoredAnswersDTO;
@@ -208,6 +209,8 @@ public class MonitoringUtil implements QaAppConstants{
 	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
 	{
+	    logger.debug("buildGroupsQuestionData: " + currentSessionId);
+	    
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		logger.debug("userId: " + userId);
@@ -216,6 +219,18 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("will be building groups question data  for content:..." + qaContent);
     	List listQuestions=qaService.getAllQuestionEntries(qaContent.getUid());
     	logger.debug("listQuestions:..." + listQuestions);
+    	
+    	String sessionName="";
+    	if  ((currentSessionId != null) && (!currentSessionId.equals("All")))
+    	{
+        	QaSession qaSession=qaService.retrieveQaSessionOrNullById(new Long(currentSessionId).longValue());
+    	    logger.debug("qaSession: " + qaSession);
+    	    
+    	    sessionName=qaSession.getSession_name();
+    	}
+    	logger.debug("sessionName: " + sessionName);
+    	request.setAttribute(CURRENT_SESSION_NAME, sessionName);
+    	
     	
     	List listMonitoredAnswersContainerDTO= new LinkedList();
     		
@@ -230,6 +245,7 @@ public class MonitoringUtil implements QaAppConstants{
 	    		QaMonitoredAnswersDTO qaMonitoredAnswersDTO= new QaMonitoredAnswersDTO();
 	    		qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
 	    		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
+	    		qaMonitoredAnswersDTO.setSessionName(sessionName);
 	    		
 	    		logger.debug("using allUsersData to retrieve users data: " + isUserNamesVisible);
 				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaService, qaQueContent, qaQueContent.getUid().toString(), 
@@ -248,12 +264,13 @@ public class MonitoringUtil implements QaAppConstants{
 	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, IQaService qaService, QaQueContent qaQueContent, String questionUid, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
 	{
+	    logger.debug("doing buildGroupsAttemptData...");
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		logger.debug("currentSessionId: " + currentSessionId);
 		logger.debug("userId: " + userId);
 		
-		logger.debug("doing buildGroupsAttemptData...");
+		
     	logger.debug("qaService: " + qaService);
 
     	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new QaStringComparator());
@@ -268,26 +285,47 @@ public class MonitoringUtil implements QaAppConstants{
     	/*request is for monitoring summary */
     	if (!isLearnerRequest)
     	{
-        	while (itMap.hasNext()) 
-        	{
-            	Map.Entry pairs = (Map.Entry)itMap.next();
-                logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
-                
-                if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
+
+    	    if (currentSessionId != null)
+    	    {
+                if (currentSessionId.equals("All"))
                 {
-                	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
-                	QaSession qaSession= qaService.retrieveQaSession(new Long(pairs.getValue().toString()).longValue());
-                	logger.debug("qaSession: " +  " = " + qaSession);
-                	if (qaSession != null)
+                    logger.debug("**summary request is for All**:");
+                	while (itMap.hasNext()) 
                 	{
-                		List listUsers=qaService.getUserBySessionOnly(qaSession);	
-                		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
-                		Map sessionUsersAttempts=populateSessionUsersAttempts(request, qaService, qaSession.getQaSessionId(), listUsers, questionUid, 
-                				isUserNamesVisible, isLearnerRequest, userId);
-                		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-                	}
+                    	Map.Entry pairs = (Map.Entry)itMap.next();
+                        logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                        
+                        if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
+                        {
+                        	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
+                        	QaSession qaSession= qaService.retrieveQaSession(new Long(pairs.getValue().toString()).longValue());
+                        	logger.debug("qaSession: " +  " = " + qaSession);
+                        	if (qaSession != null)
+                        	{
+                        		List listUsers=qaService.getUserBySessionOnly(qaSession);	
+                        		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
+                        		Map sessionUsersAttempts=populateSessionUsersAttempts(request, qaService, qaSession.getQaSessionId(), listUsers, questionUid, 
+                        				isUserNamesVisible, isLearnerRequest, userId);
+                        		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                        	}
+                        }
+            		}
                 }
-    		}
+                else if (!currentSessionId.equals("All"))
+                {
+                    logger.debug("**summary request is for currentSessionId**:"  + currentSessionId);
+                	QaSession qaSession= qaService.retrieveQaSession(new Long(currentSessionId.toString()).longValue());
+                	logger.debug("qaSession: " +  " = " + qaSession);
+                    
+                    List listUsers=qaService.getUserBySessionOnly(qaSession);
+                    logger.debug("listUsers: " +  " = " + listUsers);
+                    
+            		Map sessionUsersAttempts=populateSessionUsersAttempts(request, qaService, new Long(currentSessionId), listUsers, questionUid, 
+            				isUserNamesVisible, isLearnerRequest, userId);
+            		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                }
+    	    }
     	}
     	else
     	{
@@ -585,6 +623,22 @@ public class MonitoringUtil implements QaAppConstants{
 	}
 
 	
+	public static Map removeNewLinesMap(Map map)
+	{
+	    Map newMap= new TreeMap(new QaStringComparator());
+	    
+	    Iterator itMap = map.entrySet().iterator();
+	    while (itMap.hasNext()) 
+    	{
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            newMap.put(pairs.getKey(), QaUtils.replaceNewLines(pairs.getValue().toString()));
+    	}
+		logger.debug("newMap: " + newMap);
+	    return newMap;
+	}
+	
+
 	public static Map convertToMap(List list)
 	{
 		logger.debug("using convertToMap: " + list);
@@ -601,6 +655,7 @@ public class MonitoringUtil implements QaAppConstants{
 		}
 		return map;
 	}
+
 	
 	
 	
@@ -695,6 +750,87 @@ public class MonitoringUtil implements QaAppConstants{
 
 		request.setAttribute(QA_STATS_DTO, qaStatsDTO);
 	}
+	
+	public static void generateGroupsSessionData(HttpServletRequest request, IQaService qaService, QaContent qaContent)
+	{
+	    logger.debug("generateGroupsSessionData: " + qaContent);
+	    
+	    List listAllGroupsDTO=buildGroupBasedSessionData(request, qaContent, qaService);
+		logger.debug("listAllGroupsDTO: " + listAllGroupsDTO);
+		
+	    request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
+	}
+
+	
+	
+	public static List buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService)
+	{
+		logger.debug("buildGroupBasedSessionData" + qaContent);
+		logger.debug("will be building groups question data  for content:..." + qaContent);
+    	List listQuestions=qaService.getAllQuestionEntries(qaContent.getUid());
+    	logger.debug("listQuestions:..." + listQuestions);
+    	
+    	List listAllGroupsContainerDTO= new LinkedList();
+    	
+    	
+		Iterator iteratorSession= qaContent.getQaSessions().iterator();
+		while (iteratorSession.hasNext())
+		{
+		    QaSession qaSession=(QaSession) iteratorSession.next();
+		    logger.debug("iteration for group based session data: " + qaSession);
+		    String currentSessionId=qaSession.getQaSessionId().toString();
+		    logger.debug("currentSessionId: " + currentSessionId);
+		    
+		    String currentSessionName=qaSession.getSession_name();
+		    logger.debug("currentSessionName: " + currentSessionName);
+		    
+		    QaAllGroupsDTO qaAllGroupsDTO= new QaAllGroupsDTO();
+		    List listMonitoredAnswersContainerDTO= new LinkedList();
+		    
+		    if (qaSession != null)
+		    {
+				Iterator itListQuestions = listQuestions.iterator();
+			    while (itListQuestions.hasNext())
+			    {
+			    	QaQueContent qaQueContent =(QaQueContent)itListQuestions.next();
+			    	logger.debug("qaQueContent:..." + qaQueContent);
+			    	
+			    	if (qaQueContent != null)
+			    	{
+					    logger.debug("populating QaMonitoredAnswersDTO for : " + qaQueContent);
+			    		QaMonitoredAnswersDTO qaMonitoredAnswersDTO= new QaMonitoredAnswersDTO();
+			    		qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
+			    		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
+			    		qaMonitoredAnswersDTO.setSessionId(currentSessionId);
+			    		qaMonitoredAnswersDTO.setSessionName(currentSessionName);
+			    		
+			    		Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaService, qaQueContent, qaQueContent.getUid().toString(), 
+								true,false, currentSessionId, null);
+			    		logger.debug("generated  questionAttemptData: " + questionAttemptData);
+						qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+						
+						logger.debug("adding qaMonitoredAnswersDTO to the listMonitoredAnswersContainerDTO: " + qaMonitoredAnswersDTO);
+						listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
+			    	}
+			    }
+		    }
+		    logger.debug("listMonitoredAnswersContainerDTO:" + listMonitoredAnswersContainerDTO);
+		    
+		    logger.debug("adding listMonitoredAnswersContainerDTO to the qaAllGroupsDTO:" + listMonitoredAnswersContainerDTO);
+		    qaAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
+		    qaAllGroupsDTO.setSessionName(currentSessionName);
+		    qaAllGroupsDTO.setSessionId(currentSessionId);
+		    
+		    logger.debug("built qaAllGroupsDTO:" + qaAllGroupsDTO);
+		    listAllGroupsContainerDTO.add(qaAllGroupsDTO);
+		    
+		}
+    	
+    	
+		logger.debug("final listAllGroupsContainerDTO:..." + listAllGroupsContainerDTO);
+		return listAllGroupsContainerDTO;
+	}	
+	
 	
 }
 

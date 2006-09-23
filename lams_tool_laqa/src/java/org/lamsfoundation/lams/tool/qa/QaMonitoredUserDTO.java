@@ -78,7 +78,13 @@ public class QaMonitoredUserDTO implements Comparable
 	
 	public String toString() {
         return new ToStringBuilder(this)
-            .append("queUsrId and username", getQueUsrId() + " and " + getUserName())
+        	.append("sessionId:", sessionId)
+            .append("userName:", userName)
+            .append("queUsrId:", queUsrId)
+            .append("questionUid:", questionUid)            
+            .append("response:", response)
+            .append("visible:", visible)
+            .append("usersAttempts:", usersAttempts)
             .toString();
     }
 	/**

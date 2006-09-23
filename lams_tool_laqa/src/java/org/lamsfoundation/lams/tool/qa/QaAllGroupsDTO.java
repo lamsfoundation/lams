@@ -24,7 +24,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -35,90 +35,47 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class QaMonitoredAnswersDTO implements Comparable
+public class QaAllGroupsDTO implements Comparable
 {
+
     private String sessionId;
     
     private String sessionName;
     
-	private String questionUid;
+    private List  groupData;
+    
 	
-	private String question;
-	
-	private Map questionAttempts;
-	
-	
-	/**
-	
-	/**
-	 * @return Returns the question.
-	 */
-	public String getQuestion() {
-		return question;
-	}
-	/**
-	 * @param question The question to set.
-	 */
-	public void setQuestion(String question) {
-		this.question = question;
-	}
-	/**
-	 * @return Returns the questionUid.
-	 */
-	public String getQuestionUid() {
-		return questionUid;
-	}
-	/**
-	 * @param questionUid The questionUid to set.
-	 */
-	public void setQuestionUid(String questionUid) {
-		this.questionUid = questionUid;
-	}
-	
-	/**
-	 * @return Returns the questionAttempts.
-	 */
-	public Map getQuestionAttempts() {
-		return questionAttempts;
-	}
-	/**
-	 * @param questionAttempts The questionAttempts to set.
-	 */
-	public void setQuestionAttempts(Map questionAttempts) {
-		this.questionAttempts = questionAttempts;
-	}
 	
 	public String toString() {
         return new ToStringBuilder(this)
+        	.append("sessionId:", sessionId)
             .append("sessionName:", sessionName)
-            .append("sessionId:", sessionId)
-			.append("questionUid:", questionUid)
-			.append("question:", question)
-			.append("questionAttempts:", questionAttempts)
+            .append("groupData: ", groupData)
             .toString();
     }
 	
 	public int compareTo(Object o)
     {
-		QaMonitoredAnswersDTO qaMonitoredAnswersDTO = (QaMonitoredAnswersDTO) o;
+	    QaAllGroupsDTO qaAllGroupsDTO = (QaAllGroupsDTO) o;
      
-        if (qaMonitoredAnswersDTO == null)
+        if (qaAllGroupsDTO == null)
         	return 1;
 		else
-			return (int) (new Long(questionUid).longValue() - new Long(qaMonitoredAnswersDTO.questionUid).longValue());
+			return 0;
     }
 	
+
     /**
-     * @return Returns the sessionId.
+     * @return Returns the groupData.
      */
-    public String getSessionId() {
-        return sessionId;
+    public List getGroupData() {
+        return groupData;
     }
     /**
-     * @param sessionId The sessionId to set.
+     * @param groupData The groupData to set.
      */
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setGroupData(List groupData) {
+        this.groupData = groupData;
     }
     /**
      * @return Returns the sessionName.
@@ -131,5 +88,17 @@ public class QaMonitoredAnswersDTO implements Comparable
      */
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
+    }
+    /**
+     * @return Returns the sessionId.
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+    /**
+     * @param sessionId The sessionId to set.
+     */
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

@@ -111,23 +111,6 @@
         length="1"
     />
 
-    <property
-        name="reportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="report_title"
-        length="100"
-    />
-    
-
-    <property
-        name="monitoringReportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="monitoring_report_title"
-        length="100"
-    />
- 
  
     <property
         name="createdBy"

@@ -72,11 +72,6 @@
 			redirect="false"
 	  	/>
 	
-	  	<forward
-			name="errorList"
-			path="/QaErrorBox.jsp"
-			redirect="false"
-	  	/>
 	</action>  
 	
 	<action
@@ -194,12 +189,6 @@
 	  	
 
 		<forward
-		    name="errorListLearner"
-		    path="/QaErrorBox.jsp"
-		    redirect="false"
-	  	/>   
-
-		<forward
 		    name="notebook"
 		    path="/learning/Notebook.jsp"
 		    redirect="false"
@@ -267,12 +256,6 @@
 		    redirect="false"
 	      />
 
-	      <forward
-		    name="errorListLearner"
-		    path="/QaErrorBox.jsp"
-		    redirect="false"
-	  	/>      
-
 		<forward
 		    name="notebook"
 		    path="/learning/Notebook.jsp"
@@ -307,11 +290,6 @@
           redirect="false"
         />
 	  	
-	  	<forward
-		    name="errorList"
-		    path="/QaErrorBox.jsp"
-		    redirect="false"
-	  	/>
 	</action>  
 	
 	 <action
@@ -335,11 +313,6 @@
 		    redirect="false"
 	  	/>
 	      
-   	  	<forward
-		    name="errorList"
-		    path="/QaErrorBox.jsp"
-		    redirect="false"
-	  	/>
 	</action>
 
 	 <action
@@ -387,24 +360,12 @@
 			redirect="false"
 	    />
 	  	
-	    <forward
-	        name="starter"
-	        path="/index.jsp"
-	        redirect="false"
-	     />
-	      
-
         <forward
           name="learnerNotebook"
           path="/monitoring/LearnerNotebook.jsp"
           redirect="false"
         />
 
-   	  	<forward
-		    name="errorList"
-		    path="/QaErrorBox.jsp"
-		    redirect="false"
-	  	/>
 	</action>
 	
 	<action path="/clearsession"

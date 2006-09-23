@@ -45,6 +45,8 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
 	protected String showResponse;
 	protected String currentUid;
 	
+	protected String sessionId;
+	
 	protected IQaService qaService;
 	
 	
@@ -159,4 +161,16 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
 	public void setMethod(String method) {
 		this.method = method;
 	}
+    /**
+     * @return Returns the sessionId.
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+    /**
+     * @param sessionId The sessionId to set.
+     */
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 }

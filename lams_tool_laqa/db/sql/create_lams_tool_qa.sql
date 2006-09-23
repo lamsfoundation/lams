@@ -30,8 +30,6 @@ CREATE TABLE tl_laqa11_content (
      , reflect TINYINT(1) NOT NULL DEFAULT 0
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
-     , monitoring_report_title VARCHAR(100) DEFAULT 'Learner Results'
-     , report_title VARCHAR(100) DEFAULT 'Report'
      , created_by BIGINT(20) NOT NULL DEFAULT 0
      , run_offline TINYINT(1) DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
@@ -118,6 +116,7 @@ INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date
 
 -- data for content questions table
 INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
+
 
 
 
