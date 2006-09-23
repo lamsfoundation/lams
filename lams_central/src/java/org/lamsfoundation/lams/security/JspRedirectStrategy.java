@@ -48,7 +48,7 @@ public class JspRedirectStrategy {
 	
 	public static final String SECURITY_CHECK_PASSED = "securityCheckPassed";
 
-	public static final String WELCOME_PAGE = "index.jsp ";
+	public static final String WELCOME_PAGE = "index.jsp";
 
 	private static Logger log = Logger.getLogger(JspRedirectStrategy.class);
 
