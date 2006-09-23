@@ -83,6 +83,7 @@ public interface QaAppConstants {
 	public static final String REFLECTIONS_CONTAINER_DTO				="reflectionsContainerDTO";
 	public static final String LEARNER_NOTEBOOK							="learnerNotebook";
 	public static final String NOTEBOOK_ENTRIES_EXIST					="notebookEntriesExist";
+	public static final String NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST		="noSessionsNotebookEntriesExist";	
 	public static final String QA_STATS_DTO								="qaStatsDTO";
 	public static final String LIST_ALL_GROUPS_DTO						="listAllGroupsDTO";
 	public static final String CURRENT_SESSION_NAME						="currentSessionName";

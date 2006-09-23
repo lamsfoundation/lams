@@ -150,7 +150,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		{
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 			generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-			
 		}
 		else
 		{
@@ -236,11 +235,20 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)generalMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
+
 		}
 		else
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-		    
 		}
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);

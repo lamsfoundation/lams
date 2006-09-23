@@ -57,5 +57,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									 </td>
 								</tr>	
 							</c:forEach>		
-							
+						</table>
 				</c:if> 															

@@ -810,6 +810,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)generalMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{
@@ -2245,8 +2254,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    return (mapping.findForward(LOAD_MONITORING));
      }
     
-
-    
     
     public ActionForward hideGroupResponse(ActionMapping mapping,
             ActionForm form,
@@ -2415,9 +2422,25 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
         logger.debug("attachmentList: " + attachmentList);
         generalMonitoringDTO.setAttachmentList(attachmentList);
+        
+        
+        
+		if (qaService.studentActivityOccurredGlobal(qaContent))
+		{
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+			generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+		}
+		else
+		{
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+			generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+		}
+
+        
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
     	request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
+    	
 
 		/*find out if there are any reflection entries, from here*/
 		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2426,6 +2449,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)generalMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{
@@ -2677,6 +2709,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{
@@ -2934,6 +2975,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{
@@ -3123,6 +3173,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{
@@ -3240,6 +3299,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{
@@ -3398,6 +3466,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
+
 		}
 		else
 		{
@@ -3584,6 +3662,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
+
 		}
 		else
 		{
@@ -3743,6 +3831,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
+
 		}
 		else
 		{
@@ -3901,6 +3999,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (notebookEntriesExist)
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
 		}
 		else
 		{

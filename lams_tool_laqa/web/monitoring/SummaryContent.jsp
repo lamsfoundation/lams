@@ -35,6 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 			</c:if>							
 		</c:if>			
+		
 					
 		<c:if test="${(qaGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }"> 	
 		
@@ -97,6 +98,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			</table>  	
 		</c:if>						
+		
+			<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
+						<jsp:include page="/monitoring/Reflections.jsp" />
+			</c:if>						
+		
+		
 
 
 	
