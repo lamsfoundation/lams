@@ -39,7 +39,6 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -161,7 +160,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang);
-			return buildContentTree(userMap.getUser()).toString();
+			return buildContentTree(userMap.getUser().getUserId()).toString();
 		} catch (Exception e) {
 			log.debug(e.getMessage(),e);
 			throw new RemoteException(e.getMessage(), e);
@@ -169,16 +168,16 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 
 	}
 
-	private ContentTreeNode buildContentTree(User user) throws IOException,
+	private ContentTreeNode buildContentTree(Integer userId) throws IOException,
 			UserAccessDeniedException, RepositoryCheckedException {
-		log.debug("User Id - "+user.getUserId());
+		log.debug("User Id - "+userId);
 		FolderContentDTO rootFolder = new FolderContentDTO(msgService
 				.getMessage("label.workspace.root_folder"), msgService.getMessage("folder"), null,
 				null, FolderContentDTO.FOLDER, WorkspaceAction.BOOTSTRAP_FOLDER_ID.longValue(),
 				WorkspaceFolder.READ_ACCESS, null);
 		ContentTreeNode root = new ContentTreeNode(rootFolder);
-		FolderContentDTO userFolder = service.getUserWorkspaceFolder(user.getUserId());
-		root.addChild(buildContentTreeNode(userFolder, user.getUserId()));
+		FolderContentDTO userFolder = service.getUserWorkspaceFolder(userId);
+		root.addChild(buildContentTreeNode(userFolder, userId));
 		FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService
 				.getMessage("organisations"), msgService.getMessage("folder"), null, null,
 				FolderContentDTO.FOLDER, new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()),
@@ -187,10 +186,10 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 		//tried using service.getAccessibleOrganisationWorkspaceFolders(userId) api, 
 		//but it doesn't work, the userOrganisations set of the user 
 		// got from workspaceManagementService with the userId supplied is empty, which is not true.
-		Vector orgFolders = service.getAccessibleOrganisationWorkspaceFolders(user);
+		Vector orgFolders = service.getAccessibleOrganisationWorkspaceFolders(userId);
 		for (int i = 0; i < orgFolders.size(); i++) {
 			FolderContentDTO orgFolder = (FolderContentDTO) orgFolders.get(i);
-			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, user.getUserId()));
+			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId));
 		}
 		root.addChild(dummyOrgNode);
 		return root;
