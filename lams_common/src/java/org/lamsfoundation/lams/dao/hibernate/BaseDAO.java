@@ -232,7 +232,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	
 	private String buildQueryString(Class clazz,String operation){
 		StringBuffer queryString = new StringBuffer(operation).append(clazz.getSimpleName());
-		log.debug(queryString);
+		//log.debug(queryString);
 		return queryString.toString();
 	}
 	
@@ -242,7 +242,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 		StringBuffer queryString = new StringBuffer(operation).append(clazzName).append(SPACE)
 										.append(objName).append(WHERE).append(objName).append(SPOT)
 										.append(name).append(EQUAL_TO_WHAT);
-		log.debug(queryString);
+		//log.debug(queryString);
 		return queryString.toString();
 	}
 	
@@ -303,7 +303,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 			values[i] = entry.getValue();
 			i++;
 		}
-		log.debug(queryString);
+		//log.debug(queryString);
 		return new Qv(queryString.toString(),values);
 	}
 	
@@ -325,7 +325,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 				values.add(value);
 			}
 		}
-		log.debug(queryString);
+		//log.debug(queryString);
 		return new Qv(queryString.toString(),values.toArray());
 	}
 	
