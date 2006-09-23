@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 
 
@@ -46,7 +45,6 @@ import org.lamsfoundation.lams.web.util.HttpSessionManager;
  */
 public class SessionListener implements HttpSessionListener
 {
-	private static Logger log = Logger.getLogger(SessionListener.class);
 
 	/** HttpSessionListener interface */
 	public void sessionCreated(HttpSessionEvent se)
