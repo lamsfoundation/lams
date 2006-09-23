@@ -214,13 +214,11 @@
         name="organisation"
         class="org.lamsfoundation.lams.usermanagement.Organisation"
         not-null="true"
-        lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-           	lazy="false"         
-           @hibernate.column name="orgid"
+           @hibernate.column name="orgid"         
         </meta>
         <column name="orgid" />
     </many-to-one>

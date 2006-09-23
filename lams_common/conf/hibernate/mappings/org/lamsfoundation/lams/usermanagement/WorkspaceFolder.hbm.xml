@@ -80,13 +80,13 @@
     <!-- bi-directional one-to-many association to WorkspaceFolder -->
     <set
         name="childWorkspaceFolders"
-        lazy="false"
+        lazy="true"
         inverse="true"
 		cascade="none"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="false"
+            lazy="true"
             inverse="true"
             cascade="none"
 
@@ -126,7 +126,7 @@
     </set>
     
     <!-- bi-directional one-to-many association to WorkspaceFolderContent -->
-    <set name="folderContent" lazy="false" inverse="true" cascade="delete">
+    <set name="folderContent" lazy="true" inverse="true" cascade="delete">
         <key><column name="workspace_folder_id" /></key>
         <one-to-many class="org.lamsfoundation.lams.workspace.WorkspaceFolderContent"/>
     </set>

@@ -61,13 +61,11 @@
         name="role"
         class="org.lamsfoundation.lams.usermanagement.Role"
         not-null="true"
-        lazy="false"
     >
         <meta attribute="use-in-equals">true</meta>
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-            lazy="false"
            @hibernate.column name="role_id"         
         </meta>
         <column name="role_id" />

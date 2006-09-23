@@ -173,12 +173,10 @@
         name="organisationState"
         class="org.lamsfoundation.lams.usermanagement.OrganisationState"
         not-null="true"
-        lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-        	lazy="false"
            @hibernate.column name="organisation_state_id"         
         </meta>
         <column name="organisation_state_id" />
@@ -189,14 +187,12 @@
         name="workspace"
         class="org.lamsfoundation.lams.usermanagement.Workspace"
         cascade="all"
-        lazy = "false"
         not-null="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
 			cascade="all"
             not-null="false"
-            lazy="false"
            @hibernate.column name="workspace_id"         
         </meta>
         <column name="workspace_id" />

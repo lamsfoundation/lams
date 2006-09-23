@@ -299,13 +299,11 @@
     <many-to-one
         name="workspace"
         cascade="all"
-        lazy="false"
         class="org.lamsfoundation.lams.usermanagement.Workspace"     
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
 	         cascade="all"
-	         lazy="false"
            @hibernate.column name="workspace_id"         
         </meta>
         <column name="workspace_id" />
@@ -314,13 +312,11 @@
     <set
         name="userOrganisations"
         inverse="true"
-        lazy="false"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
             inverse="true"
-            lazy="false"
             cascade="all-delete-orphan"
 
            @hibernate.collection-key
