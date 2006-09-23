@@ -121,20 +121,16 @@ public class IndexAction extends Action {
 				for(Object userOrganisationRole:userOrganisation.getUserOrganisationRoles()){
 					roles.add(((UserOrganisationRole)userOrganisationRole).getRole().getRoleId());
 				}
-				for(Integer roleId:roles){
-					log.debug("role:"+roleId);
-				}
 				orgBeans.add(createOrgBean(userOrganisation.getOrganisation(),roles,request.getRemoteUser(),false));
 			}
 		}
-		log.debug("set orgBeans in request");
 		request.setAttribute("orgBeans",orgBeans);
 		return mapping.findForward("index");
 	}
 
 	@SuppressWarnings({"unchecked","static-access"})
 	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin) {
-		log.debug("creating orgBean for org:"+org.getName());
+		//log.debug("creating orgBean for org:"+org.getName());
 		User user = (User)getService().findByProperty(User.class, "login",username).get(0);
 		IndexOrgBean orgBean = new IndexOrgBean(org.getName(), org.getOrganisationType().getOrganisationTypeId());
 		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
@@ -224,9 +220,7 @@ public class IndexAction extends Action {
 	}
 
 	private boolean contains(List<Integer> roles, Integer roleId) {
-		log.debug("roleId:"+roleId);
 		for (int i = 0; i < roles.size(); i++) {
-			log.debug(roles.get(i));
 			if (roleId.equals(roles.get(i)))
 				return true;
 		}
