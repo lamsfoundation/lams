@@ -36,9 +36,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * When j_security_check authentication is successful the user is redirected to
@@ -113,11 +110,6 @@ public class LoginRequestValve extends ValveBase {
 					log.info("Redirect URL decoded - " + redirect);
 					// create catalina internal session
 					Session session = request.getContext().getManager().findSession(hses.getId());
-					HttpSession sharedsession = SessionManager.getSession();
-					if(sharedsession!=null){
-						log.debug("Shared Session - "+sharedsession.getId());
-						sharedsession.setAttribute(AttributeNames.USER,(UserDTO)hses.getAttribute(AttributeNames.USER));
-					}
 					// Create and populate a SavedRequest object for this
 					// request
 					SavedRequest saved = new SavedRequest();
