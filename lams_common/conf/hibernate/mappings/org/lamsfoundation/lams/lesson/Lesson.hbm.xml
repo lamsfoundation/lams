@@ -74,12 +74,14 @@
 			column="class_grouping_id"
 			unique="true"
 			not-null="false" 
+			lazy="false"
 			cascade = "all"/>
 
 		<!-- bi-directional many-to-one association to Organisation -->
 		<many-to-one name="organisation"
 			class="org.lamsfoundation.lams.usermanagement.Organisation"
-			not-null="false">
+			not-null="false"
+			lazy="false">
 			<column name="organisation_id" />
 		</many-to-one>
 
