@@ -217,6 +217,7 @@ Ant build file.
 		<jar jarfile="${build.lib}/${product}.jar">
 			<fileset dir="${build.classes.java}">
 				<exclude name="org/lamsfoundation/lams/integration/security/LoginRequestValve.class"/>
+				<exclude name="org/lamsfoundation/lams/integration/security/SingleSignOn.class"/>
 			</fileset>
 			<fileset dir="${conf.hibernate.mapping.dir}"/>
 		</jar>
@@ -228,6 +229,7 @@ Ant build file.
 		<jar jarfile="${build.lib}/lams-valve.jar">
 			<fileset dir="${build.classes.java}">
 				<include name="org/lamsfoundation/lams/integration/security/LoginRequestValve.class"/>
+				<include name="org/lamsfoundation/lams/integration/security/SingleSignOn.class"/>
 			</fileset>
 		</jar>
 		<copy overwrite="yes" todir="${build.lib}/language/org/lamsfoundation/lams">
