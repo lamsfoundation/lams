@@ -27,7 +27,7 @@
     <filter-name>SystemSessionFilter</filter-name>
      <url-pattern>/fckeditor/*</url-pattern> 
    </filter-mapping>
-  
+   
    <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>*.do</url-pattern>
@@ -53,11 +53,21 @@
      <url-pattern>/servlet/*</url-pattern>
    </filter-mapping>
   
+   <filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+     <url-pattern>/services/*</url-pattern>
+   </filter-mapping>
+
   <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>/fckeditor/*</url-pattern>
    </filter-mapping>
-  
+
+    <filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+     <url-pattern>/LoginRequest</url-pattern>
+   </filter-mapping>
+     
    <filter-mapping>
     <filter-name>LocaleFilter</filter-name>
      <url-pattern>*.do</url-pattern>
