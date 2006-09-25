@@ -11,12 +11,24 @@
 <table cellpadding="0">
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 		<c:set var="groupSize" value="${fn:length(group)}" />
-		<c:forEach var="item" items="${group}" varStatus="status">
+		<c:set var="surveySession"  value="${summaryList.key}"/>
+		<c:set var="questions"  value="${summaryList.value}"/>
+		
+		<c:if test="${empty questions}">
+			<tr>
+				<td colspan="2">
+					<div align="left">
+						<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
+					</div>
+				</td>
+			</tr>
+		</c:if>
+		<c:forEach var="item" items="${questions}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.first}">
 				<tr>
-					<td colspan="5">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
+					<td colspan="2">
+						<B><fmt:message key="monitoring.label.group" /> ${surveySession.sessionName}</B> 
 						<SPAN style="font-size: 12px;"> 
 							<c:if test="${firstGroup.index==0}">
 								<fmt:message key="monitoring.summary.note" />
@@ -24,89 +36,63 @@
 						</SPAN>
 					</td>
 				</tr>
-				<tr>
-					<th width="18%" align="center">
-						<fmt:message key="monitoring.label.type" />
-					</th>
-					<th width="25%">
-						<fmt:message key="monitoring.label.title" />
-					</th>
-					<th width="20%">
-						<fmt:message key="monitoring.label.suggest" />
-					</th>
-					<th width="22%" align="center">
-						<fmt:message key="monitoring.label.number.learners" />
-					</th>
-					<th width="15%">
-						<!--hide/show-->
-					</th>
-				</tr>
 				<%-- End group title display --%>
 			</c:if>
-			<c:if test="${item.itemUid == -1}">
+			<tr>
+				<th>${question.shortTitle}</th>
+				<th>
+					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewPieChart.do?"/>toolSessionID${surveySession.sessionId}&questionUid=${question.uid}')">
+						<img src="/includes/images/piechart.gif" title="<fmt:message key='message.view.pie.chart'/>">
+					</a>
+					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewBarChart.do?"/>toolSessionID${surveySession.sessionId}&questionUid=${question.uid}')">
+						<img src="/includes/images/barchart.gif" title="<fmt:message key='message.view.bar.chart'/>">
+					</a>
+				</th>
+			</tr>
+			<tr>
+				<td><fmt:message key="message.possible.answers"/></td>
+				<td><fmt:message key="message.total.user.response"/></td>
+			</tr>
+			<c:set var="optSize" value="${fn:length(question.options)}" />
+			<c:forEach var="option" items="question.options"  varStatus="status">
 				<tr>
-					<td colspan="5">
-						<div align="left">
-							<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
-						</div>
+					<td>${option.description}</td>
+					<td>
+						<c:set var="imgTitle">
+							<fmt:message key="message.learner.choose.answer">
+								<fmt:param>${option.response}</fmt:param>
+							</fmt:message>
+						</c:set>
+						<c:set var="imgIdx">
+							${status.index % 5}
+						</c:set>			
+						<img src="/includes/images/bar${imgIdx}.gif" height="10" width="${option.response * 2}" 
+						title="${imgTitle}">
+						${option.responseCount} (${option.responseFormatStr}%)
+					</td>
+				</tr>
+			</c:forEach>
+			<c:if test="${question.appendText}">
+				<tr>
+					<td><fmt:message key="label.open.response"/></td>
+					<td>
+						<c:set var="imgTitle">
+							<fmt:message key="message.learner.choose.answer">
+								<fmt:param>${question.openResponseFormatStr}</fmt:param>
+							</fmt:message>
+						</c:set>
+						<c:set var="imgIdx">
+							${(optSize + 1) % 5}
+						</c:set>						
+						<img src="/includes/images/bar${imgIdx}.gif" height="10" width="${question.openResponse * 2}" 
+						title="${imgTitle}">
+						${question.openResponseCount} (${question.openResponseFormatStr}%)
 					</td>
 				</tr>
 			</c:if>
-			<c:if test="${item.itemUid != -1}">
-				<tr>
-					<td>
-						<c:choose>
-							<c:when test="${item.itemType == 1}">
-								<fmt:message key="label.authoring.basic.survey.url" />
-							</c:when>
-							<c:when test="${item.itemType == 2}">
-								<fmt:message key="label.authoring.basic.survey.file" />
-							</c:when>
-							<c:when test="${item.itemType == 3}">
-								<fmt:message key="label.authoring.basic.survey.website" />
-							</c:when>
-							<c:when test="${item.itemType == 4}">
-								<fmt:message key="label.authoring.basic.survey.learning.object" />
-							</c:when>
-						</c:choose>
-					</td>
-					<td>
-						<a href="javascript:;" onclick="viewItem(${item.itemUid},'${sessionMapID}')">${item.itemTitle}</a>
-					</td>
-					<td>
-						<c:if test="${!item.itemCreateByAuthor}">
-											${item.username}
-										</c:if>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.viewNumber > 0}">
-								<c:set var="listUrl">
-									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}' />
-								</c:set>
-								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
-							</c:when>
-							<c:otherwise>
-									0
-							</c:otherwise>
-						</c:choose>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
-							</c:when>
-							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</c:if>
-			
 				<%-- Reflection list  --%>
 				<c:if test="${sessionMap.survey.reflectOnActivity && status.last}">
-					<c:set var="userList" value="${sessionMap.reflectList[item.sessionId]}"/>
+					<c:set var="userList" value="${sessionMap.reflectList[surveySession.sessionId]}"/>
 					<c:forEach var="user" items="${userList}" varStatus="refStatus">
 						<c:if test="${refStatus.first}">
 							<tr>

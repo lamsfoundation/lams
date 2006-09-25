@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.survey.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -105,9 +106,25 @@ public interface ISurveyService
 	 * @param uid
 	 */
 	void deleteQuestion(Long uid);
-
+	/**
+	 * Get question and its answer list by session and user.
+	 * @param sessionId
+	 * @param userUid
+	 * @return
+	 */
 	List<SurveyQuestion> getQuestionAnswer(Long sessionId, Long userUid);
-
+	/**
+	 * Get question's answer with response percentage infromation.
+	 * @param sessionId
+	 * @param questionUid
+	 * @return
+	 */
+	SurveyQuestion getQuestionResponse(Long sessionId, Long questionUid);
+	
+	/**
+	 * Commit answers for a group of question together. 
+	 * @param answerList
+	 */
 	void updateAnswerList(List<SurveyAnswer> answerList);
 	//******************************************************************************************
 	//********** user methods *************
@@ -170,6 +187,16 @@ public interface ISurveyService
 	 */
 	String finishToolSession(Long toolSessionId, Long userId)  throws SurveyApplicationException;
 
+	
+	//******************************************************************************************
+	//  	Monitoring summary /statistic methods
+	//******************************************************************************************
+
+	/**
+	 * Return a map which sorted by SurveySession and list of questions for this session. 
+	 */
+
+	SortedMap<SurveySession,List<SurveyQuestion>> getSummary(Long contentId);
 
 	//******************************************************************************************
 	//  	NOTEBOOK Functions
@@ -200,6 +227,7 @@ public interface ISurveyService
 	 * @return
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+	
 	
 
 }

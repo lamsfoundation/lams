@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 
@@ -63,6 +64,10 @@ public class SurveyQuestion  implements Cloneable{
 	private String shortTitle;
 	//this is DTO field. For answer, which is user and session level. For question, which is content level.
 	private SurveyAnswer answer;
+	//Open text entry response percentage  if this question has open text entry.
+	private double openResponse; 
+	private String openResponseFormatStr;
+	private int openResponseCount; 
 	
     public Object clone(){
     	SurveyQuestion obj = null;
@@ -227,6 +232,24 @@ public class SurveyQuestion  implements Cloneable{
 		}
 		public void setAnswer(SurveyAnswer answer) {
 			this.answer = answer;
+		}
+		public double getOpenResponse() {
+			return openResponse;
+		}
+		public void setOpenResponse(double openResponse) {
+			this.openResponse = openResponse;
+		}
+		public int getOpenResponseCount() {
+			return openResponseCount;
+		}
+		public void setOpenResponseCount(int openResponseCount) {
+			this.openResponseCount = openResponseCount;
+		}
+		public String getOpenResponseFormatStr() {
+			return openResponseFormatStr;
+		}
+		public void setOpenResponseFormatStr(String openResponseFormatStr) {
+			this.openResponseFormatStr = openResponseFormatStr;
 		}
 
 

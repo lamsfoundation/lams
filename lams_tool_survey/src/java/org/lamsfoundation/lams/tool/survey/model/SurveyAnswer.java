@@ -47,7 +47,7 @@ public class SurveyAnswer {
 	//************************************************
 	// DTO fields
 	//************************************************
-	//it is list of optionl UIDs
+	//it is list of optional UIDs. Uid is long type, but here just save them by String format
 	private String[] choices;
 	
 	/**

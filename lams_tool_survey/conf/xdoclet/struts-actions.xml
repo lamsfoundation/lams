@@ -228,20 +228,26 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		
+		<action path="/monitoring/viewBarChart"
+			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
+			parameter="viewBarChart" >
+			<forward name="success" path="/pages/monitoring/barchart.jsp" />
+		</action>
+		<action path="/monitoring/viewPieChart"
+			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
+			parameter="viewPieChart" >
+			<forward name="success" path="/pages/monitoring/piechart.jsp" />
+		</action>
+		<action path="/showChart"
+			type="org.lamsfoundation.lams.tool.survey.web.action.ChartAction">
+			<forward name="error" path="/pages/monitoring/charterror.jsp" />
+		</action>
+		
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
 			parameter="listuser" >
 			<forward name="success" path="/pages/monitoring/userlist.jsp" />
-		</action>
-		<action path="/monitoring/hideitem"
-			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="hideitem" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>
-		<action path="/monitoring/showitem"
-			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="showitem" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
 		
 		<action path="/monitoring/viewReflection"

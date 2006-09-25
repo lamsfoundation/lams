@@ -61,6 +61,13 @@ public class SurveyConstants {
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	public static final String ERROR_MSG_MANDATORY_QUESTION = "error.mandatory.question";
 	
+	public static final String MSG_OPEN_RESPONSE ="label.open.response";
+	public static final String MSG_PIECHART_TITLE = "piechart.title";
+	public static final String MSG_BARCHART_TITLE = "barchart.title";
+	public static final String MSG_BARCHART_CATEGORY_AXIS_LABEL = "barchart.category.axis.label";
+	public static final String MSG_BARCHART_VALUE_AXIS_LABEL = "barchart.value.axis.label";
+	
+
 	
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
@@ -91,6 +98,10 @@ public class SurveyConstants {
 	public static final String ERROR_MSG_KEY = "questionError";
 	public static final String ATTR_TOTAL_QUESTIONS = "totalQuestions";
 	public static final String ATTR_CURRENT_QUESTIONS_IDX = "currentIdx";
+	public static final String CHART_TYPE = "chartType";
+	public static final String ATTR_QUESTION_UID = "questionUid";
+	public static final String ATTR_SUMMARY_LIST = "summaryList";
+	public static final String ATTR_SURVEY = "survey";
 	
 	//POSITION
 	public static int POSITION_INSIDE = 0;

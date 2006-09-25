@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.survey.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -79,6 +82,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
+import org.lamsfoundation.lams.tool.survey.util.SurveySessionComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -323,7 +327,87 @@ public class SurveyServiceImpl implements
 		}
 	}
 
+	public SurveyQuestion getQuestionResponse(Long sessionId, Long questionUid){
+		SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
+		
+		
+		if(question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+			return question;
+		
+		//get question all answer from this session
+		List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid);
 
+		//create a map to hold Option UID and sequenceID(start from 0); 
+		Map<String, Integer> optMap = new HashMap<String, Integer>();
+		Set<SurveyOption> options = question.getOptions();
+		int idx=0;
+		for (SurveyOption option : options) {
+			optMap.put(option.getUid().toString(),idx);
+			idx++;
+		}
+		
+		//initial a array to hold how many time chose has been done for a option or open text.
+		int optSize = options.size();
+		if(question.isAppendText())
+			optSize++;
+		
+		int[] choose = new int[optSize];
+		Arrays.fill(choose, 0);
+
+		//sum up all option and open text (if has) have been selected count list
+		int answerSum = 1;
+		if(answsers != null){
+			for (SurveyAnswer answer : answsers) {
+				String[] choseOpt = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
+				for (String optUid : choseOpt) {
+					if(optMap.containsKey(optUid))
+						choose[optMap.get(optUid)]++;
+				}
+				if(question.isAppendText() && !StringUtils.isBlank(answer.getAnswerText()))
+					choose[optSize-1]++;
+					
+				answerSum ++;
+			}
+		}
+		//caculate the percentage of answer response
+		idx=0;
+		for (SurveyOption option : options) {
+			option.setReponse((double)choose[idx]/(double)answerSum);
+			option.setReponseFormatStr(new Integer((int) option.getReponse()).toString());
+			option.setResponseCount(choose[idx]);
+			idx++;
+		}
+		if(question.isAppendText()){
+			question.setOpenResponse((double)choose[idx]/(double)answerSum);
+			question.setOpenResponseFormatStr(new Integer((int) question.getOpenResponse()).toString());
+			question.setOpenResponseCount(choose[idx]);
+		}
+		return question;
+		
+	}
+	
+	public SortedMap<SurveySession,List<SurveyQuestion>> getSummary(Long toolContentId) {
+		
+		SortedMap<SurveySession,List<SurveyQuestion>> summary = 
+				new TreeMap<SurveySession, List<SurveyQuestion>>(new SurveySessionComparator());
+		
+		Survey survey = surveyDao.getByContentId(toolContentId);
+		//get all question under this survey
+		Set<SurveyQuestion> questionList = survey.getQuestions();
+		List<SurveySession> sessionList = surveySessionDao.getByContentId(toolContentId);
+		//iterator all sessions under this survey content, and get all questions and its answers.
+		for (SurveySession session : sessionList) {
+			List<SurveyQuestion> responseList = new ArrayList<SurveyQuestion>();
+			for (SurveyQuestion question : questionList) {
+				SurveyQuestion response = getQuestionResponse(session.getSessionId(), question.getUid());
+				responseList.add(response);
+			}
+			summary.put(session, responseList);
+		}
+		
+		
+		return summary;
+	}
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
