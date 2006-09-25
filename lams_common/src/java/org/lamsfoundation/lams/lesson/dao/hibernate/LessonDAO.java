@@ -36,15 +36,15 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * Hibernate implementation of ILessonDAO
  * @author chris
  */
-public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
+public class LessonDAO extends BaseDAO implements ILessonDAO
 {
 	private final static String FIND_LESSON_BY_CREATOR="from "
 					+ Lesson.class.getName()

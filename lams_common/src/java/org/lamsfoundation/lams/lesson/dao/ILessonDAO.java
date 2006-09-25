@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.lesson.dao;
 import java.util.Date;
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -33,7 +34,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * Inteface defines Lesson DAO Methods
  * @author chris
  */
-public interface ILessonDAO
+public interface ILessonDAO extends IBaseDAO
 {
     
     /**
