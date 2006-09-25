@@ -202,6 +202,8 @@ INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_cod
 VALUES (19, 'ar', 'JO', 'عربي', 'RTL');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (20, 'da', 'DK', 'Dansk', 'LTR');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
+VALUES (21, 'ru', 'RU', 'Русский', 'LTR');
 
 -- which current tool supports the old 1.0.x tools?
 INSERT INTO lams_tool_import_support VALUES (1, 'lafrum11', 'messageboard');
