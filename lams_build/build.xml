@@ -46,8 +46,8 @@
 			</fileset>
 		</delete>
 		<delete includeemptydirs="true">
-			<fileset dir="${jboss.server.instance}/work">
-				<include name="**/*" />
+			<fileset dir="${jboss.server.instance}/work/jboss.web/localhost">
+				<include name="lams*/*" />
 			</fileset>
 		</delete>
 	</target>
