@@ -44,83 +44,81 @@ import org.apache.log4j.Logger;
  */
 public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn {
 	private static Logger log = Logger.getLogger(SingleSignOn.class);
-	
-	public void invoke(Request request, Response response)
-    throws IOException, ServletException {
 
-    request.removeNote(Constants.REQ_SSOID_NOTE);
+	public void invoke(Request request, Response response) throws IOException, ServletException {
 
-    // Has a valid user already been authenticated?
-    if (log.isDebugEnabled())
-        log.debug("Process request for '" + request.getRequestURI() + "'");
-    Principal p = request.getUserPrincipal();
-    String username = null;
-    String password = null;
-    if (request.getUserPrincipal() != null) {
-        if (log.isDebugEnabled())
-            log.debug(" Principal '" + request.getUserPrincipal().getName() +
-                "' has already been authenticated");
-        getNext().invoke(request, response);
-        return;
-    }else{
-    	Session session = request.getSessionInternal(false);
-    	if(session != null){
-    		p = (Principal)session.getNote(Constants.FORM_PRINCIPAL_NOTE);
-    		username = (String)session.getNote(Constants.SESS_USERNAME_NOTE);
-    		username = (String)session.getNote(Constants.SESS_PASSWORD_NOTE);
-    	}
-    }
-    
-    // Check for the single sign on cookie
-    if (log.isDebugEnabled())
-        log.debug(" Checking for SSO cookie");
-    Cookie cookie = null;
-    Cookie cookies[] = request.getCookies();
-    if (cookies == null)
-        cookies = new Cookie[0];
-    for (int i = 0; i < cookies.length; i++) {
-        if (Constants.SINGLE_SIGN_ON_COOKIE.equals(cookies[i].getName())) {
-            cookie = cookies[i];
-            break;
-        }
-    }
-    if (cookie == null) {
-        if (log.isDebugEnabled())
-            log.debug(" SSO cookie is not present");
-        getNext().invoke(request, response);
-        return;
-    }
+		request.removeNote(Constants.REQ_SSOID_NOTE);
 
-    // Look up the cached Principal associated with this cookie value
-    if (log.isDebugEnabled())
-        log.debug(" Checking for cached principal for " + cookie.getValue());
-    // register principal from internal session. This principal is set
-    // in internal session by catalina FormAuthenticator
-    if(p!=null){
-    	log.debug("principal - "+p.getName() );
-    	register(cookie.getValue(), p, Constants.FORM_METHOD,username, password);
-    }
-    SingleSignOnEntry entry = lookup(cookie.getValue());
-    if (entry != null) {
-        if (log.isDebugEnabled())
-            log.debug(" Found cached principal '" +
-                entry.getPrincipal().getName() + "' with auth type '" +
-                entry.getAuthType() + "'");
-        request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
-        // Only set security elements if reauthentication is not required
-        if (!getRequireReauthentication()) {
-            request.setAuthType(entry.getAuthType());
-            request.setUserPrincipal(entry.getPrincipal());
-        }
-    } else {
-        if (log.isDebugEnabled())
-            log.debug(" No cached principal found, erasing SSO cookie");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-    }
+		// Has a valid user already been authenticated?
+		if (log.isDebugEnabled())
+			log.debug("Process request for '" + request.getRequestURI() + "'");
+		Principal p = request.getUserPrincipal();
+		String username = null;
+		String password = null;
+		if (request.getUserPrincipal() != null) {
+			if (log.isDebugEnabled())
+				log.debug(" Principal '" + request.getUserPrincipal().getName()
+						+ "' has already been authenticated");
+			getNext().invoke(request, response);
+			return;
+		} else {
+			Session session = request.getSessionInternal(false);
+			if (session != null) {
+				p = (Principal) session.getNote(Constants.FORM_PRINCIPAL_NOTE);
+				username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
+				username = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+			}
+		}
 
-    // Invoke the next Valve in our pipeline
-    getNext().invoke(request, response);
+		// Check for the single sign on cookie
+		if (log.isDebugEnabled())
+			log.debug(" Checking for SSO cookie");
+		Cookie cookie = null;
+		Cookie cookies[] = request.getCookies();
+		if (cookies == null)
+			cookies = new Cookie[0];
+		for (int i = 0; i < cookies.length; i++) {
+			if (Constants.SINGLE_SIGN_ON_COOKIE.equals(cookies[i].getName())) {
+				cookie = cookies[i];
+				break;
+			}
+		}
+		if (cookie == null) {
+			if (log.isDebugEnabled())
+				log.debug(" SSO cookie is not present");
+			getNext().invoke(request, response);
+			return;
+		}
 
-}
+		// Look up the cached Principal associated with this cookie value
+		if (log.isDebugEnabled())
+			log.debug(" Checking for cached principal for " + cookie.getValue());
+		// register principal from internal session. This principal is set
+		// in internal session by catalina FormAuthenticator
+		if (p != null) {
+			log.debug("principal - " + p.getName());
+			register(cookie.getValue(), p, Constants.FORM_METHOD, username, password);
+		}
+		SingleSignOnEntry entry = lookup(cookie.getValue());
+		if (entry != null) {
+			if (log.isDebugEnabled())
+				log.debug(" Found cached principal '" + entry.getPrincipal().getName()
+						+ "' with auth type '" + entry.getAuthType() + "'");
+			request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
+			// Only set security elements if reauthentication is not required
+			if (!getRequireReauthentication()) {
+				request.setAuthType(entry.getAuthType());
+				request.setUserPrincipal(entry.getPrincipal());
+			}
+		} else {
+			if (log.isDebugEnabled())
+				log.debug(" No cached principal found, erasing SSO cookie");
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
+		}
+
+		// Invoke the next Valve in our pipeline
+		getNext().invoke(request, response);
+
+	}
 }
