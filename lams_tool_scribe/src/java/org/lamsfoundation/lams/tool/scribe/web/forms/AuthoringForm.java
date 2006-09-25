@@ -33,7 +33,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * @struts.form name="authoringForm"
@@ -51,10 +50,6 @@ public class AuthoringForm extends ActionForm {
 	String offlineInstruction;
 
 	String onlineInstruction;
-
-	Long toolContentID;
-	
-	String contentFolderID;
 	
 	boolean lockOnFinished;
 
@@ -75,8 +70,11 @@ public class AuthoringForm extends ActionForm {
 	String sessionMapID;
 	
 	Long deleteFileUuid;
-
-	SessionMap sessionMap;
+	
+	// Properties for AddHeading.jsp page
+	
+	String heading;
+	Integer headingIndex;
 	
 	@Override
 	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
@@ -166,23 +164,6 @@ public class AuthoringForm extends ActionForm {
 		this.title = title;
 	}
 
-	public Long getToolContentID() {
-		return toolContentID;
-	}
-
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
-
-	public void setSessionMap(SessionMap sessionMap) {
-		this.sessionMap = sessionMap;
-		
-	}
-
-	public SessionMap getSessionMap() {
-		return sessionMap;
-	}
-
 	public Long getDeleteFileUuid() {
 		return deleteFileUuid;
 	}
@@ -207,19 +188,27 @@ public class AuthoringForm extends ActionForm {
 		this.reflectInstructions = reflectInstructions;
 	}
 
-	public String getContentFolderID() {
-		return contentFolderID;
-	}
-
-	public void setContentFolderID(String contentFolderID) {
-		this.contentFolderID = contentFolderID;
-	}
-
 	public boolean isAutoSelectScribe() {
 		return autoSelectScribe;
 	}
 
 	public void setAutoSelectScribe(boolean autoSelectScribe) {
 		this.autoSelectScribe = autoSelectScribe;
+	}
+
+	public String getHeading() {
+		return heading;
+	}
+
+	public void setHeading(String heading) {
+		this.heading = heading;
+	}
+
+	public Integer getHeadingIndex() {
+		return headingIndex;
+	}
+
+	public void setHeadingIndex(Integer headingIndex) {
+		this.headingIndex = headingIndex;
 	}
 }

@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeAttachmentDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeDAO;
+import org.lamsfoundation.lams.tool.scribe.dao.IScribeHeadingDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeSessionDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeUserDAO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
@@ -93,6 +94,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	private IScribeUserDAO scribeUserDAO = null;
 
 	private IScribeAttachmentDAO scribeAttachmentDAO = null;
+	
+	private IScribeHeadingDAO scribeHeadingDAO = null;
 
 	private ILearnerService learnerService;
 
@@ -397,6 +400,10 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		scribeUserDAO.saveOrUpdate(scribeUser);
 	}
 
+//	public void saveOrUpdateScribeHeading(ScribeHeading heading) {
+//		scribeHeadingDAO.saveOrUpdate(heading);
+//	}
+	
 	public synchronized ScribeUser createScribeUser(UserDTO user,
 			ScribeSession scribeSession) {
 		ScribeUser scribeUser = new ScribeUser(user, scribeSession);
@@ -608,6 +615,5 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     	scribe.setReflectOnActivity(Boolean.TRUE);
     	scribe.setReflectInstructions(description);
     }
-    
     //=========================================================================================
 }

@@ -36,6 +36,11 @@
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="" />
 	</definition>
+	
+	<definition name="tiles:/layout:blank" path="/layouts/blankLayout.jsp">
+		<put name="header" value="tiles:/header:default" />
+		<put name="body" value="" />	
+	</definition>
 
 	<!--  End: Layouts -->
 
@@ -76,6 +81,17 @@
 	<definition name="tiles:/header:authoring" extends="tiles:/header:default">
 		<put name="headItems" value="/pages/authoring/headItems.jsp" />
 	</definition>
+	
+	<definition name="tiles:/authoring/headingForm" extends="tiles:/layout:blank" >
+		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="body" value="/pages/authoring/headingForm.jsp" />
+	</definition>
+		
+	<definition name="tiles:/authoring/headingResponse" extends="tiles:/layout:blank" >
+		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="body" value="/pages/authoring/headingResponse.jsp" />
+	</definition>
+	
 	<!-- End: Authoring -->
 
 

@@ -29,8 +29,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import middlegen.Column;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -90,6 +88,8 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	private Set scribeAttachments;
 
 	private Set scribeSessions;
+	
+	private Set scribeHeadings;
 	
 	
 	//*********** NON Persisit fields
@@ -355,6 +355,19 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	public void setScribeSessions(Set scribeSessions) {
 		this.scribeSessions = scribeSessions;
 	}
+	
+	/**
+	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+	 * @hibernate.collection-key column="scribe_uid"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scribe.model.ScribeHeading" 
+	 */
+	public Set getScribeHeadings() {
+		return scribeHeadings;
+	}
+
+	public void setScribeHeadings(Set scribeHeadings) {
+		this.scribeHeadings = scribeHeadings;
+	}
 
 	/**
 	 * toString
@@ -433,8 +446,25 @@ public class Scribe implements java.io.Serializable, Cloneable {
 				}
 				scribe.scribeAttachments = set;
 			}
+			
+			if (scribeHeadings != null) {
+				// create copy of headings
+				Iterator iter = scribeHeadings.iterator();
+				Set<ScribeHeading> set = new HashSet<ScribeHeading>();
+				while (iter.hasNext()) {
+					ScribeHeading originalHeading = (ScribeHeading) iter.next();
+					ScribeHeading newHeading = (ScribeHeading)originalHeading.clone();
+					set.add(newHeading);
+				}
+				scribe.scribeHeadings = set;
+				
+			}
+			
+			
 			// create an empty set for the scribeSession
 			scribe.scribeSessions = new HashSet();
+			
+
 
 		} catch (CloneNotSupportedException cnse) {
 			log.error("Error cloning " + Scribe.class);

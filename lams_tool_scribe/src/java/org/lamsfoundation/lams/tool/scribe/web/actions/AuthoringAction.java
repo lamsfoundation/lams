@@ -24,11 +24,13 @@
 
 package org.lamsfoundation.lams.tool.scribe.web.actions;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,15 +47,15 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
-import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
+import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-
 
 /**
  * @author
@@ -64,6 +66,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * 
  * @struts.action-forward name="success" path="tiles:/authoring/main"
  * @struts.action-forward name="message_page" path="tiles:/generic/message"
+ * @struts.action-forward name="heading_form"
+ *                        path="tiles:/authoring/headingForm"
+ * @struts.action-forward name="heading_response"
+ *                        path="tiles:/authoring/headingResponse"
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -72,6 +78,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	public IScribeService scribeService;
 
 	// Authoring SessionMap key names
+	private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
+
+	private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
+
 	private static final String KEY_MODE = "mode";
 
 	private static final String KEY_ONLINE_FILES = "onlineFiles";
@@ -83,6 +93,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	private static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
 
 	private static final String KEY_DELETED_FILES = "deletedFiles";
+
+	private static final String KEY_HEADINGS = "headings";
 
 	/**
 	 * Default method when no dispatch parameter is specified. It is expected
@@ -96,13 +108,14 @@ public class AuthoringAction extends LamsDispatchAction {
 		// Extract toolContentID from parameters.
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
-		
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+
+		String contentFolderID = WebUtil.readStrParam(request,
+				AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 		// set up scribeService
 		if (scribeService == null) {
-			scribeService = ScribeServiceProxy.getScribeService(this.getServlet()
-					.getServletContext());
+			scribeService = ScribeServiceProxy.getScribeService(this
+					.getServlet().getServletContext());
 		}
 
 		// retrieving Scribe with given toolContentID
@@ -130,17 +143,16 @@ public class AuthoringAction extends LamsDispatchAction {
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
 		updateAuthForm(authForm, scribe);
-		
+
 		// Set up sessionMap
-		SessionMap<String, Object> map = createSessionMap(scribe, getAccessMode(request));
+		SessionMap<String, Object> map = createSessionMap(scribe,
+				getAccessMode(request), contentFolderID, toolContentID);
 		authForm.setSessionMapID(map.getSessionID());
-		
-		authForm.setContentFolderID(contentFolderID);
 
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
 		request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
-		
+
 		return mapping.findForward("success");
 	}
 
@@ -153,7 +165,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		// get scribe content.
-		Scribe scribe = scribeService.getScribeByContentId(authForm.getToolContentID());
+		Scribe scribe = scribeService.getScribeByContentId((Long) map
+				.get(KEY_TOOL_CONTENT_ID));
 
 		// update scribe content using form inputs.
 		updateScribe(scribe, authForm);
@@ -170,13 +183,22 @@ public class AuthoringAction extends LamsDispatchAction {
 					.getFileVersionId());
 			attachments.remove(att);
 		}
-		
+
 		// add unsaved attachments
 		attachments.addAll(getAttList(KEY_UNSAVED_ONLINE_FILES, map));
 		attachments.addAll(getAttList(KEY_UNSAVED_OFFLINE_FILES, map));
-		
+
 		// set attachments in case it didn't exist
 		scribe.setScribeAttachments(attachments);
+
+		// update headings.
+		List<ScribeHeading> updatedHeadings = getHeadingList(map);
+		Set currentHeadings = scribe.getScribeHeadings();
+		currentHeadings.clear();		
+		for (ScribeHeading heading : updatedHeadings) {
+			heading.setUid(null);
+			currentHeadings.add(heading);			
+		}
 
 		// set the update date
 		scribe.setUpdateDate(new Date());
@@ -188,12 +210,12 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,
 				Boolean.TRUE);
-		
+
 		// add the sessionMapID to form
 		authForm.setSessionMapID(map.getSessionID());
 
 		request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
-		
+
 		return mapping.findForward("success");
 	}
 
@@ -235,6 +257,114 @@ public class AuthoringAction extends LamsDispatchAction {
 				IToolContentHandler.TYPE_OFFLINE, request);
 	}
 
+	public ActionForward loadHeadingForm(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
+		Integer headingIndex = WebUtil.readIntParam(request, "headingIndex", true);
+
+		AuthoringForm authForm = ((AuthoringForm) form);
+		
+		if (headingIndex == null) {
+			headingIndex = -1;
+		}
+		
+		authForm.setHeadingIndex(headingIndex);
+		authForm.setSessionMapID(sessionMapID);
+
+		return mapping.findForward("heading_form");
+	}
+
+	public ActionForward addOrUpdateHeading(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		AuthoringForm authForm = (AuthoringForm) form;
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
+
+		String headingText = authForm.getHeading();
+		Integer headingIndex = authForm.getHeadingIndex();
+		Long toolContentID = getToolContentID(map);
+
+		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
+
+		if (headingIndex == -1) {
+			// create a new heading
+			List<ScribeHeading> headings = getHeadingList(map);
+			
+			ScribeHeading scribeHeading = new ScribeHeading(headings.size());
+			scribeHeading.setScribe(scribe);
+			scribeHeading.setHeadingText(headingText);
+
+			headings.add(scribeHeading);
+		} else {
+			// update the existing heading
+			ScribeHeading heading = getHeadingList(map).get(headingIndex);
+			heading.setHeadingText(headingText);			
+		}
+
+		request.setAttribute("sessionMapID", map.getSessionID());
+		return mapping.findForward("heading_response");
+	}
+	
+	public ActionForward moveHeading(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		AuthoringForm authForm = (AuthoringForm) form;
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
+		
+		int headingIndex = WebUtil.readIntParam(request, "headingIndex");
+		String direction = WebUtil.readStrParam(request, "direction");
+		
+		ListIterator<ScribeHeading> iter =  getHeadingList(map).listIterator(headingIndex);
+		
+		ScribeHeading heading = iter.next();
+		iter.remove();
+		
+		// move to correct location
+		if (direction.equals("up")) {
+			if (iter.hasPrevious())
+				iter.previous();			
+		} else if (direction.equals("down")) {
+			if (iter.hasNext())
+				iter.next();
+		} else {
+			// invalid direction, don't move anywhere.
+			log.error("moveHeading: received invalid direction : " + direction);
+		}
+		
+		// adding heading back into list
+		iter.add(heading);		
+		
+		// update the displayOrder
+		int i = 0;
+		for(ScribeHeading elem : getHeadingList(map)) {
+			elem.setDisplayOrder(i);
+			i++;
+		}
+		
+		request.setAttribute("sessionMapID", map.getSessionID());
+		return mapping.findForward("heading_response");
+	}
+
+	public ActionForward deleteHeading(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		AuthoringForm authForm = (AuthoringForm) form;
+		SessionMap<String, Object> map = getSessionMap(request, authForm);
+		
+		Integer headingIndex = authForm.getHeadingIndex();
+		
+		getHeadingList(map).remove(headingIndex.intValue());		
+		
+		request.setAttribute("sessionMapID", map.getSessionID());
+		return mapping.findForward("heading_response");
+				
+	}
+	
 	/* ========== Private Methods ********** */
 
 	private ActionForward uploadFile(ActionMapping mapping,
@@ -257,8 +387,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// upload file to repository
-		ScribeAttachment newAtt = scribeService.uploadFileToContent(authForm
-				.getToolContentID(), file, type);
+		ScribeAttachment newAtt = scribeService.uploadFileToContent((Long) map
+				.get(KEY_TOOL_CONTENT_ID), file, type);
 
 		// Add attachment to unsavedFiles
 		// check to see if file with same name exists
@@ -369,7 +499,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @return
 	 */
 	private void updateAuthForm(AuthoringForm authForm, Scribe scribe) {
-		authForm.setToolContentID(scribe.getToolContentId());
 		authForm.setTitle(scribe.getTitle());
 		authForm.setInstructions(scribe.getInstructions());
 		authForm.setOnlineInstruction(scribe.getOnlineInstructions());
@@ -384,19 +513,24 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * Updates SessionMap using Scribe content.
 	 * 
 	 * @param scribe
-	 * @param mode 
+	 * @param mode
 	 */
-	private SessionMap<String, Object> createSessionMap(Scribe scribe, ToolAccessMode mode) {
-		
+	private SessionMap<String, Object> createSessionMap(Scribe scribe,
+			ToolAccessMode mode, String contentFolderID, Long toolContentID) {
+
 		SessionMap<String, Object> map = new SessionMap<String, Object>();
-		
+
 		map.put(KEY_MODE, mode);
+		map.put(KEY_CONTENT_FOLDER_ID, contentFolderID);
+		map.put(KEY_TOOL_CONTENT_ID, toolContentID);
 		map.put(KEY_ONLINE_FILES, new LinkedList<ScribeAttachment>());
 		map.put(KEY_OFFLINE_FILES, new LinkedList<ScribeAttachment>());
 		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<ScribeAttachment>());
 		map.put(KEY_UNSAVED_OFFLINE_FILES, new LinkedList<ScribeAttachment>());
-		map.put(KEY_DELETED_FILES, new LinkedList<ScribeAttachment>());		
-			
+		map.put(KEY_DELETED_FILES, new LinkedList<ScribeAttachment>());
+		map.put(KEY_HEADINGS, new LinkedList<ScribeHeading>());
+
+		// adding attachments
 		Iterator iter = scribe.getScribeAttachments().iterator();
 		while (iter.hasNext()) {
 			ScribeAttachment attachment = (ScribeAttachment) iter.next();
@@ -409,6 +543,16 @@ public class AuthoringAction extends LamsDispatchAction {
 			}
 		}
 		
+		// adding headings
+		iter = scribe.getScribeHeadings().iterator();
+		while (iter.hasNext()) {
+			ScribeHeading element = (ScribeHeading) iter.next();
+			getHeadingList(map).add(element);
+		}
+		
+		// sorting headings according to displayOrder.
+		Collections.sort(getHeadingList(map));
+
 		return map;
 	}
 
@@ -431,31 +575,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	/**
-	 * Set up SessionMap for first use. Creates empty lists and sets the access
-	 * mode.
-	 * 
-	 * @param map
-	 * @param request
-	 */
-	private void initSessionMap(SessionMap<String, Object> map, HttpServletRequest request) {
-		map.put(KEY_MODE, getAccessMode(request));
-		map.put(KEY_ONLINE_FILES, new LinkedList<ScribeAttachment>());
-		map.put(KEY_OFFLINE_FILES, new LinkedList<ScribeAttachment>());
-		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<ScribeAttachment>());
-		map.put(KEY_UNSAVED_OFFLINE_FILES, new LinkedList<ScribeAttachment>());
-		map.put(KEY_DELETED_FILES, new LinkedList<ScribeAttachment>());
-	}
-
-	/**
 	 * Retrieves a List of attachments from the map using the key.
 	 * 
 	 * @param key
 	 * @param map
 	 * @return
 	 */
-	private List<ScribeAttachment> getAttList(String key, SessionMap<String, Object> map) {
-		List<ScribeAttachment> list = (List<ScribeAttachment>) map.get(key);
-		return list;
+	private List<ScribeAttachment> getAttList(String key,
+			SessionMap<String, Object> map) {
+		return (List<ScribeAttachment>) map.get(key);
+	}
+
+	private List<ScribeHeading> getHeadingList(SessionMap<String, Object> map) {
+		return (List<ScribeHeading>) map.get(KEY_HEADINGS);
 	}
 
 	/**
@@ -465,9 +597,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param authForm
 	 * @return
 	 */
-	private SessionMap<String, Object> getSessionMap(HttpServletRequest request,
-			AuthoringForm authForm) {
+	private SessionMap<String, Object> getSessionMap(
+			HttpServletRequest request, AuthoringForm authForm) {
 		return (SessionMap<String, Object>) request.getSession().getAttribute(
 				authForm.getSessionMapID());
+	}
+
+	private Long getToolContentID(SessionMap map) {
+		return (Long) map.get(KEY_TOOL_CONTENT_ID);
 	}
 }

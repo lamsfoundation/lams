@@ -24,13 +24,11 @@
 
 package org.lamsfoundation.lams.tool.scribe.service;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
@@ -151,4 +149,6 @@ public interface IScribeService {
 
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
+	
+//	public void saveOrUpdateScribeHeading(ScribeHeading heading);
 }
