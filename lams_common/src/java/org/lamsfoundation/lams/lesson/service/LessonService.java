@@ -335,10 +335,13 @@ public class LessonService implements ILessonService
 		}
 		
 		LessonClass lessonClass = lesson.getLessonClass();
+		
 		if ( lessonClass == null ) {
 			throw new LessonServiceException("Lesson class for "+lessonId+" does not exist. Unable to add staff member to lesson.");
 		}
-
+		
+		lessonDAO.initialize(lessonClass.getStaffGroup());
+		
 		boolean ret = lessonClass.addStaffMember(user);
 		if ( ret ) {
 			lessonClassDAO.updateLessonClass(lessonClass);
