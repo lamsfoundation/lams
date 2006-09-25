@@ -300,4 +300,11 @@ public interface IBaseDAO {
 	 */
 	public List searchByNumberSpan(Class clazz, String name, Integer min, Boolean minIncluded, Integer max, Boolean maxIncluded);
 	
+	
+	/**
+	 * Force initialization of a Hibernate proxy or persistent collection
+	 * @param proxy of persistent object or a collection
+	 */
+	public void initialize(Object proxy);
+	
 }

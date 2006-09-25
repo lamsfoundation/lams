@@ -343,4 +343,8 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 		return clazzName.substring(0,1).toLowerCase();
 	}
 
+	public void initialize(Object proxy) {
+		getHibernateTemplate().initialize(proxy);
+	}
+
 }
