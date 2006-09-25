@@ -375,14 +375,18 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public Integer getPermissions(WorkspaceFolder workspaceFolder, User user){
 		Integer permission = null;
-
+		WorkspaceFolder userDefaultFolder = user.getWorkspace().getDefaultFolder();
 		if  ( workspaceFolder==null || user==null ) {
+			log.debug("no access due to null value(s) in user or workspaceFolder");
 			permission = WorkspaceFolder.NO_ACCESS;
 		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
+			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.OWNER_ACCESS;
 		} else if(user.hasMemberAccess(workspaceFolder)) {
+			log.debug(user.getLogin()+" has membership access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 		} else {
+			log.debug(user.getLogin()+" has no access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.NO_ACCESS;
 		}
 		return permission;
@@ -1047,8 +1051,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws Exception
 	 */
 	private Vector<FolderContentDTO> getContentsFromRepository(WorkspaceFolder workspaceFolder, Integer permissions) throws RepositoryCheckedException{
+		log.debug("Trying to get contents from folder "+ workspaceFolder.getName());
+		Set children = workspaceFolder.getChildWorkspaceFolders();
+		if(children!=null){
+			log.debug(children.size()+"  child workspace folders");
+		}
 		Set content = workspaceFolder.getFolderContent();
-		if(content.size()==0)
+		if(content==null || content.size()==0)
 			return null;
 		else{
 			ITicket ticket = getRepositoryLoginTicket();
@@ -1110,9 +1119,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 									Set roles = member.getUserOrganisationRoles();
 									if (hasWriteAccess(roles)) {
 										Integer permission = getPermissions(orgFolder,user);
-										log.debug("Permission - "+permission);
 										if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) {
-											log.debug("folder added");
 											folders.add(new FolderContentDTO(orgFolder,permission));
 										}
 									}

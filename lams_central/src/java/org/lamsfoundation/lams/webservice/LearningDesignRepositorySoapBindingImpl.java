@@ -200,6 +200,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 		log.debug("build content tree node for folder - "+folder.getName());
 		ContentTreeNode node = new ContentTreeNode(folder);
 		if (folder.getResourceType().equals(FolderContentDTO.FOLDER)) {
+			log.debug(folder.getName()+" is a folder");
 			WorkspaceFolder wsfolder = service
 					.getWorkspaceFolder(folder.getResourceID().intValue());
 			Vector items = service.getFolderContentsExcludeHome(userId, wsfolder,
