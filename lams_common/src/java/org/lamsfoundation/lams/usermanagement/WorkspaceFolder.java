@@ -366,8 +366,14 @@ public class WorkspaceFolder implements Serializable {
 	public void addFolderContent(WorkspaceFolderContent workspaceFolderContent){
 		if(this.folderContent==null)
 			this.folderContent = new HashSet();
-		
 		this.folderContent.add(workspaceFolderContent);
+		workspaceFolderContent.setWorkspaceFolder(this);
 	}
-	
+
+	public void addChild(WorkspaceFolder workspaceFolder) {
+		if(childWorkspaceFolders == null){
+			childWorkspaceFolders = new HashSet();
+		}
+		childWorkspaceFolders.add(workspaceFolder);
+	}
 }
