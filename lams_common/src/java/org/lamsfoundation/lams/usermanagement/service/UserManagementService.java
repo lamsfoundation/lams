@@ -408,6 +408,7 @@ public class UserManagementService implements IUserManagementService {
 		return user;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Workspace createWorkspaceForOrganisation(String workspaceName, Integer userID, Date createDateTime ) {
 		
 		// this method is public so it can be accessed from the junit test
@@ -424,7 +425,10 @@ public class UserManagementService implements IUserManagementService {
 		WorkspaceFolder workspaceFolder2 = new WorkspaceFolder(description,userID, createDateTime, createDateTime, WorkspaceFolder.RUN_SEQUENCES);
 		workspaceFolder2.setParentWorkspaceFolder(workspaceFolder);
 		save(workspaceFolder2);
-
+		
+		workspaceFolder.addChild(workspaceFolder2);
+		save(workspaceFolder);
+		
 		Workspace workspace =  new Workspace(workspaceName);
 		workspace.setDefaultFolder(workspaceFolder);
 		workspace.setDefaultRunSequencesFolder(workspaceFolder2);
