@@ -165,6 +165,13 @@ public class SessionManager{
 	 * @param res
 	 */
 	public static void startSession(ServletRequest req, ServletResponse res) {
+		Cookie ssoCookie = findCookie((HttpServletRequest) req,SystemSessionFilter.SSO_SESSION_COOKIE);
+		if(ssoCookie == null){
+			log.debug("==>Couldn't find the sso cookie");
+			String value = (String) new UUIDHexGenerator().generate(null,null);
+			ssoCookie = createCookie((HttpServletResponse) res,SystemSessionFilter.SSO_SESSION_COOKIE,value);
+			log.debug("==>Created one - "+ssoCookie.getValue());
+		}
 		Cookie cookie = findCookie((HttpServletRequest) req,SystemSessionFilter.SYS_SESSION_COOKIE);
 		String currentSessionId = null;
 		if(cookie != null){
