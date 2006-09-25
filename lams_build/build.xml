@@ -40,6 +40,16 @@
 				<include name="**/*" />
 			</fileset>
 		</delete>
+		<delete includeemptydirs="true">
+			<fileset dir="${jboss.server.instance}/tmp">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+		<delete includeemptydirs="true">
+			<fileset dir="${jboss.server.instance}/work">
+				<include name="**/*" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- clean all projects -->
