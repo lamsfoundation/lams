@@ -45,6 +45,8 @@ public class SystemSessionFilter implements Filter {
 	
 	//The session name to trace shared session
 	public static final String SYS_SESSION_COOKIE = "JSESSIONID";
+	
+	public static final String SSO_SESSION_COOKIE = "JSESSIONIDSSO";
 
 	public void init(FilterConfig config) throws ServletException {
 	}
