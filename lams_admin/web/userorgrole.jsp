@@ -5,6 +5,7 @@
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <script language="javascript" type="text/JavaScript">
 function toggleCheckboxes(roleIndex, object){
@@ -28,7 +29,7 @@ function toggleCheckboxes(roleIndex, object){
 					name="<c:out value="${roleIndex}" />" 
 					onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
 					onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />
-			<c:out value="${role.name}" /></th>
+			<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
 	</logic-el:iterate>
 </tr>
 <logic-el:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">

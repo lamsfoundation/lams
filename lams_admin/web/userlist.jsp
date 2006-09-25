@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <form>
 <h2 align="left">
@@ -48,7 +49,7 @@
 		<td>
 		    <small>
 		    <logic:iterate id="role" name="userManageBean" property="roles">
-		        <c:out value="${role.name}" />&nbsp;
+		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message>&nbsp;
 		    </logic:iterate>
 		    </small>
 		</td>

@@ -5,6 +5,7 @@
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <html-el:form action="/userrolessave.do" method="post">
 <html-el:hidden property="userId" />
@@ -26,7 +27,7 @@
 	    <td>
             <c:forEach items="${rolelist}" var="role">
                 <html-el:multibox name="UserRolesForm" property="roles" value="${role.roleId}"/>
-                <c:out value="${role.name}"/><br/>
+                <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
             </c:forEach>
 	    </td>
 	</tr>
