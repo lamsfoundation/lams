@@ -230,7 +230,6 @@
             class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
         </meta>
         
-        <cache usage="transactional" />
         <key>
             <column name="organisation_id" />
         </key>
