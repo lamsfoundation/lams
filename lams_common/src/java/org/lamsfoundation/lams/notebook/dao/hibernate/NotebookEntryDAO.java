@@ -34,7 +34,8 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	
 	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName() 
-							+ " where external_id=? and external_id_type=? and external_signature=? and user_id=?";
+							+ " where external_id=? and external_id_type=? and external_signature=? and user_id=?"
+							+ " order by create_date desc";
 	
 	private static final String SQL_QUERY_FIND_ENTRY_BY_USER_ID = "from " + NotebookEntry.class.getName() 
 							+ " where user_id=?";
