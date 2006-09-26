@@ -112,6 +112,7 @@ INSERT INTO lams_activity_category VALUES (2 ,'COLLABORATION');
 INSERT INTO lams_activity_category VALUES (3 ,'ASSESSMENT');
 INSERT INTO lams_activity_category VALUES (4 ,'CONTENT');
 INSERT INTO lams_activity_category VALUES (5 ,'SPLIT');
+INSERT INTO lams_activity_category VALUES (6 ,'RESPONSE');
 
 INSERT INTO lams_grouping_support_type VALUES (1 ,'NONE');
 INSERT INTO lams_grouping_support_type VALUES (2 ,'OPTIONAL');

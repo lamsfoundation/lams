@@ -79,6 +79,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int CATEGORY_ASSESSMENT = 3;
 	public static final int CATEGORY_CONTENT = 4;
 	public static final int CATEGORY_SPLIT = 5;
+	public static final int CATEGORY_RESPONSE = 6;
 	/******************************************************************/
 	
 	/**
