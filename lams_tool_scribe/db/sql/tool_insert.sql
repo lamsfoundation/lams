@@ -30,7 +30,7 @@ create_date_time
 VALUES
 (
 'lascrb11',
-'scribeService',
+'lascrbScribeService',
 'Scribe',
 'Scribe',
 'scribe',
