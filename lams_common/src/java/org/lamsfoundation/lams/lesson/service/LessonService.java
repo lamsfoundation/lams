@@ -134,6 +134,14 @@ public class LessonService implements ILessonService
 		return dto;
 	}
 
+	/** Get the lesson object.
+	 * @param lessonId
+	 * @return lesson details
+	 */
+	public Lesson getLesson(Long lessonId) {
+		return lessonDAO.getLesson(lessonId);
+	}
+
 	/**
      * If the supplied learner is not already in a group, then perform grouping for 
      * the learners who have started the lesson, based on the grouping activity.

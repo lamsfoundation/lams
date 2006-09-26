@@ -71,6 +71,12 @@ public interface ILessonService {
 	 */
 	public abstract LessonDetailsDTO getLessonDetails(Long lessonId);
 
+	/** Get the lesson object.
+	 * @param lessonId
+	 * @return lesson details
+	 */
+	public abstract Lesson getLesson(Long lessonId);
+
 	/** Get the lesson details for the LAMS client. Suitable for the learner client.
 	 * Contains a reduced number of fields compared to getLessonDetails.
 	 * @param lessonId
