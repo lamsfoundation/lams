@@ -40,12 +40,12 @@
 				<include name="**/*" />
 			</fileset>
 		</delete>
-		<delete includeemptydirs="true">
+		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${jboss.server.instance}/tmp">
 				<include name="**/*" />
 			</fileset>
 		</delete>
-		<delete includeemptydirs="true">
+		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${jboss.server.instance}/work/jboss.web/localhost">
 				<include name="lams*/*" />
 			</fileset>
