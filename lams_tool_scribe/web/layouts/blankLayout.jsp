@@ -5,7 +5,7 @@
 
 <html>
 	<tiles:insert attribute="header" />
-	<body class="stripes">
+	<body>
 		<tiles:insert attribute="body" />
 	</body>
 </html>
