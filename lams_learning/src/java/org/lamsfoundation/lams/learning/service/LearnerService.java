@@ -228,6 +228,12 @@ public class LearnerService implements ICoreLearnerService
     	User learner = (User)userManagementService.findById(User.class,learnerId);
     	
     	Lesson lesson = getLesson(lessonID);
+    	
+    	if ( lesson == null || ! lesson.isLessonStarted() ) {
+			log.error("joinLesson: Learner "+learner.getLogin()+" joining lesson "+lesson+" but lesson has not started");
+			throw new LearnerServiceException("Cannot join lesson as lesson has not started");
+    	}
+    		
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(),lessonID);
     	
         if(learnerProgress==null)
@@ -392,16 +398,23 @@ public class LearnerService implements ICoreLearnerService
     	// interface. If it calls any other methods then it mustn't use anything on the ICoreLearnerService interface.
     	
         ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);	
-        toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
-        lamsCoreToolService.updateToolSession(toolSession);
+        // in the future, we might want to see if the entire tool session is completed at this point. 
        
         LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), toolSession.getLesson().getLessonId());
         
-        if (currentProgress.getCompletedActivities().contains(toolSession.getToolActivity()))
+        String returnURL = null;
+        if (currentProgress.getCompletedActivities().contains(toolSession.getToolActivity())) {
         	// return close window url
-        	return ActivityMapping.getCloseURL();
-        else
-        	return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
+        	returnURL = ActivityMapping.getCloseURL();
+        } else {
+        	returnURL = completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
+        }
+        
+        if ( log.isDebugEnabled() ) { 
+        	log.debug("Moving onto next activity after tool session id "+toolSessionId+" learnerId "+learnerId+" url is "+returnURL);
+        }
+        
+        return returnURL;
         
     }
     
