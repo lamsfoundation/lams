@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
@@ -8,11 +9,10 @@
 	</div>
 </c:if>
 
-<table cellpadding="0">
+<table cellpadding="0"  class="alternative-color">
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-		<c:set var="groupSize" value="${fn:length(group)}" />
-		<c:set var="surveySession"  value="${summaryList.key}"/>
-		<c:set var="questions"  value="${summaryList.value}"/>
+		<c:set var="surveySession"  value="${group.key}"/>
+		<c:set var="questions"  value="${group.value}"/>
 		
 		<c:if test="${empty questions}">
 			<tr>
@@ -23,30 +23,32 @@
 				</td>
 			</tr>
 		</c:if>
-		<c:forEach var="item" items="${questions}" varStatus="status">
+		<c:forEach var="question" items="${questions}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.first}">
 				<tr>
 					<td colspan="2">
 						<B><fmt:message key="monitoring.label.group" /> ${surveySession.sessionName}</B> 
-						<SPAN style="font-size: 12px;"> 
-							<c:if test="${firstGroup.index==0}">
-								<fmt:message key="monitoring.summary.note" />
-							</c:if> 
-						</SPAN>
 					</td>
 				</tr>
 				<%-- End group title display --%>
 			</c:if>
 			<tr>
-				<th>${question.shortTitle}</th>
-				<th>
-					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewPieChart.do?"/>toolSessionID${surveySession.sessionId}&questionUid=${question.uid}')">
-						<img src="/includes/images/piechart.gif" title="<fmt:message key='message.view.pie.chart'/>">
+				<th class="first">
+					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/listAnswers.do?"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
+						${question.shortTitle}
 					</a>
-					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewBarChart.do?"/>toolSessionID${surveySession.sessionId}&questionUid=${question.uid}')">
-						<img src="/includes/images/barchart.gif" title="<fmt:message key='message.view.bar.chart'/>">
-					</a>
+				</th>
+				<th class="first">
+					<%-- Only show pie/bar chart when question is single/multiple choics type --%>
+					<c:if test="${question.type !=3}">
+						<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewChartReport.do?chartType=pie&"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
+							<img src="${tool}/includes/images/piechart.gif" title="<fmt:message key='message.view.pie.chart'/>" height="22" width="25" border="0">
+						</a>
+						<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewChartReport.do?chartType=bar&"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
+							<img src="${tool}/includes/images/columnchart.gif" title="<fmt:message key='message.view.bar.chart'/>" height="22" width="25" border="0">
+						</a>
+					</c:if>
 				</th>
 			</tr>
 			<tr>
@@ -54,19 +56,19 @@
 				<td><fmt:message key="message.total.user.response"/></td>
 			</tr>
 			<c:set var="optSize" value="${fn:length(question.options)}" />
-			<c:forEach var="option" items="question.options"  varStatus="status">
+			<c:forEach var="option" items="${question.options}"  varStatus="status">
 				<tr>
 					<td>${option.description}</td>
 					<td>
 						<c:set var="imgTitle">
-							<fmt:message key="message.learner.choose.answer">
+							<fmt:message key="message.learner.choose.answer.percentage">
 								<fmt:param>${option.response}</fmt:param>
 							</fmt:message>
 						</c:set>
 						<c:set var="imgIdx">
-							${status.index % 5}
+							${status.index % 5 + 1}
 						</c:set>			
-						<img src="/includes/images/bar${imgIdx}.gif" height="10" width="${option.response * 2}" 
+						<img src="${tool}/includes/images/bar${imgIdx}.gif" height="10" width="${option.response * 2}" 
 						title="${imgTitle}">
 						${option.responseCount} (${option.responseFormatStr}%)
 					</td>
@@ -77,16 +79,24 @@
 					<td><fmt:message key="label.open.response"/></td>
 					<td>
 						<c:set var="imgTitle">
-							<fmt:message key="message.learner.choose.answer">
+							<fmt:message key="message.learner.choose.answer.percentage">
 								<fmt:param>${question.openResponseFormatStr}</fmt:param>
 							</fmt:message>
 						</c:set>
 						<c:set var="imgIdx">
-							${(optSize + 1) % 5}
+							${(optSize % 5)  + 1}
 						</c:set>						
-						<img src="/includes/images/bar${imgIdx}.gif" height="10" width="${question.openResponse * 2}" 
+						<img src="${tool}/includes/images/bar${imgIdx}.gif" height="10" width="${question.openResponse * 2}" 
 						title="${imgTitle}">
 						${question.openResponseCount} (${question.openResponseFormatStr}%)
+					</td>
+				</tr>
+			</c:if>
+			<c:if test="${question.type == 3}">
+				<tr>
+					<td><fmt:message key="label.open.response"/></td>
+					<td>
+						${question.openResponseCount} 
 					</td>
 				</tr>
 			</c:if>

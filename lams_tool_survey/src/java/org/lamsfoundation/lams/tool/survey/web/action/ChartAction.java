@@ -23,14 +23,23 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.web.action;
 
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.ATTR_QUESTION_UID;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.CHART_TYPE;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.ERROR_MSG_CHART_ERROR;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_BARCHART_CATEGORY_AXIS_LABEL;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_BARCHART_TITLE;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_BARCHART_VALUE_AXIS_LABEL;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_OPEN_RESPONSE;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_PIECHART_TITLE;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.QUESTION_TYPE_TEXT_ENTRY;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.SURVEY_SERVICE;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.OPTION_SHORT_HEADER;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,9 +55,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.*;
-
-import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
@@ -64,7 +70,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @version $Revision$
  */
 public class ChartAction extends  Action {
-    private static final String OPTION_SHORT_HEADER = "a";
     
 	static Logger logger = Logger.getLogger(ChartAction.class.getName());
 	
@@ -72,6 +77,7 @@ public class ChartAction extends  Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
+		resource = getResources(request);
         OutputStream out= response.getOutputStream(); 
         
         String type= WebUtil.readStrParam(request, CHART_TYPE);
@@ -83,7 +89,8 @@ public class ChartAction extends  Action {
 		SurveyQuestion question =service.getQuestionResponse(sessionId,questionUid);
 		if(question.getType() == QUESTION_TYPE_TEXT_ENTRY){
 			logger.error("Error question type : Text entry can not generate chart.");
-			return mapping.findForward(ERROR);
+			response.getWriter().print(resource.getMessage(ERROR_MSG_CHART_ERROR));
+			return null;
 		}
 			
 		//Try to create chart
@@ -94,14 +101,14 @@ public class ChartAction extends  Action {
     		chart = createBarChart (question);    
     	}
     	
-    	resource = getResources(request);
         //send chart to response output stream
         if (chart != null){
             response.setContentType("image/png");
             ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
             return null;
         }else{
-        	return mapping.findForward(ERROR);
+			response.getWriter().print(resource.getMessage(ERROR_MSG_CHART_ERROR));
+			return null;
         }
      
     }
@@ -114,7 +121,7 @@ public class ChartAction extends  Action {
         Set<SurveyOption> options = question.getOptions();
 		int optIdx = 1;
 		for (SurveyOption option : options) {
-			data.setValue(OPTION_SHORT_HEADER + optIdx, (Number) option.getReponse());
+			data.setValue(OPTION_SHORT_HEADER + optIdx, (Number) option.getResponse());
 			optIdx++;
   		}
           
@@ -135,7 +142,7 @@ public class ChartAction extends  Action {
         Set<SurveyOption> options = question.getOptions();
         int optIdx = 1;
         for (SurveyOption option : options) {
-            data.setValue((Number)option.getReponse(), OPTION_SHORT_HEADER + optIdx, OPTION_SHORT_HEADER + optIdx);
+            data.setValue((Number)option.getResponse(), OPTION_SHORT_HEADER + optIdx, OPTION_SHORT_HEADER + optIdx);
             optIdx++;
 		}
         

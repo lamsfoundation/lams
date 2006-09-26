@@ -125,7 +125,7 @@
             inverse="false"
             cascade="all"
             sort="unsorted"
-            order-by="sequence_id desc"
+            order-by="sequence_id asc"
         >
 
             <key

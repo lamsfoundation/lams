@@ -417,7 +417,7 @@ public class Survey implements Cloneable{
 	 * @hibernate.set lazy="true"
 	 *                inverse="false"
 	 *                cascade="all"
-	 *                order-by="sequence_id desc"
+	 *                order-by="sequence_id asc"
 	 * @hibernate.collection-key column="survey_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
 	 * 

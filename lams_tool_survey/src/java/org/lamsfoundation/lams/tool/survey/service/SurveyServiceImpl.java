@@ -89,6 +89,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -295,7 +296,9 @@ public class SurveyServiceImpl implements
 		return (SurveyUser) surveyUserDao.getObject(SurveyUser.class, uid);
 	}
 	
-
+	public List<SurveyUser> getSessionUsers(Long sessionId){
+		return surveyUserDao.getBySessionID(sessionId);
+	}
 
 	public void deleteQuestion(Long uid) {
 		surveyQuestionDao.removeObject(SurveyQuestion.class, uid);
@@ -330,9 +333,7 @@ public class SurveyServiceImpl implements
 	public SurveyQuestion getQuestionResponse(Long sessionId, Long questionUid){
 		SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
 		
-		
-		if(question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
-			return question;
+		SurveyWebUtils.createShortTitle(question);
 		
 		//get question all answer from this session
 		List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid);
@@ -348,14 +349,14 @@ public class SurveyServiceImpl implements
 		
 		//initial a array to hold how many time chose has been done for a option or open text.
 		int optSize = options.size();
-		if(question.isAppendText())
+		if(question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
 			optSize++;
 		
 		int[] choose = new int[optSize];
 		Arrays.fill(choose, 0);
 
 		//sum up all option and open text (if has) have been selected count list
-		int answerSum = 1;
+		int answerSum = 0;
 		if(answsers != null){
 			for (SurveyAnswer answer : answsers) {
 				String[] choseOpt = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
@@ -363,7 +364,9 @@ public class SurveyServiceImpl implements
 					if(optMap.containsKey(optUid))
 						choose[optMap.get(optUid)]++;
 				}
-				if(question.isAppendText() && !StringUtils.isBlank(answer.getAnswerText()))
+				if((question.isAppendText()
+						|| question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+						&& !StringUtils.isBlank(answer.getAnswerText()))
 					choose[optSize-1]++;
 					
 				answerSum ++;
@@ -371,17 +374,21 @@ public class SurveyServiceImpl implements
 		}
 		//caculate the percentage of answer response
 		idx=0;
+		if(answerSum == 0){
+			answerSum = 1;
+		}
 		for (SurveyOption option : options) {
-			option.setReponse((double)choose[idx]/(double)answerSum);
-			option.setReponseFormatStr(new Integer((int) option.getReponse()).toString());
+			option.setResponse((double)choose[idx]/(double)answerSum * 100d);
+			option.setResponseFormatStr(new Integer((int) option.getResponse()).toString());
 			option.setResponseCount(choose[idx]);
 			idx++;
 		}
-		if(question.isAppendText()){
-			question.setOpenResponse((double)choose[idx]/(double)answerSum);
+		if(question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
+			question.setOpenResponse((double)choose[idx]/(double)answerSum * 100d);
 			question.setOpenResponseFormatStr(new Integer((int) question.getOpenResponse()).toString());
 			question.setOpenResponseCount(choose[idx]);
 		}
+		
 		return question;
 		
 	}
@@ -408,6 +415,11 @@ public class SurveyServiceImpl implements
 		
 		return summary;
 	}
+
+	public SurveyQuestion getQuestion(Long questionUid) {
+		return surveyQuestionDao.getByUid(questionUid);
+	}
+
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
@@ -817,6 +829,7 @@ public class SurveyServiceImpl implements
 	public void setSurveyAnswerDao(SurveyAnswerDAO surveyAnswerDao) {
 		this.surveyAnswerDao = surveyAnswerDao;
 	}
+
 
 
 }

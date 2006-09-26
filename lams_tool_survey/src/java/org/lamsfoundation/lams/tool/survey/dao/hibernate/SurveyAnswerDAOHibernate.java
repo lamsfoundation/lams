@@ -8,7 +8,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements SurveyAnswerDAO {
 	private static final String GET_LEARNER_ANSWER = "from "+SurveyAnswer.class.getName()+" as a where a.surveyQuestion.uid=? and a.user.uid=?";
 	private static final String GET_SESSION_ANSWER = "from "+SurveyAnswer.class.getName()+" as a " +
-							" where a.surveyQuestion.uid=? and a.user.session.sessionId=?";
+							" where a.user.session.sessionId=? and a.surveyQuestion.uid=?";
 	
 	public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
 		List list = getHibernateTemplate().find(GET_LEARNER_ANSWER,new Object[]{questionUid,userUid});

@@ -24,11 +24,16 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.survey.web.action;
 
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.CHART_TYPE;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.ATTR_QUESTION;
+import static org.lamsfoundation.lams.tool.survey.SurveyConstants.ATTR_ANSWER_LIST;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +53,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
+import org.lamsfoundation.lams.tool.survey.util.SurveyUserComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -67,18 +73,30 @@ public class MonitoringAction extends Action {
 			return summary(mapping, form, request, response);
 		}
 
-		if (param.equals("listuser")) {
-			return listuser(mapping, form, request, response);
+		if (param.equals("viewChartReport")) {
+			return viewChartReport(mapping, form, request, response);
+		}
+
+		if (param.equals("listAnswers")) {
+			return listAnswers(mapping, form, request, response);
 		}
 
 		if (param.equals("viewReflection")) {
 			return viewReflection(mapping, form, request, response);
 		}
-		
 
 		return mapping.findForward(SurveyConstants.ERROR);
 	}
 
+
+	/**
+	 * Summary page action.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 
 	private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -103,18 +121,56 @@ public class MonitoringAction extends Action {
 		
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
+	/**
+	 * Display pie chart or bar chart for one question.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward viewChartReport(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+		String type= WebUtil.readStrParam(request, CHART_TYPE);
+		
+		Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
+		ISurveyService service = getSurveyService();
+		//get question
+		SurveyQuestion question = service.getQuestion(questionUid);
 
-	private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+		//set all attribute to request for show
+		request.setAttribute( AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		request.setAttribute( CHART_TYPE, type);
+		request.setAttribute( ATTR_QUESTION, question);
+		
+		return mapping.findForward(SurveyConstants.SUCCESS);
+	}
+
+
+
+	private ActionForward listAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		Long itemUid = WebUtil.readLongParam(request, SurveyConstants.PARAM_RESOURCE_ITEM_UID);
+		Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
 
-		//get user list by given item uid
+		//get user list 
 		ISurveyService service = getSurveyService();
-//		List list = service.getUserListBySessionItem(sessionId, itemUid);
 		
-		//set to request
-//		request.setAttribute(SurveyConstants.ATTR_USER_LIST, list);
+		SortedMap<SurveyUser,SurveyQuestion> userAnswerMap = new TreeMap<SurveyUser, SurveyQuestion>(new SurveyUserComparator());
+//		get all users with their answers whatever they answer or not
+		List<SurveyUser> users = service.getSessionUsers(sessionId);
+		for (SurveyUser user : users) {
+			List<SurveyQuestion> questionAnswers = service.getQuestionAnswer(sessionId, user.getUid());
+			for (SurveyQuestion questionAnswer : questionAnswers) {
+				if(questionUid.equals(questionAnswer.getUid())){
+					userAnswerMap.put(user,questionAnswer);
+					break;
+				}
+			}
+		}
+		//set all attribute to request for show
+		request.setAttribute( ATTR_ANSWER_LIST, userAnswerMap);
+		
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
 	

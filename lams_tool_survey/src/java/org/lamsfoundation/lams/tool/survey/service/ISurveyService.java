@@ -100,7 +100,7 @@ public interface ISurveyService
 	//******************************************************************************************
 	//*************** Questions  methods **********************
 	//******************************************************************************************
-	
+	SurveyQuestion getQuestion(Long questionUid);
 	/**
 	 * Delete resoruce item from database.
 	 * @param uid
@@ -154,6 +154,14 @@ public interface ISurveyService
 	 * @return
 	 */
 	SurveyUser getUser(Long uid);
+
+	/**
+	 * Get all users under one tool session.
+	 * @param sessionId
+	 * @return
+	 */
+	List<SurveyUser> getSessionUsers(Long sessionId);
+
 	//******************************************************************************************
 	//********** Repository methods ***********************
 	//******************************************************************************************
@@ -227,8 +235,6 @@ public interface ISurveyService
 	 * @return
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
-	
-	
 
 }
 

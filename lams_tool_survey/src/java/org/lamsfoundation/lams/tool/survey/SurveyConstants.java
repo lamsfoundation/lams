@@ -45,7 +45,6 @@ public class SurveyConstants {
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
-	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
 	public static final String PARAM_RUN_OFFLINE = "runOffline";
 	public static final String PARAM_TITLE = "title";
 	public static final String ATTR_USER_UID = "userUid";
@@ -60,7 +59,8 @@ public class SurveyConstants {
 	public static final String ERROR_MSG_INVALID_URL = "error.survey.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	public static final String ERROR_MSG_MANDATORY_QUESTION = "error.mandatory.question";
-	
+	public static final String ERROR_MSG_CHART_ERROR = "error.chart.gen";
+
 	public static final String MSG_OPEN_RESPONSE ="label.open.response";
 	public static final String MSG_PIECHART_TITLE = "piechart.title";
 	public static final String MSG_BARCHART_TITLE = "barchart.title";
@@ -81,6 +81,8 @@ public class SurveyConstants {
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 	public static final String ATTR_QUESTION_LIST = "questionList";
+	public static final String ATTR_ANSWER_LIST = "answerList";
+	public static final String ATTR_QUESTION = "question";
 	public static final String ATTR_DELETED_QUESTION_LIST = "deletedQuestionList";
 	
 	public static final String ATTR_TITLE = "title";
@@ -108,4 +110,6 @@ public class SurveyConstants {
 	public static int POSITION_FIRST = 1;
 	public static int POSITION_LAST = 2;
 	public static int POSITION_ONLY_ONE = 3;
+	
+	public static final String OPTION_SHORT_HEADER = "a";
 }

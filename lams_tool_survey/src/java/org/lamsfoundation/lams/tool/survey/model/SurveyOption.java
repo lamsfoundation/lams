@@ -41,8 +41,8 @@ public class SurveyOption  implements Cloneable{
 	
 	//****************************************************
 	// DTO fields: percentage of response for this option. For monitoring summary usage.
-	private double reponse;
-	private String reponseFormatStr;
+	private double response;
+	private String responseFormatStr;
 	private int responseCount;
 	
     public Object clone(){
@@ -92,11 +92,11 @@ public class SurveyOption  implements Cloneable{
 		public void setSequenceId(int sequenceId) {
 			this.sequenceId = sequenceId;
 		}
-		public double getReponse() {
-			return reponse;
+		public double getResponse() {
+			return response;
 		}
-		public void setReponse(double reponse) {
-			this.reponse = reponse;
+		public void setResponse(double reponse) {
+			this.response = reponse;
 		}
 		public int getResponseCount() {
 			return responseCount;
@@ -104,11 +104,11 @@ public class SurveyOption  implements Cloneable{
 		public void setResponseCount(int responseCount) {
 			this.responseCount = responseCount;
 		}
-		public String getReponseFormatStr() {
-			return reponseFormatStr;
+		public String getResponseFormatStr() {
+			return responseFormatStr;
 		}
-		public void setReponseFormatStr(String reponseFormatStr) {
-			this.reponseFormatStr = reponseFormatStr;
+		public void setResponseFormatStr(String reponseFormatStr) {
+			this.responseFormatStr = reponseFormatStr;
 		}
 
 }

@@ -33,7 +33,6 @@ create table tl_lasurv11_answer (
 uid bigint not null auto_increment, 
 question_uid bigint, 
 user_uid bigint, 
-session_id bigint, 
 answer_choices varchar(255), 
 udpate_date datetime, 
 answer_text varchar(255), 

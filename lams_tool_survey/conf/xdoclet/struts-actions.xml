@@ -229,25 +229,19 @@
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
 		
-		<action path="/monitoring/viewBarChart"
+		<action path="/monitoring/viewChartReport"
 			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="viewBarChart" >
-			<forward name="success" path="/pages/monitoring/barchart.jsp" />
-		</action>
-		<action path="/monitoring/viewPieChart"
-			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="viewPieChart" >
-			<forward name="success" path="/pages/monitoring/piechart.jsp" />
+			parameter="viewChartReport" >
+			<forward name="success" path="/pages/monitoring/chartreport.jsp" />
 		</action>
 		<action path="/showChart"
 			type="org.lamsfoundation.lams.tool.survey.web.action.ChartAction">
-			<forward name="error" path="/pages/monitoring/charterror.jsp" />
 		</action>
 		
-		<action path="/monitoring/listuser"
+		<action path="/monitoring/listAnswers"
 			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="listuser" >
-			<forward name="success" path="/pages/monitoring/userlist.jsp" />
+			parameter="listAnswers" >
+			<forward name="success" path="/pages/monitoring/listanswers.jsp" />
 		</action>
 		
 		<action path="/monitoring/viewReflection"

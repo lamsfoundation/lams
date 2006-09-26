@@ -868,7 +868,7 @@ public class AuthoringAction extends Action {
 			retriveQuestionForDisplay(item);
 		}
 	}
-	private void retriveQuestionForDisplay(SurveyQuestion item) {
+	public static void retriveQuestionForDisplay(SurveyQuestion item) {
 		String desc = item.getDescription();
 		desc = desc.replaceAll("<(.|\n)*?>", "");
 		item.setShortTitle(StringUtils.abbreviate(desc,SHORT_TITLE_LENGTH));
