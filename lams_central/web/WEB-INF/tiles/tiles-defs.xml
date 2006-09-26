@@ -59,9 +59,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 
 	<definition name=".error" path="/template.jsp">
-		<put name="titleKey" value="heading.password.changed.screen"/>
+		<put name="titleKey" value="heading.general.error"/>
 		<put name="header" value="header.jsp"/>
 		<put name="content" value="errorContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+	
+	<definition name=".message" path="/template.jsp">
+		<put name="titleKey" value="heading.general.error"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="msgContent.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 </tiles-definitions>
