@@ -40,9 +40,11 @@ public class ExportPortfolioConstants {
 	public static final String DIR_SUFFIX_EXPORT = "export"; //will appear as the name of the tmp directory created. For eg. lamstmp_1129615396387_export
 	public static final String DIR_SUFFIX_ZIP = "exportZipFile"; //suffix for the tmp directory. For eg. lamstmp_1129615396387_exportZipFile
 	public static final String MAIN_EXPORT_FILENAME = "export_main.html";
+	public static final String MAIN_NOTEBOOK_FILENAME = "notebook_main.html";
 	public static final String ZIP_FILENAME = "export.zip";
 	public static final String HOST = getServerURL();
 	public static final String SUBDIRECTORY_BASENAME = "Activity"; //subdirectory for each activity is ActivityXX where XX is the activity Id
+	public static final String SUBDIRECTORY_NOTEBOOK_BASENAME = "Notebook";
 	public static final String PARAM_FILE_LOCATION = "fileLocation";
 	public static final String URL_FOR_UNSUPPORTED_EXPORT = "learning/exportPortfolio/notSupported.jsp";
 	public static final String EXPORT_ERROR_FILENAME = "export_error.html";

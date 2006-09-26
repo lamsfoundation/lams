@@ -24,11 +24,14 @@
 
 package org.lamsfoundation.lams.learning.export.service;
 
+import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.commons.collections.ArrayStack;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ActivityPortfolio;
+import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -47,6 +50,8 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -56,10 +61,13 @@ public class PortfolioBuilder extends LearningDesignProcessor {
     private static Logger log = Logger.getLogger(PortfolioBuilder.class);
 
     ArrayList<ActivityPortfolio> mainPortfolioList;
+    ArrayList<NotebookPortfolio> mainNotebookList;
 	ArrayStack activityListStack;
 	ArrayList<ActivityPortfolio> currentPortfolioList;
+	ArrayList<NotebookPortfolio> currentNotebookList;
 	ToolAccessMode accessMode;
 	ILamsCoreToolService lamsCoreToolService;
+	ICoreNotebookService coreNotebookService;
 	User user;
 	LearnerProgress progress;
 	Lesson lesson;
@@ -81,14 +89,17 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	 * @param user
 	 */
 	public PortfolioBuilder(LearningDesign design, IActivityDAO activityDAO, 
-			ILamsCoreToolService lamsCoreToolService, ToolAccessMode accessMode, 
+			ILamsCoreToolService lamsCoreToolService, ICoreNotebookService coreNotebookService, ToolAccessMode accessMode, 
 			Lesson lesson, LearnerProgress progress, User user) {
 		super(design, activityDAO);
 		this.mainPortfolioList = new ArrayList<ActivityPortfolio>();
+		this.mainNotebookList = new ArrayList<NotebookPortfolio>();
 		this.currentPortfolioList = mainPortfolioList;
+		this.currentNotebookList = mainNotebookList;
 		this.activityListStack = new ArrayStack(5);
 		this.accessMode = accessMode;
 		this.lamsCoreToolService = lamsCoreToolService;
+		this.coreNotebookService = coreNotebookService;
 		
 		this.user = user;
 		this.lesson = lesson;
@@ -203,6 +214,20 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 		currentPortfolioList.add(p);
 		
 	}
+	
+	/**
+	 * Process all Notebook (Scratchpad) entries into portfolio objects.
+	 */
+	public void processNotebook() {
+		
+		List entries = coreNotebookService.getEntry(new Long(1),new Integer(1),"SCRATCHPAD", user.getUserId());
+		Iterator it = entries.iterator();
+		while(it.hasNext()) {
+			NotebookEntry entry = (NotebookEntry) it.next();
+			NotebookPortfolio portfolio = createNotebookPortfolio(entry);
+			currentNotebookList.add(portfolio);
+		}
+	}
 
 	/**
 	 * Obtains the Tool from the ToolActivity and creates a portfolio object with properties activityId, activityName, 
@@ -226,10 +251,40 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 		p.setActivityDescription(activity.getDescription());
 		return p;		
 	}
+	
+	/**
+	 * Creates a portfolio object with properties title and entry from the NotebookEntry.
+	 * @param entry The Notebook Entry
+	 * @return a Portfolio object
+	 */
+	protected NotebookPortfolio createNotebookPortfolio(NotebookEntry entry)
+	{
+		if (entry == null)
+		{
+			String error="Cannot create portfolio for this notebook entry as the entry is null.";
+			log.error(error);
+			throw new ExportPortfolioException(error);
+		}
+		
+		NotebookPortfolio p = new NotebookPortfolio();
+		p.setEntry(entry.getEntry());
+		p.setTitle(entry.getTitle());
+		p.setCreated(entry.getCreateDate());
+		p.setModified(entry.getLastModified());
+		return p;
+	}
 
 	/** Get the list of all the activity portfolios, which in turn may contain other activity portfolios */
 	public ArrayList<ActivityPortfolio> getPortfolioList() {
 		return mainPortfolioList;
+	}
+	
+	/**
+	 * Get the list of notebook entries
+	 * @return
+	 */
+	public ArrayList<NotebookPortfolio> getNotebookList() {
+		return mainNotebookList;
 	}
 	
 }

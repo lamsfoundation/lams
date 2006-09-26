@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.export.ActivityPortfolio;
+import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.Portfolio;
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -80,6 +82,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     private static Logger log = Logger.getLogger(ExportPortfolioService.class);
     
 	private ILamsCoreToolService lamsCoreToolService;
+	private ICoreNotebookService coreNotebookService;
 	private IActivityDAO activityDAO;
     private ICoreLearnerService learnerService;
     private IBaseDAO baseDAO;
@@ -92,6 +95,13 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	 */
 	public void setLearnerService(ICoreLearnerService learnerService) {
 		this.learnerService = learnerService;
+	}
+	
+	/**
+	 * @param learnerService The learnerService to set.
+	 */
+	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+		this.coreNotebookService = coreNotebookService;
 	}
 	
 	/**
@@ -135,11 +145,11 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		{
 			try
 			{
-		   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, ToolAccessMode.TEACHER, lesson, null, null);
+		   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, coreNotebookService, ToolAccessMode.TEACHER, lesson, null, null);
 		   		builder.parseLearningDesign();
 	    		portfolios = builder.getPortfolioList();
 
-	    		exports = doExport(portfolios, cookies,lesson);	    	
+	    		exports = doExport(portfolios, null, cookies,lesson);	    	
 	    		
 			}
 	    	catch (LamsToolServiceException e)
@@ -171,6 +181,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies)
 	{
 		ArrayList<ActivityPortfolio> portfolios = null;
+		ArrayList<NotebookPortfolio> notes = null;
 	    Portfolio exports = null;
 		
 	    User learner = (User)baseDAO.find(User.class,userId);
@@ -185,12 +196,16 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 				try
 				{
-			   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, ToolAccessMode.LEARNER, lesson, learnerProgress, learner);
+			   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, coreNotebookService, ToolAccessMode.LEARNER, lesson, learnerProgress, learner);
+			   		
 			   		builder.parseLearningDesign();
+			   		builder.processNotebook();
+			   		
 		    		portfolios = builder.getPortfolioList();
+		    		notes = builder.getNotebookList();
 		    		
 		    		if ( portfolios.size() >= 0 ) {
-			    		exports = doExport(portfolios, cookies,lesson);	 
+			    		exports = doExport(portfolios, notes, cookies,lesson);	 
 			    		exports.setLearnerName(learner.getFirstName()+" "+learner.getLastName()+" ("+learner.getLogin()+")");
 		    		} else {
 				        log.error("The learner has not completed or attempted any activities");
@@ -201,6 +216,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 				{
 		    	    log.error("An exception has occurred while generating portfolios.",e);
 		        }
+		    	
 		    }
 		    else
 		    {
@@ -257,7 +273,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	}
 	
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#doExport(Vector, Cookie[]) */
-	public Portfolio doExport(ArrayList<ActivityPortfolio> portfolios, Cookie[] cookies, Lesson lesson)
+	public Portfolio doExport(ArrayList<ActivityPortfolio> portfolios, ArrayList<NotebookPortfolio> notes, Cookie[] cookies, Lesson lesson)
 	{		
 		String tempDirectoryName;
 		
@@ -274,6 +290,11 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		
 		processPortfolios(portfolios, cookies, tempDirectoryName);
 		portfolio.setActivityPortfolios((ActivityPortfolio[])portfolios.toArray(new ActivityPortfolio[portfolios.size()]));
+		
+		processNotes(notes, tempDirectoryName, portfolio);
+		portfolio.setNotebookPortfolios((NotebookPortfolio[])notes.toArray(new NotebookPortfolio[notes.size()]));
+		
+		
 		return portfolio;
 		
 
@@ -319,6 +340,38 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		}
 		
 		
+	}
+	
+	private void processNotes(List portfolios, String tempDirectoryName, Portfolio portfolio) {
+		// create a subdirectory with the name Notebook
+		String subDirectoryName = ExportPortfolioConstants.SUBDIRECTORY_NOTEBOOK_BASENAME;
+		
+		if(!createSubDirectory(tempDirectoryName, subDirectoryName))
+		{
+		    throw new ExportPortfolioException("The subdirectory " + subDirectoryName + " could not be created.");
+		} else {
+			File dir = new File(tempDirectoryName, subDirectoryName);
+			portfolio.setNotebookDir(dir.getAbsolutePath());
+		}
+		
+		if(portfolios.size() > 0) {
+		
+			Iterator i = portfolios.iterator();
+			
+			//iterate through the list of portfolios
+			while(i.hasNext())
+			{
+				NotebookPortfolio notebookPortfolio = (NotebookPortfolio)i.next();
+							
+			}
+			
+			String mainFileName = ExportPortfolioConstants.MAIN_NOTEBOOK_FILENAME;
+			
+			//notebookLink is used in main page, so that it can link with the tools export pages.
+			String notebookLink = subDirectoryName + "/" + mainFileName;	
+			portfolio.setNotebookLink(notebookLink);
+			
+		}
 	}
 	
 	/**
@@ -415,6 +468,33 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    {
 	    	request.getSession().setAttribute("portfolio", portfolio);
 		    HttpUrlConnectionUtil.writeResponseToFile(url, portfolio.getExportTmpDir(), filename, cookies);
+	    	request.getSession().removeAttribute("portfolio");
+	    }	    
+		catch(MalformedURLException e)
+		{
+		    log.error("The URL given is invalid. Exception Message was: " +e);
+		}
+		catch(FileNotFoundException e)
+		{
+		    log.error("The directory or file may not exist. Exception Message was: " +e);
+		}
+		catch(IOException e)
+		{
+		    log.error("A problem has occurred while writing the contents of " + url + " to file. Exception Message was: " +e);
+		}
+	}
+	
+	/** Generate the main page, given this portfolio */
+	public void generateNotebookPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies) {
+
+		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+		String url = basePath + "/exportPortfolio/notebook.jsp";
+		
+		String filename = ExportPortfolioConstants.MAIN_NOTEBOOK_FILENAME;
+	    try
+	    {
+	    	request.getSession().setAttribute("portfolio", portfolio);
+		    HttpUrlConnectionUtil.writeResponseToFile(url, portfolio.getNotebookDir(), filename, cookies);
 	    	request.getSession().removeAttribute("portfolio");
 	    }	    
 		catch(MalformedURLException e)

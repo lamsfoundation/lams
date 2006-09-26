@@ -125,6 +125,10 @@ public class MainExportServlet extends HttpServlet {
 				
 			exportService.generateMainPage(request, portfolios, cookies);	
 			
+			if(portfolios.getNotebookPortfolios().length > 0) {
+				exportService.generateNotebookPage(request, portfolios, cookies);
+			}
+			
 			//bundle the stylesheet with the package
 			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir);
 			bundler.bundleStylesheet();

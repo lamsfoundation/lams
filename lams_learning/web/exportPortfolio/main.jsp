@@ -72,6 +72,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><fmt:message key="export.portfolio.generated.date.label"/> 
 			<lams:Date value="${portfolio.portfolioCreatedDate}"/></p>
 
+		<c:if test="${!empty portfolio.notebookPortfolios}">
+			<p>
+				<a href="${portfolio.notebookLink}">
+					<fmt:message key="export.portfolio.notebook.link.label"/>
+				</a>
+			</p>
+		</c:if>
+
 		<c:if test="${empty portfolio.activityPortfolios}">
 			<p><fmt:message key="export.portfolio.noneAttempted.message"/></p>
 		</c:if>
@@ -88,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 			</c:forEach>
 		</div>
-
+		
 		</div>
 		<div id="footer"></div>
 	</div>

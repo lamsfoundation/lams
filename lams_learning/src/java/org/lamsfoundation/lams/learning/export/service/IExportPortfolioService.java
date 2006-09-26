@@ -103,6 +103,8 @@ public interface IExportPortfolioService {
 	
 	/** Generate the main page, given this portfolio */
 	public void generateMainPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies);
+	/** Generate the main notebook page, given this portfolio */
+	public void generateNotebookPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies);
 
 	
 }

@@ -38,9 +38,12 @@ public class Portfolio {
     private String lessonName;
     private String lessonDescription;
     private ActivityPortfolio[] activityPortfolios;
+    private NotebookPortfolio[] notebookPortfolios;
     private String learnerName;
     private Date lessonStartDate;
     private Date portfolioCreatedDate;
+    private String notebookLink;
+    private String notebookDir;
     
     public Portfolio(String exportID)
     {
@@ -48,6 +51,8 @@ public class Portfolio {
         this.activityPortfolios = null;
         this.exportID = exportID;
         this.portfolioCreatedDate = new Date();
+        this.notebookLink = null;
+        this.notebookDir = null;
     }
 
     /**
@@ -62,6 +67,12 @@ public class Portfolio {
     public void setExportTmpDir(String exportTmpDir) {
         this.exportTmpDir = exportTmpDir;
     }
+    public String getNotebookDir() {
+    	return notebookDir;
+    }
+    public void setNotebookDir(String notebookDir) {
+    	this.notebookDir = notebookDir;
+    }
     /**
      * @return Returns the toolPortfolios.
      */
@@ -74,7 +85,15 @@ public class Portfolio {
     public void setActivityPortfolios(ActivityPortfolio[] activityPortfolios) {
         this.activityPortfolios = activityPortfolios;
     }
-
+    
+    public NotebookPortfolio[] getNotebookPortfolios() {
+    	return notebookPortfolios;
+    }
+    
+    public void setNotebookPortfolios(NotebookPortfolio[] notebookPortfolios) {
+    	this.notebookPortfolios = notebookPortfolios;
+    }
+    
 	public String getLessonName() {
 		return lessonName;
 	}
@@ -122,5 +141,13 @@ public class Portfolio {
 
 	public void setPortfolioCreatedDate(Date portfolioCreatedDate) {
 		this.portfolioCreatedDate = portfolioCreatedDate;
+	}
+	
+	public String getNotebookLink() {
+		return notebookLink;
+	}
+	
+	public void setNotebookLink(String notebookLink) {
+		this.notebookLink = notebookLink;
 	}
 }

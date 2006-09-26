@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.notebook.web;
 
 import java.util.Hashtable;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -88,6 +89,12 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 			if (keyExists(table, WDDXTAGS.ENTRY)) {
 				notebookEntry.setEntry(WDDXProcessor.convertToString(table, WDDXTAGS.ENTRY));
 			}
+			
+			// set date fields
+			Date createDate = new Date();
+			notebookEntry.setCreateDate(createDate);
+			notebookEntry.setLastModified(createDate);
+			
 			
 			notebookService.saveOrUpdateNotebookEntry(notebookEntry);
 			
