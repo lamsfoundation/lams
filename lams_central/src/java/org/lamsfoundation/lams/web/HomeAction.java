@@ -35,10 +35,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -61,6 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="monitorLesson" path="/monitorLesson.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
  * @struts:action-forward name="error" path=".error"
+ * @struts:action-forward name="message" path=".message"
  * @struts:action-forward name="passwordChange" path=".passwordChange"
  * @struts:action-forward name="index" path="/login.jsp"
  *
@@ -70,6 +73,7 @@ public class HomeAction extends DispatchAction {
 	private static Logger log = Logger.getLogger(HomeAction.class);
 	
 	private static IUserManagementService service;
+	private static ILessonService lessonService;
 	
 	private IUserManagementService getService(){
 		if(service==null){
@@ -79,12 +83,22 @@ public class HomeAction extends DispatchAction {
 		return service;
 	}
 
+	private ILessonService getLessonService(){
+		if(lessonService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			lessonService = (ILessonService) ctx.getBean("lessonService");
+		}
+		return lessonService;
+	}
+
 	private UserDTO getUser() {
 		HttpSession ss = SessionManager.getSession();
 		return (UserDTO) ss.getAttribute(AttributeNames.USER);
 	}
 	
-
+	private User getRealUser(UserDTO dto) {
+		return service.getUserByLogin(dto.getLogin());
+	}
 
 	/**
 	 * request for sysadmin environment
@@ -105,7 +119,7 @@ public class HomeAction extends DispatchAction {
 				return mapping.findForward("sysadmin");
 			} else {
 				log.error("User "+user.getLogin()+" tried to get sysadmin screen but isn't sysadmin in organisation: "+orgId);
-				return mapping.findForward("error");
+				return displayMessage(mapping, req, "error.authorisation");
 			}
 			
 		} catch (Exception e) {
@@ -127,10 +141,19 @@ public class HomeAction extends DispatchAction {
 			Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 			UserDTO user = getUser();
 			if ( user == null ) {
-				log.error("admin: User missing from session. ");
+				log.error("learner: User missing from session. ");
 				return mapping.findForward("error");
 			} else { 
-				// TODO check that the user is in the learner group for the lesson
+				Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
+				if ( lesson == null || ! lesson.isLessonStarted()) {
+					return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
+				}
+				
+				if ( lesson.getLessonClass() == null || ! lesson.getLessonClass().getLearners().contains(getRealUser(user)) ) {
+					log.error("learner: User "+user.getLogin()+" is not a learner in the requested lesson. Cannot access the lesson.");
+					return displayMessage(mapping, req, "error.authorisation");
+				}
+
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
 				req.setAttribute(AttributeNames.PARAM_LESSON_ID,lessonId);
@@ -158,7 +181,6 @@ public class HomeAction extends DispatchAction {
 				log.error("admin: User missing from session. ");
 				return mapping.findForward("error");
 			} else {
-				// todo check user really does have authoring permission in some organisation.
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
 				return mapping.findForward("author");
@@ -180,13 +202,23 @@ public class HomeAction extends DispatchAction {
 
 			try {
 			log.debug("request monitorLesson");
-			int lessonId = WebUtil.readIntParam(req, AttributeNames.PARAM_LESSON_ID);
+			Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 			UserDTO user = getUser();
 			if ( user == null ) {
 				log.error("admin: User missing from session. ");
 				return mapping.findForward("error");
 			} else { 
-				// TODO check that the user is in the staff group for the lesson
+				Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
+				if ( lesson == null ) {
+					log.error("monitorLesson: Lesson "+lessonId+" does not exist. Unable to monitor lesson");
+					return mapping.findForward("error");
+				}
+				
+				if ( lesson.getLessonClass() == null || ! lesson.getLessonClass().isStaffMember(getRealUser(user)) ) {
+					log.error("learner: User "+user.getLogin()+" is not a learner in the requested lesson. Cannot access the lesson.");
+					return displayMessage(mapping, req, "error.authorisation");
+				}
+
 				log.debug("user is staff");
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
@@ -225,7 +257,7 @@ public class HomeAction extends DispatchAction {
 					return mapping.findForward("addLesson");
 				} else {
 					log.error("User "+ user.getLogin() + " tried to get staff screen but isn't staff in organisation: " + orgId);
-					return mapping.findForward("error");
+					return displayMessage(mapping, req, "error.authorisation");
 				}
 			}
 
@@ -244,5 +276,10 @@ public class HomeAction extends DispatchAction {
 		SessionManager.getSession().invalidate();
 		
 		return mapping.findForward("index");
+	}
+	
+	private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
+		req.setAttribute("messageKey", messageKey);
+		return mapping.findForward("message");
 	}
 }
