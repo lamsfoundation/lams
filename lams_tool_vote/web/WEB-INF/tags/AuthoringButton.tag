@@ -15,7 +15,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -37,6 +37,7 @@
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>
 <%@ attribute name="toolSignature" required="true" rtexprvalue="true" %>
 <%@ attribute name="toolContentID" required="true" rtexprvalue="true" %>
+<%@ attribute name="contentFolderID" required="true" rtexprvalue="true" %>
 <%@ attribute name="clearSessionActionUrl" required="true" rtexprvalue="true" %>
 
 <%-- Optional attribute --%>
@@ -45,6 +46,7 @@
 <%@ attribute name="saveButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="cancelConfirmMsgKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="defineLater" required="false" rtexprvalue="true" %>
+<%@ attribute name="customiseSessionID" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty cancelButtonLabelKey}">
@@ -63,14 +65,14 @@
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}'/>";
+       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}'/>";
+        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}'/>";
         	//just for depress alert window when call window.close()
         	//only available for IE browser
         	var userAgent=navigator.userAgent;
@@ -80,7 +82,7 @@
 		}
     }  				
 </script>				
-<p align="right">
+<p style="text-align: right">
 	<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button">
 		<fmt:message key="${saveButtonLabelKey}" /> 
 	</html:link>

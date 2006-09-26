@@ -20,20 +20,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 
 
-			<table>
+				<table class="forms">
 				
 						<c:if test="${statsTabActive != 'true'}"> 							
 							<tr> 
@@ -42,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
 										<table>			
 											<tr> 
-												<td align=right valign=top> <b> <bean:message key="label.group"/> </b>
+												<td align=center valign=top> <b> <bean:message key="label.group"/> </b>
 														<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
 															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
@@ -51,7 +45,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
 																
 																		<c:set var="SELECTED_SESSION" scope="request" value=""/>
-																		<c:if test="${voteGeneralMonitoringDTO.selectionCase == 2}"> 			
+																		<c:if test="${requestScope.selectionCase == 2}"> 			
 																			<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
 																		</c:if>						
 																		
@@ -84,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
 										<table>			
 											<tr> 
-												<td align=right valign=top> <b> <bean:message key="label.group"/> </b>
+												<td align=center valign=top> <b> <bean:message key="label.group"/> </b>
 														<select name="monitoredToolSessionIdStats" onchange="javascript:submitSession(this.value,'submitSession');">
 														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
 															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
@@ -93,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
 																
 																		<c:set var="SELECTED_SESSION" scope="request" value=""/>
-																		<c:if test="${voteGeneralMonitoringDTO.selectionCase == 2}"> 			
+																		<c:if test="${requestScope.selectionCase == 2}"> 			
 																			<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
 																		</c:if>						
 																		
@@ -119,6 +113,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</td> 
 							</tr>
 						</c:if> 
+
 
 						<tr>
 					 		<td NOWRAP colspan=2 > </td>
@@ -223,7 +218,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 																		  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
 																							<c:set scope="request" var="viewURL">
-																								<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
+																								<lams:WebAppURL/>monitoring.do?dispatch=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
 																							</c:set>
 																		  																					
 																							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">

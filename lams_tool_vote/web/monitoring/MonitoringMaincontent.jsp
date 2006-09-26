@@ -43,9 +43,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title> <bean:message key="label.monitoring"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 
 	<script type="text/javascript">
+	
+	   	var imgRoot="${lams}images/";
+	    var themeName="aqua";
 	
         function init(){
         
@@ -56,17 +60,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-                
-
-            initEditor("title");
-            initEditor("instructions");
-            
-            initEditor("optionContent0");
-            <c:set var="optIndex" scope="request" value="1"/>
-            <c:forEach var="questionEntry" items="${voteGeneralMonitoringDTO.mapOptionsContent}">
-                <c:set var="optIndex" scope="request" value="${optIndex +1}"/>
-                initEditor("<c:out value="optionContent${optIndex-1}"/>");
-            </c:forEach>
 
         }     
         
@@ -79,13 +72,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         } 
         
         function doSubmit(method) {
-        	document.VoteMonitoringForm.method.value=method;
+        	document.VoteMonitoringForm.dispatch.value=method;
         	document.VoteMonitoringForm.submit();
         }
 
 		function submitMonitoringMethod(actionMethod) 
 		{
-			document.VoteMonitoringForm.method.value=actionMethod; 
+			document.VoteMonitoringForm.dispatch.value=actionMethod; 
 			document.VoteMonitoringForm.submit();
 		}
 		
@@ -99,6 +92,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
+		
+		function submitModifyMonitoringNomination(questionIndexValue, actionMethod) 
+		{
+			document.VoteMonitoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
 		
 		function submitEditResponse(responseId, actionMethod) 
 		{
@@ -155,9 +155,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">						
 	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="method"/>
+		<html:hidden property="dispatch"/>
 		<html:hidden property="toolContentID"/>
+		<html:hidden property="httpSessionID"/>		
 		<html:hidden property="currentTab" styleId="currentTab" />
+		<html:hidden property="contentFolderID"/>						
 		<html:hidden property="activeModule"/>
 		<html:hidden property="defineLaterInEditMode"/>
 		<html:hidden property="responseId"/>	 
@@ -173,7 +175,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>	
 
 	<div id="footer"></div>
-		<lams:HTMLEditor />
+
 	</div>
 	
 </body>

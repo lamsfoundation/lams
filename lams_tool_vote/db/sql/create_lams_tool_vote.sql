@@ -80,16 +80,17 @@ CREATE TABLE tl_lavote11_usr_attempt (
 )TYPE=InnoDB;
 
 CREATE TABLE tl_lavote11_uploadedfile (
-       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+       submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
      , uuid VARCHAR(255) NOT NULL
-     , vote_content_id BIGINT(20) NOT NULL
      , isOnline_File TINYINT(1) NOT NULL
      , filename VARCHAR(255) NOT NULL
-     , PRIMARY KEY (uid)
+     , vote_content_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (submissionId)
      , INDEX (vote_content_id)
-     , CONSTRAINT FK_tl_lavote11_uploadedfile_1 FOREIGN KEY (vote_content_id)
+     , CONSTRAINT FK_tablex_111 FOREIGN KEY (vote_content_id)
                   REFERENCES tl_lavote11_content (uid)
 )TYPE=InnoDB;
+
 
 INSERT INTO tl_lavote11_content(uid, content_id , title , instructions , creation_date , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', NOW(), 1,0, 0, 'offline instructions','online instructions', 0, 0);
 

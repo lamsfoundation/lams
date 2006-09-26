@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.vote.pojos;
 import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
@@ -43,9 +45,8 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 public class VoteUploadedFile implements Serializable, Comparable
 {
 	static Logger logger = Logger.getLogger(VoteUploadedFile.class.getName());
-	
 	/** identifier field */
-    private Long uid;
+    private Long submissionId;
     
     /** persistent field */
     private String uuid;
@@ -54,10 +55,7 @@ public class VoteUploadedFile implements Serializable, Comparable
     private boolean fileOnline;
     
     /** persistent field */
-    private String filename;
-    
-    
-    private Long voteContentId;
+    private String fileName;
     
     /** persistent field */
     private VoteContent voteContent;
@@ -65,43 +63,21 @@ public class VoteUploadedFile implements Serializable, Comparable
     public VoteUploadedFile(){};
 
     /** full constructor */
-    public VoteUploadedFile(Long uid,
+    public VoteUploadedFile(Long submissionId,
     					String uuid, 
     					boolean fileOnline, 
-    					String filename,
+    					String fileName,
 						VoteContent voteContent)  
     {
-    	this.uid=uid;
+    	this.submissionId=submissionId;
         this.uuid = uuid;
         this.fileOnline = fileOnline;
-        this.filename = filename;
-        this.voteContent=voteContent;
-    }
-
-    public VoteUploadedFile(String uuid, 
-    					boolean fileOnline, 
-    					String filename,
-						VoteContent voteContent)  
-    {
-        this.uuid = uuid;
-        this.fileOnline = fileOnline;
-        this.filename = filename;
+        this.fileName = fileName;
         this.voteContent=voteContent;
     }
     
-    public VoteUploadedFile(String uuid, 
-			boolean fileOnline, 
-			String filename,
-			Long voteContentId)  
-    {
-		this.uuid = uuid;
-		this.fileOnline = fileOnline;
-		this.filename = filename;
-		this.voteContentId=voteContentId;
-    }
     
-    
-    public static VoteUploadedFile newInstance(IToolContentHandler toolContentHandler, VoteUploadedFile mcUploadedFile,
+    public static VoteUploadedFile newInstance(IToolContentHandler toolContentHandler, VoteUploadedFile voteUploadedFile,
 			VoteContent newMcContent) throws ItemNotFoundException, RepositoryCheckedException
 			
 	{
@@ -109,16 +85,16 @@ public class VoteUploadedFile implements Serializable, Comparable
 
     	try
 		{
-    		String fileUuid = mcUploadedFile.getUuid(); 
+    		String fileUuid = voteUploadedFile.getUuid(); 
     		if(toolContentHandler != null){
-	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
+	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(voteUploadedFile.getUuid()));
 	        	logger.debug("copied NodeKey: " + copiedNodeKey);
 	        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
 	        	fileUuid = copiedNodeKey.getUuid().toString();
     		}
         	newMcUploadedFile = new VoteUploadedFile(fileUuid,
-					mcUploadedFile.isFileOnline(),
-					mcUploadedFile.getFilename(),
+        			voteUploadedFile.isFileOnline(),
+        			voteUploadedFile.getFileName(),
 					newMcContent);
 
 		}
@@ -131,24 +107,79 @@ public class VoteUploadedFile implements Serializable, Comparable
 	}
     
     
+
+    public VoteUploadedFile(String uuid, 
+    					boolean fileOnline, 
+    					String fileName,
+						VoteContent voteContent)  
+    {
+    	logger.debug("constructor gets called.");
+        this.uuid = uuid;
+        this.fileOnline = fileOnline;
+        this.fileName = fileName;
+        this.voteContent=voteContent;
+    }
+    
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("uuid: ", getUuid())
+			.append("fileName: ", getFileName())
 			.toString();
     }
+
+    public boolean equals(Object other) {
+        if ( !(other instanceof VoteUploadedFile) ) return false;
+        VoteUploadedFile castOther = (VoteUploadedFile) other;
+        return new EqualsBuilder()
+            .append(this.getUuid(), castOther.getUuid())
+            .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(getUuid())
+            .toHashCode();
+    }
   
-	
-	/**
-	 * @return Returns the uid.
+    
+        /**
+	 * @return Returns the fileName.
 	 */
-	public Long getSubmissionId() {
-		return uid;
+	public String getFileName() {
+		return fileName;
 	}
 	/**
-	 * @param uid The uid to set.
+	 * @param fileName The fileName to set.
 	 */
-	public void setSubmissionId(Long uid) {
-		this.uid = uid;
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	
+	/**
+	 * @return Returns the voteContent.
+	 */
+	public VoteContent getVoteContent() {
+		return voteContent;
+	}
+	/**
+	 * @param voteContent The voteContent to set.
+	 */
+	public void setVoteContent(VoteContent voteContent) {
+		this.voteContent = voteContent;
+	}
+
+	/**
+	 * @return Returns the submissionId.
+	 */
+	public Long getSubmissionId() {
+		return submissionId;
+	}
+	/**
+	 * @param submissionId The submissionId to set.
+	 */
+	public void setSubmissionId(Long submissionId) {
+		this.submissionId = submissionId;
 	}
 	/**
 	 * @return Returns the uuid.
@@ -174,65 +205,16 @@ public class VoteUploadedFile implements Serializable, Comparable
 	public void setFileOnline(boolean fileOnline) {
 		this.fileOnline = fileOnline;
 	}
-	/**
-	 * @return Returns the uid.
-	 */
-	public Long getUid() {
-		return uid;
-	}
-	/**
-	 * @param uid The uid to set.
-	 */
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	/**
-	 * @return Returns the filename.
-	 */
-	public String getFilename() {
-		return filename;
-	}
-	/**
-	 * @param filename The filename to set.
-	 */
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
 	
 	public int compareTo(Object o)
     {
-		VoteUploadedFile optContent = (VoteUploadedFile) o;
+		VoteUploadedFile file = (VoteUploadedFile) o;
         //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-        if (uid == null)
+        if (submissionId == null)
         	return 1;
 		else
-			return (int) (uid.longValue() - optContent.uid.longValue());
+			return (int) (submissionId.longValue() - file.submissionId.longValue());
     }
-    /**
-     * @return Returns the voteContentId.
-     */
-    public Long getVoteContentId() {
-        return voteContentId;
-    }
-    /**
-     * @param voteContentId The voteContentId to set.
-     */
-    public void setVoteContentId(Long voteContentId) {
-        this.voteContentId = voteContentId;
-    }
-    /**
-     * @return Returns the voteContent.
-     */
-    public VoteContent getVoteContent() {
-        return voteContent;
-    }
-    /**
-     * @param voteContent The voteContent to set.
-     */
-    public void setVoteContent(VoteContent voteContent) {
-        this.voteContent = voteContent;
-    }
-    
 	public String getFileProperty() {
 		   if (isFileOnline())
 	        {

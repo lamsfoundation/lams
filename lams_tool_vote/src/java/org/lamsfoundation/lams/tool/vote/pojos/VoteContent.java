@@ -369,6 +369,9 @@ public class VoteContent implements Serializable {
      * @return Returns the voteAttachments.
      */
     public Set getVoteAttachments() {
+        if(voteAttachments == null)
+            voteAttachments = new TreeSet();
+        
         return voteAttachments;
     }
     /**

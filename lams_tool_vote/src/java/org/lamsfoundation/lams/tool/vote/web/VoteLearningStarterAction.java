@@ -57,7 +57,8 @@
  * If the tool has a LockOnFinish flag, then the tool should lock learner's entries once they have completed the activity. 
  * If they return to the activity (e.g. via the progress bar) then the entries should be read only.
  * 
- *    <!--Learning Starter Action: initializes the Learning module -->
+
+   <!--Learning Starter Action: initializes the Learning module -->
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteLearningStarterAction" 
    			name="VoteLearningForm" 
@@ -96,7 +97,12 @@
 		    path="/learning/RedoQuestions.jsp"
 		    redirect="false"
 	  	/>
-	  	
+
+	  	<forward
+		    name="runOffline"
+	        path="/learning/RunOffline.jsp"
+		    redirect="false"
+	  	/>
 
 	  	<forward
 		    name="exitPage"
@@ -128,6 +134,12 @@
 	        path="/learning/defineLater.jsp"
 		    redirect="false"
 	  	/>
+	  	
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
 
 	  	<forward
 		    name="errorList"
@@ -135,6 +147,7 @@
 		    redirect="false"
 	  	/>
 	</action>  
+  
 
  * 
  */

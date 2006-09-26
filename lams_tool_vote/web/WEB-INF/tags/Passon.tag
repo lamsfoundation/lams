@@ -15,7 +15,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -33,16 +33,20 @@
 <%@ tag body-content="empty" %>
 <%@ attribute name="progress" required="true" rtexprvalue="true" type="java.lang.String" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
+<%@ attribute name="redirect" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <c:if test="${!empty progress}">
 		<c:set var="randomID">
 			<lams:generateID id="${id}"/>
 		</c:set>
-			<c:set var="passonurl_params" value="?${progress}&lessonID=${id}&uniqueID=${randomID}"/>
-			<c:set var="passonurl_nojs" value="passon.swf${passonurl_params}"/>
-			<c:set var="passonurl_js" value="passon${passonurl_params}"/>
+			<c:set var="passonurl_params" value="${progress}&lessonID=${id}&uniqueID=${randomID}"/>
+			<c:if test="${redirect}">
+				<c:set var="passonurl_params" value="redirect=true&${passonurl_params}"/>
+			</c:if>
 			
+			<c:set var="passonurl_nojs" value="passon.swf?${passonurl_params}"/>
+			<c:set var="passonurl_js" value="passon?${passonurl_params}"/>
 			<script type="text/javascript">
 				AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','1','height','1','align','left','src','<c:out value="${passonurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#FFFFFF','name','passon', 'id', 'passon', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie','<c:out value="${passonurl_js}" escapeXml="false"/>' );
 			</script>

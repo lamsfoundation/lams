@@ -74,6 +74,12 @@ public interface VoteAppConstants {
     public static final String SELECTED_TOOL_SESSION_ID					="selectedToolSessionId";
     public static final String DEFAULT_VOTING_TITLE						="Voting Title";
     public static final String DEFAULT_VOTING_INSTRUCTIONS				="Voting Instructions";
+    public static final String NOTEBOOK_ENTRIES_EXIST					="notebookEntriesExist";
+    public static final String NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST		="noSessionsNotebookEntriesExist";
+    public static final String UUID                                     ="uuid";
+	public static final String VOTE_STATS_DTO							="voteStatsDTO";
+	public static final String LIST_ALL_GROUPS_DTO						="listAllGroupsDTO";
+	public static final String CURRENT_SESSION_NAME						="currentSessionName";
 	
 	public static final String ATTACHMENT_LIST_KEY 						= "attachmentListKey";
 	public static final String DELETED_ATTACHMENT_LIST_KEY				= "deletedAttachmentListKey";
@@ -81,6 +87,7 @@ public interface VoteAppConstants {
 	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
 	public static final String VOTE_GENERAL_MONITORING_DTO				= "voteGeneralMonitoringDTO";
 	public static final String LEARNER_NOTEBOOK							="learnerNotebook";
+	
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
@@ -95,11 +102,16 @@ public interface VoteAppConstants {
     public static final String VOTE_GENERAL_AUTHORING_DTO				="voteGeneralAuthoringDTO";
     public static final String MAP_OPTIONS_CONTENT_KEY					="mapOptionsContentKey";
     public static final String HTTP_SESSION_ID							="httpSessionID";
+    public static final String LIST_NOMINATION_CONTENT_DTO				= "listNominationContentDTO";
+    public static final String LIST_NOMINATION_CONTENT_DTO_KEY			= "listNominationContentDTOKey";
     
 	public static final String DEFAULT_ONLINE_INST						="online instructions";
 	public static final String DEFAULT_OFFLINE_INST						="offline instructions";
+	public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
+    public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
 	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
 	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
+	public static final String TOTAL_NOMINATION_COUNT					= "totalNominationCount";
 
 	public static final String EXPORT_PORTFOLIO_DTO						= "exportPortfolioDto";
 	public static final String NOTEBOOK									="notebook";
@@ -185,6 +197,8 @@ public interface VoteAppConstants {
     public static final String CREATION_DATE							="creationDate";
     public static final String DEFINE_LATER								="defineLater";
     public static final String VIEW_ANSWERS								="viewAnswers";
+    
+    public static final String EDIT_ACTIVITY_DTO						="editActivityDTO";
         
     public static final String REFLECT									="reflect";
     public static final String ON										="ON";

@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.vote;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -63,7 +65,26 @@ public abstract class VoteUtils implements VoteAppConstants {
         return newText;
     }
 
+    public static String getCurrentLearnerID()
+    {
+        String userID = "";
+        HttpSession ss = SessionManager.getSession();
+        logger.debug("ss: " + ss);
+        
+        if (ss != null)
+        {
+    	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	    if ((user != null) && (user.getUserID() != null))
+    	    {
+    	    	userID = user.getUserID().toString();
+    		    logger.debug("retrieved userId: " + userID);
+    	    }
+        }
+        return userID;
+    }
 
+    
+    
 	/**
 	 * 
 	 * getGMTDateTime(HttpServletRequest request)
@@ -539,4 +560,154 @@ public abstract class VoteUtils implements VoteAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100);
     	request.getSession().removeAttribute(USER_EXCEPTION_SINGLE_OPTION);
     }
+    
+    
+    
+    public static void setFormProperties(HttpServletRequest request, IVoteService voteService,  
+            VoteAuthoringForm  voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO, String strToolContentID, 
+            String defaultContentIdStr, String activeModule, SessionMap sessionMap, String httpSessionID)
+    {
+    	logger.debug("setFormProperties: ");
+    	logger.debug("using strToolContentID: " + strToolContentID);
+    	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
+    	logger.debug("using activeModule: " + activeModule);
+    	logger.debug("using httpSessionID: " + httpSessionID);
+
+    	voteAuthoringForm.setHttpSessionID(httpSessionID);
+    	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+    	
+    	voteAuthoringForm.setToolContentID(strToolContentID);
+    	
+    	if ((defaultContentIdStr != null) && (defaultContentIdStr.length() > 0)) 
+    	    voteAuthoringForm.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
+    	
+    	voteAuthoringForm.setActiveModule(activeModule);
+    	voteGeneralAuthoringDTO.setActiveModule(activeModule);
+    	
+		String voteChangable=request.getParameter("voteChangable");
+    	logger.debug("voteChangable: " + voteChangable);
+		voteAuthoringForm.setVoteChangable(voteChangable);
+		voteGeneralAuthoringDTO.setVoteChangable(voteChangable);
+		
+		String lockOnFinish=request.getParameter("lockOnFinish");
+		logger.debug("lockOnFinish: " + lockOnFinish);
+		voteAuthoringForm.setLockOnFinish(lockOnFinish);
+		voteGeneralAuthoringDTO.setLockOnFinish(lockOnFinish);
+		
+		String allowText=request.getParameter("allowText");
+		logger.debug("allowText: " + allowText);
+		voteAuthoringForm.setAllowText(allowText);
+		voteGeneralAuthoringDTO.setAllowText(allowText);
+		
+		String maxNominationCount=request.getParameter("maxNominationCount");
+		logger.debug("maxNominationCount: " + maxNominationCount);
+		voteAuthoringForm.setMaxNominationCount(maxNominationCount);
+		voteGeneralAuthoringDTO.setMaxNominationCount(maxNominationCount);
+
+		String reflect=request.getParameter("reflect");
+		logger.debug("reflect: " + maxNominationCount);
+		voteAuthoringForm.setReflect(reflect);
+		voteGeneralAuthoringDTO.setReflect(reflect);
+
+		String reflectionSubject=request.getParameter("reflectionSubject");
+		logger.debug("reflectionSubject: " + reflectionSubject);
+		voteAuthoringForm.setReflectionSubject(reflectionSubject);
+		voteGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
+
+
+		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
+		logger.debug("offlineInstructions: " + offlineInstructions);
+		voteAuthoringForm.setOfflineInstructions(offlineInstructions);
+		voteGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
+		String onlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
+		logger.debug("onlineInstructions: " + onlineInstructions);
+		voteAuthoringForm.setOnlineInstructions(onlineInstructions);
+		voteGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+		
+		logger.debug("ending setFormProperties with voteAuthoringForm: " + voteAuthoringForm);
+		logger.debug("ending setFormProperties with voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
+    }
+
+    
+	public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID, IVoteService voteService)
+    {
+		logger.debug("voteService: " + voteService);
+    	logger.debug("value:" + value);
+    	logger.debug("strToolContentID:" + strToolContentID);
+    	
+		VoteContent voteContent=voteService.retrieveVote(new Long(strToolContentID));
+		
+    	logger.debug("voteContent:" + voteContent);
+    	if (voteContent != null)
+    	{
+    		voteContent.setDefineLater(value);
+        	logger.debug("defineLater has been set to:" + value);
+        	voteService.updateVote(voteContent);	
+    	}
+    }
+	
+	
+
+    /** If this file exists in attachments map, move it to the deleted attachments map.
+     * Returns the updated deletedAttachments map, creating a new one if needed. If uuid supplied
+     * then tries to match on that, otherwise uses filename and isOnline. */
+    public static List moveToDelete(String uuid, List attachmentsList, List deletedAttachmentsList ) {
+
+        logger.debug("doing moveToDelete: " + attachmentsList);
+        logger.debug("doing moveToDelete: " + deletedAttachmentsList);
+        List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
+        
+        logger.debug("deletedList: " + deletedList);
+        
+        if ( attachmentsList != null ) {
+            logger.debug("attachmentsList not null: " + attachmentsList);
+            Iterator iter = attachmentsList.iterator();
+            VoteUploadedFile attachment = null;
+            while ( iter.hasNext() && attachment == null ) {
+                VoteUploadedFile value = (VoteUploadedFile) iter.next();
+                logger.debug("value: " + value);
+                
+                if ( uuid.equals(value.getUuid()) ) {
+                    logger.debug("value made attachment:");
+                    attachment = value;
+                }
+
+            }
+            if ( attachment != null ) {
+                logger.debug("attachment not null");                
+                deletedList.add(attachment);
+                attachmentsList.remove(attachment);
+            }
+        }
+        
+        logger.debug("final attachmentsList: " + attachmentsList);
+        logger.debug("final deletedAttachmentsList: " + deletedAttachmentsList);
+        return deletedList;
+    }
+
+
+    public static List moveToDelete(String filename, boolean isOnline, List attachmentsList, List deletedAttachmentsList ) {
+
+        List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
+        
+        if ( attachmentsList != null ) {
+            Iterator iter = attachmentsList.iterator();
+            VoteUploadedFile attachment = null;
+            while ( iter.hasNext() && attachment == null ) {
+                VoteUploadedFile value = (VoteUploadedFile) iter.next();
+                if ( filename.equals(value.getFileName()) && isOnline == value.isFileOnline()) {
+                    attachment = value;
+                }
+
+            }
+            if ( attachment != null ) {
+                deletedList.add(attachment);
+                attachmentsList.remove(attachment);
+            }
+        }
+        
+        return deletedList;
+    }
+    
 }

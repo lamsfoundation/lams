@@ -26,29 +26,36 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 
 /**
  * Simple client for accessing the content repository.
- * 
- * @author Ozgur Demirtas
  */
 public class VoteToolContentHandler extends ToolContentHandler {
 
     private static String repositoryWorkspaceName = "vote11";
     private final String repositoryUser 			= "vote11";
     private final char[] repositoryId 				= {'v','o','t','e','_','1', '1'};
-	
 
-    public VoteToolContentHandler() {
+    private VoteToolContentHandler() {
         super();
     }
 
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
+     */
     public String getRepositoryWorkspaceName() {
         return repositoryWorkspaceName;
     }
 
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
+     */
     public String getRepositoryUser() {
         return repositoryUser;
     }
 
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
+     */
     public char[] getRepositoryId() {
         return repositoryId;
     }
+
 }

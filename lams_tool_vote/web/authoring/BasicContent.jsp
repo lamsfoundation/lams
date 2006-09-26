@@ -20,162 +20,145 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-	                                     
-					<table>
-						<tr>   
-						<td NOWRAP>
-							<c:if test="${voteGeneralAuthoringDTO.sbmtSuccess == 'true' }"> 			
-								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
-								<bean:message key="sbmt.successful"/>  </img>
-							</c:if> 			
+<script type="text/javascript">
+<!-- Common Javascript functions for LAMS -->
+	/**
+	 * Launches the popup window for the instruction files
+	 */
+	function showMessage(url) {
+		var area=document.getElementById("messageArea");
+		if(area != null){
+			area.style.width="670px";
+			area.style.height="100%";
+			area.src=url;
+			area.style.display="block";
+		}
+	}
+	function hideMessage(){
+		var area=document.getElementById("messageArea");
+		if(area != null){
+			area.style.width="0px";
+			area.style.height="0px";
+			area.style.display="none";
+		}
+	}
 
-							<c:if test="${voteGeneralAuthoringDTO.userExceptionMaxNominationInvalid == 'true'}"> 										
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  
-									<bean:message key="error.maxNominationCount.invalid"/>  </img>
-							</c:if> 			
-
-							<c:if test="${voteGeneralAuthoringDTO.userExceptionOptionsDuplicate == 'true'}"> 			
-									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>   
-									<bean:message key="error.duplicate.nomination"/>  </img>
-							</c:if> 			
-							
-						</td>
-						</tr> 
-					</table>
-
-
-					<table class="forms">
-				
-							<tr> 
-								<td valign=top>
-									<lams:SetEditor id="title" text="${voteGeneralAuthoringDTO.activityTitle}" small="true" key="label.authoring.title.col"/>								
-								</td> 
-						  	</tr>
-	
-						  	<tr> 
-								<td valign=top>
-									<lams:SetEditor id="instructions" text="${voteGeneralAuthoringDTO.activityInstructions}" key="label.authoring.instructions.col"/>								
-								</td> 
-							</tr>
-
-
-					 		<tr> 
-								<td NOWRAP valign=top>
-								<table>
-
-				 		<!--default Option content, this entry can not be deleted but can be updated -->
-					 		<tr> 
-					 		
-								<td valign=top>
-									<lams:SetEditor id="optionContent0" text="${voteGeneralAuthoringDTO.defaultOptionContent}" key="label.nomination.col"/>								
-
-								  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> 
-								</td> 
-						  	</tr>
-				
-						  	<!--end of default Option content -->
-
-					  		<!-- if there is more than just the default content start presenting them -->
-					  	 		<c:set var="optIndex" scope="request" value="1"/>
-								<c:forEach var="optionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
-							  		<c:if test="${optionEntry.key > 1}"> 			
-										<c:set var="optIndex" scope="request" value="${optIndex +1}"/>
-										  <tr>
-
-											<td NOWRAP valign=top>
-			                                	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'monitoring' }"> 			
-					 		 						<html:submit property="removeContent" 
-			                                                     styleClass="linkbutton"  
-			                                                     onclick="removeNomination(${optIndex});">
-														<bean:message key="button.delete"/>
-													</html:submit>
-												</c:if> 			
-												
-			                                	<c:if test="${voteGeneralAuthoringDTO.activeModule == 'monitoring' }"> 			
-					 		 						<html:submit property="removeContent" 
-			                                                     styleClass="linkbutton"  
-			                                                     onclick="removeMonitoringNomination(${optIndex});">
-														<bean:message key="button.delete"/>
-													</html:submit>
-												</c:if> 													
-											
-												<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" key="label.nomination.col"/>								
-
-								  			 	<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex == optIndex}"> 			
-				     								  <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> 
-				     							</c:if> 	    
-												
-				 				  				<c:if test="${voteGeneralAuthoringDTO.maxOptionIndex != optIndex }"> 			
-					   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
-					       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
-												</c:if> 	           								 
-											</td>					
-
-										  </tr>
-									</c:if> 			
-								</c:forEach>
-								<html:hidden property="optIndex"/>
-								
-								
-								</table> </td> </tr>
-								
-								
-						</table>
-
-
-				<table class="forms">
-	                    <tr>
-	                        <td valign=top align="right">
-	                            <html:submit property="addContent" 
-	                                         styleClass="linkbutton" 
-	                                         onclick="submitMethod('addNewNomination');">
-	                                <bean:message key="button.add"/>
-	                            </html:submit>
-	                        </td>
-	                    </tr>
-	                    <tr> <td> &nbsp</td> </tr>
-	                    <tr> <td> &nbsp</td> </tr>	                    
-	             </table>
-
-
-
-      	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring' }"> 					
-			<p align="right">
-		        <a href="javascript:submitMethod('submitAllContent')" class="button">
-		        	<bean:message key="label.save"/></a>
-			</p>
-		</c:if> 				
-		
-      	<c:if test="${voteGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
-			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
-			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />		
-		</c:if> 							
-
-<SCRIPT language="JavaScript"> 
-
-	function removeNomination(optIndex)
+	function removeNomination(questionIndex)
 	{
-		document.VoteAuthoringForm.optIndex.value=optIndex;
+		document.VoteAuthoringForm.questionIndex.value=questionIndex;
         submitMethod('removeNomination');
 	}
 
-	function removeMonitoringNomination(optIndex)
+	function removeMonitoringNomination(questionIndex)
 	{
-		document.VoteMonitoringForm.optIndex.value=optIndex;
+		document.VoteMonitoringForm.questionIndex.value=questionIndex;
         submitMonitoringMethod('removeNomination');
 	}
+
+</script>
+
+			<html:hidden property="questionIndex"/>
+			
+			<table cellpadding="0">
+
+						<tr>
+							<td colspan="2">
+								<div class="field-name" style="text-align: left;">
+									<fmt:message key="label.authoring.title.col"></fmt:message>
+								</div>
+								<html:text property="title" style="width: 100%;"></html:text>
+							</td>
+						</tr>
+						
+
+						<tr>
+							<td colspan="2">
+								<div class="field-name" style="text-align: left;">
+									<fmt:message key="label.authoring.instructions.col"></fmt:message>
+								</div>
+								<lams:FCKEditor id="instructions"
+									value="${voteGeneralAuthoringDTO.activityInstructions}"
+									contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+							</td>
+						</tr>
 	
- </SCRIPT>
+				 		<tr>
+						<td colspan="2">
+							<div id="resourceListArea">
+						 		<c:if test="${voteGeneralAuthoringDTO.activeModule == 'authoring' || voteGeneralAuthoringDTO.activeModule == 'defineLater'}"> 		
+									<%@ include file="/authoring/itemlist.jsp"%>
+								</c:if> 							
+						 		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring' && voteGeneralAuthoringDTO.activeModule != 'defineLater'}"> 		
+									<%@ include file="/monitoring/itemlist.jsp"%>
+								</c:if> 							
+							</div>
+						</td>
+						</tr>
+						
+
+			 		<c:if test="${voteGeneralAuthoringDTO.activeModule == 'authoring' || voteGeneralAuthoringDTO.activeModule == 'defineLater'}"> 								
+						<tr>
+							<td colspan="2">
+									<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');"
+										style="float:right;width:150px" class="button-add-item"> <fmt:message
+										key="label.add.new.nomination" /> </a>
+							</td>
+						</tr>
+					</c:if> 												
+			 		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring' && voteGeneralAuthoringDTO.activeModule != 'defineLater'}"> 							
+						<tr>
+							<td colspan="2">
+									<a href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');"
+										style="float:right;width:150px" class="button-add-item"> <fmt:message
+										key="label.add.new.nomination" /> </a>
+							</td>
+						</tr>
+					</c:if> 																		 		
+
+					<tr>
+						<td colspan="2">
+							<iframe
+								onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+								id="messageArea" name="messageArea"
+								style="width:0px;height:0px;border:0px;display:none"
+								frameborder="no" scrolling="no">
+							</iframe>
+						</td>
+					</tr>
+
+			 </table>			
+
+				
+				<table cellpadding="0">
+					    <tr> <td> &nbsp </td> </tr>					    
+						<tr> 
+							<td>							
+						      	<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
+									<p align="right">
+									    <a href="javascript:submitMethod('submitAllContent')" class="button">
+								        	<bean:message key="label.save"/></a>
+									</p>
+									
+								</c:if> 					
+					
+						      	<c:if test="${voteGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
+									<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+									<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
+									cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
+									contentFolderID="${formBean.contentFolderID}" />
+								</c:if> 						      	
+							</td> 
+					  	</tr>
+				 </table>
+
+	                                     
+
+
+
+
+

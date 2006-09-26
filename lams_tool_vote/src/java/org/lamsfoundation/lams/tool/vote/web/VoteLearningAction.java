@@ -81,7 +81,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Ozgur Demirtas
  * 
  * 
- *    <!--Learning Main Action: interacts with the Learning module user -->
+   <!--Learning Main Action: interacts with the Learning module user -->
 	<action	path="/learning"
 		    type="org.lamsfoundation.lams.tool.vote.web.VoteLearningAction"
 			name="VoteLearningForm"
@@ -145,6 +145,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 	        path="/learning/Preview.jsp"
 		    redirect="false"
 	     />
+
+		<forward
+		    name="notebook"
+		    path="/learning/Notebook.jsp"
+		    redirect="false"
+	  	/>   
+	     
 
 	  	<forward
 		    name="errorList"

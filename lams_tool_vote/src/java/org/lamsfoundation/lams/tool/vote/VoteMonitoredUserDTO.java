@@ -59,6 +59,10 @@ public class VoteMonitoredUserDTO implements Comparable
 	private String questionUid;
     
     private Map usersAttempts;
+    
+    private String responsePresentable;
+    
+    
 	
 	/**
 	 * @return Returns the queUsrId.
@@ -220,4 +224,16 @@ public class VoteMonitoredUserDTO implements Comparable
     public void setAttemptTime(Date attemptTime) {
         this.attemptTime = attemptTime;
     }    
+    /**
+     * @return Returns the responsePresentable.
+     */
+    public String getResponsePresentable() {
+        return responsePresentable;
+    }
+    /**
+     * @param responsePresentable The responsePresentable to set.
+     */
+    public void setResponsePresentable(String responsePresentable) {
+        this.responsePresentable = responsePresentable;
+    }
 }

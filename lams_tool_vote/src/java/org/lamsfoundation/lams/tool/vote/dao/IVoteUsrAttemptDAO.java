@@ -84,7 +84,7 @@ public interface IVoteUsrAttemptDAO
 	
 	public int  getLastNominationCount(Long userId);
 	
-	public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+	//public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
 	
 	public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long voteSessionId);
 	
@@ -101,6 +101,8 @@ public interface IVoteUsrAttemptDAO
 	public Set getAttemptsForUserAndSession(final Long queUsrId,  final Long voteSessionId);
 	
 	public Set getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId,  final Long voteSessionId);
+	
+	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
 }
 
 

@@ -28,6 +28,27 @@
  * 
  * @author Ozgur Demirtas
  * 
+   <!--Define Later Starter Action: initializes the DefineLater module -->
+   <action path="/defineLaterStarter" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteDLStarterAction" 
+   			name="VoteAuthoringForm" 
+	      	scope="request"   			
+   			input="/index.jsp"> 
+	
+	      <forward
+	        name="load"
+	        path="/authoring/AuthoringMaincontent.jsp"
+		    redirect="false"
+	      />
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="false"
+	  	/>
+	</action>  
+ * 
+ * 
 */
 package org.lamsfoundation.lams.tool.vote.web;
 import java.io.IOException;
@@ -60,7 +81,6 @@ public class VoteDLStarterAction extends Action implements VoteAppConstants {
 		
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("voteService: " + voteService);
-		//request.getSession().setAttribute(TOOL_SERVICE, voteService);
 		voteAuthoringForm.setVoteService(voteService);
 		
 		VoteStarterAction voteStarterAction= new VoteStarterAction();

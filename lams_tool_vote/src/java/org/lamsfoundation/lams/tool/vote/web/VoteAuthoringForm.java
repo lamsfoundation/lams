@@ -86,6 +86,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	protected String isRemoveContent;
 	protected String toolContentID;
+	protected String editableNominationIndex;
 	
 	
 	/* instructions content */
@@ -115,6 +116,13 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String defaultOptionContent;
 	protected String httpSessionID;
 	protected IVoteService voteService;
+	
+	
+	private String contentFolderID;
+	private String addSingleQuestion;
+	private String editableQuestionIndex;
+	private String feedback;
+	private String editQuestionBoxRequest;
 	
 	public void resetUserAction()
     {
@@ -880,6 +888,11 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	public String toString() {
         return new ToStringBuilder(this)
             .append("activeModule: ", activeModule)
+			.append("contentFolderID: ", contentFolderID)    
+			.append("addSingleQuestion: ", addSingleQuestion)
+			.append("editableQuestionIndex: ", editableQuestionIndex)
+			.append("feedback: ", feedback)
+			.append("editQuestionBoxRequest: ", editQuestionBoxRequest)
             .append("defineLaterInEditMode: ", defineLaterInEditMode)
             .append("submissionAttempt: ", submissionAttempt)
             .append("sbmtSuccess: ", sbmtSuccess)
@@ -926,5 +939,80 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
+    }
+    
+    /**
+     * @return Returns the addSingleQuestion.
+     */
+    public String getAddSingleQuestion() {
+        return addSingleQuestion;
+    }
+    /**
+     * @param addSingleQuestion The addSingleQuestion to set.
+     */
+    public void setAddSingleQuestion(String addSingleQuestion) {
+        this.addSingleQuestion = addSingleQuestion;
+    }
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+    /**
+     * @return Returns the editableQuestionIndex.
+     */
+    public String getEditableQuestionIndex() {
+        return editableQuestionIndex;
+    }
+    /**
+     * @param editableQuestionIndex The editableQuestionIndex to set.
+     */
+    public void setEditableQuestionIndex(String editableQuestionIndex) {
+        this.editableQuestionIndex = editableQuestionIndex;
+    }
+    /**
+     * @return Returns the editQuestionBoxRequest.
+     */
+    public String getEditQuestionBoxRequest() {
+        return editQuestionBoxRequest;
+    }
+    /**
+     * @param editQuestionBoxRequest The editQuestionBoxRequest to set.
+     */
+    public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
+        this.editQuestionBoxRequest = editQuestionBoxRequest;
+    }
+    /**
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+    /**
+     * @param feedback The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+    
+    
+    /**
+     * @return Returns the editableNominationIndex.
+     */
+    public String getEditableNominationIndex() {
+        return editableNominationIndex;
+    }
+    /**
+     * @param editableNominationIndex The editableNominationIndex to set.
+     */
+    public void setEditableNominationIndex(String editableNominationIndex) {
+        this.editableNominationIndex = editableNominationIndex;
     }
 }

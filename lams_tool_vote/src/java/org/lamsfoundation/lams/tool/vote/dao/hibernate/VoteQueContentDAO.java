@@ -48,6 +48,8 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.displayOrder=:displayOrder and voteQueContent.voteContentId=:voteContentUid";
 	 	
+	 	private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId order by voteQueContent.displayOrder";
+	 	
 	 		 	
 	 	public VoteQueContent getVoteQueContentByUID(Long uid)
 		{
@@ -195,6 +197,18 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 		    	}
 			}
 	    }
+
+	 	
+	 	public List getAllQuestionEntriesSorted(final long voteContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+				.setLong("voteContentId", voteContentId)
+				.list();
+
+			return list;
+	    }
+
 
 	 	
 	 	public void saveVoteQueContent(VoteQueContent voteQueContent)

@@ -23,7 +23,10 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,17 +42,20 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.vote.EditActivityDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 
 /**
@@ -141,7 +147,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		logger.debug("post initSummaryContent, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		
 		logger.debug("calling initInstructionsContent.");
-		voteMonitoringAction.initInstructionsContent(toolContentID, request, voteService, voteGeneralMonitoringDTO);
 		logger.debug("post initInstructionsContent, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		
 		logger.debug("calling initStatsContent.");
@@ -197,7 +202,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 		/*...till here */
 		
-		voteMonitoringAction.prepareReflectionData(request, voteContent, voteService, null, false);
+		//voteMonitoringAction.prepareReflectionData(request, voteContent, voteService, null, false);
 		
 		logger.debug("calling submitSession with selectedToolSessionId" + voteMonitoringForm.getSelectedToolSessionId());
 		return voteMonitoringAction.submitSession(mapping, voteMonitoringForm,  request, response, voteService, voteGeneralMonitoringDTO);
@@ -230,7 +235,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
 			voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(new Boolean(true).toString());
-			persistInRequestError(request, "error.content.doesNotExist");
 			return false;
 		}
 		
@@ -241,7 +245,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		if (isContentInUse == true)
 		{
 			logger.debug("monitoring url does not allow editActivity since the content is in use.");
-			persistInRequestError(request,"error.content.inUse");
 			voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
 		}
 		
@@ -268,6 +271,17 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		 * get the nominations 
 		 * section  is needed for the Edit tab's View Only mode, starts here
 		 */
+		
+		SessionMap sessionMap = new SessionMap();
+	    sessionMap.put(ACTIVITY_TITLE_KEY, voteContent.getTitle());
+	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, voteContent.getInstructions());
+	    	    
+	    voteMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
+		
+		List listNominationContentDTO= new  LinkedList();
+		
 		Map mapOptionsContent= new TreeMap(new VoteComparator());
 		logger.debug("setting existing content data from the db");
 		mapOptionsContent.clear();
@@ -276,16 +290,17 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		logger.debug("mapOptionsContent: " + mapOptionsContent);
 		while (queIterator.hasNext())
 		{
+		    VoteNominationContentDTO voteNominationContentDTO=new VoteNominationContentDTO();
+		    
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
 				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
 
-				if (mapIndex.longValue() == 1)
-	    		{
-	    		    voteGeneralMonitoringDTO.setDefaultOptionContent(voteQueContent.getQuestion()); 
-	    		}
+				voteNominationContentDTO.setQuestion(voteQueContent.getQuestion());
+				voteNominationContentDTO.setDisplayOrder(new Integer(voteQueContent.getDisplayOrder()).toString());
+				listNominationContentDTO.add(voteNominationContentDTO);
 	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
@@ -293,6 +308,13 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 		voteGeneralMonitoringDTO.setMapOptionsContent(mapOptionsContent);
 		/* ends here*/
+		
+		
+		logger.debug("listNominationContentDTO: " + listNominationContentDTO);
+		request.setAttribute(LIST_NOMINATION_CONTENT_DTO,listNominationContentDTO);
+		sessionMap.put(LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+		
+		request.setAttribute(TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 		
 		
 		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
@@ -306,12 +328,64 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		logger.debug("post refreshStatsData, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 		
 		logger.debug("refreshing instructions data...");
-		voteMonitoringAction.refreshInstructionsData(request, voteContent, voteService, voteGeneralMonitoringDTO);
+		//voteMonitoringAction.refreshInstructionsData(request, voteContent, voteService, voteGeneralMonitoringDTO);
 		    		
 	    logger.debug("end initializing  monitoring data...");
 	    voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(false).toString());
 
 	    logger.debug("post refreshes, voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
+	    
+	    
+    	EditActivityDTO editActivityDTO = new EditActivityDTO();
+		isContentInUse=VoteUtils.isContentInUse(voteContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		if (isContentInUse == true)
+		{
+		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+		}
+		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
+        voteMonitoringAction.prepareReflectionData(request, voteContent, voteService, null, false, "All");
+
+	    
+	    
+		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(voteService, voteContent);
+		logger.debug("notebookEntriesExist : " + notebookEntriesExist);
+		
+		if (notebookEntriesExist)
+		{
+		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    
+		    String userExceptionNoToolSessions=(String)voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+		    
+		    if (userExceptionNoToolSessions.equals("true"))
+		    {
+		        logger.debug("there are no online student activity but there are reflections : ");
+		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		    }
+
+		}
+		else
+		{
+		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
+		}
+	
+		
+		/**getting instructions screen content from here... */
+		voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
+		voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
+		
+        List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
+        logger.debug("attachmentList: " + attachmentList);
+        voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
+        voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
+        /** ...till here **/
+
+		
+		
+		MonitoringUtil.buildVoteStatsDTO(request,voteService, voteContent);
+
 		return true;
 	}
 
@@ -325,7 +399,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	        //persistInRequestError(request, "error.contentId.required");
 	    	VoteUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
@@ -339,7 +412,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 			}
 	    	catch(NumberFormatException e)
 			{
-	    	    persistInRequestError(request, "error.numberFormatException");
 	    		logger.debug("add error.numberFormatException to ActionMessages.");
 	    		VoteUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));

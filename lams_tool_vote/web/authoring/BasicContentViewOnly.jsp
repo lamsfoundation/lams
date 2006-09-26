@@ -19,58 +19,38 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<%@ include file="/common/taglibs.jsp"%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-	
-				<tr> <td>
-						<table>
+			<html:hidden property="questionIndex"/>
+			<table cellpadding="0">
 
-							<tr> 
-	 							<td> <b>  <bean:message key="label.authoring.title.col"/> </b> </td>
-						 		<td NOWRAP> 
-	                                     <c:out value="${voteGeneralAuthoringDTO.activityTitle}" escapeXml="false"/>
-								</td> 
-						  	</tr>
+						<tr>
+							<td colspan="2">
+								<div class="field-name" style="text-align: left;">
+									<fmt:message key="label.authoring.title.col"></fmt:message>
+								</div>
+						  			<c:out value="${voteGeneralAuthoringDTO.activityTitle}" escapeXml="false"/> 								
+							</td>
+						</tr>
 						
-							<tr> 
-	 							<td> <b>  <bean:message key="label.authoring.instructions.col"/> </b> </td>
-						 		<td NOWRAP> 
-	                                     <c:out value="${voteGeneralAuthoringDTO.activityInstructions}" escapeXml="false"/>
-								</td> 
-						  	</tr>
 
-					 		<tr> 
-							  	<td valign="top"> 
-							 		 <b> <bean:message key="label.nomination1"/>:  </b>
-							 	</td>
-							  	<td>
-										<c:out value="${voteGeneralAuthoringDTO.defaultOptionContent}"  escapeXml="false"/>
-							  	</td>
-						  	</tr>
+						<tr>
+							<td colspan="2">
+								<div class="field-name" style="text-align: left;">
+									<fmt:message key="label.authoring.instructions.col"></fmt:message>
+								</div>
+						  			<c:out value="${voteGeneralAuthoringDTO.activityInstructions}" escapeXml="false"/> 																	
+							</td>
+						</tr>
 	
-			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="optIndex" scope="request" value="1"/>
-						<c:forEach var="optionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
-					  		<c:if test="${optionEntry.key > 1}"> 			
-								<c:set var="optIndex" scope="request" value="${optIndex +1}"/>
-								  <tr>
-								  	<td NOWRAP valign="top">   <b> <c:out value="Nomination ${optIndex}"/>:  </b> </td>
+				 		<tr>
+						<td colspan="2">
+							<div id="resourceListArea">
+									<%@ include file="/authoring/itemlistViewOnly.jsp"%>									
+							</div>
+						</td>
+						</tr>
 
-									<td NOWRAP valign=top>
-										<c:out value="${optionEntry.value}"  escapeXml="false"/>										
-                                    </td>
-								  </tr>
-							</c:if> 			
-						</c:forEach>
-						<html:hidden property="optIndex"/>
-                        
-				
 						<tr>
 							<td colspan=2 align=right>			
 				   				<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="button">
@@ -78,10 +58,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</html:submit>	 				 		  					
 							</td>
 						</tr>
+			 </table>			
+				 
 
-						</table>
-				</td></tr>			
+
+				
+							
+							
+				
 
 
+
+
+
+
+		
 
 		

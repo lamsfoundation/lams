@@ -58,10 +58,12 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
@@ -100,10 +102,11 @@ public class VoteServicePOJO implements
 {
 	static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
 	
-	/*repository access related constants */
-	private final String repositoryUser 		= "vote11";
-	private final char[] repositoryId 			= {'v','o','t','e','_','1', '1'}; 
-	private final String repositoryWorkspace 	= "vote11";
+    private static String repositoryWorkspaceName = "vote11";
+    private final String repositoryUser 			= "vote11";
+    private final char[] repositoryId 				= {'v','o','t','e','_','1', '1'};
+
+	
 	private IRepositoryService repositoryService;
 	private ICredentials cred;
 	
@@ -133,7 +136,7 @@ public class VoteServicePOJO implements
 		  {
           	repositoryService.createCredentials(cred);
           	logger.debug("created credentails.");
-          	repositoryService.addWorkspace(cred,repositoryWorkspace);
+          	repositoryService.addWorkspace(cred,repositoryWorkspaceName);
           	logger.debug("created workspace.");
           } catch (ItemExistsException ie) {
               logger.warn("Tried to configure repository but it "
@@ -145,6 +148,7 @@ public class VoteServicePOJO implements
   			throw new VoteApplicationException(error,e);
           }
       }
+    
     
     
     public void createVote(VoteContent voteContent) throws VoteApplicationException
@@ -739,22 +743,7 @@ public class VoteServicePOJO implements
 														   e);
         }        
     }
-
     
-    
-    public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
-	{
-        try
-        {
-        	return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContent(queUsrId, voteQueContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is getting vote UsrAttempt by user id and que content id: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
     
     
     public List getUserRecords(final String userEntry) throws VoteApplicationException
@@ -1362,6 +1351,21 @@ public class VoteServicePOJO implements
     }
 
     
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
+	{
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContent(queUsrId, voteQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting vote voteUsrRespDAO by user id and que content id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+
+    
 	/**
 	 * checks the parameter content in the user responses table 
 	 * @param voteContent
@@ -1410,7 +1414,6 @@ public class VoteServicePOJO implements
 
 	public int countIncompleteSession(VoteContent vote) throws VoteApplicationException
 	{
-		//int countIncompleteSession=voteSessionDAO.countIncompleteSession(vote);
 		int countIncompleteSession=2;
 		return countIncompleteSession;
 	}
@@ -1426,7 +1429,7 @@ public class VoteServicePOJO implements
 	 */
 	public boolean studentActivityOccurred(VoteContent vote) throws VoteApplicationException
 	{
-		//int countStudentActivity=voteSessionDAO.studentActivityOccurred(vote);
+
 		int countStudentActivity=2;
 		
 		if (countStudentActivity > 0)
@@ -2060,12 +2063,13 @@ public class VoteServicePOJO implements
 		repositoryService = RepositoryProxy.getRepositoryService();
     	logger.debug("retrieved repositoryService : " + repositoryService);
 		
+		
 		ICredentials credentials = new SimpleCredentials(
 				repositoryUser,
 				repositoryId);
 		try {
 			ITicket ticket = repositoryService.login(credentials,
-					repositoryWorkspace);
+			        repositoryWorkspaceName);
 			logger.debug("retrieved ticket: " + ticket);
 			return ticket;
 		} catch (AccessDeniedException e) {
@@ -2078,6 +2082,7 @@ public class VoteServicePOJO implements
 			throw new VoteApplicationException("Login failed." + e.getMessage());
 		}
 	}
+	
 	
 	
 	/**
@@ -2103,6 +2108,8 @@ public class VoteServicePOJO implements
 							+ " the repository " + e.getMessage());
 		}
 	}
+	
+
 	
 	
 	/**
@@ -2153,93 +2160,7 @@ public class VoteServicePOJO implements
 	}
 	
 	
-	public void removeOffLineFile(String filename, Long voteContentId) throws VoteApplicationException
-	{
-	    try
-        {
-            voteUploadedFileDAO.removeOffLineFile(filename, voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is removing offline filename"
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-    
-    public void removeOnLineFile(String filename, Long voteContentId) throws VoteApplicationException
-	{
-	    try
-        {
-            voteUploadedFileDAO.removeOnLineFile(filename, voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is removing online filename"
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
 	
-	public boolean isOffLineFilePersisted(String filename) throws VoteApplicationException
-	{
-	    try
-        {
-            return voteUploadedFileDAO.isOffLineFilePersisted(filename);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is checking if offline filename is persisted: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-    
-    public boolean isOnLineFilePersisted(String filename) throws VoteApplicationException
-	{
-        try
-        {
-            return voteUploadedFileDAO.isOnLineFilePersisted(filename);
-        }
-        catch (DataAccessException e)
-        {
-        	throw new VoteApplicationException("Exception occured when lams is checking if online filename is persisted: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public String getFileUuid(String filename) throws VoteApplicationException
-	{
-	    try
-        {
-            return voteUploadedFileDAO.getFileUuid(filename);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading uuid by filename: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public List getOnlineFilesMetaData(Long voteContentId) throws VoteApplicationException
-	{
-		return voteUploadedFileDAO.getOnlineFilesMetaData(voteContentId);
-	}
-    
-	
-    public List getOfflineFilesMetaData(Long voteContentId) throws VoteApplicationException
-	{
-    	return voteUploadedFileDAO.getOfflineFilesMetaData(voteContentId);
-	}
-	
-	public boolean isUuidPersisted(String uuid) throws VoteApplicationException
-	{
-		return voteUploadedFileDAO.isUuidPersisted(uuid);
-	}
 	
 	/**
 	 * adds a new entry to the uploaded files table
@@ -2263,74 +2184,148 @@ public class VoteServicePOJO implements
 		logger.debug("files meta data has been cleaned up");
 	}
 	
-	
-	public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline) throws VoteApplicationException {
-        try
-        {
-            return voteUploadedFileDAO.retrieveVoteUploadedFiles(voteContentId, fileOnline);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-
-	public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId) throws VoteApplicationException {
-		try
-        {
-            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesUuid(voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: offline + uuids "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId) throws VoteApplicationException {
-		try
-        {
-            return voteUploadedFileDAO.retrieveVoteUploadedOnlineFilesUuid(voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: online + uuids "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public List retrieveVoteUploadedOfflineFilesName(Long voteContentId) throws VoteApplicationException {
-		try
-        {
-            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesName(voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: offline + fileNames "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
 
 	
-	public List retrieveVoteUploadedOnlineFilesName(Long voteContentId) throws VoteApplicationException {
-    	try
-        {
-            return voteUploadedFileDAO.retrieveVoteUploadedOnlineFilesName(voteContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: online + fileNames "
-                                                         + e.getMessage(),
-														   e);
-        }
+	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	
+
+    /**
+     * Import the data for a 1.0.2 Chat
+     */
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
+    {
+    	Date now = new Date();
+    	VoteContent toolContentObj = new VoteContent();
+    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	toolContentObj.setCreatedBy(user.getUserID().longValue());
+    	toolContentObj.setCreationDate(now);
+    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setOfflineInstructions(null);
+    	toolContentObj.setOnlineInstructions(null);
+    	toolContentObj.setReflectionSubject(null);
+    	toolContentObj.setReflect(Boolean.FALSE);
+    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+    	
+    	toolContentObj.setContent(null);
+    	toolContentObj.setUpdateDate(now);
+    	toolContentObj.setVoteContentId(toolContentId);
+    	toolContentObj.setVoteChangable(Boolean.FALSE);
+    	
+		try {
+			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);
+	    	toolContentObj.setAllowText(bool!=null?bool:false);
+
+	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_MB_REUSABLE);
+	    	toolContentObj.setLockOnFinish(bool!=null?bool:true);
+
+	    	Integer maxCount = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);
+	        toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
+	        
+		} catch (WDDXProcessorConversionException e) {
+	   		logger.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
+    		throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+ 		}
+		
+    	// leave as empty, no need to set them to anything.
+    	//setVoteUploadedFiles(Set voteAttachments);
+    	//setVoteSessions(Set voteSessions);
+    	
+    	// set up question from body 	
+    	Vector nominations = (Vector) importValues.get(CONTENT_VOTE_NOMINATIONS);
+    	if ( nominations != null ) {
+    		Iterator iter = nominations.iterator();
+    		int order = 1;
+    		while (iter.hasNext()) {
+				String element = (String) iter.next();
+				VoteQueContent nomination = new VoteQueContent(element,  toolContentObj, null);
+				nomination.setDisplayOrder(order++);
+				toolContentObj.getVoteQueContents().add(nomination);
+			}
+    	}
+    	
+    	voteContentDAO.saveVoteContent(toolContentObj);
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) 
+    		throws ToolException, DataMissingException {
+    	
+    	VoteContent toolContentObj = null;
+    	if ( toolContentId != null ) {
+    		toolContentObj=retrieveVote(toolContentId);
+    	}
+    	if ( toolContentObj == null ) {
+    		throw new DataMissingException("Unable to set reflective data titled "+title
+	       			+" on activity toolContentId "+toolContentId
+	       			+" as the tool content does not exist.");
+    	}
+    	
+    	toolContentObj.setReflect(Boolean.TRUE);
+    	toolContentObj.setReflectionSubject(description);
+    }
+    
+	public Long createNotebookEntry(Long id, Integer idType, String signature,
+			Integer userID, String entry) {
+	    logger.debug("coreNotebookService: " + coreNotebookService);
+		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
 	}
+	
+	
+	
+
+	public NotebookEntry getEntry(Long id, Integer idType, String signature,
+			Integer userID) {
+		
+		List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+	
+    public List getAllQuestionEntriesSorted(final long voteContentId) throws VoteApplicationException
+	{
+ 	   try
+       {
+           return voteQueContentDAO.getAllQuestionEntriesSorted(voteContentId);
+       }
+       catch (DataAccessException e)
+       {
+           throw new VoteApplicationException("Exception occured when lams is getting all question entries: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+	
+    public void removeFile(Long submissionId) throws VoteApplicationException {
+        voteUploadedFileDAO.removeUploadFile(submissionId);
+        logger.debug("removed voteUploadedFile: " + submissionId);
+    }
+
+    
+    public void persistFile(VoteContent content, VoteUploadedFile file) throws VoteApplicationException {
+    	logger.debug("in persistFile: " + file);
+        content.getVoteAttachments().add(file);
+        file.setVoteContent(content);
+        voteContentDAO.saveOrUpdateVote(content);
+        logger.debug("persisted voteUploadedFile: " + file);
+
+    }
+    
+    
+    public List retrieveVoteUploadedFiles(VoteContent Vote) throws VoteApplicationException {
+        try {
+            return voteUploadedFileDAO.retrieveVoteUploadedFiles(Vote);
+        }
+        catch (DataAccessException e) {
+            throw new VoteApplicationException("Exception occured when lams is loading Vote uploaded files: "
+                                                       + e.getMessage(),
+                                                         e);
+        }
+    }
 	
 	
 	
@@ -2365,12 +2360,6 @@ public class VoteServicePOJO implements
 	 */
 	public String getRepositoryUser() {
 		return repositoryUser;
-	}
-	/**
-	 * @return Returns the repositoryWorkspace.
-	 */
-	public String getRepositoryWorkspace() {
-		return repositoryWorkspace;
 	}
 
 	/**
@@ -2623,107 +2612,4 @@ public class VoteServicePOJO implements
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
         this.coreNotebookService = coreNotebookService;
     }
-
-	
-	/* ===============Methods implemented from ToolContentImport102Manager =============== */
-	
-
-    /**
-     * Import the data for a 1.0.2 Chat
-     */
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
-    {
-    	Date now = new Date();
-    	VoteContent toolContentObj = new VoteContent();
-    	toolContentObj.setContentInUse(Boolean.FALSE);
-    	toolContentObj.setCreatedBy(user.getUserID().longValue());
-    	toolContentObj.setCreationDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE);
-    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
-    	toolContentObj.setOfflineInstructions(null);
-    	toolContentObj.setOnlineInstructions(null);
-    	toolContentObj.setReflectionSubject(null);
-    	toolContentObj.setReflect(Boolean.FALSE);
-    	toolContentObj.setRunOffline(Boolean.FALSE);
-    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-    	
-    	toolContentObj.setContent(null);
-    	toolContentObj.setUpdateDate(now);
-    	toolContentObj.setVoteContentId(toolContentId);
-    	toolContentObj.setVoteChangable(Boolean.FALSE);
-    	
-		try {
-			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);
-	    	toolContentObj.setAllowText(bool!=null?bool:false);
-
-	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_MB_REUSABLE);
-	    	toolContentObj.setLockOnFinish(bool!=null?bool:true);
-
-	    	Integer maxCount = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);
-	        toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
-	        
-		} catch (WDDXProcessorConversionException e) {
-	   		logger.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
-    		throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
- 		}
-		
-    	// leave as empty, no need to set them to anything.
-    	//setVoteUploadedFiles(Set voteAttachments);
-    	//setVoteSessions(Set voteSessions);
-    	
-    	// set up question from body 	
-    	Vector nominations = (Vector) importValues.get(CONTENT_VOTE_NOMINATIONS);
-    	if ( nominations != null ) {
-    		Iterator iter = nominations.iterator();
-    		int order = 1;
-    		while (iter.hasNext()) {
-				String element = (String) iter.next();
-				VoteQueContent nomination = new VoteQueContent(element,  toolContentObj, null);
-				nomination.setDisplayOrder(order++);
-				toolContentObj.getVoteQueContents().add(nomination);
-			}
-    	}
-    	
-    	voteContentDAO.saveVoteContent(toolContentObj);
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) 
-    		throws ToolException, DataMissingException {
-    	
-    	VoteContent toolContentObj = null;
-    	if ( toolContentId != null ) {
-    		toolContentObj=retrieveVote(toolContentId);
-    	}
-    	if ( toolContentObj == null ) {
-    		throw new DataMissingException("Unable to set reflective data titled "+title
-	       			+" on activity toolContentId "+toolContentId
-	       			+" as the tool content does not exist.");
-    	}
-    	
-    	toolContentObj.setReflect(Boolean.TRUE);
-    	toolContentObj.setReflectionSubject(description);
-    }
-    
-	public Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry) {
-	    logger.debug("coreNotebookService: " + coreNotebookService);
-		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-	}
-	
-	
-	
-
-	public NotebookEntry getEntry(Long id, Integer idType, String signature,
-			Integer userID) {
-		
-		List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-		if (list == null || list.isEmpty()) {
-			return null;
-		} else {
-			return list.get(0);
-		}
-	}
-	
-
 }

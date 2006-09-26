@@ -53,6 +53,14 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 		return (VoteContent) this.getHibernateTemplate().get(VoteContent.class, uid);
 	}
 	
+ 	public void saveOrUpdateVote(VoteContent vote)
+    {
+ 		this.getSession().setFlushMode(FlushMode.AUTO);
+		logger.debug("before saveOrUpdateVote: " + vote);
+		this.getHibernateTemplate().saveOrUpdate(vote);
+    }
+
+	
 	public VoteContent findVoteContentById(Long voteContentId)
 	{
 		String query = "from VoteContent as vote where vote.voteContentId = ?";

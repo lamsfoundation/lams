@@ -33,7 +33,10 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
+import org.lamsfoundation.lams.tool.vote.VoteAllGroupsDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAllSessionsDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -41,6 +44,7 @@ import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
+import org.lamsfoundation.lams.tool.vote.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.VoteStringComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
@@ -1237,5 +1241,532 @@ public class MonitoringUtil implements VoteAppConstants{
 		}
 		logger.debug("ending prepareChartDataForExportTeacher, exportPortfolioDTO: " + exportPortfolioDTO);
 	}	
+
+	public static boolean notebookEntriesExist(IVoteService voteService, VoteContent voteContent)
+	{
+		logger.debug("finding out about content level notebook entries: " + voteContent);
+		Iterator iteratorSession= voteContent.getVoteSessions().iterator();
+		while (iteratorSession.hasNext())
+		{
+		    VoteSession voteSession=(VoteSession) iteratorSession.next();
+		    logger.debug("voteSession: " + voteSession);
+		    
+		    if (voteSession != null)
+		    {
+			    logger.debug("voteSession id: " + voteSession.getVoteSessionId());
+			    
+			    Iterator iteratorUser=voteSession.getVoteQueUsers().iterator();
+			    while (iteratorUser.hasNext())
+				{
+			        VoteQueUsr voteQueUsr=(VoteQueUsr) iteratorUser.next();
+			        logger.debug("voteQueUsr: " + voteQueUsr);
+			        
+			        if (voteQueUsr != null)
+			        {
+				        logger.debug("voteQueUsr id: " + voteQueUsr.getQueUsrId());
+				        
+						logger.debug("attempt getting notebookEntry: ");
+						NotebookEntry notebookEntry = voteService.getEntry(voteSession.getVoteSessionId(),
+								CoreNotebookConstants.NOTEBOOK_TOOL,
+								MY_SIGNATURE, new Integer(voteQueUsr.getQueUsrId().intValue()));
+						
+				        logger.debug("notebookEntry: " + notebookEntry);			 
+						if (notebookEntry != null)
+						{
+						    logger.debug("found at least one notebookEntry: " + notebookEntry.getEntry());
+						    return true;
+						}
+						    
+			        }
+				}		        
+		    }
+		}
+		return false;
+	}
+	
+	
+	public static void buildVoteStatsDTO(HttpServletRequest request, IVoteService voteService, VoteContent voteContent)
+	{
+		logger.debug("building voteStatsDTO: " + voteContent);
+		VoteStatsDTO voteStatsDTO= new VoteStatsDTO();
+		
+		int countSessionComplete=0;
+		int countAllUsers=0;
+		logger.debug("finding out about content level notebook entries: " + voteContent);
+		Iterator iteratorSession= voteContent.getVoteSessions().iterator();
+		while (iteratorSession.hasNext())
+		{
+		    VoteSession voteSession=(VoteSession) iteratorSession.next();
+		    logger.debug("voteSession: " + voteSession);
+		    
+		    if (voteSession != null)
+		    {
+			    logger.debug("voteSession id: " + voteSession.getVoteSessionId());
+			    
+			    if (voteSession.getSessionStatus().equals(COMPLETED))
+			    {
+			        ++countSessionComplete;
+			    }
+			        
+			    Iterator iteratorUser=voteSession.getVoteQueUsers().iterator();
+			    while (iteratorUser.hasNext())
+				{
+			        VoteQueUsr voteQueUsr=(VoteQueUsr) iteratorUser.next();
+			        logger.debug("voteQueUsr: " + voteQueUsr);
+			        
+			        if (voteQueUsr != null)
+			        {
+				        logger.debug("voteQueUsr foundid");
+				        ++countAllUsers;
+			        }
+				}		        
+		    }
+		}
+		logger.debug("countAllUsers: " + countAllUsers);
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		
+		
+		voteStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
+		voteStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
+		
+		logger.debug("voteStatsDTO: " + voteStatsDTO);
+
+		request.setAttribute(VOTE_STATS_DTO, voteStatsDTO);
+	}
+	
+	public static void generateGroupsSessionData(HttpServletRequest request, IVoteService voteService, VoteContent voteContent)
+	{
+	    logger.debug("generateGroupsSessionData: " + voteContent);
+	    
+	    List listAllGroupsDTO=buildGroupBasedSessionData(request, voteContent, voteService);
+		logger.debug("listAllGroupsDTO: " + listAllGroupsDTO);
+		
+	    request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
+	}
+
+	
+	
+	public static List buildGroupBasedSessionData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService)
+	{
+		logger.debug("buildGroupBasedSessionData" + voteContent);
+		logger.debug("will be building groups question data  for content:..." + voteContent);
+    	List listQuestions=voteService.getAllQuestionEntries(voteContent.getUid());
+    	logger.debug("listQuestions:..." + listQuestions);
+    	
+    	List listAllGroupsContainerDTO= new LinkedList();
+    	
+    	
+		Iterator iteratorSession= voteContent.getVoteSessions().iterator();
+		while (iteratorSession.hasNext())
+		{
+		    VoteSession voteSession=(VoteSession) iteratorSession.next();
+		    logger.debug("iteration for group based session data: " + voteSession);
+		    String currentSessionId=voteSession.getVoteSessionId().toString();
+		    logger.debug("currentSessionId: " + currentSessionId);
+		    
+		    String currentSessionName=voteSession.getSession_name();
+		    logger.debug("currentSessionName: " + currentSessionName);
+		    
+		    VoteAllGroupsDTO voteAllGroupsDTO= new VoteAllGroupsDTO();
+		    List listMonitoredAnswersContainerDTO= new LinkedList();
+		    
+		    if (voteSession != null)
+		    {
+				Iterator itListQuestions = listQuestions.iterator();
+			    while (itListQuestions.hasNext())
+			    {
+			    	VoteQueContent voteQueContent =(VoteQueContent)itListQuestions.next();
+			    	logger.debug("voteQueContent:..." + voteQueContent);
+			    	
+			    	if (voteQueContent != null)
+			    	{
+					    logger.debug("populating VoteMonitoredAnswersDTO for : " + voteQueContent);
+			    		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO= new VoteMonitoredAnswersDTO();
+			    		voteMonitoredAnswersDTO.setQuestionUid(voteQueContent.getUid().toString());
+			    		voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
+			    		voteMonitoredAnswersDTO.setSessionId(currentSessionId);
+			    		voteMonitoredAnswersDTO.setSessionName(currentSessionName);
+			    		
+			    		Map questionAttemptData= buildGroupsAttemptData(request, voteContent, voteService, voteQueContent, voteQueContent.getUid().toString(), 
+								true,false, currentSessionId, null);
+			    		logger.debug("generated  questionAttemptData: " + questionAttemptData);
+						voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+						
+						logger.debug("adding voteMonitoredAnswersDTO to the listMonitoredAnswersContainerDTO: " + voteMonitoredAnswersDTO);
+						listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
+			    	}
+			    }
+		    }
+		    logger.debug("listMonitoredAnswersContainerDTO:" + listMonitoredAnswersContainerDTO);
+		    
+		    logger.debug("adding listMonitoredAnswersContainerDTO to the voteAllGroupsDTO:" + listMonitoredAnswersContainerDTO);
+		    voteAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
+		    voteAllGroupsDTO.setSessionName(currentSessionName);
+		    voteAllGroupsDTO.setSessionId(currentSessionId);
+		    
+		    logger.debug("built voteAllGroupsDTO:" + voteAllGroupsDTO);
+		    listAllGroupsContainerDTO.add(voteAllGroupsDTO);
+		    
+		}
+    	
+    	
+		logger.debug("final listAllGroupsContainerDTO:..." + listAllGroupsContainerDTO);
+		return listAllGroupsContainerDTO;
+	}	
+	
+	
+	public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, VoteQueContent voteQueContent, String questionUid, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+	{
+	    logger.debug("doing buildGroupsAttemptData...");
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
+		logger.debug("currentSessionId: " + currentSessionId);
+		logger.debug("userId: " + userId);
+		
+		
+    	logger.debug("voteService: " + voteService);
+
+    	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new VoteStringComparator());
+    	List listMonitoredAttemptsContainerDTO= new LinkedList();
+    	
+    	Map summaryToolSessions=populateToolSessionsId(request, voteContent, voteService);
+    	logger.debug("summaryToolSessions: " + summaryToolSessions);
+    	
+    	Iterator itMap = summaryToolSessions.entrySet().iterator();
+    	
+    	
+    	/*request is for monitoring summary */
+    	if (!isLearnerRequest)
+    	{
+
+    	    if (currentSessionId != null)
+    	    {
+                if (currentSessionId.equals("All"))
+                {
+                    logger.debug("**summary request is for All**:");
+                	while (itMap.hasNext()) 
+                	{
+                    	Map.Entry pairs = (Map.Entry)itMap.next();
+                        logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                        
+                        if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
+                        {
+                        	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
+                        	VoteSession voteSession= voteService.retrieveVoteSession(new Long(pairs.getValue().toString()));
+                        	logger.debug("voteSession: " +  " = " + voteSession);
+                        	if (voteSession != null)
+                        	{
+                        		List listUsers=voteService.getUserBySessionOnly(voteSession);	
+                        		logger.debug("listMcUsers for session id:"  + voteSession.getVoteSessionId() +  " = " + listUsers);
+                        		Map sessionUsersAttempts=populateSessionUsersAttempts(request, voteService, voteSession.getVoteSessionId(), listUsers, questionUid, 
+                        				isUserNamesVisible, isLearnerRequest, userId);
+                        		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                        	}
+                        }
+            		}
+                }
+                else if (!currentSessionId.equals("All"))
+                {
+                    logger.debug("**summary request is for currentSessionId**:"  + currentSessionId);
+                	VoteSession voteSession= voteService.retrieveVoteSession(new Long(currentSessionId.toString()));
+                	logger.debug("voteSession: " +  " = " + voteSession);
+                    
+                    List listUsers=voteService.getUserBySessionOnly(voteSession);
+                    logger.debug("listUsers: " +  " = " + listUsers);
+                    
+            		Map sessionUsersAttempts=populateSessionUsersAttempts(request, voteService, new Long(currentSessionId), listUsers, questionUid, 
+            				isUserNamesVisible, isLearnerRequest, userId);
+            		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                }
+    	    }
+    	}
+    	else
+    	{
+    		/*request is for learner report, use only the passed tool session in the report*/
+    		logger.debug("using currentSessionId for the learner report:"  + currentSessionId);
+        	while (itMap.hasNext()) 
+        	{
+            	Map.Entry pairs = (Map.Entry)itMap.next();
+                logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                
+                if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
+                {
+                	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
+                	
+                	if (currentSessionId.equals(pairs.getValue()))
+                	{
+                		logger.debug("only using this tool session for the learner report: " +  " = " + pairs.getValue());
+                		VoteSession voteSession= voteService.retrieveVoteSession(new Long(pairs.getValue().toString()));
+                    	logger.debug("voteSession: " +  " = " + voteSession);
+                    	if (voteSession != null)
+                    	{
+                    		List listUsers=voteService.getUserBySessionOnly(voteSession);	
+                    		logger.debug("listVoteUsers for session id:"  + voteSession.getVoteSessionId() +  " = " + listUsers);
+                    		Map sessionUsersAttempts=populateSessionUsersAttempts(request, voteService, voteSession.getVoteSessionId(), listUsers, questionUid, 
+                    				isUserNamesVisible, isLearnerRequest, userId);
+                    		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                    	}
+                	}
+                }
+    		}
+    	}
+
+    	logger.debug("final listMonitoredAttemptsContainerDTO:..." + listMonitoredAttemptsContainerDTO);
+    	mapMonitoredAttemptsContainerDTO=convertToMap(listMonitoredAttemptsContainerDTO);
+    	logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
+		return mapMonitoredAttemptsContainerDTO;
+	}
+	
+
+	
+	public static Map populateSessionUsersAttempts(HttpServletRequest request,IVoteService voteService, Long sessionId, 
+	        List listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String userId)
+	{
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
+		logger.debug("userId: " + userId);
+		
+		logger.debug("doing populateSessionUsersAttempts...");
+    	logger.debug("voteService: " + voteService);
+		
+		Map mapMonitoredUserContainerDTO= new TreeMap(new VoteStringComparator());
+		List listMonitoredUserContainerDTO= new LinkedList();
+		Iterator itUsers=listUsers.iterator();
+		
+		
+		if (userId == null)
+		{
+			logger.debug("request is not for learner progress report");
+			if ((isUserNamesVisible) && (!isLearnerRequest))
+			{
+				logger.debug("isUserNamesVisible true, isLearnerRequest false" );
+				logger.debug("getting alll the user' data");
+				while (itUsers.hasNext())
+				{
+		    		VoteQueUsr voteQueUsr=(VoteQueUsr)itUsers.next();
+		    		logger.debug("voteQueUsr: " + voteQueUsr);
+		    		
+		    		if (voteQueUsr != null)
+		    		{
+		    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
+		    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+		    			logger.debug("listUserAttempts: " + listUserAttempts);
+	
+		    			Iterator itAttempts=listUserAttempts.iterator();
+		    			while (itAttempts.hasNext())
+		    			{
+		    			    VoteUsrAttempt voteUsrResp=(VoteUsrAttempt)itAttempts.next();
+		    	    		logger.debug("voteUsrResp: " + voteUsrResp);
+		    	    		
+		    	    		if (voteUsrResp != null)
+		    	    		{
+		    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+		    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());		    	    			
+		    	    			//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+		    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
+		    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
+		    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
+		    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
+		    	    			voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+		    	    			
+		    	    			String responsePresentable=VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
+		    	    			logger.debug("responsePresentable: " + responsePresentable);
+		    	    			voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
+		    	    			
+		    	    			voteMonitoredUserDTO.setQuestionUid(questionUid);
+		    	    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrResp.isVisible()).toString());
+		    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+		    	    		}
+		    			}
+		    		}
+				}
+			}
+			else if ((isUserNamesVisible) && (isLearnerRequest))
+			{
+				logger.debug("just populating data normally just like monitoring summary, except that the data is ony for a specific session" );
+				logger.debug("isUserNamesVisible true, isLearnerRequest true" );
+
+			    String userID = VoteUtils.getCurrentLearnerID();				
+				logger.debug("userID: " + userID);
+				VoteQueUsr voteQueUsr=voteService.getVoteQueUsrById(new Long(userID).longValue());
+				logger.debug("the current user voteQueUsr " + voteQueUsr + " and username: "  + voteQueUsr.getUsername());
+							
+					while (itUsers.hasNext())
+					{
+			    		voteQueUsr=(VoteQueUsr)itUsers.next();
+			    		logger.debug("voteQueUsr: " + voteQueUsr);
+			    		
+			    		if (voteQueUsr != null)
+			    		{
+			    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
+			    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+			    			logger.debug("listUserAttempts: " + listUserAttempts);
+		
+			    			Iterator itAttempts=listUserAttempts.iterator();
+			    			while (itAttempts.hasNext())
+			    			{
+			    			    VoteUsrAttempt voteUsrResp=(VoteUsrAttempt)itAttempts.next();
+			    	    		logger.debug("voteUsrResp: " + voteUsrResp);
+			    	    		
+			    	    		if (voteUsrResp != null)
+			    	    		{
+			    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());			    	    			
+			    	    			//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+			    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
+			    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
+			    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
+			    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
+			    	    			voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+			    	    			
+			    	    			String responsePresentable=VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
+			    	    			logger.debug("responsePresentable: " + responsePresentable);
+			    	    			voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
+			    	    			
+			    	    			voteMonitoredUserDTO.setQuestionUid(questionUid);
+			    	    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrResp.isVisible()).toString());
+			    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+			    	    		}
+			    			}
+			    		}
+					}
+				}
+				else if ((!isUserNamesVisible) && (isLearnerRequest))
+				{
+					logger.debug("populating data normally exception are for a specific session and other user names are not visible.");				
+					logger.debug("isUserNamesVisible false, isLearnerRequest true" );
+					logger.debug("getting only current user's data" );
+
+					String userID = VoteUtils.getCurrentLearnerID();
+					logger.debug("userID: " + userID);
+								
+						while (itUsers.hasNext())
+						{
+							VoteQueUsr voteQueUsr=(VoteQueUsr)itUsers.next();
+				    		logger.debug("voteQueUsr: " + voteQueUsr);
+				    		
+				    		if (voteQueUsr != null)
+				    		{
+				    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
+				    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+				    			logger.debug("listUserAttempts: " + listUserAttempts);
+		
+				    			Iterator itAttempts=listUserAttempts.iterator();
+				    			while (itAttempts.hasNext())
+				    			{
+				    			    VoteUsrAttempt voteUsrResp=(VoteUsrAttempt)itAttempts.next();
+				    	    		logger.debug("voteUsrResp: " + voteUsrResp);
+				    	    		
+				    	    		if (voteUsrResp != null)
+				    	    		{
+				    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+				    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
+				    	    			//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+				    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
+				    	    			
+				    	    			logger.debug("userID versus queUsrId: " + userID + "-" + voteQueUsr.getQueUsrId());
+				    	    			if (userID.equals(voteQueUsr.getQueUsrId().toString()))
+										{
+				    	    				logger.debug("this is current user, put his name normally.");
+				    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());	
+										}
+				    	    			else
+				    	    			{
+				    	    				logger.debug("this is  not current user, put his name as blank.");
+				    	    				voteMonitoredUserDTO.setUserName("        ");
+				    	    			}
+				    	    			
+				    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
+				    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
+				    	    			voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+				    	    			
+				    	    			String responsePresentable=VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
+				    	    			logger.debug("responsePresentable: " + responsePresentable);
+				    	    			voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
+
+				    	    			voteMonitoredUserDTO.setQuestionUid(questionUid);
+				    	    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrResp.isVisible()).toString());
+				    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+				    	    		}
+				    			}
+				    		}
+						}
+				}
+		}
+		else
+		{
+				logger.debug("request is for learner progress report: " + userId);
+				while (itUsers.hasNext())
+				{
+					VoteQueUsr voteQueUsr=(VoteQueUsr)itUsers.next();
+		    		logger.debug("voteQueUsr: " + voteQueUsr);
+		    		
+		    		if (voteQueUsr != null)
+		    		{
+		    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
+		    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+		    			logger.debug("listUserAttempts: " + listUserAttempts);
+
+		    			Iterator itAttempts=listUserAttempts.iterator();
+		    			while (itAttempts.hasNext())
+		    			{
+		    			    VoteUsrAttempt voteUsrResp=(VoteUsrAttempt)itAttempts.next();
+		    	    		logger.debug("voteUsrResp: " + voteUsrResp);
+		    	    		
+		    	    		if (voteUsrResp != null)
+		    	    		{
+	    	    				logger.debug("userID versus queUsrId: " + userId + "-" + voteQueUsr.getQueUsrId());
+		    	    			if (userId.equals(voteQueUsr.getQueUsrId().toString()))
+		    	    			{
+		    	    				logger.debug("this is the user requested , include his name for learner progress.");
+			    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
+			    	    			//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+			    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
+		    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());	
+			    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
+			    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
+			    	    			voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+			    	    			
+			    	    			String responsePresentable=VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
+			    	    			logger.debug("responsePresentable: " + responsePresentable);
+			    	    			voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
+			    	    			
+			    	    			voteMonitoredUserDTO.setQuestionUid(questionUid);
+			    	    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrResp.isVisible()).toString());
+			    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+		    	    			}
+		    	    		}
+		    			}
+		    		}
+				}	
+			
+		}
+		
+		
+		logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
+		mapMonitoredUserContainerDTO=convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+		logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
+		return mapMonitoredUserContainerDTO;
+	}
+
+	
+	public static Map convertToMcMonitoredUserDTOMap(List list)
+	{
+		logger.debug("using convertToVoteMonitoredUserDTOMap: " + list);
+		Map map= new TreeMap(new VoteStringComparator());
+		
+		Iterator listIterator=list.iterator();
+    	Long mapIndex=new Long(1);
+    	
+    	while (listIterator.hasNext())
+    	{
+    		VoteMonitoredUserDTO data=(VoteMonitoredUserDTO)listIterator.next();
+   			map.put(mapIndex.toString(), data);
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return map;
+	}
 	
 }

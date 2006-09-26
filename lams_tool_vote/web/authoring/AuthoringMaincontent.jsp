@@ -45,10 +45,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title> <bean:message key="activity.title"/>  </title>
 
 	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 
 
 	<script type="text/javascript">
+	
+	   	var imgRoot="${lams}images/";
+	    var themeName="aqua";
 	
         function init(){
 			if (document.VoteAuthoringForm.activeModule.value != 'defineLater')
@@ -61,8 +65,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	            else
 	                selectTab(1); //select the default tab;
 	            
-	            initEditor("richTextOfflineInstructions");                                    
-		        initEditor("richTextOnlineInstructions");                                    
 			}
 			else
 			{
@@ -74,16 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	            else
 	                selectTab(1); //select the default tab;
 			}
-			
-	            initEditor("title");
-	            initEditor("instructions");
-	            
-	            initEditor("optionContent0");
-	            <c:set var="optIndex" scope="request" value="1"/>
-	            <c:forEach var="questionEntry" items="${voteGeneralAuthoringDTO.mapOptionsContent}">
-	                <c:set var="optIndex" scope="request" value="${optIndex +1}"/>
-	                initEditor("<c:out value="optionContent${optIndex-1}"/>");
-	            </c:forEach>			
+
         }     
         
         function doSelectTab(tabId) {
@@ -103,6 +96,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
+		
+
+		function submitModifyAuthoringNomination(questionIndexValue, actionMethod) 
+		{
+			document.VoteAuthoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
 		
 		function submitMethod(actionMethod) 
 		{
@@ -150,6 +151,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="httpSessionID"/>								
 		<html:hidden property="defaultContentIdStr"/>								
 		<html:hidden property="defineLaterInEditMode"/>										
+		<html:hidden property="contentFolderID"/>												
+		
+		<%@ include file="/common/messages.jsp"%>
 		
 		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->
@@ -179,7 +183,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 
 	<div id="footer"></div>
-		<lams:HTMLEditor />
+
+
 	</div>
 
 

@@ -110,6 +110,20 @@
 	        path="/learning/Preview.jsp"
 		    redirect="false"
 	     />
+	     
+	    <forward
+			name="newNominationBox"
+			path="/authoring/newNominationBox.jsp"
+			redirect="false"
+	    />
+
+	    <forward
+			name="editNominationBox"
+			path="/authoring/editNominationBox.jsp"
+			redirect="false"
+	    />
+
+	     
 	  	
 	  	<forward
 		    name="errorList"
@@ -348,7 +362,7 @@
    			name="VoteMonitoringForm" 
 	      	scope="request"
    			input="/monitoring/MonitoringMaincontent.jsp"
-      		parameter="method"
+      		parameter="dispatch"
       		unknown="false"
       		validate="false"> 
 	      
@@ -381,6 +395,20 @@
           path="/monitoring/LearnerNotebook.jsp"
           redirect="false"
         />
+
+
+	    <forward
+			name="newNominationBox"
+			path="/monitoring/newNominationBox.jsp"
+			redirect="false"
+	    />
+
+	    <forward
+			name="editNominationBox"
+			path="/monitoring/editNominationBox.jsp"
+			redirect="false"
+	    />
+
 
 	  	<forward
 		    name="errorList"

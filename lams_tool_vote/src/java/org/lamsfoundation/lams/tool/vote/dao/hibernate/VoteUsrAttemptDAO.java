@@ -443,8 +443,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    }
 		
 		
-		
-		public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
+	    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
@@ -452,15 +451,10 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			.setLong("voteQueContentId", voteQueContentId.longValue())
 			.list();
 	        
-	        if(list != null && list.size() > 0){
-			    VoteUsrAttempt voteA = (VoteUsrAttempt) list.get(0);
-				return voteA;
-			}
-	        
-			return null;
+			return list;
 	    }
 
-
+		
 		public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long voteSessionId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();

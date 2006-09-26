@@ -142,7 +142,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
     	logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
     	request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
     	
-    	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
+    	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
 
     	logger.debug("ending learner mode: ");
     }
@@ -189,7 +189,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
         request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
         
-        voteMonitoringAction.prepareReflectionData(request, content, voteService, null,true);
+        voteMonitoringAction.prepareReflectionData(request, content, voteService, null, true, "All");
         logger.debug("ending teacher mode: ");
     }
     

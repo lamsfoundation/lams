@@ -270,4 +270,76 @@ http://www.gnu.org/licenses/gpl.txt
 		   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 		</taglib>
 	</jsp-config>
+	
+
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>MONITOR</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
+		    <url-pattern>/authoring.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
+		    <url-pattern>/monitoring.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>MONITOR</role-name>
+    		<role-name>TEACHER</role-name>
+    	</auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Adminstrator Content</web-resource-name>
+		    <url-pattern>/admin.do</url-pattern> 
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>ADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
+		    <url-pattern>/sysadmin.do</url-pattern> 
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+	<!--  some combine role security setting -->
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
+		    <url-pattern>/download/</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>MONITOR</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+	
+	
 </web-app>

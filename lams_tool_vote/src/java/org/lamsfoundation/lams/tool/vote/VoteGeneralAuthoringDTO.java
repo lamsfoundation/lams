@@ -75,6 +75,22 @@ public class VoteGeneralAuthoringDTO implements Comparable
 	protected String validationError;
 	protected String userExceptionOptionsDuplicate;
 	protected String httpSessionID;
+
+	protected String contentFolderID;
+    protected String editableQuestionText;
+    protected String editableQuestionFeedback;
+    
+    protected List attachmentList;
+    protected List deletedAttachmentList;
+    protected String reflect;
+    protected String reflectionSubject;
+    
+    protected Map mapNominationContent;
+    protected String editableNominationText;
+    protected String editableNominationFeedback;
+    protected String isToolSessionChanged;
+    protected String responseId;
+    protected String currentUid;
 	
     
     /**
@@ -514,13 +530,18 @@ public class VoteGeneralAuthoringDTO implements Comparable
 	public String toString() {
         return new ToStringBuilder(this)
             .append("activeModule: ", activeModule)
+            .append("contentFolderID: ", contentFolderID)
+            .append("editableQuestionText: ", editableQuestionText)            
             .append("defineLaterInEditMode: ", defineLaterInEditMode)
+            .append("reflectionSubject: ", reflectionSubject)            
             .append("submissionAttempt: ", submissionAttempt)
+            .append("mapNominationContent: ", mapNominationContent)            
             .append("sbmtSuccess: ", sbmtSuccess)
             .append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
             .append("toolContentID: ", toolContentID)
             .append("defaultContentId: ", defaultContentId)
-            .append("defaultContentIdStr: ", defaultContentIdStr)            
+            .append("defaultContentIdStr: ", defaultContentIdStr)
+            .append("reflect: ", reflect)            
             .append("isDefineLater: ", isDefineLater)
             .append("allowText: ", allowText)
             .append("voteChangable: ", voteChangable)
@@ -548,5 +569,163 @@ public class VoteGeneralAuthoringDTO implements Comparable
 			.append("httpSessionID: ", httpSessionID)
 			.append("editActivityEditMode: ", editActivityEditMode)
             .toString();
+    }
+	
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+    /**
+     * @return Returns the editableQuestionFeedback.
+     */
+    public String getEditableQuestionFeedback() {
+        return editableQuestionFeedback;
+    }
+    /**
+     * @param editableQuestionFeedback The editableQuestionFeedback to set.
+     */
+    public void setEditableQuestionFeedback(String editableQuestionFeedback) {
+        this.editableQuestionFeedback = editableQuestionFeedback;
+    }
+    /**
+     * @return Returns the editableQuestionText.
+     */
+    public String getEditableQuestionText() {
+        return editableQuestionText;
+    }
+    /**
+     * @param editableQuestionText The editableQuestionText to set.
+     */
+    public void setEditableQuestionText(String editableQuestionText) {
+        this.editableQuestionText = editableQuestionText;
+    }
+    
+    /**
+     * @return Returns the attachmentList.
+     */
+    public List getAttachmentList() {
+        return attachmentList;
+    }
+    /**
+     * @param attachmentList The attachmentList to set.
+     */
+    public void setAttachmentList(List attachmentList) {
+        this.attachmentList = attachmentList;
+    }
+    /**
+     * @return Returns the deletedAttachmentList.
+     */
+    public List getDeletedAttachmentList() {
+        return deletedAttachmentList;
+    }
+    /**
+     * @param deletedAttachmentList The deletedAttachmentList to set.
+     */
+    public void setDeletedAttachmentList(List deletedAttachmentList) {
+        this.deletedAttachmentList = deletedAttachmentList;
+    }
+    /**
+     * @return Returns the reflect.
+     */
+    public String getReflect() {
+        return reflect;
+    }
+    /**
+     * @param reflect The reflect to set.
+     */
+    public void setReflect(String reflect) {
+        this.reflect = reflect;
+    }
+    /**
+     * @return Returns the reflectionSubject.
+     */
+    public String getReflectionSubject() {
+        return reflectionSubject;
+    }
+    /**
+     * @param reflectionSubject The reflectionSubject to set.
+     */
+    public void setReflectionSubject(String reflectionSubject) {
+        this.reflectionSubject = reflectionSubject;
+    }
+    /**
+     * @return Returns the editableNominationFeedback.
+     */
+    public String getEditableNominationFeedback() {
+        return editableNominationFeedback;
+    }
+    /**
+     * @param editableNominationFeedback The editableNominationFeedback to set.
+     */
+    public void setEditableNominationFeedback(String editableNominationFeedback) {
+        this.editableNominationFeedback = editableNominationFeedback;
+    }
+    /**
+     * @return Returns the editableNominationText.
+     */
+    public String getEditableNominationText() {
+        return editableNominationText;
+    }
+    /**
+     * @param editableNominationText The editableNominationText to set.
+     */
+    public void setEditableNominationText(String editableNominationText) {
+        this.editableNominationText = editableNominationText;
+    }
+    /**
+     * @return Returns the mapNominationContent.
+     */
+    public Map getMapNominationContent() {
+        return mapNominationContent;
+    }
+    /**
+     * @param mapNominationContent The mapNominationContent to set.
+     */
+    public void setMapNominationContent(Map mapNominationContent) {
+        this.mapNominationContent = mapNominationContent;
+    }
+    /**
+     * @return Returns the isToolSessionChanged.
+     */
+    public String getIsToolSessionChanged() {
+        return isToolSessionChanged;
+    }
+    /**
+     * @param isToolSessionChanged The isToolSessionChanged to set.
+     */
+    public void setIsToolSessionChanged(String isToolSessionChanged) {
+        this.isToolSessionChanged = isToolSessionChanged;
+    }
+    /**
+     * @return Returns the currentUid.
+     */
+    public String getCurrentUid() {
+        return currentUid;
+    }
+    /**
+     * @param currentUid The currentUid to set.
+     */
+    public void setCurrentUid(String currentUid) {
+        this.currentUid = currentUid;
+    }
+    /**
+     * @return Returns the responseId.
+     */
+    public String getResponseId() {
+        return responseId;
+    }
+    /**
+     * @param responseId The responseId to set.
+     */
+    public void setResponseId(String responseId) {
+        this.responseId = responseId;
     }
 }

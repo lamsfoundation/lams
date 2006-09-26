@@ -63,5 +63,7 @@ public interface IVoteQueContentDAO
 	
 	public void removeVoteQueContent(VoteQueContent voteQueContent);
 	
+	public List getAllQuestionEntriesSorted(final long voteContentId);
+	
  	public void flush();
 }

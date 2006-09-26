@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -120,7 +121,9 @@ public interface IVoteService
 	
 	public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException;
     
-    public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
+    //public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
+    
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) throws VoteApplicationException;
     
     public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long toolSessionUid) throws VoteApplicationException;
     
@@ -249,18 +252,6 @@ public interface IVoteService
 	
 	public InputStream downloadFile(Long uuid, Long versionID) throws VoteApplicationException;
 	
-	public String getFileUuid(String filename) throws VoteApplicationException;
-	
-	public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId) throws VoteApplicationException;
-	
-	public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId) throws VoteApplicationException;
-	
-	public List retrieveVoteUploadedOfflineFilesName(Long voteContentId) throws VoteApplicationException;
-	
-	public List retrieveVoteUploadedOnlineFilesName(Long voteContentId) throws VoteApplicationException;
-	
-	public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline) throws VoteApplicationException;
-	
 	public void cleanUploadedFilesMetaData() throws VoteApplicationException;
     
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent voteContent) throws VoteApplicationException;
@@ -279,19 +270,7 @@ public interface IVoteService
     
     public NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
     
-    public void removeOffLineFile(String filename, Long voteContentId) throws VoteApplicationException;
-    
-    public void removeOnLineFile(String filename, Long voteContentId) throws VoteApplicationException;
-    
-    public boolean isOffLineFilePersisted(String filename) throws VoteApplicationException;
-    
-    public boolean isOnLineFilePersisted(String filename) throws VoteApplicationException;
-    
-    public boolean isUuidPersisted(String uuid) throws VoteApplicationException;
-    
-    public List getOnlineFilesMetaData(Long voteContentId) throws VoteApplicationException;
-    
-    public List getOfflineFilesMetaData(Long voteContentId) throws VoteApplicationException;
+    public List getAllQuestionEntriesSorted(final long voteContentId) throws VoteApplicationException;
     
     public List getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
     
@@ -304,6 +283,10 @@ public interface IVoteService
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
     
-
+    public void removeFile(Long submissionId) throws VoteApplicationException;
+    
+    public void persistFile(VoteContent content, VoteUploadedFile file) throws VoteApplicationException;
+    
+    public List retrieveVoteUploadedFiles(VoteContent Vote) throws VoteApplicationException;
 }
 

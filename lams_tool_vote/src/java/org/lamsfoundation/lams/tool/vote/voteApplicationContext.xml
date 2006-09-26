@@ -75,7 +75,7 @@
 					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>													
 			 		<property name="voteUploadedFileDAO"><ref bean="voteUploadedFileDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>
-		 		<property name="repositoryService"><ref bean="repositoryService"/></property> 
+			 		<property name="repositoryService"><ref bean="repositoryService"/></property> 
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="auditService"><ref bean="auditService"/></property>			 		
 					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		
@@ -89,12 +89,9 @@
 					<prop key="copy*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="save*">PROPAGATION_REQUIRED, -VoteApplicationException</prop>
 					<prop key="update*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-VoteApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED, -QacpApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
-					<prop key="setAsDefineLater">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
-					<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
-					<prop key="exportToolSession">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
-					<prop key="leaveToolSession">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="persistFile">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="importToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>

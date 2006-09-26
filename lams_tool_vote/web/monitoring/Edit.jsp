@@ -18,33 +18,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+	
+	<%@ include file="/common/taglibs.jsp"%>
 
+	<c:set var="lams"><lams:LAMSURL/></c:set>
+	<c:set var="tool"><lams:WebAppURL/></c:set>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+	<%@ include file="/common/messages.jsp"%>								
+	
+	<c:if test="${editActivityDTO.monitoredContentInUse != 'true'}"> 			
+		<c:if test="${voteGeneralMonitoringDTO.defineLaterInEditMode != 'true'}"> 			
+			<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
+		</c:if> 				
+		<c:if test="${voteGeneralMonitoringDTO.defineLaterInEditMode == 'true'}"> 			
+			<jsp:include page="/authoring/BasicContent.jsp" />
+		</c:if> 				
+	</c:if> 											
 
-<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
-<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
+	<c:if test="${editActivityDTO.monitoredContentInUse == 'true'}"> 			
+		<table border="0" cellspacing="2" cellpadding="2">									
+			<tr> <td NOWRAP valign=top>
+					<bean:message key="error.content.inUse"/> 
+			</td> </tr>
+		</table>
+	</c:if> 																									
 
-		<c:if test="${voteGeneralMonitoringDTO.isMonitoredContentInUse != 'true'}"> 			
-			<c:if test="${voteGeneralMonitoringDTO.defineLaterInEditMode != 'true'}"> 			
-				<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
-			</c:if> 				
-			<c:if test="${voteGeneralMonitoringDTO.defineLaterInEditMode == 'true'}"> 			
-				<jsp:include page="/authoring/BasicContent.jsp" />
-			</c:if> 				
-		</c:if> 											
-
-
-		<c:if test="${voteGeneralMonitoringDTO.isMonitoredContentInUse == 'true'}"> 			
-					<table border="0" cellspacing="2" cellpadding="2">									
-						<tr> <td NOWRAP valign=top>
-								 <bean:message key="error.content.inUse"/> 
-						</td> </tr>
-					</table>
-		</c:if> 																									
+		
+		

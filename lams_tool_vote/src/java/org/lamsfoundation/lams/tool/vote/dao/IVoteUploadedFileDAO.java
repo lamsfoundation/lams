@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.vote.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 
 /**
@@ -30,53 +31,26 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
  * 
  * <p> Interface that defines the contract for IVoteUploadedFile access </p>
  */
+
 public interface IVoteUploadedFileDAO
 {
- 	public VoteUploadedFile getUploadedFileById(long submissionId);
- 	
- 	public VoteUploadedFile loadUploadedFileById(long uid);
- 	
- 	public void updateUploadFile(VoteUploadedFile voteUploadedFile);
-     
-    public void saveUploadFile(VoteUploadedFile voteUploadedFile);
-    
-    public void createUploadFile(VoteUploadedFile voteUploadedFile); 
-    
-    public void UpdateUploadFile(VoteUploadedFile voteUploadedFile);
+	 	public VoteUploadedFile loadUploadedFileById(long submissionId);
 
-    public void removeOffLineFile(String filename, Long voteContentId);
+	 	public void updateUploadFile(VoteUploadedFile voteUploadedFile);
+	 	
+	    public void saveUploadFile(VoteUploadedFile voteUploadedFile);
+	    
+	    public void createUploadFile(VoteUploadedFile voteUploadedFile); 
+	    
+	    public void UpdateUploadFile(VoteUploadedFile voteUploadedFile);
 
-    public void removeOnLineFile(String filename, Long voteContentId);
-    
-    public boolean isOffLineFilePersisted(String filename);
-
-    public boolean isOnLineFilePersisted(String filename);
-    
-    public List getOnlineFilesMetaData(Long voteContentId);
-
-    public List getOfflineFilesMetaData(Long voteContentId);
-    
-    public boolean isUuidPersisted(String uuid);
-    
-    public void cleanUploadedFilesMetaData();
-    
-    public String getFileUuid(String filename);
-    
-    public void removeUploadFile(Long uid);
-    
-    public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline);
-
- 	public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId);
-    
-    public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId);
-    
-    public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long voteContentId);
-    
-    public List retrieveVoteUploadedOfflineFilesName(Long voteContentId);
-
-    public List retrieveVoteUploadedOnlineFilesName(Long voteContentId);
-    
-    public void deleteUploadFile(VoteUploadedFile voteUploadedFile);
-    
-    public void flush();
+	    public void removeUploadFile(Long submissionId);
+	    
+	    public void deleteUploadFile(VoteUploadedFile voteUploadedFile);
+        
+        public List retrieveVoteUploadedFiles(VoteContent vote);
+	    
+	    public void cleanUploadedFilesMetaData();
+	    
+	    public void flush();
 }

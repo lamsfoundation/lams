@@ -46,6 +46,7 @@ public class VoteGeneralMonitoringDTO implements Comparable
     protected String userExceptionContentDoesNotExist;
     protected String userExceptionNoStudentActivity;
     protected String isMonitoredContentInUse;
+    protected String monitoredContentInUse;
 
     protected String activeModule;
     protected String currentTab;
@@ -91,6 +92,15 @@ public class VoteGeneralMonitoringDTO implements Comparable
     protected String completedSessionUserCount;
     protected String completedSessionUserPercent;
     protected List mapStudentsVoted;
+    
+    protected String onlineInstructions;
+    protected String offlineInstructions;
+    protected List attachmentList;
+    protected List deletedAttachmentList;
+    
+    protected String contentFolderID;
+
+
     
     /**
      * @return Returns the listOfflineFilesMetadata.
@@ -698,6 +708,7 @@ public class VoteGeneralMonitoringDTO implements Comparable
         return new ToStringBuilder(this)
         	.append("toolContentID: ", toolContentID)
         	.append("activeModule: ", activeModule)
+        	.append("monitoredContentInUse: ", monitoredContentInUse)
             .append("currentMonitoringTab: ", currentMonitoringTab)
             .append("selectionCase: ", selectionCase)
             .append("isToolSessionChanged: ", isToolSessionChanged)
@@ -750,5 +761,79 @@ public class VoteGeneralMonitoringDTO implements Comparable
 		else
 			return 0;
     }
+
+        /**
+     * @return Returns the monitoredContentInUse.
+     */
+    public String getMonitoredContentInUse() {
+        return monitoredContentInUse;
+    }
+    /**
+     * @param monitoredContentInUse The monitoredContentInUse to set.
+     */
+    public void setMonitoredContentInUse(String monitoredContentInUse) {
+        this.monitoredContentInUse = monitoredContentInUse;
+    }
     
+    /**
+     * @return Returns the offlineInstructions.
+     */
+    public String getOfflineInstructions() {
+        return offlineInstructions;
+    }
+    /**
+     * @param offlineInstructions The offlineInstructions to set.
+     */
+    public void setOfflineInstructions(String offlineInstructions) {
+        this.offlineInstructions = offlineInstructions;
+    }
+    /**
+     * @return Returns the onlineInstructions.
+     */
+    public String getOnlineInstructions() {
+        return onlineInstructions;
+    }
+    /**
+     * @param onlineInstructions The onlineInstructions to set.
+     */
+    public void setOnlineInstructions(String onlineInstructions) {
+        this.onlineInstructions = onlineInstructions;
+    }
+    
+    /**
+     * @return Returns the attachmentList.
+     */
+    public List getAttachmentList() {
+        return attachmentList;
+    }
+    /**
+     * @param attachmentList The attachmentList to set.
+     */
+    public void setAttachmentList(List attachmentList) {
+        this.attachmentList = attachmentList;
+    }
+    /**
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    /**
+     * @param contentFolderID The contentFolderID to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+    /**
+     * @return Returns the deletedAttachmentList.
+     */
+    public List getDeletedAttachmentList() {
+        return deletedAttachmentList;
+    }
+    /**
+     * @param deletedAttachmentList The deletedAttachmentList to set.
+     */
+    public void setDeletedAttachmentList(List deletedAttachmentList) {
+        this.deletedAttachmentList = deletedAttachmentList;
+    }
 }
