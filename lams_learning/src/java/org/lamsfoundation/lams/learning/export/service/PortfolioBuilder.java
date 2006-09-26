@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -219,13 +220,14 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	 * Process all Notebook (Scratchpad) entries into portfolio objects.
 	 */
 	public void processNotebook() {
-		
-		List entries = coreNotebookService.getEntry(new Long(1),new Integer(1),"SCRATCHPAD", user.getUserId());
-		Iterator it = entries.iterator();
-		while(it.hasNext()) {
-			NotebookEntry entry = (NotebookEntry) it.next();
-			NotebookPortfolio portfolio = createNotebookPortfolio(entry);
-			currentNotebookList.add(portfolio);
+		if(lesson != null && user != null) {
+			List entries = coreNotebookService.getEntry(lesson.getLessonId(),CoreNotebookConstants.SCRATCH_PAD,"SCRATCHPAD", user.getUserId());
+			Iterator it = entries.iterator();
+			while(it.hasNext()) {
+				NotebookEntry entry = (NotebookEntry) it.next();
+				NotebookPortfolio portfolio = createNotebookPortfolio(entry);
+				currentNotebookList.add(portfolio);
+			}
 		}
 	}
 
