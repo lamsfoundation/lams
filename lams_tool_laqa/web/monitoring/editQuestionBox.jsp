@@ -83,19 +83,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td>
 				</tr>
 
+				
 				<tr>
 					<td align="center" valign="bottom">
-						<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
-							<bean:message key="label.cancel" />
-						</a>
-
-						&nbsp; &nbsp;					
-                        
-						<a href="#" onclick="getElementById('newQuestionForm').submit();" class="button-add-item">
-							<bean:message key="label.save.question" />
-						</a>
-					
-						<BR><BR>
+						<table>
+							<tr>
+							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+								<a href="#" onclick="getElementById('newQuestionForm').submit();" class="button-add-item">
+									<bean:message key="label.save.question" />
+								</a>
+							</td> 
+	
+							<td>
+								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
+									<bean:message key="label.cancel" />
+								</a>
+							</td> 	
+							</tr>					
+						</table>
 					</td>
 				</tr>
 				
