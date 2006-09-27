@@ -47,6 +47,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
+import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
@@ -160,8 +161,8 @@ public class MonitoringAction extends Action {
 //		get all users with their answers whatever they answer or not
 		List<SurveyUser> users = service.getSessionUsers(sessionId);
 		for (SurveyUser user : users) {
-			List<SurveyQuestion> questionAnswers = service.getQuestionAnswer(sessionId, user.getUid());
-			for (SurveyQuestion questionAnswer : questionAnswers) {
+			List<AnswerDTO> questionAnswers = service.getQuestionAnswers(sessionId, user.getUid());
+			for (AnswerDTO questionAnswer : questionAnswers) {
 				if(questionUid.equals(questionAnswer.getUid())){
 					userAnswerMap.put(user,questionAnswer);
 					break;

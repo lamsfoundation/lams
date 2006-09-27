@@ -39,8 +39,6 @@ import org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction;
  */
 public class SurveyWebUtils {
 
-	private static final int SHORT_TITLE_LENGTH = 60;
-	
 	public static boolean isSurveyEditable(Survey survey) {
 	        if ( (survey.isDefineLater() == true) && (survey.isContentInUse()==true) )
 	        {
@@ -71,10 +69,5 @@ public class SurveyWebUtils {
 			return new String[]{};
 		
 		return choiceList.split("&");
-	}
-	public static void createShortTitle(SurveyQuestion question) {
-		String desc = question.getDescription();
-		desc = desc.replaceAll("<(.|\n)*?>", "");
-		question.setShortTitle(StringUtils.abbreviate(desc,SHORT_TITLE_LENGTH));
 	}
 }

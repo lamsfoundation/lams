@@ -55,6 +55,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
@@ -86,8 +87,8 @@ public class ChartAction extends  Action {
         
     	ISurveyService service = getSurveyService();
 		
-		SurveyQuestion question =service.getQuestionResponse(sessionId,questionUid);
-		if(question.getType() == QUESTION_TYPE_TEXT_ENTRY){
+		AnswerDTO answer =service.getQuestionResponse(sessionId,questionUid);
+		if(answer.getType() == QUESTION_TYPE_TEXT_ENTRY){
 			logger.error("Error question type : Text entry can not generate chart.");
 			response.getWriter().print(resource.getMessage(ERROR_MSG_CHART_ERROR));
 			return null;
@@ -96,9 +97,9 @@ public class ChartAction extends  Action {
 		//Try to create chart
         JFreeChart chart=null;
     	if (type.equals("pie")){
-    	    chart = createPieChart (question);    
+    	    chart = createPieChart (answer);    
     	}else if (type.equals("bar")){
-    		chart = createBarChart (question);    
+    		chart = createBarChart (answer);    
     	}
     	
         //send chart to response output stream
@@ -114,45 +115,45 @@ public class ChartAction extends  Action {
     }
 
 
-    public JFreeChart createPieChart(SurveyQuestion question){
+    public JFreeChart createPieChart(AnswerDTO answer){
     
         DefaultPieDataset data= new DefaultPieDataset();
         
-        Set<SurveyOption> options = question.getOptions();
+        Set<SurveyOption> options = answer.getOptions();
 		int optIdx = 1;
 		for (SurveyOption option : options) {
 			data.setValue(OPTION_SHORT_HEADER + optIdx, (Number) option.getResponse());
 			optIdx++;
   		}
           
-          if(question.isAppendText())
-          	 data.setValue(resource.getMessage(MSG_OPEN_RESPONSE), (Number)question.getOpenResponse());
+          if(answer.isAppendText())
+          	 data.setValue(resource.getMessage(MSG_OPEN_RESPONSE), (Number)answer.getOpenResponse());
           
         
     	JFreeChart chart=null;
-   	    chart=ChartFactory.createPieChart3D(resource.getMessage(MSG_PIECHART_TITLE,question.getSequenceId()) , data, true, true, false);
+   	    chart=ChartFactory.createPieChart3D(resource.getMessage(MSG_PIECHART_TITLE,answer.getSequenceId()) , data, true, true, false);
 
    	    return chart;
     }
     
-    public JFreeChart createBarChart(SurveyQuestion question){
+    public JFreeChart createBarChart(AnswerDTO answer){
         
     	DefaultCategoryDataset data= new DefaultCategoryDataset();
       
-        Set<SurveyOption> options = question.getOptions();
+        Set<SurveyOption> options = answer.getOptions();
         int optIdx = 1;
         for (SurveyOption option : options) {
             data.setValue((Number)option.getResponse(), OPTION_SHORT_HEADER + optIdx, OPTION_SHORT_HEADER + optIdx);
             optIdx++;
 		}
         
-        if(question.isAppendText())
-        	 data.setValue((Number)question.getOpenResponse(), resource.getMessage(MSG_OPEN_RESPONSE), resource.getMessage(MSG_OPEN_RESPONSE));
+        if(answer.isAppendText())
+        	 data.setValue((Number)answer.getOpenResponse(), resource.getMessage(MSG_OPEN_RESPONSE), resource.getMessage(MSG_OPEN_RESPONSE));
         
     	JFreeChart chart=null;
     	
     	
-   	    chart=ChartFactory.createBarChart3D(resource.getMessage(MSG_BARCHART_TITLE,question.getSequenceId()), 
+   	    chart=ChartFactory.createBarChart3D(resource.getMessage(MSG_BARCHART_TITLE,answer.getSequenceId()), 
    	    									resource.getMessage(MSG_BARCHART_CATEGORY_AXIS_LABEL), 
    	    									resource.getMessage(MSG_BARCHART_VALUE_AXIS_LABEL), 
    	    									data, PlotOrientation.VERTICAL, true, true, false);

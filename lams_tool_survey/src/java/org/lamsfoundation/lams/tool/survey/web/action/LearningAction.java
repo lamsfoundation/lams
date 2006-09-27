@@ -50,9 +50,9 @@ import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
+import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
-import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
@@ -143,9 +143,8 @@ public class LearningAction extends Action {
 		ISurveyService service = getSurveyService();
 		SurveyUser surveyUser = getCurrentUser(service,sessionId);
 
-		List<SurveyQuestion> questions = null;
 		Survey survey;
-		questions = service.getQuestionAnswer(sessionId,surveyUser.getUid());
+		List<AnswerDTO> questions =  service.getQuestionAnswers(sessionId,surveyUser.getUid());
 		survey = service.getSurveyBySessionId(sessionId);
 
 		//check whehter finish lock is on/off
@@ -181,11 +180,10 @@ public class LearningAction extends Action {
 			sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, false);
 				
 		//init survey item list
-		SortedMap<Integer, SurveyQuestion> surveyItemList = getQuestionList(sessionMap);
+		SortedMap<Integer, AnswerDTO> surveyItemList = getQuestionList(sessionMap);
 		surveyItemList.clear();
 		if(questions != null){
-			//remove hidden items.
-			for(SurveyQuestion question : questions){
+			for(AnswerDTO question : questions){
 				surveyItemList.put(question.getSequenceId(),question);
 			}
 		}
@@ -217,7 +215,7 @@ public class LearningAction extends Action {
 		String sessionMapID = answerForm.getSessionMapID();
 		
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		SortedMap<Integer, SurveyQuestion> surveyItemMap = getQuestionList(sessionMap);
+		SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 		
 		
 		ActionErrors errors = getAnswer(request, surveyItemMap.get(questionSeqID));
@@ -227,7 +225,7 @@ public class LearningAction extends Action {
 		
 		//go to next question
 		boolean next = false;
-		for(Map.Entry<Integer, SurveyQuestion> entry: surveyItemMap.entrySet()){
+		for(Map.Entry<Integer, AnswerDTO> entry: surveyItemMap.entrySet()){
 			if(entry.getKey().equals(questionSeqID)){
 				next = true;
 				//failure tolerance: if arrive last one
@@ -258,14 +256,14 @@ public class LearningAction extends Action {
 		String sessionMapID = answerForm.getSessionMapID();
 		
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		SortedMap<Integer, SurveyQuestion> surveyItemMap = getQuestionList(sessionMap);
+		SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 		
 		ActionErrors errors = getAnswer(request, surveyItemMap.get(questionSeqID));
 		if(!errors.isEmpty()){
 			return mapping.getInputForward();
 		}
 		
-		SortedMap<Integer, SurveyQuestion> subMap = surveyItemMap.headMap(questionSeqID);
+		SortedMap<Integer, AnswerDTO> subMap = surveyItemMap.headMap(questionSeqID);
 		if(subMap.isEmpty())
 			questionSeqID = surveyItemMap.firstKey();
 		else
@@ -292,7 +290,7 @@ public class LearningAction extends Action {
 		String sessionMapID = answerForm.getSessionMapID();
 		
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		SortedMap<Integer, SurveyQuestion> surveyItemMap = getQuestionList(sessionMap);
+		SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 		//get current question index of total questions
 		int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
 		answerForm.setCurrentIdx(currIdx);
@@ -307,8 +305,8 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		
 		//validate
-		SortedMap<Integer, SurveyQuestion> surveyItemMap = getQuestionList(sessionMap);
-		Collection<SurveyQuestion> surveyItemList = surveyItemMap.values();
+		SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
+		Collection<AnswerDTO> surveyItemList = surveyItemMap.values();
 		
 		ActionErrors errors;
 		if(questionSeqID == null || questionSeqID.equals(0))
@@ -320,7 +318,7 @@ public class LearningAction extends Action {
 		}
 		
 		List<SurveyAnswer> answerList = new ArrayList<SurveyAnswer>();
-		for(SurveyQuestion question : surveyItemList){
+		for(AnswerDTO question : surveyItemList){
 			if(question.getAnswer() != null)
 				answerList.add(question.getAnswer());
 		}
@@ -427,7 +425,7 @@ public class LearningAction extends Action {
 	/**
 	 * Get answer by special question.
 	 */
-	private ActionErrors getAnswer(HttpServletRequest request,SurveyQuestion question) {
+	private ActionErrors getAnswer(HttpServletRequest request,AnswerDTO question) {
 		ActionErrors errors = new ActionErrors();
 		//get sessionMap
 		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -455,9 +453,9 @@ public class LearningAction extends Action {
 		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		Collection<SurveyQuestion> questionList = getQuestionList(sessionMap).values();
+		Collection<AnswerDTO> questionList = getQuestionList(sessionMap).values();
 		
-		for(SurveyQuestion question :questionList){
+		for(AnswerDTO question :questionList){
 			SurveyAnswer answer = getAnswerFromPage(request,question, sessionID);
 			question.setAnswer(answer);
 			//for mandatory questions, answer can not be null.
@@ -471,7 +469,7 @@ public class LearningAction extends Action {
 	}
 
 
-	private SurveyAnswer getAnswerFromPage(HttpServletRequest request, SurveyQuestion question, Long sessionID) {
+	private SurveyAnswer getAnswerFromPage(HttpServletRequest request, AnswerDTO question, Long sessionID) {
 		
 		String[] choiceList = request.getParameterValues(SurveyConstants.PREFIX_QUESTION_CHOICE+question.getUid());
 		String textEntry = request.getParameter(SurveyConstants.PREFIX_QUESTION_TEXT+question.getUid());
@@ -494,10 +492,6 @@ public class LearningAction extends Action {
 		return answer;
 	}
 
-
-
-	
-
 	private ISurveyService getSurveyService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	      return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
@@ -507,10 +501,10 @@ public class LearningAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private SortedMap<Integer, SurveyQuestion> getQuestionList(SessionMap sessionMap) {
-		SortedMap<Integer, SurveyQuestion> list = (SortedMap<Integer, SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
+	private SortedMap<Integer, AnswerDTO> getQuestionList(SessionMap sessionMap) {
+		SortedMap<Integer, AnswerDTO> list = (SortedMap<Integer, AnswerDTO>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
 		if(list == null){
-			list = new TreeMap<Integer,SurveyQuestion>(new IntegerComparator());
+			list = new TreeMap<Integer,AnswerDTO>(new IntegerComparator());
 			sessionMap.put(SurveyConstants.ATTR_QUESTION_LIST,list);
 		}
 		return list;

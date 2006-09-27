@@ -30,6 +30,7 @@ import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
@@ -112,14 +113,14 @@ public interface ISurveyService
 	 * @param userUid
 	 * @return
 	 */
-	List<SurveyQuestion> getQuestionAnswer(Long sessionId, Long userUid);
+	List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid);
 	/**
 	 * Get question's answer with response percentage infromation.
 	 * @param sessionId
 	 * @param questionUid
 	 * @return
 	 */
-	SurveyQuestion getQuestionResponse(Long sessionId, Long questionUid);
+	AnswerDTO getQuestionResponse(Long sessionId, Long questionUid);
 	
 	/**
 	 * Commit answers for a group of question together. 

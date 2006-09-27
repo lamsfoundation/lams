@@ -34,12 +34,11 @@
 				<%-- End group title display --%>
 			</c:if>
 			<tr>
-				<th class="first">
+				<th class="first" colspan="2">
 					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/listAnswers.do?"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
 						${question.shortTitle}
 					</a>
-				</th>
-				<th class="first">
+					<div style="float:right">
 					<%-- Only show pie/bar chart when question is single/multiple choics type --%>
 					<c:if test="${question.type !=3}">
 						<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewChartReport.do?chartType=pie&"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
@@ -49,12 +48,15 @@
 							<img src="${tool}/includes/images/columnchart.gif" title="<fmt:message key='message.view.bar.chart'/>" height="22" width="25" border="0">
 						</a>
 					</c:if>
+					</div>
 				</th>
 			</tr>
+			<%-- 
 			<tr>
 				<td><fmt:message key="message.possible.answers"/></td>
 				<td><fmt:message key="message.total.user.response"/></td>
 			</tr>
+			--%>
 			<c:set var="optSize" value="${fn:length(question.options)}" />
 			<c:forEach var="option" items="${question.options}"  varStatus="status">
 				<tr>

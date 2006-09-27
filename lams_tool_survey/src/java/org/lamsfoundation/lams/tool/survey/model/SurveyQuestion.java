@@ -59,15 +59,9 @@ public class SurveyQuestion  implements Cloneable{
 	private Date createDate;
 	private SurveyUser createBy;
 	
-	//***********************************************
+//	***********************************************
 	//DTO fields:
 	private String shortTitle;
-	//this is DTO field. For answer, which is user and session level. For question, which is content level.
-	private SurveyAnswer answer;
-	//Open text entry response percentage  if this question has open text entry.
-	private double openResponse; 
-	private String openResponseFormatStr;
-	private int openResponseCount; 
 	
     public Object clone(){
     	SurveyQuestion obj = null;
@@ -215,42 +209,15 @@ public class SurveyQuestion  implements Cloneable{
 		public void setSequenceId(int sequenceId) {
 			this.sequenceId = sequenceId;
 		}
-
-	
-		
-		//****************************************************************
-		// DTO fields
-		//****************************************************************
 		public String getShortTitle() {
 			return shortTitle;
 		}
 		public void setShortTitle(String shortTitle) {
 			this.shortTitle = shortTitle;
 		}
-		public SurveyAnswer getAnswer() {
-			return answer;
-		}
-		public void setAnswer(SurveyAnswer answer) {
-			this.answer = answer;
-		}
-		public double getOpenResponse() {
-			return openResponse;
-		}
-		public void setOpenResponse(double openResponse) {
-			this.openResponse = openResponse;
-		}
-		public int getOpenResponseCount() {
-			return openResponseCount;
-		}
-		public void setOpenResponseCount(int openResponseCount) {
-			this.openResponseCount = openResponseCount;
-		}
-		public String getOpenResponseFormatStr() {
-			return openResponseFormatStr;
-		}
-		public void setOpenResponseFormatStr(String openResponseFormatStr) {
-			this.openResponseFormatStr = openResponseFormatStr;
-		}
 
+	
+		
+	
 
 }

@@ -16,17 +16,19 @@
 		<div id="header-no-tabs-learner">
 		</div>
 		<div id="content-learner">
-			<table border="0" cellspacing="3" width="98%">
+			<table class="alternative-color">
 				<tr>
-					<td><fmt:message key="label.question"/></td>
-					<td><c:out value="${question.description}" escapeXml="false"/></td>
+					<%-- <th class="first"><fmt:message key="label.question"/></th> --%>
+					<th colspan="2" class="first"><c:out value="${question.description}" escapeXml="false"/></th>
 				</tr>
+				<%-- 
 				<tr>
 					<td colspan="2"><fmt:message key="message.possible.answers"/></td>
 				</tr>
+				--%>
 				<c:forEach var="option" items="${question.options}" varStatus="status">
 					<tr>
-						<td>
+						<td style="width:50px">
 							<%= SurveyConstants.OPTION_SHORT_HEADER %>${status.count}
 						</td>
 						<td>
@@ -36,19 +38,16 @@
 				</c:forEach>
 				<c:if test="${question.appendText}">
 					<tr>
-						<td>
+						<td colspan="2">
 							<fmt:message key="label.open.response"/>
 						</td>
-						<td></td>
 					</tr>
 				</c:if>
-				<tr>
-					<td colspan="2">
-						<img src="<c:url value="/showChart.do?chartType=${chartType}&toolSessionID="/>${toolSessionID}&questionUid=${question.uid}" 
-							title="<fmt:message key="message.view.pie.chart"/>">
-					</td>
-				</tr>
 			</table>
+			<div align="center">
+			<img src="<c:url value="/showChart.do?chartType=${chartType}&toolSessionID="/>${toolSessionID}&questionUid=${question.uid}" 
+							title="<fmt:message key="message.view.pie.chart"/>">
+			</div>
 		</div>
 		<div id="footer-learner"></div>
 		</div>

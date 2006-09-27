@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.tool.survey.dao.SurveyDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyQuestionDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveySessionDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
+import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
@@ -305,8 +306,8 @@ public class SurveyServiceImpl implements
 		
 	}
 
-	public List<SurveyQuestion> getQuestionAnswer(Long sessionId,Long userUid) {
-		List<SurveyQuestion> questions = null;
+	public List<AnswerDTO> getQuestionAnswers(Long sessionId,Long userUid) {
+		List<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
 		SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
 		if(session != null){
 			Survey survey = session.getSurvey();
@@ -315,13 +316,16 @@ public class SurveyServiceImpl implements
 		}
 		
 		//set answer for this question acoording
+		List<AnswerDTO> answers = new ArrayList<AnswerDTO>();
 		for(SurveyQuestion question:questions){
+			AnswerDTO answerDTO = new AnswerDTO(question);
 			SurveyAnswer answer = surveyAnswerDao.getAnswer(question.getUid(),userUid);
 			if(answer != null)
 				answer.setChoices(SurveyWebUtils.getChoiceList(answer.getAnswerChoices()));
-			question.setAnswer(answer);
+			answerDTO.setAnswer(answer);
+			answers.add(answerDTO);
 		}
-		return questions;
+		return answers;
 	}
 
 	public void updateAnswerList(List<SurveyAnswer> answerList) {
@@ -330,17 +334,16 @@ public class SurveyServiceImpl implements
 		}
 	}
 
-	public SurveyQuestion getQuestionResponse(Long sessionId, Long questionUid){
+	public AnswerDTO getQuestionResponse(Long sessionId, Long questionUid){
 		SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
-		
-		SurveyWebUtils.createShortTitle(question);
+		AnswerDTO answerDto = new AnswerDTO(question);
 		
 		//get question all answer from this session
 		List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid);
 
 		//create a map to hold Option UID and sequenceID(start from 0); 
 		Map<String, Integer> optMap = new HashMap<String, Integer>();
-		Set<SurveyOption> options = question.getOptions();
+		Set<SurveyOption> options = answerDto.getOptions();
 		int idx=0;
 		for (SurveyOption option : options) {
 			optMap.put(option.getUid().toString(),idx);
@@ -349,7 +352,8 @@ public class SurveyServiceImpl implements
 		
 		//initial a array to hold how many time chose has been done for a option or open text.
 		int optSize = options.size();
-		if(question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+		//for appendText and open Text Entry will be the last one of choose[] array.
+		if(answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
 			optSize++;
 		
 		int[] choose = new int[optSize];
@@ -361,15 +365,19 @@ public class SurveyServiceImpl implements
 			for (SurveyAnswer answer : answsers) {
 				String[] choseOpt = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
 				for (String optUid : choseOpt) {
-					if(optMap.containsKey(optUid))
+					//if option has been chosen, the relative index of choose[] array will increase.
+					if(optMap.containsKey(optUid)){
 						choose[optMap.get(optUid)]++;
+						answerSum ++;
+					}
 				}
-				if((question.isAppendText()
-						|| question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
-						&& !StringUtils.isBlank(answer.getAnswerText()))
+				//handle appendText or Open Text Entry
+				if((answerDto.isAppendText()
+						|| answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+						&& !StringUtils.isBlank(answer.getAnswerText())){
 					choose[optSize-1]++;
-					
-				answerSum ++;
+					answerSum ++;
+				}
 			}
 		}
 		//caculate the percentage of answer response
@@ -379,17 +387,17 @@ public class SurveyServiceImpl implements
 		}
 		for (SurveyOption option : options) {
 			option.setResponse((double)choose[idx]/(double)answerSum * 100d);
-			option.setResponseFormatStr(new Integer((int) option.getResponse()).toString());
+			option.setResponseFormatStr(new Long(Math.round(option.getResponse())).toString());
 			option.setResponseCount(choose[idx]);
 			idx++;
 		}
-		if(question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
-			question.setOpenResponse((double)choose[idx]/(double)answerSum * 100d);
-			question.setOpenResponseFormatStr(new Integer((int) question.getOpenResponse()).toString());
-			question.setOpenResponseCount(choose[idx]);
+		if(answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
+			answerDto.setOpenResponse((double)choose[idx]/(double)answerSum * 100d);
+			answerDto.setOpenResponseFormatStr(new Long(Math.round(answerDto.getOpenResponse())).toString());
+			answerDto.setOpenResponseCount(choose[idx]);
 		}
 		
-		return question;
+		return answerDto;
 		
 	}
 	
