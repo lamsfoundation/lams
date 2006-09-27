@@ -64,13 +64,16 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
 		+ " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
 
     /**
-     * Retrieves the Lesson
+     * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces 
+     * an initialize.
      * @param lessonId identifies the lesson to get
      * @return the lesson
      */
     public Lesson getLesson(Long lessonId)
     {
-        return (Lesson)getHibernateTemplate().get(Lesson.class, lessonId);
+        Lesson lesson =  (Lesson)getHibernateTemplate().get(Lesson.class, lessonId);
+        initialize(lesson);
+        return lesson;
     }
     
     
