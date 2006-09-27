@@ -419,14 +419,14 @@ class Monitor {
 	private function openGroupHelp(url:String){
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GROUP
 		var locale:String = _root.lang + _root.country;
-		var target:String = app.module +actToolSignature+ '#' + app.module +actToolSignature+ '-' + locale;
+		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
 		getURL(url + target, '_blank');
 	}
 	
 	private function openGateHelp(url:String){
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GATE
 		var locale:String = _root.lang + _root.country;
-		var target:String = app.module +actToolSignature+ '#' + app.module +actToolSignature+ '-' + locale;
+		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
 		getURL(url + target, '_blank');
 	}
 
