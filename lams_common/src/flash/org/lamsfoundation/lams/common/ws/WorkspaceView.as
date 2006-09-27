@@ -43,7 +43,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	private var _popup:MovieClip;
 	private var okClickedCallback:Function;
 	private var _workspaceController:WorkspaceController;
-	
+	private var dialog:MovieClip;
 	/*
 	* Constructor
 	*/
@@ -86,7 +86,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
     * @param    callback - The function to call and pass the selectedID to
     */
     public function createWorkspaceDialog(pos:Object){
-        var dialog:MovieClip;
+        
 		var m:WorkspaceModel = WorkspaceModel(getModel());
 		var mode:String = m.currentMode
 		trace('mode returned: ' + mode);
@@ -143,7 +143,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	}
 
 	
-	
+	public function clearDialog():Void {
+		dialog.deletePopUp();
+	}
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   

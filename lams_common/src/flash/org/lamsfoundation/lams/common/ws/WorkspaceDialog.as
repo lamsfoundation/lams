@@ -684,7 +684,24 @@ class WorkspaceDialog extends MovieClip{
         //close parent window
         _container.deletePopUp();
     }
-    
+	
+	public function showHideBtn(v:Boolean):Void{
+		ok_btn.enabled = v;
+		cancel_btn.enabled = v;
+		switchView_tab.enabled = v;
+		new_btn.enabled = v;
+		copy_btn.enabled = v;
+		paste_btn.enabled = v;
+		delete_btn.enabled = v;
+		rename_btn.enabled = v;
+		treeview.enabled = v;
+		location_dnd.enabled = v;
+		resourceDesc_txa.enabled = v;
+		licenseID_cmb.enabled = v;
+		viewLicense_btn.enabled = v;
+	}
+	
+	 
    /**
     * Called by the OK button
 	* Dispatches the okClicked event and passes a result DTO containing:
@@ -700,7 +717,8 @@ class WorkspaceDialog extends MovieClip{
 		
         trace('OK');
 		_global.breakpoint();
-	
+		_workspaceController = _workspaceView.getController();
+		_workspaceController.setBusy()
 		//TODO: Validate you are allowed to use the name etc... Are you overwriting - NOTE Same names are nto allowed in this version
 		
 		var snode = treeview.selectedNode;
@@ -714,8 +732,10 @@ class WorkspaceDialog extends MovieClip{
 		var tempTitle = StringUtils.replace(resourceTitle_txi.text, " ", "");
 		if (tempTitle == "" || tempTitle == undefined){
 			Cursor.showCursor(ApplicationParent.C_DEFAULT);
+			
 			var sendMsg:String = Dictionary.getValue('ws_file_name_empty')+"\n"+Dictionary.getValue('ws_entre_file_name')+"\n\n";
 			LFMessage.showMessageAlert(sendMsg,null);
+			_workspaceController.clearBusy();
 			resourceTitle_txi.setFocus();
 		}else{
 			
@@ -896,7 +916,7 @@ class WorkspaceDialog extends MovieClip{
 
         dispatchEvent({type:'okClicked',target:this});
 	   
-        closeThisDialogue();
+        //closeThisDialogue();
 		
 	}
 	

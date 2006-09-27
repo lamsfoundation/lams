@@ -36,6 +36,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	
 	private var _workspaceModel:WorkspaceModel;
 	private var _workspaceController:WorkspaceController;
+	private var _isBusy:Boolean;
 	/**
 	* Constructor
 	*
@@ -45,6 +46,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		super (wm);
 		_workspaceController = this;
 		_workspaceModel = WorkspaceModel(wm);
+		_isBusy = false;
 	}
    
    
@@ -262,6 +264,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	 * @return  
 	 */
 	public function fileOperationRequest(e:Object){
+		setBusy()
 		var tgt:String = new String(e.target);
 		var workspaceDialogue = getView().workspaceDialogue;
 		Debugger.log('type:'+e.type+',target:'+tgt,Debugger.GEN,'fileOperationRequest','org.lamsfoundation.lams.WorkspaceController');
@@ -366,7 +369,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			//_workspaceModel.getWorkspace().requestCreateFolder();
 			
 		}
-
+		clearBusy()
 		
 		//TODO: integrate with key listener for canvas!! CTRL-C is handels by the canvas at the mo... need to set somethign in application.#
 		
@@ -408,7 +411,15 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		_workspaceModel.getWorkspace().requestNewFolder(selectedFolderID,newName);
 	}
 	
+	public function setBusy(){
+		_isBusy = true;
+		getView().workspaceDialogue.showHideBtn(false);
+	}
 	
+	public function clearBusy(){
+		_isBusy = false;
+		getView().workspaceDialogue.showHideBtn(true);
+	}
 	
 	//override the super version
 	public function getView(){

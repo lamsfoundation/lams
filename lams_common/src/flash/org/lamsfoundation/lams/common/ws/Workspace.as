@@ -360,5 +360,10 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		return workspaceModel;
 	}
 	
+	public function getWV():WorkspaceView{
+		return workspaceView;
+	}
+	
+	
 	
 }

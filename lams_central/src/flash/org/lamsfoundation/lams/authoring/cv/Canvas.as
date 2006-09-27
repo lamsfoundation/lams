@@ -64,7 +64,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var toolActWidth:Number = 123;
 	private var toolActHeight:Number = 50;
 	private var complexActWidth:Number = 143;
-
+	private var _isBusy:Boolean;
 	// auto-save interval
 	//private static var AUTOSAVE_DEFAULT_CHECK_INTERVAL:Number = 10000;
 	private static var AUTOSAVE_CONFIG:String = "autosave";
@@ -112,7 +112,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		_undoStack = new Array();
 		_redoStack = new Array();
-		
+		_isBusy = false;
 		//some initialisation:
 
 
@@ -169,10 +169,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				}
 				setInterval(Proxy.create(this,autoSave), autosave_config_interval);
 			}
-			
 			clearCanvas(true);
 			
             dispatchEvent({type:'load',target:this});
+			
         }else {
             Debugger.log('Event type not recognised : ' + evt.type,Debugger.CRITICAL,'viewLoaded','Canvas');
         }
@@ -218,7 +218,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
     public function openDesignById(workspaceResultDTO:Object){
-		
+		//Application.getInstance().getWorkspace().getWV().workspaceDialog.closeThisDialogue();
 		ObjectUtils.toString(workspaceResultDTO);
 		var designId:Number = workspaceResultDTO.selectedResourceID;
 
@@ -317,7 +317,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	public function saveDesign(){
-		if((_ddm.learningDesignID == undefined || _ddm.learningDesignID == "" || _ddm.learningDesignID == null || _ddm.learningDesignID =="undefined") && (_ddm.title == "" || _ddm.title == undefined || _ddm.title == null)){
+		if((_ddm.learningDesignID == undefined || _ddm.learningDesignID == "" || _ddm.learningDesignID == null || _ddm.learningDesignID =="undefined") || _ddm.learningDesignID == Config.NUMERIC_NULL_VALUE && (_ddm.title == "" || _ddm.title == undefined || _ddm.title == null)){
 			// raise alert if design is empty
 			if (canvasModel.activitiesDisplayed.size() < 1){
 				Cursor.showCursor(Application.C_DEFAULT);
@@ -412,6 +412,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function onStoreDesignResponse(r):Void{
 		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
+		Application.getInstance().getWorkspace().getWV().clearDialog();
+		
 		if(r instanceof LFError){
 			Cursor.showCursor(Application.C_DEFAULT);
 			r.showErrorAlert();
@@ -1188,14 +1190,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private function openGroupHelp(url:String){
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GROUP
 		var locale:String = _root.lang + _root.country;
-		var target:String = app.module +actToolSignature+ '#' + app.module +actToolSignature+ '-' + locale;
+		var target:String = actToolSignature + app.module + '#' + actToolSignature+ app.module + '-' + locale;
 		getURL(url + target, '_blank');
 	}
 	
 	private function openGateHelp(url:String){
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GATE
 		var locale:String = _root.lang + _root.country;
-		var target:String = app.module +actToolSignature+ '#' + app.module +actToolSignature+ '-' + locale;
+		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
 		getURL(url + target, '_blank');
 	}
 	
@@ -1211,7 +1213,18 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		return complexActWidth;
 	}
 	
+	private function setBusy():Void{
+		if(_isBusy){
+			//Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+			//Debugger.log('!!!!!!!!!!!!!!!!!!!! HASHTABLE ACCESED WHILE BUSY !!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+			//Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+		}
+		_isBusy=true;
+	}
 	
+	private function clearBusy():Void{
+		_isBusy=false;
+	}
 	/**
 	* Used by application to set the Position
 	* @param x
