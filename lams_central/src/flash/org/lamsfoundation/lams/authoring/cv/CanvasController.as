@@ -39,6 +39,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private var _canvasModel:CanvasModel;
 	private var _canvasView:CanvasView;
 	private var _pi:PropertyInspectorNew;
+	private var _isBusy:Boolean;
 	
 	/**
 	* Constructor
@@ -51,7 +52,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_canvasModel = CanvasModel(getModel());
 		_canvasView = CanvasView(getView());
 		_pi = new PropertyInspectorNew();
-		
+		_isBusy = false;
 	}
    
     public function activityClick(ca:Object):Void{
@@ -383,6 +384,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 	}
    
+	private function setBusy():Void{
+		if(_isBusy){
+			//Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+			//Debugger.log('!!!!!!!!!!!!!!!!!!!! HASHTABLE ACCESED WHILE BUSY !!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+			//Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+		}
+		_isBusy=true;
+	}
+	
+	private function clearBusy():Void{
+		_isBusy=false;
+	}
 	
 	
 	/**
