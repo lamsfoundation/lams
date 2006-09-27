@@ -178,7 +178,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	
 
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#exportPortfolioForStudent(java.lang.Long, org.lamsfoundation.lams.usermanagement.User,boolean) */
-	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies)
+	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, ToolAccessMode accessMode, Cookie[] cookies)
 	{
 		ArrayList<ActivityPortfolio> portfolios = null;
 		ArrayList<NotebookPortfolio> notes = null;
@@ -196,10 +196,11 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 				try
 				{
-			   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, coreNotebookService, ToolAccessMode.LEARNER, lesson, learnerProgress, learner);
+					
+					PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, coreNotebookService, ToolAccessMode.LEARNER, lesson, learnerProgress, learner);
 			   		
 			   		builder.parseLearningDesign();
-			   		builder.processNotebook();
+			   		builder.processNotebook(accessMode);
 			   		
 		    		portfolios = builder.getPortfolioList();
 		    		notes = builder.getNotebookList();
@@ -288,12 +289,15 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		portfolio.setLessonDescription(lesson.getLessonDescription());
 		portfolio.setLessonStartDate(lesson.getStartDateTime());
 		
-		processPortfolios(portfolios, cookies, tempDirectoryName);
-		portfolio.setActivityPortfolios((ActivityPortfolio[])portfolios.toArray(new ActivityPortfolio[portfolios.size()]));
+		if(portfolios != null) {
+			processPortfolios(portfolios, cookies, tempDirectoryName);
+			portfolio.setActivityPortfolios((ActivityPortfolio[])portfolios.toArray(new ActivityPortfolio[portfolios.size()]));
+		}
 		
-		processNotes(notes, tempDirectoryName, portfolio);
-		portfolio.setNotebookPortfolios((NotebookPortfolio[])notes.toArray(new NotebookPortfolio[notes.size()]));
-		
+		if(notes != null) {
+			processNotes(notes, tempDirectoryName, portfolio);
+			portfolio.setNotebookPortfolios((NotebookPortfolio[])notes.toArray(new NotebookPortfolio[notes.size()]));
+		}
 		
 		return portfolio;
 		

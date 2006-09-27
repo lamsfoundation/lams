@@ -218,16 +218,30 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	
 	/**
 	 * Process all Notebook (Scratchpad) entries into portfolio objects.
+	 * @param notebookAccessMode 	The access mode that determines what entries are returned.
 	 */
-	public void processNotebook() {
-		if(lesson != null && user != null) {
-			List entries = coreNotebookService.getEntry(lesson.getLessonId(),CoreNotebookConstants.SCRATCH_PAD,"SCRATCHPAD", user.getUserId());
-			Iterator it = entries.iterator();
-			while(it.hasNext()) {
-				NotebookEntry entry = (NotebookEntry) it.next();
-				NotebookPortfolio portfolio = createNotebookPortfolio(entry);
-				currentNotebookList.add(portfolio);
-			}
+	public void processNotebook(ToolAccessMode notebookAccessMode) throws ExportPortfolioException {
+		List entries = null;
+		
+		if(lesson == null || user == null) {
+			throw new ExportPortfolioException();
+		}
+		
+		if(notebookAccessMode == null)
+			entries = coreNotebookService.getEntry(lesson.getLessonId(),CoreNotebookConstants.SCRATCH_PAD, user.getUserId());
+		else if(notebookAccessMode.equals(ToolAccessMode.TEACHER))
+			entries = coreNotebookService.getEntry(lesson.getLessonId(),CoreNotebookConstants.SCRATCH_PAD,CoreNotebookConstants.JOURNAL_SIG, user.getUserId());
+				
+		if(entries == null) {
+			throw new ExportPortfolioException();
+		}
+			
+		Iterator it = entries.iterator();
+		
+		while(it.hasNext()) {
+			NotebookEntry entry = (NotebookEntry) it.next();	
+			NotebookPortfolio portfolio = createNotebookPortfolio(entry);
+			currentNotebookList.add(portfolio);
 		}
 	}
 
@@ -273,6 +287,12 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 		p.setTitle(entry.getTitle());
 		p.setCreated(entry.getCreateDate());
 		p.setModified(entry.getLastModified());
+		
+		if(entry.getExternalSignature().equals(CoreNotebookConstants.JOURNAL_SIG))
+			p.setTeacherViewable(true);
+		else 
+			p.setTeacherViewable(false);
+		
 		return p;
 	}
 

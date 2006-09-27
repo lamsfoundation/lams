@@ -37,6 +37,8 @@ public interface ICoreNotebookService {
 
 	List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
 	
+	List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID);
+	
 	NotebookEntry getEntry(Long uid);
 	
 	void updateEntry(Long uid, String title, String entry);

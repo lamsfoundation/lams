@@ -33,10 +33,12 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	
-	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName() 
+	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG = "from " + NotebookEntry.class.getName() 
 							+ " where external_id=? and external_id_type=? and external_signature=? and user_id=?"
 							+ " order by create_date desc";
-	
+	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE = "from " + NotebookEntry.class.getName() 
+							+ " where external_id=? and external_id_type=? and user_id=?"
+							+ " order by create_date desc";
 	private static final String SQL_QUERY_FIND_ENTRY_BY_USER_ID = "from " + NotebookEntry.class.getName() 
 							+ " where user_id=?";
 	
@@ -46,7 +48,11 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	}
 
 	public List<NotebookEntry> get(Long id, Integer idType, String signature, Integer userID) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID, new Object[]{id, idType, signature, userID}));
+		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG, new Object[]{id, idType, signature, userID}));
+	}
+	
+	public List<NotebookEntry> get(Long id, Integer idType, Integer userID) {
+		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE, new Object[]{id, idType, userID}));
 	}
 
 	public NotebookEntry get(Long uid) {

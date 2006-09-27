@@ -37,6 +37,7 @@ public class NotebookPortfolio {
 	private String title;
 	private Date created;
 	private Date modified;
+	private boolean teacherViewable;
 	
 	public NotebookPortfolio()
 	{
@@ -44,6 +45,7 @@ public class NotebookPortfolio {
 		this.title = null;
 		this.created = null;
 		this.modified = null;
+		this.teacherViewable = false;
 	}
 	
 	/**
@@ -98,5 +100,19 @@ public class NotebookPortfolio {
 	 */
 	public void setModified(Date modified) {
 		this.modified = modified;
+	}
+	/**
+	 * 
+	 * @return  true if teacher can view entry, otherwise false.
+	 */
+	public boolean getTeacherViewable() {
+		return teacherViewable;
+	}
+	/**
+	 * 
+	 * @param teacherViewable 
+	 */
+	public void setTeacherViewable(boolean teacherViewable) {
+		this.teacherViewable = teacherViewable;
 	}
 }

@@ -28,6 +28,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.export.Portfolio;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 /**
  * @author mtruong
  *
@@ -86,10 +87,11 @@ public interface IExportPortfolioService {
 	 * @param userId The learner id.
 	 * @param lessonID The lesson id of the lesson, the learner is doing the export for
 	 * @param anonymity The anonymity flag, is true, then anonymity is on, otherwise username would be visible.
+	 * @param accessMode The access mode to set.
 	 * @param cookies Are passed along to doExport, in order for access the export for other tools
 	 * @return Portfolio Portfolio object which contains the array of ToolPortfolio objects.
 	 */
-	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies);
+	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, ToolAccessMode accessMode, Cookie[] cookies);
 	
 	/**
 	 * Zips up the directory specified by <code>directoryToZip</code> and

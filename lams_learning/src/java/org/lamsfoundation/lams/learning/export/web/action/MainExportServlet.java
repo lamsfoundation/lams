@@ -96,6 +96,8 @@ public class MainExportServlet extends HttpServlet {
 	    
 		Portfolio portfolios = null;
 		Long lessonID = null;
+		String role = null;
+		ToolAccessMode accessMode = null;
 		
 	    /** Get the cookies that were sent along with this request, then pass it onto export service */
 		Cookie[] cookies = request.getCookies();	
@@ -103,13 +105,17 @@ public class MainExportServlet extends HttpServlet {
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this.getServletContext());
 		
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
-		
 		if (mode.equals(ToolAccessMode.LEARNER.toString()))
 		{
 			// TODO check if the user id is coming from the request then the current user should have monitoring privilege
-		    Integer userId = getLearnerUserID(request);
+			Integer userId = getLearnerUserID(request);
 		    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
-		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, cookies);
+		    
+		    if((role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE, true)) != null){   
+		    	accessMode = (role.equals(ToolAccessMode.TEACHER.toString()))?ToolAccessMode.TEACHER:null;
+		    }
+		    
+		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, accessMode, cookies);
 		}
 		else if(mode.equals(ToolAccessMode.TEACHER.toString()))
 		{
@@ -125,9 +131,10 @@ public class MainExportServlet extends HttpServlet {
 				
 			exportService.generateMainPage(request, portfolios, cookies);	
 			
-			if(portfolios.getNotebookPortfolios().length > 0) {
-				exportService.generateNotebookPage(request, portfolios, cookies);
-			}
+			if(portfolios.getNotebookPortfolios() != null)
+				if(portfolios.getNotebookPortfolios().length > 0)
+					exportService.generateNotebookPage(request, portfolios, cookies);
+			
 			
 			//bundle the stylesheet with the package
 			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir);

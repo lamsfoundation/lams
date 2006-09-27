@@ -20,7 +20,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -60,6 +59,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:forEach var="entry" items="${portfolio.notebookPortfolios}" varStatus="status">
 			<p>
 				<b><c:out value="${entry.title}"/></b>
+				<br><i>
+				<c:choose>
+					<c:when test="${entry.teacherViewable}"><fmt:message key="export.portfolio.notebook.public.label"/></c:when>
+					<c:otherwise><fmt:message key="export.portfolio.notebook.private.label"/></c:otherwise>
+				</c:choose>
+				</i>
 				<br><i><fmt:message key="export.portfolio.notebook.created.label">
 						<fmt:param><lams:Date value="${entry.created}"/></fmt:param>
 					</fmt:message></i>

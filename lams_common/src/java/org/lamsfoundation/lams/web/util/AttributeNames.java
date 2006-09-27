@@ -41,6 +41,7 @@ public class AttributeNames {
 	public static final String UID="uniqueID";
 
     public static final String PARAM_MODE = "mode";
+    public static final String PARAM_ROLE = "role";
     public static final String PARAM_SESSION_STATUS = "sessionStatus";
     public static final String PARAM_USER_ID = "userID";
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
