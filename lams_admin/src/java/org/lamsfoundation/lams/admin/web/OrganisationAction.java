@@ -35,14 +35,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang
@@ -61,23 +63,32 @@ public class OrganisationAction extends LamsDispatchAction {
 	private static Logger log = Logger.getLogger(OrganisationAction.class);
 
 	private static IUserManagementService service;
+	private static MessageService messageService;
 	private static List<SupportedLocale> locales; 
 	private static List status;
 	
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		initLocalesAndStatus();
+		DynaActionForm orgForm = (DynaActionForm)form;
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+
 		if(orgId != null){//editing existing organisation
-			Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
-			DynaActionForm orgForm = (DynaActionForm)form;
+			Organisation org = (Organisation)service.findById(Organisation.class,orgId);
 			BeanUtils.copyProperties(orgForm,org);
-			log.debug("Struts Pupulated orgId:"+(Integer)orgForm.get("orgId"));
+			log.debug("Struts Populated orgId:"+(Integer)orgForm.get("orgId"));
 			orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
 			orgForm.set("parentName",org.getParentOrganisation().getName());
 			orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
 			orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
 			SupportedLocale locale = org.getLocale();
 			orgForm.set("localeId",locale != null ? locale.getLocaleId() : null);
+		} else if(!request.isUserInRole(Role.SYSADMIN) && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE)) {
+			// only sysadmin can create new group
+			messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+			request.setAttribute("errorName", "OrganisationAction");
+			request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
+			return mapping.findForward("error");
 		}
 		request.getSession().setAttribute("locales",locales);
 		request.getSession().setAttribute("status",status);
@@ -91,20 +102,10 @@ public class OrganisationAction extends LamsDispatchAction {
 		request.setAttribute("org",parentId);
 		return mapping.findForward("orglist");
 	}*/
-
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
 	
 	@SuppressWarnings("unchecked")
 	private void initLocalesAndStatus(){
-		if((locales==null)||(status==null)){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		if((locales==null)||(status==null) && service!=null){
 			locales = service.findAll(SupportedLocale.class);
 			status = service.findAll(OrganisationState.class);
 			Collections.sort(locales);
