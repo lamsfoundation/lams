@@ -97,7 +97,7 @@ public class HomeAction extends DispatchAction {
 	}
 	
 	private User getRealUser(UserDTO dto) {
-		return service.getUserByLogin(dto.getLogin());
+		return getService().getUserByLogin(dto.getLogin());
 	}
 
 	/**
