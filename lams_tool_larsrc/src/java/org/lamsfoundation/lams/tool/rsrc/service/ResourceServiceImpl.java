@@ -851,7 +851,7 @@ public class ResourceServiceImpl implements
 			
 //			reset it to new toolContentId
 			toolContentObj.setContentId(toolContentId);
-			ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(new Long(newUserUid.longValue()), toolContentId);
+			ResourceUser user = resourceUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
 			if(user == null){
 				user = new ResourceUser();
 				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
