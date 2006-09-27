@@ -33,7 +33,7 @@
 						<td>
 							<c:choose>
 								<c:when test="${userDTO.finishReflection}">
-									<c:out value="${userDTO.reflect}" escapeXml="false"/>
+									<lams:out value="${userDTO.reflect}"/>
 								</c:when>
 								<c:otherwise>
 									<fmt:message key="message.not.avaliable" />

@@ -68,7 +68,7 @@ public class SurveyServiceProxy
     private static Object getSurveyDomainService(ServletContext servletContext)
     {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        return wac.getBean("surveyService");
+        return wac.getBean("lasurvSurveyService");
     }
     
 }

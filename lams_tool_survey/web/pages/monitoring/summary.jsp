@@ -9,12 +9,12 @@
 	</div>
 </c:if>
 
-<table cellpadding="0"  class="alternative-color">
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 		<c:set var="surveySession"  value="${group.key}"/>
 		<c:set var="questions"  value="${group.value}"/>
 		
 		<c:if test="${empty questions}">
+		<table cellpadding="0"  class="alternative-color">
 			<tr>
 				<td colspan="2">
 					<div align="left">
@@ -22,10 +22,12 @@
 					</div>
 				</td>
 			</tr>
+		</table>
 		</c:if>
-		<c:forEach var="question" items="${questions}" varStatus="status">
+		<c:forEach var="question" items="${questions}" varStatus="queStatus">
 			<%-- display group name on first row--%>
-			<c:if test="${status.first}">
+			<c:if test="${queStatus.first}">
+				<table cellpadding="0"  class="alternative-color">
 				<tr>
 					<td colspan="2">
 						<B><fmt:message key="monitoring.label.group" /> ${surveySession.sessionName}</B> 
@@ -58,7 +60,7 @@
 			</tr>
 			--%>
 			<c:set var="optSize" value="${fn:length(question.options)}" />
-			<c:forEach var="option" items="${question.options}"  varStatus="status">
+			<c:forEach var="option" items="${question.options}"  varStatus="optStatus">
 				<tr>
 					<td>${option.description}</td>
 					<td>
@@ -68,7 +70,7 @@
 							</fmt:message>
 						</c:set>
 						<c:set var="imgIdx">
-							${status.index % 5 + 1}
+							${optStatus.index % 5 + 1}
 						</c:set>			
 						<img src="${tool}/includes/images/bar${imgIdx}.gif" height="10" width="${option.response * 2}" 
 						title="${imgTitle}">
@@ -102,11 +104,15 @@
 					</td>
 				</tr>
 			</c:if>
+			<c:if test="${queStatus.last}">
+				</table>
+			</c:if>
 				<%-- Reflection list  --%>
-				<c:if test="${sessionMap.survey.reflectOnActivity && status.last}">
+				<c:if test="${sessionMap.survey.reflectOnActivity && queStatus.last}">
 					<c:set var="userList" value="${sessionMap.reflectList[surveySession.sessionId]}"/>
 					<c:forEach var="user" items="${userList}" varStatus="refStatus">
 						<c:if test="${refStatus.first}">
+							<table cellpadding="0"  class="alternative-color">
 							<tr>
 								<td colspan="5">
 									<h2><fmt:message key="title.reflection"/>	</h2>
@@ -133,17 +139,19 @@
 							</td>
 							<td >
 								<c:set var="viewReflection">
-									<c:url value="/monitoring/viewReflection.do?toolSessionID=${item.sessionId}&userUid=${user.userUid}"/>
+									<c:url value="/monitoring/viewReflection.do?toolSessionID=${surveySession.sessionId}&userUid=${user.userUid}"/>
 								</c:set>
 								<html:link href="javascript:launchPopup('${viewReflection}')">
 									<fmt:message key="label.view" />
 								</html:link>
 							</td>
 						</tr>
+						<c:if test="${refStatus.last}">
+							</table>
+						</c:if>
 					</c:forEach>
 				</c:if>
 			
 		</c:forEach>
 		
 	</c:forEach>
-</table>
