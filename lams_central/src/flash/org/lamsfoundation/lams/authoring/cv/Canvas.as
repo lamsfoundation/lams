@@ -219,6 +219,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
     public function openDesignById(workspaceResultDTO:Object){
 		//Application.getInstance().getWorkspace().getWV().workspaceDialog.closeThisDialogue();
+		Application.getInstance().getWorkspace().getWV().clearDialog();
 		ObjectUtils.toString(workspaceResultDTO);
 		var designId:Number = workspaceResultDTO.selectedResourceID;
 
