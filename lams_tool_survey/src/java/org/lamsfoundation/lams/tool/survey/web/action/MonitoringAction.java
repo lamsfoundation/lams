@@ -105,11 +105,13 @@ public class MonitoringAction extends Action {
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		//save contentFolderID into session
+		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
 		
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		ISurveyService service = getSurveyService();
 		
-		SortedMap<SurveySession,List<SurveyQuestion>> summary = service.getSummary(contentId);
+		SortedMap<SurveySession,List<AnswerDTO>> summary = service.getSummary(contentId);
 		Survey survey = service.getSurveyByContentId(contentId);
 		
 		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);

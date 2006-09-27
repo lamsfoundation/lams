@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 
 public interface SurveyQuestionDAO extends DAO {

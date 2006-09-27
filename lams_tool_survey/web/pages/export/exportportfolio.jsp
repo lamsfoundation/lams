@@ -1,160 +1,115 @@
-<%@ include file="/common/taglibs.jsp"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<c:set var="sessionMapID" value="${param.sessionMapID}"/>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.summaryList}"/>
-<c:set var="mode" value="${sessionMap.mode}"/>
-<c:set var="title" value="${sessionMap.title}"/>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
-<html:html locale="true">
+
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="tool"><lams:WebAppURL/></c:set>
+<%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
+<html>
 <head>
-	<title><fmt:message key="export.title" /></title>
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-	<script type="text/javascript">
-		function launchPopup(url,title) {
-			var wd = null;
-			if(wd && wd.open && !wd.closed){
-				wd.close();
-			}
-			wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
-			wd.window.focus();
-		}
-	</script>
-	<lams:css localLinkPath="../"/>
+	    <%@ include file="/common/header.jsp" %>
 </head>
 <body>
-
-<div id="page-learner"><!--main box 'page'-->
-
-	<h1 class="no-tabs-below">${title} </h1>
-	<div id="header-no-tabs-learner">
-	</div><!--closes header-->
-
-	<div id="content-learner">
-
-		<table border="0" cellspacing="3" width="98%">
-			<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-				<c:set var="groupSize" value="${fn:length(group)}" />
-				<c:forEach var="item" items="${group}" varStatus="status">
-					<%-- display group name on first row--%>
-					<c:if test="${status.index == 0}">
+	<div id="page-learner">
+		<h1 class="no-tabs-below">
+			<fmt:message key="title.chart.report"/>
+		</h1>
+		<div id="header-no-tabs-learner">
+		</div>
+		<div id="content-learner">
+			<c:forEach var="entry" items="${answerList}" varStatus="status">
+				<c:set var="user" value="${entry.key}"/>
+				<c:set var="question" value="${entry.value}"/>
+				<%--  display question header  --%>
+				<c:if test="${status.first}">
+					<h2><fmt:message key="label.question"/></h2>
+					<table  class="alternative-color">
+					<tr>
+						<%-- <td><fmt:message key="label.question"/></td>--%>
+						<th colspan="2" class="first" width="50px"><c:out value="${question.description}" escapeXml="false"/></th>
+					</tr>
+					<%-- 
+					<tr>
+						<td colspan="2"><b><fmt:message key="message.possible.answers"/></b></td>
+					</tr>
+					--%>
+					<c:forEach var="option" items="${question.options}" varStatus="optStatus">
 						<tr>
 							<td>
-								<c:choose>
-									<c:when test="${item.initGroup}">
-										<B><fmt:message key="export.init.survey" /></B>
-									</c:when>
-									<c:otherwise>
-										<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B>
-									</c:otherwise>
-								</c:choose>
+								<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
+							</td>
+							<td>
+								${option.description}
 							</td>
 						</tr>
+					</c:forEach>
+					<c:if test="${question.appendText ||question.type == 3}">
 						<tr>
 							<td>
-								<table border="0" cellspacing="3" width="98%">
-									<tr>
-										<th width="50">
-											<fmt:message key="monitoring.label.type" />
-										</th>
-										<th width="300">
-											<fmt:message key="monitoring.label.title" />
-										</th>
-										<th width="150">
-											<fmt:message key="monitoring.label.suggest" />
-										</th>
-										<th width="300" align="center">
-											<fmt:message key="export.label.survey" />
-										</th>
-										<c:if test="${mode == 'teacher'}">
-											<th width="50" align="center">
-												<!-- hide/show -->
-											</th>
-										</c:if>
-									</tr>
-									</c:if>
-									<c:if test="${item.itemUid == -1}">
-										<tr>
-											<td colspan="4">
-												<div align="left">
-													<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
-												</div>
-											</td>
-										</tr>
-									</c:if>
-									<c:if test="${item.itemUid != -1}">
-										<tr>
-											<td>
-												<c:choose>
-													<c:when test="${item.itemType == 1}">
-														<fmt:message key="label.authoring.basic.survey.url" />
-													</c:when>
-													<c:when test="${item.itemType == 2}">
-														<fmt:message key="label.authoring.basic.survey.file" />
-													</c:when>
-													<c:when test="${item.itemType == 3}">
-														<fmt:message key="label.authoring.basic.survey.website" />
-													</c:when>
-													<c:when test="${item.itemType == 4}">
-														<fmt:message key="label.authoring.basic.survey.learning.object" />
-													</c:when>
-												</c:choose>
-											</td>
-											<td>
-												${item.itemTitle}
-											</td>
-											<td>
-												${item.username}
-											</td>
-											<td align="center">
-												<c:choose>
-													<c:when test="${item.itemType == 1}">
-														<a href="javascript:;" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.survey.preview" /> </a>
-													</c:when>
-													<c:when test="${item.itemType == 2}">
-														<c:set var="downloadUrl">
-															<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
-														</c:set>
-														<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
-													</c:when>
-													<c:when test="${item.itemType == 3}">
-														<c:set var="downloadUrl">
-															<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
-														</c:set>
-														<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
-													</c:when>
-													<c:when test="${item.itemType == 4}">
-														<fmt:message key="export.label.no.learning.object" />
-													</c:when>
-												</c:choose>
-											</td>
-											<c:if test="${mode == 'teacher'}">
-												<td align="center">
-													<c:if test="${item.itemHide}">
-														<fmt:message key="monitoring.label.hidden" />
-													</c:if>
-												</td>
-											</c:if>
-										</tr>
-									</c:if>
-									<c:if test="${status.count == groupSize}">
-								</table>
+								<fmt:message key="label.open.response"/>
 							</td>
+							<td>&nbsp;</td>
 						</tr>
 					</c:if>
+					<tr>
+					</table>
+				<%--  End first check  --%>
+				</c:if>
+				<c:if test="${status.first}">
+					<h2><fmt:message key="label.answer"/></h2>
+					<div align="center">
+						<table class="alternative-color">
+							<tr>
+								<th class="first"><fmt:message key="label.learner"/></th>
+								<c:forEach var="option" items="${question.options}" varStatus="optStatus">
+									<th>
+										<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
+									</th>
+								</c:forEach>
+								<c:if test="${question.appendText || question.type == 3}">
+									<th>
+										<fmt:message key="label.open.response"/>
+									</th>
+								</c:if>
+							</tr>
+				</c:if>
+						<%--  User answer list --%>
+						<tr>
+							<td>${user.loginName}</td>
+							<c:forEach var="option" items="${question.options}">
+								<td>
+									<c:if test="${not empty question.answer}">
+										<c:set var="checked" value="false"/>
+										<c:forEach var="choice" items="${question.answer.choices}">
+											<c:if test="${choice == option.uid}">
+												<c:set var="checked" value="true"/>
+											</c:if>
+										</c:forEach>
+										<c:if test="${checked}">
+											Y
+										</c:if>
+									</c:if>
+									&nbsp;
+								</td>
+							</c:forEach>
+							<c:if test="${question.appendText ||question.type == 3}">
+								<td>
+									<c:if test="${not empty question.answer}">
+										<lams:out value="${question.answer.answerText}"/>
+									</c:if>
+									&nbsp;
+								</td>
+							</c:if>
+						</tr>
+					<c:if test="${status.last}">
+						</table>
+						</div>
+					<%--  End first check  --%>
+					</c:if>
 				</c:forEach>
-			</c:forEach>
-		</table>
-
-	</div>  <!--closes content-->
-
-
-	<div id="footer-learner">
-	</div><!--closes footer-->
-
-</div><!--closes page-->
-
+		</div>
+		<div id="footer-learner"></div>
+		</div>
+	</div>
 </body>
-</html:html>
+</html>

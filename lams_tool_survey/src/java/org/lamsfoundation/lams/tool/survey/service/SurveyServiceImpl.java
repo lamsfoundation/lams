@@ -85,6 +85,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.SurveySessionComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
+import org.lamsfoundation.lams.tool.survey.util.SurveyUserComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -94,6 +95,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+
+import sun.reflect.generics.tree.Tree;
 
 /**
  * 
@@ -401,10 +404,10 @@ public class SurveyServiceImpl implements
 		
 	}
 	
-	public SortedMap<SurveySession,List<SurveyQuestion>> getSummary(Long toolContentId) {
+	public SortedMap<SurveySession,List<AnswerDTO>> getSummary(Long toolContentId) {
 		
-		SortedMap<SurveySession,List<SurveyQuestion>> summary = 
-				new TreeMap<SurveySession, List<SurveyQuestion>>(new SurveySessionComparator());
+		SortedMap<SurveySession,List<AnswerDTO>> summary = 
+				new TreeMap<SurveySession, List<AnswerDTO>>(new SurveySessionComparator());
 		
 		Survey survey = surveyDao.getByContentId(toolContentId);
 		//get all question under this survey
@@ -412,14 +415,13 @@ public class SurveyServiceImpl implements
 		List<SurveySession> sessionList = surveySessionDao.getByContentId(toolContentId);
 		//iterator all sessions under this survey content, and get all questions and its answers.
 		for (SurveySession session : sessionList) {
-			List<SurveyQuestion> responseList = new ArrayList<SurveyQuestion>();
+			List<AnswerDTO> responseList = new ArrayList<AnswerDTO>();
 			for (SurveyQuestion question : questionList) {
-				SurveyQuestion response = getQuestionResponse(session.getSessionId(), question.getUid());
+				AnswerDTO response = getQuestionResponse(session.getSessionId(), question.getUid());
 				responseList.add(response);
 			}
 			summary.put(session, responseList);
 		}
-		
 		
 		return summary;
 	}
@@ -427,6 +429,52 @@ public class SurveyServiceImpl implements
 	public SurveyQuestion getQuestion(Long questionUid) {
 		return surveyQuestionDao.getByUid(questionUid);
 	}
+
+
+
+	public SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> exportByContentId(Long toolContentID) {
+		SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> summary = 
+			new TreeMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>>(new SurveySessionComparator());
+		
+		//get all tool sessions in this content
+		List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentID);
+		if(sessions != null){
+			for (SurveySession session : sessions) {
+				//get all users under this session 
+				List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
+				
+				//container for this user's answers
+				SortedMap<SurveyUser,List<AnswerDTO>> learnerAnswers  = 
+					new TreeMap<SurveyUser, List<AnswerDTO>>(new SurveyUserComparator());
+				if(users != null){
+					//for every user, get answers of all questions. 
+					for (SurveyUser user : users) {
+						List<AnswerDTO> answers = getQuestionAnswers(user.getSession().getSessionId(), user.getUid());
+						learnerAnswers.put(user, answers);
+					}
+				}
+				summary.put(session, learnerAnswers);
+			}
+		}
+		
+		return summary;
+	}
+
+
+	public SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> exportByLeaner(SurveyUser learner) {
+		SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> summary = 
+				new TreeMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>>(new SurveySessionComparator());
+		
+		
+		List<AnswerDTO> answers = getQuestionAnswers(learner.getSession().getSessionId(), learner.getUid());
+		SortedMap<SurveyUser,List<AnswerDTO>> learnerAnswers  = new TreeMap<SurveyUser, List<AnswerDTO>>(new SurveyUserComparator());
+		learnerAnswers.put(learner, answers);
+		
+		summary.put(learner.getSession(), learnerAnswers);
+		
+		return summary;
+	}
+
 
 	//*****************************************************************************
 	// private methods
@@ -530,7 +578,6 @@ public class SurveyServiceImpl implements
  		toolContentObj.setOnlineFileList(null);
 		try {
 			exportContentService.registerFileClassForExport(SurveyAttachment.class.getName(),"fileUuid","fileVersionId");
-			exportContentService.registerFileClassForExport(SurveyQuestion.class.getName(),"fileUuid","fileVersionId");
 			exportContentService.exportToolContent( toolContentId, toolContentObj,surveyToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
@@ -543,17 +590,15 @@ public class SurveyServiceImpl implements
 		try {
 			exportContentService.registerFileClassForImport(SurveyAttachment.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,null);
-			exportContentService.registerFileClassForImport(SurveyQuestion.class.getName()
-					,"fileUuid","fileVersionId","fileName","fileType",null,"initialItem");
 			
 			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,surveyToolContentHandler);
 			if(!(toolPOJO instanceof Survey))
-				throw new ImportToolContentException("Import Share surveys tool content failed. Deserialized object is " + toolPOJO);
+				throw new ImportToolContentException("Import survey tool content failed. Deserialized object is " + toolPOJO);
 			Survey toolContentObj = (Survey) toolPOJO;
 			
 //			reset it to new toolContentId
 			toolContentObj.setContentId(toolContentId);
-			SurveyUser user = surveyUserDao.getUserByUserIDAndSessionID(new Long(newUserUid.longValue()), toolContentId);
+			SurveyUser user = surveyUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
 			if(user == null){
 				user = new SurveyUser();
 				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
@@ -837,7 +882,5 @@ public class SurveyServiceImpl implements
 	public void setSurveyAnswerDao(SurveyAnswerDAO surveyAnswerDao) {
 		this.surveyAnswerDao = surveyAnswerDao;
 	}
-
-
 
 }

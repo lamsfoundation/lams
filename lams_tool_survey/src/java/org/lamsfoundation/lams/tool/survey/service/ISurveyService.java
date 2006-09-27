@@ -99,7 +99,7 @@ public interface ISurveyService
 	void deleteSurveyAttachment(Long attachmentUid);
 	
 	//******************************************************************************************
-	//*************** Questions  methods **********************
+	//*************** Questions and Answers methods **********************
 	//******************************************************************************************
 	SurveyQuestion getQuestion(Long questionUid);
 	/**
@@ -205,7 +205,13 @@ public interface ISurveyService
 	 * Return a map which sorted by SurveySession and list of questions for this session. 
 	 */
 
-	SortedMap<SurveySession,List<SurveyQuestion>> getSummary(Long contentId);
+	SortedMap<SurveySession,List<AnswerDTO>> getSummary(Long contentId);
+
+	//******************************************************************************************
+	//  	Export portfolio methods
+	//******************************************************************************************
+	SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> exportByLeaner(SurveyUser learner);
+	SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> exportByContentId(Long toolContentID);
 
 	//******************************************************************************************
 	//  	NOTEBOOK Functions

@@ -18,7 +18,11 @@
 			$("surveyForm").action = '<c:url value="/learning/nextQuestion.do"/>';
 			$("surveyForm").submit();
 		}
-		
+		function singleChoice(choiceName){
+			var rs = document.getElementsByName(choiceName);
+			for(idx=0;idx<rs.length;idx++)
+				rs[idx].checked=false;
+		}
 	-->        
     </script>
 </head>

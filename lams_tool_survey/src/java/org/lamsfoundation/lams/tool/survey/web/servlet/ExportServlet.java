@@ -25,7 +25,10 @@
 
 package org.lamsfoundation.lams.tool.survey.web.servlet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.SortedMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +37,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.survey.SurveyConstants;
+import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
@@ -73,7 +79,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				teacher(request, response, directoryName, cookies,sessionMap);
 			}
 		} catch (SurveyApplicationException e) {
-			logger.error("Cannot perform export for share survey tool.");
+			logger.error("Cannot perform export for survey tool.");
 		}
 
 		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -112,13 +118,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		
-//		List<Summary> group = service.exportBySessionId(toolSessionID,true);
-//		
-//		List<List> groupList = new ArrayList<List>();
-//		if(group.size() > 0)
-//			groupList.add(group);
-//		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
-//		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
+		SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> groupList = service.exportByLeaner(learner);
+		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
@@ -139,11 +141,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SurveyApplicationException(error);
 		}
-//		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-//		
-//		// put it into HTTPSession
-//		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
-//		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
+		SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> groupList = service.exportByContentId(toolContentID);
+		
+		// put it into HTTPSession
+		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 }

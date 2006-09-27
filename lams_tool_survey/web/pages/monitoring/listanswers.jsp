@@ -17,19 +17,22 @@
 		<div id="header-no-tabs-learner">
 		</div>
 		<div id="content-learner">
-			<table border="0" cellspacing="3" width="98%">
 			<c:forEach var="entry" items="${answerList}" varStatus="status">
 				<c:set var="user" value="${entry.key}"/>
 				<c:set var="question" value="${entry.value}"/>
 				<%--  display question header  --%>
 				<c:if test="${status.first}">
+					<h2><fmt:message key="label.question"/></h2>
+					<table  class="alternative-color">
 					<tr>
-						<td><fmt:message key="label.question"/></td>
-						<td><c:out value="${question.description}" escapeXml="false"/></td>
+						<%-- <td><fmt:message key="label.question"/></td>--%>
+						<th colspan="2" class="first" width="50px"><c:out value="${question.description}" escapeXml="false"/></th>
 					</tr>
+					<%-- 
 					<tr>
-						<td colspan="2"><fmt:message key="message.possible.answers"/></td>
+						<td colspan="2"><b><fmt:message key="message.possible.answers"/></b></td>
 					</tr>
+					--%>
 					<c:forEach var="option" items="${question.options}" varStatus="optStatus">
 						<tr>
 							<td>
@@ -45,63 +48,65 @@
 							<td>
 								<fmt:message key="label.open.response"/>
 							</td>
-							<td></td>
+							<td>&nbsp;</td>
 						</tr>
 					</c:if>
 					<tr>
-						<td colspan="2">
-							<table>
-								<tr>
-									<th><fmt:message key="label.learner"/></th>
-									<c:forEach var="option" items="${question.options}" varStatus="optStatus">
-										<th>
-											<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
-										</th>
-									</c:forEach>
-									<c:if test="${question.appendText || question.type == 3}">
-										<th>
-											<fmt:message key="label.open.response"/>
-										</th>
-									</c:if>
-								</tr>
+					</table>
 				<%--  End first check  --%>
 				</c:if>
-								<%--  User answer list --%>
-								<tr>
-									<td>${user.loginName}</td>
-									<c:forEach var="option" items="${question.options}">
-										<td>
-											<c:if test="${not empty question.answer}">
-												<c:set var="checked" value="false"/>
-												<c:forEach var="choice" items="${question.answer.choices}">
-													<c:if test="${choice == option.uid}">
-														<c:set var="checked" value="true"/>
-													</c:if>
-												</c:forEach>
-												<c:if test="${checked}">
-													<img src="${tool}/includes/images/tick_red.gif" title="<fmt:message key="message.learner.choose.answer"/>">
-												</c:if>
-											</c:if>
-										</td>
-									</c:forEach>
-									<c:if test="${question.appendText ||question.type == 3}">
-										<td>
-											<c:if test="${not empty question.answer}">
-												<c:if test="${not empty question.answer.answerText}">
-													<img src="${tool}/includes/images/tick_red.gif" title="<fmt:message key="message.learner.choose.answer"/>">
-												</c:if>
-											</c:if>
-										</td>
-									</c:if>
-								</tr>
 				<c:if test="${status.first}">
-							</table>
-						</td>
-					</tr>
-				<%--  End first check  --%>
+					<h2><fmt:message key="label.answer"/></h2>
+					<div align="center">
+						<table class="alternative-color">
+							<tr>
+								<th class="first"><fmt:message key="label.learner"/></th>
+								<c:forEach var="option" items="${question.options}" varStatus="optStatus">
+									<th>
+										<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
+									</th>
+								</c:forEach>
+								<c:if test="${question.appendText || question.type == 3}">
+									<th>
+										<fmt:message key="label.open.response"/>
+									</th>
+								</c:if>
+							</tr>
 				</c:if>
+						<%--  User answer list --%>
+						<tr>
+							<td>${user.loginName}</td>
+							<c:forEach var="option" items="${question.options}">
+								<td>
+									<c:if test="${not empty question.answer}">
+										<c:set var="checked" value="false"/>
+										<c:forEach var="choice" items="${question.answer.choices}">
+											<c:if test="${choice == option.uid}">
+												<c:set var="checked" value="true"/>
+											</c:if>
+										</c:forEach>
+										<c:if test="${checked}">
+											<img src="${tool}/includes/images/tick_red.gif" title="<fmt:message key="message.learner.choose.answer"/>">
+										</c:if>
+									</c:if>
+									&nbsp;
+								</td>
+							</c:forEach>
+							<c:if test="${question.appendText ||question.type == 3}">
+								<td>
+									<c:if test="${not empty question.answer}">
+										<lams:out value="${question.answer.answerText}"/>
+									</c:if>
+									&nbsp;
+								</td>
+							</c:if>
+						</tr>
+					<c:if test="${status.last}">
+						</table>
+						</div>
+					<%--  End first check  --%>
+					</c:if>
 				</c:forEach>
-			</table>
 		</div>
 		<div id="footer-learner"></div>
 		</div>

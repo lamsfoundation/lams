@@ -45,7 +45,13 @@
 			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz">${answerText}</textarea><BR><BR>
 		</c:if>
 		<c:if test="${question.appendText}">
-			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz">${answerText}</textarea><BR><BR>
+			<c:set var="jsfunc" value=""/>
+			<%-- for single choice question, use javascript to ensure only one optino or openText can be chosen --%>
+			<c:if test="${question.type == 1}">
+				<c:set var="jsfunc" value="onclick=\"singleChoice('optionChoice${question.uid}')\""/>
+			</c:if>
+			
+			<textarea name="optionText${question.uid}" rows="7" cols="50" type="_moz" ${jsfunc}>${answerText}</textarea><BR><BR>
 		</c:if>
 	</td>
 </tr>

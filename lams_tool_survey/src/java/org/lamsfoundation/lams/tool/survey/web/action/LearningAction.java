@@ -144,7 +144,7 @@ public class LearningAction extends Action {
 		SurveyUser surveyUser = getCurrentUser(service,sessionId);
 
 		Survey survey;
-		List<AnswerDTO> questions =  service.getQuestionAnswers(sessionId,surveyUser.getUid());
+		List<AnswerDTO> answers =  service.getQuestionAnswers(sessionId,surveyUser.getUid());
 		survey = service.getSurveyBySessionId(sessionId);
 
 		//check whehter finish lock is on/off
@@ -182,9 +182,9 @@ public class LearningAction extends Action {
 		//init survey item list
 		SortedMap<Integer, AnswerDTO> surveyItemList = getQuestionList(sessionMap);
 		surveyItemList.clear();
-		if(questions != null){
-			for(AnswerDTO question : questions){
-				surveyItemList.put(question.getSequenceId(),question);
+		if(answers != null){
+			for(AnswerDTO answer : answers){
+				surveyItemList.put(answer.getSequenceId(),answer);
 			}
 		}
 		if(survey.isShowOnePage()){
@@ -425,23 +425,22 @@ public class LearningAction extends Action {
 	/**
 	 * Get answer by special question.
 	 */
-	private ActionErrors getAnswer(HttpServletRequest request,AnswerDTO question) {
+	private ActionErrors getAnswer(HttpServletRequest request,AnswerDTO answerDto) {
 		ActionErrors errors = new ActionErrors();
 		//get sessionMap
 		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
-		SurveyAnswer answer = getAnswerFromPage(request,question, sessionID);
-		question.setAnswer(answer);
-		//for mandatory questions, answer can not be null.
-		if(!question.isOptional() && answer == null){
-			errors.add(SurveyConstants.ERROR_MSG_KEY+ question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
+		SurveyAnswer answer = getAnswerFromPage(request,answerDto, sessionID);
+		answerDto.setAnswer(answer);
+		validateAnswers(request, answerDto, errors, answer);
+		if(!errors.isEmpty())
 			addErrors(request, errors);
-		}
-
 		return errors;
 	}
+
+
 	/**
 	 * Get all answer for all questions in this page
 	 * @param request
@@ -453,21 +452,33 @@ public class LearningAction extends Action {
 		String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		Collection<AnswerDTO> questionList = getQuestionList(sessionMap).values();
+		Collection<AnswerDTO> answerDtoList = getQuestionList(sessionMap).values();
 		
-		for(AnswerDTO question :questionList){
-			SurveyAnswer answer = getAnswerFromPage(request,question, sessionID);
-			question.setAnswer(answer);
-			//for mandatory questions, answer can not be null.
-			if(!question.isOptional() && answer == null){
-				errors.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
-			}
+		for(AnswerDTO answerDto :answerDtoList){
+			SurveyAnswer answer = getAnswerFromPage(request,answerDto, sessionID);
+			answerDto.setAnswer(answer);
+			validateAnswers(request, answerDto, errors, answer);
 		}
 		if(!errors.isEmpty())
 			addErrors(request, errors);
 		return errors;
 	}
 
+
+	private void validateAnswers(HttpServletRequest request, AnswerDTO question, ActionErrors errors, SurveyAnswer answer) {
+		//for mandatory questions, answer can not be null.
+		if(!question.isOptional() && answer == null){
+			errors.add(SurveyConstants.ERROR_MSG_KEY+ question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
+		}
+		if(question.getType() == SurveyConstants.QUESTION_TYPE_SINGLE_CHOICE
+				&& question.isAppendText()){
+			//for single choice, user only can choose one option or open text (if it has)
+			if(!StringUtils.isBlank(question.getAnswer().getAnswerChoices())
+				&& !StringUtils.isBlank(question.getAnswer().getAnswerText())){
+				errors.add(SurveyConstants.ERROR_MSG_KEY+ question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_SINGLE_CHOICE));
+			}
+		}
+	}
 
 	private SurveyAnswer getAnswerFromPage(HttpServletRequest request, AnswerDTO question, Long sessionID) {
 		

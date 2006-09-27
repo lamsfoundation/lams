@@ -60,6 +60,7 @@ public class SurveyConstants {
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	public static final String ERROR_MSG_MANDATORY_QUESTION = "error.mandatory.question";
 	public static final String ERROR_MSG_CHART_ERROR = "error.chart.gen";
+	public static final String ERROR_MSG_SINGLE_CHOICE = "error.single.choice.over";
 
 	public static final String MSG_OPEN_RESPONSE ="label.open.response";
 	public static final String MSG_PIECHART_TITLE = "piechart.title";
