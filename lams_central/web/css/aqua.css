@@ -324,6 +324,79 @@ a:hover.button-add-item {
 	padding:25px 15px 25px 28px;
 }
 
+/************ The sequence name box **********/
+.sequence-name {
+	margin-top:5px;
+	margin-left:30px;
+	
+}
+
+.sequence-name p{
+	margin:0px;
+	
+}
+
+
+#content a.sequence-name-link {
+	color:#0087E5;
+	text-decoration: none;
+	border-bottom: 1px dotted #0087E5;
+	}
+	
+	
+#content a:hover.sequence-name-link {
+	color:#0087E5;
+	text-decoration: none;
+	border-bottom: 1px solid #0087E5;
+	
+}
+
+#content a.sequence-action-link {
+	color:#47bc23;
+	text-decoration: none;
+	border:0px;
+	font-variant:small-caps;
+	margin-left:20px;	
+}
+
+#content a:hover.sequence-action-link {
+	color:#47bc23;
+	text-decoration: none;
+	border-bottom:0px;
+	font-variant:small-caps;
+	margin-left:20px;
+	}
+
+/* my courses individual course boxes */
+
+.course-bg {  /*---- box around the green tabbed items -- */
+	margin-top:15px;
+	margin-bottom:20px;
+	width:100%;
+	background:#fff url('../images/css/mycourses_greentab.jpg') no-repeat top; 
+	margin-left:0px;
+
+}
+
+.course-bg h2 {
+	font-size:13px;
+	color:#47bc23;
+	padding-left:0px;
+	margin-top:12px;
+	margin-left:0px;
+}
+
+.course-bg h4 {
+	font-size:12px;
+	color:#47bc23;
+	padding-left:0px
+}
+
+.course-buttons {
+	margin-right:0px;
+}
+
+
 /* Hovering submit button */
 input.button {
 	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
