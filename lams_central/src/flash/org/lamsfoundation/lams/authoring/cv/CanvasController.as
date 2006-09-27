@@ -89,6 +89,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
    }
    
+   private function clearAllSelections(optionalOnCanvas:Array, parallelOnCanvas:Array){
+	for (var i=0; i<optionalOnCanvas.length; i++){
+			for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
+				optionalOnCanvas[i].actChildren[j].setSelected(false);
+			}
+			optionalOnCanvas[i].init()
+		}
+		for (var m=0; m<parallelOnCanvas.length; m++){
+			for(var n=0; n < parallelOnCanvas[m].actChildren.length; n++){
+				parallelOnCanvas[m].actChildren[n].selectActivity = "false";
+			}
+			parallelOnCanvas[m].init()
+		}
+   }
 	
    
     public function activityRelease(ca:Object):Void{
@@ -101,23 +115,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		//_canvasModel.selectedItem = ca;
 		var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 		var parallelOnCanvas:Array  = _canvasModel.findParallelActivities();
-		for (var i=0; i<optionalOnCanvas.length; i++){
-			for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
-				optionalOnCanvas[i].actChildren[j].setSelected(false);
-			}
-			optionalOnCanvas[i].init()
-		}
-		for (var m=0; m<parallelOnCanvas.length; m++){
-			for(var n=0; n < parallelOnCanvas[m].actChildren.length; n++){
-				parallelOnCanvas[m].actChildren[n].selectActivity = "false";
-			}
-			parallelOnCanvas[m].init()
-		}
+		
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
-			
-			
 			if (ca.activity.parentUIID != null){
 				trace ("testing Optional child on Canvas "+ca.activity.activityUIID)
 				for (var i=0; i<optionalOnCanvas.length; i++){
@@ -137,6 +138,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						}
 					}
 				}
+				
 			} else {
 			
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
@@ -166,6 +168,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						}
 						
 					}
+					
 				}
 				
 				
@@ -206,7 +209,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				t.removeMovieClip();
 				
 			}
-					
+			clearAllSelections(optionalOnCanvas, parallelOnCanvas)		
 			_canvasModel.setDirty();
 			_canvasModel.selectedItem = ca;
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
@@ -219,6 +222,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.getCanvas().view.removeTempTrans();
 				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
+			clearAllSelections(optionalOnCanvas, parallelOnCanvas)
 			_canvasModel.setDirty();
 			_canvasModel.selectedItem = ca;
 		}
