@@ -320,7 +320,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var styleObj = _tm.getStyleObject('button');
 		var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn')
 		var nameTextFormat = new TextFormat();
-		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
+		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
 		trace("Monitor Tab Grid Width: "+z.w+" Monitor Tab Grid Height: "+z.h);
 		
 		_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X+2, ACT_Y, z.w-22, 20);
