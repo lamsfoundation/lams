@@ -8,12 +8,14 @@
 <form>
 <logic:equal name="OrgManageForm" property="type" value="1">
 	<h2><fmt:message key="admin.course.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>: <bean:write name="OrgManageForm" property="parentName"/></h2>
-	<c:url var="editaction" value="organisation.do">
-		<c:param name="method" value="edit" />
-		<c:param name="typeId" value="2" />
-		<c:param name="parentId" value="${OrgManageForm.parentId}" />
-	</c:url>
-	<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
+	<logic:equal name="isSysadmin" value="true">
+		<c:url var="editaction" value="organisation.do">
+			<c:param name="method" value="edit" />
+			<c:param name="typeId" value="2" />
+			<c:param name="parentId" value="${OrgManageForm.parentId}" />
+		</c:url>
+		<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
+	</logic:equal>
 </logic:equal>
 <logic:equal name="OrgManageForm" property="type" value="2">
 	<h2><fmt:message key="admin.class.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.course"/>:<bean:write name="OrgManageForm" property="parentName"/></h2>

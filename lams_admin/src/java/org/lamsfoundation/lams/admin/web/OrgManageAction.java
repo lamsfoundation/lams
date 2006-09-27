@@ -34,6 +34,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -43,8 +44,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @version
@@ -81,54 +80,63 @@ public class OrgManageAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		
+		// Get organisation whose child organisations we will populate the DTO/orgManageForm with
 		Integer orgId = WebUtil.readIntParam(request,"org",true);
 		if(orgId==null){
 			orgId = (Integer)request.getAttribute("org");
 		}
 		if((orgId==null)||(orgId<=0)){
 			request.setAttribute("errorName","OrgManageAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
 		OrgListDTO orgManageForm = new OrgListDTO();
-		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
+		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
 		log.debug("orgId:"+orgId);
 		if(org==null){
 			request.setAttribute("errorName","OrgManageAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}else if(org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){
 			request.setAttribute("errorName","OrgManageAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.orgtype.invalid"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.orgtype.invalid"));
 			return mapping.findForward("error");
 		}
 		
+		// Set DTO/orgManageForm
 		orgManageForm.setParentId(orgId);
 		orgManageForm.setParentName(org.getName());
 		orgManageForm.setType(org.getOrganisationType().getOrganisationTypeId());
 		log.debug("orgType:"+orgManageForm.getType());
+		
+		// Get list of child organisations depending on requestor's role and the organisation's type
 		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
-		//if(getService().isUserSysAdmin(username)){
 		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		if(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)){
+			// the organisation type of the children
 			Integer type;
 			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){
 				type = OrganisationType.COURSE_TYPE;
 			}else{
 				type = OrganisationType.CLASS_TYPE;
 			}
-			List organisations = getService().findByProperty(Organisation.class,"organisationType.organisationTypeId",type);
+			List organisations = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",type);
 			log.debug("user is an admin or manager");
 			log.debug("Got "+organisations.size()+" organisations");
 			log.debug("organisationType is "+type);
 			for(int i=0; i<organisations.size(); i++){
 				Organisation organisation = (Organisation)organisations.get(i);
 				Organisation parentOrg = (type.equals(OrganisationType.CLASS_TYPE)) ? organisation.getParentOrganisation() : organisation;
+				// do not list this org as a child if requestor is not an admin or manager in the parent
 				if (!request.isUserInRole(Role.SYSADMIN)) {
-					if (!(getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN)
-							|| getService().isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER)))
+					if (!(service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN)
+							|| service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER)))
 						continue;
 				}
+				// do not list this org if it is not a child of the requested parent
 				if(type.equals(OrganisationType.CLASS_TYPE)){
 					if (!parentOrg.getOrganisationId().equals(orgId))
 						continue;
@@ -142,23 +150,9 @@ public class OrgManageAction extends Action {
 		}
 		orgManageForm.setOrgManageBeans(orgManageBeans);
 		request.setAttribute("OrgManageForm",orgManageForm);
+		// let the jsp know whether to display the 'create group' link
+		request.setAttribute("isSysadmin",request.isUserInRole(Role.SYSADMIN));
 		return mapping.findForward("orglist");
-	}
-
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
-	
-	private MessageService getMessageService(){
-		if(messageService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			messageService = (MessageService)ctx.getBean("adminMessageService");
-		}
-		return messageService;
 	}
 
 }
