@@ -185,13 +185,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 				styleObj = _tm.getStyleObject('ACTPanel2')
 				break;
 			case '3' :
-				styleObj = _tm.getStyleObject('ACTPanel3')
+				styleObj = _tm.getStyleObject('ACTPanel5')
 				break;
 			case '4' :
 				styleObj = _tm.getStyleObject('ACTPanel4')
 				break;
 			case '5' :
-				styleObj = _tm.getStyleObject('ACTPanel5')
+				styleObj = _tm.getStyleObject('ACTPanel0')
+				break;
+			case '6' :
+				styleObj = _tm.getStyleObject('ACTPanel3')
 				break;
             default :
                 styleObj = _tm.getStyleObject('ACTPanel0')
@@ -253,7 +256,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		title_lbl.setStyle (styleObj);
 		styleObj = getAssociatedStyle();
 		container_pnl.setStyle('styleName',styleObj);
-		styleObj = _tm.getStyleObject ('OptHeadPanel');
+		styleObj = _tm.getStyleObject ('parallelHeadPanel');
 		header_pnl.setStyle('styleName',styleObj);
 		//container_pnl.setStyle("backgroundColor",0x4289FF);
 	}

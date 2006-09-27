@@ -529,13 +529,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				styleObj = _tm.getStyleObject('ACTPanel2')
 				break;
 			case '3' :
-				styleObj = _tm.getStyleObject('ACTPanel3')
+				styleObj = _tm.getStyleObject('ACTPanel5')
 				break;
 			case '4' :
 				styleObj = _tm.getStyleObject('ACTPanel4')
 				break;
 			case '5' :
-				styleObj = _tm.getStyleObject('ACTPanel5')
+				styleObj = _tm.getStyleObject('ACTPanel0')
+				break;
+			case '6' :
+				styleObj = _tm.getStyleObject('ACTPanel3')
 				break;
             default :
                 styleObj = _tm.getStyleObject('ACTPanel0')
@@ -575,7 +578,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				}
 				if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 					trace("called by view")
-					styleObj = _tm.getStyleObject('OptActPanel')
+					styleObj = _tm.getStyleObject('ACTPanel1')
 					act_pnl.setStyle('styleName',styleObj);
 				}else {
 					
