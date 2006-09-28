@@ -41,6 +41,7 @@ public class QuestionForm extends ActionForm {
 	//1: single or multiple choice question;3:open text question
 	private short itemType;
 	private String sessionMapID;
+	private String contentFolderID;
 	
 	//tool access mode;
 	private String mode;
@@ -86,5 +87,11 @@ public class QuestionForm extends ActionForm {
 	}
 	public void setItemType(short itemType) {
 		this.itemType = itemType;
+	}
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 }

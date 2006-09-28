@@ -25,9 +25,9 @@
 	}
 
 	
-	function editItem(idx,itemType,sessionMapID){
+	function editItem(idx,itemType,sessionMapID,contentFolderID){
 		 var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&itemType="+itemType+"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&itemType="+itemType+"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID+"&contentFolderID="+contentFolderID;
 		showMessage(url);
 	}
 	//The panel of survey list panel
@@ -89,12 +89,12 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1&sessionMapID=${formBean.sessionMapID}"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');">
 								<fmt:message key="label.authoring.basic.add.survey.question" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&sessionMapID=${formBean.sessionMapID}"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');">
 								<fmt:message key="label.authoring.basic.add.survey.open.question" />
 							</a>
 						</td>

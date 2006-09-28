@@ -240,8 +240,6 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		QuestionForm questionForm = (QuestionForm)form;
-		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-		questionForm.setSessionMapID(sessionMapID);
 		
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
@@ -294,6 +292,7 @@ public class AuthoringAction extends Action {
 		}
 		//set session map ID so that itemlist.jsp can get sessionMAP
 		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+		request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, itemForm.getContentFolderID());
 		//return null to close this window
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}

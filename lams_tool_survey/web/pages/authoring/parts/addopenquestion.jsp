@@ -36,6 +36,7 @@
 					<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="surveyItemForm">
 						<c:set var="formBean"	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 						<html:hidden property="sessionMapID" />
+						<html:hidden property="contentFolderID" />
 						<html:hidden property="itemIndex" />
 						<html:hidden property="itemType" value="3" />
 						<table >
@@ -58,21 +59,9 @@
 							</tr>
 							<tr>
 								<td colspan="2">
-									<c:set var="language">
-										<lams:user property="localeLanguage" />
-									</c:set>
-									<fck:editor id="question.description" basePath="/lams/fckeditor/"
-										imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-										linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-										flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-										imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-										linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-										flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-										toolbarSet="Default-Learner" defaultLanguage="${language}"
-										autoDetectLanguage="false">
-										<c:out value="${formBean.question.description}"
-											escapeXml="false" />
-									</fck:editor>
+								<lams:FCKEditor id="question.description"
+									value="${formBean.question.description}"
+									contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor>
 								</td>
 							</tr>
 						</table>

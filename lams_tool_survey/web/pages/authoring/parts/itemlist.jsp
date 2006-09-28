@@ -29,7 +29,7 @@
 			</c:if>
 		</td>
 		<td width="80px" align="center">
-			<a href="#" onclick="editItem(${status.index},${question.type},'${sessionMapID}')" class="button">
+			<a href="#" onclick="editItem(${status.index},${question.type},'${sessionMapID}','${contentFolderID}')" class="button">
 				<fmt:message key="label.authoring.basic.survey.edit" />
 			</a>
 		</td>
