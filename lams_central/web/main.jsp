@@ -53,7 +53,6 @@
 			</c:forEach>
 		</div>
 	</div>
-	<!--closes header-->
 	<div id="content">
 		<div id="message" style="text-align: center;"></div>
 		<div style="display: block;" class="box">
@@ -91,7 +90,6 @@
 		</p>
 	</div>
 </div>
-	<!--closes footer-->
 </body>
 </lams:html>
 

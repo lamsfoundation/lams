@@ -3,9 +3,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 
 <c:forEach var="orgBean" items="${orgBeans}">
-	<!--Start course section -->
 	<div class="course-bg">
-		<!--start course heading - coloured bar section-->
 		<div class="row">
 			<div class="left-buttons">
 				<h2><c:out value="${orgBean.name}" /></h2>
@@ -18,7 +16,6 @@
 				</c:forEach>
 			</div>
 		</div>
-		<!--end course heading - coloured bar section--> <!--start sequence name-->
 		<c:forEach var="lesson" items="${orgBean.lessons}">
 			<div class="sequence-name">
 				<p>
@@ -31,7 +28,7 @@
 					</c:forEach>
 				</p>
 			</div>
-		</c:forEach> <!--close sequence name--> <!--start group name--> 
+		</c:forEach>
 		<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
 		<div class="group-name">
 			<p>
@@ -57,8 +54,8 @@
 				</p>
 			</c:forEach>
 		</div>
-	</c:forEach> <!--end group name --></div>
-	<!-- close course section  -->
+	</c:forEach>
+</div>
 </c:forEach>
 <c:if test="${empty orgBeans}">
 	<p align="left"><fmt:message key="msg.groups.empty" /></p>
