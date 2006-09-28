@@ -37,6 +37,8 @@ public interface INotebookEntryDAO {
 
 	List<NotebookEntry> get(Integer userID);
 
+	List<NotebookEntry> get(Integer userID, Integer idType);
+	
 	List<NotebookEntry> get(Integer userID, Long lessonID);
 
 	List<NotebookEntry> get(Long id, Integer idType, Integer userID);

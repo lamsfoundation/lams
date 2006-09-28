@@ -36,11 +36,14 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG = "from " + NotebookEntry.class.getName() 
 							+ " where external_id=? and external_id_type=? and external_signature=? and user_id=?"
 							+ " order by create_date desc";
-	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE = "from " + NotebookEntry.class.getName() 
+	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName() 
 							+ " where external_id=? and external_id_type=? and user_id=?"
 							+ " order by create_date desc";
 	private static final String SQL_QUERY_FIND_ENTRY_BY_USER_ID = "from " + NotebookEntry.class.getName() 
 							+ " where user_id=?";
+	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE = "from " + NotebookEntry.class.getName() 
+							+ " where user_id=? and external_id_type=?"
+							+ " order by external_signature desc, create_date desc";
 	
 	public void saveOrUpdate(NotebookEntry notebookEntry) {
 		this.getHibernateTemplate().saveOrUpdate(notebookEntry);
@@ -52,7 +55,7 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	}
 	
 	public List<NotebookEntry> get(Long id, Integer idType, Integer userID) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE, new Object[]{id, idType, userID}));
+		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID, new Object[]{id, idType, userID}));
 	}
 
 	public NotebookEntry get(Long uid) {
@@ -68,6 +71,10 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_USER_ID, userID));
 	}
 
+	public List<NotebookEntry> get(Integer userID, Integer idType) {
+		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE, new Object[]{userID, idType}));
+	}
+	
 	public List<NotebookEntry> get(Integer userID, Long lessonID) {
 		// TODO need to write hql query for lessionID and userID
 		return null;

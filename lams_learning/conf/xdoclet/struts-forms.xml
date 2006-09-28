@@ -13,3 +13,10 @@
 	<form-property name="previewLesson" type="java.lang.Boolean" />
 </form-bean>
 
+<form-bean name="NotebookForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="method" type="java.lang.String" />
+	<form-property name="title" type="java.lang.String" />
+	<form-property name="entry" type="java.lang.String" />
+	<form-property name="signature" type="java.lang.String" />
+</form-bean>
+

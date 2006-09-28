@@ -86,13 +86,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/previewDefineLater.jsp"/>
 	</definition>
 	
-	<!-- Journal definitions -->
+	<!-- Journal/Notebook definitions -->
 	
 	<definition name=".journalDetail" extends=".layout">
 		<put name="pageTitle" value="Journal - Detail" />
 		<put name="title" value="Journal" />
 		<put name="body" value="/notebook/detail.jsp"/>
 	</definition>
+	<definition name=".notebookViewAll" extends=".layout">
+		<put name="body" value="/notebook/viewall.jsp"/>
+	</definition>
+	<definition name=".notebookAddNew" extends=".layout">
+		<put name="body" value="/notebook/addnew.jsp"/>
+	</definition>
+	<definition name=".notebookSaveSuccess" extends=".layout">
+		<put name="body" value="/notebook/viewentry.jsp"/>
+	</definition>
+	
 	<!-- Grouping definitions -->
 	<definition name=".showgroup" extends=".layout">
 		<put name="pageTitle" value="Grouping" />

@@ -62,6 +62,10 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 	public List<NotebookEntry> getEntry(Integer userID) {
 		return notebookEntryDAO.get(userID);
 	}
+	
+	public List<NotebookEntry> getEntry(Integer userID, Integer idType) {
+		return notebookEntryDAO.get(userID, idType);
+	}
 
 	public List<NotebookEntry> getEntry(Integer userID, Long lessonID) {
 		return notebookEntryDAO.get(userID, lessonID);		

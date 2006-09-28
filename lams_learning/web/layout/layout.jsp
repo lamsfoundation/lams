@@ -47,7 +47,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:when>
 		<c:otherwise>
 			<lams:css/>
-			<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+			<c:set var="lams"><lams:LAMSURL/></c:set>
+			<script src="${lams}includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		</c:otherwise>
 		</c:choose>
 	  </head>

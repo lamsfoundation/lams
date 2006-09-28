@@ -41,6 +41,13 @@
 	<form-property name="previewLesson" type="java.lang.Boolean" />
 </form-bean>
 
+<form-bean name="NotebookForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="method" type="java.lang.String" />
+	<form-property name="title" type="java.lang.String" />
+	<form-property name="entry" type="java.lang.String" />
+	<form-property name="signature" type="java.lang.String" />
+</form-bean>
+
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -116,6 +123,31 @@
       unknown="false"
       validate="false"
     >
+    </action>
+    <action
+      path="/notebook"
+      type="org.lamsfoundation.lams.learning.web.action.NotebookAction"
+      name="NotebookForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="viewAll"
+        path=".notebookViewAll"
+        redirect="false"
+      />
+      <forward
+        name="addNew"
+        path=".notebookAddNew"
+        redirect="false"
+      />
+      <forward
+        name="saveSuccess"
+        path=".notebookSaveSuccess"
+        redirect="false"
+      />
     </action>
     <action
       path="/LessonComplete"
@@ -295,7 +327,6 @@
 <action path="/parallelWait"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".parallelWait"/>
-
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

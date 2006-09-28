@@ -6,4 +6,6 @@ public class CoreNotebookConstants {
 	
 	public static String SCRATCH_PAD_SIG = "SCRATCHPAD";
 	public static String JOURNAL_SIG = "JOURNAL";
+	
+	public static String NOTEBOOK_SERVICE_BEAN_NAME = "coreNotebookService";
 }
