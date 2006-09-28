@@ -730,23 +730,21 @@ class WorkspaceDialog extends MovieClip{
 		
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		var tempTitle = StringUtils.replace(resourceTitle_txi.text, " ", "");
-		if (tempTitle == "" || tempTitle == undefined){
-			Cursor.showCursor(ApplicationParent.C_DEFAULT);
-			
-			var sendMsg:String = Dictionary.getValue('ws_file_name_empty')+"\n"+Dictionary.getValue('ws_entre_file_name')+"\n\n";
-			LFMessage.showMessageAlert(sendMsg,null);
-			_workspaceController.clearBusy();
-			resourceTitle_txi.setFocus();
-		}else{
-			
-			if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
+		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
+			if (tempTitle == "" || tempTitle == undefined){
+				Cursor.showCursor(ApplicationParent.C_DEFAULT);
+				
+				var sendMsg:String = Dictionary.getValue('ws_file_name_empty')+"\n"+Dictionary.getValue('ws_entre_file_name')+"\n\n";
+				LFMessage.showMessageAlert(sendMsg,null);
+				_workspaceController.clearBusy();
+				resourceTitle_txi.setFocus();
+			}else{
 				Cursor.showCursor(ApplicationParent.C_HOURGLASS);
 				saveFile(snode);
-			} else {
-				openFile(snode);
 			}
-		}
-			
+		} else {
+			openFile(snode);
+		}			
     }
 	
 	/**
@@ -757,12 +755,15 @@ class WorkspaceDialog extends MovieClip{
 	
 	private function openFile(snode:XMLNode):Void{
 		Debugger.log('Opening a file.',Debugger.GEN,'openFile','org.lamsfoundation.lams.WorkspaceDialog');
+		_workspaceController = _workspaceView.getController();
+		
 		if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 			if(resourceTitle_txi.text == null){
-				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_file_open'),null);
+				//LFMessage.showMessageAlert(Dictionary.getValue('ws_click_file_open'),null);
 			} else {
 				if(!searchForFile(snode, resourceTitle_txi.text)){
-					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
+					//LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
+				_workspaceController.clearBusy()	
 				}
 			}
 		} else {
@@ -847,7 +848,7 @@ class WorkspaceDialog extends MovieClip{
 	
 	public function receivedFolderContents(dto:Object){
 		_workspaceModel.setFolderContents(dto, false);
-		
+		_workspaceController = _workspaceView.getController();
 		if(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
 			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
 				if(searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
@@ -856,7 +857,8 @@ class WorkspaceDialog extends MovieClip{
 				}
 			} else {
 				if(!searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
-					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
+					//LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
+					_workspaceController.clearBusy()
 				}
 			}
 		}
