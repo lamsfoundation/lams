@@ -86,7 +86,7 @@ public class IndexAction extends Action {
 			List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 			if (request.isUserInRole(Role.AUTHOR)) {
 				log.debug("user is author");
-				headerLinks.add(new IndexLinkBean("index.author", "home.do?method=author"));
+				headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 			}
 			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
 				log.debug("user is an admin or manager");
