@@ -724,7 +724,7 @@ class WorkspaceDialog extends MovieClip{
 		var snode = treeview.selectedNode;
 		
 		if(isVirtualFolder(snode)){
-			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_virtual_folder'),null);
+			_workspaceController.clearBusy();			//LFMessage.showMessageAlert(Dictionary.getValue('ws_click_virtual_folder'),null);
 			return;
 		}
 		
