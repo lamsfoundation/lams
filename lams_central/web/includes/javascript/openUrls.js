@@ -18,15 +18,15 @@
 		var copyrightWin = null;
 		
 		function closeAllChildren(){
-			if (authorWin && authorWin.open && !authorWin.closed) authorWin.close();
-			if (learnWin && learnWin.open && !learnWin.closed) learnWin.close();
-			if (monitorLessonWin && monitorLessonWin.open && !monitorLessonWin.closed) monitorLessonWin.close();
-			if (addLessonWin && addLessonWin.open && !addLessonWin.closed) addLessonWin.close();
-			if (epWin && epWin.open && !epWin.closed) epWin.close();
-			if (sysadminWin && sysadminWin.open && !sysadminWin.closed) sysadminWin.close();
-			if (omWin && omWin.open && !omWin.closed) omWin.close();
-			if (pWin && pWin.open && !pWin.closed) pWin.close();
-			if (copyrightWin && copyrightWin.open && !copyrightWin.closed) copyrightWin.close();
+			if (authorWin && !authorWin.closed) authorWin.close();
+			if (learnWin && !learnWin.closed) learnWin.close();
+			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.close();
+			if (addLessonWin && !addLessonWin.closed) addLessonWin.close();
+			if (epWin && !epWin.closed) epWin.close();
+			if (sysadminWin && !sysadminWin.closed) sysadminWin.close();
+			if (omWin && !omWin.closed) omWin.close();
+			if (pWin && !pWin.closed) pWin.close();
+			if (copyrightWin && !copyrightWin.closed) copyrightWin.close();
 		}
 		
 		function openProfile()
@@ -37,7 +37,7 @@
 			}
 			else
 			{
-				if(pWin && pWin.open && !pWin.closed)
+				if(pWin && !pWin.closed)
 				{
 					pWin.location='profile.do?method=view';
 					pWin.focus();
@@ -58,7 +58,7 @@
 			}
 			else
 			{
-				if(authorWin && authorWin.open && !authorWin.closed)
+				if(authorWin && !authorWin.closed)
 				{
 					//authorWin.location = 'home.do?method=author';
 					authorWin.focus();
@@ -86,7 +86,7 @@
 			}
 			else
 			{
-				if(monitorLessonWin && monitorLessonWin.open && !monitorLessonWin.closed)
+				if(monitorLessonWin && !monitorLessonWin.closed)
 				{
 					monitorLessonWin.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
 					monitorLessonWin.focus();
@@ -111,7 +111,7 @@
 			}
 			else
 			{
-				if(addLessonWin && addLessonWin.open && !addLessonWin.closed)
+				if(addLessonWin && !addLessonWin.closed)
 				{
 					addLessonWin.location = 'home.do?method=addLesson&courseID='+courseID+'&classID='+classID;
 					addLessonWin.focus();
@@ -131,7 +131,7 @@
 			}
 			else
 			{
-				if(learnWin && learnWin.open && !learnWin.closed )
+				if(learnWin && !learnWin.closed )
 				{
 					learnWin.location = 'home.do?method=learner&lessonID='+lessonId;		
 					learnWin.focus();
@@ -151,7 +151,7 @@
 			}
 			else
 			{
-				if(epWin && epWin.open && !epWin.closed )
+				if(epWin && !epWin.closed )
 				{
 					epWin.location = 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId;		
 					ep.focus();
@@ -179,7 +179,7 @@
 			}
 			else
 			{
-				if(sysadminWin && sysadminWin.open && !sysadminWin.closed )
+				if(sysadminWin && !sysadminWin.closed )
 				{
 					sysadminWin.location = 'admin/sysadminstart.do';
 					sysadminWin.focus();
@@ -208,7 +208,7 @@
 			}
 			else
 			{
-				if(omWin && omWin.open && !omWin.closed )
+				if(omWin && !omWin.closed )
 				{
 					omWin.location = 'admin/orgmanage.do?org='+orgId;
 					omWin.focus();
@@ -233,7 +233,7 @@
 			if(isMac){
 				copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
 			}else{
-				if(copyrightWin && copyrightWin.open && !copyrightWin.closed ){
+				if(copyrightWin && !copyrightWin.closed ){
 					copyrightWin.focus();
 				}else{
 					copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
