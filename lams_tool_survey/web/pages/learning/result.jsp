@@ -30,16 +30,13 @@
     </script>
 
 </head>
-<body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+<body class="stripes">
+
+
+		<div id="content">
+		<h1>
 			${sessionMap.title}
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<!--closes header-->
-
-		<div id="content-learner">
 			<h2>
 				${sessionMap.instructions}
 			</h2>
@@ -92,6 +89,9 @@
 				</c:forEach>
 					
 			</table>
+			
+			<table>
+			<tr><td>
 			<c:if test="${not sessionMap.finishedLock}">
 				<span class="left-buttons">
 					<html:button property="RetakeButton"
@@ -119,16 +119,15 @@
 					</c:otherwise>
 				</c:choose>
 			</span>
-
+			</td></tr>
+			</table>
 		</div>
 		<!--closes content-->
 
-		<div id="footer-learner">
+		<div id="footer">
 		</div>
 		<!--closes footer-->
 
-	</div>
-	<!--closes page-->
 </body>
 </html:html>
 

@@ -179,6 +179,14 @@
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
+      <attribute>
+         <description>Output stylesheet based on the user preferences.</description>
+         <name>style</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
 
    </tag>
 

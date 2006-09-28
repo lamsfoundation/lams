@@ -29,25 +29,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title> <bean:message key="label.export"/> </title>
 		<lams:css localLinkPath="../"/>
 	</head>
-	<body>
+	<body class="stripes">
 	
     <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 	<html:hidden property="method"/>
 	<html:hidden property="toolContentID"/>
 
-	<div id="page-learner"><!--main box 'page'-->
-
-		<h1 class="no-tabs-below">
+		<div id="content">
+	
+		<h1>
 		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions != 'true') }"> 	
 			<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
 			<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
 		</c:if>
         </h1>
-		<div id="header-no-tabs-learner">
-	
-		</div><!--closes header-->
-	
-		<div id="content-learner">
 	
 		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions == 'true')}"> 	
 				<table align="center">
@@ -67,11 +62,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>  <!--closes content-->
 	
 	
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
 	
-	</div><!--closes page-->
-
 		</html:form>
 </body>
 </html:html>

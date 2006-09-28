@@ -26,7 +26,7 @@
 	-->        
     </script>
 </head>
-<body>
+<body class="stripes">
 	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm">
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<html:hidden property="questionSeqID"/>
@@ -38,15 +38,12 @@
 	<c:set var="position" value="${formBean.position}"/>
 	<c:set var="questionSeqID" value="${formBean.questionSeqID}"/>
 	<c:set var="currentIdx" value="${formBean.currentIdx}"/>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
-			${sessionMap.title}
-		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<!--closes header-->
 
-		<div id="content-learner">
+		<div id="content">
+			<h1>
+				${sessionMap.title}
+			</h1>
+
 			<h2>
 				${sessionMap.instructions}
 			</h2>
@@ -70,6 +67,8 @@
 				</table>
 				<%-- Display button according to different situation --%>
 				<%--POSITION: 0=middle of survey, 1=first question, 2=last question, 3=Only one question available--%>
+				<table>
+					<tr><td>
 					<c:choose>
 						<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
 							<div class="right-buttons">
@@ -104,14 +103,15 @@
 							</span>
 						</c:otherwise>
 					</c:choose>
-		
+				</td>
+				</tr>
+				</table>
 		</div>  <!--closes content-->
 		
-		<div id="footer-learner">
+		<div id="footer">
 		</div>
 		<!--closes footer-->
 
-	</div><!--closes page-->
 </html:form>	
 </body>
 </html:html>

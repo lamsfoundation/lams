@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<title> <bean:message key="label.monitoring"/> </title>
 
-	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/tabbedheader.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 
@@ -143,7 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</script>
 	
 </head>
-<body onLoad="init();">
+<body class="stripes" onLoad="init();">
 
 
 	<div id="page">

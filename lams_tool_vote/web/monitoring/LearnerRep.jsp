@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		//-->
 	</script>	
 </head>
-<body>
+<body class="stripes">
 
 		<table>
 				<tr>

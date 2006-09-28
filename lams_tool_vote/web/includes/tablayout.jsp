@@ -7,12 +7,12 @@
 <html>
 	<head>
 		<title><bean:message key="activity.title" /></title>
-		<%@ include file="/common/header.jsp"%>
+		<%@ include file="/common/tabbedheader.jsp"%>
 
 		<tiles:insert attribute="header" />
 	</head>
 
-	<body onLoad="init()">
+	<body class="stripes" onLoad="init()">
 		<div id="page">
 	
 				<tiles:useAttribute name="pageTitleKey" scope="request" />

@@ -5,7 +5,7 @@
         
 <html>
 	<tiles:insert attribute="header" />
-	<body>
+	<body class="stripes">
 		<tiles:useAttribute name="pageTitleKey" scope="request" />
 		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
 		<logic:notEmpty name="pTitleKey">

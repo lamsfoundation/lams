@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>		
 	</head>
 	
-	<body>
+	<body class="stripes">
 		<table cellpadding="0">
 
 			<html:form  action="/monitoring?validate=false" styleId="newNominationForm" enctype="multipart/form-data" method="POST">			

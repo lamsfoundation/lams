@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 	
 </head>
-<body>
+<body class="stripes">
 <div id="page">
 
     <table>

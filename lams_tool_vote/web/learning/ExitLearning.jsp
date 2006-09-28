@@ -34,7 +34,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html>
 <head>
 	<html:base />
-	<lams:headItems />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
 	<title><bean:message key="activity.title" /></title>
 	
 	<script language="JavaScript" type="text/JavaScript">
@@ -46,16 +47,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</script>
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 
-<h1 class="no-tabs-below">
+
+
+<div id="content">
+<h1>
 	<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 </h1>
 
-<div id="header-no-tabs-learner"></div>
-
-<div id="content-learner">
 <html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolSessionID"/>
@@ -112,9 +112,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </div>
 
-<div id="footer-learner"></div>
-
-</div>
+<div id="footer"></div>
 </body>
 </html:html>
 

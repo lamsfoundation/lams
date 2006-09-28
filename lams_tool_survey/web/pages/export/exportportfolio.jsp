@@ -12,13 +12,11 @@
 	    <%@ include file="/common/header.jsp" %>
 </head>
 <body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+		<div id="content">
+		<h1>
 			${sessionMap.title}
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<div id="content-learner">
+
 			<c:forEach var="sessionEntry" items="${sessionMap.summaryList}" varStatus="sessionStatus">
 				<c:set var="toolSession" value="${sessionEntry.key}"/>
 				<c:set var="questionList" value="${sessionEntry.value}"/>
@@ -110,8 +108,7 @@
 					</c:forEach>
 				<%-- End session table --%>
 			</c:forEach>
-		<div id="footer-learner"></div>
+		<div id="footer"></div>
 		</div>
-	</div>
 </body>
 </html>

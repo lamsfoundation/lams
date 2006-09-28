@@ -39,19 +39,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 	
-	<h1 class="no-tabs-below">
+	<h1>
 		<bean:message key="label.view.reflection"/>
 	</h1>
 	
 	
-	<div id="header-no-tabs-learner"></div>
+	
 	
 	<html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 	
-		<div id="content-learner">
+		<div id="content">
 		
 			<table>
 				<tr>
@@ -81,10 +80,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</html:form>	
 	
-	<div id="footer-learner"></div>
+	<div id="footer"></div>
 
 
-</div>
 </body>
 </html:html>
 

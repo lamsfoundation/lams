@@ -9,7 +9,7 @@
 		<title><bean:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
 	</head>
-	<body>
+	<body class="stripes">
 		<div id="page">
 			<tiles:useAttribute name="pageTitleKey" scope="request" />
 			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />

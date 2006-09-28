@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <html>
-	<body>
+	<body class="stripes">
 
 		<c:choose>
 			<c:when test="${sessionMap.showOnOnePage}">
@@ -15,5 +15,5 @@
 				</script>
 			</c:otherwise>
 		</c:choose>
-	<body>
+	<body class="stripes">
 </html>
