@@ -3,8 +3,10 @@
 
 
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="tool"><lams:WebAppURL/></c:set>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
+<c:set var="tool"><lams:WebAppURL/></c:set>
+<c:set var="sessionMapID" value="${param.sessionMapID}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <html>
 <head>
 	    <%@ include file="/common/header.jsp" %>
@@ -12,75 +14,75 @@
 <body>
 	<div id="page-learner">
 		<h1 class="no-tabs-below">
-			<fmt:message key="title.chart.report"/>
+			${sessionMap.title}
 		</h1>
 		<div id="header-no-tabs-learner">
 		</div>
 		<div id="content-learner">
-			<c:forEach var="entry" items="${answerList}" varStatus="status">
-				<c:set var="user" value="${entry.key}"/>
-				<c:set var="question" value="${entry.value}"/>
-				<%--  display question header  --%>
-				<c:if test="${status.first}">
-					<h2><fmt:message key="label.question"/></h2>
-					<table  class="alternative-color">
-					<tr>
-						<%-- <td><fmt:message key="label.question"/></td>--%>
-						<th colspan="2" class="first" width="50px"><c:out value="${question.description}" escapeXml="false"/></th>
-					</tr>
-					<%-- 
-					<tr>
-						<td colspan="2"><b><fmt:message key="message.possible.answers"/></b></td>
-					</tr>
-					--%>
-					<c:forEach var="option" items="${question.options}" varStatus="optStatus">
-						<tr>
-							<td>
-								<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
-							</td>
-							<td>
-								${option.description}
-							</td>
-						</tr>
-					</c:forEach>
-					<c:if test="${question.appendText ||question.type == 3}">
-						<tr>
-							<td>
-								<fmt:message key="label.open.response"/>
-							</td>
-							<td>&nbsp;</td>
-						</tr>
-					</c:if>
-					<tr>
-					</table>
-				<%--  End first check  --%>
-				</c:if>
-				<c:if test="${status.first}">
-					<h2><fmt:message key="label.answer"/></h2>
-					<div align="center">
-						<table class="alternative-color">
-							<tr>
-								<th class="first"><fmt:message key="label.learner"/></th>
-								<c:forEach var="option" items="${question.options}" varStatus="optStatus">
-									<th>
-										<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
-									</th>
+			<c:forEach var="sessionEntry" items="${sessionMap.summaryList}" varStatus="sessionStatus">
+				<c:set var="toolSession" value="${sessionEntry.key}"/>
+				<c:set var="questionList" value="${sessionEntry.value}"/>
+				<%-- only display question list once --%>
+				<c:if test="${sessionStatus.first}">
+					<h1><fmt:message key="label.authoring.basic.survey.list.title"/></h1>
+					<c:forEach var="qe" items="${questionList}" varStatus="qeStatus">
+						<c:set var="qe" value="${qe.key}"/>
+							<table  class="alternative-color">
+								<tr>
+									<%-- <td><fmt:message key="label.question"/></td>--%>
+									<th colspan="2" class="first"><fmt:message key="label.question"/> ${qeStatus.count} : <c:out value="${qe.description}" escapeXml="false"/></th>
+								</tr>
+								<c:forEach var="optionTitle" items="${qe.options}" varStatus="optTitleStatus">
+									<tr>
+										<td width="100px">
+											<%= SurveyConstants.OPTION_SHORT_HEADER %>${optTitleStatus.count}
+										</td>
+										<td>
+											${optionTitle.description}
+										</td>
+									</tr>
 								</c:forEach>
-								<c:if test="${question.appendText || question.type == 3}">
-									<th>
-										<fmt:message key="label.open.response"/>
-									</th>
+								<c:if test="${qe.appendText ||qe.type == 3}">
+									<tr>
+										<td>
+											<fmt:message key="label.open.response"/>
+										</td>
+										<td>&nbsp;</td>
+									</tr>
 								</c:if>
-							</tr>
+								<tr>
+							</table>
+					</c:forEach>
 				</c:if>
+				<h1>${toolSession.sessionName}</h1>
+				<c:forEach var="entry" items="${questionList}" varStatus="questionStatus">
+					<c:set var="question" value="${entry.key}"/>
+					<c:set var="answers" value="${entry.value}"/>
+					<%-- only display session name once for each session group--%>
+					<%-- Display question header --%>
+					<table class="alternative-color">
+						<tr>
+							<th class="first" width="150px"><fmt:message key="label.question"/> ${questionStatus.count}</th>
+							<c:forEach var="option" items="${question.options}" varStatus="optStatus">
+								<th>
+									<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
+								</th>
+							</c:forEach>
+							<c:if test="${question.appendText || question.type == 3}">
+								<th>
+									<fmt:message key="label.open.response"/>
+								</th>
+							</c:if>
+						</tr>
+					<c:forEach var="answer" items="${answers}">
 						<%--  User answer list --%>
 						<tr>
-							<td>${user.loginName}</td>
+							<td>${answer.replier.loginName}</td>
 							<c:forEach var="option" items="${question.options}">
 								<td>
-									<c:if test="${not empty question.answer}">
+									<c:if test="${not empty answer.answer}">
 										<c:set var="checked" value="false"/>
-										<c:forEach var="choice" items="${question.answer.choices}">
+										<c:forEach var="choice" items="${answer.answer.choices}">
 											<c:if test="${choice == option.uid}">
 												<c:set var="checked" value="true"/>
 											</c:if>
@@ -94,20 +96,20 @@
 							</c:forEach>
 							<c:if test="${question.appendText ||question.type == 3}">
 								<td>
-									<c:if test="${not empty question.answer}">
-										<lams:out value="${question.answer.answerText}"/>
+									<c:if test="${not empty answer.answer}">
+										<lams:out value="${answer.answer.answerText}"/>
 									</c:if>
 									&nbsp;
 								</td>
 							</c:if>
 						</tr>
-					<c:if test="${status.last}">
+						<%-- End all answers for this question --%>
+						</c:forEach>
 						</table>
-						</div>
-					<%--  End first check  --%>
-					</c:if>
-				</c:forEach>
-		</div>
+				<%-- End question table --%>
+					</c:forEach>
+				<%-- End session table --%>
+			</c:forEach>
 		<div id="footer-learner"></div>
 		</div>
 	</div>

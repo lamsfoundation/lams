@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
@@ -118,7 +119,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		
-		SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> groupList = service.exportByLeaner(learner);
+		 SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByLeaner(learner);
 		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
@@ -141,7 +142,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SurveyApplicationException(error);
 		}
-		SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> groupList = service.exportByContentId(toolContentID);
+		 SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByContentId(toolContentID);
 		
 		// put it into HTTPSession
 		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());

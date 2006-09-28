@@ -111,12 +111,21 @@ public class MonitoringAction extends Action {
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		ISurveyService service = getSurveyService();
 		
+		//get summary 
 		SortedMap<SurveySession,List<AnswerDTO>> summary = service.getSummary(contentId);
+		
+		//get survey 
 		Survey survey = service.getSurveyByContentId(contentId);
 		
+		//get statistic
+		SortedMap<SurveySession,Integer> statis = service.getStatistic(contentId);
+		
+		//get refection list
 		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);
+		
 		//cache into sessionMap
 		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, summary);
+		sessionMap.put(SurveyConstants.ATTR_STATISTIC_LIST, statis);
 		sessionMap.put(SurveyConstants.PAGE_EDITABLE, new Boolean(SurveyWebUtils.isSurveyEditable(survey)));
 		sessionMap.put(SurveyConstants.ATTR_SURVEY, survey);
 		sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
@@ -159,7 +168,7 @@ public class MonitoringAction extends Action {
 		//get user list 
 		ISurveyService service = getSurveyService();
 		
-		SortedMap<SurveyUser,SurveyQuestion> userAnswerMap = new TreeMap<SurveyUser, SurveyQuestion>(new SurveyUserComparator());
+		SortedMap<SurveyUser,AnswerDTO> userAnswerMap = new TreeMap<SurveyUser, AnswerDTO>(new SurveyUserComparator());
 //		get all users with their answers whatever they answer or not
 		List<SurveyUser> users = service.getSessionUsers(sessionId);
 		for (SurveyUser user : users) {

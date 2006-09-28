@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
+import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.SurveyOptionComparator;
-import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 
 
 
@@ -49,6 +49,9 @@ public class AnswerDTO extends SurveyQuestion{
 	private double openResponse; 
 	private String openResponseFormatStr;
 	private int openResponseCount; 
+	
+	//this field could have value even this user does not reply this question (the answer is null)
+	private SurveyUser replier;
 	
 	static Logger logger = Logger.getLogger(AnswerDTO.class.getName());
 	public AnswerDTO(SurveyQuestion question){
@@ -102,6 +105,13 @@ public class AnswerDTO extends SurveyQuestion{
 	}
 	public void setOpenResponseFormatStr(String openResponseFormatStr) {
 		this.openResponseFormatStr = openResponseFormatStr;
+	}
+	
+	public SurveyUser getReplier() {
+		return replier;
+	}
+	public void setReplier(SurveyUser replier) {
+		this.replier = replier;
 	}
 
 }

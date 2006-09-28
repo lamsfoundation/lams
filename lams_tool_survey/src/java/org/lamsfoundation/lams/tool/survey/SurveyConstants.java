@@ -77,6 +77,7 @@ public class SurveyConstants {
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	public static final String ATTR_SURVEY_FORM = "surveyForm";
+	public static final String ATTR_STATISTIC_LIST = "statistic";
 	
 	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";

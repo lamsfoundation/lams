@@ -108,7 +108,7 @@ public interface ISurveyService
 	 */
 	void deleteQuestion(Long uid);
 	/**
-	 * Get question and its answer list by session and user.
+	 * Get a learner's all answers in a survey. 
 	 * @param sessionId
 	 * @param userUid
 	 * @return
@@ -206,12 +206,17 @@ public interface ISurveyService
 	 */
 
 	SortedMap<SurveySession,List<AnswerDTO>> getSummary(Long contentId);
-
+	/**
+	 * Return a map which sorted by SurveySesson and a list of total user count in this session.
+	 * @param contentId
+	 * @return
+	 */
+	SortedMap<SurveySession, Integer> getStatistic(Long contentId);
 	//******************************************************************************************
 	//  	Export portfolio methods
 	//******************************************************************************************
-	SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> exportByLeaner(SurveyUser learner);
-	SortedMap<SurveySession,SortedMap<SurveyUser,List<AnswerDTO>>> exportByContentId(Long toolContentID);
+	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLeaner(SurveyUser learner);
+	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByContentId(Long toolContentID);
 
 	//******************************************************************************************
 	//  	NOTEBOOK Functions
@@ -242,6 +247,7 @@ public interface ISurveyService
 	 * @return
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+
 
 }
 
