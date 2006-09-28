@@ -448,16 +448,16 @@
 				</fileset>
 			</path> 
 				  
-			<property name="assembly.activity" value="${basedir}/chatscribe"/>
-			<property name="package.cfg" value="librarypackages/chatscribe"/>
+			<property name="cs.assembly.activity" value="${basedir}/chatscribe"/>
+			<property name="cs.package.cfg" value="librarypackages/chatscribe"/>
 		
-			<mkdir dir="${assembly.activity}/"/>
-			<mkdir dir="${assembly.activity}/lib"/> 
-			<mkdir dir="${assembly.activity}/sql"/> 
-			<mkdir dir="${assembly.activity}/language"/> 
+			<mkdir dir="${cs.assembly.activity}/"/>
+			<mkdir dir="${cs.assembly.activity}/lib"/> 
+			<mkdir dir="${cs.assembly.activity}/sql"/> 
+			<mkdir dir="${cs.assembly.activity}/language"/> 
 		
-			<copy overwrite="yes" todir="${assembly.activity}/sql">
-				<fileset dir="${package.cfg}">
+			<copy overwrite="yes" todir="${cs.assembly.activity}/sql">
+				<fileset dir="${cs.package.cfg}">
 					<include name="learninglibrary1_insert.sql"/>
 					<include name="libraryActivity1_insert.sql"/>
 					<include name="toolActivity1_insert.sql"/>
@@ -465,24 +465,24 @@
 				</fileset>
 			</copy>
 
-			<copy overwrite="yes" todir="${assembly.activity}/language">
-				<fileset dir="${package.cfg}/language">
+			<copy overwrite="yes" todir="${cs.assembly.activity}/language">
+				<fileset dir="${cs.package.cfg}/language">
 					<include name="*.*"/>
 				</fileset>
 			</copy>
 
-		<copy overwrite="yes" file="${package.cfg}/deployLibrary.xml"
-					   	tofile="${assembly.activity}/deploy.xml" >
+		<copy overwrite="yes" file="${cs.package.cfg}/deployLibrary.xml"
+					   	tofile="${cs.assembly.activity}/deploy.xml" >
 			  <!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
 		        <filterchain>
 		            <striplinecomments>
 		               <comment value="!"/>
 		            </striplinecomments>
 		           <replacetokens>
-		                <token key="assemblydir" value="${assembly.activity}/sql"/>
+		                <token key="assemblydir" value="${cs.assembly.activity}/sql"/>
 		            </replacetokens>
 		            <replacetokens>
-			            <token key="assemblylangdir" value="${assembly.activity}/language"/>
+			            <token key="assemblylangdir" value="${cs.assembly.activity}/language"/>
 			        </replacetokens>
 		            <replacetokens>
 			             <token key="lamsear" value="${jboss.deploy}"/>
@@ -490,7 +490,7 @@
 		        </filterchain>
 		    </copy>
 
-			<copy overwrite="yes" todir="${assembly.activity}/lib">
+			<copy overwrite="yes" todir="${cs.assembly.activity}/lib">
 				<fileset dir="${deploy.tool.dir}/lib">
 					<include name="*.jar"/>
 				</fileset>
@@ -503,8 +503,8 @@
 
 			<generateDeployLibraryProperties depends="compile" 
 				mode="development" 
-				outputPath="${assembly.activity}"
-				configFile="${assembly.activity}/deploy.xml"
+				outputPath="${cs.assembly.activity}"
+				configFile="${cs.assembly.activity}/deploy.xml"
 				dbPassword="${db.password}"
 				dbUsername="${db.username}"
 				dbDriverUrl="${db.url}"
@@ -513,7 +513,7 @@
 		
 			<!-- Do the actual deployment -->
 			<path id="deploy.classpath">
-				<fileset dir="${assembly.activity}">
+				<fileset dir="${cs.assembly.activity}">
 					<include name="lib/*.jar"/>
 				</fileset>
 			</path> 
@@ -522,8 +522,8 @@
 				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
 				classpathref="deploy.classpath"
 				fork="true">
-					<arg file="${assembly.activity}/deploy.xml"/>
-					<arg file="${assembly.activity}/language"/>
+					<arg file="${cs.assembly.activity}/deploy.xml"/>
+					<arg file="${cs.assembly.activity}/language"/>
 			</java>
 		
 		</target>
