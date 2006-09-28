@@ -14,7 +14,8 @@
 		var epWin = null;
 		var sysadminWin = null;
 		var omWin = null;
-		var pWin = null
+		var pWin = null;
+		var copyrightWin = null;
 		
 		function closeAllChildren(){
 			if (authorWin && authorWin.open && !authorWin.closed) authorWin.close();
@@ -25,10 +26,10 @@
 			if (sysadminWin && sysadminWin.open && !sysadminWin.closed) sysadminWin.close();
 			if (omWin && omWin.open && !omWin.closed) omWin.close();
 			if (pWin && pWin.open && !pWin.closed) pWin.close();
-			
+			if (copyrightWin && copyrightWin.open && !copyrightWin.closed) copyrightWin.close();
 		}
 		
-		function openProfile(username)
+		function openProfile()
 		{
 			if(isMac)
 			{
@@ -219,6 +220,27 @@
 				}
 			}
 		}	
+
+		function openCopyRight() {
+			var height = 388;
+			var width = 750;
+			var left = 0;
+			var top = 0;
+			if(self.screen){
+				top = self.screen.height/2-height/2;
+				left = self.screen.width/2-width/2;
+			}
+			if(isMac){
+				copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
+			}else{
+				if(copyrightWin && copyrightWin.open && !copyrightWin.closed ){
+					copyrightWin.focus();
+				}else{
+					copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
+					copyrightWin.focus();
+				}
+			}
+		}
 		
 			
 	//-->
