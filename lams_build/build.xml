@@ -47,7 +47,7 @@
 		</delete>
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${jboss.server.instance}/work/jboss.web/localhost">
-				<include name="lams*/*" />
+				<include name="lams*/**" />
 			</fileset>
 		</delete>
 	</target>
@@ -535,6 +535,26 @@
 	
 		</target>
 
+
+	
+	<!-- Copy lams.tld and the lams tags from lams-central to the other projects -->
+	<target name="copy-tags" description="Copy lams.tld and the lams tags from lams-central to the other projects">
+		<ant antfile="../${lams_admin}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_learning}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_monitoring}/build.xml"  target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_www}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_chat_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_forum_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<!-- <ant antfile="../${tool_lamc_dir}/build.xml" target="copy-tags" inheritAll="false"/> -->
+		<ant antfile="../${tool_laqa_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_larsrc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_lanb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_notebook_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_sbmt_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_scribe_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<!-- <ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/> -->
+	</target>
 
 
 </project>
