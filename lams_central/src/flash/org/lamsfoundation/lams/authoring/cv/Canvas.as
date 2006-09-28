@@ -1260,6 +1260,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		return _ddm;
 	}
 	
+	public function get taWidth():Number{
+		return toolActWidth	
+	}
+	
+	public function get taHeight():Number{
+		return toolActHeight
+	}
+	
 	/*
 	public function getPropertyInspector():MovieClip{
 		return _pi;

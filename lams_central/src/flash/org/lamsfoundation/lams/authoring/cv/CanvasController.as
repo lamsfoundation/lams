@@ -129,8 +129,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
 								//give it the new co-ords and 'drop' it
-								ca.activity.xCoord = _xmouse - _canvasModel.getPosition().x;
-								ca.activity.yCoord = _ymouse - _canvasModel.getPosition().y;
+
+								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
+								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							} else {
 								activitySnapBack(ca);

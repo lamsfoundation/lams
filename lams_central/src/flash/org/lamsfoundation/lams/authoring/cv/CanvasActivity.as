@@ -576,15 +576,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				}else {
 					var parentAct = mm.getMonitor().ddm.getActivityByUIID(this.activity.parentUIID)
 				}
-				if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
-					trace("called by view")
-					styleObj = _tm.getStyleObject('ACTPanel1')
-					act_pnl.setStyle('styleName',styleObj);
-				}else {
+				//if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+					//trace("called by view")
+					//styleObj = _tm.getStyleObject('ACTPanel1')
+					//act_pnl.setStyle('styleName',styleObj);
+				//}else {
 					
 					styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
 					act_pnl.setStyle('styleName',styleObj);
-				}
+				//}
 			}else {
 					styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
 					act_pnl.setStyle('styleName',styleObj);
