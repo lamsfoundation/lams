@@ -25,6 +25,7 @@ export_pfolio_learner_url,
 export_pfolio_class_url,
 contribute_url,
 moderation_url,
+help_url,
 language_file,
 create_date_time
 )
@@ -51,6 +52,7 @@ NULL,
 'tool/lasurv11/exportPortfolio?mode=teacher',
 'tool/lasurv11/contribute.do',
 'tool/lasurv11/moderate.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/lasurv11',
 'org.lamsfoundation.lams.tool.survey.ApplicationResources',
 NOW()
 )

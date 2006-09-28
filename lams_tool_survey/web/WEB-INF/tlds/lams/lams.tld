@@ -13,6 +13,26 @@
 
    <tag>
 
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
+      <icon>    
+      </icon>
+      <name>role</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts role name into form usable as message resources key</description>
+         <name>role</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Output the Server URL as defined in the lams.xml configuration file.</description>
       <display-name>LAMS URL</display-name>
       <icon>    
@@ -381,6 +401,6 @@
    	<tag-file>
 	    <name>DefineLater</name>
 		<path>/WEB-INF/tags/DefineLater.tag</path>
-   	</tag-file>
+   	</tag-file>  
 
 </taglib>
