@@ -64,7 +64,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts.action path="/index" validate="false"
  * 
- * @struts.action-forward name="index" path="/indexContent.jsp"
+ * @struts.action-forward name="main" path="/main.jsp"
+ * 
+ * @struts.action-forward name="content" path="/indexContent.jsp"
  */
 public class IndexAction extends Action {
 
@@ -82,20 +84,19 @@ public class IndexAction extends Action {
 		// only set header links if we are displaying 'active' organisations; i.e., on the index page
 		if(state.equals(OrganisationState.ACTIVE)){
 			List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
-			//headerLinks.add(new IndexLinkBean("index.dummymonitor","javascript:openDummyMonitor()"));
-			headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile('" + request.getRemoteUser()+"')"));
-			if (request.isUserInRole(Role.SYSADMIN)) {
-				log.debug("user is sysadmin");
-				headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
+			if (request.isUserInRole(Role.AUTHOR)) {
+				log.debug("user is author");
+				headerLinks.add(new IndexLinkBean("index.author", "home.do?method=author"));
 			}
 			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
 				log.debug("user is an admin or manager");
-				headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+")"));
+				headerLinks.add(new IndexLinkBean("index.courseman", "admin/orgmanage.do?org=" + getService().getRootOrganisation().getOrganisationId()));
 			}
-			if (request.isUserInRole(Role.AUTHOR)) {
-				log.debug("user is author");
-				headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
+			if (request.isUserInRole(Role.SYSADMIN)) {
+				log.debug("user is sysadmin");
+				headerLinks.add(new IndexLinkBean("index.sysadmin", "admin/sysadminstart.do"));
 			}
+			headerLinks.add(new IndexLinkBean("index.myprofile", "profile.do?method=view"));
 			log.debug("set headerLinks in request");
 			request.setAttribute("headerLinks", headerLinks);
 		}
@@ -125,7 +126,10 @@ public class IndexAction extends Action {
 			}
 		}
 		request.setAttribute("orgBeans",orgBeans);
-		return mapping.findForward("index");
+		if(state.equals(OrganisationState.ACTIVE))
+			return mapping.findForward("main");
+		else
+			return mapping.findForward("content");
 	}
 
 	@SuppressWarnings({"unchecked","static-access"})
@@ -136,20 +140,20 @@ public class IndexAction extends Action {
 		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
 		if(isSysAdmin && state.equals(OrganisationState.ACTIVE)){
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
+				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
 			}
 		}
 		if ((contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 				&& state.equals(OrganisationState.ACTIVE)) {
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 				if((!isSysAdmin)&&(contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER))){
-					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
+					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
 				}
 				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')"));
+					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button"));
 			}else{//CLASS_TYPE
 				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")"));
+					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button"));
 			}
 		}
 		
@@ -161,6 +165,7 @@ public class IndexAction extends Action {
 			if(isInLesson(user,lesson)){
 				if(!lesson.isPreviewLesson()){
 					List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
+					String url = null;
 					if(state.equals(OrganisationState.ACTIVE)){
 						if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_MONITOR)){
 							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
@@ -170,7 +175,7 @@ public class IndexAction extends Action {
 						if(contains(roles,Role.ROLE_LEARNER)){
 							log.debug("Lesson State:"+lesson.getLessonStateId());
 							if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
-								lessonLinks.add(new IndexLinkBean("index.participate","javascript:openLearner("+lesson.getLessonId()+")"));
+								url = "javascript:openLearner("+lesson.getLessonId()+")";
 							}
 						}
 					}else if(state.equals(OrganisationState.ARCHIVED)){
@@ -186,8 +191,9 @@ public class IndexAction extends Action {
 							}
 						}
 					}
-					if(lessonLinks.size()>0){
+					if(lessonLinks.size()>0 || url!=null){
 						IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
+						lessonBean.setUrl(url);
 						lessonBeans.add(lessonBean);
 					}
 				}

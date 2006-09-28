@@ -19,51 +19,6 @@
 					parameters: params
 				});
 		}
-
-		function findNextDiv(node)
-		 {
-		 	 var nd = node.nextSibling;
-		 	  while(nd.nodeName.toUpperCase()!="DIV"){
-		 	   	nd=nd.nextSibling;
-		 	  }  
-		 	   return nd
-		 }
-		 
-		function toggle(node)
-		{
-			// Unfold the branch if it isn't visible
-			var nextDiv = findNextDiv(node);
-			if (nextDiv.style.display == 'none')
-			{
-				// Change the image (if there is an image)
-				if (node.childNodes.length > 0)
-				{
-					if (node.childNodes.item(0).nodeName == "IMG")
-					{
-						node.childNodes.item(0).src = "images/tree_open.gif";
-					}
-				}
-		
-				nextDiv.style.display = 'block';
-			}
-			// Collapse the branch if it IS visible
-			else
-			{
-				// Change the image (if there is an image)
-				if (node.childNodes.length > 0)
-				{
-					if (node.childNodes.item(0).nodeName == "IMG")
-					{
-						node.childNodes.item(0).src = "images/tree_closed.gif";
-					}
-				}
-		
-				nextDiv.style.display = 'none';
-			}
-		
-		}
-		
-		getContent();
 	</script>
 
 <h2><fmt:message key="index.myprofile" /></h2>

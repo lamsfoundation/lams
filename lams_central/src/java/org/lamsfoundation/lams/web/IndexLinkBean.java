@@ -37,6 +37,14 @@ public class IndexLinkBean {
 	
 	private String name;
 	private String url;
+	private String style;
+	
+	public IndexLinkBean(String name, String url, String style) {
+		super();
+		this.name = name;
+		this.url = url;
+		this.style = style;
+	}
 	
 	public IndexLinkBean(String name, String url) {
 		this.name = name;
@@ -65,6 +73,14 @@ public class IndexLinkBean {
 	 */
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	public String getStyle() {
+		return style;
+	}
+	
+	public void setStyle(String style) {
+		this.style = style;
 	}
 
 }
