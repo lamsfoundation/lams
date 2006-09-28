@@ -50,6 +50,9 @@ public class CSSThemeUtil {
 	{
 		CSSThemeBriefDTO theme = null;
 
+		String defaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+		boolean userThemeIsDefault = false;
+		
 		List themeList = new ArrayList();
 		
 	   	HttpSession ss = SessionManager.getSession();
@@ -58,13 +61,22 @@ public class CSSThemeUtil {
 	   		if ( user != null ) {
 	   			theme = user.getHtmlTheme();
 	   			
-	   			if (theme != null & theme.getName() != null)
-	   				themeList.add(theme.getName());
+	   			if (theme != null ) {
+	   				String themeName = theme.getName();
+	   				if ( themeName != null) {
+	   					themeList.add(theme.getName());
+	   					if ( themeName.equals(defaultTheme) ) {
+	   						userThemeIsDefault = true;
+	   					}
+	   				}
+	   			}
 	   		}
 	   		
 	   	}
 	 
-	   	themeList.add("default");
+	   	if ( ! userThemeIsDefault ) {
+	   		themeList.add(defaultTheme);
+	   	}
 	   	
 	   	return themeList;
 	}

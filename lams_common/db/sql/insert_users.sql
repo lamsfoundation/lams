@@ -7,15 +7,8 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 -- themes and styles 
-INSERT INTO lams_css_style (style_id, theme_ve_id) VALUES (1,1);
-INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (1, 1, "borderStyle", "outset", NULL, 1);
-INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (2, 1, "color", "12452097", "_tf", 3);
-INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (3, 1, "rollOverColor", "16711680", NULL, 2);
-
 INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (1, "default", "Default Flash style", null, 1);
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (2, "ruby", "Incomplete style for Flash", null, 0);
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (3, "aqua", "JSP theme", null, 1);
-
+INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (2, "defaultHTML", "Default HTML style", null, 1);
 
 insert into lams_workspace (workspace_id, name, default_fld_id) values(1,'ROOT',1);
 insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(2,'Developers Playpen',2,22);
@@ -99,7 +92,7 @@ locale_id, flash_theme_id, html_theme_id)
 VALUES(1, 'sysadmin',SHA1('sysadmin'),'Mr','Fei','Yang',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',
 0,NOW(),1,null,
-1,1,3);
+1,1,2);
 
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
@@ -108,7 +101,7 @@ locale_id, flash_theme_id, html_theme_id)
 VALUES(2, 'test',SHA1('test'),'Dr','Testing','LDAP',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'test@xx.xx.xx',
 0,NOW(),3,null,
-3,1,3);
+3,1,2);
 
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
@@ -117,7 +110,7 @@ locale_id, flash_theme_id, html_theme_id)
 VALUES(3, 'lamskh01',SHA1('dummy'),'Mr','Jacky','Fang',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'jfang@melcoe.mq.edu.au',
 0,NOW(),2,null,
-1,1,3);
+1,1,2);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
@@ -128,7 +121,7 @@ values
 (4,'mmm',SHA1('mmm'),'Ms','Mary','Morgan','99','First Ave',null,
 'Parramatta','NSW','Australia','0295099999','0298939999','0499999999',
 '0299999999','mmmmmmm@xx.os',
-0,'20041223',1,4,1,1,3);
+0,'20041223',1,4,1,1,2);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
@@ -139,7 +132,7 @@ values
 (5,'test1',SHA1('test1'),'Dr','One','Test','1','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test1@xx.os',
-0,'20041223',1,5,1,1,3);
+0,'20041223',1,5,1,1,2);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
@@ -150,7 +143,7 @@ values
 (6,'test2',SHA1('test2'),'Dr','Two','Test','2','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test2@xx.os',
-0,'20041223',1,6,1,1,3);
+0,'20041223',1,6,1,1,2);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
@@ -161,7 +154,7 @@ values
 (7,'test3',SHA1('test3'),'Dr','Three','Test','3','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test3@xx.os',
-0,'20041223',1,7,1,1,3);
+0,'20041223',1,7,1,1,2);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,
@@ -172,7 +165,7 @@ values
 (8,'test4',SHA1('test4'),'Dr','Four','Test','4','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test4@xx.os',
-0,'20041223',1,8,1,1,3);
+0,'20041223',1,8,1,1,2);
 
 --- sysadmin only belongs to root
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (1, 1, 1);

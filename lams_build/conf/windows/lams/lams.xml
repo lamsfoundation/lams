@@ -41,5 +41,5 @@
 	<XmppAdmin>admin</XmppAdmin>
 	<XmppPassword>wildfire</XmppPassword>
 	<DefaultFlashTheme>default</DefaultFlashTheme>
-	<DefaultHTMLTheme>aqua</DefaultHTMLTheme>
+	<DefaultHTMLTheme>defaultHTML</DefaultHTMLTheme>
 </Lams>
