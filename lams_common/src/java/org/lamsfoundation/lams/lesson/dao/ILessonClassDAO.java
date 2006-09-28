@@ -23,17 +23,18 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 
 /**
  * Inteface defines Lesson DAO Methods
  * @author chris
  */
-public interface ILessonClassDAO
+public interface ILessonClassDAO extends IBaseDAO
 {
     
     /**
-     * Retrieves the Lesson
+     * Retrieves the Lesson. Maybe a Hibernate Proxy that requires lazy loading to get to data.
      * @param lessonId identifies the lesson to get
      * @return the lesson
      */

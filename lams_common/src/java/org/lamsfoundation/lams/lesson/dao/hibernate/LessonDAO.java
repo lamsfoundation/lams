@@ -72,7 +72,6 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
     public Lesson getLesson(Long lessonId)
     {
         Lesson lesson =  (Lesson)getHibernateTemplate().get(Lesson.class, lessonId);
-        initialize(lesson);
         return lesson;
     }
     

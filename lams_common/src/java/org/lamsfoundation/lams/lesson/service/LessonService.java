@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.lesson.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -324,6 +325,17 @@ public class LessonService implements ILessonService
 			throw new LessonServiceException("Lesson class for "+lessonId+" does not exist. Unable to add learner to lesson.");
 		}
 
+		// initialise the lesson group, or we get a lazy loading error when logging in 
+		// from moodle. Should only be two groups - learner and staff
+		// yes this is a bit of a hack!
+		Group learnersGroup = lessonClass.getLearnersGroup();
+		if ( learnersGroup != null )
+			lessonDAO.initialize(learnersGroup);
+
+		// hack - if coming from moodle and person is accessing lams
+		// for the first time since it starts, the user object isn't full initialised.
+		lessonDAO.initialize(user); 
+		
 		boolean ret = lessonClass.addLearner(user);
 		if ( ret ) {
 			lessonClassDAO.updateLessonClass(lessonClass);
@@ -349,7 +361,12 @@ public class LessonService implements ILessonService
 		}
 		
 		lessonDAO.initialize(lessonClass.getStaffGroup());
+
+		// hack - if coming from moodle and person is accessing lams
+		// for the first time since it starts, the user object isn't full initialised.
+		lessonDAO.initialize(user); 
 		
+
 		boolean ret = lessonClass.addStaffMember(user);
 		if ( ret ) {
 			lessonClassDAO.updateLessonClass(lessonClass);

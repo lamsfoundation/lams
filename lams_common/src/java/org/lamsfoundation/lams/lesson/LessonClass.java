@@ -81,7 +81,7 @@ public class LessonClass extends Grouping {
      */
     public boolean isLearnerGroup(Group group)
     {
-        if(group.getGroupId()==null||staffGroup.getGroupId()==null)
+        if(group==null||group.getGroupId()==null||staffGroup.getGroupId()==null)
         	return false;
         
         return staffGroup.getGroupId()!=group.getGroupId();
@@ -120,11 +120,7 @@ public class LessonClass extends Grouping {
     		return false;
 
     	// should be one ordinary group for lesson class, and this is all the learners in the lesson class
-    	Group learnersGroup = null; 
-    	Iterator iter = getGroups().iterator();
-    	if (iter.hasNext()) {
-			learnersGroup = (Group) iter.next();
-		}
+    	Group learnersGroup = getLearnersGroup();
     	if ( learnersGroup == null ) {
     		Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
     		if ( lessonOrganisation == null ) {
@@ -138,17 +134,23 @@ public class LessonClass extends Grouping {
     	}
 
     	if ( ! learnersGroup.hasLearner(user) ) {
-    		if ( log.isDebugEnabled() ) {
-    			log.debug("Adding learner "+user.getLogin()+" to LessonClass "+getGroupingId());
-    		}
     		learnersGroup.getUsers().add(user);
     		return true;
     	}
-    	if ( log.isDebugEnabled() ) {
-			log.debug("Not adding learner "+user.getLogin()+" to LessonClass "+getGroupingId()+". User is already a learner.");
-		}
     	return false;
     }
+
+	public Group getLearnersGroup() {
+		Group learnersGroup = null; 
+    	Iterator iter = getGroups().iterator();
+    	while (learnersGroup==null && iter.hasNext()) {
+			learnersGroup = (Group) iter.next();
+			if ( ! isLearnerGroup(learnersGroup) ) {
+				learnersGroup = null;
+			} 	
+		}
+		return learnersGroup;
+	}
     
     /** 
      * Add a staff member to the lesson class. Checks for duplicates.
@@ -176,15 +178,9 @@ public class LessonClass extends Grouping {
     	}
 
     	if ( ! staffGroup.hasLearner(user) ) {
-    		if ( log.isDebugEnabled() ) {
-    			log.debug("Adding staff member "+user.getLogin()+" to LessonClass "+getGroupingId());
-    		}
     		staffGroup.getUsers().add(user);
     		return true;
     	}
-    	if ( log.isDebugEnabled() ) {
-			log.debug("Not adding staff member "+user.getLogin()+" to LessonClass "+getGroupingId()+". User is already a staff member.");
-		}
     	return false;
 
     }

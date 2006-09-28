@@ -24,8 +24,7 @@
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 
@@ -33,7 +32,7 @@ import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
  * Hibernate implementation of ILessonDAO
  * @author chris
  */
-public class LessonClassDAO extends HibernateDaoSupport implements ILessonClassDAO
+public class LessonClassDAO extends BaseDAO implements ILessonClassDAO
 {
     
     public LessonClass getLessonClass(Long lessonClassId)
