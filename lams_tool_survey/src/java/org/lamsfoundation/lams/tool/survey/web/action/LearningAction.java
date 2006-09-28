@@ -471,10 +471,10 @@ public class LearningAction extends Action {
 			errors.add(SurveyConstants.ERROR_MSG_KEY+ question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
 		}
 		if(question.getType() == SurveyConstants.QUESTION_TYPE_SINGLE_CHOICE
-				&& question.isAppendText()){
+				&& question.isAppendText() && answer != null){
 			//for single choice, user only can choose one option or open text (if it has)
-			if(!StringUtils.isBlank(question.getAnswer().getAnswerChoices())
-				&& !StringUtils.isBlank(question.getAnswer().getAnswerText())){
+			if(!StringUtils.isBlank(answer.getAnswerChoices())
+				&& !StringUtils.isBlank(answer.getAnswerText())){
 				errors.add(SurveyConstants.ERROR_MSG_KEY+ question.getUid(),new ActionMessage(SurveyConstants.ERROR_MSG_SINGLE_CHOICE));
 			}
 		}
