@@ -43,17 +43,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </head>
 
-<body>
+<body class="stripes">
 
-	<div id="page">	
-		<h1 class="no-tabs-below">
-			<c:out value="${pageTitle}"/>
-		</h1>
-		<div id="header-no-tabs">
-		</div>
 		<div id="content">
 		
-		<p>&nbsp;</p>
+		<h1>
+			<c:out value="${pageTitle}"/>
+		</h1>
 
 		<div align="left" width="90">
 			<c:forEach var="entry" items="${portfolio.notebookPortfolios}" varStatus="status">

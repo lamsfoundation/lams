@@ -11,19 +11,13 @@
 		<lams:css localLinkPath="../" />
 	</head>
 
-	<body>
-		<div id="page">
-			<!--main box 'page'-->
-
-			<h1 class="no-tabs-below">
-				<c:out value="${notebookDTO.title}" escapeXml="false" />
-			</h1>
-			<div id="header-no-tabs">
-
-			</div>
-			<!--closes header-->
+	<body class="stripes">
 
 			<div id="content">
+
+			<h1>
+				<c:out value="${notebookDTO.title}" escapeXml="false" />
+			</h1>
 
 				<p>
 					<c:out value="${notebookDTO.instructions}" escapeXml="false" />
@@ -92,8 +86,6 @@
 			</div>
 			<!--closes footer-->
 
-		</div>
-		<!--closes page-->
 	</body>
 </html>
 

@@ -39,17 +39,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </head>
 
-<body>
+<body class="stripes">
 
-	<div id="page">	
-		<h1 class="no-tabs-below">
-			<c:out value="${portfolio.lessonName}"/>
-		</h1>
-		<div id="header-no-tabs">
-		</div>
 		<div id="content">
 		
-		<p>&nbsp;</p>
+		<h1>
+			<c:out value="${portfolio.lessonName}"/>
+		</h1>
 
 		<c:choose>
 			<c:when test="${not empty portfolio.learnerName}">

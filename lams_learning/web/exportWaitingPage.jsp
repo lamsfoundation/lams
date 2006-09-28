@@ -142,17 +142,13 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 
   </head>
   
-  <body>
+  <body class="stripes">
 
-	<div id="page-learner">
-		<h1 class="no-tabs-below"><fmt:message key='export.portfolio.window.title'/></h1>
-		<div id="header-no-tabs-learner">
 
-		</div><!--closes header-->
+		<div id="content">
+	
+			<h1><fmt:message key='export.portfolio.window.title'/></h1>
 
-		<div id="content-learner">
-
-			<p>&nbsp;</p>
 			<div id="message"></div>
 			<div id="button" style="visibility:hidden">
 				<p><a href='#' onclick='javascript:window.close()' class='button'><fmt:message key='label.finish.button'/></a></p>
@@ -161,9 +157,8 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 		</div>  <!--closes content-->
 
 
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
-	</div>
 
   </body>
 </html>

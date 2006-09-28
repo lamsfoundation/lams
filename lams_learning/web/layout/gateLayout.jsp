@@ -40,27 +40,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityId}">
 	  </head>
 
-	<body>
-		<div id="page-learner"><!--main box 'page'-->
+	<body class="stripes">
+		
 
-			<h1 class="no-tabs-below"><c:out value="${GateForm.map.gate.title}"/></h1>
-			<div id="header-no-tabs-learner">
+			<div id="content">
 
-			</div><!--closes header-->
+				<h1><c:out value="${GateForm.map.gate.title}"/></h1>
 
-			<div id="content-learner">
-
-				<p>&nbsp;</p>
 				<tiles:insert attribute="body" />
 				<%@ include file="../gate/gateNext.jsp" %>			  
 
 			</div>  <!--closes content-->
 
 
-			<div id="footer-learner">
+			<div id="footer">
 			</div><!--closes footer-->
-
-		</div><!--closes page-->
 
 	</body>
 

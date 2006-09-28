@@ -72,7 +72,7 @@ if (exception != null) {
 <%
 }
 %>
-<body>
+<body class="stripes">
 <form action="${lams}errorpages/error.jsp" method="post" id="errorForm">
 	<input type="hidden" name="errorName" value="${errorName}"/>
 	<input type="hidden" name="errorMessage" value="${errorMessage}"/>

@@ -44,7 +44,8 @@
 
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-<lams:css />
+<lams:css style="tabbed"/>
+
 <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

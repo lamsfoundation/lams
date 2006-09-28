@@ -13,14 +13,14 @@
 	<lams:css localLinkPath="../"/>
 </head>
 
-<body>
-<h1 class="no-tabs-below">
+<body class="stripes">
+
+
+<div id="content">
+
+<h1>
 	${title}
 </h1>
-
-<div id="header-no-tabs-learner"></div>
-
-<div id="content-learner">
 
 <c:forEach var="entry" items="${ToolContentTopicList}">
 	<c:set var="sessionName" value="${entry.key}"/>
@@ -115,7 +115,7 @@
 
 </div>
 
-<div id="footer-learner"></div>
+
 
 </body>
 </html:html>

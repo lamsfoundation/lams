@@ -25,9 +25,7 @@
 		</script>		
 		
 	</head>
-	<body>
-		<div id="page-learner">
+	<body class="stripes">
 			<tiles:insert attribute="body" />
-		</div>
 	</body>
 </html>

@@ -66,16 +66,14 @@
 	-->        
     </script>
 </head>
-<body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+<body class="stripes">
+
+
+		<div id="content">
+		<h1>
 			${resource.title}
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<!--closes header-->
 
-		<div id="content-learner">
 			<h2>
 				${resource.instructions}
 			</h2>
@@ -212,11 +210,10 @@
 			</c:if>
 		</div>  <!--closes content-->
 		
-		<div id="footer-learner">
+		<div id="footer">
 		</div>
 		<!--closes footer-->
 
-	</div><!--closes page-->
 </body>
 </html:html>
 

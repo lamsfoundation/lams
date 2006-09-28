@@ -3,7 +3,7 @@
 <head>
 	<lams:headItems />
 <head>
-<body>
+<body class="stripes">
 	<div align="center">
 		<h1>
 			<fmt:message key="label.authoring.heading" />

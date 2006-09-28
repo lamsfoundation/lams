@@ -7,7 +7,7 @@
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
-	<body>
+	<body class="stripes">
 		<table>
 			<!-- Basic Info Form-->
 			<tr>

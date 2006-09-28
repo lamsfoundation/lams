@@ -5,7 +5,7 @@
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
-	<body>
+	<body class="stripes">
 		<script type="text/javascript">
 			var reqIDVar = new Date();
 			window.parent.location.href  = "${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();

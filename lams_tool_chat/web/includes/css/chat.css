@@ -14,7 +14,7 @@
 
 /* ==================== LEARNING PAGE STYLES ==================== */
 #chat_content {
-	width: 560px;
+	width: 500 px;
 	padding: 12px;
 	/* compensate for content image border */
 	margin-left: 4px;

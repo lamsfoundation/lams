@@ -5,6 +5,7 @@
 
 	</head>
 	<body>
+		<div class="content">
 		<!-- Basic Info Form-->
 		<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm">
 			<html:hidden property="itemType" styleId="itemType" value="1" />
@@ -53,5 +54,6 @@
 				</tr>
 			</table>
 		</html:form>
+		</div>
 	</body>
 </html>

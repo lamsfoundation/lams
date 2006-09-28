@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		//-->
 		</script>
 	</head>
-	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<body class="stripes" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 	
 	<% 
 	String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);

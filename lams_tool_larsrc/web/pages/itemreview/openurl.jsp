@@ -3,7 +3,7 @@
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
-	<body>
+	<body class="stripes">
 		<br>
 		<div align="center">
 			<p><b>${title}</b></p>

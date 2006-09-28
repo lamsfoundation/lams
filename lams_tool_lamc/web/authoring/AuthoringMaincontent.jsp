@@ -200,7 +200,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</script>
 	
 </head>
-<body onLoad="init();">
+<body class="stripes" onLoad="init();">
 
 <div id="page">
 	<h1> <bean:message key="label.authoring.mc"/> </h1>

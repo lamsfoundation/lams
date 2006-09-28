@@ -57,7 +57,7 @@
 		//-->
 		</script>
 	</head>
-	<body>
+	<body class="stripes">
 		
 		<div id="content" style="padding-bottom: 0px;float:none;margin: auto;">
 			<table cellpadding="0">

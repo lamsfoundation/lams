@@ -30,11 +30,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<head>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<lams:css/>
-		<title>Learner :: Staff</title>
+		<lams:css style="core"/>
+		<title></title>
 	</head>
 
-<body>
+<body class="stripes">
 <H1><fmt:message key="preview.deleted.title"/></H1>
 
 <p><fmt:message key="preview.deleted.message">

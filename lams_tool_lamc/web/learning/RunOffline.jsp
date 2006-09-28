@@ -38,12 +38,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><bean:message key="activity.title" /></title>
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 	
-	<h1 class="no-tabs-below">&nbsp;</h1>
+	<h1>&nbsp;</h1>
 	
-	<div id="header-no-tabs-learner"></div>
+	
 	
 	<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
@@ -52,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="userID"/>								
 
 	
-		<div id="content-learner">
+		<div id="content">
 			&nbsp&nbsp&nbsp&nbsp&nbsp <bean:message key="label.learning.forceOfflineMessage" />
 			
 			<table>	
@@ -79,10 +78,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</html:form>	
 	
-	<div id="footer-learner"></div>
+	<div id="footer"></div>
 
 
-</div>
 </body>
 </html:html>
 

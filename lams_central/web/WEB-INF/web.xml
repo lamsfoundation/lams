@@ -13,8 +13,10 @@
 				classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 				classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+				classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/web/webApplicationContext.xml
+				classpath:/org/lamsfoundation/lams/integrationContext.xml
 				<!--  Needed to communicate with the tools -->
 				classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
@@ -89,9 +91,19 @@
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>/servlet/*</url-pattern>
    </filter-mapping>
+   <filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+     <url-pattern>/services/*</url-pattern>
+   </filter-mapping>
+
   <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>/fckeditor/*</url-pattern>
+   </filter-mapping>
+
+    <filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+     <url-pattern>/LoginRequest</url-pattern>
    </filter-mapping>
    <filter-mapping>
     <filter-name>LocaleFilter</filter-name>
@@ -122,11 +134,18 @@
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
-</listener>	
+</listener>
+
 <listener>
 	<listener-class>
- 		org.lamsfoundation.lams.web.SessionListener
- 	</listener-class>
+		org.lamsfoundation.lams.web.SessionListener
+	</listener-class>
+</listener>
+
+<listener>
+	<listener-class>
+		org.apache.axis.transport.http.AxisHTTPSessionListener
+	</listener-class>
 </listener>
 
    <servlet>
@@ -257,16 +276,24 @@
 	<servlet-name>AxisServlet</servlet-name>
 	<display-name>Apache-Axis Servlet</display-name>
 	<servlet-class>
-		org.apache.axis2.transport.http.AxisServlet
+		org.apache.axis.transport.http.AxisServlet
 	</servlet-class>
-	<load-on-startup>2</load-on-startup>
 </servlet>
 
 <servlet>
-	<servlet-name>AxisRESTServlet</servlet-name>
-	<display-name>Apache-Axis Servlet (REST)</display-name>
+	<servlet-name>AdminServlet</servlet-name>
+	<display-name>Axis Admin Servlet</display-name>
 	<servlet-class>
-		org.apache.axis2.transport.http.AxisRESTServlet
+		org.apache.axis.transport.http.AdminServlet
+	</servlet-class>
+	<load-on-startup>100</load-on-startup>
+</servlet>
+
+<servlet>
+	<servlet-name>LoginRequest</servlet-name>
+	<display-name>LoginRequest Servlet For Integration</display-name>
+	<servlet-class>
+		org.lamsfoundation.lams.web.LoginRequestServlet
 	</servlet-class>
 </servlet>
 
@@ -278,11 +305,6 @@
 <servlet-mapping>
 	<servlet-name>download</servlet-name>
 	<url-pattern>/download/*</url-pattern>
-</servlet-mapping>
-
-<servlet-mapping>
-	<servlet-name>AxisRESTServlet</servlet-name>
-	<url-pattern>/rest/*</url-pattern>
 </servlet-mapping>
 
 <servlet-mapping>
@@ -298,6 +320,11 @@
 <servlet-mapping>
 	<servlet-name>AxisServlet</servlet-name>
 	<url-pattern>/services/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>LoginRequest</servlet-name>
+	<url-pattern>/LoginRequest</url-pattern>
 </servlet-mapping>
 
    <servlet-mapping>
@@ -333,12 +360,20 @@
       <session-timeout>120</session-timeout>
    </session-config>
 
-   <!--
-   To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
-   Organize mime-mappings.xml following this DTD slice:
+  <mime-mapping>
+	<extension>csv</extension>
+	<mime-type>text/plain</mime-type>
+</mime-mapping>
 
-   <!ELEMENT mime-mapping (extension, mime-type)>
-   -->
+<mime-mapping>
+	<extension>wsdl</extension>
+	<mime-type>text/xml</mime-type>
+</mime-mapping>
+
+<mime-mapping>
+	<extension>xsd</extension>
+	<mime-type>text/xml</mime-type>
+</mime-mapping>
 
       <error-page>
         <error-code>500</error-code>
@@ -424,7 +459,7 @@
 	    	<web-resource-name>Secure Content</web-resource-name>
     		<url-pattern>*.jsp</url-pattern>
     		<url-pattern>*.html</url-pattern>
-    		<url-pattern>/index.jsp</url-pattern>
+    		<url-pattern>*.do</url-pattern>
     		<url-pattern>/servlet/*</url-pattern>
     		<url-pattern>/fckeditor/*</url-pattern>
     	</web-resource-collection>

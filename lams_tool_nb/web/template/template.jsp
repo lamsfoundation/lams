@@ -16,22 +16,18 @@
 	<title><fmt:message key="activity.title" /></title>
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 
-		<h1 class="no-tabs-below">
+		<h1>
 			<fmt:message key="activity.title" />
 		</h1>
 
-		<div id="header-no-tabs-learner">
-		</div>
-
-		<div id="content-learner">
+		<div id="content">
 			<tiles:insert attribute="content" />
 		</div>
 
-		<div id="footer-learner">
+		<div id="footer">
 		</div>
-	</div>
+
 </body>
 </lams:html>

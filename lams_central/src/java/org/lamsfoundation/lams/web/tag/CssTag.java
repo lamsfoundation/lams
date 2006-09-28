@@ -54,7 +54,10 @@ public class CssTag extends TagSupport {
 	private static final Logger log = Logger.getLogger(CssTag.class);
 	private static final String IE_STYLESHEET_NAME = "ie-styles";
 	private String localLinkPath = null; 
+	private String style = null; 
 	
+	private static final String LEARNER_STYLE = "learner"; // expandable
+	private static final String TABBED_STYLE = "tabbed"; // fixed width
 	/**
 	 * 
 	 */
@@ -80,6 +83,7 @@ public class CssTag extends TagSupport {
 				{
 					String theme = (String)i.next();
 					if ( theme != null) {
+						theme = appendStyle(theme);
 						if (localLinkPath != null)
 							customStylesheetLink = generateLocalLink(theme);
 						else	
@@ -116,6 +120,14 @@ public class CssTag extends TagSupport {
 		} else { 
 			return "<link href=\""+localLinkPath+"/css/"+stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
 		}
+	}
+
+	private String appendStyle(String stylesheetName) {
+		String ssName = stylesheetName;
+		if ( ssName != null && ( getStyle() == null || getStyle().equals(LEARNER_STYLE)) ) {
+				ssName = ssName + "_" + "learner";
+		}
+		return ssName;
 	}
 	
 	private String generateLocalURL(String stylesheetName) {
@@ -163,6 +175,25 @@ public class CssTag extends TagSupport {
 	{
 		this.localLinkPath = localLinkPath;
 	}
+
+	/**
+	 * @jsp.attribute required="false" rtexprvalue="true" 
+	 * description="Learner pages use learner, fancy pages such as index page use core"
+	 * 
+	 * Sets whether to use blah.css (style="core") or blah_learner.css (style=learner). 
+	 * If this parameter is left blank, you get blah_learner.css e.g. default_learner.css
+	 * @return Returns style.
+	 */
+	public String getStyle()
+	{
+		return style;
+	}
+
+	public void setStyle(String style)
+	{
+		this.style = style;
+	}
+
 
 
 }

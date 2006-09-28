@@ -11,7 +11,7 @@
 	<lams:css/>
 </HEAD>
 
-<BODY>
+<body class="stripes">
 	<div id="page">	
 		<div id="content">
 			<p><fmt:message key="msg.loading.add.lesson.window"/></p>

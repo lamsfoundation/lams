@@ -33,7 +33,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html>
 <head>
 	<html:base />
-	<lams:headItems />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
 	<title><bean:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
@@ -53,15 +54,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 </head>
 
-<body>
-	<div id="page-learner">
-	
-	<h1 class="no-tabs-below">
-		<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
-	</h1>
+<body class="stripes">
 	
 	
-	<div id="header-no-tabs-learner"></div>
+	
 	
 	<html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
@@ -70,8 +66,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="httpSessionID"/>		
 		<html:hidden property="totalQuestionCount"/>		
 	
-		<div id="content-learner">
+		<div id="content">
 		
+	<h1>
+		<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
+	</h1>
+	
 		<table>
 			<tr>
 				<td>
@@ -81,7 +81,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<tr>
 				<td>
-					<html:textarea cols="66" rows="8" property="entryText"></html:textarea>
+					<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
 				</td>
 			</tr>
 
@@ -98,10 +98,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</html:form>	
 	
-	<div id="footer-learner"></div>
+	<div id="footer"></div>
 
 
-</div>
 </body>
 </html:html>
 

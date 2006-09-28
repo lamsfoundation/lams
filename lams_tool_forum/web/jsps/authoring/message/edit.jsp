@@ -13,7 +13,8 @@
 		
 	</head>
 	<body>
-		<table cellpadding="3">
+		<div class="content">
+		<table cellpadding="3" width="100%">
 			<!-- Basic Info Form-->
 			<%@ include file="/common/messages.jsp"%>
 			<html:form action="/authoring/updateTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
@@ -57,7 +58,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td align="center" valign="bottom">
+					<td align="center" valign="bottom"><p>
 						<a href="#" onclick="getElementById('topicFormId').submit();" class="button-add-item">
 							<bean:message key="button.add" />
 						</a>
@@ -65,11 +66,11 @@
 						<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
 							<bean:message key="button.cancel" />
 						</a>					
-						<BR><BR>
+						</p>
 					</td>
 				</tr>
 			</html:form>
 		</table>
-
+		</div>
 	</body>
 </html>

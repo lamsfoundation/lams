@@ -47,14 +47,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       <meta http-equiv="cache-control" content="no-cache">
     </head>
     
-    <body>
-		<div id="login-page">	
+    <body class="stripes">
 		<tiles:insert attribute="content" />
 
 		<div id="footer">
 		</div><!--closes footer-->
-
-		</div><!--closes page-->
 
     </body>
 </html:html>

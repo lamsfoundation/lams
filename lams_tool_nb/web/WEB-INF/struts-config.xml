@@ -137,6 +137,11 @@
         path="/monitoring/monitoring.jsp"
         redirect="false"
       />
+      <forward
+        name="monitorReflectionPage"
+        path=".monitorReflectionPage"
+        redirect="false"
+      />
     </action>
     <action
       path="/learner"
@@ -151,6 +156,11 @@
       <forward
         name="displayLearnerContent"
         path=".learnerContent"
+        redirect="false"
+      />
+      <forward
+        name="reflectOnActivity"
+        path=".reflectOnActivity"
         redirect="false"
       />
     </action>

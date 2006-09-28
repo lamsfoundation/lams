@@ -11,20 +11,15 @@
 	<lams:css/>
 </HEAD>
 
-<BODY>
-	<div id="page-learner"><!--main box 'page'-->
+<body class="stripes">
 	
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
-
-		<div id="content-learner">
+		<div id="content">
 			<p><fmt:message key="msg.loading.learner.window"/></p>
 		</div>
 	   
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
 
-	</div><!--closes page-->
 </BODY>
 	
 </lams:html>

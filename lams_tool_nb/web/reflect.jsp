@@ -1,12 +1,12 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+<div id="content">
+<h1>
 	<c:out value="${title}" escapeXml="false" />
 </h1>
-<div id="header-no-tabs-learner"></div>
-<div id="content-learner">
+
 	<html:form action="/learner" method="post">
-		<table>
+		<table width="100%">
 			<tr>
 				<td>
 					<lams:out value="${reflectInstructions}" />				
@@ -15,7 +15,7 @@
 
 			<tr>
 				<td>
-					<html:textarea cols="66" rows="8" property="reflectionText"></html:textarea>
+					<html:textarea cols="60" rows="8" property="reflectionText"></html:textarea>
 				</td>
 			</tr>
 
@@ -33,4 +33,4 @@
 		</table>
 	</html:form>
 </div>
-<div id="footer-learner"></div>
+

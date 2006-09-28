@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title> <bean:message key="activity.title"/> </title>
     </head>
-    <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+    <body class="stripes" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
       <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
 	        <!-- header -->
 	        <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>

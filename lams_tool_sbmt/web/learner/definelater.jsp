@@ -5,7 +5,7 @@
 
 <html:html>
 <head>
-	<lams:headItems />
+	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript">
 		var locked =  <c:out value="${learner.locked}"/>;
 		function finish(){
@@ -15,20 +15,17 @@
 	</script>
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 
-		<h1 class="no-tabs-below">
+		<div id="content">
+		<h1>
 			<fmt:message key="activity.title"></fmt:message>
 		</h1>
 
-		<div id="header-no-tabs-learner"></div>
-
-		<div id="content-learner">
 			<lams:DefineLater/>
 		</div>
-		<div id="footer-learner"></div>
-	</div>
+		<div id="footer"></div>
+
 </body>
 </html:html>
 

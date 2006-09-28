@@ -9,9 +9,9 @@
 <head>
 	<title><fmt:message key="title.lams"/></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<lams:css/>
+	<lams:css  style="core"/>
 </head>
-<body>
+<body class="stripes">
 	<div id="page">	
 		<h1 class="no-tabs-below">
 			<fmt:message key="msg.LAMS.copyright.statement.1"/>

@@ -7,13 +7,13 @@
 		location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&reqUid=" />"+reqIDVar.getTime();;
 	}
 </script>
-<h1 class="no-tabs-below">
+
+
+<div id="content">
+
+<h1>
 	${sessionMap.title}
 </h1>
-
-<div id="header-no-tabs-learner"></div>
-
-<div id="content-learner">
 
 	<h2>
 
@@ -29,6 +29,8 @@
 		</html:button>
 	</p>
 	<%@ include file="message/topicview.jsp"%>
+	<table>
+	<tr><td>
 	<div class="left-buttons">
 		<c:set var="refreshTopicURL">
 			
@@ -37,6 +39,8 @@
 			<fmt:message key="label.refresh"/>
 		</a>
 	</div>
+	</td></tr>
+	</table>
 </div>
 
-<div id="footer-learner"></div>
+

@@ -115,7 +115,6 @@
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="build-war" depends="webdoclet,build-jar" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
-		<copy overwrite="yes" file="${conf.web.dir}/css/aqua.css" tofile="${conf.web.dir}/css/default.css"/>
 		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
   				webxml="${conf.webinf.dir}/web.xml">
 			<webinf dir="${conf.webinf.dir}">

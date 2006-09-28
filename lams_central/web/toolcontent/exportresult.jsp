@@ -16,15 +16,10 @@
 		</script>
 	</head>
 
-	<BODY>
+	<body class="stripes">
 
-	<div id="page-learner"><!--main box 'page'-->
-
-	<h1 class="no-tabs-below"><fmt:message key="msg.export.success" /></h1>
-	<div id="header-no-tabs-learner">
-	</div><!--closes header-->
-	
-	<div id="content-learner">
+	<h1><fmt:message key="msg.export.success" /></h1>
+	<div id="content">
 
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
@@ -51,10 +46,8 @@
 	<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
 	</div>  <!--closes content-->
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
-		
-	</div><!--closes page-->
 		
 	</BODY>
 </HTML>

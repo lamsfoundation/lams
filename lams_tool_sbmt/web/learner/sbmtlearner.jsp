@@ -8,7 +8,8 @@
 <head>
 	<title><fmt:message key="tool.display.name" /></title>
 	<html:base />
-	<lams:headItems />
+	<%@ include file="/common/header.jsp"%>
+
 	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
 	
 	<script type="text/javascript">
@@ -36,17 +37,13 @@
 
 </head>
 
-<body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+<body class="stripes">
+
+		<div id="content">
+		<h1>
 			<c:out value="${sessionMap.title}" escapeXml="false" />
 		</h1>
 
-		<div id="header-no-tabs-learner">
-
-		</div>
-
-		<div id="content-learner">
 			<table cellpadding="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td colspan="2">
@@ -210,7 +207,6 @@
 				</html:form>
 			</c:if>
 		</div>
-		<div id="footer-learner"></div>
-	</div>
+		<div id="footer"></div>
 </body>
 </html:html>

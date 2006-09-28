@@ -25,13 +25,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<h1 class="no-tabs-below"><fmt:message key="label.synch.gate.title"/></h1>
-	<div id="login-header">
-	</div id="login-header">
+	<div id="content">
 
-	<div id="login-content">
+		<h1><fmt:message key="label.synch.gate.title"/></h1>
 
-		<p>&nbsp;</p> 
 		<%@ include file="gateInfo.jsp" %>
 		<%@ include file="gateStatus.jsp" %>
 

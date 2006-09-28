@@ -35,11 +35,11 @@
 <script type="text/javascript"
 	src="${tool}includes/javascript/learning.js"></script>
 
-<h1 class="no-tabs-below">
-	<c:out value="${chatDTO.title}" escapeXml="false" />
-</h1>
-<div id="header-no-tabs-learner"></div>
-<div id="content-learner">
+<div id="content">
+	<h1>
+		<c:out value="${chatDTO.title}" escapeXml="false" />
+	</h1>
+
 	<div id="chat_content">
 		<div id="chat_pane">
 			<form name="sendForm" action="" onSubmit="return sendMsg(this);">
@@ -80,4 +80,4 @@
 		</div>
 	</div>
 </div>
-<div id="footer-learner"></div>
+

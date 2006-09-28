@@ -33,12 +33,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:form action="${formAction}" target="_self">
 
-		<h1 class="no-tabs-below"><c:out value="${GroupingForm.map.title}"/></h1>
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
 
-		<div id="content-learner">
+		<div id="content">
 		
+			<h1><c:out value="${GroupingForm.map.title}"/></h1>
+			
 			<p>&nbsp;</p>
 
 			<p><fmt:message key="label.view.view.groups.wait.message"/></p>
@@ -54,7 +53,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		</div>  <!--closes content-->
 
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
 
 	</html:form>

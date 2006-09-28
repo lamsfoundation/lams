@@ -27,14 +27,10 @@
 	<%@ taglib uri="tags-lams" prefix="lams" %>
 
 
-	<h1 class="no-tabs-below"><fmt:message key="label.preview.definelater.title"/></h1>
-	<div id="header-no-tabs-learner">
 
-	</div><!--closes header-->
+	<div id="content">
 
-	<div id="content-learner">
-
-		<p>&nbsp;</p>
+		<h1><fmt:message key="label.preview.definelater.title"/></h1>
 
 		<p><fmt:message key="label.preview.definelater.message">
 				<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
@@ -46,7 +42,7 @@
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 
 

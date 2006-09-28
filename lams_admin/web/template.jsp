@@ -14,12 +14,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
-	<lams:css/>
+	<lams:css  style="core"/>
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 </head>
     
-<body>
+<body class="stripes">
 <div id="page">
 	<div id="content">
 			<tiles:insert attribute="content" />

@@ -1,12 +1,12 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+<h1>
 	<fmt:message key="titleHeading.reflection" />
 </h1>
 
-<div id="header-no-tabs-learner"></div>
 
-<div id="content-learner">
+
+<div id="content">
 
 <!-- if nbEntry is empty, display 'has not reflected' message -->
 <table>
@@ -28,4 +28,3 @@
 
 </div>
 
-<div id="footer-learner"></div>

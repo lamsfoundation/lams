@@ -7,13 +7,13 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 </head>
-<body>
-	<div id="page-learner">
-			<h1 class="no-tabs-below">
+<body class="stripes">
+
+			<h1>
 				<fmt:message key="page.title.monitoring.view.reflection"/>
 			</h1>
-			<div id="header-no-tabs-learner"></div>
-			<div id="content-learner">
+			
+			<div id="content">
 			<table>
 				<tr>
 					<td>
@@ -53,9 +53,9 @@
 
 
 			</div>
-		<div id="footer-learner">
+		<div id="footer">
 		</div>
 		<!--closes footer-->
-	</div><!--closes page-->
+
 </body>
 </html:html>

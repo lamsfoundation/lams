@@ -7,14 +7,13 @@
 <head>
 	    <%@ include file="/common/header.jsp" %>
 </head>
-<body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+<body class="stripes">
+
+		<h1>
 			<fmt:message key="label.monitoring.heading.access"/>
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<div id="content-learner">
+
+		<div id="content">
 	<table border="0" cellspacing="3" width="98%">
 		<tr>
 			<th>
@@ -47,8 +46,7 @@
 		</tr>
 	</table>
 </div>
-		<div id="footer-learner"></div>
+		<div id="footer"></div>
 		</div>
-	</div>
 </body>
 </html>

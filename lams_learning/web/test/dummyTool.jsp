@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<head>
 		<title>LAMS</title>
 	</head>
-	<body>
+	<body class="stripes">
 	
 		<bean:parameter id="toolSessionId" name="toolSessionId" />
 		<b><c:out value="${toolSessionId}" /></b><br />

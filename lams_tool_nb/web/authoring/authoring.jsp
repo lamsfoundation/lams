@@ -52,7 +52,7 @@
      </script>  
 </head>
 
-<body onLoad="init()">
+<body class="stripes" onLoad="init()">
 
 	<div id="page">
 		<html:form action="/authoring" styleId="authoringForm" target="_self"

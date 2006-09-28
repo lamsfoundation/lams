@@ -14,7 +14,7 @@
 <head>
 	<title><fmt:message key="label.author.title" /></title>
 
-	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/tabbedheader.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script>
@@ -46,7 +46,7 @@
 
 
 </head>
-<body onLoad="init()">
+<body class="stripes" onLoad="init()">
 <div id="page">
 	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />

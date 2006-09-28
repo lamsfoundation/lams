@@ -13,6 +13,26 @@
 
    <tag>
 
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
+      <icon>    
+      </icon>
+      <name>role</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts role name into form usable as message resources key</description>
+         <name>role</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Output the Server URL as defined in the lams.xml configuration file.</description>
       <display-name>LAMS URL</display-name>
       <icon>    
@@ -20,6 +40,74 @@
       <name>LAMSURL</name>
       <tag-class>org.lamsfoundation.lams.web.tag.LAMSURLTag</tag-class>
       <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+      <display-name>converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
+      <icon>    
+      </icon>
+      <name>out</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>value</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Render html tag with direction and language</description>
+      <display-name>Render html tag with direction and language</display-name>
+      <icon>    
+      </icon>
+      <name>html</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Render html tag with direction and language</description>
+         <name>xhtml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Help tag</description>
+      <display-name>Help tag</display-name>
+      <icon>    
+      </icon>
+      <name>help</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Help tag</description>
+         <name>module</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>toolSignature</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
 
    </tag>
    <tag>
@@ -86,6 +174,14 @@
       <attribute>
          <description>Output stylesheet based on the user preferences.</description>
          <name>localLinkPath</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Output stylesheet based on the user preferences.</description>
+         <name>style</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -286,13 +382,19 @@
        <name>TabBody</name>
        <path>/WEB-INF/tags/TabBody.tag</path>
    	</tag-file>
-   	<tag-file>
+	<!-- HTMLEditor and SetEditor to be removed -->
+  	<tag-file>
        <name>HTMLEditor</name>
        <path>/WEB-INF/tags/HTMLEditor.tag</path>
    	</tag-file>
-   	<tag-file>
+    	<tag-file>
        <name>SetEditor</name>
        <path>/WEB-INF/tags/SetEditor.tag</path>
+   	</tag-file>
+ 
+   	<tag-file>
+       <name>FCKEditor</name>
+       <path>/WEB-INF/tags/FCKEditor.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AuthoringButton</name>
@@ -310,8 +412,13 @@
 	    <name>ExportPortOutput</name>
 		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
-	<tag-file>
+   	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
    	</tag-file>  
+   	<tag-file>
+	    <name>DefineLater</name>
+		<path>/WEB-INF/tags/DefineLater.tag</path>
+   	</tag-file>  
+
 </taglib>

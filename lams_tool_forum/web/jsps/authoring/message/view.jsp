@@ -21,7 +21,7 @@
 		</style>
 	</head>
 	<body>
-		<!--closes header-->
+		<div class="content">
 		<table class="forum" >
 			<!-- Basic Info Form-->
 			<tr>
@@ -73,6 +73,7 @@
 				</td>
 			</tr>
 		</table>
+		</div>
 	</body>
 </html>
 

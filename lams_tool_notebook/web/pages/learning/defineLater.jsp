@@ -1,10 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+<div id="content">
+<h1>
 	<fmt:message key="activity.title" />
 </h1>
-<div id="header-no-tabs-learner"></div>
-<div id="content-learner">
+
 	<table>
 		<tr>
 			<td>
@@ -18,4 +18,5 @@
 	</div>
 </div>
 
-<div id="footer-learner"></div>
+
+

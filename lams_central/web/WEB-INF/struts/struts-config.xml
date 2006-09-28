@@ -149,7 +149,12 @@
       validate="false"
     >
       <forward
-        name="index"
+        name="main"
+        path="/main.jsp"
+        redirect="false"
+      />
+      <forward
+        name="content"
         path="/indexContent.jsp"
         redirect="false"
       />
@@ -233,6 +238,11 @@
       <forward
         name="error"
         path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
         redirect="false"
       />
       <forward

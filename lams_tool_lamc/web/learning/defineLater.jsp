@@ -38,21 +38,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><bean:message key="activity.title" /></title>
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 	
-	<h1 class="no-tabs-below">&nbsp;</h1>
+	<h1>&nbsp;</h1>
 	
-	<div id="header-no-tabs-learner"></div>
 	
-	<div id="content-learner">
+	
+	<div id="content">
 		<lams:DefineLater defineLaterMessageKey="error.defineLater"/>		
 	</div>
 	
-	<div id="footer-learner"></div>
+	<div id="footer"></div>
 
 
-</div>
 </body>
 </html:html>
 

@@ -27,11 +27,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
 
-	<h1 class="no-tabs-below"><c:out value="${title}"/></h1>
-	<div id="header-no-tabs-learner">
-	</div><!--closes header-->
+	<div id="content">
 
-	<div id="content-learner">
+		<h1><c:out value="${title}"/></h1>
 
 		<table class="alternative-color">
 			<tr>
@@ -63,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	</div>  <!--closes content-->
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 
 	</html:form>

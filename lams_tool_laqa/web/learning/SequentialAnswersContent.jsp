@@ -31,43 +31,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 	<!--question content goes here-->
-			<tr> <td>
-			<table>
 				<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 			  		<c:if test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}"> 			
-					  <tr>
-						<td colspan=2> 
-					  		<b> <bean:message key="label.question"/> 
+					  <tr> <td><b> <bean:message key="label.question"/> 
 						  	<c:out value="${questionEntry.key}" />:  </b> 
-						</td>
-					  </tr>
+					</td></tr>
 					  
 
-					  <tr>
-					  	<td colspan=2>  
-					  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
-					  	 </td>
-					  </tr>
+					  <tr> <td><c:out value="${questionEntry.value}" escapeXml="false"/> 
+					  </td></tr>
 					  
 
-					  <tr> 
-					  	<td colspan=2>  <b> <bean:message key="label.answer"/> </b> </td>
-				  	  </tr>
+					  <tr> <td><b> <bean:message key="label.answer"/> </b> 
+					</td></tr>
 				  	  
 				  	  
-					  <tr> 
-							<td colspan=2>
-				 			<textarea name="answer" rows=5 cols=60><c:out value="${generalLearnerFlowDTO.currentAnswer}" escapeXml="false"/></textarea>
+					  <tr> <td><textarea name="answer" rows=5 cols=60><c:out value="${generalLearnerFlowDTO.currentAnswer}" escapeXml="false"/></textarea>
 				 			<html:hidden property="currentQuestionIndex" value="${questionEntry.key}"/>
-				 		</td>
-				  	  </tr>
+				 	</td></tr>
 				  	  
  					</c:if> 			
 				</c:forEach>
-			</table>
 
 	<!--question content ends here-->
-			<table>
 				<tr>
 				<c:choose>  
 				  <c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
@@ -113,7 +99,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  </c:otherwise>
 				</c:choose> 
 				</tr>
-			</table>
-		</td>
-		</tr>
 

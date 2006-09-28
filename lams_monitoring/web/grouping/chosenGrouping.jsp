@@ -408,17 +408,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 </head>
 
-<body onLoad="init()">
+<body class="stripes" onLoad="init()">
 
-<div id="login-page">	
-	
-	<h1 class="no-tabs-below">
+	<div id="content">
+
+	<h1>
 		<c:out value="${title}"/>
 	</h1>
-	<div id="login-header">
-	</div id="login-header">
-
-	<div id="login-content">
 
 	<form>
 
@@ -463,9 +459,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td><p>
 	   			<input id="newgroupname" name="newgroupname" type="text" size="25"  />
 				<input type="button" class="button" id="groupadd" name="groupadd" value="<fmt:message key="button.grouping.add.group"/>" onclick="addGroup()"  />
+				</p>
 			</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>

@@ -13,17 +13,12 @@
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css localLinkPath="../"/>
 </head>
-<body>
+<body class="stripes">
 
-<div id="page-learner"><!--main box 'page'-->
 
-	<h1 class="no-tabs-below"><fmt:message key="activity.title" /></h1>
-	<div id="header-no-tabs-learner">
+	<div id="content">
 
-	</div><!--closes header-->
-
-	<div id="content-learner">
-
+	<h1><fmt:message key="activity.title" /></h1>
 		<c:choose>
 			<c:when test="${empty report}">
 				<h3>
@@ -154,10 +149,9 @@
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 
-</div><!--closes page-->
 </body>
 </html:html>
 

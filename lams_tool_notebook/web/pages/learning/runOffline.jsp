@@ -1,10 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+<div id="content">
+<h1>
 	${notebookDTO.title}
 </h1>
-<div id="header-no-tabs-learner"></div>
-<div id="content-learner">
+
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<html:form action="/learning" method="post">
 
@@ -34,4 +34,4 @@
 		</html:form>
 	</c:if>
 </div>
-<div id="footer-learner"></div>
+

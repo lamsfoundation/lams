@@ -13,18 +13,13 @@
 <lams:css/>
 </head>
 
-<body>
+<body class="stripes">
 
-	<div id="page-learner"><!--main box 'page'-->
-	
-		<h1 class="no-tabs-below">
+		<h1>
 			Test WDDX Packet
 		</h1>
 
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
-
-		<div id="content-learner">
+		<div id="content">
 			<html:form action="/servlet/WDDXPost.do" target="_self" method="POST" enctype="multipart/form-data">
 			
 			  <p>Test posting file to form - this should be WDDX XML to a URL expecting 
@@ -46,9 +41,8 @@
 			for this page is normally commented out and will need to be uncommented. Look for WDDXPost.</p>
 		</div>
 	   
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
 
-	</div><!--closes page-->
 </body>
 </html>

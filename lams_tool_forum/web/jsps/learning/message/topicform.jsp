@@ -23,18 +23,23 @@
 			</td>
 		</tr>
 	</c:if>
-</table>
 
-<div class="right-buttons">
-	<html:submit styleClass="button">
-		<bean:message key="button.submit" />
-	</html:submit>
-	<c:set var="backToForum">
-		<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}" />
-	</c:set>
-	<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="button">
-		<bean:message key="button.cancel" />
-	</html:button>
-</div>
+	<div class="right-buttons">
+	<tr>
+		<td>
+		<html:submit styleClass="button">
+			<bean:message key="button.submit" />
+		</html:submit>
+		<c:set var="backToForum">
+			<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}" />
+		</c:set>
+		<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="button">
+			<bean:message key="button.cancel" />
+		</html:button>
+		</td>
+	</tr>
+	</div>
+
+</table>
 
 <div class="space-bottom"></div>

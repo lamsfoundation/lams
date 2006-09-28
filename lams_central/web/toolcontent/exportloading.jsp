@@ -27,27 +27,21 @@
 		</script>
 	</head>
 
-	<BODY onload="download()">
+	<body class="stripes" onload="download()">
 
-	<div id="page-learner"><!--main box 'page'-->
-
-		<h1 class="no-tabs-below">
+		<h1>
 			<fmt:message key="title.export.loading" />
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
 		
-		 <div id="content-learner">
+		 <div id="content">
 	  
 				<H2><fmt:message key="msg.export.loading" /></H2>
 				<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
 		
 		</div>  <!--closes content-->
 			
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
-			
-	</div><!--closes page-->
 
 	</BODY>
 </HTML>

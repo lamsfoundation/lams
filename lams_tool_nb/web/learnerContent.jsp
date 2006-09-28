@@ -1,25 +1,22 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+
+<div id="content">
+
+<h1>
 	<c:out value="${NbLearnerForm.title}" escapeXml="false" />
 </h1>
 
-<div id="header-no-tabs-learner"></div>
-
-<div id="content-learner">
-
-	<table cellpadding="0">
+	<table width="100%">
 		<tr>
 			<td>
-				<p>
-					<c:out value="${NbLearnerForm.content}" escapeXml="false" />
-				</p>
+				<p><c:out value="${NbLearnerForm.content}" escapeXml="false" /></p>
 			</td>
 		</tr>
 
 		<c:if test="${!NbLearnerForm.readOnly}">
-			<tr>
-				<td>
+		<tr>
+			<td>
 					<div class="right-buttons">
 						<html:form action="/learner" target="_self">
 								<html:hidden property="toolSessionID" />
@@ -44,6 +41,6 @@
 	</table>
 </div>
 
-<div id="footer-learner"></div>
+
 
 

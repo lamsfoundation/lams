@@ -13,16 +13,12 @@
 		}
 	</script>
 </head>
-<body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+<body class="stripes">
+		<h1>
 			<fmt:message key="label.monitoring.heading.marking"/>
 		</h1>
 
-		<div id="header-no-tabs-learner">
-
-		</div>
-		<div id="content-learner">
+		<div id="content">
 			<table cellpadding="0">
 				<c:forEach var="user" items="${reports}">
 					<c:forEach items="${user.value}" var="fileInfo" varStatus="status">
@@ -38,8 +34,8 @@
 				</tr>
 			</table>
 			</div>
-			<div id="footer-learner"></div>
+			<div id="footer"></div>
 		</div>
-	</div>
+
 </body>
 </html>

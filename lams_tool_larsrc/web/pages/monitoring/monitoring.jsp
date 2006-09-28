@@ -6,7 +6,7 @@
 
 <html>
 	<head>
-		 <%@ include file="/common/header.jsp" %>
+		 <%@ include file="/common/tabbedheader.jsp" %>
 	 <script>
 
 	        function init(){
@@ -25,7 +25,7 @@
 			}
 	    </script>		 
 	</head>
-	<body onLoad="init()">
+	<body class="stripes" onLoad="init()">
 	<div id="page">
 		<h1>
 			<fmt:message key="label.authoring.heading" />

@@ -6,11 +6,11 @@
 <html:form action="/learning/submitReflection" method="post">
 	<html:hidden property="userID" />
 	<html:hidden property="sessionMapID"/>
-	<h1 class="no-tabs-below">
+	
+	<div id="content">
+	<h1>
 		${sessionMap.title}
 	</h1>
-	<div id="header-no-tabs-learner"></div>
-	<div id="content-learner">
 			<table>
 				<tr>
 					<td>
@@ -25,7 +25,7 @@
 	
 				<tr>
 					<td>
-						<lams:STRUTS-textarea cols="66" rows="8" property="entryText"/>
+						<lams:STRUTS-textarea cols="60" rows="8" property="entryText"/>
 					</td>
 				</tr>
 	
@@ -39,4 +39,4 @@
 			</table>
 	</div>
 </html:form>
-<div id="footer-learner"></div>
+

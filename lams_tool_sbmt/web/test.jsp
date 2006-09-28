@@ -2,7 +2,7 @@
 <html>
 <head><title>Learning Design Details</title></head>
 	
-<body>
+<body class="stripes">
 	<form name="authoring" method="get" action="authoring.do">
 		<input type ="hidden" name="toolContentID" value="1">
 		<input type="submit" name="submit" value="Author1 Logon">

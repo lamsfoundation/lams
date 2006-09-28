@@ -23,7 +23,8 @@
 			</td>
 		</tr>
 	</c:if>
-</table>
+		<tr>
+			<td>
 <div class="right-buttons">
 			<html:submit styleClass="button">
 				<bean:message key="button.submit" />
@@ -34,4 +35,7 @@
 			<html:button property="goback" onclick="javascript:location.href='${backToTopic}';" styleClass="button">
 				<bean:message key="button.cancel" />
 			</html:button>
+			</td>
+		</tr>
 </div>
+</table>

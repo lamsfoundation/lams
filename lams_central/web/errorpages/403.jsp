@@ -16,17 +16,17 @@
 		<lams:css />
 	</head>
 
-	<body>
-		<div id="page-learner">
+	<body class="stripes">
+
 			<!--main box 'page'-->
 
-			<h1 class="no-tabs-below">
+			<h1>
 				<fmt:message key="403.title" />
 			</h1>
-			<div id="header-no-tabs-learner"></div>
+			
 			<!--closes header-->
 
-			<div id="content-learner">
+			<div id="content">
 				<%-- Error Messages --%>
 				<p class="warning">
 					<fmt:message key="403.message" />
@@ -40,9 +40,8 @@
 			</div>
 			<!--closes content-->
 
-			<div id="footer-learner"></div>
+			<div id="footer"></div>
 			<!--closes footer-->
-		</div>
-		<!--closes page-->
+
 	</body>
 </html>

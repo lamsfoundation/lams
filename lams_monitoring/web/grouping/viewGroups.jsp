@@ -26,11 +26,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<h1 class="no-tabs-below"><c:out value="${title}"/></h1>
-<div id="login-header">
-</div id="login-header">
 
-<div id="login-content">
+<div id="content">
+
+	<h1><c:out value="${title}"/></h1>
 
 	<c:if test="${not empty description}">
 		<p>&nbsp;</p>

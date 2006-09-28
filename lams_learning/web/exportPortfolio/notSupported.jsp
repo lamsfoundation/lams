@@ -40,15 +40,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:css/>
 	</head>
 
-	<body>
-	<div id="page-learner"><!--main box 'page'-->
+	<body class="stripes">
 
-	<h1 class="no-tabs-below"><c:out value="${pageTitle}"/></h1>
-	<div id="header-no-tabs-learner">
 
-	</div><!--closes header-->
+	<div id="content">
 
-	<div id="content-learner">
+		<h1><c:out value="${pageTitle}"/></h1>
 
 		<p>	<fmt:message key="${error.export.portfolio.not.supported}">
 				<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
@@ -57,6 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 	</div>  <!--closes content-->
 
+	<div id="footer"></div>
 	</body>
 	
 </html:html>

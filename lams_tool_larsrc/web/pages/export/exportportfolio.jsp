@@ -24,15 +24,12 @@
 	</script>
 	<lams:css localLinkPath="../"/>
 </head>
-<body>
+<body class="stripes">
 
-<div id="page-learner"><!--main box 'page'-->
 
-	<h1 class="no-tabs-below">${title} </h1>
-	<div id="header-no-tabs-learner">
-	</div><!--closes header-->
+	<div id="content">
 
-	<div id="content-learner">
+	<h1>${title} </h1>
 
 		<table border="0" cellspacing="3" width="98%">
 			<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
@@ -151,10 +148,8 @@
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
-
-</div><!--closes page-->
 
 </body>
 </html:html>

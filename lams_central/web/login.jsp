@@ -28,7 +28,7 @@ j_security_login_page
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
-	<lams:css/>
+	<lams:css  style="core"/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -42,7 +42,7 @@ j_security_login_page
 	</script>
 </head>
 
-<body>
+<body class="stripes">
 	<div id="login-page"><!--main box 'page'-->
 	
 		<h1 class="no-tabs-below">&nbsp;</h1>

@@ -15,6 +15,7 @@
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
 		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml
 	</param-value>
 </context-param>
 
@@ -120,12 +121,18 @@
    <!ELEMENT mime-mapping (extension, mime-type)>
    -->
 
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
-
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
+      <error-page>
+        <error-code>500</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404.jsp</location>
+    </error-page>
 
   	<jsp-config>
 		<!--  ======================================================== -->	

@@ -3,7 +3,7 @@
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
-	<body>
+	<body class="stripes">
 		<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm" enctype="multipart/form-data">
 			<html:hidden property="itemType" styleId="itemType" value="2" />
 			<html:hidden property="mode"/>

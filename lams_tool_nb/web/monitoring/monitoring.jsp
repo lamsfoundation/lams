@@ -15,7 +15,7 @@
 
 <lams:html>
 <head>
-	<lams:css/>
+	<lams:css style="tabbed"/>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<title><fmt:message key="activity.title" /></title>
@@ -36,7 +36,7 @@
 	</script>
 </head>
 
-<body onLoad='init()'>
+<body class="stripes" onLoad='init()'>
 
 	<div id="page">
 			<h1>

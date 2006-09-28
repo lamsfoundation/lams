@@ -17,19 +17,15 @@
 		</script>
 	</head>
 
-	<BODY>
-		<div id="page-learner">
+	<body class="stripes">
+
 			<!--main box 'page'-->
 
-			<h1 class="no-tabs-below">
+			<h1>
 				<fmt:message key="title.import" />
 			</h1>
 
-			<div id="header-no-tabs-learner">
-			</div>
-			<!--closes header-->
-
-			<div id="content-learner">
+			<div id="content">
 				<h2>
 					<fmt:message key="title.import.instruction" />
 				</h2>
@@ -51,13 +47,9 @@
 			<!--closes content-->
 
 
-			<div id="footer-learner">
+			<div id="footer">
 			</div>
 			<!--closes footer-->
-
-		</div>
-		<!--closes page-->
-
 
 
 	</BODY>

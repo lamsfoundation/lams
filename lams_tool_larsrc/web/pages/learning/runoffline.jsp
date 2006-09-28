@@ -21,13 +21,12 @@
     </script>
 </head>
 
-<body>
-<div id="page-learner">
-			<h1 class="no-tabs-below">
+<body class="stripes">
+			<h1>
 				${sessionMap.title}
 			</h1>
-			<div id="header-no-tabs-learner"></div>
-			<div id="content-learner">
+			
+			<div id="content">
 				<table>
 					<tr>
 						<td>
@@ -51,10 +50,9 @@
 					</c:otherwise>
 				</c:choose>		
 			</div>
-	<div id="footer-learner">
+	<div id="footer">
 		</div>
 		<!--closes footer-->
 
-	</div><!--closes page-->
-</body>
+f</body>
 </html:html>

@@ -1,14 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
-<h1 class="no-tabs-below">
+
+
+
+<div id="content">
+
+<h1>
 	<c:out value="${sessionMap.title}" escapeXml="false" />
 </h1>
-
-<div id="header-no-tabs-learner"></div>
-
-
-<div id="content-learner">
 
 	<table>
 		<tr>
@@ -76,4 +76,4 @@
 	</table>
 </div>
 
-<div id="footer-learner"></div>
+

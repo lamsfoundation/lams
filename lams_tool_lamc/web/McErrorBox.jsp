@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<%@ include file="/common/header.jsp"%>
 
 </head>
-<body>
+<body class="stripes">
 		<table>
 		<c:if test="${userExceptionQuestionEmpty == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>

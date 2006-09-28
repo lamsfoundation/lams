@@ -5,7 +5,7 @@
 
 <html>
 	<tiles:insert attribute="header" />
-	<body>
+	<body class="stripes">
 		<div id="page">	
 			<tiles:useAttribute name="pageTitleKey" ignore="true"/>
 			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />

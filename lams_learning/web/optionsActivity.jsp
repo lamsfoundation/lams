@@ -58,12 +58,9 @@
 	<html:form action="/ChooseActivity" method="POST">
 	<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		
-	<h1 class="no-tabs-below"><c:out value="${optionsActivityForm.title}"/></h1>
-	<div id="header-no-tabs-learner">
+	<div id="content">
 
-	</div><!--closes header-->
-
-	<div id="content-learner">
+		<h1><c:out value="${optionsActivityForm.title}"/></h1>
 
 		<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
 		
@@ -122,7 +119,7 @@
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 
 

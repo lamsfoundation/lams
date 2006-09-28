@@ -258,6 +258,15 @@
 	   	
 	   </target>
 	
+	   <target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
+	   		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />	
+			<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
+				<fileset dir="${tag.web.dir}/tags">
+					<include name="*.tag" />
+				</fileset>
+			</copy>
+	   </target>
+
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->
@@ -456,5 +465,15 @@
 			   includes="*.txt" ext=".properties"/>
 	    </target>
 
+	   <!-- ================================= 
+	          target: synchronize-jsp              
+	         ================================= -->
+	    <target name="synchronize-deploy" description="copy non-java file into deploy folder">
+	        <copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+	        	<fileset dir="${conf.web.dir}">
+	        		<include name="**/*.*"/>
+	        	</fileset>
+	        </copy>
+	    </target>
 
 </project>

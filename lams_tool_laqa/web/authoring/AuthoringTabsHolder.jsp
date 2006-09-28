@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<head>
 	<title><fmt:message key="activity.title" /></title>
 
-	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/tabbedheader.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 
@@ -109,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 
 
-<body onLoad="init();">
+<body class="stripes" onLoad="init();">
 
 <div id="page">
 	<h1>  <bean:message key="label.authoring.qa"/> </h1>

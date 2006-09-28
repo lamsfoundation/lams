@@ -41,10 +41,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	  </head>
 
-	<body>
-		<div id="page-learner"><!--main box 'page'-->
+	<body class="stripes">
 	      <tiles:insert attribute="body" />
-		</div>
 	</body>
 
 </html:html>

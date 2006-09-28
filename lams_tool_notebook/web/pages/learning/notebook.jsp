@@ -1,10 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+<div id="content">
+<h1>
 	${notebookDTO.title}
 </h1>
-<div id="header-no-tabs-learner"></div>
-<div id="content-learner">
+
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<html:form action="/learning" method="post">
 
@@ -38,7 +38,7 @@
 									</c:when>
 
 									<c:otherwise>
-										<html:textarea cols="66" rows="8" property="entryText"></html:textarea>
+										<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
 									</c:otherwise>
 								</c:choose>
 							</c:when>
@@ -63,4 +63,4 @@
 		</html:form>
 	</c:if>
 </div>
-<div id="footer-learner"></div>
+

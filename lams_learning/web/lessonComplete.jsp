@@ -28,21 +28,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
  	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
 
- 	<h1 class="no-tabs-below">&nbsp;</h1>
-	<div id="header-no-tabs-learner">
-
-	</div><!--closes header-->
-
-	<div id="content-learner">
+	<div id="content">
 
 		<H2><fmt:message key="message.lesson.finished" /></H2>
-		<P>&nbsp;</p>
 		<p><fmt:message key="message.lesson.finishedCont" /></p>
 
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 
     

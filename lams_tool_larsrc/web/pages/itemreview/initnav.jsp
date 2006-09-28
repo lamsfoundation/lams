@@ -11,7 +11,7 @@ request using this page as target
 <html>
 	<head>
 	</head>
-	<body bgcolor="#9DC5EC" border="1" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<body class="stripes" bgcolor="#9DC5EC" border="1" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 		<c:redirect url="/nextInstruction.do">
 			<c:param name="mode" value="${param.mode}"/>
 			<c:param name="itemIndex" value="${param.itemIndex}"/>

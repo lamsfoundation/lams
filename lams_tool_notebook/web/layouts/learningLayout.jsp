@@ -5,12 +5,9 @@
 
 <html>
 	<tiles:insert attribute="header" />
-	<body>
-		<div id="page-learner">	
-			
-			
-				<tiles:insert attribute="body" />
-			
-		</div>
+	<body class="stripes">
+		<tiles:insert attribute="body" />
+		<div class="footer">
+		</div>					
 	</body>
 </html>

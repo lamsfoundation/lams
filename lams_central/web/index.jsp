@@ -10,19 +10,14 @@
 	<lams:css/>
 </head>
 
-<body>
-	<div id="page-learner"><!--main box 'page'-->
+<body class="stripes">
 	
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
-
-		<div id="content-learner"  valign="middle">
+		<div id="content"  valign="middle">
 			<p align="center"><img src="images/loading.gif" /> <font color="gray" size="4"><fmt:message key="msg.loading"/></font></p>
 		</div>
 	   
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
 
-	</div><!--closes page-->
 </body>
 </lams:html>

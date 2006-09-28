@@ -57,16 +57,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:choose>
 			<c:when test="${includeBodyTag}">
 				<body>
-					<div id="page-learner"><!--main box 'page'-->
 						<tiles:insert attribute="body" />
-					</div>
 				</body>
-				
 			</c:when>
 			<c:otherwise>
-					<div id="page-learner"><!--main box 'page'-->
-						<tiles:insert attribute="body" />
-					</div>
+					<tiles:insert attribute="body" />
 			</c:otherwise>
 
 	</c:choose>

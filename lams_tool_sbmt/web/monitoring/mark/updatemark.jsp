@@ -10,14 +10,11 @@
 	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
 </head>
 
-<body>
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+<body class="stripes">
+		<h1>
 			<fmt:message key="label.monitoring.updateMarks.button"/>
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<div id="content-learner">
+		<div id="content">
 			<c:forEach var="fileInfo"  items="${report}" varStatus="status">
 				<form id="updateMarkForm" method="post" action="<c:url value='/monitoring.do'/>">
 					<input type="hidden" name="method" value="updateMark" />
@@ -74,8 +71,7 @@
 			</c:forEach>
 			</div>
 
-		<div id="footer-learner"></div>
+		<div id="footer"></div>
 		</div>
-	</div>
 </body>
 </html>

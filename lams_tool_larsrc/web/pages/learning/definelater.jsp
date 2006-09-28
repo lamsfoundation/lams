@@ -6,25 +6,19 @@
 	<meta http-equiv="refresh" content="60">
 </head>
 
-<body>
+<body class="stripes">
 
-	<div id="page-learner">
-		<h1 class="no-tabs-below">
+		<h1>
 			${resource.title}
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div>
-		<!--closes header-->
 
-		<div id="content-learner">
+		<div id="content">
 			<lams:DefineLater/>
 		</div>
 		
-		<div id="footer-learner">
+		<div id="footer">
 		</div>
 		<!--closes footer-->
-
-	</div>
 
 </body>
 </html:html>

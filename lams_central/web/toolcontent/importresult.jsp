@@ -16,17 +16,13 @@
 		</script>
 	</head>
 
-	<BODY>
+	<body class="stripes">
 
-		<div id="page-learner"><!--main box 'page'-->
-	
-		<h1 class="no-tabs-below">
+		<h1>
 			<fmt:message key="title.import" />
 		</h1>
-		<div id="header-no-tabs-learner">
-		</div><!--closes header-->
 	
-		<div id="content-learner">
+		<div id="content">
 	  
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
@@ -56,10 +52,8 @@
 		</div>  <!--closes content-->
 	   
 		
-		<div id="footer-learner">
+		<div id="footer">
 		</div><!--closes footer-->
 		
-	</div><!--closes page-->
-
 	</BODY>
 </HTML>

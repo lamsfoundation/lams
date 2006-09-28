@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<frame src="../<%=footer%>" name="footerFrame" marginheight="0" scrolling="NO">
 	</frameset>
 	
-	<noframes><body>
+	<noframes><body class="stripes">
 		This tool requires the support of frames. Your browser does not support frames.
 	</body></noframes>
 

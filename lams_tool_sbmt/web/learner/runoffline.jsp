@@ -6,7 +6,9 @@
 
 <html:html>
 <head>
-	<lams:headItems />
+
+	<%@ include file="/common/header.jsp"%>
+
 	<script type="text/javascript">
 		function finish(){
 			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
@@ -19,16 +21,13 @@
 	</script>
 </head>
 
-<body>
-	<div id="page-learner">
+<body class="stripes">
 
-		<h1 class="no-tabs-below">
+		<h1>
 			<fmt:message key="activity.title"></fmt:message>
 		</h1>
 
-		<div id="header-no-tabs-learner"></div>
-
-		<div id="content-learner">
+		<div id="content">
 			<table>
 				<tr>
 					<td>
@@ -54,7 +53,7 @@
 				</c:choose>				
 			</div>
 		</div>
-		<div id="footer-learner"></div>
-	</div>
+		<div id="footer"></div>
+
 </body>
 </html:html>

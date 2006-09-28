@@ -14,7 +14,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
 
  	<!-- ********************  CSS ********************** -->
-	<lams:css />
+	<lams:css style="tabbed"/>
 
 
  	<!-- ********************  javascript ********************** -->

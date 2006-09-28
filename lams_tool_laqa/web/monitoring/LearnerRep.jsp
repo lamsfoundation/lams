@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		MM_reloadPage(true);
 	</script>	
 </head>
-<body>
+<body class="stripes">
 
 <div id="page">
 

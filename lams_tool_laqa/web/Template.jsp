@@ -20,7 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
-    <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+    <body class="stripes" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
       <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
 	        <!-- header -->
 	        <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>

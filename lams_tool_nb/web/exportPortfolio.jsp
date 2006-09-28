@@ -10,27 +10,18 @@
 	  	
 		<lams:css localLinkPath="../"/>
 	</head>  
-  	<body>
-		<div id="page-learner"/>
+  	<body class="stripes">
+	
+			<div id="content">
 
-			<h1 class="no-tabs-below">
+			<h1>
 				<c:out value="${NbExportForm.title}" escapeXml="false" />
 			</h1>
-
-			<div id="header-no-tabs-learner">
-			</div>
-
-			<div id="content-learner">
 
 				<p>
 					<c:out value="${NbExportForm.content}" escapeXml="false" />
 				</p>
 				
-			</div>
-
-			<div id="footer-learner">
-			</div>
-
 			<c:if test="${learner}">
 				<h2><fmt:message key="titleHeading.reflection" /></h2>
 				<logic:empty name="nbEntry"><p><fmt:message key="message.no.reflection" /></p></logic:empty>
@@ -53,7 +44,11 @@
 				</table>
 			</logic:empty>
 
-		</div>
+			</div>
+
+			<div id="footer">
+			</div>
+
 
 	</body>
 </lams:html>

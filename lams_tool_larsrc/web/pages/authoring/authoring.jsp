@@ -17,7 +17,7 @@
 <head>
 	<title><fmt:message key="label.author.title" /></title>
 
-	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/tabbedheader.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script>
@@ -94,7 +94,7 @@
 
  
 </head>
-<body onLoad="init()">
+<body class="stripes" onLoad="init()">
 <div id="page">
 		<h1>
 			<fmt:message key="label.authoring.heading" />

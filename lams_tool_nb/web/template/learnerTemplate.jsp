@@ -16,10 +16,8 @@
 	<title><fmt:message key="activity.title"/></title>
 </head>
 
-<body>
-<div id="page-learner"><!--main box 'page'-->
+<body class="stripes">
 
 	<tiles:insert attribute="content" />
 	
-</body>
 </lams:html>

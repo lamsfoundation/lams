@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   <head>
   </head>
   
-  <body>
+  <body class="stripes">
   
   	<b>Valid=<c:out value="${doubleSubmit}" /></b><br />
   

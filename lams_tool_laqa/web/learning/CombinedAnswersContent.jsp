@@ -30,45 +30,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-			<tr> <td>
-			<table>
-				<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-						<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
-					  		<c:if test="${questionEntry.key == answerEntry.key}"> 			
-							  <tr>
-							  	<td colspan=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
-							  	 </td>
-							  </tr>
-	
-							  <tr>
-							  	<td colspan=2>  
-							  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
-							  	 </td>
-							  </tr>
-							  
-	
-							  <tr> 
-						 		<td colspan=2> <b> <bean:message key="label.answer"/> </b> </td>
-						 	  </tr>
-						 	  
-	  						  <tr> 
-								<td colspan=2>
-						 			<textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60><c:out value="${answerEntry.value}" escapeXml="false"/></textarea>
-						 		</td>
-						  	  </tr>
-	
-						  	  <tr><td colspan=2> &nbsp </td> </tr>
-	  	   					</c:if> 			
-						</c:forEach>
-				</c:forEach>
-			</table>
+			<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 			
-			<table>
+					<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+				  		<c:if test="${questionEntry.key == answerEntry.key}"> 			
+						  <tr> <td><b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b> </td></tr>
+						  <tr> <td><c:out value="${questionEntry.value}" escapeXml="false"/> </td></tr>
+						  <tr> <td><b> <bean:message key="label.answer"/> </b> </td></tr>
+					 	  <tr> <td><textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60><c:out value="${answerEntry.value}" escapeXml="false"/></textarea> </td></tr>
+					 	  <tr> <td>&nbsp;</td></tr>
+  	   					</c:if> 			
+					</c:forEach>
+			
+			</c:forEach>
 			<tr>
-				 <td align=left> 
+				 <td> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 							<bean:message key="button.submitAllContent"/>
 						</html:submit>	 				 		  					
 				</td> 
 			</tr>
-			</table>

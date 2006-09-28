@@ -120,7 +120,10 @@ public class CSSBundler {
 			
 			String url = basePath + "/lams/css/" + theme + ".css";
 			HttpUrlConnectionUtil.writeResponseToFile(url, outputDirectory, theme + ".css", cookies); //cookies aren't really needed here.
-		}
+
+			url = basePath + "/lams/css/" + theme + "_learner.css";
+			HttpUrlConnectionUtil.writeResponseToFile(url, outputDirectory, theme + "_learner.css", cookies); //cookies aren't really needed here.
+}
 		
 		// include the special IE stylesheet
 		String url = basePath + "/lams/css/ie-styles.css";
@@ -161,20 +164,25 @@ public class CSSBundler {
 		while (i.hasNext())
 		{
 			String theme = (String)i.next();
-			addThemeFile(cssDirectory, theme);
+
+			String themeFilename = theme + ".css";
+			addThemeFile(cssDirectory, themeFilename);
+
+			themeFilename = theme + "_learner.css";
+			addThemeFile(cssDirectory, themeFilename);
 		}
 		
 		// include the special IE stylesheet
 		addThemeFile(cssDirectory, "ie-styles");
 	}
 
-	private void addThemeFile(String cssDirectory, String themeName) {
-		String theme = themeName + ".css";
-		File themeFile = new File(centralPath + "/css/" + theme);
+	private void addThemeFile(String cssDirectory, String themeFilename) {
+		File themeFile = new File(centralPath + File.separatorChar + "css" + File.separatorChar + themeFilename);
 		if ( ! themeFile.canRead() ) {
 			log.error("Unable to read theme file "+themeFile.getAbsolutePath());
 		} else {
-			filesToCopy.put(cssDirectory+File.separatorChar+theme,themeFile);
+			filesToCopy.put(cssDirectory+File.separatorChar+themeFilename,themeFile);
+
 		}
 	}
 
