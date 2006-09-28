@@ -545,7 +545,7 @@
 		<ant antfile="../${lams_www}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_chat_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_forum_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<!-- <ant antfile="../${tool_lamc_dir}/build.xml" target="copy-tags" inheritAll="false"/> -->
+		<ant antfile="../${tool_lamc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_laqa_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_larsrc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_lanb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
@@ -553,7 +553,7 @@
 		<ant antfile="../${tool_sbmt_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_scribe_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_survey_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<!-- <ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/> -->
+		<ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 	</target>
 
 
