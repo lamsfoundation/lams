@@ -91,9 +91,7 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 			}
 			
 			// set date fields
-			Date createDate = new Date();
-			notebookEntry.setCreateDate(createDate);
-			notebookEntry.setLastModified(createDate);
+			notebookEntry.setCreateDate(new Date());
 			
 			
 			notebookService.saveOrUpdateNotebookEntry(notebookEntry);

@@ -249,7 +249,7 @@ class Scratchpad extends MovieClip {
 	public function viewNotebookEntries(){
 		// TODO: Pop-up for Notebook Entries
 		
-		var notebook_url:String = _root.serverURL + 'learning/notebook.do?method=viewAll';
+		var notebook_url:String = _root.serverURL + 'learning/notebook.do?method=viewAll&lessonID=' + _root.lessonID;
 		
 		JsPopup.getInstance().launchPopupWindow(notebook_url, 'Notebook', 570, 796, true, true, false, false, false);
 	

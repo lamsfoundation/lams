@@ -24,13 +24,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
+	<c:set var="addnote">
+			<html:rewrite page="/notebook/add.do?lessonID=" /><c:out value="${lessonID}"/>
+	</c:set> 
+	<div id="content">
+		<h1><fmt:message key="mynotes.title"/></h1>
 	
-	<h1 class="no-tabs-below"><fmt:message key="mynotes.title"/></h1>
-	<div id="header-no-tabs-learner">
-
-	</div><!--closes header-->
-
-	<div id="content-learner">
 		<h2><fmt:message key="mynotes.view.all.button"/></h2>
 		<p>&nbsp;</p>
 		<table class="alternative-color">
@@ -51,9 +50,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<!-- do segment separator -->
 					</table>
 					
-					<div class="right-buttons">
-						<a href="notebook.do?method=addNew" class="button" id="addNewBtn"><fmt:message key="mynotes.add.new.button"/></a>
-					</div>
+					<table>
+						<tr>
+							<td>
+								<div class="right-buttons">
+									<a href="${addnote}" class="button" id="addNewBtn"><fmt:message key="mynotes.add.new.button"/></a>
+								</div>
+							</td>
+						</tr>
+					</table>
 					
 					<c:set var="sigToCheck" value="${entry.externalSignature}"/>
 					<h2><fmt:message key="mynotes.signature.${sigToCheck}.heading"/></h2>
@@ -69,7 +74,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td align="left" width="28%">
 						<c:set var="viewnote">
-							<html:rewrite page="/notebook.do?method=viewEntry&noteID=" /><c:out value="${entry.uid}"/>
+							<html:rewrite page="/notebook.do?method=viewEntry&uid=" /><c:out value="${entry.uid}"/>
 						</c:set> 
 						<html:link href="${viewnote}">
 							<c:out value="${entry.title}"/>
@@ -79,15 +84,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td><lams:Date value="${entry.lastModified}"/></td>
 				</tr>
 			</c:forEach>
-
-		</table>
 		
-		<div class="right-buttons">
-			<a href="notebook.do?method=addNew" class="button" id="addNewBtn"><fmt:message key="mynotes.add.new.button"/></a>
-		</div>
+		</table>
+		<table>
+			<tr>
+				<td>
+				<div class="right-buttons">
+					<a href="${addnote}" class="button" id="addNewBtn"><fmt:message key="mynotes.add.new.button"/></a>
+				</div>
+				</td>
+			</tr>
+		</table>
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 

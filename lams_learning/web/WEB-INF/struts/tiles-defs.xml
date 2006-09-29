@@ -102,6 +102,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".notebookSaveSuccess" extends=".layout">
 		<put name="body" value="/notebook/viewentry.jsp"/>
 	</definition>
+	<definition name=".notebookViewSingle" extends=".layout">
+		<put name="body" value="/notebook/view.jsp"/>
+	</definition>
 	
 	<!-- Grouping definitions -->
 	<definition name=".showgroup" extends=".layout">

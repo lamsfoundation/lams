@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.List;
+import java.lang.Integer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -68,6 +69,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  *                validate="false"
  *                
  * @struts.action-forward name = "viewAll" path = ".notebookViewAll"
+ * @struts.action-forward name= "viewSingle" path = ".notebookViewSingle"
  * @struts.action-forward name = "addNew" path = ".notebookAddNew"
  * @struts.action-forward name = "saveSuccess" path = ".notebookSaveSuccess"
  * ----------------XDoclet Tags--------------------
@@ -83,6 +85,7 @@ public class NotebookAction extends LamsDispatchAction
 	private static IAuditService auditService;
 	
 	private static final String VIEW_ALL = "viewAll";
+	private static final String VIEW_SINGLE = "viewSingle";
 	private static final String ADD_NEW = "addNew";
 	private static final String SAVE_SUCCESS = "saveSuccess";
 
@@ -104,30 +107,53 @@ public class NotebookAction extends LamsDispatchAction
 		// initialize service object
         IExtendedCoreNotebookService notebookService = (IExtendedCoreNotebookService) getNotebookService();
         
+        DynaActionForm notebookForm = (DynaActionForm)actionForm;
+		
         // getting requested object according to coming parameters
 		Integer learnerID = LearningWebUtil.getUserId();
+		
+		// lessonID
+		Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+		
 		// get all notebook entries for the learner
 		List<NotebookEntry> entries = notebookService.getEntry(learnerID, CoreNotebookConstants.SCRATCH_PAD);
 		
 		request.getSession().setAttribute("entries", entries);
+		request.setAttribute("lessonID", lessonID);
 		
         return mapping.findForward(VIEW_ALL);
 		
 	}
 	
 	/**
-	 * make a struts forward
+	 * View all notebook entries
 	 */
-	public ActionForward addNew(
+	public ActionForward viewEntry(
 				ActionMapping mapping,
 				ActionForm actionForm,
 				HttpServletRequest request,
 				HttpServletResponse response) 
 				throws IOException, ServletException {
 
-        return mapping.findForward(ADD_NEW);
-		
+		// initialize service object
+        IExtendedCoreNotebookService notebookService = (IExtendedCoreNotebookService) getNotebookService();
+        
+        DynaActionForm notebookForm = (DynaActionForm)actionForm;
+        Long uid = (Long) notebookForm.get("uid");
+        String mode = WebUtil.readStrParam(request, "mode", true);
+        
+        NotebookEntry entry = notebookService.getEntry(uid);
+        
+        if(mode != null)
+        	request.setAttribute("mode", mode);
+        
+        if(entry != null)
+        	request.setAttribute("entry", entry);
+        
+        return mapping.findForward(VIEW_SINGLE);
 	}
+        
+        
 	
 	/**
 	 * 
@@ -143,9 +169,58 @@ public class NotebookAction extends LamsDispatchAction
         ICoreNotebookService notebookService = (ICoreNotebookService) getNotebookService();
         
 		DynaActionForm notebookForm = (DynaActionForm)actionForm;
-	    
+		Long id = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+		String title = (String) notebookForm.get("title");
+		String entry = (String) notebookForm.get("entry");
+		String signature = (String) notebookForm.get("signature");
+		Integer userID = LearningWebUtil.getUserId();
 		
-        return mapping.findForward(SAVE_SUCCESS);
+		notebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature,
+				userID, title, entry);
+		
+        return viewAll(mapping, actionForm, request, response);
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public ActionForward updateEntry(
+				ActionMapping mapping,
+				ActionForm actionForm,
+				HttpServletRequest request,
+				HttpServletResponse response) 
+				throws IOException, ServletException {
+		
+		// initialize service object
+        ICoreNotebookService notebookService = (ICoreNotebookService) getNotebookService();
+        
+        // get form data
+		DynaActionForm notebookForm = (DynaActionForm)actionForm;
+        Long uid = (Long) notebookForm.get("uid");
+		Long id = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+		String title = (String) notebookForm.get("title");
+		String entry = (String) notebookForm.get("entry");
+		String signature = (String) notebookForm.get("signature");
+		
+		
+		// get existing entry to edit
+        NotebookEntry entryObj = notebookService.getEntry(uid);
+		
+        // check entry is being edited by it's owner
+		Integer userID = LearningWebUtil.getUserId();
+        if(userID != entryObj.getUserID()) {
+        	// throw exception
+        }
+        
+        //update entry
+        entryObj.setTitle(title);
+        entryObj.setEntry(entry);
+        entryObj.setExternalSignature(signature);
+        
+        notebookService.updateEntry(entryObj);
+        
+        return viewAll(mapping, actionForm, request, response);
 		
 	}
 	

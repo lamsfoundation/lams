@@ -42,9 +42,10 @@
 </form-bean>
 
 <form-bean name="NotebookForm" type="org.apache.struts.action.DynaActionForm">
-	<form-property name="method" type="java.lang.String" />
+	<form-property name="uid" type="java.lang.Long"/>
 	<form-property name="title" type="java.lang.String" />
 	<form-property name="entry" type="java.lang.String" />
+	<form-property name="lessonID" type="java.lang.Long" />
 	<form-property name="signature" type="java.lang.String" />
 </form-bean>
 
@@ -136,6 +137,11 @@
       <forward
         name="viewAll"
         path=".notebookViewAll"
+        redirect="false"
+      />
+      <forward
+        name="viewSingle"
+        path=".notebookViewSingle"
         redirect="false"
       />
       <forward
@@ -327,6 +333,9 @@
 <action path="/parallelWait"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".parallelWait"/>
+<action path="/notebook/add" 
+	type="org.apache.struts.actions.ForwardAction" 
+	parameter=".notebookAddNew"/>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

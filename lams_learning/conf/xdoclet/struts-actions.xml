@@ -14,3 +14,6 @@
 <action path="/parallelWait"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".parallelWait"/>
+<action path="/notebook/add" 
+	type="org.apache.struts.actions.ForwardAction" 
+	parameter=".notebookAddNew"/>

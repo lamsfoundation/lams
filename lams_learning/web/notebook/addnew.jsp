@@ -33,16 +33,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </script>
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
 	
-	<h1 class="no-tabs-below"><fmt:message key="mynotes.title"/></h1>
-	<div id="header-no-tabs-learner">
-
-	</div><!--closes header-->
-
-	<div id="content-learner">
+	<div id="content">
 		<html:form action="/notebook.do?method=processNewEntry" styleId="notebookForm" method="post">
 			
-			<html:hidden property="method" value="createNew"/>
 			<html:hidden property="signature"/>
+			<html:hidden property="lessonID" value="${param.lessonID}"/>
+			<h1><fmt:message key="mynotes.title"/></h1>
 			
 			<h2><fmt:message key="mynotes.add.new.button"/></h2>
 			<table>
@@ -63,16 +59,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td>
 				</tr>
 			</table>
-			
-			<div class="right-buttons">
-				<a href="#" class="button" id="saveInNotebookBtn" onClick="doSubmit('<%= CoreNotebookConstants.SCRATCH_PAD_SIG %>')"><fmt:message key="mynotes.notebook.save.button"/></a>
-				<a href="#" class="button" id="saveInJournalBtn" onClick="doSubmit('<%= CoreNotebookConstants.JOURNAL_SIG %>')"><fmt:message key="mynotes.journal.save.button"/></a>
-				<a href="javascript: history.back();" class="button" id="cancelBtn"><fmt:message key="label.cancel.button"/></a>
-			</div>
+			<table>
+				<tr>
+					<td>	
+						<div class="right-buttons">
+							<a href="#" class="button" id="saveInNotebookBtn" onClick="doSubmit('<%= CoreNotebookConstants.SCRATCH_PAD_SIG %>')"><fmt:message key="mynotes.notebook.save.button"/></a>
+							<a href="#" class="button" id="saveInJournalBtn" onClick="doSubmit('<%= CoreNotebookConstants.JOURNAL_SIG %>')"><fmt:message key="mynotes.journal.save.button"/></a>
+							<a href="javascript: history.back();" class="button" id="cancelBtn"><fmt:message key="label.cancel.button"/></a>
+						</div>
+					</td>
+				</tr>
+			</table>
 		</html:form>
 	</div>  <!--closes content-->
 
 
-	<div id="footer-learner">
+	<div id="footer">
 	</div><!--closes footer-->
 

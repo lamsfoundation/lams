@@ -206,9 +206,28 @@
 	</bean>
 			
 	<!--  Core Notebook Service -->
-	<bean id="coreNotebookService" class="org.lamsfoundation.lams.notebook.service.CoreNotebookService" singleton="true">
+	<bean id="coreNotebookServiceTarget" class="org.lamsfoundation.lams.notebook.service.CoreNotebookService">
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
+	</bean>
+	
+	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="coreNotebookServiceTarget"/></property>
+		
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
 	</bean>
 	
 	<!-- auditing service -->
