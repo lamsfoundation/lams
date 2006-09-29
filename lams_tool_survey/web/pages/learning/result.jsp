@@ -38,7 +38,7 @@
 			${sessionMap.title}
 		</h1>
 			<h2>
-				${sessionMap.instructions}
+				<c:out value="${sessionMap.instructions}" escapeXml="false"/>
 			</h2>
 			<BR>
 			<BR>

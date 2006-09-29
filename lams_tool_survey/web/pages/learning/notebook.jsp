@@ -28,7 +28,7 @@
 					</tr>
 					<tr>
 						<td>
-							${sessionMap.reflectInstructions}
+							<lams:out value="${sessionMap.reflectInstructions}"/>
 						</td>
 					</tr>
 		

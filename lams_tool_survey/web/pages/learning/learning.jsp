@@ -43,10 +43,7 @@
 			<h1>
 				${sessionMap.title}
 			</h1>
-
-			<h2>
-				${sessionMap.instructions}
-			</h2>
+				<h2><c:out value="${sessionMap.instructions}" escapeXml="false"/></h2>
 			<BR><BR>
 				<table cellpadding="0" cellspacing="0" class="alternative-color">
 					<c:choose>
@@ -92,9 +89,11 @@
 								</html:button> 
 							</span>
 							<span class="right-buttons">
-								<html:button property="NextButton"  onclick="nextQuestion()" styleClass="button"  disabled="${nextChecked}">
-									<fmt:message key="label.next" />
-								</html:button>
+								<c:if test="${position != 2}">
+									<html:button property="NextButton"  onclick="nextQuestion()" styleClass="button"  disabled="${nextChecked}">
+										<fmt:message key="label.next" />
+									</html:button>
+								</c:if>
 								<c:if test="${position == 2}">
 									<html:submit property="doSurvey"  disabled="${sessionMap.finishedLock}"  styleClass="button">
 										<fmt:message key="label.submit.survey" />
