@@ -100,6 +100,7 @@
 		<p><font size="1"><fmt:message key="message.activity.options.note" /></font></p>
 		<p>&nbsp;</p>
 
+		<table><tr><td>
 		<div class="left-buttons">
 			<a href="#" class="button" id="chooseBtn" onClick="submitChoose()"><fmt:message key="label.activity.options.choose" /></a>
 		</div>
@@ -108,6 +109,7 @@
 				<a href="#" class="button" id="finishBtn" onClick="submitFinish()"><fmt:message key="label.finish.button" /></a>
 			</div>
 		</c:if>
+		</td></tr></table>
 
 	</html:form>
 
