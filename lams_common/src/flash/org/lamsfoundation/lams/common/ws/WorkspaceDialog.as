@@ -779,20 +779,25 @@ class WorkspaceDialog extends MovieClip{
 	
 	private function saveFile(snode:XMLNode):Void{
 		Debugger.log('Saving a file.',Debugger.GEN,'saveFile','org.lamsfoundation.lams.WorkspaceDialog');
+		_workspaceController = _workspaceView.getController();
 		if(snode == treeview.dataProvider.firstChild){
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
 			//run a confirm dialogue as user is about to overwrite a design!
-			LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
+			LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true));
+			_workspaceController.clearBusy();
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 			if(snode.attributes.data.resourceID < 0){	
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
+				_workspaceController.clearBusy();
 			} else if(searchForFile(snode, resourceTitle_txi.text)){
 				//run a alert dialogue as user is using the same name as an existing design!
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [resourceTitle_txi.text]), null);
+				_workspaceController.clearBusy();
 			}
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
+			_workspaceController.clearBusy();
 		}
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 	}
@@ -854,6 +859,7 @@ class WorkspaceDialog extends MovieClip{
 				if(searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
 					//run a alert dialogue as user is using the same name as an existing design!
 					LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [_resultDTO.resourceName]), null);
+					_workspaceController.clearBusy()
 				}
 			} else {
 				if(!searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
