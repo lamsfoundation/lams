@@ -14,20 +14,14 @@
 		</style>
 	</head>
 
-	<body>
-		<div id="page-learner">
-			<!--main box 'page'-->
+	<body class="stripes">
 
-			<h1 class="no-tabs-below">
+			<div id="content">
+			<h1>
 				<c:out value="${scribeDTO.title}" escapeXml="false" />
 			</h1>
-			<div id="header-no-tabs-learner">
 
-			</div>
-			<!--closes header-->
 
-			<div id="content-learner">
-				<br/>
 				<div class="space-left space-right">
 
 					<p>
@@ -84,11 +78,9 @@
 			</div>
 			<!--closes content-->
 
-			<div id="footer-learner">
+			<div id="footer">
 			</div>
 			<!--closes footer-->
 
-		</div>
-		<!--closes page-->
 	</body>
 </html>

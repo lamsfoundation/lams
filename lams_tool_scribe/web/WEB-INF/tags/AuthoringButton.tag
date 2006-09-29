@@ -82,7 +82,7 @@
 		}
     }  				
 </script>				
-<p id="authoringButton" style="text-align: right">
+<p style="text-align: right">
 	<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button">
 		<fmt:message key="${saveButtonLabelKey}" /> 
 	</html:link>

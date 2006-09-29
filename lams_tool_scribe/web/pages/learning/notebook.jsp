@@ -1,10 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h1 class="no-tabs-below">
+<h1>
 	${scribeDTO.title}
 </h1>
-<div id="header-no-tabs-learner"></div>
-<div id="content-learner">
+
+<div id="content">
 	<html:form action="/learning" method="post">
 		<table>
 			<tr>
@@ -15,7 +15,7 @@
 
 			<tr>
 				<td>
-					<html:textarea cols="66" rows="8" property="entryText"></html:textarea>
+					<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
 				</td>
 			</tr>
 
@@ -31,4 +31,4 @@
 		</table>
 	</html:form>
 </div>
-<div id="footer-learner"></div>
+

@@ -94,6 +94,16 @@
         path="tiles:/generic/message"
         redirect="false"
       />
+      <forward
+        name="heading_form"
+        path="tiles:/authoring/headingForm"
+        redirect="false"
+      />
+      <forward
+        name="heading_response"
+        path="tiles:/authoring/headingResponse"
+        redirect="false"
+      />
     </action>
     <action
       path="/monitoring"
