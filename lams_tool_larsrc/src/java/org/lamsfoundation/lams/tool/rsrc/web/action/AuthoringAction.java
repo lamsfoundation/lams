@@ -277,8 +277,7 @@ public class AuthoringAction extends Action {
 	 * @return
 	 * @throws ServletException
 	 */
-	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-		throws Exception {
+	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response){
 		//get instructions:
 		List<String> instructionList = getInstructionsFromRequest(request);
 		
@@ -294,8 +293,13 @@ public class AuthoringAction extends Action {
 		try {
 			extractFormToResourceItem(request, instructionList, itemForm);
 		} catch (Exception e) {
-			log.error("Uploading failed. The exception is " + e.toString());
-			throw e;
+			//any upload exception will display as normal error message rather then throw exception directly
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
+			if(!errors.isEmpty()){
+				this.addErrors(request,errors);
+				request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
+				return findForward(itemForm.getItemType(),mapping);
+			}
 		}
 		//set session map ID so that itemlist.jsp can get sessionMAP
 		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());

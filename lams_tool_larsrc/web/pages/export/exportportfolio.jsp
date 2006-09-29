@@ -111,16 +111,10 @@
 														<a href="javascript:;" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.resource.preview" /> </a>
 													</c:when>
 													<c:when test="${item.itemType == 2}">
-														<c:set var="downloadUrl">
-															<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
-														</c:set>
-														<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
+														<a href="${item.attachmentLocalUrl}"> <fmt:message key="label.download" /> </a>
 													</c:when>
 													<c:when test="${item.itemType == 3}">
-														<c:set var="downloadUrl">
-															<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
-														</c:set>
-														<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
+														<a href="${item.attachmentLocalUrl}"> <fmt:message key="label.download" /> </a>
 													</c:when>
 													<c:when test="${item.itemType == 4}">
 														<fmt:message key="export.label.no.learning.object" />

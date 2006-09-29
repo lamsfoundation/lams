@@ -58,6 +58,9 @@ public class Summary {
 	private String url;
 	private Long fileUuid;
 	private Long fileVersionId;
+	private String fileName;
+	private String attachmentLocalUrl;
+	
 	//true: initial group item, false, belong to some group.
 	private boolean isInitGroup;
 	
@@ -81,6 +84,7 @@ public class Summary {
 			this.itemTitle = item.getTitle();
 			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
 			this.url = item.getUrl();
+			this.fileName = item.getFileName();
 			this.fileUuid = item.getFileUuid();
 			this.fileVersionId = item.getFileVersionId();
 		}else
@@ -104,6 +108,7 @@ public class Summary {
 			this.itemTitle = item.getTitle();
 			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
 			this.url = item.getUrl();
+			this.fileName = item.getFileName();
 			this.fileUuid = item.getFileUuid();
 			this.fileVersionId = item.getFileVersionId();
 		}else
@@ -189,6 +194,18 @@ public class Summary {
 
 	public void setInitGroup(boolean isInitGroup) {
 		this.isInitGroup = isInitGroup;
+	}
+	public String getAttachmentLocalUrl() {
+		return attachmentLocalUrl;
+	}
+	public void setAttachmentLocalUrl(String attachmentLocalUrl) {
+		this.attachmentLocalUrl = attachmentLocalUrl;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 	
 }
