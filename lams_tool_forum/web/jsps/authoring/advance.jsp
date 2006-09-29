@@ -50,7 +50,7 @@
 	</tr>
 	<tr>
 		<td>
-			<lams:STRUTS-textarea property="forum.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
+			<html:textarea property="forum.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
 		</td>
 	</tr>
 	<tr>

@@ -30,6 +30,9 @@ package org.lamsfoundation.lams.tool.forum.util;
  * Time: 10:33:00
  */
 public interface ForumConstants {
+	public static final String TOOL_SIGNATURE = "lafrum11";
+	public static final String TOOL_CONTENT_HANDLER_NAME = "forumToolContentHandler";
+
 	
 	//See LDEV652 
 	// For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.
@@ -39,8 +42,6 @@ public interface ForumConstants {
 	
 	public static final int COMPLETED = 1;
 	public static final int SESSION_STATUS_FINISHED = 1;
-	
-	public static final String TOOL_SIGNATURE = "lafrum11";
 	
     public final static int MAX_FILE_SIZE = 250 * 1000;
     public final static String FORUM_SERVICE = "forumService";
@@ -108,6 +109,7 @@ public interface ForumConstants {
 	public static final String ATTR_TOPIC_ID = "topicID";
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+
 
 
 	

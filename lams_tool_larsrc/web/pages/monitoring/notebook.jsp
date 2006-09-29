@@ -8,31 +8,23 @@
 	<%@ include file="/common/header.jsp"%>
 </head>
 <body class="stripes">
-			<h1>
-				<fmt:message key="page.title.monitoring.view.reflection"/>
-			</h1>
-			
+		
 			<div id="content">
-				<table>
+				<h1>
+					<fmt:message key="page.title.monitoring.view.reflection"/>
+				</h1>
+				${userDTO.fullName}<BR><BR>
+				<table class="alternative-color">
 					<tr>
-						<td>
-							<h1>
-								${userDTO.fullName}
-							</h1>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<h1>
-								${userDTO.reflectInstrctions}
-							</h1>
-						</td>
+						<th class="first">
+							<lams:out value="${userDTO.reflectInstrctions}"/>
+						</th>
 					</tr>
 					<tr>
 						<td>
 							<c:choose>
 								<c:when test="${userDTO.finishReflection}">
-									<c:out value="${userDTO.reflect}" escapeXml="false"/>
+									<lams:out value="${userDTO.reflect}"/>
 								</c:when>
 								<c:otherwise>
 									<fmt:message key="message.not.avaliable" />

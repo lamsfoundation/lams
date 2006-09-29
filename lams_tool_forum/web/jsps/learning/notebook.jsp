@@ -19,13 +19,13 @@
 				</tr>
 				<tr>
 					<td>
-						${sessionMap.reflectInstructions}
+						<lams:out value="${sessionMap.reflectInstructions}"/>
 					</td>
 				</tr>
 	
 				<tr>
 					<td>
-						<lams:STRUTS-textarea cols="60" rows="8" property="entryText"/>
+						<html:textarea cols="60" rows="8" property="entryText"/>
 					</td>
 				</tr>
 	

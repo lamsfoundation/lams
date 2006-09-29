@@ -33,7 +33,7 @@
 	</tr>
 	<tr>
 		<td >
-			<lams:STRUTS-textarea property="reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
+			<html:textarea property="reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
 		</td>
 	</tr>		
 </table>

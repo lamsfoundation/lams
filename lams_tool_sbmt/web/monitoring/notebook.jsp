@@ -4,37 +4,28 @@
 
 <html:html locale="true">
 <head>
-	<title><fmt:message key="label.learning.title" /></title>
+	<title><fmt:message key="page.title.monitoring.view.reflection" /></title>
 	<%@ include file="/common/header.jsp"%>
 </head>
 <body class="stripes">
 
+
+			<div id="content">
 			<h1>
 				<fmt:message key="page.title.monitoring.view.reflection"/>
 			</h1>
-			
-			<div id="content">
-			<table>
+			${userDTO.firstName} ${userDTO.lastName}<br><br>
+			<table class="alternative-color">
 				<tr>
-					<td>
-						<h1>
-							${userDTO.firstName}
-							${userDTO.lastName}
-						</h1>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h1>
-							${userDTO.reflectInstrctions}
-						</h1>
-					</td>
+					<th class="first">
+						<lams:out value="${userDTO.reflectInstrctions}"/>
+					</th>
 				</tr>
 				<tr>
 					<td>
 						<c:choose>
 							<c:when test="${userDTO.finishReflection}">
-								<c:out value="${userDTO.reflect}" escapeXml="false"/>
+								<lams:out value="${userDTO.reflect}"/>
 							</c:when>
 							<c:otherwise>
 								<fmt:message key="label.learner.notAvailable" />

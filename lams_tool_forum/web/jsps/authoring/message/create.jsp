@@ -24,16 +24,7 @@
 				<tr>
 					<td>
 						<b><bean:message key="message.label.body" />*</b><BR>
-						<c:set var="language"><lams:user property="localeLanguage"/></c:set>
-						<fck:editor id="message.body" basePath="/lams/fckeditor/"
-							imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-							linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-							flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-							imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-							linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-							flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-							toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
-						</fck:editor>							
+						<lams:FCKEditor id="message.body" value="" toolbarSet="Default-Learner"></lams:FCKEditor>
 						<html:errors property="message.body" />
 					</td>
 				</tr>

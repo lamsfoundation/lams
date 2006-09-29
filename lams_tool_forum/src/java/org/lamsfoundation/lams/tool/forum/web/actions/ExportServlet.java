@@ -223,7 +223,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
     private ForumToolContentHandler getToolContentHandler() {
   	    if ( handler == null ) {
     	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
-    	      handler = (ForumToolContentHandler) wac.getBean("forumToolContentHandler");
+    	      handler = (ForumToolContentHandler) wac.getBean(ForumConstants.TOOL_CONTENT_HANDLER_NAME);
     	    }
     	    return handler;
 	}

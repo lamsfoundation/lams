@@ -35,7 +35,7 @@
 					<td valign="top">
 						<fmt:message key="label.learning.comment.or.instruction" />
 						<BR>
-						<lams:STRUTS-textarea rows="5" cols="25" tabindex="2" property="description" />
+						<html:textarea rows="5" cols="25" tabindex="2" property="description" />
 					</td>
 				</tr>
 				<tr>

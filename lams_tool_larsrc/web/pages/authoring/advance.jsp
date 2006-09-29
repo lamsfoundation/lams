@@ -60,7 +60,7 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<lams:STRUTS-textarea property="resource.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
+				<html:textarea property="resource.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
 			</td>
 		</tr>		
 	</table>
