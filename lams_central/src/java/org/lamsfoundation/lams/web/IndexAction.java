@@ -90,13 +90,13 @@ public class IndexAction extends Action {
 			}
 			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
 				log.debug("user is an admin or manager");
-				headerLinks.add(new IndexLinkBean("index.courseman", "admin/orgmanage.do?org=" + getService().getRootOrganisation().getOrganisationId()));
+				headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
 			}
 			if (request.isUserInRole(Role.SYSADMIN)) {
 				log.debug("user is sysadmin");
-				headerLinks.add(new IndexLinkBean("index.sysadmin", "admin/sysadminstart.do"));
+				headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 			}
-			headerLinks.add(new IndexLinkBean("index.myprofile", "profile.do?method=view"));
+			headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile()"));
 			log.debug("set headerLinks in request");
 			request.setAttribute("headerLinks", headerLinks);
 		}
