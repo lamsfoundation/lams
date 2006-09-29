@@ -16,7 +16,10 @@ body {
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
 	line-height:16px;
-	background:url('../images/css/diagonal_bg.gif') repeat; 
+}
+
+body.stripes {
+	background: url('../images/css/diagonal_bg.gif');
 }
 
 .row {
@@ -219,7 +222,7 @@ Page layout
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:20px; 
-	width:85%; 
+	width:89%; 
 	height:100%; 
 	border:1px solid #d4d8da;
 	background-color:#fff;
