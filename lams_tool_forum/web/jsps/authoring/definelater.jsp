@@ -13,6 +13,7 @@
 	<html:hidden property="toolContentID" />
 	<html:hidden property="sessionMapID"/>
 	<html:hidden property="mode" value="teacher" />
+	<html:hidden property="contentFolderID" />
 	
 	<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
@@ -27,6 +28,6 @@
 		<!-- Button Row -->
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 			toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" 
-			accessMode="teacher" defineLater="yes" customiseSessionID="${formBean.sessionMapID}" />
+			accessMode="teacher" defineLater="yes" customiseSessionID="${formBean.sessionMapID}"  contentFolderID="${formBean.contentFolderID}"/>
 	</div>
 </html:form>

@@ -29,6 +29,7 @@
 					<c:url value="/definelater.do" var="authoringUrl">
 						<c:param name="mode" value="teacher" />
 						<c:param name="toolContentID" value="${authoring.contentID}" />
+						<c:param name="contentFolderID" value="${contentFolderID}" />
 					</c:url>
 					<html:link href="${authoringUrl}" styleClass="button" target="_blank">
 						<fmt:message key="label.monitoring.edit.activity.edit" />

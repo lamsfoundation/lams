@@ -76,8 +76,6 @@
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" 
 				toolContentID="${formBean.resource.contentId}"  accessMode="teacher" defineLater="yes"  
 				customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}"/>
-
-			<lams:HTMLEditor />
 		</div>
 
 

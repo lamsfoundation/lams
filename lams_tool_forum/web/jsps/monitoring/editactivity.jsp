@@ -27,6 +27,7 @@
 			<c:choose>
 				<c:when test='${isPageEditable == "true"}'>
 					<c:url value="/defineLater.do" var="authoringUrl">
+						<c:param name="contentFolderID" value="${contentFolderID}" />
 						<c:param name="toolContentID" value="${toolContentID}" />
 					</c:url>
 					<html:link href="${authoringUrl}" styleClass="button" target="_blank">

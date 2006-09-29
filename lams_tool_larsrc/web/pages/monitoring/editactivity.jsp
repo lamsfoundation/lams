@@ -30,6 +30,7 @@
 				<c:when test='${isPageEditable == "true"}'>
 					<c:url  var="authoringUrl" value="/definelater.do">
 						<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
+						<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 					</c:url>
 					<html:link href="${authoringUrl}" styleClass="button" target="_blank">
 						<fmt:message key="label.monitoring.edit.activity.edit" />

@@ -86,6 +86,7 @@ public class MonitoringAction extends Action {
 
 	private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		
 		Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 		IResourceService service = getResourceService();
 		service.setItemVisible(itemUid,false);
@@ -141,7 +142,9 @@ public class MonitoringAction extends Action {
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		
+//		save contentFolderID into session
+		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
+
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		IResourceService service = getResourceService();
 		List<List<Summary>> groupList = service.getSummary(contentId);

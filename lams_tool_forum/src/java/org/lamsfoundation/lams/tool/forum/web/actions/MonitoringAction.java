@@ -557,6 +557,10 @@ public class MonitoringAction extends Action {
 	private ActionForward viewActivity(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		//set back tool content ID
+    	String contentFolderID = WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID);
+    	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+    	
 		forumService = getForumService();
 		Forum forum = forumService.getForumByContentId(toolContentID);
 		// if can not find out forum, echo back error message

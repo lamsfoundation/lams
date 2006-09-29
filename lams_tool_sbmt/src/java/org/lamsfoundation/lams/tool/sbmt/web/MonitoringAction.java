@@ -117,8 +117,11 @@ public class MonitoringAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response)
     {
+    	String contentFolderID = WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID);
     	Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
     	submitFilesService = getSubmitFilesService();
+    	
+    	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
     	
 //    	List userList = submitFilesService.getUsers(sessionID);
         List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
