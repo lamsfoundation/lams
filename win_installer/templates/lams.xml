@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///C:/lamsconf/lams.dtd">
+<Lams>
+	<ServerURL>@URL@</ServerURL>
+	<Version>2.0 RC1</Version>
+	<LamsHome>@INSTDIR@</LamsHome>
+	<TempDir>@TEMPDIR@</TempDir>
+	<DumpDir>@DUMPDIR@</DumpDir>
+	<EARDir>@EARDIR@</EARDir>
+	<SMTPServer>mail.lib.mq.edu.au</SMTPServer>
+	<LamsSupportEmail>lams_support@melcoe.mq.edu.au</LamsSupportEmail>
+	<ContentRepositoryPath>@REPOSITORYDIR@</ContentRepositoryPath>
+	<UploadFileMaxSize>1048576</UploadFileMaxSize>
+	<UploadLargeFileMaxSize>10485760</UploadLargeFileMaxSize>
+	<UploadFileMaxMemorySize>4096</UploadFileMaxMemorySize>
+	<ChatServerName></ChatServerName>
+	<ChatPortNumber>9800</ChatPortNumber>
+	<FileManagerDir>d:/jboss-4.0.2/server/default/deploy/upload.war</FileManagerDir>
+	<ExecutableExtensions>.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs</ExecutableExtensions>
+	<TicketFile>d:/jboss-4.0.2/server/default/conf/lams.tck</TicketFile>
+	<!-- UserInactiveTimeout in seconds. 86400 seconds is one day-->
+	<UserInactiveTimeout>86400</UserInactiveTimeout>
+	<!-- If a user is allowed to login with different clients at the same time-->
+	<!-- It should be always false except when running testHarness-->
+	<AllowMultipleLogin>false</AllowMultipleLogin>
+	<!--  Turn on the cache debugging listener. Set to false in production -->
+	<UseCacheDebugListener>false</UseCacheDebugListener>
+	<!--  Number of days after which preview session data may be deleted. Recommend 7 days -->
+	<CleanupPreviewOlderThanDays>7</CleanupPreviewOlderThanDays>
+	<!--  used for client updates -->
+	<AuthoringClientVersion>2.0.200609260948</AuthoringClientVersion>
+	<MonitorClientVersion>2.0.200609260948</MonitorClientVersion>
+	<LearnerClientVersion>2.0.200609260948</LearnerClientVersion>
+	<ServerVersionNumber>2.0.200609260948</ServerVersionNumber>
+	<ServerLanguage>@LOCALE@</ServerLanguage>
+	<ServerPageDirection>@LOCALE_DIRECTION@</ServerPageDirection>
+	<DictionaryDateCreated>2006-01-02</DictionaryDateCreated>
+	<HelpURL>http://wiki.lamsfoundation.org/display/lamsdocs/</HelpURL>
+	<XmppDomain>@WILDFIRE_DOMAIN@</XmppDomain>
+	<XmppConference>@WILDFIRE_CONFERENCE@</XmppConference>
+	<XmppAdmin>@WILDFIRE_USER@</XmppAdmin>
+	<XmppPassword>@WILDFIRE_PASS@</XmppPassword>
+	<DefaultFlashTheme>default</DefaultFlashTheme>
+	<DefaultHTMLTheme>defaultHTML</DefaultHTMLTheme>
+</Lams>

@@ -1,0 +1,19 @@
+README
+------
+
+Notes
+1. The build.xml doesn't completely compile the installer, but only does some 
+   helper tasks (TODO)
+2. NSIS plugin for Eclipse: http://eclipsensis.sourceforge.net (you still need 
+   to install the NSIS compiler)
+
+Steps to build installer
+0. Build LAMS as usual.  Make sure you have also checked out jsMath (needed for
+   step 4).  
+   If using an alternate location for JBOSS_HOME and LAMS_CONF, specify these at
+   the top of src/installer.nsi.
+1. Run the dump-db and compile-java targets in the main build.xml file
+2. Make sure the dump.sql in build/ is encoded in UTF-8 (I haven't tested what 
+   happens if it isn't, but just in case)
+3. Compile src/lams-start.nsi and src/lams-stop.nsi
+4. Compile src/installer.nsi.

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="configure-lams" basedir=".">
+	
+	<property file="installer.properties" />
+
+	<target name="configure-deploy">
+		<copy overwrite="yes" todir="${LAMS_CONF}">
+			<fileset dir="${TEMP}">
+				<include name="lams.xml" />
+			</fileset>
+			<filterset>
+				<filter token="URL" value="${URL}" />
+				<filter token="INSTDIR" value="${INSTDIR}" />
+				<filter token="TEMPDIR" value="${TEMPDIR}" />
+				<filter token="DUMPDIR" value="${DUMPDIR}" />
+				<filter token="EARDIR" value="${EARDIR}" />
+				<filter token="REPOSITORYDIR" value="${REPOSITORYDIR}" />
+				<filter token="LOCALE" value="${LOCALE}" />
+				<filter token="LOCALE_DIRECTION" value="${LOCALE_DIRECTION}" />
+				<filter token="WILDFIRE_DOMAIN" value="${WILDFIRE_DOMAIN}" />
+				<filter token="WILDFIRE_CONFERENCE" value="${WILDFIRE_CONFERENCE}" />
+				<filter token="WILDFIRE_USER" value="${WILDFIRE_USER}" />
+				<filter token="WILDFIRE_PASS" value="${WILDFIRE_PASS}" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${DEPLOYDIR}">
+			<fileset dir="${TEMP}">
+				<include name="mysql-ds.xml" />
+			</fileset>
+			<filterset>
+				<filter token="DB_NAME" value="${DB_NAME}" />
+				<filter token="DB_USER" value="${DB_USER}" />
+				<filter token="DB_PASS" value="${DB_PASS}" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${TOMCATDIR}">
+			<fileset dir="${TEMP}">
+				<include name="server.xml" />
+			</fileset>
+			<filterset>
+				<filter token="LAMS_PORT" value="${LAMS_PORT}" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${BINDIR}">
+			<fileset dir="${TEMP}">
+				<include name="run.bat" />
+			</fileset>
+			<filterset>
+				<filter token="JAVA_HOME" value="${JDK_DIR}" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${INSTDIR}">
+			<fileset dir="${TEMP}">
+				<include name="wrapper.conf" />
+			</fileset>
+			<filterset>
+				<filter token="JAVA_HOME" value="${JDK_DIR_UNIX_SLASH}" />
+			</filterset>
+		</copy>
+	</target>
+	
+	<target name="import-db">
+		<sql driver="com.mysql.jdbc.Driver" 
+			classpath="${EARDIR}/mysql-connector-java-3.1.12-bin.jar" 
+			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
+			userid="${DB_USER}" 
+			password="${DB_PASS}">
+			<transaction src="${TEMP}/dump.sql" />
+		</sql>
+	</target>
+	
+</project>
