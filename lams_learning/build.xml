@@ -241,6 +241,7 @@
 				<include name="*"/>
 				<include name="css/*"/>
 				<include name="exportPortfolio/*"/>
+				<include name="notebook/*"/>
 				<include name="gate/*"/>
 				<include name="grouping/*"/>
 				<include name="images/*"/>
@@ -248,15 +249,15 @@
 			</fileset>
 		</war>
 	</target>
-
-	   <target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
+	
+	<target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
 	   		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />	
 			<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
 				<fileset dir="${tag.web.dir}/tags">
 					<include name="*.tag" />
 				</fileset>
 			</copy>
-	   </target>
+	</target>
 
 	<!-- =================================================================== -->
 	<!-- Copy the jar file to the shared lams_build area					 -->
