@@ -11,7 +11,7 @@
 <head>
 	    <%@ include file="/common/header.jsp" %>
 </head>
-<body>
+<body class="stripes">
 		<div id="content">
 		<h1>
 			${sessionMap.title}
