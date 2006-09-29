@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<c:choose>
 			<c:when test="${includeBodyTag}">
-				<body>
+				<body class="stripes">
 						<tiles:insert attribute="body" />
 				</body>
 			</c:when>
