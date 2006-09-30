@@ -25,6 +25,9 @@
 
 package org.lamsfoundation.lams.tool.scribe.web.forms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.struts.action.ActionForm;
 
 /**
@@ -37,11 +40,13 @@ public class LearningForm extends ActionForm {
 
 	private static final long serialVersionUID = -4728946254882237144L;
 	
-	String dispatch;
-	Long scribeUserUID;
-	Long toolSessionID;
-	String mode;
-	String entryText;
+	private String dispatch;
+	private Long scribeUserUID;
+	private Long toolSessionID;
+	private String mode;
+	private String entryText;	
+	
+	public Map reports = new HashMap();
 
 	public String getMode() {
 		return mode;
@@ -81,5 +86,13 @@ public class LearningForm extends ActionForm {
 
 	public void setEntryText(String entryText) {
 		this.entryText = entryText;
+	}
+	
+	public void setReport(String key, Object value) {
+		reports.put(key, value);
+	}
+	
+	public Object getReport(String key) {
+		return reports.get(key);
 	}
 }

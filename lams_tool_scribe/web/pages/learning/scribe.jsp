@@ -1,20 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="tool">
-	<lams:WebAppURL/>
-</c:set>
-
-<script type="text/javascript">
-	var t=setTimeout("refreshPage()",5000)
-
-	function refreshPage() {
-		window.location.href='${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}'
-	}
-</script>
-
-
 <div id="content">
-	
+
 	<h1>
 		<c:out value="${scribeDTO.title}" escapeXml="false" />
 	</h1>
@@ -24,7 +11,7 @@
 	</p>
 
 	<html:form action="learning">
-		<html:hidden property="dispatch" value="submitApproval"></html:hidden>
+		<html:hidden property="dispatch" value="submitReport"></html:hidden>
 		<html:hidden property="toolSessionID"></html:hidden>
 		<html:hidden property="mode"></html:hidden>
 
@@ -37,20 +24,21 @@
 				<lams:out value="${reportDTO.entryText}" />
 			</p>
 
+			<html:textarea property="report(${reportDTO.uid})" rows="4" cols="20"
+				value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
+
 		</c:forEach>
 
 		<p>
-			<c:if test="${scribeUserDTO.reportApproved eq false}">
-				<html:submit styleClass="button">
-					?Approve?
-				</html:submit>
-			</c:if>
+			<html:submit styleClass="button">
+				?Submit Report?
+			</html:submit>
 		</p>
 
 	</html:form>
+
 	<c:if test="${MODE == 'learner' || MODE == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
-
 	</c:if>
 
 	<div class="space-bottom"></div>

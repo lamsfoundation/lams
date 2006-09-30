@@ -60,7 +60,11 @@ public class ScribeSession implements java.io.Serializable {
 
 	private Scribe scribe;
 
-	private Set scribeUsers = new HashSet(0);
+	private Set scribeUsers;
+	
+	private Set scribeReportEntries;
+	
+	private ScribeUser appointedScribe;
 	
 	// Constructors
 
@@ -84,7 +88,6 @@ public class ScribeSession implements java.io.Serializable {
 	// Property accessors
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * 
 	 */
 
 	public Long getUid() {
@@ -97,7 +100,6 @@ public class ScribeSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.property column="session_end_date"
-	 * 
 	 */
 
 	public Date getSessionEndDate() {
@@ -110,7 +112,6 @@ public class ScribeSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.property column="session_start_date"
-	 * 
 	 */
 
 	public Date getSessionStartDate() {
@@ -123,7 +124,6 @@ public class ScribeSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.property column="status" length="11"
-	 * 
 	 */
 
 	public Integer getStatus() {
@@ -136,7 +136,6 @@ public class ScribeSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.property column="session_id" length="20"
-	 * 
 	 */
 
 	public Long getSessionId() {
@@ -149,7 +148,6 @@ public class ScribeSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.property column="session_name" length="250"
-	 * 
 	 */
 
 	public String getSessionName() {
@@ -163,7 +161,6 @@ public class ScribeSession implements java.io.Serializable {
 	/**
 	 * @hibernate.many-to-one not-null="true"
 	 * @hibernate.column name="scribe_uid"
-	 * 
 	 */
 
 	public Scribe getScribe() {
@@ -178,15 +175,38 @@ public class ScribeSession implements java.io.Serializable {
 	 * @hibernate.set lazy="true" inverse="true" cascade="none"
 	 * @hibernate.collection-key column="scribe_session_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scribe.model.ScribeUser"
-	 * 
 	 */
-
 	public Set getScribeUsers() {
 		return this.scribeUsers;
 	}
 
 	public void setScribeUsers(Set scribeUsers) {
 		this.scribeUsers = scribeUsers;
+	}
+	
+	/**
+	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
+	 * @hibernate.collection-key column="scribe_session_uid"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry"
+	 */
+	public Set getScribeReportEntries() {
+		return scribeReportEntries;
+	}
+
+	public void setScribeReportEntries(Set scribeReportEntries) {
+		this.scribeReportEntries = scribeReportEntries;
+	}
+	
+	/**
+	 * @hibernate.many-to-one
+	 * @hibernate.column name="appointed_scribe_uid"
+	 */
+	public ScribeUser getAppointedScribe() {
+		return appointedScribe;
+	}
+
+	public void setAppointedScribe(ScribeUser appointedScribe) {
+		this.appointedScribe = appointedScribe;
 	}
 
 	/**
@@ -245,5 +265,4 @@ public class ScribeSession implements java.io.Serializable {
 		}
   		return session;
   	}
-
 }

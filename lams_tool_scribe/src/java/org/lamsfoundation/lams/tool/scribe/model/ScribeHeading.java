@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * @hibernate.class table="tl_lascrb11_heading"
  * 
  */
-public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHeading>{
+public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHeading>, Cloneable{
 
 	private static final long serialVersionUID = -5643334348072895714L;
 	
@@ -44,8 +44,6 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	private Scribe scribe;
 
 	private String headingText;
-
-	private String report;
 	
 	private int displayOrder;
 
@@ -67,17 +65,6 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 
 	public void setHeadingText(String headingText) {
 		this.headingText = headingText;
-	}
-
-	/**
-	 * @hibernate.property column="report" type="text"
-	 */
-	public String getReport() {
-		return report;
-	}
-
-	public void setReport(String report) {
-		this.report = report;
 	}
 
 	/**

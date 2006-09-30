@@ -65,11 +65,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
 	private String instructions;
 
-	private Boolean runOffline;
+	private boolean runOffline;
 	
-	private Boolean lockOnFinished;
+	private boolean lockOnFinished;
 
-	private Boolean reflectOnActivity;
+	private boolean reflectOnActivity;
 	
 	private String reflectInstructions;
 
@@ -77,11 +77,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
 	private String offlineInstructions;
 
-	private Boolean contentInUse;
+	private boolean contentInUse;
 
-	private Boolean defineLater;
+	private boolean defineLater;
 	
-	private Boolean autoSelectScribe;
+	private boolean autoSelectScribe;
 
 	private Long toolContentId;
 
@@ -90,7 +90,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	private Set scribeSessions;
 	
 	private Set scribeHeadings;
-	
 	
 	//*********** NON Persisit fields
 	private IToolContentHandler toolContentHandler;
@@ -103,9 +102,9 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
 	/** full constructor */
 	public Scribe(Date createDate, Date updateDate, Long createBy, String title,
-			String instructions, Boolean runOffline,
+			String instructions, boolean runOffline,
 			String onlineInstructions, String offlineInstructions,
-			Boolean contentInUse, Boolean defineLater, Long toolContentId,
+			boolean contentInUse, boolean defineLater, Long toolContentId,
 			Set scribeAttachments, Set scribeSessions) {
 		this.createDate = createDate;
 		this.updateDate = updateDate;
@@ -206,11 +205,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getRunOffline() {
+	public boolean isRunOffline() {
 		return this.runOffline;
 	}
 
-	public void setRunOffline(Boolean runOffline) {
+	public void setRunOffline(boolean runOffline) {
 		this.runOffline = runOffline;
 	}
 
@@ -219,11 +218,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getLockOnFinished() {
+	public boolean isLockOnFinished() {
 		return this.lockOnFinished;
 	}
 
-	public void setLockOnFinished(Boolean lockOnFinished) {
+	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
 	}
 	
@@ -231,22 +230,22 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	 * @hibernate.property column="auto_select_scribe" length=1
 	 * 
 	 */
-	public Boolean getAutoSelectScribe() {
+	public boolean isAutoSelectScribe() {
 		return autoSelectScribe;
 	}
 
-	public void setAutoSelectScribe(Boolean autoSelectScribe) {
+	public void setAutoSelectScribe(boolean autoSelectScribe) {
 		this.autoSelectScribe = autoSelectScribe;
 	}
 	
 	/**
 	 * @hibernate.property column="reflect_on_activity" length="1"
 	 */
-	public Boolean getReflectOnActivity() {
+	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
 
-	public void setReflectOnActivity(Boolean reflectOnActivity) {
+	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
 	
@@ -292,11 +291,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getContentInUse() {
+	public boolean isContentInUse() {
 		return this.contentInUse;
 	}
 
-	public void setContentInUse(Boolean contentInUse) {
+	public void setContentInUse(boolean contentInUse) {
 		this.contentInUse = contentInUse;
 	}
 
@@ -305,11 +304,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getDefineLater() {
+	public boolean isDefineLater() {
 		return this.defineLater;
 	}
 
-	public void setDefineLater(Boolean defineLater) {
+	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
 	}
 
@@ -357,7 +356,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	}
 	
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
 	 * @hibernate.collection-key column="scribe_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scribe.model.ScribeHeading" 
 	 */

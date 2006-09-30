@@ -118,7 +118,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
 
 		// if reflectOnActivity is enabled add userDTO.
-		if (scribeSession.getScribe().getReflectOnActivity()) {
+		if (scribeSession.getScribe().isReflectOnActivity()) {
 			ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
 
 			// get the entry.
@@ -163,7 +163,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
 
 			// if reflectOnActivity is enabled add all userDTO.
-			if (session.getScribe().getReflectOnActivity()) {
+			if (session.getScribe().isReflectOnActivity()) {
 
 				for (Iterator iterator = session.getScribeUsers().iterator(); iterator
 						.hasNext();) {

@@ -27,7 +27,9 @@ package org.lamsfoundation.lams.tool.scribe.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -66,6 +68,8 @@ import org.lamsfoundation.lams.tool.scribe.dao.IScribeSessionDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeUserDAO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
@@ -129,10 +133,21 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		ScribeSession session = new ScribeSession();
 		session.setSessionId(toolSessionId);
 		session.setSessionName(toolSessionName);
-		// learner starts
-		// TODO need to also set other fields.
 		Scribe scribe = scribeDAO.getByContentId(toolContentId);
 		session.setScribe(scribe);
+		
+		// creating scribeReports for each heading and add to session.
+		Set reports = new HashSet();
+		for (Iterator iter = scribe.getScribeHeadings().iterator(); iter.hasNext();) {
+			ScribeHeading heading = (ScribeHeading) iter.next();
+			
+			ScribeReportEntry report = new ScribeReportEntry();
+			report.setScribeHeading(heading);
+			
+			reports.add(report);			
+		}
+		
+		session.setScribeReportEntries(reports);
 		scribeSessionDAO.saveOrUpdate(session);
 	}
 

@@ -5,7 +5,7 @@
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
 <%@ attribute name="toolbarSet" required="false" rtexprvalue="true"%>
-<%@ attribute name="contentFolderID" required="true" rtexprvalue="true"%>
+<%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
 
 <c:set var="language">
 	<lams:user property="localeLanguage" />

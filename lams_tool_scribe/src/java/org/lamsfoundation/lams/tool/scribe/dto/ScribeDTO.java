@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 
 public class ScribeDTO {
 
@@ -60,7 +61,7 @@ public class ScribeDTO {
 
 	public Set<ScribeAttachmentDTO> offlineInstructionsFiles = new TreeSet<ScribeAttachmentDTO>();
 
-	public Set<ScribeSessionDTO> sessionDTOs = new TreeSet<ScribeSessionDTO>();;
+	public Set<ScribeSessionDTO> sessionDTOs = new TreeSet<ScribeSessionDTO>();
 	
 	public ScribeDTO(Scribe scribe) {
 		toolContentId = scribe.getToolContentId();
@@ -68,10 +69,11 @@ public class ScribeDTO {
 		instructions = scribe.getInstructions();
 		onlineInstructions = scribe.getOnlineInstructions();
 		offlineInstructions = scribe.getOfflineInstructions();
-		contentInUse = scribe.getContentInUse();
+		contentInUse = scribe.isContentInUse();
 		reflectInstructions = scribe.getReflectInstructions();
-		reflectOnActivity = scribe.getReflectOnActivity();
+		reflectOnActivity = scribe.isReflectOnActivity();
 
+		// Adding attachments
 		for (Iterator i = scribe.getScribeAttachments().iterator(); i.hasNext();) {
 			ScribeAttachment att = (ScribeAttachment) i.next();
 			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
@@ -86,7 +88,11 @@ public class ScribeDTO {
 				logger.error("File with uid " + att.getFileUuid()
 						+ " contains invalid fileType: " + att.getFileType());
 			}
-		} 
+		}
+		
+		logger.debug("Scribe contains " + scribe.getScribeHeadings().size() + " headings");
+		
+		logger.debug("Scribe uid = " + scribe.getUid());
 	}
 
 	public Set<ScribeSessionDTO> getSessionDTOs() {

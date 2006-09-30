@@ -43,9 +43,9 @@ public class ScribeUserDTO implements Comparable{
 	
 	public boolean finishedReflection;
 	
-	public int postCount;
-	
 	public boolean finishedActivity;
+	
+	public boolean reportApproved;
 	
 	public ScribeUserDTO(ScribeUser user) {
 		this.uid = user.getUid();
@@ -53,8 +53,8 @@ public class ScribeUserDTO implements Comparable{
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
 		this.userID = user.getUserId();
-		this.finishedActivity = user.getFinishedActivity();
-		postCount=0; // this needs to be set manually.
+		this.finishedActivity = user.isFinishedActivity();
+		this.reportApproved = user.isReportApproved();
 	}
 
 	public int compareTo(Object o) {
@@ -89,14 +89,6 @@ public class ScribeUserDTO implements Comparable{
 
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
-	}
-
-	public int getPostCount() {
-		return postCount;
-	}
-
-	public void setPostCount(int postCount) {
-		this.postCount = postCount;
 	}
 
 	public Long getUid() {
@@ -137,6 +129,14 @@ public class ScribeUserDTO implements Comparable{
 
 	public void setFinishedReflection(boolean finishedReflection) {
 		this.finishedReflection = finishedReflection;
+	}
+
+	public boolean isReportApproved() {
+		return reportApproved;
+	}
+
+	public void setReportApproved(boolean reportApproved) {
+		this.reportApproved = reportApproved;
 	}
 	
 }

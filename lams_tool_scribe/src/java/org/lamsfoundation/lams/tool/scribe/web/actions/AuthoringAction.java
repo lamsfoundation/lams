@@ -128,7 +128,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// check if content in use is set
-		if (scribe.getContentInUse()) {
+		if (scribe.isContentInUse()) {
 			// Cannot edit, send to message page.
 			request.setAttribute(ScribeConstants.ATTR_MESSAGE, getResources(
 					request).getMessage("error.content.locked"));
@@ -503,10 +503,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setInstructions(scribe.getInstructions());
 		authForm.setOnlineInstruction(scribe.getOnlineInstructions());
 		authForm.setOfflineInstruction(scribe.getOfflineInstructions());
-		authForm.setLockOnFinished(scribe.getLockOnFinished());
-		authForm.setReflectOnActivity(scribe.getReflectOnActivity());
+		authForm.setLockOnFinished(scribe.isLockOnFinished());
+		authForm.setReflectOnActivity(scribe.isReflectOnActivity());
 		authForm.setReflectInstructions(scribe.getReflectInstructions());
-		authForm.setAutoSelectScribe(scribe.getAutoSelectScribe());
+		authForm.setAutoSelectScribe(scribe.isAutoSelectScribe());
 	}
 
 	/**

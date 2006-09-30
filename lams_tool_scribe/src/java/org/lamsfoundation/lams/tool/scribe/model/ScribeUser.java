@@ -55,7 +55,9 @@ public class ScribeUser implements java.io.Serializable {
 
 	private ScribeSession scribeSession;
 	
-	private Boolean finishedActivity;
+	private boolean finishedActivity;
+	
+	private boolean reportApproved;
 	
 	// Constructors
 
@@ -143,11 +145,11 @@ public class ScribeUser implements java.io.Serializable {
 	/**
 	 * @hibernate.property column="finishedActivity" 
 	 */
-	public Boolean getFinishedActivity() {
+	public boolean isFinishedActivity() {
 		return finishedActivity;
 	}
 
-	public void setFinishedActivity(Boolean finishedActivity) {
+	public void setFinishedActivity(boolean finishedActivity) {
 		this.finishedActivity = finishedActivity;
 	}
 	
@@ -163,7 +165,18 @@ public class ScribeUser implements java.io.Serializable {
 	public void setScribeSession(ScribeSession scribeSession) {
 		this.scribeSession = scribeSession;
 	}
+	
+	/**
+	 * @hibernate.property column="report_approved" 
+	 */
+	public boolean isReportApproved() {
+		return reportApproved;
+	}
 
+	public void setReportApproved(boolean reportApproved) {
+		this.reportApproved = reportApproved;
+	}
+	
 	/**
 	 * toString
 	 * 

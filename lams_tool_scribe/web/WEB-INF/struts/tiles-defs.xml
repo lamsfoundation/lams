@@ -100,7 +100,16 @@
 
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:learning">
+		<put name="header" value="tiles:/header:learning" type="definition" />
 		<put name="body" value="/pages/learning/learning.jsp" />
+	</definition>
+	
+	<definition name="tiles:/header:learning" extends="tiles:/header:learner">
+		<put name="headItems" value="/pages/learning/headItems.jsp"/>
+	</definition>
+
+	<definition name="tiles:/learning/scribe" extends="tiles:/layout:learning">
+		<put name="body" value="/pages/learning/scribe.jsp" />
 	</definition>
 
 	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:learning">

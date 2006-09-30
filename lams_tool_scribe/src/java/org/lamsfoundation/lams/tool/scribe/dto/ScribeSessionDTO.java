@@ -25,10 +25,11 @@
 
 package org.lamsfoundation.lams.tool.scribe.dto;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 
 public class ScribeSessionDTO implements Comparable {
@@ -43,11 +44,20 @@ public class ScribeSessionDTO implements Comparable {
 	
 	int numberOfLearners;
 	
+	Set<ScribeReportEntryDTO> reportDTOs;
+	
 	public ScribeSessionDTO(ScribeSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
 		
 		userDTOs = new TreeSet<ScribeUserDTO>();
+		reportDTOs = new TreeSet<ScribeReportEntryDTO>();
+		
+		// add the report DTOs
+		for (Iterator iter = session.getScribeReportEntries().iterator(); iter.hasNext();) {
+			ScribeReportEntry report = (ScribeReportEntry) iter.next();
+			reportDTOs.add(new ScribeReportEntryDTO(report));
+		}
 	}
 	
 	public ScribeSessionDTO() {
@@ -102,5 +112,13 @@ public class ScribeSessionDTO implements Comparable {
 
 	public void setNumberOfPosts(int numberOfPosts) {
 		this.numberOfPosts = numberOfPosts;
+	}
+
+	public Set<ScribeReportEntryDTO> getReportDTOs() {
+		return reportDTOs;
+	}
+
+	public void setReportDTOs(Set<ScribeReportEntryDTO> reportDTOs) {
+		this.reportDTOs = reportDTOs;
 	}
 }

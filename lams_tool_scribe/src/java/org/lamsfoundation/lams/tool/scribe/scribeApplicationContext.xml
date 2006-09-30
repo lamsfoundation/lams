@@ -20,6 +20,7 @@
 				<value>org/lamsfoundation/lams/tool/scribe/model/ScribeUser.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/scribe/model/ScribeAttachment.hbm.xml</value> 
 				<value>org/lamsfoundation/lams/tool/scribe/model/ScribeHeading.hbm.xml</value> 
+				<value>org/lamsfoundation/lams/tool/scribe/model/ScribeReportEntry.hbm.xml</value> 
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
