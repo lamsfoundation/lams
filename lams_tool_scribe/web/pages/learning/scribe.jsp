@@ -16,9 +16,9 @@
 		<html:hidden property="mode"></html:hidden>
 
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
-			<h2>
+			<h3>
 				${reportDTO.headingDTO.headingText}
-			</h2>
+			</h3>
 
 			<p>
 				<lams:out value="${reportDTO.entryText}" />

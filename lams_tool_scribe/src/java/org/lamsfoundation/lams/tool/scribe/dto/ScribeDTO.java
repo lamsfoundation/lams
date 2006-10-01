@@ -63,6 +63,12 @@ public class ScribeDTO {
 
 	public Set<ScribeSessionDTO> sessionDTOs = new TreeSet<ScribeSessionDTO>();
 	
+	public Set<ScribeHeadingDTO> headingDTOs = new TreeSet<ScribeHeadingDTO>();
+	
+	public boolean autoSelectScribe;
+	
+	
+	
 	public ScribeDTO(Scribe scribe) {
 		toolContentId = scribe.getToolContentId();
 		title = scribe.getTitle();
@@ -90,9 +96,6 @@ public class ScribeDTO {
 			}
 		}
 		
-		logger.debug("Scribe contains " + scribe.getScribeHeadings().size() + " headings");
-		
-		logger.debug("Scribe uid = " + scribe.getUid());
 	}
 
 	public Set<ScribeSessionDTO> getSessionDTOs() {
@@ -191,5 +194,13 @@ public class ScribeDTO {
 
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	public boolean isAutoSelectScribe() {
+		return autoSelectScribe;
+	}
+
+	public void setAutoSelectScribe(boolean autoSelectScribe) {
+		this.autoSelectScribe = autoSelectScribe;
 	}
 }

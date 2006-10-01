@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 
 public class ScribeSessionDTO implements Comparable {
 	
@@ -44,12 +45,21 @@ public class ScribeSessionDTO implements Comparable {
 	
 	int numberOfLearners;
 	
+	String appointedScribe;
+	
 	Set<ScribeReportEntryDTO> reportDTOs;
 	
 	public ScribeSessionDTO(ScribeSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
 		
+		ScribeUser appointedScribe = session.getAppointedScribe();
+		if (appointedScribe == null) {
+			this.appointedScribe = null;
+		} else {
+			this.appointedScribe = appointedScribe.getFirstName() + " " + appointedScribe.getLastName();
+		}
+				
 		userDTOs = new TreeSet<ScribeUserDTO>();
 		reportDTOs = new TreeSet<ScribeReportEntryDTO>();
 		
@@ -120,5 +130,13 @@ public class ScribeSessionDTO implements Comparable {
 
 	public void setReportDTOs(Set<ScribeReportEntryDTO> reportDTOs) {
 		this.reportDTOs = reportDTOs;
+	}
+
+	public String getAppointedScribe() {
+		return appointedScribe;
+	}
+
+	public void setAppointedScribe(String appointedScribe) {
+		this.appointedScribe = appointedScribe;
 	}
 }

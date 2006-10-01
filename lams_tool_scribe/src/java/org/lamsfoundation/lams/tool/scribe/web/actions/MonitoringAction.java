@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.scribe.web.actions;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +44,7 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
+import org.lamsfoundation.lams.tool.scribe.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -59,10 +59,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="scribe_client"
- *                        path="tiles:/monitoring/scribe_client"
- * @struts.action-forward name="scribe_history"
- *                        path="tiles:/monitoring/scribe_history"
  * 
  * @struts.action-forward name="notebook" path="tiles:/monitoring/notebook"
  * 
@@ -86,6 +82,49 @@ public class MonitoringAction extends LamsDispatchAction {
 					.getServletContext());
 		}
 		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
+			
+		ScribeDTO scribeDTO = setupScribeDTO(scribe);
+		
+		request.setAttribute("monitoringDTO", scribeDTO);
+		return mapping.findForward("success");
+	}
+	
+	public ActionForward openNotebook(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		Long uid = WebUtil.readLongParam(request, "uid", false);
+		
+		ScribeUser scribeUser = scribeService.getUserByUID(uid);
+		NotebookEntry notebookEntry = scribeService.getEntry(scribeUser.getScribeSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue());
+		
+		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
+		scribeUserDTO.setNotebookEntry(notebookEntry.getEntry());
+		
+		request.setAttribute("scribeUserDTO", scribeUserDTO);
+		
+		return mapping.findForward("notebook");
+	}
+
+	public ActionForward appointScribe(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		MonitoringForm monForm = (MonitoringForm)form;
+		
+		ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
+		ScribeUser user = scribeService.getUserByUID(monForm.getAppointedScribeUID());
+		
+		session.setAppointedScribe(user);
+		scribeService.saveOrUpdateScribeSession(session);
+		
+		ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
+		
+		request.setAttribute("monitoringDTO", scribeDTO);
+		return mapping.findForward("success");
+	}
+	
+	/* Private Methods */
+
+	private ScribeDTO setupScribeDTO(Scribe scribe) {
 		ScribeDTO scribeDTO = new ScribeDTO(scribe);
 
 		for (Iterator sessIter = scribe.getScribeSessions().iterator(); sessIter
@@ -115,29 +154,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
 			scribeDTO.getSessionDTOs().add(sessionDTO);
 		}
-		request.setAttribute("monitoringDTO", scribeDTO);
-		return mapping.findForward("success");
+		
+		return scribeDTO;
+		
 	}
 	
-	public ActionForward openNotebook(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
-		Long uid = WebUtil.readLongParam(request, "uid", false);
-		
-		ScribeUser scribeUser = scribeService.getUserByUID(uid);
-		NotebookEntry notebookEntry = scribeService.getEntry(scribeUser.getScribeSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue());
-		
-		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-		scribeUserDTO.setNotebookEntry(notebookEntry.getEntry());
-		
-		request.setAttribute("scribeUserDTO", scribeUserDTO);
-		
-		return mapping.findForward("notebook");
-	}
-
-	/* Private Methods */
-
 	private ScribeUser getCurrentUser(Long toolSessionId) {
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);

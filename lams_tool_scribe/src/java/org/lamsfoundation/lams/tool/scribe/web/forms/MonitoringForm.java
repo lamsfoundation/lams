@@ -36,6 +36,7 @@ public class MonitoringForm extends ActionForm {
 	
 	String dispatch;
 	Long toolSessionID;
+	Long appointedScribeUID;
 
 	public String getDispatch() {
 		return dispatch;
@@ -48,5 +49,11 @@ public class MonitoringForm extends ActionForm {
 	}
 	public void setToolSessionID(Long toolSessionID) {
 		this.toolSessionID = toolSessionID;
+	}
+	public Long getAppointedScribeUID() {
+		return appointedScribeUID;
+	}
+	public void setAppointedScribeUID(Long appointedScribeUID) {
+		this.appointedScribeUID = appointedScribeUID;
 	}
 }

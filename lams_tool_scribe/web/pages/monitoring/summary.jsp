@@ -12,45 +12,66 @@
 		</tr>
 
 		<tr>
-			<td class="field-name" style="width: 30%;">
-				<fmt:message>heading.totalLearners</fmt:message>
-			</td>
-			<td colspan="2">
-				${session.numberOfLearners}
-			</td>
-		</tr>
-
-		<tr>
-			<td class="field-name" style="width: 30%;">
-				<fmt:message>heading.totalMessages</fmt:message>
-			</td>
-			<td colspan="2">
-				${session.numberOfPosts}
-			</td>
-		</tr>
-
-		<tr>
-			<td colspan="3">
-				<h4>
-					<fmt:message>heading.recentMessages</fmt:message>
-				</h4>
-			</td>
-		</tr>
-
-		<tr>
-			<td colspan="3">
+			<td>
 				<c:choose>
-					<c:when test="${empty session.messageDTOs}">
-						<fmt:message>message.noScribeMessages</fmt:message>
-					</c:when>
-					<c:otherwise>
-						<c:forEach var="message" items="${session.messageDTOs}">
-							<div class="message">
-								<div class="messageFrom"> ${message.from} </div>
-								<lams:out value="${message.body}"></lams:out>
-							</div>
-						</c:forEach>
+					<c:when
+						test="${(not dto.autoSelectScribe) and  session.appointedScribe eq null}">
 
+						<c:choose>
+							<c:when test="${not empty session.userDTOs}">
+								<html:form action="/monitoring">
+								
+									<html:hidden property="toolSessionID"
+										value="${session.sessionID}" />
+									<html:hidden property="dispatch" value="appointScribe" />
+								
+									?Please select a scribe:?
+
+									<html:select property="appointedScribeUID" style="min-width: 150px;">
+										<c:forEach var="user" items="${session.userDTOs}">
+											<html:option value="${user.uid}">
+												${user.firstName} ${user.lastName}
+											</html:option>
+										</c:forEach>
+									</html:select>
+
+									<div>
+										<input type="submit" value="?submit?" class="button" />
+									</div>
+
+								</html:form>
+							</c:when>
+
+							<c:otherwise>
+								?No users available?
+							</c:otherwise>
+
+						</c:choose>
+
+					</c:when>
+
+					<c:otherwise>
+						<div class="field-name" style="text-align: left">
+							?Appointed Scribe?
+						</div>
+
+						<p>
+							${session.appointedScribe}
+						</p>
+
+						<div class="field-name" style="text-align: left">
+							?Report?
+						</div>
+						<hr />
+						<c:forEach var="report" items="${session.reportDTOs}">
+							<p>
+								<lams:out value="${report.headingDTO.headingText}" />
+							</p>
+							<p>
+								<lams:out value="${report.entryText}" />
+							</p>
+							<hr />
+						</c:forEach>
 					</c:otherwise>
 				</c:choose>
 			</td>
@@ -79,8 +100,8 @@
 							<fmt:message key="heading.reflection" />
 						</c:when>
 						<c:otherwise>
-						&nbsp;
-					</c:otherwise>
+							&nbsp;
+						</c:otherwise>
 					</c:choose>
 				</th>
 			</tr>
@@ -110,34 +131,5 @@
 				</tr>
 			</c:forEach>
 		</c:if>
-		<tr>
-			<td colspan="3">
-				<div>
-					<html:form action="/monitoring" method="get" target="_blank"
-						style="float:left; margin-right: 4px">
-						<div>
-							<html:hidden property="dispatch" value="openScribeHistory" />
-							<html:hidden property="toolSessionID"
-								value="${session.sessionID}" />
-							<html:submit styleClass="button">
-								<fmt:message>summary.editMessages</fmt:message>
-							</html:submit>
-						</div>
-					</html:form>
-
-					<html:form action="/learning" method="get" target="_blank">
-						<div>
-							<html:hidden property="toolSessionID"
-								value="${session.sessionID}" />
-							<html:hidden property="mode" value="teacher" />
-							<html:submit styleClass="button">
-								<fmt:message>summary.openScribe</fmt:message>
-							</html:submit>
-						</div>
-					</html:form>
-				</div>
-			</td>
-		</tr>
 	</table>
-	<hr />
 </c:forEach>
