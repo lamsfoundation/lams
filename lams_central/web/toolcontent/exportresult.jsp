@@ -18,9 +18,9 @@
 
 	<body class="stripes">
 
-	<h1><fmt:message key="msg.export.success" /></h1>
 	<div id="content">
 
+	<h1><fmt:message key="msg.export.success" /></h1>
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
 				<c:choose>
@@ -43,7 +43,9 @@
 			</c:otherwise>
 		</c:choose>
 		
-	<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
+	<table><tr><td>
+		<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
+	</td></tr></table>
 	</div>  <!--closes content-->
 
 	<div id="footer">

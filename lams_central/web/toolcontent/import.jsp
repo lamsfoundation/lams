@@ -19,13 +19,11 @@
 
 	<body class="stripes">
 
-			<!--main box 'page'-->
-
+			<div id="content">
 			<h1>
 				<fmt:message key="title.import" />
 			</h1>
 
-			<div id="content">
 				<h2>
 					<fmt:message key="title.import.instruction" />
 				</h2>

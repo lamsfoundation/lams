@@ -18,12 +18,13 @@
 
 	<body class="stripes">
 
-		<h1>
-			<fmt:message key="title.import" />
-		</h1>
 	
 		<div id="content">
 	  
+		<h1>
+			<fmt:message key="title.import" />
+		</h1>
+
 		<c:choose>
 			<c:when test="${empty ldErrorMessages}">
 				<c:choose>

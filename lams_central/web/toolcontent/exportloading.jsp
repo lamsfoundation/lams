@@ -29,14 +29,16 @@
 
 	<body class="stripes" onload="download()">
 
+		 <div id="content">
+	  
 		<h1>
 			<fmt:message key="title.export.loading" />
 		</h1>
 		
-		 <div id="content">
-	  
 				<H2><fmt:message key="msg.export.loading" /></H2>
+				<table><tr><td>
 				<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
+				</td></tr></table>
 		
 		</div>  <!--closes content-->
 			
