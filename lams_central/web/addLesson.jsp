@@ -12,12 +12,10 @@
 </HEAD>
 
 <body class="stripes">
-	<div id="page">	
-		<div id="content">
-			<p><fmt:message key="msg.loading.add.lesson.window"/></p>
-		</div>
-		<div id="footer"></div>
+	<div id="content">
+		<p><fmt:message key="msg.loading.add.lesson.window"/></p>
 	</div>
+	<div id="footer"></div>
 </BODY>
 	
 </lams:html>
