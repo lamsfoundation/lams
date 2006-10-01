@@ -52,6 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body class="stripes">
 
+	<div id="content">
 		<table>
 				<tr>
 			 		<th NOWRAP>  <bean:message key="label.learner.progress"/>   </th>
@@ -147,6 +148,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</table>
 	</html:form>
 
+	</div>
+	
+	<div id="footer"></div>
 </body>
 </html:html>
 

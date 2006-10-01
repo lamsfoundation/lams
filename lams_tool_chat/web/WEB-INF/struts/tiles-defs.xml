@@ -111,19 +111,19 @@
 
 	<definition name="tiles:/monitoring/chat_client" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
-		<put name="header" value="tiles:/header:default" />
+		<put name="header" value="tiles:/header:learner" />
 		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 
 	<definition name="tiles:/monitoring/chat_history" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring.chatHistory"></put>
-		<put name="header" value="tiles:/header:default"></put>
+		<put name="header" value="tiles:/header:learner"></put>
 		<put name="body" value="/pages/monitoring/chatHistory.jsp"></put>
 	</definition>
 
 	<definition name="tiles:/monitoring/notebook" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring.notebook"></put>
-		<put name="header" value="tiles:/header:default"></put>
+		<put name="header" value="tiles:/header:learner"></put>
 		<put name="body" value="/pages/monitoring/notebook.jsp"></put>
 	</definition>
 		

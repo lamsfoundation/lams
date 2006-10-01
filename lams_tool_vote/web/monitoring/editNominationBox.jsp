@@ -41,6 +41,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 	
 	<body class="stripes">
+	
+		<div id="content">
+		
 		<table cellpadding="0">
 
 			<html:form  action="/monitoring?validate=false" styleId="newNominationForm" enctype="multipart/form-data" method="POST">			
@@ -102,5 +105,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 		</table>
 
+		</div>
+		
+		<div id="footer"></div>
 	</body>
 </html>

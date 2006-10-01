@@ -14,7 +14,7 @@
 			<h1>
 				<fmt:message key="page.title.monitoring.view.reflection"/>
 			</h1>
-			${userDTO.firstName} ${userDTO.lastName}<br><br>
+			<p>${userDTO.firstName} ${userDTO.lastName}</p>
 			<table class="alternative-color">
 				<tr>
 					<th class="first">

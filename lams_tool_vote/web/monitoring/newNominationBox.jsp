@@ -41,6 +41,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 	
 	<body class="stripes">
+	
+	<div id="content">
+
 		<table cellpadding="0">
 	
 
@@ -100,5 +103,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</html:form>
 		</table>
 
+	</div>
+	
+	<div id="footer"></div>
 	</body>
 </html>

@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-	${userDTO.fullName}
+<p>${userDTO.fullName}</p>
+
 <table class="alternative-color">
 	<tr>
 		<th class="first">

@@ -1,5 +1,7 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
+	<p>&nbsp;</p>
+
 	<H2><c:out value="${formBean.title}" escapeXml="false" /></H2>
 	<p><c:out value="${formBean.content}" escapeXml="false" /></p>
 
@@ -26,8 +28,8 @@
 					<c:param name="userID" value="${reflection.userId}" />
 					<c:param name="toolSessionID" value="${reflection.externalId}" />
 				</c:url>
-				<td><html:link href="${viewReflection}" target="_blank">
-						<fmt:message key="link.view" />
+				<td><html:link href="javascript:launchPopup('${viewReflection}')">
+							<fmt:message key="link.view" />
 					</html:link>
 				</td>
 			</tr>

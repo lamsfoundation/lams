@@ -1,12 +1,10 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
+<div id="content">
+
 <h1>
 	<fmt:message key="titleHeading.reflection" />
 </h1>
-
-
-
-<div id="content">
 
 <!-- if nbEntry is empty, display 'has not reflected' message -->
 <table>

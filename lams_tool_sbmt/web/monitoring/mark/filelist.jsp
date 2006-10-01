@@ -13,7 +13,11 @@
 				<c:out value="${fileInfo.marks}" escapeXml="false" />
 			</c:otherwise>
 		</c:choose>
-	</td>
+		<html:link href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 
+			property="submit" styleClass="button">
+			<bean:message key="label.monitoring.updateMarks.button" />
+		</html:link>
+	</td> 
 </tr>
 <tr>
 	<td class="field-name">
@@ -34,10 +38,6 @@
 
 <tr>
 	<td colspan="2">
-		<html:link href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 
-			property="submit" styleClass="button">
-			<bean:message key="label.monitoring.updateMarks.button" />
-		</html:link>
 		<hr size="1" style="width:500px"/>
 	</td>
 </tr>

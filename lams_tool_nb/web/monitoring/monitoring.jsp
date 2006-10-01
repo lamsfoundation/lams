@@ -39,11 +39,23 @@
 <body class="stripes" onLoad='init()'>
 
 	<div id="page">
+	
+		<html:form action="/monitoring" target="_self">
+
+			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" scope="request"/>
+			<html:hidden property="method" />
+
+			<c:set var="monitoringURL">
+				<html:rewrite page="/monitoring.do" />
+			</c:set>
+			
+
 			<h1>
 				<fmt:message key="activity.title" />
 			</h1>
 			
 			<div id="header">
+			
 				<lams:Tabs>
 					<lams:Tab id="<%=NbMonitoringAction.SUMMARY_TABID%>" key="titleHeading.summary" />
 					<lams:Tab id="<%=NbMonitoringAction.INSTRUCTIONS_TABID%>" key="titleHeading.instructions" />
@@ -51,18 +63,8 @@
 					<lams:Tab id="<%=NbMonitoringAction.STATISTICS_TABID%>" key="titleHeading.statistics" />
 				</lams:Tabs>
 			</div>
-
+		
 			<div id="content">
-			
-				<html:form action="/monitoring" target="_self">
-
-				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" scope="request"/>
-				<html:hidden property="method" />
-	
-				<c:set var="monitoringURL">
-					<html:rewrite page="/monitoring.do" />
-				</c:set>
-				
 				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 				
 				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" />
@@ -72,6 +74,7 @@
 			</div>
 			
 			<div id="footer" />
+
 		</html:form>
 	</div>
 

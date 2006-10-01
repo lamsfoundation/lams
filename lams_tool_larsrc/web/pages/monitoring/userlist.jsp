@@ -9,11 +9,13 @@
 </head>
 <body class="stripes">
 
+
+		<div id="content">
+		
 		<h1>
 			<fmt:message key="label.monitoring.heading.access"/>
 		</h1>
-
-		<div id="content">
+		
 	<table border="0" cellspacing="3" width="98%">
 		<tr>
 			<th>

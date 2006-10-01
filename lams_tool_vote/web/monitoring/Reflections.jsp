@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<c:param name="contentFolderID" value="${VoteMonitoringForm.contentFolderID}" />																								
 										</c:url>
 		
-										<html:link href="${fn:escapeXml(openNotebook)}" target="_blank">
+										<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}')">
 											<bean:message key="label.view" />
 										</html:link>
 	

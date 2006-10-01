@@ -5,7 +5,8 @@
 <html>
 <head>
 	<title><fmt:message key="activity.title" /></title>
-	<lams:headItems />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
 			var act = "<c:url value="/monitoring.do"/>";
@@ -14,10 +15,10 @@
 	</script>
 </head>
 <body class="stripes">
+		<div id="content">
 		<h1>
 			<fmt:message key="label.monitoring.heading.marking"/>
 		</h1>
-		<div id="content">
 				<table cellpadding="0">
 					<c:forEach var="fileInfo" items="${report}" varStatus="status">
 						<%@include file="filelist.jsp"%>

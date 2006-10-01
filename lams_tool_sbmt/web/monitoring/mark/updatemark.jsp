@@ -5,16 +5,15 @@
 <html>
 <head>
 	<title><fmt:message key="activity.title" /></title>
-	<lams:headItems />
-	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
 </head>
 
 <body class="stripes">
+		<div id="content">
 		<h1>
 			<fmt:message key="label.monitoring.updateMarks.button"/>
 		</h1>
-		<div id="content">
 			<c:forEach var="fileInfo"  items="${report}" varStatus="status">
 				<form id="updateMarkForm" method="post" action="<c:url value='/monitoring.do'/>">
 					<input type="hidden" name="method" value="updateMark" />

@@ -10,7 +10,7 @@
 			:
 		</td>
 	<tr>
-</c:if>
+</c:if> 
 
 <tr>
 	<td class="field-name">
@@ -22,11 +22,11 @@
 		<c:set var="viewURL">
 			<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=false" />
 		</c:set>
-		<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"> <fmt:message key="label.view" /> </a>&nbsp;
+		<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a>&nbsp;
 		<c:set var="downloadURL">
 			<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=true" />
 		</c:set>
-		<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="label.download" /> </a>
+		<a href="<c:out value='${downloadURL}' escapeXml='false'/>"  class="button"> <fmt:message key="label.download" /> </a>
 	</td>
 </tr>
 <tr>
