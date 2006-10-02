@@ -20,17 +20,13 @@
 <!-- ********************  CSS ********************** -->
 <c:choose>
 	<c:when test="${not empty localLinkPath}">
-		<lams:css localLinkPath="${localLinkPath}"  style="tabbed"/>
+		<lams:css localLinkPath="${localLinkPath}"/>
 	</c:when>
 	<c:otherwise>
-		<lams:css style="tabbed"/>
+		<lams:css/>
 	</c:otherwise>
 </c:choose>
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-
-<%@ include file="/common/fckeditorheader.jsp"%>
 

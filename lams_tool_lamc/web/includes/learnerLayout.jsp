@@ -12,7 +12,7 @@
 <html>
 	<head>
 		<title><bean:message key="activity.title" /></title>
-		<%@ include file="/common/header.jsp"%>
+		<%@ include file="/common/learnerheader.jsp"%>
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
 		</script>		
@@ -25,9 +25,7 @@
 		</script>		
 		
 	</head>
-	<body>
-		<div id="page-learner">
-			<tiles:insert attribute="body" />
-		</div>
+	<body  class="stripes">
+		<tiles:insert attribute="body" />
 	</body>
 </html>

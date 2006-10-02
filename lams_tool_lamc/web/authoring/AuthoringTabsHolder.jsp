@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 
 	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    	if(tag.value != "")
 		    		selectTab(tag.value);
 	            else
-	                selectTab(1); //select the default tab;
+	              selectTab(1); //select the default tab;
 	            
 			}
 			else
@@ -108,7 +108,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 
 
-<body onLoad="init();">
+<body onLoad="init();" class="stripes">
 
 <div id="page">
 	<h1>  <bean:message key="label.authoring.mc"/> </h1>
@@ -137,7 +137,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="contentFolderID"/>												
 		
 		<%@ include file="/common/messages.jsp"%>
-		
+		   
 		
 		<c:if test="${mcGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->

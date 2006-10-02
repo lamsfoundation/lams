@@ -100,7 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<fmt:message key="label.edit.question"></fmt:message>
 						</div>
 						
-						<lams:FCKEditor id="newQuestion"
+  					<lams:FCKEditor id="newQuestion"
 							value="${mcGeneralAuthoringDTO.editableQuestionText}"
 							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 					</td>

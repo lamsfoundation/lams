@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 <html>
 	<head>
-		<%@ include file="/common/header.jsp"%>
+		<%@ include file="/common/learnerheader.jsp"%>
 		
 		<script language="JavaScript" type="text/JavaScript">
 
@@ -56,6 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 	
 	<body>
+	
 		<table cellpadding="0">
 
 			<html:form  action="/monitoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">			
@@ -165,6 +166,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</html:form>
 			
 		</table>
-
 	</body>
 </html>

@@ -32,9 +32,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <html:html>
-<head>
+<head class="stripes">
 	<html:base />
-	<lams:headItems />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
 	<title><bean:message key="activity.title" /></title>
 	
 		<script language="JavaScript" type="text/JavaScript">
@@ -47,16 +48,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>
 </head>
 
-<body>
-	<div id="page-learner">
-	
-	<h1 class="no-tabs-below">
-		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
-	</h1>
+<body class="stripes">
 
-<div id="header-no-tabs-learner"></div>
-
-<div id="content-learner">
+<div id="content">
 	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
 		<html:hidden property="toolSessionID"/>						
@@ -67,6 +61,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="learnerProgress"/>										
 		<html:hidden property="learnerProgressUserId"/>										
 		<html:hidden property="questionListingMode"/>					
+		
+		<h1>
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+		</h1>
 		
 		<c:choose> 
 		  <c:when test="${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
@@ -79,9 +77,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</html:form>
 </div>
 
-<div id="footer-learner"></div>
+<div id="footer"></div>
 
-</div>
 </body>
 </html:html>
 

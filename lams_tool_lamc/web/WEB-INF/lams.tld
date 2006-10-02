@@ -13,6 +13,26 @@
 
    <tag>
 
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
+      <icon>    
+      </icon>
+      <name>role</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts role name into form usable as message resources key</description>
+         <name>role</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Output the Server URL as defined in the lams.xml configuration file.</description>
       <display-name>LAMS URL</display-name>
       <icon>    
@@ -56,6 +76,34 @@
          <description>Render html tag with direction and language</description>
          <name>xhtml</name>
          <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Help tag</description>
+      <display-name>Help tag</display-name>
+      <icon>    
+      </icon>
+      <name>help</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Help tag</description>
+         <name>module</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>toolSignature</name>
+         <required>true</required>
 
            <rtexprvalue>true</rtexprvalue>
 
@@ -126,6 +174,14 @@
       <attribute>
          <description>Output stylesheet based on the user preferences.</description>
          <name>localLinkPath</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Output stylesheet based on the user preferences.</description>
+         <name>style</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>

@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 <html>
 	<head>
-		<%@ include file="/common/header.jsp"%>
+		<%@ include file="/common/learnerheader.jsp"%>
 		
 		<script language="JavaScript" type="text/JavaScript">
 

@@ -79,9 +79,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<div class="field-name" style="text-align: left;">
 							<fmt:message key="label.add.new.question"></fmt:message>
 						</div>
-						<lams:FCKEditor id="newQuestion"
+ 						<lams:FCKEditor id="newQuestion"
 							value="${mcGeneralAuthoringDTO.editableQuestionText}"
-							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor> 
 					</td>
 				</tr>
 

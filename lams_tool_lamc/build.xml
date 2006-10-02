@@ -455,5 +455,16 @@
 			<native2ascii encoding="UTF-8" src="${conf.language.dir}" dest="${conf.language.dir}"
 			   includes="*.txt" ext=".properties"/>
 	    </target>
+	
+	   <!-- ================================= 
+	          target: synchronize-jsp              
+	         ================================= -->
+	    <target name="synchronize-deploy" description="copy non-java file into deploy folder">
+	        <copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+	        	<fileset dir="${conf.web.dir}">
+	        		<include name="**/*.*"/>
+	        	</fileset>
+	        </copy>
+	    </target>
 
 </project>
