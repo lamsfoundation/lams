@@ -55,6 +55,23 @@
 						</p>
 
 						<div class="field-name" style="text-align: left">
+							?Total Number of Learners?
+						</div>
+												
+						<p>
+							${session.numberOfLearners}
+						</p>						
+						
+						<div class="field-name" style="text-align: left">
+							?Number of Votes?
+						</div>
+												
+						<p>
+							${session.numberOfVotes}
+						</p>
+						
+
+						<div class="field-name" style="text-align: left">
 							?Report?
 						</div>
 						<hr />

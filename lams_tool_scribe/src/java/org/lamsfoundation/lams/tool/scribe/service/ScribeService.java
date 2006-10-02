@@ -98,8 +98,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	private IScribeUserDAO scribeUserDAO = null;
 
 	private IScribeAttachmentDAO scribeAttachmentDAO = null;
-	
-	private IScribeHeadingDAO scribeHeadingDAO = null;
 
 	private ILearnerService learnerService;
 
@@ -415,10 +413,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		scribeUserDAO.saveOrUpdate(scribeUser);
 	}
 
-//	public void saveOrUpdateScribeHeading(ScribeHeading heading) {
-//		scribeHeadingDAO.saveOrUpdate(heading);
-//	}
-	
 	public synchronized ScribeUser createScribeUser(UserDTO user,
 			ScribeSession scribeSession) {
 		ScribeUser scribeUser = new ScribeUser(user, scribeSession);

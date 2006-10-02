@@ -149,6 +149,4 @@ public interface IScribeService {
 
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
-	
-//	public void saveOrUpdateScribeHeading(ScribeHeading heading);
 }

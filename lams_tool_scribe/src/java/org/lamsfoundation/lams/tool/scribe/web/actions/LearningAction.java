@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
+ * @struts.action-forward name="voteCount" path="/pages/learning/voteCount.jsp"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -130,27 +131,8 @@ public class LearningAction extends LamsDispatchAction {
 			
 		((LearningForm)form).setToolSessionID(scribeSession.getSessionId());
 		request.setAttribute("MODE", mode.toString());
-
-		ScribeDTO scribeDTO = new ScribeDTO(scribe);
-		request.setAttribute("scribeDTO", scribeDTO);
-
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
-		request.setAttribute("scribeSessionDTO", sessionDTO);
+		setupDTOs(request, scribeSession, scribeUser);
 		
-		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-		request.setAttribute("scribeUserDTO", scribeUserDTO);
-		
-		if (scribeUser.isFinishedActivity()) {
-			// get the notebook entry.
-			NotebookEntry notebookEntry = scribeService.getEntry(toolSessionID,
-					CoreNotebookConstants.NOTEBOOK_TOOL,
-					ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId()
-							.intValue());
-			if (notebookEntry != null) {
-				scribeUserDTO.notebookEntry = notebookEntry.getEntry();
-			}
-		}
-
 		// Ensure that the content is use flag is set.
 		if (!scribe.isContentInUse()) {
 			scribe.setContentInUse(new Boolean(true));
@@ -292,16 +274,7 @@ public class LearningAction extends LamsDispatchAction {
 		scribeService.saveOrUpdateScribeSession(session);
 		
 		request.setAttribute("MODE", lrnForm.getMode());
-		
-		// build dto's
-		ScribeDTO scribeDTO = new ScribeDTO(session.getScribe());
-		request.setAttribute("scribeDTO", scribeDTO);
-
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
-		request.setAttribute("scribeSessionDTO", sessionDTO);
-		
-		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-		request.setAttribute("scribeUserDTO", scribeUserDTO);
+		setupDTOs(request, session, scribeUser);
 
 		return mapping.findForward("scribe");
 	}
@@ -319,20 +292,69 @@ public class LearningAction extends LamsDispatchAction {
 		scribeUser.setReportApproved(true);
 		
 		request.setAttribute("MODE", lrnForm.getMode());
-		
-		// build dto's
-		// TODO the following code is being reused over and over, need to refactor
-		ScribeDTO scribeDTO = new ScribeDTO(session.getScribe());
-		request.setAttribute("scribeDTO", scribeDTO);
-
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
-		request.setAttribute("scribeSessionDTO", sessionDTO);
-		
-		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-		request.setAttribute("scribeUserDTO", scribeUserDTO);
+		setupDTOs(request, session, scribeUser);
 		
 		scribeService.saveOrUpdateScribeUser(scribeUser);
 
 		return mapping.findForward("learning");
+	}
+	
+	public ActionForward getVoteCount(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		
+		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+		
+		ScribeSession session = scribeService.getSessionBySessionId(toolSessionID);
+		
+		int voteCount = 0;
+		
+		for (Iterator iter = session.getScribeUsers().iterator(); iter.hasNext();) {
+			ScribeUser user = (ScribeUser) iter.next();
+			
+			if (user.isReportApproved()) {
+				voteCount++;			
+			}
+		}
+		
+		request.setAttribute("voteCount", voteCount);
+		
+		return mapping.findForward("voteCount");
+	}
+
+	
+	// Private methods.
+	
+	private void setupDTOs(HttpServletRequest request, ScribeSession scribeSession, ScribeUser scribeUser) {
+		
+		ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
+		request.setAttribute("scribeDTO", scribeDTO);
+
+		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
+			
+		int numberOfVotes = 0;
+		for (Iterator iter = scribeSession.getScribeUsers().iterator(); iter.hasNext();) {
+			ScribeUser user = (ScribeUser) iter.next();
+			if (user.isReportApproved()) {
+				numberOfVotes++;
+			}
+		}
+		
+		// TODO
+		sessionDTO.setNumberOfVotes(numberOfVotes);
+		sessionDTO.setNumberOfLearners(scribeSession.getScribeUsers().size());
+		request.setAttribute("scribeSessionDTO", sessionDTO);
+		
+		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
+		if (scribeUser.isFinishedActivity()) {
+			// get the notebook entry.
+			NotebookEntry notebookEntry = scribeService.getEntry(scribeSession.getSessionId(),
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId()
+							.intValue());
+			if (notebookEntry != null) {
+				scribeUserDTO.notebookEntry = notebookEntry.getEntry();
+			}
+		}		
+		request.setAttribute("scribeUserDTO", scribeUserDTO);
 	}
 }

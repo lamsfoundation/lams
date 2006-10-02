@@ -132,6 +132,7 @@ public class MonitoringAction extends LamsDispatchAction {
 			ScribeSession session = (ScribeSession) sessIter.next();
 
 			ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
+			int numberOfVotes = 0;
 			
 			for (Iterator userIter = session.getScribeUsers().iterator(); userIter
 					.hasNext();) {
@@ -147,11 +148,16 @@ public class MonitoringAction extends LamsDispatchAction {
 					userDTO.finishedReflection = true;
 				} else {
 					userDTO.finishedReflection = false;
-				}			
+				}
+				
+				if (user.isReportApproved()) {
+					numberOfVotes++;
+				}
 				
 				sessionDTO.getUserDTOs().add(userDTO);
 			}
-
+			sessionDTO.setNumberOfLearners(session.getScribeUsers().size());
+			sessionDTO.setNumberOfVotes(numberOfVotes);
 			scribeDTO.getSessionDTOs().add(sessionDTO);
 		}
 		

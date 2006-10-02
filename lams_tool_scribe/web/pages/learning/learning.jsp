@@ -12,7 +12,6 @@
 	}
 </script>
 
-
 <div id="content">
 	
 	<h1>
@@ -22,16 +21,28 @@
 	<p>
 		${scribeDTO.instructions}
 	</p>
+	
+	<div class="field-name" style="text-align: left">
+		?Number of Votes?
+	</div>
+	
+	<p>
+		${scribeSessionDTO.numberOfVotes}
+	</p>
 
+
+	<div class="field-name" style="text-align: left">
+		?Headings?
+	</div>
 	<html:form action="learning">
 		<html:hidden property="dispatch" value="submitApproval"></html:hidden>
 		<html:hidden property="toolSessionID"></html:hidden>
 		<html:hidden property="mode"></html:hidden>
 
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
-			<h2>
+			<p>
 				${reportDTO.headingDTO.headingText}
-			</h2>
+			</p>
 
 			<p>
 				<lams:out value="${reportDTO.entryText}" />

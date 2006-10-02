@@ -65,7 +65,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
 		if (scribeService == null) {
-			scribeService = ScribeServiceProxy.getScribeService(getServletContext());
+			scribeService = ScribeServiceProxy
+					.getScribeService(getServletContext());
 		}
 
 		try {
@@ -110,9 +111,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		// get the scribe user
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
-		
-		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(
-				user.getUserID()), toolSessionID);
+
+		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(
+				new Long(user.getUserID()), toolSessionID);
 
 		// construct session DTO.
 		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
@@ -157,20 +158,29 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
 		ScribeDTO scribeDTO = new ScribeDTO(scribe);
-		for (Iterator iter = scribe.getScribeSessions().iterator(); iter.hasNext();) {
+		for (Iterator iter = scribe.getScribeSessions().iterator(); iter
+				.hasNext();) {
 
 			ScribeSession session = (ScribeSession) iter.next();
 			ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
+			
+			int numberOfVotes = 0;
+			for (Iterator iterator = session.getScribeUsers().iterator(); iterator
+					.hasNext();) {
+				ScribeUser user = (ScribeUser) iterator.next();
+				
+				// count the votes
+				if (user.isReportApproved()) {
+					numberOfVotes++;
+				}
+				
+				// if reflectOnActivity is enabled add all userDTO.
+				if (session.getScribe().isReflectOnActivity()) {
 
-			// if reflectOnActivity is enabled add all userDTO.
-			if (session.getScribe().isReflectOnActivity()) {
-
-				for (Iterator iterator = session.getScribeUsers().iterator(); iterator
-						.hasNext();) {
-					ScribeUser user = (ScribeUser) iterator.next();
 					ScribeUserDTO userDTO = new ScribeUserDTO(user);
 					// get the entry.
-					NotebookEntry entry = scribeService.getEntry(session.getSessionId(),
+					NotebookEntry entry = scribeService.getEntry(session
+							.getSessionId(),
 							CoreNotebookConstants.NOTEBOOK_TOOL,
 							ScribeConstants.TOOL_SIGNATURE, user.getUserId()
 									.intValue());
@@ -183,6 +193,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					sessionDTO.getUserDTOs().add(userDTO);
 				}
 			}
+			
+			sessionDTO.setNumberOfLearners(session.getScribeUsers().size());
+			sessionDTO.setNumberOfVotes(numberOfVotes);
 			scribeDTO.getSessionDTOs().add(sessionDTO);
 		}
 		request.getSession().setAttribute("scribeDTO", scribeDTO);

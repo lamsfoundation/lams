@@ -41,7 +41,7 @@ public class ScribeSessionDTO implements Comparable {
 	
 	Set<ScribeUserDTO> userDTOs;
 	
-	int numberOfPosts;
+	int numberOfVotes;
 	
 	int numberOfLearners;
 	
@@ -116,12 +116,12 @@ public class ScribeSessionDTO implements Comparable {
 		this.numberOfLearners = numberOfLearners;
 	}
 
-	public int getNumberOfPosts() {
-		return numberOfPosts;
+	public int getNumberOfVotes() {
+		return numberOfVotes;
 	}
 
-	public void setNumberOfPosts(int numberOfPosts) {
-		this.numberOfPosts = numberOfPosts;
+	public void setNumberOfVotes(int numberOfVotes) {
+		this.numberOfVotes = numberOfVotes;
 	}
 
 	public Set<ScribeReportEntryDTO> getReportDTOs() {
