@@ -93,25 +93,20 @@
 				</c:choose>
 			</td>
 		</tr>
+	</table>
 
-		<c:if test="${dto.reflectOnActivity}">
-			<tr>
-				<td colspan="3">
-					<h4>
-						<fmt:message key="heading.reflections" />
-					</h4>
-				</td>
-			</tr>
+	<c:if test="${dto.reflectOnActivity}">
 
+		<div class="field-name" class="space-left" style="text-align: left">
+			<fmt:message key="heading.reflections" />
+		</div>
+		<table class="alternative-color">
 			<tr>
-				<th>
+				<th class="first">
 					<fmt:message>heading.learner</fmt:message>
 				</th>
-				<th>
-					<fmt:message>heading.numPosts</fmt:message>
-				</th>
 
-				<th>
+				<th class="first">
 					<c:choose>
 						<c:when test="${dto.reflectOnActivity}">
 							<fmt:message key="heading.reflection" />
@@ -126,10 +121,7 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						${user.jabberNickname}
-					</td>
-					<td>
-						${user.postCount}
+						${user.firstName} ${user.lastName}
 					</td>
 					<c:if test="${dto.reflectOnActivity}">
 						<td>
@@ -147,6 +139,7 @@
 					</c:if>
 				</tr>
 			</c:forEach>
-		</c:if>
-	</table>
+
+		</table>
+	</c:if>
 </c:forEach>
