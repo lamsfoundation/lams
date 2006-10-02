@@ -6,15 +6,15 @@
 <table cellspacing="0" class="alternative-color">
 	<tr>
 		<th class="first">
-			?Session Name?	
+			<fmt:message key="heading.sessionName" />	
 		</th>
 		
 		<th class="first">
-			?Number of Learners?
+			<fmt:message key="heading.totalLearners" />
 		</th>
 		
 		<th class="first">
-			?Number of Votes?
+			<fmt:message key="heading.numberOfVotes" />
 		</th>
 	</tr>
 	<c:forEach var="session" items="${dto.sessionDTOs}">

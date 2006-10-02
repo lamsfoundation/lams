@@ -47,7 +47,7 @@
 						</h2>
 
 						<div class="field-name" style="text-align: left">
-							?Appointed Scribe?
+							<fmt:message key="heading.appointedScribe" />							
 						</div>
 
 						<p>
@@ -55,7 +55,7 @@
 						</p>
 
 						<div class="field-name" style="text-align: left">
-							?Total Number of Learners?
+							<fmt:message key="heading.totalLearners" />							
 						</div>
 												
 						<p>
@@ -63,7 +63,7 @@
 						</p>						
 						
 						<div class="field-name" style="text-align: left">
-							?Number of Votes?
+							<fmt:message key="heading.numberOfVotes" />
 						</div>
 												
 						<p>
@@ -72,7 +72,7 @@
 						
 
 						<div class="field-name" style="text-align: left">
-							?Report?
+							<fmt:message key="heading.report" />
 						</div>
 						<hr />
 						<c:forEach var="report" items="${session.reportDTOs}">

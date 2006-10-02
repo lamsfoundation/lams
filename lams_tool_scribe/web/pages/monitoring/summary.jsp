@@ -20,14 +20,15 @@
 						<c:choose>
 							<c:when test="${not empty session.userDTOs}">
 								<html:form action="/monitoring">
-								
+
 									<html:hidden property="toolSessionID"
 										value="${session.sessionID}" />
 									<html:hidden property="dispatch" value="appointScribe" />
-								
-									?Please select a scribe:?
 
-									<html:select property="appointedScribeUID" style="min-width: 150px;">
+									<fmt:message key="heading.selectScribe" />
+
+									<html:select property="appointedScribeUID"
+										style="min-width: 150px;">
 										<c:forEach var="user" items="${session.userDTOs}">
 											<html:option value="${user.uid}">
 												${user.firstName} ${user.lastName}
@@ -36,14 +37,14 @@
 									</html:select>
 
 									<div>
-										<input type="submit" value="?submit?" class="button" />
+										<html:submit></html:submit>
 									</div>
 
 								</html:form>
 							</c:when>
 
 							<c:otherwise>
-								?No users available?
+								<fmt:message key="message.noLearners" />
 							</c:otherwise>
 
 						</c:choose>
@@ -52,7 +53,7 @@
 
 					<c:otherwise>
 						<div class="field-name" style="text-align: left">
-							?Appointed Scribe?
+							<fmt:message key="heading.appointedScribe" />
 						</div>
 
 						<p>
@@ -60,23 +61,23 @@
 						</p>
 
 						<div class="field-name" style="text-align: left">
-							?Total Number of Learners?
+							<fmt:message key="heading.totalLearners" />
 						</div>
-												
+
 						<p>
 							${session.numberOfLearners}
-						</p>						
-						
+						</p>
+
 						<div class="field-name" style="text-align: left">
-							?Number of Votes?
+							<fmt:message key="heading.numberOfVotes" />
 						</div>
-												
+
 						<p>
 							${session.numberOfVotes}
 						</p>
 
 						<div class="field-name" style="text-align: left">
-							?Report?
+							<fmt:message key="heading.report" />
 						</div>
 						<hr />
 						<c:forEach var="report" items="${session.reportDTOs}">
@@ -97,7 +98,7 @@
 			<tr>
 				<td colspan="3">
 					<h4>
-						Reflections
+						<fmt:message key="heading.reflections" />
 					</h4>
 				</td>
 			</tr>

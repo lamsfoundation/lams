@@ -45,7 +45,7 @@
 		<html:hidden property="mode"></html:hidden>
 
 		<div class="field-name" style="text-align: left">
-			?Number of Votes?
+			<fmt:message key="heading.numberOfVotes" />
 		</div>
 
 		<p id="voteDisplay">
@@ -53,7 +53,7 @@
 		</p>
 
 		<div class="field-name" style="text-align: left">
-			?Headings?
+			<fmt:message key="heading.report" />
 		</div>
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 			<p>
@@ -71,7 +71,7 @@
 
 		<p>
 			<html:submit styleClass="button">
-				?Submit Report?
+				<fmt:message key="button.submitReport" />
 			</html:submit>
 		</p>
 

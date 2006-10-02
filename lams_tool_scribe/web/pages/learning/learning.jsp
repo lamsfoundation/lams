@@ -23,7 +23,7 @@
 	</p>
 	
 	<div class="field-name" style="text-align: left">
-		?Number of Votes?
+		<fmt:message key="heading.numberOfVotes" />
 	</div>
 	
 	<p>
@@ -32,7 +32,7 @@
 
 
 	<div class="field-name" style="text-align: left">
-		?Headings?
+		<fmt:message key="heading.report" />
 	</div>
 	<html:form action="learning">
 		<html:hidden property="dispatch" value="submitApproval"></html:hidden>
@@ -53,7 +53,7 @@
 		<p>
 			<c:if test="${scribeUserDTO.reportApproved eq false}">
 				<html:submit styleClass="button">
-					?Approve?
+					<fmt:message key="button.approve" />					
 				</html:submit>
 			</c:if>
 		</p>
