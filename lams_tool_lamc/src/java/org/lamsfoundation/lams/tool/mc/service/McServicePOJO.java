@@ -1783,8 +1783,12 @@ public class McServicePOJO implements
 
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		McContent toolContentObj = mcContentDAO.findMcContentById(toolContentId);
+ 		if(toolContentObj == null) {
+ 			long defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
+ 			toolContentObj = mcContentDAO.findMcContentById(defaultContentId);
+ 		}
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find default content for the multiple choice tool");
  		
 		try {
 			//set ToolContentHandler as null to avoid copy file node in repository again.
