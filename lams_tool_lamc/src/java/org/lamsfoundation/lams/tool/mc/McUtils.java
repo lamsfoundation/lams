@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -37,12 +38,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.web.McAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 
 /**
@@ -53,19 +56,6 @@ public abstract class McUtils implements McAppConstants {
 
 	static Logger logger = Logger.getLogger(McUtils.class.getName());
 
-	/**
-	 * returns the service object from the session cache
-	 * IMcService getToolService(HttpServletRequest request)
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static IMcService getToolService(HttpServletRequest request)
-	{
-		IMcService mcService=(IMcService)request.getSession().getAttribute(TOOL_SERVICE);
-	    return mcService;
-	}
-	
     public static String replaceNewLines(String text)
     {
         logger.debug("using text: " + text);
@@ -152,46 +142,9 @@ public abstract class McUtils implements McAppConstants {
 	
 	
 	/**
-	 * existsContent(long toolContentId)
-	 * @param long toolContentId
-	 * @return boolean
-	 * determine whether a specific toolContentId exists in the db
-	 */
-	public static boolean existsContent(Long toolContentId, HttpServletRequest request)
-	{
-		IMcService mcService =McUtils.getToolService(request);
-	    
-    	McContent mcContent=mcService.retrieveMc(toolContentId);
-	    logger.debug("retrieving mcContent: " + mcContent);
-	    if (mcContent == null) 
-	    	return false;
-	    
-		return true;	
-	}
-
-	/**
-	 * it is expected that the tool session id already exists in the tool sessions table
-	 * existsSession(long toolSessionId)
-	 * @param toolSessionId
-	 * @return boolean
-	 */
-	public static boolean existsSession(Long toolSessionId, HttpServletRequest request)
-	{
-		logger.debug("existsSession");
-    	IMcService mcService =McUtils.getToolService(request);
-	    McSession mcSession=mcService.retrieveMcSession(toolSessionId);
-	    logger.debug("mcSession:" + mcSession);
-    	
-	    if (mcSession == null) 
-	    	return false;
-	    
-		return true;	
-	}
-	
-	
-	/**
-	 * returns a Map of options
 	 * generateOptionsMap(List listMcOptions)
+	 * 
+	 * returns a Map of options
 	 * 
 	 * @param listMcOptions
 	 * @return Map
@@ -215,7 +168,13 @@ public abstract class McUtils implements McAppConstants {
 	}
 
 	
-	//consider adding if (!requestByStarter) to other properties as well
+
+	/**
+	 * void saveInSessionRichText(HttpServletRequest request, boolean requestByStarter)
+	 * 
+	 * @param request
+	 * @param requestByStarter
+	 */
 	public static void saveInSessionRichText(HttpServletRequest request, boolean requestByStarter)
 	{
 	    logger.debug("saveInSessionRichText, requestByStarter: " + requestByStarter);
@@ -244,15 +203,8 @@ public abstract class McUtils implements McAppConstants {
 		
 		if (!requestByStarter)
 		{
-			//if ((richTextTitle != null) && (richTextTitle.length() > 0))
-			//{
-				request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
-			//}
-			
-			//if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
-			//{
-				request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
-			//}
+			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
 		}
 		
 		
@@ -285,20 +237,10 @@ public abstract class McUtils implements McAppConstants {
 		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
 		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
 		
-		//String richTextEndLearningMessage=request.getParameter(RICHTEXT_END_LEARNING_MSG);
-		//logger.debug("read parameter richTextEndLearningMessage: " + richTextEndLearningMessage);
-		
 		if ((richTextReportTitle != null) && (richTextReportTitle.length() > 0))
 		{
 			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,richTextReportTitle);
 		}
-		
-		/*
-		if ((richTextEndLearningMessage != null) && (richTextEndLearningMessage.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,richTextEndLearningMessage);
-		}
-		*/
 		
 		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
 	}
@@ -310,32 +252,6 @@ public abstract class McUtils implements McAppConstants {
     	mcService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
-	
-	/**
-	 * retrieves existing updated file information
-	 * populateUploadedFilesData(HttpServletRequest request, McContent defaultMcContent)
-	 * 
-	 * @param request
-	 * @param defaultMcContent
-	 */
-	public static void populateUploadedFilesData(HttpServletRequest request, McContent defaultMcContent)
-	{
-		logger.debug("attempt populateUploadedFilesData for: " + defaultMcContent);
-		IMcService mcService =McUtils.getToolService(request);
-    	logger.debug("mcService: " + mcService);
-
-    	/** read the uploaded offline uuid + file name pair */
-	    List listOffFilesName=mcService.retrieveMcUploadedOfflineFilesName(defaultMcContent.getUid());
-	    logger.debug("initial listOfflineFilesName: " + listOffFilesName);
-	    
-	    /** read the uploaded online uuid + file name pair */
-	    List listOnFilesName=mcService.retrieveMcUploadedOnlineFilesName(defaultMcContent.getUid());
-	    logger.debug("initial listOnlineFilesName: " + listOnFilesName);
-	    
-	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOffFilesName);
-	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listOnFilesName);
-	}
-	
 	
     /**
      * temporary function
@@ -431,8 +347,9 @@ public abstract class McUtils implements McAppConstants {
 	
 	
 	/**
-	 * builds a String based map from a list 
 	 * convertToMap(List sessionsList)
+	 * 
+	 * builds a String based map from a list
 	 * 
 	 * @param sessionsList
 	 * @return Map
@@ -509,30 +426,6 @@ public abstract class McUtils implements McAppConstants {
 		return mcContent.isRunOffline();
 	}
 
-	
-	/**
-     * sets/resets the define later flag of the content
-     * setDefineLater(HttpServletRequest request, boolean value)
-     * 
-     * @param request
-     * @param value
-     */
-    public static void setDefineLater(HttpServletRequest request, boolean value)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	logger.debug("value:" + value);
-    	
-    	McContent mcContent=mcService.retrieveMc(toolContentId);
-    	logger.debug("mcContent:" + mcContent);
-    	if (mcContent != null)
-    	{
-    		mcContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to true");
-        	mcService.saveMcContent(mcContent);	
-    	}
-    }
 	
     
 	public static String getDestination(String sourceMcStarter)
@@ -755,58 +648,223 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(ACTIVITY_TITLE);
     	request.getSession().removeAttribute(ACTIVITY_INSTRUCTIONS);
     	request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS_ID);
-    	
-    	cleanUpUserExceptions(request);
     	logger.debug("completely cleaned the session.");
     }
+  
     
-    /**
-     *removes attributes except USER_EXCEPTION_NO_STUDENT_ACTIVITY 
-     */
-    public static void cleanUpUserExceptions(HttpServletRequest request)
+	/**
+	 * String getDestination(String sourceMcStarter, String requestedModule)
+	 * 
+	 * determines the struts level location to return
+	 *   
+	 * @param sourceMcStarter
+	 * @param requestedModule
+	 * @return
+	 */
+	public static String getDestination(String sourceMcStarter, String requestedModule)
+	{
+		logger.debug("sourceMcStarter: " + sourceMcStarter + " and requestedModule:" + requestedModule);
+		
+		if (requestedModule.equals(DEFINE_LATER))
+		{
+			logger.debug("request is from define Later url. return to: " + LOAD_VIEW_ONLY);
+			return LOAD_VIEW_ONLY;	
+		}
+		else if (requestedModule.equals(AUTHORING))
+		{
+			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+			return LOAD_QUESTIONS;	
+		}
+		else
+		{
+			logger.debug("request is from an unknown source. return null");
+			return null;
+		}
+	}
+
+	
+	/**
+	 * populateAuthoringDTO(HttpServletRequest request, McContent defaultMcContent, 
+            McGeneralAuthoringDTO mcGeneralAuthoringDTO)
+	 * 
+	 * @param request
+	 * @param defaultMcContent
+	 * @param mcGeneralAuthoringDTO
+	 */
+    public static void populateAuthoringDTO(HttpServletRequest request, McContent defaultMcContent, 
+            McGeneralAuthoringDTO mcGeneralAuthoringDTO)
+	{
+        mcGeneralAuthoringDTO.setActivityTitle(defaultMcContent.getTitle());
+		mcGeneralAuthoringDTO.setActivityInstructions(defaultMcContent.getInstructions());
+		
+	    mcGeneralAuthoringDTO.setOnlineInstructions(defaultMcContent.getOnlineInstructions());
+	    mcGeneralAuthoringDTO.setOfflineInstructions(defaultMcContent.getOfflineInstructions());
+	}
+
+    
+	/**
+	 * setDefineLater(HttpServletRequest request, boolean value, String toolContentID)
+	 * @param request
+	 * @param value
+	 * @param toolContentID
+	 */
+	public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID, IMcService mcService)
     {
-    	request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
-    	request.getSession().removeAttribute(USER_EXCEPTION_INCOMPATIBLE_IDS);
-    	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
-    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
-    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
-    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLCONTENT_DOESNOTEXIST);
-    	request.getSession().removeAttribute(USER_EXCEPTION_LEARNER_REQUIRED);    	
-    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
-    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
-    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT);
-    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);    	
-    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTNUMERIC);
-    	request.getSession().removeAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
-    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_EXISTING);
-    	request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
-    	request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
-    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
-    	request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);    	
-    	request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
-    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_BEING_MODIFIED);
-    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
-    	request.getSession().removeAttribute(USER_EXCEPTION_QUESTION_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_ANSWER_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_TOTAL);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_NOTINTEGER);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_ZERO);
-    	request.getSession().removeAttribute(USER_EXCEPTION_ANSWERS_DUPLICATE);    	
-    	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_COUNT_ZERO);
-    	request.getSession().removeAttribute(USER_EXCEPTION_CHKBOXES_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_SUBMIT_NONE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_NOTINTEGER);
-    	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
-    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_GREATER100);    	
-    	request.getSession().removeAttribute(USER_EXCEPTION_FILENAME_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100);
-    	request.getSession().removeAttribute(USER_EXCEPTION_SINGLE_OPTION);
+		logger.debug("mcService: " + mcService);
+    	logger.debug("value:" + value);
+    	logger.debug("strToolContentID:" + strToolContentID);
+    	
+		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
+    	logger.debug("mcContent:" + mcContent);
+    	if (mcContent != null)
+    	{
+    		mcContent.setDefineLater(value);
+        	logger.debug("defineLater has been set to:" + value);
+        	mcService.updateMc(mcContent);	
+    	}
     }
+
+    
+	/**
+	 * setFormProperties(HttpServletRequest request, IMcService mcService,  
+            McAuthoringForm  mcAuthoringForm, McGeneralAuthoringDTO mcGeneralAuthoringDTO, String strToolContentID, String defaultContentIdStr, 
+            String activeModule, SessionMap sessionMap, String httpSessionID)
+	 * 
+	 * @param request
+	 * @param mcService
+	 * @param mcAuthoringForm
+	 * @param mcGeneralAuthoringDTO
+	 * @param strToolContentID
+	 * @param defaultContentIdStr
+	 * @param activeModule
+	 * @param sessionMap
+	 * @param httpSessionID
+	 */
+    public static void setFormProperties(HttpServletRequest request, IMcService mcService,  
+            McAuthoringForm  mcAuthoringForm, McGeneralAuthoringDTO mcGeneralAuthoringDTO, String strToolContentID, String defaultContentIdStr, 
+            String activeModule, SessionMap sessionMap, String httpSessionID)
+    {
+    	logger.debug("setFormProperties: ");
+    	logger.debug("using strToolContentID: " + strToolContentID);
+    	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
+    	logger.debug("using activeModule: " + activeModule);
+    	logger.debug("using httpSessionID: " + httpSessionID);
+
+    	mcAuthoringForm.setHttpSessionID(httpSessionID);
+    	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+    	
+    	mcAuthoringForm.setToolContentID(strToolContentID);
+    	
+    	if ((defaultContentIdStr != null) && (defaultContentIdStr.length() > 0))
+    	{
+    	    mcAuthoringForm.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
+    	    mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
+    	}
+    	    
+    	
+    	mcAuthoringForm.setActiveModule(activeModule);
+    	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+    	
+    	String sln=request.getParameter("sln");
+    	logger.debug("sln: " + sln);
+		mcAuthoringForm.setSln(sln);
+		mcGeneralAuthoringDTO.setSln(sln);
+		
+		String questionsSequenced=request.getParameter("questionsSequenced");
+		logger.debug("questionsSequenced: " + questionsSequenced);
+		mcAuthoringForm.setQuestionsSequenced(questionsSequenced);
+		mcGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
+
+		String retries=request.getParameter("retries");
+		logger.debug("retries: " + retries);
+		mcAuthoringForm.setRetries(retries);
+		mcGeneralAuthoringDTO.setRetries(retries);
+		
+		
+		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
+		logger.debug("offlineInstructions: " + offlineInstructions);
+		mcAuthoringForm.setOfflineInstructions(offlineInstructions);
+		mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
+		String onlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
+		logger.debug("onlineInstructions: " + onlineInstructions);
+		mcAuthoringForm.setOnlineInstructions(onlineInstructions);
+		mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+
+
+		String reflect=request.getParameter(REFLECT);
+		logger.debug("reflect: " + reflect);
+		mcAuthoringForm.setReflect(reflect);
+		mcGeneralAuthoringDTO.setReflect(reflect);
+		
+
+		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
+		logger.debug("reflectionSubject: " + reflectionSubject);
+		mcAuthoringForm.setReflectionSubject(reflectionSubject);
+		mcGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
+		
+		
+     	String passmark= request.getParameter("passmark");
+     	logger.debug("passmark: " + passmark);
+		mcGeneralAuthoringDTO.setPassMarkValue(passmark);
+
+		
+		logger.debug("ending setFormProperties with mcAuthoringForm: " + mcAuthoringForm);
+		logger.debug("ending setFormProperties with mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
+    }
+
+    
+    /** If this file exists in attachments map, move it to the deleted attachments map.
+     * Returns the updated deletedAttachments map, creating a new one if needed. If uuid supplied
+     * then tries to match on that, otherwise uses filename and isOnline. */
+    public static List moveToDelete(String uuid, List attachmentsList, List deletedAttachmentsList ) {
+
+        List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
+        
+        if ( attachmentsList != null ) {
+            Iterator iter = attachmentsList.iterator();
+            McUploadedFile attachment = null;
+            while ( iter.hasNext() && attachment == null ) {
+                McUploadedFile value = (McUploadedFile) iter.next();
+                if ( uuid.equals(value.getUuid()) ) {
+                    attachment = value;
+                }
+
+            }
+            if ( attachment != null ) {
+                deletedList.add(attachment);
+                attachmentsList.remove(attachment);
+            }
+        }
+        
+        return deletedList;
+    }
+    
+    
+    /** If this file exists in attachments map, move it to the deleted attachments map.
+     * Returns the updated deletedAttachments map, creating a new one if needed. If uuid supplied
+     * then tries to match on that, otherwise uses filename and isOnline. */
+    public static List moveToDelete(String filename, boolean isOnline, List attachmentsList, List deletedAttachmentsList ) {
+
+        List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
+        
+        if ( attachmentsList != null ) {
+            Iterator iter = attachmentsList.iterator();
+            McUploadedFile attachment = null;
+            while ( iter.hasNext() && attachment == null ) {
+                McUploadedFile value = (McUploadedFile) iter.next();
+                if ( filename.equals(value.getFileName()) && isOnline == value.isFileOnline()) {
+                    attachment = value;
+                }
+
+            }
+            if ( attachment != null ) {
+                deletedList.add(attachment);
+                attachmentsList.remove(attachment);
+            }
+        }
+        
+        return deletedList;
+    }
+	
 }

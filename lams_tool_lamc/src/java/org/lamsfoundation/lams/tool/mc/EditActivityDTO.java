@@ -1,4 +1,4 @@
-/***************************************************************************
+/****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -18,67 +18,52 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ***********************************************************************/
+ * ****************************************************************
+ */
+
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-
 /**
- * <p> DTO that holds candiate answers data for summary page
+ * <p> DTO that holds question and user attempts data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McCandidateAnswersDTO implements Comparable
+public class EditActivityDTO implements Comparable
 {
-    
-	private String candidateAnswer;
+    private String monitoredContentInUse;
 	
-	private String correct;
-
+	
     /**
-     * @return Returns the candidateAnswer.
+     * @return Returns the monitoredContentInUse.
      */
-    public String getCandidateAnswer() {
-        return candidateAnswer;
+    public String getMonitoredContentInUse() {
+        return monitoredContentInUse;
     }
     /**
-     * @param candidateAnswer The candidateAnswer to set.
+     * @param monitoredContentInUse The monitoredContentInUse to set.
      */
-    public void setCandidateAnswer(String candidateAnswer) {
-        this.candidateAnswer = candidateAnswer;
+    public void setMonitoredContentInUse(String monitoredContentInUse) {
+        this.monitoredContentInUse = monitoredContentInUse;
     }
-    /**
-     * @return Returns the correct.
-     */
-    public String getCorrect() {
-        return correct;
-    }
-    /**
-     * @param correct The correct to set.
-     */
-    public void setCorrect(String correct) {
-        this.correct = correct;
+	public String toString() {
+        return new ToStringBuilder(this)
+            .append("monitoredContentInUse", monitoredContentInUse)
+            .toString();
     }
 	
 	public int compareTo(Object o)
     {
-	    McCandidateAnswersDTO mcCandidateAnswersDTO = (McCandidateAnswersDTO) o;
+	    EditActivityDTO editActivityDTO = (EditActivityDTO) o;
      
-        if (mcCandidateAnswersDTO == null)
+        if (editActivityDTO == null)
         	return 1;
 		else
 			return 0;
-    }
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("candidateAnswer: ", candidateAnswer)
-            .append("correct: ", correct)
-            .toString();
     }
 	
 }

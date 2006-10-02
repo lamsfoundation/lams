@@ -43,8 +43,11 @@ public interface McAppConstants {
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	public static final String LOAD_LEARNER								="loadLearner";
-    public static final String LOAD_MONITORING_CONTENT							="loadMonitoring";
-    public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY				="loadMonitoringEditActivity";
+    public static final String LOAD_MONITORING_CONTENT					="loadMonitoring";
+    public static final String LOAD_MONITORING							="refreshMonitoring";
+    public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
+    public static final String MC_STATS_DTO								="mcStatsDTO";
+    public static final String LIST_ALL_GROUPS_DTO						="listAllGroupsDTO";
     public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
     public static final String INDIVIDUAL_REPORT						="individualReport";
     public static final String VIEW_SUMMARY								="viewSummary";
@@ -55,9 +58,44 @@ public interface McAppConstants {
     public static final String PREVIEW									="preview";
     public static final String LEARNER_PROGRESS							="learnerProgress";
     public static final String LEARNER_PROGRESS_USERID					="learnerProgressUserId";
-	
-    public static final String AUTHORING								="authoring";
+	public static final String ATTACHMENT_LIST_KEY 						= "attachmentListKey";
+	public static final String DELETED_ATTACHMENT_LIST_KEY				= "deletedAttachmentListKey";
+	public static final String ACTIVITY_TITLE_KEY						= "activityTitleKey";
+	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
+	public static final String LIST_QUESTION_CONTENT_DTO				= "listQuestionContentDTO";
+	public static final String LIST_QUESTION_CONTENT_DTO_KEY			= "listQuestionContentDTOKey";
+	public static final String DEFAULT_ONLINE_INST						="online instructions";
+	public static final String DEFAULT_OFFLINE_INST						="offline instructions";
+	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
+	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
+	public static final String MAP_QUESTION_CONTENT_KEY					= "mapQuestionContentKey";
+	public static final String DEFAULT_MC_TITLE							="MCQ Title";
+	public static final String DEFAULT_MC_INSTRUCTIONS					="MCQ Instructions";
+	public static final String LOAD_VIEW_ONLY							="loadViewOnly";
+	public static final String MC_GENERAL_AUTHORING_DTO					="mcGeneralAuthoringDTO";
+	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
+	public static final String LIST_ADD_QUESTION_CONTENT_DTO_KEY		="listAddQuestionContentDtoKey";
+	public static final String NEW_QUESTION_CONTENT_DTO					="newQuestionContentDTO";
+	public static final Integer MAX_QUESTION_COUNT						=new Integer(50);
+    public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
+    public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
+    public static final String UUID                                     ="uuid";
+    public static final String EDIT_ACTIVITY_DTO						="editActivityDTO";
+    public static final String LIST_CANDIDATE_ANSWERS_DTO				="listCandidateAnswersDTO";
+    public static final String CURRENT_EDITABLE_QUESTION_INDEX			="currentEditableQuestionIndex";
+    public static final String MC_GENERAL_MONITORING_DTO				="mcGeneralMonitoringDTO";
+    public static final String NOTEBOOK_ENTRIES_EXIST					="notebookEntriesExist";
+    public static final String NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST		="noSessionsNotebookEntriesExist";
+    public static final String MONITORING								="monitoring";
+    public static final String RESPONSE_ID								="responseId";
+    public static final String CURRENT_UID								="currentUid";
+    public static final String NEW_QUESTION_BOX_DTO						="newQuestionBoxDTO";
+    public static final String NEW_QUESTION_BOX_DTO_KEY					="newQuestionBoxDTOKey";
+    
+
+	public static final String AUTHORING								="authoring";
     public static final String SOURCE_MC_STARTER						="sourceMcStarter";
+    public static final String TARGET_MODE_AUTHORING					="Authoring";
     public static final String AUTHORING_CANCELLED						="authoringCancelled";
     public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
     public static final String ACTIVE_MODULE							="activeModule";
@@ -93,8 +131,7 @@ public interface McAppConstants {
      * refers to number of questions presented initially, we have a single record for default content
      */
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
-    public static final long MAX_QUESTION_COUNT 		=20;
-    public static final long MAX_OPTION_COUNT 			=10;
+    public static final int  MAX_OPTION_COUNT 			=25;
     public static final int  MAX_ATTEMPT_HISTORY 		=30;
     public static final String  QUESTION_AND_CANDIDATE_ANSWERS_KEY		="questionAndCandidateAnswersKey";
     

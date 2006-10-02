@@ -110,6 +110,8 @@ public interface IMcContentDAO {
      */
     public void addMcSession(Long mcContentId, McSession mcSession);
     
+    public void saveOrUpdateMc(McContent mc);
+    
     public List findAll(Class objClass);
     
     public void flush();

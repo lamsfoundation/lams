@@ -337,6 +337,8 @@ public class McGeneralLearnerFlowDTO implements Comparable
 	public String toString() {
         return new ToStringBuilder(this)
             .append("retries: ", retries)
+            .append("mapQueAttempts: ", mapQueAttempts)
+            .append("mapGeneralOptionsContent: ", mapGeneralOptionsContent)
             .append("learnerMark : ", learnerMark)
             .append("learnerMarkAtLeast: ", learnerMarkAtLeast)
             .append("totalQuestionCount: ", totalQuestionCount)

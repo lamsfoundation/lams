@@ -55,6 +55,7 @@ public class McLearnerAnswersDTO implements Comparable
     
     protected String feedbackCorrect;
     
+    protected String feedback;
     
     /**
      * @return Returns the candidateAnswers.
@@ -197,5 +198,17 @@ public class McLearnerAnswersDTO implements Comparable
      */
     public void setMark(String mark) {
         this.mark = mark;
+    }
+    /**
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+    /**
+     * @param feedback The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }

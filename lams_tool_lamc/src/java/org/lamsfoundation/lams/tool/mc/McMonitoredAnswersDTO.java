@@ -42,6 +42,12 @@ public class McMonitoredAnswersDTO implements Comparable
 	
 	private String weight;
 	
+	private String mark;
+	
+	private String sessionId;
+	
+	private String sessionName;
+	
 	private List candidateAnswers;
 	
 	private List candidateAnswersCorrect;
@@ -145,5 +151,42 @@ public class McMonitoredAnswersDTO implements Comparable
      */
     public void setCandidateAnswersCorrect(List candidateAnswersCorrect) {
         this.candidateAnswersCorrect = candidateAnswersCorrect;
+    }
+    
+    /**
+     * @return Returns the sessionId.
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+    /**
+     * @param sessionId The sessionId to set.
+     */
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+    /**
+     * @return Returns the sessionName.
+     */
+    public String getSessionName() {
+        return sessionName;
+    }
+    /**
+     * @param sessionName The sessionName to set.
+     */
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
+    }
+    /**
+     * @return Returns the mark.
+     */
+    public String getMark() {
+        return mark;
+    }
+    /**
+     * @param mark The mark to set.
+     */
+    public void setMark(String mark) {
+        this.mark = mark;
     }
 }

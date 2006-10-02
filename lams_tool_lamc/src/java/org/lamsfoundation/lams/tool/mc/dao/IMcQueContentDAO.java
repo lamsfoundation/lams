@@ -177,4 +177,8 @@ public interface IMcQueContentDAO
 	
 	public McQueContent findMcQuestionContentByUid(Long uid);
 	
+	public List getAllQuestionEntriesSorted(final long qaContentId);
+	
+	public List getMcQueContentsByContentId(long mcContentId);
+	
 }

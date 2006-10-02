@@ -86,6 +86,7 @@
 			 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
+					<property name="auditService"><ref bean="auditService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property> 		
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
 				</bean>
@@ -96,12 +97,9 @@
 					<prop key="copy*">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="save*">PROPAGATION_REQUIRED, -McApplicationException</prop>
 					<prop key="update*">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-McApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED, -MccpApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="setAsDefineLater">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="exportToolSession">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="leaveToolSession">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="persistFile">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="importToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>

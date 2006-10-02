@@ -27,9 +27,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -57,6 +56,8 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.displayOrder=:displayOrder and mcQueContent.mcContentId=:mcContentUid";
 	 	
 	 	private static final String GET_NEXT_AVAILABLE_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
+	 	
+	 	private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId order by mcQueContent.displayOrder";
 	 		 	
 	 	
 	 	public McQueContent findMcQuestionContentByUid(Long uid)
@@ -247,10 +248,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    	this.getHibernateTemplate().save(mcQueContent);
 	    }
 	    
-		public void updateMcQueContent(McQueContent mcQueContent)
-	    {
-	    	this.getHibernateTemplate().update(mcQueContent);
-	    }
 		
 		public void saveOrUpdateMcQueContent(McQueContent mcQueContent)
 	    {
@@ -263,7 +260,29 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().delete(mcq);
 	    }
+
+		public void updateMcQueContent(McQueContent mcQueContent)
+	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
+	    	this.getHibernateTemplate().update(mcQueContent);
+	    }
 		
+	 	public List getAllQuestionEntriesSorted(final long mcContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+				.setLong("mcContentId", mcContentId)
+				.list();
+
+			return list;
+	    }
+
+
+        public List getMcQueContentsByContentId(long mcContentId){
+            return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "mcContentId", new Long(mcContentId));
+        }
+
+	 	
 		
 		public void removeMcQueContent(McQueContent mcQueContent)
 	    {
