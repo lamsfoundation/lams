@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
-import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 
 public class ScribeDTO {
 

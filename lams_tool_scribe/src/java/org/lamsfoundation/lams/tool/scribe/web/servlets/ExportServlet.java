@@ -107,10 +107,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		ScribeSession scribeSession = scribeService
 				.getSessionBySessionId(toolSessionID);
 
+		// get the scribe user
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
-
-		// get the scribe user
+		
 		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(
 				user.getUserID()), toolSessionID);
 
@@ -142,7 +142,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		request.getSession().setAttribute("scribeDTO", scribeDTO);
 	}
 
-	public void doTeacherExport(HttpServletRequest request,
+	private void doTeacherExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
 			throws ScribeException {
 
