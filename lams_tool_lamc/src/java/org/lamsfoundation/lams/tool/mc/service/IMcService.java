@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -59,6 +60,10 @@ public interface IMcService
     public McContent retrieveMc(Long toolContentId) throws McApplicationException;
     
     public void createMcQue(McQueContent mcQueContent) throws McApplicationException;
+    
+    public void updateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
+    
+    public List retrieveMcQueContentsByToolContentId(long mcContentId) throws McApplicationException;
     
     public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) throws McApplicationException;
     
@@ -95,6 +100,8 @@ public interface IMcService
     public void cleanAllQuestions(final Long mcContentUid) throws McApplicationException;
     
     public List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
+    
+    public List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException;
     
     public List findMcOptionUidsByQueId(Long mcQueContentId)  throws McApplicationException;
     
@@ -230,18 +237,6 @@ public interface IMcService
 	
 	public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
 	
-	public String getFileUuid(String filename) throws McApplicationException;
-	
-	public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId) throws McApplicationException;
-	
-	public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId) throws McApplicationException;
-	
-	public List retrieveMcUploadedOfflineFilesName(Long mcContentId) throws McApplicationException;
-	
-	public List retrieveMcUploadedOnlineFilesName(Long mcContentId) throws McApplicationException;
-	
-	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws McApplicationException;
-	
 	public void cleanUploadedFilesMetaData() throws McApplicationException;
     
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
@@ -272,20 +267,6 @@ public interface IMcService
     
     public NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
     
-    public void removeOffLineFile(String filename, Long mcContentId) throws McApplicationException;
-    
-    public void removeOnLineFile(String filename, Long mcContentId) throws McApplicationException;
-    
-    public boolean isOffLineFilePersisted(String filename) throws McApplicationException;
-    
-    public boolean isOnLineFilePersisted(String filename) throws McApplicationException;
-    
-    public boolean isUuidPersisted(String uuid) throws McApplicationException;
-    
-    public List getOnlineFilesMetaData(Long mcContentId) throws McApplicationException;
-    
-    public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException;
-    
     public List getSessionsFromContent(McContent mcContent) throws McApplicationException;
     
     public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
@@ -298,7 +279,13 @@ public interface IMcService
 
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
-
+	
+	
+    public void persistFile(McContent content, McUploadedFile file) throws McApplicationException;
+    
+    public void removeFile(Long submissionId) throws McApplicationException;
+    
+    public List retrieveMcUploadedFiles(McContent mc) throws McApplicationException;
     
 }
 

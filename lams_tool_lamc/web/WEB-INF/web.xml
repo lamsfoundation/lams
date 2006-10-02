@@ -174,6 +174,7 @@
    <!ELEMENT error-page ((error-code | exception-type), location)>
    -->
 
+
   	<jsp-config>
 		<!--  ======================================================== -->	
 		<!-- Struts Tag Library Descriptors -->
@@ -189,10 +190,6 @@
 		<taglib>
 		    <taglib-uri>tags-logic</taglib-uri>
 		    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
-		</taglib>
-		<taglib>
-		    <taglib-uri>tags-logic-el</taglib-uri>
-		    <taglib-location>/WEB-INF/struts/tlds/struts-logic-el.tld</taglib-location>
 		</taglib>
 		<taglib>
 		    <taglib-uri>tags-tiles</taglib-uri>
@@ -217,30 +214,21 @@
 		    <taglib-uri>tags-xml</taglib-uri>
 		    <taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
 		  </taglib>
-		<!--  ======================================================== -->	
-		<!--  JSTL 1.2 Tag Library: Apache implementation of TLV	   -->
-		<!--  ======================================================== -->	
-		  <taglib>
-		    <taglib-uri>tags-permittedTaglibs</taglib-uri>
-		    <taglib-location>/WEB-INF/jstl/tlds/permittedTaglibs.tld</taglib-location>
-		  </taglib>
-		  <taglib>
-		    <taglib-uri>tags-scriptfree</taglib-uri>
-		    <taglib-location>/WEB-INF/jstl/tlds/scriptfree.tld</taglib-location>
-		  </taglib>
-		<!--  ======================================================== -->	
-		<!--   Customized Tag Library -->
-		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-		</taglib>
-		 <taglib>
-		   <taglib-uri>tags-lams</taglib-uri>
-		   <taglib-location>/WEB-INF/lams.tld</taglib-location>
-		</taglib>
+			<!--  ======================================================== -->	
+			<!--   Customized Tag Library -->
+			<!--  ======================================================== -->	
+			<taglib>
+			    <taglib-uri>fck-editor</taglib-uri>
+			    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
+			</taglib>
+			<taglib>
+			   <taglib-uri>tags-lams</taglib-uri>
+			   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+			</taglib>
 	</jsp-config>
-	
+
+
+
   	<!--  Security Constraint -->
 	<security-constraint>
 	   	<web-resource-collection>
@@ -350,6 +338,5 @@
 			<form-error-page>/login.jsp?failed=y</form-error-page>    		    		
    		</form-login-config>
    	</login-config>
-
 	
 </web-app>

@@ -104,6 +104,13 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
     	this.getHibernateTemplate().update(mcContent);
     }
 
+ 	public void saveOrUpdateMc(McContent mc)
+    {
+ 		this.getSession().setFlushMode(FlushMode.AUTO);
+		logger.debug("before saveOrUpdateMc: " + mc);
+		this.getHibernateTemplate().saveOrUpdate(mc);
+    }
+
    
 	public void removeMcById(Long mcContentId)
     {

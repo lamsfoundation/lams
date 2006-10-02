@@ -75,7 +75,17 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		
 		return FILENAME;
 	}
-    
+   
+	/**
+	 * learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	 * 
+	 * generates report for learner mode
+	 * 
+	 * @param request
+	 * @param response
+	 * @param directoryName
+	 * @param cookies
+	 */
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
 	    logger.debug("starting learner mode...");
@@ -116,14 +126,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             throw new McApplicationException(error);
         }
         
-        
+    
+
         McMonitoringAction mcMonitoringAction= new McMonitoringAction();
         List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionDataForExportLearner(request, content, mcService, mcSession, learner );
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    
-
-	    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
+	    
+	    	    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
 	    logger.debug("intTotalMark: " + intTotalMark);
 	    
 	    request.getSession().setAttribute(LEARNER_MARK,intTotalMark);
@@ -136,7 +147,16 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
     }
 
 	
-	
+	/**
+	 * viewAnswers(HttpServletRequest request, McContent content, McQueUsr mcQueUsr, McSession mcSession, IMcService mcService)
+	 * 
+	 * @param request
+	 * @param content
+	 * @param mcQueUsr
+	 * @param mcSession
+	 * @param mcService
+	 * @return
+	 */
 	 public String viewAnswers(HttpServletRequest request, McContent content, McQueUsr mcQueUsr, McSession mcSession, IMcService mcService)
 	 {
 			logger.debug("starting viewAnswers...");
@@ -206,7 +226,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		    			String currentMark="";
 						if (isAttemptCorrect)
 						{
-						    currentMark= mcUsrAttemptUser.getMcQueContent().getWeight().toString();
+						    currentMark= mcUsrAttemptUser.getMcQueContent().getMark().toString();
 						}
 						else
 						{
@@ -246,7 +266,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 						String currentMark="";
 						if (isAttemptCorrect)
 						{
-						    currentMark= mcUsrAttempt.getMcQueContent().getWeight().toString();
+						    currentMark= mcUsrAttempt.getMcQueContent().getMark().toString();
 						}
 						else
 						{
@@ -334,6 +354,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	}
 	 
 
+	 /**
+	  * teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	  * 
+	  * generates report for teacher mode
+	  * @param request
+	  * @param response
+	  * @param directoryName
+	  * @param cookies
+	  */
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
         logger.debug("starting teacher mode...");
@@ -375,5 +404,4 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    mcMonitoringAction.prepareReflectionData(request, content, mcService, null, true);
         logger.debug("ending teacher mode: ");
     }
-
 }

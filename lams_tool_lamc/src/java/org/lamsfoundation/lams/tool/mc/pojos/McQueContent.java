@@ -58,9 +58,9 @@ public class McQueContent implements Serializable, Comparable {
     /** nullable persistent field */
     private Integer weight;
     
-    private String feedbackCorrect;
+    private Integer mark;
     
-    private String feedbackIncorrect;
+    private String feedback;
     
     
     /** non persistent field */
@@ -101,17 +101,41 @@ public class McQueContent implements Serializable, Comparable {
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
     }
+
     
-    public McQueContent(String question, Integer displayOrder, Integer weight, String feedbackIncorrect, String feedbackCorrect, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, Integer displayOrder, Integer weight,  Integer mark, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
         this.weight = weight;
-        this.feedbackIncorrect = feedbackIncorrect;
-        this.feedbackCorrect = feedbackCorrect;
+        this.mark = mark;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
     }
+
+    
+    public McQueContent(String question, Integer displayOrder, Integer weight, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight = weight;
+        this.feedback = feedback;
+        this.mcContent=mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+
+    
+    public McQueContent(String question, Integer displayOrder, Integer weight, Integer mark, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight = weight;
+        this.mark = mark;
+        this.feedback = feedback;
+        this.mcContent=mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+
     
     
     public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
@@ -131,7 +155,17 @@ public class McQueContent implements Serializable, Comparable {
         this.mcOptionsContents = mcOptionsContents;
     }
     
-    
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer weight,Integer mark, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.mcQueContentId = mcQueContentId;
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight=weight;
+        this.mark=mark;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+
+
     
     public McQueContent(String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
@@ -166,12 +200,12 @@ public class McQueContent implements Serializable, Comparable {
     										McContent newMcContent)
     										
     {
-    	logger.debug("deep copying queContent: " + queContent.getFeedbackIncorrect());
+    	logger.debug("deep copying queContent: " + queContent);
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
 													  queContent.getWeight(),
-													  queContent.getFeedbackIncorrect(),
-													  queContent.getFeedbackCorrect(),
+													  queContent.getMark(),
+													  queContent.getFeedback(),
 													  newMcContent,
                                                       new TreeSet(),
                                                       new TreeSet());
@@ -291,31 +325,32 @@ public class McQueContent implements Serializable, Comparable {
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
-	/**
-	 * @return Returns the feedbackCorrect.
-	 */
-	public String getFeedbackCorrect() {
-		return feedbackCorrect;
-	}
-	/**
-	 * @param feedbackCorrect The feedbackCorrect to set.
-	 */
-	public void setFeedbackCorrect(String feedbackCorrect) {
-		this.feedbackCorrect = feedbackCorrect;
-	}
-	/**
-	 * @return Returns the feedbackIncorrect.
-	 */
-	public String getFeedbackIncorrect() {
-		return feedbackIncorrect;
-	}
-	/**
-	 * @param feedbackIncorrect The feedbackIncorrect to set.
-	 */
-	public void setFeedbackIncorrect(String feedbackIncorrect) {
-		this.feedbackIncorrect = feedbackIncorrect;
-	}
 	
+	
+    /**
+     * @return Returns the logger.
+     */
+    public static Logger getLogger() {
+        return logger;
+    }
+    /**
+     * @param logger The logger to set.
+     */
+    public static void setLogger(Logger logger) {
+        McQueContent.logger = logger;
+    }
+    /**
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+    /**
+     * @param feedback The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
 	public int compareTo(Object o)
     {
         McQueContent queContent = (McQueContent) o;
@@ -324,5 +359,18 @@ public class McQueContent implements Serializable, Comparable {
         	return 1;
 		else
 			return (int) (mcQueContentId.longValue() - queContent.mcQueContentId.longValue());
+    }
+	
+    /**
+     * @return Returns the mark.
+     */
+    public Integer getMark() {
+        return mark;
+    }
+    /**
+     * @param mark The mark to set.
+     */
+    public void setMark(Integer mark) {
+        this.mark = mark;
     }
 }

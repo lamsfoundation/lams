@@ -7,18 +7,13 @@ CREATE TABLE tl_lamc11_content (
      , update_date DATETIME
      , reflect TINYINT(1) NOT NULL DEFAULT 0
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
-     , username_visible TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0
-     , monitoring_report_title TEXT NOT NULL
-     , report_title TEXT NOT NULL
      , run_offline TINYINT(1) NOT NULL DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
-     , synch_in_monitor TINYINT(1) NOT NULL DEFAULT 0
      , offline_instructions TEXT
      , online_instructions TEXT
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
      , retries TINYINT(1) NOT NULL DEFAULT 0
-     , show_feedback TINYINT(1) NOT NULL DEFAULT 0
      , pass_mark INTEGER
      , show_report TINYINT(1) NOT NULL DEFAULT 0
      , reflectionSubject TEXT
@@ -28,13 +23,13 @@ CREATE TABLE tl_lamc11_content (
 
 CREATE TABLE tl_lamc11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , question VARCHAR(255)
+     , question TEXT
+     , mark INT(5) NOT NULL DEFAULT 1
      , weight INT(5) NOT NULL DEFAULT 0
      , disabled TINYINT(1) NOT NULL DEFAULT 1
-     , feedbackCorrect TEXT
-     , feedbackIncorrect TEXT
      , display_order INT(5)
      , mc_content_id BIGINT(20) NOT NULL
+     , feedback TEXT
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_que_content_1 FOREIGN KEY (mc_content_id)
@@ -106,21 +101,21 @@ CREATE TABLE tl_lamc11_usr_attempt (
 )TYPE=InnoDB;
 
 CREATE TABLE tl_lamc11_uploadedfile (
-       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+       submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
      , uuid VARCHAR(255) NOT NULL
      , mc_content_id BIGINT(20) NOT NULL
      , isOnline_File TINYINT(1) NOT NULL
      , filename VARCHAR(255) NOT NULL
-     , PRIMARY KEY (uid)
+     , PRIMARY KEY (submissionId)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
                   REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
 
-INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, content_in_use, retries, show_feedback, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ Title', 'MCQ Instructions', NOW(), 0, 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions', 0, 0, 0, 0, 50);
+INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced , created_by , run_offline , define_later,  offline_instructions, online_instructions, content_in_use, retries, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ Title', 'MCQ Instructions', NOW(), 0, 0, 1, 0, 0, 'offline instructions','online instructions', 0, 0, 0, 0);
 
-INSERT INTO tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id, feedbackIncorrect, feedbackCorrect) VALUES (1, 'A Sample question?', 100, 0, 1,1, 'Your answer is incorrect', 'Correct');
+INSERT INTO tl_lamc11_que_content  (uid,question, mark, weight, disabled, display_order,  mc_content_id) VALUES (1, 'A Sample question?', 1, 100, 0, 1,1);
 	
 INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1,'Candidate Answer 1');
 INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 1,'Candidate Answer 2');

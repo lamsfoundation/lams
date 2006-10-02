@@ -10,47 +10,36 @@
     table="tl_lamc11_uploadedfile"
 >
     <id
-        name="uid"
+        name="submissionId"
         type="java.lang.Long"
-        column="uid"
+        column="submissionId"
     >
-        <generator class="native" />
+	    <generator class="native"/>
     </id>
 
-	<property
+
+    <property
         name="uuid"
         type="java.lang.String"
+        access="property"
         column="uuid"
-        not-null="true"
         length="255"
-    >
-    </property>
-    
-   <property
-        name="fileOnline"
-        type="boolean"
-        access="property"
-        column="isOnline_File"
-   />
-   
-      <property
-        name="filename"
-        type="java.lang.String"
-        access="property"
-        column="filename"
-        length="255"
-   />
-   
-  <property
-        name="mcContentId"
-        type="java.lang.Long"
-        update="false"
-        insert="false"
-        access="property"
-        column="mc_content_id"
-        length="20"
     />
-    
+
+   <property
+            name="fileOnline"
+            type="boolean"
+            access="property"
+            column="isOnline_File"
+   />
+
+   <property
+            name="fileName"
+            type="java.lang.String"
+            access="property"
+            column="filename"
+   />
+   
    <many-to-one
         name="mcContent"
         class="org.lamsfoundation.lams.tool.mc.pojos.McContent"

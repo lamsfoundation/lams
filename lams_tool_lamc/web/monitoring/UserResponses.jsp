@@ -18,29 +18,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+
+<%@ include file="/common/taglibs.jsp"%>
+
+<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
+<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 
-<%
-	String toolContentID="9876";
-	String toolUrl="/monitoringStarter?toolContentID=" + toolContentID;
-
-%>
-
-
-<html:form action="<%=toolUrl%>" method="post">
-      <table border=1>
-      </table><br/><BR>
-      <html:submit value="Monitoring Starter"/>
-</html:form>
-
-
-
-
+mc user responses

@@ -1,9 +1,9 @@
-<%-- 
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
+  it under the terms of the GNU General Public License version 2 as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -13,25 +13,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-			
 	<table cellpadding="0">
 					<tr>
 						<td>							
@@ -56,6 +44,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:checkbox>
 		      			</td>		      			
 			        </tr>
+
+	   				<tr>
+						<td>							
+									<select name="passmark">
+										<c:forEach var="passmarkEntry" items="${mcGeneralAuthoringDTO.passMarksMap}">
+											<c:set var="SELECTED_PASS" scope="request" value=""/>
+											<c:if test="${passmarkEntry.value == mcGeneralAuthoringDTO.passMarkValue}"> 			
+														<c:set var="SELECTED_PASS" scope="request" value="SELECTED"/>
+											</c:if>						
+
+												<option value="<c:out value="${passmarkEntry.value}"/>"  <c:out value="${SELECTED_PASS}"/>> <c:out value="${passmarkEntry.value}"/>  </option>																				
+										</c:forEach>		  	
+									</select>
+									<bean:message key="radiobox.passmark" />
+		      			</td>		      			
+			        </tr>
+
+
 			        
 
    				<tr>
@@ -72,14 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	      			</td>
 		        </tr>
 		</table>
-
-
-
-
-
-
-		
 		
 		
 
-					
+		

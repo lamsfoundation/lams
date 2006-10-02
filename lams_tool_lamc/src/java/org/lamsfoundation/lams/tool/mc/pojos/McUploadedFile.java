@@ -20,12 +20,14 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $$Id$$ */	
 package org.lamsfoundation.lams.tool.mc.pojos;
 
 import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
@@ -34,19 +36,26 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
- * <p>Persistent  object/bean that defines the uploaded file for the MCQ tool.
- * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_lamc11_uploadedFile
- * </p>
  * 
  * @author Ozgur Demirtas
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
  */
+
+/**
+ * McQueContent Value Object
+ * The value object that maps to our model database table: tl_lamc11_que_content
+ * The relevant hibernate mapping resides in: McQueContent.hbm.xml
+ *
+ * Holds question content within a particular content  
+ */
+
 public class McUploadedFile implements Serializable, Comparable
 {
 	static Logger logger = Logger.getLogger(McUploadedFile.class.getName());
-	
 	/** identifier field */
-    private Long uid;
+    private Long submissionId;
     
     /** persistent field */
     private String uuid;
@@ -55,10 +64,7 @@ public class McUploadedFile implements Serializable, Comparable
     private boolean fileOnline;
     
     /** persistent field */
-    private String filename;
-    
-    
-    private Long mcContentId;
+    private String fileName;
     
     /** persistent field */
     private McContent mcContent;
@@ -66,39 +72,17 @@ public class McUploadedFile implements Serializable, Comparable
     public McUploadedFile(){};
 
     /** full constructor */
-    public McUploadedFile(Long uid,
+    public McUploadedFile(Long submissionId,
     					String uuid, 
     					boolean fileOnline, 
-    					String filename,
+    					String fileName,
 						McContent mcContent)  
     {
-    	this.uid=uid;
+    	this.submissionId=submissionId;
         this.uuid = uuid;
         this.fileOnline = fileOnline;
-        this.filename = filename;
+        this.fileName = fileName;
         this.mcContent=mcContent;
-    }
-
-    public McUploadedFile(String uuid, 
-    					boolean fileOnline, 
-    					String filename,
-						McContent mcContent)  
-    {
-        this.uuid = uuid;
-        this.fileOnline = fileOnline;
-        this.filename = filename;
-        this.mcContent=mcContent;
-    }
-    
-    public McUploadedFile(String uuid, 
-			boolean fileOnline, 
-			String filename,
-			Long mcContentId)  
-    {
-		this.uuid = uuid;
-		this.fileOnline = fileOnline;
-		this.filename = filename;
-		this.mcContentId=mcContentId;
     }
     
     
@@ -110,16 +94,16 @@ public class McUploadedFile implements Serializable, Comparable
 
     	try
 		{
-    		String fileUuid = mcUploadedFile.getUuid();
+    		String fileUuid = mcUploadedFile.getUuid(); 
     		if(toolContentHandler != null){
 	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
-	    		fileUuid = copiedNodeKey.getUuid().toString();
 	        	logger.debug("copied NodeKey: " + copiedNodeKey);
-	        	logger.debug("copied NodeKey uuid: " + fileUuid);
+	        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
+	        	fileUuid = copiedNodeKey.getUuid().toString();
     		}
         	newMcUploadedFile = new McUploadedFile(fileUuid,
-					mcUploadedFile.isFileOnline(),
-					mcUploadedFile.getFilename(),
+        			mcUploadedFile.isFileOnline(),
+        			mcUploadedFile.getFileName(),
 					newMcContent);
 
 		}
@@ -132,12 +116,54 @@ public class McUploadedFile implements Serializable, Comparable
 	}
     
     
+
+    public McUploadedFile(String uuid, 
+    					boolean fileOnline, 
+    					String fileName,
+						McContent mcContent)  
+    {
+    	logger.debug("constructor gets called.");
+        this.uuid = uuid;
+        this.fileOnline = fileOnline;
+        this.fileName = fileName;
+        this.mcContent=mcContent;
+    }
+    
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("uuid: ", getUuid())
+			.append("fileName: ", getFileName())
 			.toString();
     }
+
+    public boolean equals(Object other) {
+        if ( !(other instanceof McUploadedFile) ) return false;
+        McUploadedFile castOther = (McUploadedFile) other;
+        return new EqualsBuilder()
+            .append(this.getUuid(), castOther.getUuid())
+            .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(getUuid())
+            .toHashCode();
+    }
   
+    
+        /**
+	 * @return Returns the fileName.
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+	/**
+	 * @param fileName The fileName to set.
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 	
 	/**
 	 * @return Returns the mcContent.
@@ -151,29 +177,18 @@ public class McUploadedFile implements Serializable, Comparable
 	public void setMcContent(McContent mcContent) {
 		this.mcContent = mcContent;
 	}
+
 	/**
-	 * @return Returns the mcContentId.
-	 */
-	public Long getMcContentId() {
-		return mcContentId;
-	}
-	/**
-	 * @param mcContentId The mcContentId to set.
-	 */
-	public void setMcContentId(Long mcContentId) {
-		this.mcContentId = mcContentId;
-	}
-	/**
-	 * @return Returns the uid.
+	 * @return Returns the submissionId.
 	 */
 	public Long getSubmissionId() {
-		return uid;
+		return submissionId;
 	}
 	/**
-	 * @param uid The uid to set.
+	 * @param submissionId The submissionId to set.
 	 */
-	public void setSubmissionId(Long uid) {
-		this.uid = uid;
+	public void setSubmissionId(Long submissionId) {
+		this.submissionId = submissionId;
 	}
 	/**
 	 * @return Returns the uuid.
@@ -199,39 +214,15 @@ public class McUploadedFile implements Serializable, Comparable
 	public void setFileOnline(boolean fileOnline) {
 		this.fileOnline = fileOnline;
 	}
-	/**
-	 * @return Returns the uid.
-	 */
-	public Long getUid() {
-		return uid;
-	}
-	/**
-	 * @param uid The uid to set.
-	 */
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	/**
-	 * @return Returns the filename.
-	 */
-	public String getFilename() {
-		return filename;
-	}
-	/**
-	 * @param filename The filename to set.
-	 */
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
 	
 	public int compareTo(Object o)
     {
-		McUploadedFile optContent = (McUploadedFile) o;
+		McUploadedFile file = (McUploadedFile) o;
         //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-        if (uid == null)
+        if (submissionId == null)
         	return 1;
 		else
-			return (int) (uid.longValue() - optContent.uid.longValue());
+			return (int) (submissionId.longValue() - file.submissionId.longValue());
     }
 	public String getFileProperty() {
 		   if (isFileOnline())
@@ -248,5 +239,4 @@ public class McUploadedFile implements Serializable, Comparable
 		else
 			this.fileOnline = false;
 	}	
-
 }

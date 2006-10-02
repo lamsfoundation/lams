@@ -18,14 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
@@ -64,8 +57,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.message"/> (<c:out value="${mcGeneralLearnerFlowDTO.passMark}"/>
-						  	 <bean:message key="label.percent"/> )  </b>
+						  	 <b>  <bean:message key="label.learner.message"/> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}"/> )  </b>
+						  	 
 					  	</td>
 					  </tr>
 					</c:if>
@@ -80,8 +73,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}"> 										
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
-										  		<c:out value="${dto.question}"/> &nbsp[ <b> <bean:message key="label.weight"/> : </b>
-										  		<c:out value="${dto.weight}"/> ]
+										  		<c:out value="${dto.question}" escapeXml="false"/> &nbsp[ <b> <bean:message key="label.mark"/> </b>
+										  		<c:out value="${dto.mark}"/> ]
 									  	</td>
 									  </tr>
 									

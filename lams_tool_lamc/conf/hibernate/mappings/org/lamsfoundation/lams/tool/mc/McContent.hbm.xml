@@ -103,29 +103,6 @@
         length="1"        
    />
 
-    <property
-        name="usernameVisible"
-        type="boolean"
-        access="property"        
-        column="username_visible"
-        length="1"
-    />
-
-    <property
-        name="reportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="report_title"
-        length="65535"
-    />
-    
-    <property
-        name="monitoringReportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="monitoring_report_title"
-        length="65535"
-    />
  
     <property
         name="createdBy"
@@ -135,14 +112,6 @@
         length="20"
     />
 
-    <property
-        name="synchInMonitor"
-        type="boolean"
-        access="property"        
-        column="synch_in_monitor"
-        length="1"
-    />
-    
     <property
         name="contentInUse"
         type="boolean"
@@ -192,13 +161,6 @@
         length="1"
     />
 
-    <property
-        name="showFeedback"
-        type="boolean"
-        access="property"        
-        column="show_feedback"
-        length="1"
-    />
     
    	 <set
             name="mcQueContents"

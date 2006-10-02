@@ -68,7 +68,6 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private boolean reflect;
 
-    
     /** nullable persistent field */
     private Date creationDate;
 
@@ -79,19 +78,7 @@ public class McContent implements Serializable {
     private boolean questionsSequenced;
 
     /** nullable persistent field */
-    private boolean usernameVisible;
-
-    /** nullable persistent field */
-    private String reportTitle;
-
-    /** nullable persistent field */
-    private String monitoringReportTitle;
-
-    /** nullable persistent field */
     private long createdBy;
-
-    /** nullable persistent field */
-    private boolean synchInMonitor;
 
     /** nullable persistent field */
     private boolean contentInUse;
@@ -108,15 +95,10 @@ public class McContent implements Serializable {
     
     private boolean showReport;
     
-	
     /** nullable persistent field */
     private Integer passMark;
 
-    /** nullable persistent field */
-    private boolean showFeedback;
-    
     private String reflectionSubject;
-
     
     /** persistent field */
     private Set mcQueContents;
@@ -129,10 +111,8 @@ public class McContent implements Serializable {
 
     /** full constructor */
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
-    		Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, 
-			long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
-			Integer passMark, boolean showReport, boolean showFeedback, boolean retries, boolean reflect, 
-			String reflectionSubject, Set mcQueContents, Set mcSessions, 
+    		Date updateDate, boolean questionsSequenced,  long createdBy, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
+			Integer passMark, boolean showReport, boolean retries, boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
         
         logger.debug("copying properties");
@@ -145,13 +125,8 @@ public class McContent implements Serializable {
         this.creationDate = creationDate;
         this.updateDate = updateDate;
         this.questionsSequenced = questionsSequenced;
-        this.usernameVisible = usernameVisible;
-        this.reportTitle = reportTitle;
-        this.monitoringReportTitle = monitoringReportTitle;
         this.createdBy = createdBy;
-        this.synchInMonitor = synchInMonitor;
         this.contentInUse = contentInUse;
-        this.showFeedback = showFeedback;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
         this.retries=retries;
@@ -200,17 +175,12 @@ public class McContent implements Serializable {
 					 mc.getCreationDate(),
 			         mc.getUpdateDate(),
 					 mc.isQuestionsSequenced(),
-                     mc.isUsernameVisible(),
-                     mc.getReportTitle(),
-					 mc.getMonitoringReportTitle(),
 					 mc.getCreatedBy(),				 
-					 mc.isSynchInMonitor(),
 					 mc.isContentInUse(),
 					 mc.getOfflineInstructions(),
 					 mc.getOnlineInstructions(),
 					 mc.getPassMark(),
 					 mc.isShowReport(),
-					 mc.isShowFeedback(),
 					 mc.isRetries(),
 					 mc.isReflect(),
 					 mc.getReflectionSubject(),
@@ -239,7 +209,6 @@ public class McContent implements Serializable {
             McQueContent queContent = (McQueContent) i.next();
             if (queContent.getMcContent() != null)
             {
-            	logger.debug("deep copying queContent: " + queContent.getFeedbackIncorrect());
             	McQueContent mcQueContent=McQueContent.newInstance(queContent,
 															newMcContent);
             	newMcQueContent.add(mcQueContent);
@@ -336,44 +305,12 @@ public class McContent implements Serializable {
         this.questionsSequenced = questionsSequenced;
     }
 
-    public boolean isUsernameVisible() {
-        return this.usernameVisible;
-    }
-
-    public void setUsernameVisible(boolean usernameVisible) {
-        this.usernameVisible = usernameVisible;
-    }
-
-    public String getReportTitle() {
-        return this.reportTitle;
-    }
-
-    public void setReportTitle(String reportTitle) {
-        this.reportTitle = reportTitle;
-    }
-
-    public String getMonitoringReportTitle() {
-        return this.monitoringReportTitle;
-    }
-
-    public void setMonitoringReportTitle(String monitoringReportTitle) {
-        this.monitoringReportTitle = monitoringReportTitle;
-    }
-
     public long getCreatedBy() {
         return this.createdBy;
     }
 
     public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public boolean isSynchInMonitor() {
-        return this.synchInMonitor;
-    }
-
-    public void setSynchInMonitor(boolean synchInMonitor) {
-        this.synchInMonitor = synchInMonitor;
     }
 
     public boolean isContentInUse() {
@@ -406,14 +343,6 @@ public class McContent implements Serializable {
 
     public void setPassMark(Integer passMark) {
         this.passMark = passMark;
-    }
-
-    public boolean isShowFeedback() {
-        return this.showFeedback;
-    }
-
-    public void setShowFeedback(boolean showFeedback) {
-        this.showFeedback = showFeedback;
     }
 
         
@@ -473,6 +402,9 @@ public class McContent implements Serializable {
 	 * @return Returns the mcAttachments.
 	 */
 	public Set getMcAttachments() {
+        if(mcAttachments == null)
+            mcAttachments = new TreeSet();
+
 		return mcAttachments;
 	}
 	/**

@@ -31,12 +31,16 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  * ActionForm for the Monitoring environment
  */
 public class McMonitoringForm extends McAuthoringForm implements McAppConstants {
-	// controls which method is called by the Lookup map */
 	protected String method;
 	
 	protected String selectedToolSessionId;
 	
 	protected String isToolSessionChanged;
+	
+	private String currentUid;
+
+	private String editResponse;
+
 	
 	/**
 	 * @return Returns the isToolSessionChanged.
@@ -75,4 +79,28 @@ public class McMonitoringForm extends McAuthoringForm implements McAppConstants 
 	public void setMethod(String method) {
 		this.method = method;
 	}
+    /**
+     * @return Returns the currentUid.
+     */
+    public String getCurrentUid() {
+        return currentUid;
+    }
+    /**
+     * @param currentUid The currentUid to set.
+     */
+    public void setCurrentUid(String currentUid) {
+        this.currentUid = currentUid;
+    }
+    /**
+     * @return Returns the editResponse.
+     */
+    public String getEditResponse() {
+        return editResponse;
+    }
+    /**
+     * @param editResponse The editResponse to set.
+     */
+    public void setEditResponse(String editResponse) {
+        this.editResponse = editResponse;
+    }
 }

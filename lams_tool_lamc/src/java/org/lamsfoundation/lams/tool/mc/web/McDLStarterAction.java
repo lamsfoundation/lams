@@ -27,45 +27,32 @@
  * It reuses majority of the functionality from existing authoring module.
  * 
    <!--Define Later Starter Action: initializes the DefineLater module -->
-   <action path="/defineLaterStarter" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
-   			name="McAuthoringForm" 
-   			input=".starter"> 
-	
-		<exception
-	        key="error.exception.McApplication"
-	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />
-
-		<exception
-	        key="error.exception.McApplication"
-	        type="java.lang.NullPointerException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />	         			   			
+   <action 
+   	path="/defineLaterStarter" 
+   	type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
+   	name="McAuthoringForm" 
+	scope="request"
+   	input="/index.jsp"> 
 
 	  	<forward
 		    name="load"
-		    path=".questions"
-		    redirect="true"
+          	path="/AuthoringMaincontent.jsp"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 	        name="starter"
-	        path=".starter"
-	        redirect="true"
+	        path="/index.jsp"
+	        redirect="false"
 	     />
+	  
+        <forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
 	  	
-	  	<forward
-		    name="errorList"
-		    path=".mcErrorBox"
-		    redirect="true"
-	  	/>
-	</action>    
+	</action>  
   
 */
 /* $$Id$$ */
@@ -83,7 +70,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
@@ -93,14 +79,12 @@ public class McDLStarterAction extends Action implements McAppConstants {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
-		McUtils.cleanUpSessionAbsolute(request);
-		logger.debug("init defineLater mode. removed attributes...");
+		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		logger.debug("mcService: " + mcService);
-	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
-	    
+		mcAuthoringForm.setMcService(mcService);
+		
 	    McStarterAction mcStarterAction= new McStarterAction();
-	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
+	    return mcStarterAction.executeDefineLater(mapping, mcAuthoringForm, request, response, mcService);
 	}
 }

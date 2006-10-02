@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table class="forms">
 		  	 		
-					<c:forEach var="sessionMarksDto" items="${sessionScope.listMonitoredMarksContainerDto}">
+					<c:forEach var="sessionMarksDto" items="${listMonitoredMarksContainerDto}">
 			  	 		<c:set var="currentSessionId" scope="request" value="${sessionMarksDto.sessionId}"/>
 			  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
 
@@ -37,11 +37,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		<tr>
 							 <td NOWRAP valign=top align=left> <b> <bean:message key="label.user"/> </b> </td>  
 				  	 		<c:set var="queIndex" scope="request" value="0"/>
-							<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+							<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 							<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 								<td NOWRAP valign=top align=left> <b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
-									 &nbsp (<bean:message key="label.weight"/> 
-									<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
+									 &nbsp (<bean:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
 								</td>
 							</c:forEach>		  	
 							 
@@ -52,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	 		<c:set var="data" scope="request" value="${markData.value}"/>
 						  	 		<c:set var="currentUserSessionId" scope="request" value="${data.sessionId}"/>
 
-									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
+									<c:if test="${currentMonitoredToolSession == 'All'}"> 			
 										<c:if test="${currentUserSessionId == currentSessionId}"> 	
 											<tr>									  	 		
 							  	 				<td NOWRAP valign=top align=left> 
@@ -77,8 +76,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:forEach var="markData" items="${mapUserMarksDto}">						
 						  	 		<c:set var="data" scope="request" value="${markData.value}"/>
 						  	 		<c:set var="currentUserSessionId" scope="request" value="${data.sessionId}"/>							  	 		
-									<c:if test="${sessionScope.currentMonitoredToolSession !='All'}"> 			
-										<c:if test="${sessionScope.currentMonitoredToolSession == currentUserSessionId}"> 										
+									<c:if test="${currentMonitoredToolSession !='All'}"> 			
+										<c:if test="${currentMonitoredToolSession == currentUserSessionId}"> 										
 											<c:if test="${currentUserSessionId == currentSessionId}"> 									
 											<tr>			
 												<td NOWRAP valign=top align=left> 

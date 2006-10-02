@@ -1,3 +1,4 @@
+
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -19,135 +20,179 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
-				<table class="forms">
-					<tr> <td>
-						<jsp:include page="/McErrorBox.jsp" />
-					</td> </tr>
-				</table>
-
-				<table class="forms">
-				<tr> 
-					<td NOWRAP colspan=2 valign=top>
-						<lams:SetEditor id="richTextOnlineInstructions" text="${sessionScope.richTextOnlineInstructions}" small="true" key="label.onlineInstructions.col"/>					
-					</td> 
-				</tr>
-				
+		<table class="forms">
 
 				<tr>
-					<td colspan=2 NOWRAP align=left valign=top width="50%">
-						<table width="50%" cellspacing="8" align="CENTER" class="forms">
-									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
-											<tr>
-												<td NOWRAP valign=top>
-													 <c:out value="${file.filename}"/> 
-												</td>
-												<td NOWRAP valign=top>												
-													<c:set var="viewURL">
-														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
-													</c:set>
-													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														 	<bean:message key="label.view"/> 
-													</a>
-
-												</td>
-												<td NOWRAP valign=top>													
-													<c:set var="downloadURL">
-															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
-													</c:set>
-													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<bean:message key="label.download"/> 
-													</a>
-												</td>
-												<td NOWRAP valign=top>
-													<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> 
-												</td>
-											</tr>
-				         			</c:forEach>
-	         			</table>
-					</td> 
-				</tr>
-				
-
-				<tr> 
-					<td class="field-name">
-    	      				 <bean:message key="label.onlineFiles" /> 
-          			</td>
-          			<td NOWRAP valign=top> 
-							<html:file  property="theOnlineFile"></html:file>
-						 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');" styleClass="buttonLeft">
-								 <bean:message key="button.upload"/> 
-							</html:submit>
-					</td> 
-				</tr>
-
-				
-				<tr> 
 					<td NOWRAP colspan=2 valign=top>
-						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true" key="label.offlineInstructions.col"/>																			
-					</td> 
+						<div class="field-name" style="text-align: left;">
+							<fmt:message key="label.onlineInstructions.col"></fmt:message>
+						</div>
+						<html:textarea property="onlineInstructions" rows="3" cols="80"></html:textarea>
+					</td>
 				</tr>
+				
+				
+				<tr>
+				<td NOWRAP colspan=2 valign=top>
+				<table class="forms">
+					<tr><td align=center>
 
-				<tr> 
-					<td colspan=2 NOWRAP align=left valign=top width="50%">
-						<table width="50%" cellspacing="8" align="CENTER" class="forms">
-									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
-											<tr>
-												<td NOWRAP valign=top>
-													 <c:out value="${file.filename}"/> 
-												</td>
-												<td NOWRAP valign=top>												
-													<c:set var="viewURL">
-														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
-													</c:set>
-													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														 	<bean:message key="label.view"/> 
-													</a>
+							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
+								<tr>
+									<td>
+										<table width="70%" align="left">
 
-												</td>
-												<td NOWRAP valign=top>													
-													<c:set var="downloadURL">
-															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
-													</c:set>
-													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<bean:message key="label.download"/> 
-													</a>
-												</td>
-												<td NOWRAP valign=top>
-													<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> 
-												</td>
-				         			</c:forEach>
-	         			</table>
-					</td> 
+									<c:forEach var="attachment" items="${mcGeneralAuthoringDTO.attachmentList}">
+											<c:if test="${attachment.fileOnline == true }"> 			
+								            	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
+												<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
+						                        <bean:define id="uuid" name="attachment" property="uuid" />
+						                        
+						                        <tr>
+									            	<td> <bean:write name="attachment" property="fileName"/>  </td>
+										            <td>
+											        	<table>
+												        	<tr>
+												            	<td>
+												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
+												                   		<bean:message key="label.view" />
+												                    </a>
+																	&nbsp&nbsp
+													            	<html:link page="<%=download%>" styleClass="button">
+													                	<bean:message key="label.download" />
+													                </html:link>
+																	&nbsp&nbsp   
+													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&passmark=${mcGeneralAuthoringDTO.passMarkValue}"
+													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
+													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
+													                         	target="_self" styleClass="button">
+													                	<bean:message key="label.delete" />
+													                </html:link> 
+													            </td>
+												           	</tr>
+											            </table>
+										           	</td>
+									   	     	</tr>
+											</c:if> 											   	     	
+										</c:forEach>
+										</table>
+								 	</td>
+								</tr>
+							</table>
+
+
+
+							 	</td>
+							</tr>
+				</table>
+					</td> 				
 				</tr>
-
+				
 				
 				<tr> 
-					<td class="field-name">
-							 <bean:message key="label.offlineFiles" /> 
+					<td class="field-name"> 
+	          				<bean:message key="label.onlineFiles" />
           			</td>
-          			<td NOWRAP valign=top> 
-							<html:file  property="theOfflineFile"></html:file>
-						 	<html:submit onclick="javascript:submitMethod('submitOfflineFiles');" styleClass="buttonLeft">
-								 <bean:message key="button.upload"/> 
-							</html:submit>
+          			<td NOWRAP> 
+						<html:file  property="theOnlineFile"></html:file>
+					 	<html:submit property="submitOnlineFile" 
+                                     styleClass="linkbutton" 
+                                     onclick="submitMethod('addNewFile');">
+								<bean:message key="label.upload"/>
+						</html:submit>
 					</td> 
-
+				
 				</tr>
 
-				<html:hidden property="fileItem"/>
-				<html:hidden property="offlineFile"/>				
-				<html:hidden property="uuid"/>				
-				
+
+				<tr>
+					<td NOWRAP colspan=2 valign=top>
+						<div class="field-name" style="text-align: left;">
+							<fmt:message key="label.offlineInstructions.col"></fmt:message>
+						</div>
+						<html:textarea property="offlineInstructions" rows="3" cols="80"></html:textarea>
+					</td>
+				</tr>
+
+
+				<tr>
+					<td NOWRAP colspan=2 valign=top>
+				<table class="forms">
+					<tr><td align=center>
+							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
+								<tr>
+									<td>
+										<table width="70%" align="left">
+
+									<c:forEach var="attachment" items="${mcGeneralAuthoringDTO.attachmentList}">
+		
+											<c:if test="${attachment.fileOnline == false}"> 			
+								            	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
+												<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
+						                        <bean:define id="uuid" name="attachment" property="uuid" />
+						                        
+						                        <tr>
+									            	<td> <bean:write name="attachment" property="fileName"/>  </td>
+										            <td>
+											        	<table>
+												        	<tr>
+												            	<td>
+												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
+												                   		<bean:message key="label.view" />
+												                    </a>
+																	&nbsp&nbsp
+													            	<html:link page="<%=download%>" styleClass="button">
+													                	<bean:message key="label.download" />
+													                </html:link>
+																	&nbsp&nbsp
+													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&passmark=${mcGeneralAuthoringDTO.passMarkValue}"
+													            	paramId="uuid" paramName="attachment" paramProperty="uuid"
+													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
+													                         	target="_self" styleClass="button">
+													                	<bean:message key="label.delete" />
+													                </html:link> 
+													            </td>
+												           	</tr>
+											            </table>
+										           	</td>
+									   	     	</tr>
+										</c:if> 											   	     	
+											</c:forEach>
+										</table>
+								 	</td>
+								</tr>
+							</table>
+
+							 	</td>
+							</tr>
+				</table>
+					</td> 				
+				</tr>
+
+
+
+				<tr> 
+					<td class="field-name"> 
+          				<bean:message key="label.offlineFiles" />
+          			</td>
+          			<td NOWRAP> 
+						<html:file  property="theOfflineFile"></html:file>
+					 	<html:submit property="submitOfflineFile" 
+                                     styleClass="linkbutton" 
+                                     onclick="submitMethod('addNewFile');">
+								<bean:message key="label.upload"/>
+						</html:submit>
+					</td> 
+				</tr>          		
 			</table>	  	
+	
+
+
+	
+	
+
+
+
+

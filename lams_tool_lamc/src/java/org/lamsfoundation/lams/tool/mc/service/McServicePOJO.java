@@ -77,10 +77,12 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
@@ -115,6 +117,7 @@ public class McServicePOJO implements
 	private IMcUsrAttemptDAO		mcUsrAttemptDAO;
 	private IMcUploadedFileDAO  	mcUploadedFileDAO;
 	
+	private IAuditService auditService;
     private IUserManagementService 	userManagementService;
     private ILearnerService 		learnerService;
     private ILamsToolService 		toolService;
@@ -207,6 +210,38 @@ public class McServicePOJO implements
         }
     }
     
+    public void updateMcQueContent(McQueContent mcQueContent) throws McApplicationException
+    {
+        try
+        {
+        	mcQueContentDAO.updateMcQueContent(mcQueContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is updating mc que content: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+        
+    }
+
+    
+    public List retrieveMcQueContentsByToolContentId(long mcContentId) throws McApplicationException
+	{
+        try
+        {
+            return mcQueContentDAO.getMcQueContentsByContentId(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc que usr: "
+                                                         + e.getMessage(),
+                                                           e);
+        }
+    }
+
+    
+    
     public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) throws McApplicationException
 	{
         try
@@ -235,6 +270,22 @@ public class McServicePOJO implements
 														   e);
         }	
     }
+    
+    
+    public List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException
+	{
+ 	   try
+       {
+           return mcQueContentDAO.getAllQuestionEntriesSorted(mcContentId);
+       }
+       catch (DataAccessException e)
+       {
+           throw new McApplicationException("Exception occured when lams is getting all question entries: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+    
     
     
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException
@@ -1774,7 +1825,7 @@ public class McServicePOJO implements
 			toolContentObj.setCreatedBy(newUserUid);
 			Set<McUploadedFile> files = toolContentObj.getMcAttachments();
 			for(McUploadedFile file : files){
-				file.setMcContentId(toolContentId);
+				//file.setMcContentId(toolContentId);
 				file.setMcContent(toolContentObj);
 			}
 			mcContentDAO.saveMcContent(toolContentObj);
@@ -2204,93 +2255,6 @@ public class McServicePOJO implements
 	}
 	
 	
-	public void removeOffLineFile(String filename, Long mcContentId) throws McApplicationException
-	{
-	    try
-        {
-            mcUploadedFileDAO.removeOffLineFile(filename, mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is removing offline filename"
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-    
-    public void removeOnLineFile(String filename, Long mcContentId) throws McApplicationException
-	{
-	    try
-        {
-            mcUploadedFileDAO.removeOnLineFile(filename, mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is removing online filename"
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	public boolean isOffLineFilePersisted(String filename) throws McApplicationException
-	{
-	    try
-        {
-            return mcUploadedFileDAO.isOffLineFilePersisted(filename);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is checking if offline filename is persisted: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-    
-    public boolean isOnLineFilePersisted(String filename) throws McApplicationException
-	{
-        try
-        {
-            return mcUploadedFileDAO.isOnLineFilePersisted(filename);
-        }
-        catch (DataAccessException e)
-        {
-        	throw new McApplicationException("Exception occured when lams is checking if online filename is persisted: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public String getFileUuid(String filename) throws McApplicationException
-	{
-	    try
-        {
-            return mcUploadedFileDAO.getFileUuid(filename);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading uuid by filename: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public List getOnlineFilesMetaData(Long mcContentId) throws McApplicationException
-	{
-		return mcUploadedFileDAO.getOnlineFilesMetaData(mcContentId);
-	}
-    
-	
-    public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException
-	{
-    	return mcUploadedFileDAO.getOfflineFilesMetaData(mcContentId);
-	}
-	
-	public boolean isUuidPersisted(String uuid) throws McApplicationException
-	{
-		return mcUploadedFileDAO.isUuidPersisted(uuid);
-	}
 	
 	/**
 	 * adds a new entry to the uploaded files table
@@ -2315,91 +2279,7 @@ public class McServicePOJO implements
 	}
 	
 	
-	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws McApplicationException {
-        try
-        {
-            return mcUploadedFileDAO.retrieveMcUploadedFiles(mcContentId, fileOnline);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
 
-	public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId) throws McApplicationException {
-		try
-        {
-            return mcUploadedFileDAO.retrieveMcUploadedOfflineFilesUuid(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: offline + uuids "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId) throws McApplicationException {
-		try
-        {
-            return mcUploadedFileDAO.retrieveMcUploadedOnlineFilesUuid(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: online + uuids "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	public List retrieveMcUploadedOfflineFilesName(Long mcContentId) throws McApplicationException {
-		try
-        {
-            return mcUploadedFileDAO.retrieveMcUploadedOfflineFilesName(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: offline + fileNames "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-
-	
-	public List retrieveMcUploadedOnlineFilesName(Long mcContentId) throws McApplicationException {
-    	try
-        {
-            return mcUploadedFileDAO.retrieveMcUploadedOnlineFilesName(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: online + fileNames "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-	
-	/*
-	public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws McApplicationException {
-		try
-        {
-            return mcUploadedFileDAO.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is loading mc uploaded offline file uuid plus filename:  "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	*/
-	
-	
 	/**
 	 * @return Returns the logger.
 	 */
@@ -2427,12 +2307,12 @@ public class McServicePOJO implements
 	
 	/*
 	   !!! COMPLETE THIS !!!
-	public IQaUploadedFileDAO getQaUploadedFileDAO() {
-		return qaUploadedFileDAO;
+	public IMcUploadedFileDAO getMcUploadedFileDAO() {
+		return mcUploadedFileDAO;
 	}
 	
-	public void setQaUploadedFileDAO(IQaUploadedFileDAO qaUploadedFileDAO) {
-		this.qaUploadedFileDAO = qaUploadedFileDAO;
+	public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) {
+		this.mcUploadedFileDAO = mcUploadedFileDAO;
 	}
 	
 	*/
@@ -2637,14 +2517,9 @@ public class McServicePOJO implements
     	toolContentObj.setUpdateDate(now);
     	toolContentObj.setMcContentId(toolContentId);
     	toolContentObj.setQuestionsSequenced(false);
-    	toolContentObj.setUsernameVisible(false);
     	// I can't find a use for these.
-    	toolContentObj.setUsernameVisible(false);
-    	toolContentObj.setSynchInMonitor(false);
     	toolContentObj.setShowReport(false);
     	// not supported in 1.0.2 so set to blank. Fields are mandatory in the database 
-    	toolContentObj.setReportTitle("");
-    	toolContentObj.setMonitoringReportTitle("");
     	//toolContentObj.setEndLearningMessage("");
     	
     	
@@ -2653,7 +2528,7 @@ public class McServicePOJO implements
 	    	toolContentObj.setRetries(bool!=null?bool:false);
 
 	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_Q_FEEDBACK);
-	    	toolContentObj.setShowFeedback(bool!=null?bool:false);
+	    	//toolContentObj.setShowFeedback(bool!=null?bool:false);
 
 	    	Integer minPassMark = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_Q_MIN_PASSMARK);
 	    	toolContentObj.setPassMark(minPassMark != null ? minPassMark : new Integer(0));
@@ -2697,8 +2572,8 @@ public class McServicePOJO implements
 		McQueContent question = new McQueContent();
 		question.setDisplayOrder( WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_Q_ORDER) );
 		// only one feedback field in 1.0.2, so use it for both
-		question.setFeedbackCorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
-		question.setFeedbackIncorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
+		//question.setFeedbackCorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
+		//question.setFeedbackIncorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
 		question.setQuestion((String)questionMap.get(CONTENT_Q_QUESTION));
 		question.setWeight( weight );
 		
@@ -2741,7 +2616,45 @@ public class McServicePOJO implements
     	toolContentObj.setReflect(Boolean.TRUE);
     	toolContentObj.setReflectionSubject(description);
     }
+   
+
     
+    public List retrieveMcUploadedFiles(McContent mc) throws McApplicationException {
+        try {
+            return mcUploadedFileDAO.retrieveMcUploadedFiles(mc);
+        }
+        catch (DataAccessException e) {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: "
+                                                       + e.getMessage(),
+                                                         e);
+        }
+    }
+
+    
+    
+    /**
+     * adds a new entry to the uploaded files table
+     */
+    public void persistFile(McContent content, McUploadedFile file) throws McApplicationException {
+    	logger.debug("in persistFile: " + file);
+    	logger.debug("in persistFile, content: " + content);
+    	
+    	content.getMcAttachments().add(file);
+        file.setMcContent(content);
+        mcContentDAO.saveOrUpdateMc(content);
+        logger.debug("persisted mcUploadedFile: " + file);
+    }
+    
+    
+    /**
+     * removes an entry from the uploaded files table
+     */
+    public void removeFile(Long submissionId) throws McApplicationException {
+        mcUploadedFileDAO.removeUploadFile(submissionId);
+        logger.debug("removed mcUploadedFile: " + submissionId);
+    }
+    
+
 	public Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String entry) {
 	    logger.debug("coreNotebookService: " + coreNotebookService);
@@ -2775,4 +2688,18 @@ public class McServicePOJO implements
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
         this.coreNotebookService = coreNotebookService;
     }
+    
+    /**
+     * @return Returns the auditService.
+     */
+    public IAuditService getAuditService() {
+        return auditService;
+    }
+    /**
+     * @param auditService The auditService to set.
+     */
+    public void setAuditService(IAuditService auditService) {
+        this.auditService = auditService;
+    }
+
 }

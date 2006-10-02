@@ -28,8 +28,8 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 
 /**
  * @author Ozgur Demirtas
+ * 
  */
-
 public class McExportForm extends ActionForm {
     
     static Logger logger = Logger.getLogger(McExportForm.class.getName());

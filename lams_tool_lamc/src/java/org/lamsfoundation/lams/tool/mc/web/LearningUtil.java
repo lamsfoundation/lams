@@ -56,7 +56,13 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 public class LearningUtil implements McAppConstants {
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 	
-	
+	/**
+	 * void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm, boolean prepareViewAnswersDataMode)
+	 * 
+	 * @param request
+	 * @param mcLearningForm
+	 * @param prepareViewAnswersDataMode
+	 */
 	public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm, boolean prepareViewAnswersDataMode)
 	{
 	    logger.debug("prepareViewAnswersDataMode: " + prepareViewAnswersDataMode);
@@ -97,14 +103,6 @@ public class LearningUtil implements McAppConstants {
 	 	logger.debug("done saving form request data.");
 	}
 	
-    /**
-     * updates the Map based on learner activity
-     * selectOptionsCheckBox(HttpServletRequest request,McLearningForm mcLearningForm, String questionIndex)
-     * 
-     * @param request
-     * @param form
-     * @param questionIndex
-     */
     
     /**
      * continueOptions(HttpServletRequest request)
@@ -394,6 +392,12 @@ public class LearningUtil implements McAppConstants {
 	}
     
 
+    /**
+     * Map buildMapCorrectOptionUids(List correctOptions)
+     * 
+     * @param correctOptions
+     * @return
+     */
     public static Map buildMapCorrectOptionUids(List correctOptions)
 	{
     	Map mapCorrectOptionUids= new TreeMap(new McComparator());
@@ -413,6 +417,13 @@ public class LearningUtil implements McAppConstants {
 	}
 
     
+    /**
+     * Map compare(Map mapGeneralCorrectOptions,Map mapGeneralCheckedOptionsContent)
+     * 
+     * @param mapGeneralCorrectOptions
+     * @param mapGeneralCheckedOptionsContent
+     * @return
+     */
     public static Map compare(Map mapGeneralCorrectOptions,Map mapGeneralCheckedOptionsContent)
     {
     	logger.debug("incoming mapGeneralCorrectOptions : " + mapGeneralCorrectOptions);
@@ -451,7 +462,13 @@ public class LearningUtil implements McAppConstants {
 		return mapLeanerAssessmentResults;
     }
     
-    
+    /**
+     * boolean compareMapItems(Map mapCorrectOptions, Map mapCheckedOptions)
+     * 
+     * @param mapCorrectOptions
+     * @param mapCheckedOptions
+     * @return
+     */
     public static boolean compareMapItems(Map mapCorrectOptions, Map mapCheckedOptions)
 	{
        logger.debug("performing compareMaps");
@@ -474,6 +491,7 @@ public class LearningUtil implements McAppConstants {
 		}
        return true;
 	}
+    
     
     /**
      * compareMapsCross(Map mapCorrectOptions, Map mapCheckedOptions)
@@ -530,6 +548,15 @@ public class LearningUtil implements McAppConstants {
     	return false;
     }
 	
+    
+    /**
+     * McQueUsr getUser(HttpServletRequest request, IMcService mcService, String toolSessionId)
+     * 
+     * @param request
+     * @param mcService
+     * @param toolSessionId
+     * @return
+     */
     public static McQueUsr getUser(HttpServletRequest request, IMcService mcService, String toolSessionId)
 	{
     	logger.debug("getUser:: " + toolSessionId);
@@ -567,6 +594,20 @@ public class LearningUtil implements McAppConstants {
 		return mcQueUsr;
 	}
 
+    
+    /**
+     * createLearnerAttempt(HttpServletRequest request, McQueUsr mcQueUsr, List selectedQuestionAndCandidateAnswersDTO, 
+            int mark,  boolean passed, int highestAttemptOrder, Map mapLeanerAssessmentResults, IMcService mcService)
+            
+     * @param request
+     * @param mcQueUsr
+     * @param selectedQuestionAndCandidateAnswersDTO
+     * @param mark
+     * @param passed
+     * @param highestAttemptOrder
+     * @param mapLeanerAssessmentResults
+     * @param mcService
+     */
     public static void createLearnerAttempt(HttpServletRequest request, McQueUsr mcQueUsr, List selectedQuestionAndCandidateAnswersDTO, 
             int mark,  boolean passed, int highestAttemptOrder, Map mapLeanerAssessmentResults, IMcService mcService)
 	{
@@ -601,6 +642,24 @@ public class LearningUtil implements McAppConstants {
 	 }
 
     
+    /**
+     * 
+     * createIndividualOptions(HttpServletRequest request, Map candidateAnswers, McQueContent mcQueContent, 
+            McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect, 
+            IMcService mcService)
+     * 
+     * @param request
+     * @param candidateAnswers
+     * @param mcQueContent
+     * @param mcQueUsr
+     * @param attempTime
+     * @param timeZone
+     * @param mark
+     * @param passed
+     * @param highestAttemptOrder
+     * @param isAttemptCorrect
+     * @param mcService
+     */
     public static void createIndividualOptions(HttpServletRequest request, Map candidateAnswers, McQueContent mcQueContent, 
             McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect, 
             IMcService mcService)
@@ -637,7 +696,7 @@ public class LearningUtil implements McAppConstants {
     
     
     /**
-     * buildWeightsMap(HttpServletRequest request, Long toolContentId)
+     * Map buildWeightsMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
      * 
      * @param request
      * @param toolContentId
@@ -666,7 +725,48 @@ public class LearningUtil implements McAppConstants {
     	return mapWeights;
     }
     
+
+    /**
+     * Map buildMarksMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
+     * 
+     * @param request
+     * @param toolContentId
+     * @param mcService
+     * @return
+     */
+    public static Map buildMarksMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
+    {
+        logger.debug("starting buildMarksMap : " + toolContentId);
+    	Map mapMarks= new TreeMap(new McComparator());
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent : " + mcContent);
+		
+    	List questionsContent=mcService.refreshQuestionContent(mcContent.getUid());
+    	logger.debug("questionsContent : " + questionsContent);
+    	
+    	Iterator listIterator=questionsContent.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent : " + mcQueContent);
+    		mapMarks.put(mapIndex.toString(),mcQueContent.getMark().toString());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	logger.debug("mapMarks : " + mapMarks);
+    	return mapMarks;
+    }
+
     
+    /**
+     * 
+     * Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent, IMcService mcService)
+     * 
+     * @param request
+     * @param mcContent
+     * @param mcService
+     * @return
+     */    
     public static Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent, IMcService mcService)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
@@ -681,7 +781,7 @@ public class LearningUtil implements McAppConstants {
         		if (displayOrder != 0)
         		{
         			/* add the question to the questions Map in the displayOrder*/
-        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion() + "      of weight: " + mcQueContent.getWeight().toString() + "%");
+        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion() + " of weight: " + mcQueContent.getWeight().toString() + "%");
         		}
         		
         		/* prepare the first question's candidate answers for presentation*/ 
@@ -701,7 +801,13 @@ public class LearningUtil implements McAppConstants {
     	return mapQuestionsContent;
     }
     
-    
+
+    /**
+     * McGeneralLearnerFlowDTO buildMcGeneralLearnerFlowDTO(McContent mcContent)
+     * 
+     * @param mcContent
+     * @return
+     */
     public static McGeneralLearnerFlowDTO buildMcGeneralLearnerFlowDTO(McContent mcContent)
     {
         logger.debug("starting buildMcGeneralLearnerFlowDTO: " + mcContent);
@@ -710,7 +816,7 @@ public class LearningUtil implements McAppConstants {
         mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
         mcGeneralLearnerFlowDTO.setActivityInstructions(mcContent.getInstructions());
         mcGeneralLearnerFlowDTO.setPassMark(mcContent.getPassMark().toString());
-        mcGeneralLearnerFlowDTO.setReportTitleLearner(mcContent.getReportTitle());
+        mcGeneralLearnerFlowDTO.setReportTitleLearner("Report");
         mcGeneralLearnerFlowDTO.setLearnerProgress(new Boolean(false).toString());
         
         if (mcContent.isQuestionsSequenced()) 
@@ -726,6 +832,14 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+    /**
+     * List buildQuestionAndCandidateAnswersDTO(HttpServletRequest request, McContent mcContent, IMcService mcService)
+     * 
+     * @param request
+     * @param mcContent
+     * @param mcService
+     * @return
+     */
     public static List buildQuestionAndCandidateAnswersDTO(HttpServletRequest request, McContent mcContent, IMcService mcService)
     {
         logger.debug("starting buildQuestionAndCandidateAnswersDTO");
@@ -760,6 +874,7 @@ public class LearningUtil implements McAppConstants {
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		
     		mcLearnerAnswersDTO.setWeight(mcQueContent.getWeight().toString());
+    		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
     		mcLearnerAnswersDTO.setCandidateAnswerUids(mapCandidateAnswerUids);
     		
     		mcLearnerAnswersDTO.setCandidateAnswers(mapCandidateAnswers);
@@ -775,6 +890,12 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+    /**
+     * Map convertToStringMap(List list)
+     * 
+     * @param list
+     * @return
+     */
 	public static Map convertToStringMap(List list)
 	{
 		logger.debug("using convertToStringMap: " + list);
@@ -793,7 +914,13 @@ public class LearningUtil implements McAppConstants {
 	}
 
     
-
+	/**
+	 * int getLearnerMarkAtLeast(Integer passMark, Map mapQuestionWeights)
+	 * 
+	 * @param passMark
+	 * @param mapQuestionWeights
+	 * @return
+	 */
     public static int getLearnerMarkAtLeast(Integer passMark, Map mapQuestionWeights)
     {
     	logger.debug("doing getLearnerMarkAtLeast");
@@ -815,6 +942,41 @@ public class LearningUtil implements McAppConstants {
     }
 
 
+    /**
+     * int getMarksBasedLearnerMarkAtLeast(Integer passMark, Map mapQuestionMarks)
+     * 
+     * @param passMark
+     * @param mapQuestionMarks
+     * @return
+     */
+    public static int getMarksBasedLearnerMarkAtLeast(Integer passMark, Map mapQuestionMarks)
+    {
+    	logger.debug("doing getMarksBasedLearnerMarkAtLeast: " + mapQuestionMarks);
+    	logger.debug("passMark:" + passMark);
+        logger.debug("mapQuestionMarks:" + mapQuestionMarks);
+        
+    	if ((passMark == null) || (passMark.intValue() == 0))
+    	{
+    		logger.debug("no passMark..");
+    		return 0;
+    	}
+    	else if ((passMark != null) && (passMark.intValue() != 0))
+    	{
+    		int minimumQuestionCountToPass=calculateMarksBasedMinimumQuestionCountToPass(passMark, mapQuestionMarks);
+    		logger.debug("minimumQuestionCountToPass: " + minimumQuestionCountToPass);
+    		return minimumQuestionCountToPass;
+    	}
+    	return 0;
+    }
+
+    
+    /**
+     * int calculateMinimumQuestionCountToPass(Integer passMark, Map mapQuestionWeights)
+     * 
+     * @param passMark
+     * @param mapQuestionWeights
+     * @return
+     */
     public static int calculateMinimumQuestionCountToPass(Integer passMark, Map mapQuestionWeights)
     {
     	logger.debug("calculating minimumQuestionCountToPass: mapQuestionWeights: " + mapQuestionWeights + " passmark: " + passMark);
@@ -844,8 +1006,87 @@ public class LearningUtil implements McAppConstants {
     	logger.debug("returning minimumQuestionCount: " + minimumQuestionCount);
     	return minimumQuestionCount;
     }
+
     
+    /**
+     * int calculateMarksBasedMinimumQuestionCountToPass(Integer passMark, Map mapQuestionMarks)
+     * 
+     * @param passMark
+     * @param mapQuestionMarks
+     * @return
+     */
+    public static int calculateMarksBasedMinimumQuestionCountToPass(Integer passMark, Map mapQuestionMarks)
+    {
+    	logger.debug("calculating minimumQuestionCountToPass: mapQuestionMarks: " + mapQuestionMarks + " passmark: " + passMark);
+    	logger.debug("passMark: " + passMark);
+    	logger.debug("original mapQuestionMarks: " + mapQuestionMarks);
+    	
+    	boolean mapExcluded=false;
+    	int minimumQuestionCount=0;
+    	int totalHighestMarks=0;
+    	while (totalHighestMarks <= passMark.intValue())
+    	{
+    		logger.debug("totalHighestMarks versus passMark: " + totalHighestMarks + " versus" + passMark);
+        	int highestWeight=getHighestMark(mapQuestionMarks, mapExcluded);
+        	logger.debug("highestWeight: " + highestWeight);
+        	totalHighestMarks=totalHighestMarks + highestWeight;
+        	logger.debug("totalHighestMarks: " + totalHighestMarks);
+        	mapQuestionMarks=rebuildWeightsMapExcludeHighestWeight(mapQuestionMarks, highestWeight);
+        	mapExcluded=true;
+    		logger.debug("mapQuestionMarks: " + mapQuestionMarks);
+    		++minimumQuestionCount;
+    		if (mapQuestionMarks.size() == 0)
+    		{
+    			logger.debug("no more marks: ");
+    			break;
+    		}
+    	}
+    	logger.debug("returning minimumQuestionCount: " + minimumQuestionCount);
+    	return minimumQuestionCount;
+    }
+
+
+    /**
+     * int getHighestMark(Map mapQuestionMarks, boolean mapExcluded)
+     * 
+     * @param mapQuestionMarks
+     * @param mapExcluded
+     * @return
+     */
+    public static int getHighestMark(Map mapQuestionMarks, boolean mapExcluded)
+	{
+	    logger.debug("mapExcluded: " + mapExcluded);
+	   
+		if ((mapQuestionMarks.size() == 1) && (!mapExcluded))
+		{
+			logger.debug("using map with 1 question only");
+			/*the only alternative is 100*/
+			return 100;
+		}
+		
+	   logger.debug("continue excluding map");
+	   Iterator itMap = mapQuestionMarks.entrySet().iterator();
+ 	   int highestMark=0; 	   
+       while (itMap.hasNext()) 
+       {
+       		Map.Entry pair = (Map.Entry)itMap.next();
+       		String mark=pair.getValue().toString();
+       		int intMark=new Integer(mark).intValue();
+       		
+			if (intMark > highestMark)
+			    highestMark= intMark;
+       }
+       return highestMark;
+	}
+
     
+    /**
+     * int getHighestWeight(Map mapQuestionWeights, boolean mapExcluded)
+     * 
+     * @param mapQuestionWeights
+     * @param mapExcluded
+     * @return
+     */
 	public static int getHighestWeight(Map mapQuestionWeights, boolean mapExcluded)
 	{
 	    logger.debug("mapExcluded: " + mapExcluded);
@@ -873,6 +1114,13 @@ public class LearningUtil implements McAppConstants {
 	}
 
 	
+	/**
+	 * Map rebuildWeightsMapExcludeHighestWeight(Map mapQuestionWeights, int highestWeight)
+	 * 
+	 * @param mapQuestionWeights
+	 * @param highestWeight
+	 * @return
+	 */
 	public static Map rebuildWeightsMapExcludeHighestWeight(Map mapQuestionWeights, int highestWeight)
 	{
 		logger.debug("doing rebuildWeightsMapExcludeHighestWeight: " + mapQuestionWeights);
@@ -903,16 +1151,56 @@ public class LearningUtil implements McAppConstants {
        return mapWeightsExcludeHighestWeight; 
 	}
 
+	
+	/**
+	 * Map rebuildMarksMapExcludeHighestMark(Map mapQuestionMarks, int highestMark)
+	 * 
+	 * @param mapQuestionMarks
+	 * @param highestMark
+	 * @return
+	 */
+	public static Map rebuildMarksMapExcludeHighestMark(Map mapQuestionMarks, int highestMark)
+	{
+		logger.debug("doing rebuildMarksMapExcludeHighestMark: " + mapQuestionMarks);
+		logger.debug("using highestMark: " + highestMark);
+		
+	   Map mapMarksExcludeHighestMark= new TreeMap(new McComparator());
+	   
+	   Iterator itMap = mapQuestionMarks.entrySet().iterator();
+	   Long mapIndex=new Long(1);
+       while (itMap.hasNext()) 
+       {
+       		Map.Entry pair = (Map.Entry)itMap.next();
+       		String mark=pair.getValue().toString();
+       		int intMark=new Integer(mark).intValue();
+       		
+       		logger.debug("intMark: " + intMark);
+       		logger.debug("intMark versus highestMark:" + intMark + " versus" + highestMark);
+       		if (intMark != highestMark)
+       		{
+       		    mapMarksExcludeHighestMark.put(mapIndex.toString(),mark);
+    	   		mapIndex=new Long(mapIndex.longValue()+1);
+       		}
+       		else
+       		{
+       			logger.debug("excluding highest weight from the reconstructed map: " + intMark);
+       		}
+       }
+       logger.debug("returning mapWeightsExcludeHighestWeight: " + mapMarksExcludeHighestMark);
+       return mapMarksExcludeHighestMark; 
+	}
+	
+	
     
     /**
-     * removes Learning session attributes
+     * 
      * cleanUpLearningSession(HttpServletRequest request)
+     * removes Learning session attributes
      * 
      * @param request
      */
     public static void cleanUpLearningSession(HttpServletRequest request)
     {
-    	//request.getSession().removeAttribute(USER_ID);
     	request.getSession().removeAttribute(TOOL_CONTENT_ID);
     	request.getSession().removeAttribute(TOOL_SESSION_ID);
     	request.getSession().removeAttribute(QUESTION_LISTING_MODE);

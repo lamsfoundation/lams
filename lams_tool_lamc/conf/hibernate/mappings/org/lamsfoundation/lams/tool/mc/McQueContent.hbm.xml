@@ -26,15 +26,26 @@
     <property
         name="question"
         type="java.lang.String"
+        access="property"                
         column="question"
-        length="255"
+        length="65535"
     >
     </property>
+    
     
     <property
         name="displayOrder"
         type="java.lang.Integer"
         column="display_order"
+        length="5"
+    >
+    </property>
+
+
+    <property
+        name="mark"
+        type="java.lang.Integer"
+        column="mark"
         length="5"
     >
     </property>
@@ -47,23 +58,15 @@
     >
     </property>
 
-   <property
-        name="feedbackCorrect"
-        type="java.lang.String"
-        access="property"
-        column="feedbackCorrect"
-        length="65535"
-   />
-    
-       <property
-        name="feedbackIncorrect"
-        type="java.lang.String"
-        access="property"
-        column="feedbackIncorrect"
-        length="65535"        
-   />
-    
-    
+
+    <property
+	        name="feedback"
+	        type="java.lang.String"
+	        access="property"
+	        column="feedback"
+	        length="65535"
+	    />
+
     <property
         name="mcContentId"
         type="java.lang.Long"

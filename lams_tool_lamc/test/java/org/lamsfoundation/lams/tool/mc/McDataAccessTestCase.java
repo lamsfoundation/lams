@@ -115,18 +115,13 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 		mc.setTitle("title...");
 		mc.setInstructions("instructions...");
 		mc.setQuestionsSequenced(false);
-		mc.setUsernameVisible(false);
 		mc.setCreatedBy(0);
-		mc.setMonitoringReportTitle("Monitoring Report");
-		mc.setReportTitle("Report");
 		mc.setRunOffline(false);
 	    mc.setDefineLater(false);
-	    mc.setSynchInMonitor(false);
 	    mc.setOnlineInstructions("online instructions...");
 	    mc.setOfflineInstructions("offline instructions...");
 	    mc.setContentInUse(false);
 	    mc.setRetries(false);
-	    mc.setShowFeedback(false);
 	    mc.setMcQueContents(new HashSet());
 	    mc.setMcSessions(new HashSet());
 	    mcContentDAO.saveMcContent(mc);

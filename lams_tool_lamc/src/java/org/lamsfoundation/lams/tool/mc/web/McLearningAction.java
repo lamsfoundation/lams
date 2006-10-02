@@ -191,40 +191,22 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
-    	McUtils.cleanUpUserExceptions(request);
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
 	 	return null;
     }
 
     
+    
     /**
-     *  responds to learner activity in learner mode.
-     * 
-     * ActionForward displayMc(ActionMapping mapping,
+     *displayMc(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                       ServletException
-     * 
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-
-
-     * 
-     * ActionForward displayMc(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-     * 
-     * 
+     *
+     * responds to learner activity in learner mode.
+     *  
      * @param mapping
      * @param form
      * @param request
@@ -239,7 +221,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                       ServletException
    {
-    	McUtils.cleanUpUserExceptions(request);
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
     		 	
@@ -260,7 +241,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	 	    (!mcLearningForm.getNextQuestionSelected().equals(""))) 
 	 	{
 	 	   logger.debug("presenting next question...");
-	 	  LearningUtil.saveFormRequestData(request, mcLearningForm, false);
+	 	   LearningUtil.saveFormRequestData(request, mcLearningForm, false);
 	 	   mcLearningForm.resetParameters();
 	   	   setContentInUse(request, toolContentId, mcService);
 	 	   return getNextOptions(mapping, form, request, response);
@@ -328,6 +309,21 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
    }
 
     
+    /**
+     * ActionForward endLearning(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+            
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward endLearning(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -477,7 +473,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	
 
     
-    
+    /**
+     * Set parseLearnerInput(List learnerInput, McContent mcContent, IMcService mcService)
+     * 
+     * @param learnerInput
+     * @param mcContent
+     * @param mcService
+     * @return
+     */
     protected Set parseLearnerInput(List learnerInput, McContent mcContent, IMcService mcService)
     {
         logger.debug("learnerInput: " + learnerInput);
@@ -530,6 +533,16 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 
     
+    /**
+     * List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, 
+            IMcService mcService, McContent mcContent)
+            
+     * @param learnerInput
+     * @param mcTempDataHolderDTO
+     * @param mcService
+     * @param mcContent
+     * @return
+     */
     protected List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, 
             IMcService mcService, McContent mcContent)
     {
@@ -539,6 +552,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("learnerInput: " + learnerInput);
         int mark=0;
         int userWeight=0;
+        int userMarks=0;
         
         Set questionUids=parseLearnerInput(learnerInput, mcContent, mcService);
         logger.debug("set questionUids: " + questionUids);
@@ -561,6 +575,16 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     		mcLearnerAnswersDTO.setWeight(mcQueContent.getWeight().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
+    		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
+    		
+    		String feedback=mcQueContent.getFeedback();
+    		if (feedback == null) feedback="";
+    		logger.debug("feedback: " + feedback);
+    		
+    		feedback=McUtils.replaceNewLines(feedback);
+    		logger.debug("feedback after procesing new lines: " + feedback);
+    		
+    		mcLearnerAnswersDTO.setFeedback(feedback);
     		
     		Map caMap= new TreeMap(new McStringComparator());
     		Map caIdsMap= new TreeMap(new McStringComparator());
@@ -611,15 +635,21 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             mcLearnerAnswersDTO.setAttemptCorrect(new Boolean(compareResult).toString());
             if (compareResult)
             {
-            	mcLearnerAnswersDTO.setFeedbackCorrect(mcQueContent.getFeedbackCorrect());
+            	mcLearnerAnswersDTO.setFeedbackCorrect(mcQueContent.getFeedback());
             	++mark;
             	int weight=mcQueContent.getWeight().intValue();
             	logger.debug("weight: " +  weight);
+            	
+            	int currentMark=mcQueContent.getMark().intValue();
+            	logger.debug("currentMark: " +  currentMark);
+            	
+            	
             	userWeight=userWeight + weight;
+            	userMarks=userMarks + currentMark;;
             }
             else
             {
-                mcLearnerAnswersDTO.setFeedbackIncorrect(mcQueContent.getFeedbackIncorrect());
+                mcLearnerAnswersDTO.setFeedbackIncorrect(mcQueContent.getFeedback());
             }
         	logger.debug("assesment complete");
         	logger.debug("mark:: " + mark);
@@ -629,21 +659,27 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("final questionAndCandidateAnswersList: " + questionAndCandidateAnswersList);
         logger.debug("final mark: " + mark);
         logger.debug("final userWeight: " + userWeight);
+        logger.debug("final userMarks: " + userMarks);
+        
         
         mcTempDataHolderDTO.setLearnerMark(new Integer(mark).toString());
         mcTempDataHolderDTO.setTotalUserWeight(new Integer(userWeight).toString());
+        mcTempDataHolderDTO.setTotalUserMark(new Integer(userMarks).toString());
+        
+        logger.debug("mcTempDataHolderDTO before return : " + mcTempDataHolderDTO);
         
         return questionAndCandidateAnswersList;
     }
     
 
     /**
-     * responses to learner when they answer all the questions on a single page
      * continueOptionsCombined(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
-     * 
+     *
+     * responses to learner when they answer all the questions on a single page
+     *  
      * @param request
      * @param form
      * @param mapping
@@ -655,7 +691,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{   
-    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching continueOptionsCombined...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -770,6 +805,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		String totalUserWeight=mcTempDataHolderDTO.getTotalUserWeight();
 		logger.debug("totalUserWeight: " + totalUserWeight);
 		
+		String totalUserMark=mcTempDataHolderDTO.getTotalUserMark();
+		logger.debug("totalUserMark: " + totalUserMark);
+		
 		
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
     	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
@@ -791,11 +829,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		{
     	    mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(true).toString());
 
-    	    logger.debug("totalUserWeight versus passMark: " + totalUserWeight + " versus " + passMark);
-    	    if (new Integer(totalUserWeight).intValue()  < passMark.intValue())
+    	    logger.debug("totalUserMark versus passMark: " + totalUserMark + " versus " + passMark);
+    	    if (new Integer(totalUserMark).intValue()  < passMark.intValue())
     		{
     			logger.debug("USER FAILED");
-    			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
+    			logger.debug("totalUserMark is less than passmark: " + totalUserMark + " < " + passMark.intValue());
     			passed=false;
     		}
     		else
@@ -812,13 +850,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(false).toString());
     	}
     	
-    	/*
-    	if (!mcContent.isRetries())
-    	{
-    		logger.debug("content is not isRetries. set passed to true");
-    		passed=true;
-    	}
-    	*/
     	
         Long toolSessionUid=mcSession.getUid();
         logger.debug("toolSessionUid: " + toolSessionUid);
@@ -886,10 +917,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	LearningUtil.createLearnerAttempt(request, mcQueUsr, selectedQuestionAndCandidateAnswersDTO, new Integer(learnerMark).intValue(), passed, new Integer(highestAttemptOrder).intValue(), null, mcService);
     	logger.debug("created user attempt in the db");
     		
-        Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId(), mcService);
-        logger.debug("mapQuestionWeights:" + mapQuestionWeights);
+        //Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId(), mcService);
+        //logger.debug("mapQuestionWeights:" + mapQuestionWeights);
         
-        int learnerMarkAtLeast=LearningUtil.getLearnerMarkAtLeast(passMark,mapQuestionWeights);
+        Map mapQuestionMarks=LearningUtil.buildMarksMap(request, mcContent.getMcContentId(), mcService);
+        logger.debug("mapQuestionMarks:" + mapQuestionMarks);
+        
+        
+        int learnerMarkAtLeast=LearningUtil.getMarksBasedLearnerMarkAtLeast(passMark,mapQuestionMarks);
         logger.debug("learnerMarkAtLeast:" + learnerMarkAtLeast);
         mcGeneralLearnerFlowDTO.setLearnerMarkAtLeast (new Integer(learnerMarkAtLeast).toString());
 		
@@ -910,11 +945,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     
 
     /**
-     * takes the learner to the next set of questions
+     * 
      * continueOptionsCombined(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
+            
+       takes the learner to the next set of questions            
      * 
      * @param request
      * @param form
@@ -927,7 +964,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching getNextOptions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -1028,11 +1064,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 
     /**
-     * allows the learner to take the activity again
+     * 
      * redoQuestions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
+     * 
+     * allows the learner to take the activity again
      * 
      * @param request
      * @param form
@@ -1045,7 +1083,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching redoQuestions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -1117,6 +1154,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 
     
+    /**
+     * void prepareViewAnswersData(ActionMapping mapping,
+            McLearningForm mcLearningForm,
+            HttpServletRequest request,
+            HttpServletResponse response)
+            
+     * @param mapping
+     * @param mcLearningForm
+     * @param request
+     * @param response
+     */
     public void prepareViewAnswersData(ActionMapping mapping,
             McLearningForm mcLearningForm,
             HttpServletRequest request,
@@ -1169,11 +1217,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
     	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId), mcService);
     	logger.debug("mapQuestionsUidContent:" + mapQuestionsUidContent);
-
+    	
     	Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent, mcService);
     	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
     	mcGeneralLearnerFlowDTO.setMapGeneralOptionsContent(mapStartupGeneralOptionsContent);
     	
+
     	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId), mcService);
     	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
     	mcGeneralLearnerFlowDTO.setMapQuestionsContent(mapQuestionsContent);
@@ -1372,11 +1421,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     
 
     /**
-     * allows the learner to view their answer history
+     * 
      * viewAnswers(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
+            
+       allows the learner to view their answer history            
      * 
      * @param request
      * @param form
@@ -1399,11 +1450,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 
     /**
-     * allows the learner to view all the other learners' activity summary 
+     *  
      * viewSummary(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
+     * 
+     * allows the learner to view all the other learners' activity summary
      * 
      * @param request
      * @param form
@@ -1416,7 +1469,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewSummary...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -1494,13 +1546,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		return (mapping.findForward(RESULTS_SUMMARY));	
     }
         
+
     
+
     /**
-     * to indicate that some learners are using the content
-     * marks the content as used content
-     * setContentInUse(HttpServletRequest request)
+     * setContentInUse(HttpServletRequest request, String toolContentId, IMcService mcService)
+     * 
+     * indicates that some learners are using the content
      * 
      * @param request
+     * @param toolContentId
+     * @param mcService
      */
     protected void setContentInUse(HttpServletRequest request, String toolContentId, IMcService mcService)
     {
@@ -1525,7 +1581,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      */
     public ActionForward redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
     {
-    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("requested redoQuestions...");
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 		
@@ -1578,6 +1633,19 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		saveErrors(request,errors);	    	    
 	}
 
+    
+    /**
+     * submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
 	throws IOException, ServletException, ToolException
 	{ 
@@ -1651,6 +1719,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	}
 
     
+    /**
+     * forwardtoReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward forwardtoReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
 	throws IOException, ServletException, ToolException
 	{
@@ -1668,7 +1748,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    McContent mcContent=mcSession.getMcContent();
 	    logger.debug("using mcContent: " + mcContent);
 	    
-        
 	    McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO= new McGeneralLearnerFlowDTO();
 	    mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
 	    String reflectionSubject=mcContent.getReflectionSubject();
@@ -1682,6 +1761,5 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("fwd'ing to: " + NOTEBOOK);
         return (mapping.findForward(NOTEBOOK));
 	}
-    
 }
     
