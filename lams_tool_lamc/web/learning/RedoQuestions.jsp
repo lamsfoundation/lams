@@ -38,14 +38,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><bean:message key="activity.title" /></title>
 </head>
 
-<body class="stripes">
+<body>
+	<div id="page-learner">
 	
-	<h1>
+	<h1 class="no-tabs-below">
 		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />		
 	</h1>
 	
 	
-	
+	<div id="header-no-tabs-learner"></div>
 	
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 			<html:hidden property="toolContentID"/>						
@@ -58,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="learnerProgressUserId"/>										
 			<html:hidden property="questionListingMode"/>													
 
-			<div id="content">		
+			<div id="content-learner">		
 				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
@@ -125,9 +126,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		</html:form>	
 	
-	<div id="footer"></div>
+	<div id="footer-learner"></div>
 
 
+</div>
 </body>
 </html:html>
 

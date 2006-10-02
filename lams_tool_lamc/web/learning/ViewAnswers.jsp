@@ -38,15 +38,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><bean:message key="activity.title" /></title>
 </head>
 
-<body class="stripes">
+<body>
+	<div id="page-learner">
 	
-	<h1>
+	<h1 class="no-tabs-below">
 		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
+<div id="header-no-tabs-learner"></div>
 
 
-<div id="content">
+<div id="content-learner">
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 			<html:hidden property="toolContentID"/>						
 			<html:hidden property="toolSessionID"/>								
@@ -66,12 +68,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	</th>
 					  </tr>
 					</c:if> 								  					  
-
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<c:out value="${mcGeneralLearnerFlowDTO.reportTitleLearner}" escapeXml="false" />
-					  	</td>
-					  </tr>
 
 
 					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
@@ -96,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
 						  <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
-								  		<c:out value="${questionEntry.value}"/> 
+								  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 						  	</td>
 						  </tr>
 
@@ -107,12 +103,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  		  	 		<c:set var="queIndex" scope="request" value="0"/>
 								<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
 									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
+									
 										<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}"> 		
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
 													<td NOWRAP align=left valign=top> 
 						   								    <img src="<c:out value="${tool}"/>images/dot.jpg" align=left> &nbsp
-															<c:out value="${subEntry.value}"/> 
+															<c:out value="${subEntry.value}" escapeXml="false"/> 
 													</td> 
 												</tr>	
 											</c:forEach>
@@ -123,15 +120,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</td> 
 												</tr>
 												
+												
 												<tr>
 													<td  NOWRAP align=left valign=top> 											
 													<table align=left>
 														<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
+
 															<c:if test="${requestScope.mainQueIndex == attemptEntry.key}"> 		
  											  		  	 		<c:set var="aIndex" scope="request" value="1"/>
 																 <c:forEach var="i" begin="1" end="30" step="1">
 
 					 													<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
+
 																				<c:if test="${distinctAttemptEntry.key == i}"> 	
 																					<tr>
 																						<td NOWRAP align=left valign=top> 
@@ -143,7 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
 																									<tr>
 																										<td NOWRAP align=left valign=top>
-													 															<c:out value="${singleAttemptEntry.value}"/> 
+													 															<c:out value="${singleAttemptEntry.value}" escapeXml="false"/> 
 												 														</td>
 																									</tr>	
 																								</c:forEach>
@@ -240,8 +240,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </div>
 
-<div id="footer"></div>
+<div id="footer-learner"></div>
 
+</div>
 </body>
 </html:html>
 

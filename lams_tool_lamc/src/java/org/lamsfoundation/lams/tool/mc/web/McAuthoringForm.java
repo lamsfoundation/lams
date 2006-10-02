@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
@@ -51,6 +51,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	
 	protected FormFile receivedFile;
 	protected String offlineFile;
+	protected String defaultContentIdStr;
 	
 	protected String addContent;
 	protected String removeContent;
@@ -113,6 +114,10 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 
 	protected String edit;
 	private String contentFolderID;
+	private String editableQuestionIndex;
+	private String defineLaterInEditMode;
+	private String feedback;
+	private String candidateIndex;
 	
 	public void resetUserAction()
     {
@@ -892,4 +897,65 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setContentFolderID(String contentFolderID) {
         this.contentFolderID = contentFolderID;
     }
+    /**
+     * @return Returns the defaultContentIdStr.
+     */
+    public String getDefaultContentIdStr() {
+        return defaultContentIdStr;
+    }
+    /**
+     * @param defaultContentIdStr The defaultContentIdStr to set.
+     */
+    public void setDefaultContentIdStr(String defaultContentIdStr) {
+        this.defaultContentIdStr = defaultContentIdStr;
+    }
+    /**
+     * @return Returns the editableQuestionIndex.
+     */
+    public String getEditableQuestionIndex() {
+        return editableQuestionIndex;
+    }
+    /**
+     * @param editableQuestionIndex The editableQuestionIndex to set.
+     */
+    public void setEditableQuestionIndex(String editableQuestionIndex) {
+        this.editableQuestionIndex = editableQuestionIndex;
+    }
+    /**
+     * @return Returns the defineLaterInEditMode.
+     */
+    public String getDefineLaterInEditMode() {
+        return defineLaterInEditMode;
+    }
+    /**
+     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     */
+    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
+        this.defineLaterInEditMode = defineLaterInEditMode;
+    }
+    /**
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+    /**
+     * @param feedback The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+    /**
+     * @return Returns the candidateIndex.
+     */
+    public String getCandidateIndex() {
+        return candidateIndex;
+    }
+    /**
+     * @param candidateIndex The candidateIndex to set.
+     */
+    public void setCandidateIndex(String candidateIndex) {
+        this.candidateIndex = candidateIndex;
+    }
+
 }

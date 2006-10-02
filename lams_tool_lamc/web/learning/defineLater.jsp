@@ -13,7 +13,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
   USA
 
   http://www.gnu.org/licenses/gpl.txt
@@ -38,19 +38,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><bean:message key="activity.title" /></title>
 </head>
 
-<body class="stripes">
+<body>
+	<div id="page-learner">
 	
-	<h1>&nbsp;</h1>
+	<h1 class="no-tabs-below">&nbsp;</h1>
 	
+	<div id="header-no-tabs-learner"></div>
 	
-	
-	<div id="content">
+	<div id="content-learner">
 		<lams:DefineLater defineLaterMessageKey="error.defineLater"/>		
 	</div>
 	
-	<div id="footer"></div>
+	<div id="footer-learner"></div>
 
 
+</div>
 </body>
 </html:html>
 

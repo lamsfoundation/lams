@@ -37,15 +37,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><bean:message key="activity.title" /></title>
 </head>
 
-<body class="stripes">
+<body>
+	<div id="page-learner">
 	
-	<h1>
+	<h1 class="no-tabs-below">
 		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 	</h1>
 
+<div id="header-no-tabs-learner"></div>
 
-
-<div id="content">
+<div id="content-learner">
 
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 			<html:hidden property="toolContentID"/>						
@@ -63,12 +64,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	<th scope="col" valign=top colspan=2> 
 						  	  <bean:message key="label.assessment"/> 
 						  	</th>
-					  </tr>
-
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<c:out value="${mcGeneralLearnerFlowDTO.reportTitleLearner}" escapeXml="false" />
-					  	</td>
 					  </tr>
 
 				
@@ -120,10 +115,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	<td NOWRAP align=left valign=top colspan=2> 
 						<table align=left>
 								<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
+								
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
-										  		<c:out value="${dto.question}"/> &nbsp[ <b> <bean:message key="label.weight"/> : </b>
-										  		<c:out value="${dto.weight}"/> ]
+											<b> <bean:message key="label.question.col"/> </b>
+									  	</td>
+									  </tr>
+
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+											<c:out value="${dto.question}" escapeXml="false"/> &nbsp[ <b> <bean:message key="label.mark"/> </b>
+										  	<c:out value="${dto.mark}"/> ]
 									  	</td>
 									  </tr>
 									
@@ -138,13 +140,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
-											<b> <bean:message key="label.feedback"/> </b>																				  									  	
-											<c:if test="${dto.attemptCorrect == 'true'}"> 											  
-													 <c:out value="${dto.feedbackCorrect}" escapeXml="false"/><BR>											
-											</c:if>																
-											<c:if test="${dto.attemptCorrect != 'true'}"> 		
-													<c:out value="${dto.feedbackIncorrect}" escapeXml="false"/><BR>											
-											</c:if>																
+											<i> <c:out value="${dto.feedback}" escapeXml="false"/> </i> <BR>						
+									  	</td>
+									  </tr>
+
+									  <tr>
+									  	<td NOWRAP align=left valign=top> 
+											&nbsp&nbsp&nbsp
 									  	</td>
 									  </tr>
 									  
@@ -229,7 +231,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </div>
 
-<div id="footer"></div>
+<div id="footer-learner"></div>
 
 </div>
 </body>

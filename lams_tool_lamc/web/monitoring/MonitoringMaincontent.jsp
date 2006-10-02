@@ -1,9 +1,9 @@
-<%--
+<%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
+  it under the terms of the GNU General Public License version 2 as 
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -13,7 +13,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  USA
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
@@ -36,53 +37,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		pageContext.setAttribute("tabs", tabs);
 	%>
 
-<html:html locale="true">
-<head>
-	<title><fmt:message key="activity.title" /></title>
+	<html:html locale="true">
+	<head>
+
+	<title> <bean:message key="label.monitoring"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
+
+	<script type="text/javascript">
 	
-	 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-	<script language="JavaScript" type="text/JavaScript">
-		function submitMonitoringMethod(actionMethod) 
-		{
-			document.McMonitoringForm.method.value=actionMethod; 
-			document.McMonitoringForm.submit();
-		}
-		
-		function submitModifyQuestion(questionIndexValue, actionMethod) 
-		{
-			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitMethod(actionMethod) 
-		{
-			submitMonitoringMethod(actionMethod);
-		}
-		
-		function deleteOption(deletableOptionIndex, actionMethod) {
-			document.McMonitoringForm.deletableOptionIndex.value=deletableOptionIndex; 
-			submitMethod(actionMethod);
-		}
-		
-		
-		function submitSession(selectedToolSessionId, actionMethod) {
-			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
-			submitMonitoringMethod(actionMethod);
-		}
-		
-		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-		}
-		
-    	var imgRoot="${lams}images/";
+	   	var imgRoot="${lams}images/";
 	    var themeName="aqua";
+	
+        function init(){
         
+            initTabSize(4);
+            
+            var tag = document.getElementById("currentTab");
+	    	if(tag.value != "")
+	    		selectTab(tag.value);
+            else
+                selectTab(1); //select the default tab;
+
+        }     
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
@@ -93,92 +72,111 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         } 
         
         function doSubmit(method) {
-        	document.McMonitoringForm.method.value=method;
+        	document.McMonitoringForm.dispatch.value=method;
         	document.McMonitoringForm.submit();
         }
 
-	</script>	
-
-	<script language="JavaScript" type="text/JavaScript">
-
-		<c:if test="${sessionScope.editOptionsMode != 1 }"> 		
-		        function init(){
-		        
-		            initTabSize(4);
-		            
-		            var tag = document.getElementById("currentTab");
-			    	if(tag.value != "")
-			    		selectTab(tag.value);
-		            else
-		                selectTab(1); //select the default tab;
+		function submitMonitoringMethod(actionMethod) 
+		{
+			document.McMonitoringForm.dispatch.value=actionMethod; 
+			document.McMonitoringForm.submit();
+		}
 		
-		            //initEditor("richTextTitle");
-		            //initEditor("richTextInstructions");
-		        }     
-		</c:if> 
-
-		<c:if test="${sessionScope.editOptionsMode == 1 }"> 		
-		        function init(){
-		        
-		            initTabSize(4);
-		            
-		            var tag = document.getElementById("currentTab");
-			    	if(tag.value != "")
-			    		selectTab(tag.value);
-		            else
-		                selectTab(1); //select the default tab;
+		function submitAuthoringMethod(actionMethod) {
+			document.McAuthoringForm.dispatch.value=actionMethod; 
+			document.McAuthoringForm.submit();
+		}
 		
-		            //initEditor("richTextIncorrectFeedback");                                                
-		            //initEditor("richTextCorrectFeedback");                                                            		            
-		        }     
-		</c:if> 
+		function submitModifyQuestion(questionIndexValue, actionMethod) 
+		{
+			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
+		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) 
+		{
+			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
+		
+		function submitEditResponse(responseId, actionMethod) 
+		{
+			document.McMonitoringForm.responseId.value=responseId; 
+			submitMethod(actionMethod);
+		}
+		
+		function submitMethod(actionMethod) 
+		{
+			submitMonitoringMethod(actionMethod);
+		}
+		
+		function deleteOption(optIndex, actionMethod) {
+			document.McMonitoringForm.optIndex.value=optIndex; 
+			submitMethod(actionMethod);
+		}
+		
+		function submitSession(selectedToolSessionId, actionMethod) {
+			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
+			submitMonitoringMethod(actionMethod);
+		}
+		
+		
+		function submitModifyOption(optionIndexValue, actionMethod) 
+		{
+			document.McMonitoringForm.optIndex.value=optionIndexValue; 
+			submitMethod(actionMethod);
+		}
 
+		function submitModifyQuestion(optionIndexValue, actionMethod) 
+		{
+			document.McMonitoringForm.optIndex.value=optionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
+		function submitOpenMc(currentUid, actionMethod)
+		{
+			document.McMonitoringForm.currentUid.value=currentUid;
+	        submitMethod(actionMethod);
+		}
 	
-	</script>	
+	</script>
 	
 </head>
+<body onLoad="init();">
 
-<%-- chooses which tab to highlight --%>
 
-<body class="stripes" onLoad="init();">
-<div id="page">
-	<h1> <bean:message key="label.monitoring"/>  </h1>
-	
-		<c:set var="monitoringURL">
-			<html:rewrite page="/monitoring.do" />
-		</c:set>
+	<div id="page">
+			<h1> <bean:message key="label.monitoring"/> </h1>
 
 	<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 	</div>	
 
-
-	<div id="content">		
-	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="method"/>	 
+	<div id="content">						
+	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		<html:hidden property="dispatch"/>
+		<html:hidden property="toolContentID"/>
+		<html:hidden property="httpSessionID"/>		
 		<html:hidden property="currentTab" styleId="currentTab" />
+		<html:hidden property="contentFolderID"/>						
+		<html:hidden property="activeModule"/>
+		<html:hidden property="defineLaterInEditMode"/>
+		<html:hidden property="responseId"/>	 
+		<html:hidden property="currentUid"/>
+		<html:hidden property="selectedToolSessionId"/>							
+		<input type="hidden" name="isToolSessionChanged"/>	
 		
-		<lams:TabBody id="1" titleKey="label.summary" page="Summary.jsp"/>
-
-		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
-
-		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
-		
-		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
- 		</html:form>
-	</div>		
+			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+			<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
+			<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
+			<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+		</html:form>
+	</div>	
 
 	<div id="footer"></div>
-		<lams:HTMLEditor />
+
 	</div>
-
-
+	
 </body>
 </html:html>
-
-
-
-
-
-
-

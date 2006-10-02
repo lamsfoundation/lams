@@ -259,15 +259,6 @@
 	   	
 	   </target>
 	
-	   <target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
-	   		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />	
-			<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
-				<fileset dir="${tag.web.dir}/tags">
-					<include name="*.tag" />
-				</fileset>
-			</copy>
-	   </target>
-
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->

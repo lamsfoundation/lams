@@ -31,20 +31,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css localLinkPath="../"/>
 	</head>
 
-	<body class="stripes">
+	<body>
 	
 	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>
 		<html:hidden property="toolContentID"/>
 	
-			<h1>
+		<div id="page-learner"><!--main box 'page'-->
+	
+			<h1 class="no-tabs-below">
 			<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 				<c:if test="${(portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
 				<c:if test="${(portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
 			</c:if>
 	        </h1>
+			<div id="header-no-tabs-learner">
 		
-			<div id="content">
+			</div><!--closes header-->
+		
+			<div id="content-learner">
 		
 				<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
 						<h2> <bean:message key="error.noLearnerActivity"/> </h2>
@@ -62,7 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						
 			  	 		<c:set var="queIndex" scope="request" value="0"/>
-						<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+						<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 						<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 				  	 		<tr>
@@ -70,8 +75,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 		</tr>
 							<tr>			
 								<td NOWRAP valign=top align=left><b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
-									<c:out value="${currentDto.question}"/> &nbsp; (<bean:message key="label.weight"/> 
-									<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
+									<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp; (<bean:message key="label.mark"/> 
+									<c:out value="${currentDto.mark}"/>)
 								 </td>
 							</tr>	
 							<tr>					
@@ -80,7 +85,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 											<tr>			
 												<td NOWRAP valign=top align=left>
-													<c:out value="${answersData.candidateAnswer}"/> 
+													<c:out value="${answersData.candidateAnswer}" escapeXml="false"/> 
 													
 													<c:if test="${answersData.correct == 'true'}"> 		
 														&nbsp; (<bean:message key="label.correct"/>)
@@ -96,7 +101,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			  	 		<tr>
 			  	 			<td NOWRAP valign=top align=left> <b> 
-			  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  
+			  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/>  
 			  	 			</td>
 			  	 		</tr>
 					</table>
@@ -105,7 +110,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 <h2>    <bean:message key="label.studentMarks"/>  </h2>
 
 						<table class="forms">
-							<c:forEach var="sessionMarksDto" items="${sessionScope.listMonitoredMarksContainerDto}">
+							<c:forEach var="sessionMarksDto" items="${listMonitoredMarksContainerDto}">
 					  	 		<c:set var="currentSessionId" scope="request" value="${sessionMarksDto.sessionId}"/>
 					  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
 		
@@ -118,12 +123,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	 		<tr>
 									 <td NOWRAP valign=top align=left> <b> <bean:message key="label.user"/> </b> </td>  
 						  	 		<c:set var="queIndex" scope="request" value="0"/>
-									<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+									<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 										<td NOWRAP valign=top align=left> <b>  <bean:message key="label.question.only"/> 
 											<c:out value="${queIndex}"/></b>
-											 &nbsp (<bean:message key="label.weight"/> 
-											<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
+											 &nbsp (<bean:message key="label.mark"/> <c:out value="${currentDto.mark}"/>)
 										</td>
 									</c:forEach>		  	
 									 
@@ -169,7 +173,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${(portfolioExportMode == 'learner')}">
 						<table width="80%" cellspacing="8" align="center">
 				  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
-							<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+							<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 							<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
 					  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 					  	 		<tr>
@@ -177,8 +181,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	 		</tr>
 								<tr>			
 									<td NOWRAP valign=top align=left><b>  <bean:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
-										<c:out value="${currentDto.question}"/> &nbsp; (<bean:message key="label.weight"/> 
-										<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
+										<c:out value="${currentDto.question}"  escapeXml="false"/> &nbsp; (<bean:message key="label.mark"/> 
+										<c:out value="${currentDto.mark}"/>)
 									 </td>
 								</tr>	
 								<tr>					
@@ -187,7 +191,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 												<tr>			
 													<td NOWRAP valign=top align=left>
-														<c:out value="${answersData.candidateAnswer}"/> 
+														<c:out value="${answersData.candidateAnswer}"  escapeXml="false"/> 
 														
 														<c:if test="${answersData.correct == 'true'}"> 		
 															&nbsp; (<bean:message key="label.correct"/>)
@@ -202,9 +206,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr>
 									<td  NOWRAP align=left valign=top> 											
 									<table align=left>
-										<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
+										<c:forEach var="attemptEntry" items="${mapQueAttempts}">
 											<c:if test="${mainQueIndex == attemptEntry.key}"> 		
-									  		  	 		<c:set var="aIndex" scope="session" value="1"/>
+									  		  	 		<c:set var="aIndex" scope="request" value="1"/>
 										  		  	 		<tr>
 																<td NOWRAP align=left valign=top> 
 																			<b> <bean:message key="label.yourAnswers"/>  </b>
@@ -212,7 +216,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<td align=right valign=top>
 																	<c:forEach var="responseEntry" items="${mapResponses}">
 																			<c:if test="${mainQueIndex == responseEntry.key}"> 		
-																				(<c:out value="${responseEntry.value}"/> <bean:message key="label.percent"/>)
+																				(<c:out value="${responseEntry.value}"/>)
 																			</c:if> 																							
 																	</c:forEach>
 																</td>
@@ -222,13 +226,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							 								<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
 																<c:if test="${distinctAttemptEntry.key == i}"> 	
 																	<tr>
-																		<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
+																		<c:set var="aIndex" scope="request" value="${aIndex +1}"/>
 				 														<td align=left valign=top colspan=2> 																					
 					 														<table align=left>
 							 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
 																					<tr>
 																						<td NOWRAP align=left valign=top>
-									 															<c:out value="${singleAttemptEntry.value}"/> 
+									 															<c:out value="${singleAttemptEntry.value}"  escapeXml="false"/> 
 								 														</td>
 																					</tr>	
 																				</c:forEach>
@@ -250,21 +254,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				  	 		<tr>
 				  	 			<td NOWRAP valign=top align=left> <b> 
-				  	 				<bean:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  
+				  	 				<bean:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
 				  	 			</td>
 				  	 		</tr>
 		
 		
 				  	 		<tr>
 				  	 			<td NOWRAP valign=top align=left> <b> 
-				  	 				<bean:message key="label.studentMark"/>: </b> <c:out value="${learnerMark}"/> <bean:message key="label.percent"/>  
+				  	 				<bean:message key="label.studentMark"/>: </b> <c:out value="${learnerMark}"/> 
 				  	 			</td>
 				  	 		</tr>
 						</table>					
 				</c:if>								 
 				
 				
-				<table width="100%" cellspacing="8">
+				<table  class="forms">
 				
 						<tr>			
 							<td valign=top align=left>
@@ -317,8 +321,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>  <!--closes content-->
 		
 		
-			<div id="content">
+			<div id="footer-learner">
 			</div><!--closes footer-->
+		
+		</div><!--closes page-->
 		
 		</html:form>	
 
