@@ -895,10 +895,11 @@ public class AuthoringAction extends Action {
 		for(ResourceItemInstruction in : instructionList){
 			instructions.add(in.getDescription());
 		}
+		//FOR requirment from LDEV-754
 		//add extra blank line for instructions
-		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
-			instructions.add("");
-		}
+//		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
+//			instructions.add("");
+//		}
 		if(item.getFileUuid() != null){
 			form.setFileUuid(item.getFileUuid());
 			form.setFileVersionId(item.getFileVersionId());
