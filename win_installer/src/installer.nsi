@@ -34,8 +34,8 @@
 
 # constants
 !define VERSION "2.0 RC1"
-!define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss and lamsconf where lams was built
-!define SOURCE_LAMS_CONF "C:\lamsconf"
+!define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
+!define SOURCE_LAMS_CONF "C:\lamsconf"  ; location of lamsconf where lamsconf was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
 # installer variables
@@ -56,7 +56,10 @@ InstallDirRegKey HKLM "${REG_HEAD}" ""
 !define MUI_ABORTWARNING
 
 # set welcome page
-!define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Installer"
+!define MUI_WELCOMEPAGE_TITLE "Installing LAMS ${VERSION}"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n \
+    Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x.\r\n\r\n \
+    Click Next to continue."
 
 # set components page type
 ;!define MUI_COMPONENTSPAGE_NODESC
@@ -647,6 +650,8 @@ FunctionEnd
 
 Function SetupStartMenu
 	CreateDirectory "$SMPROGRAMS\LAMSv2"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\Access LAMS.lnk" "http://$LAMS_DOMAIN:$LAMS_PORT/lams/"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\LAMS Community.lnk" "http://www.lamscommunity.org"
 	CreateShortCut "$SMPROGRAMS\LAMSv2\Start LAMS.lnk" "$INSTDIR\lams-start.exe"
 	CreateShortCut "$SMPROGRAMS\LAMSv2\Stop LAMS.lnk" "$INSTDIR\lams-stop.exe"
 	CreateShortCut "$SMPROGRAMS\LAMSv2\Uninstall LAMS.lnk" "$INSTDIR\lams-uninstall.exe"
@@ -655,6 +660,7 @@ FunctionEnd
 
 # cleanup functions
 Function RemoveTempFiles
+    Delete "$TEMP\LocalPortScanner.class"
     Delete "$TEMP\lams.xml"
     Delete "$TEMP\mysql-ds.xml"
     Delete "$TEMP\server.xml"
@@ -814,12 +820,21 @@ Section "Uninstall"
     nsExec::ExecToStack 'sc delete LAMSv2'
     Pop $0
     Pop $1
-    ${StrStr} $2 $1 "SUCCESS"
+    /*${StrStr} $2 $1 "SUCCESS"
     ${If} $2 == ""
         MessageBox MB_OK|MB_ICONSTOP "Couldn't remove LAMSv2 service.$\r$\n$\r$\n$1"
         DetailPrint "Failed to remove LAMSv2 service."
     ${Else}
         DetailPrint "Removed LAMSv2 service."
-    ${EndIf}
+    ${EndIf}*/
+    StrCmp $1 "[SC] Delete Service SUCCESS" 0 +3
+    DetailPrint "Removed LAMSv2 service."
+    Goto +3
+    MessageBox MB_OK|MB_ICONSTOP "Couldn't remove LAMSv2 service.$\r$\n$\r$\n$1"
+    DetailPrint "Failed to remove LAMSv2 service."
+    
     DeleteRegKey HKLM "${REG_HEAD}"
+    DetailPrint "Removed registry entries."
+    RMDir /r "$SMPROGRAMS\LAMSv2"
+    DetailPrint "Removed start menu entries."
 SectionEnd
