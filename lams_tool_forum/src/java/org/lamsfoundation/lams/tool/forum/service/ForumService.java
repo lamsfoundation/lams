@@ -671,7 +671,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		Forum toolContentObj = forumDao.getByContentId(toolContentId);
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			toolContentObj = getDefaultForum();
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find default content for the forum tool");
  		
  		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
  		toolContentObj = Forum.newInstance(toolContentObj,toolContentId,null);

@@ -1632,8 +1632,13 @@ public class VoteServicePOJO implements
 
 	public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
 		VoteContent toolContentObj = voteContentDAO.findVoteContentById(toolContentID);
- 		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentID);
+ 		if(toolContentObj == null) {
+ 			long defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
+ 			toolContentObj = voteContentDAO.findVoteContentById(defaultContentId);
+ 		}
+ 		
+		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find default content for the voting tool");
  		
 		try {
 			//set ToolContentHandler as null to avoid copy file node in repository again.

@@ -262,8 +262,11 @@ public class SubmitFilesService implements ToolContentManager,
  	public void exportToolContent(Long toolContentId , String toPath) throws ToolException, DataMissingException{
  		exportContentService.registerFileClassForExport(InstructionFiles.class.getName(),"uuID","versionID");
  		SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
- 		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		if(toolContentObj == null) {
+ 			toolContentObj = getDefaultSubmit();
+ 		}
+ 	 	if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find default content for the submit files tool");
  		
  		//set toolContentHandler as null to avoid duplicate file node in repository.
  		toolContentObj = SubmitFilesContent.newInstance(toolContentObj,toolContentId,null);

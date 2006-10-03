@@ -290,8 +290,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 			throws DataMissingException, ToolException {
 		Chat chat = chatDAO.getByContentId(toolContentId);
 		if (chat == null)
-			throw new DataMissingException(
-					"Unable to find tool content by given id :" + toolContentId);
+			chat = getDefaultContent();
+		if (chat ==null )
+ 			throw new DataMissingException("Unable to find default content for the chat tool");
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.

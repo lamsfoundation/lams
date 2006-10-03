@@ -224,9 +224,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	public void exportToolContent(Long toolContentId, String rootPath)
 			throws DataMissingException, ToolException {
 		Notebook notebook = notebookDAO.getByContentId(toolContentId);
+		if (notebook == null) {
+			notebook = getDefaultContent();
+		}
 		if (notebook == null)
-			throw new DataMissingException(
-					"Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find default content for the notebook tool");
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.

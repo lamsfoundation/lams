@@ -917,8 +917,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		NoticeboardContent toolContentObj = nbContentDAO.findNbContentById(toolContentId);
+ 		if(toolContentObj == null) {
+		    Long defaultContentId = getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
+		    toolContentObj = retrieveNoticeboard(defaultContentId);
+ 		}
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find default content for the noticeboard tool");
  		
 		try {
 			//set ResourceToolContentHandler as null to avoid copy file node in repository again.

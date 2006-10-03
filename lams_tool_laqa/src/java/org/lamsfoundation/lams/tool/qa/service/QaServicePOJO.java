@@ -1423,8 +1423,12 @@ public class QaServicePOJO
 
 	public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
 		QaContent toolContentObj = qaDAO.getQaById(toolContentID);
+ 		if(toolContentObj == null) {
+ 			long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+ 			toolContentObj = retrieveQa(defaultToolContentId);
+ 		}
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentID);
+ 			throw new DataMissingException("Unable to find default content for the question and answer tool");
  		
 		try {
 			//set ToolContentHandler as null to avoid copy file node in repository again.
@@ -2102,7 +2106,7 @@ public class QaServicePOJO
     	toolContentObj.setContent(null);
     	toolContentObj.setReportTitle(null);
     	toolContentObj.setMonitoringReportTitle(null);
-    	toolContentObj.setSynchInMonitor(true); // don't know what this does but the default content has false
+    	toolContentObj.setSynchInMonitor(false); // doesn't appear to be used in LAMS 2.0
     	
     	Boolean bool;
 		try {

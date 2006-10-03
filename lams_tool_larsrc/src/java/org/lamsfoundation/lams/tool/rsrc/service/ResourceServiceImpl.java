@@ -817,8 +817,15 @@ public class ResourceServiceImpl implements
 	
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		Resource toolContentObj = resourceDao.getByContentId(toolContentId);
+ 		if(toolContentObj == null) {
+ 			try {
+				toolContentObj = getDefaultResource();
+			} catch (ResourceApplicationException e) {
+				throw new DataMissingException(e.getMessage());
+			}
+ 		}
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find default content for the share resources tool");
  		
  		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
  		toolContentObj = Resource.newInstance(toolContentObj,toolContentId,null);
