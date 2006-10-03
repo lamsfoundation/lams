@@ -24,7 +24,7 @@
 
 /*
  * TODO: uninstaller option to keep database/lams.xml/repository
- *
+ * TODO: jsmath option to install as compressed war
  *
  */
 
@@ -38,7 +38,7 @@
 !define SOURCE_LAMS_CONF "C:\lamsconf"  ; location of lamsconf where lamsconf was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
-# installer variables
+# installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
 !define MUI_UNICON "..\graphics\lams2.ico"
 Name "LAMS ${VERSION}"
@@ -46,6 +46,7 @@ Name "LAMS ${VERSION}"
 OutFile "..\build\LAMS-${VERSION}.exe"
 InstallDir "C:\lams"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
+LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
 
 # set installer header image
 ;!define MUI_HEADERIMAGE
@@ -56,7 +57,7 @@ InstallDirRegKey HKLM "${REG_HEAD}" ""
 !define MUI_ABORTWARNING
 
 # set welcome page
-!define MUI_WELCOMEPAGE_TITLE "Installing LAMS ${VERSION}"
+!define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n \
     Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x.\r\n\r\n \
     Click Next to continue."
@@ -90,6 +91,7 @@ UninstPage custom un.PreUninstall un.PostUninstall
 
 # supported translations
   !insertmacro MUI_LANGUAGE "English" # first language is the default language
+/*
   !insertmacro MUI_LANGUAGE "French"
   !insertmacro MUI_LANGUAGE "German"
   !insertmacro MUI_LANGUAGE "Spanish"
@@ -108,7 +110,7 @@ UninstPage custom un.PreUninstall un.PostUninstall
   !insertmacro MUI_LANGUAGE "Bulgarian"  
   !insertmacro MUI_LANGUAGE "Thai"
   !insertmacro MUI_LANGUAGE "Arabic"
-/*
+
   !insertmacro MUI_LANGUAGE "TradChinese"
   !insertmacro MUI_LANGUAGE "Japanese"
   !insertmacro MUI_LANGUAGE "Swedish"
@@ -282,7 +284,7 @@ FunctionEnd
 
 Function .onInit
     # select language
-    !insertmacro MUI_LANGDLL_DISPLAY
+    ;!insertmacro MUI_LANGDLL_DISPLAY
     
     # extract custom page display config
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams.ini"
@@ -294,7 +296,6 @@ FunctionEnd
 Function CheckJava
     # check for JDK
     ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.5" "JavaHome"
-    ;MessageBox MB_OK|MB_ICONSTOP "$JDK_DIR"
     ${If} $JDK_DIR == ""
         MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 installation.  Please ensure you have JDK 1.5 installed."
     ${EndIf}
@@ -343,7 +344,7 @@ Function PostMySQLConfig
         ${EndIf}
     ${EndIf}
     
-    # check mysql is running
+    # check root password, server status
     StrLen $0 $MYSQL_ROOT_PASS
     ${If} $0 == 0
         nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin ping -u root'
@@ -352,8 +353,15 @@ Function PostMySQLConfig
     ${EndIf}
     Pop $0
     Pop $1
-    ${StrStr} $0 $1 "mysqld is alive"
-    ${If} $0 == ""
+    # check root password is correct
+    ${StrStr} $2 $1 "Access denied"
+    ${If} $2 != ""
+        MessageBox MB_OK|MB_ICONSTOP "The MySQL root password appears to be incorrect - please re-enter your password."
+        Abort
+    ${EndIf}
+    # check mysql is running
+    ${StrStr} $2 $1 "mysqld is alive"
+    ${If} $2 == ""
         MessageBox MB_OK|MB_ICONSTOP "MySQL does not appear to be running - please make sure it is running before continuing."
         Abort
     ${EndIf}
@@ -408,7 +416,7 @@ Function PostWildfireConfig
     Pop $0
     Pop $1
     ${If} $0 == 0
-        MessageBox MB_OK|MB_ICONSTOP "Wildfire does not appear to be running - LAMS will be OK, but chat rooms will be unavailable."
+        MessageBox MB_OK|MB_ICONINFORMATION "Wildfire does not appear to be running - LAMS will be OK, but chat rooms will be unavailable."
     ${EndIf}
 FunctionEnd
 
@@ -418,7 +426,6 @@ Function DeployConfig
     SetOutPath $INSTDIR
     File /r "..\apache-ant-1.6.5"
     SetOutPath $TEMP
-    ;File "..\build\Switch.class"
     File "build.xml"
     File "..\templates\lams.xml"
     File "..\templates\mysql-ds.xml"
@@ -433,27 +440,18 @@ Function DeployConfig
         goto error
         
     # convert '\' to '/' for Ant's benefit
-    ;nsExec::ExecToStack 'java -cp "$TEMP" Switch "$TEMP"'
-    ;Pop $1 ; return code, 0=success
-    ;Pop $2 ; output
     Push $TEMP
     Push "\"
     Call StrSlash
     Pop $2
     FileWrite $0 "TEMP=$2$\r$\n"
     
-    ;nsExec::ExecToStack 'java -cp "$TEMP" Switch "$LAMS_CONF"'
-    ;Pop $1 ; return code, 0=success
-    ;Pop $2 ; output
     Push $LAMS_CONF
     Push "\"
     Call StrSlash
     Pop $2
     FileWrite $0 "LAMS_CONF=$2$\r$\n"
         
-    ;nsExec::ExecToStack 'java -cp "$TEMP" Switch "$INSTDIR"'
-    ;Pop $1 ; return code, 0=success
-    ;Pop $2 ; output
     Push $INSTDIR
     Push "\"
     Call StrSlash
@@ -474,9 +472,6 @@ Function DeployConfig
     Pop $2
     FileWrite $0 "JDK_DIR_UNIX_SLASH=$2$\r$\n"
     
-    ;nsExec::ExecToStack 'java -cp "$TEMP" Switch "$LAMS_REPOSITORY"'
-    ;Pop $1 ; return code, 0=success
-    ;Pop $2 ; output
     Push $LAMS_REPOSITORY
     Push "\"
     Call StrSlash
@@ -613,19 +608,23 @@ Function ImportDatabase
     goto done
     
     error:
+        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root'
+        DetailPrint $0
+        ${If} $9 != 0
+            StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root -p$MYSQL_ROOT_PASS'
+        ${EndIf}
+        nsExec::ExecToStack $0
+        Pop $1
+        Pop $2
+        ${If} $1 != 1
+            DetailPrint "Undid create database action."
+        ${Else}
+            DetailPrint "Could not remove database '$DB_NAME'."
+        ${EndIf}
         MessageBox MB_OK|MB_ICONSTOP "Database setup failed.  Please check your MySQL configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
         Abort "Database setup failed."
     done:
     
-FunctionEnd
-
-
-Function DeployLAMSConfigAlt
-    # failed attempt to not use Ant
-    ;File "..\build\Filter.class"
-    ;File "lams.xml.template"
-    ;nsExec::ExecToStack 'java -cp "$TEMP" Filter lams.xml.template @URL@ "$LAMS_DOMAIN"'
-    ;nsExec::Exec 'copy "$TEMP\lams.xml.tmp" "$LAMS_CONF\lams.xml"'
 FunctionEnd
 
 
@@ -686,23 +685,24 @@ FunctionEnd
 
 # installer sections
 #
-SectionGroup /e "Install LAMS ${VERSION}"
+SectionGroup /e "!Install LAMS"
     Section "JBoss 4.0.2" jboss
         SectionIn RO
+        SetOutPath $INSTDIR
+        File /a /r /x all /x minimal /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
     SectionEnd
 
     Section "LAMS ${VERSION}" lams
         SectionIn RO
         
         SetOutPath $INSTDIR
-        File /a /r /x all /x minimal /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
         
         Call DeployConfig
         Call ImportDatabase
         
-        CreateDirectory $INSTDIR\temp
-        CreateDirectory $INSTDIR\dump
-        CreateDirectory $LAMS_REPOSITORY
+        CreateDirectory "$INSTDIR\temp"
+        CreateDirectory "$INSTDIR\dump"
+        CreateDirectory "$LAMS_REPOSITORY"
         
         SetOutPath $LAMS_CONF
         File /a ${SOURCE_LAMS_CONF}\*.dtd
@@ -740,7 +740,7 @@ SectionGroup /e "Install LAMS ${VERSION}"
             DetailPrint "LAMSv2 successfully setup as a service. ($0)"
         ${Else}
             DetailPrint "LAMSv2 was not setup as a service. ($0)"
-            MessageBox MB_OK|MB_ICONSTOP "LAMSv2 was not installed as a service.  However you may start LAMS by double-clicking $INSTDIR\jboss-4.0.2\bin\run.bat."
+            MessageBox MB_OK|MB_ICONEXCLAMATION "LAMSv2 was not installed as a service.  However you may start LAMS by double-clicking $INSTDIR\jboss-4.0.2\bin\run.bat."
         ${EndIf}            
     SectionEnd
 SectionGroupEnd
@@ -748,7 +748,7 @@ SectionGroupEnd
 SectionGroup /e "Optional"
     Section /o "jsMath" jsmath
         SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy"
-        File /a /r "${SOURCE_JBOSS_HOME}\server\default\deploy\jsMath.war"
+        ;File /a /r "${SOURCE_JBOSS_HOME}\server\default\deploy\jsMath.war"
     SectionEnd
 SectionGroupEnd
 
@@ -775,6 +775,36 @@ Var UNINSTALL_DB
 Function un.onInit
     !insertmacro MUI_LANGDLL_DISPLAY
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "uninstall.ini"
+    
+    # check if LAMS is stopped
+    SetOutPath $TEMP
+    File "..\build\LocalPortScanner.class"
+    ReadRegStr $0 HKLM "${REG_HEAD}" "lams_port"
+    ReadRegStr $1 HKLM "${REG_HEAD}" "dir_jdk"
+    Goto checklams
+    
+    checklams:
+        nsExec::ExecToStack "$1\bin\java LocalPortScanner $0"
+        Pop $2
+        ${If} $2 == 2
+            MessageBox MB_YESNO|MB_ICONQUESTION "LAMS appears to be running.  Do you wish to stop LAMS?" \
+                IDYES stoplams \
+                IDNO quit
+        ${EndIf}
+        Goto continue
+    stoplams:
+        nsExec::ExecToStack 'sc stop LAMSv2'
+        Pop $0
+        Pop $1
+        DetailPrint "Sent stop command to LAMS service."
+        Goto checklams
+    quit:
+        Delete "$TEMP\LocalPortScanner.class"
+        MessageBox MB_OK|MB_ICONSTOP "Uninstall cannot continue while LAMS is running."
+        Abort
+    
+    continue:
+        Delete "$TEMP\LocalPortScanner.class"
 FunctionEnd
 
 Function un.PreUninstall
@@ -782,17 +812,79 @@ Function un.PreUninstall
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "uninstall.ini"
 FunctionEnd
 
-
 Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
 FunctionEnd
 
+# http://nsis.sourceforge.net/StrStr
+#
+!define un.StrStr "!insertmacro un.StrStr"
+ 
+!macro un.StrStr ResultVar String SubString
+  Push `${String}`
+  Push `${SubString}`
+  Call un.StrStr
+  Pop `${ResultVar}`
+!macroend
+
+Function un.StrStr
+/*After this point:
+  ------------------------------------------
+  $R0 = SubString (input)
+  $R1 = String (input)
+  $R2 = SubStringLen (temp)
+  $R3 = StrLen (temp)
+  $R4 = StartCharPos (temp)
+  $R5 = TempStr (temp)*/
+ 
+  ;Get input from user
+  Exch $R0
+  Exch
+  Exch $R1
+  Push $R2
+  Push $R3
+  Push $R4
+  Push $R5
+ 
+  ;Get "String" and "SubString" length
+  StrLen $R2 $R0
+  StrLen $R3 $R1
+  ;Start "StartCharPos" counter
+  StrCpy $R4 0
+ 
+  ;Loop until "SubString" is found or "String" reaches its end
+  ${Do}
+    ;Remove everything before and after the searched part ("TempStr")
+    StrCpy $R5 $R1 $R2 $R4
+ 
+    ;Compare "TempStr" with "SubString"
+    ${IfThen} $R5 == $R0 ${|} ${ExitDo} ${|}
+    ;If not "SubString", this could be "String"'s end
+    ${IfThen} $R4 >= $R3 ${|} ${ExitDo} ${|}
+    ;If not, continue the loop
+    IntOp $R4 $R4 + 1
+  ${Loop}
+ 
+/*After this point:
+  ------------------------------------------
+  $R0 = ResultVar (output)*/
+ 
+  ;Remove part before "SubString" on "String" (if there has one)
+  StrCpy $R0 $R1 `` $R4
+ 
+  ;Return output to user
+  Pop $R5
+  Pop $R4
+  Pop $R3
+  Pop $R2
+  Pop $R1
+  Exch $R0
+FunctionEnd
+
 
 Section "Uninstall"
-    # need to check lams is stopped
     RMDir /r $INSTDIR
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
-    DetailPrint "Removing $0..."
     RMDir /r $0
     
     ${If} $UNINSTALL_DB == 1
@@ -820,21 +912,23 @@ Section "Uninstall"
     nsExec::ExecToStack 'sc delete LAMSv2'
     Pop $0
     Pop $1
-    /*${StrStr} $2 $1 "SUCCESS"
+    ; can't call StrStr from within uninstaller unless it's a un. function
+    ${un.StrStr} $2 $1 "SUCCESS"
     ${If} $2 == ""
         MessageBox MB_OK|MB_ICONSTOP "Couldn't remove LAMSv2 service.$\r$\n$\r$\n$1"
         DetailPrint "Failed to remove LAMSv2 service."
     ${Else}
         DetailPrint "Removed LAMSv2 service."
-    ${EndIf}*/
-    StrCmp $1 "[SC] Delete Service SUCCESS" 0 +3
+    ${EndIf}
+    /*StrCmp $1 "[SC] Delete Service SUCCESS$\r$\n" 0 +3
     DetailPrint "Removed LAMSv2 service."
     Goto +3
     MessageBox MB_OK|MB_ICONSTOP "Couldn't remove LAMSv2 service.$\r$\n$\r$\n$1"
-    DetailPrint "Failed to remove LAMSv2 service."
+    DetailPrint "Failed to remove LAMSv2 service."*/
     
     DeleteRegKey HKLM "${REG_HEAD}"
     DetailPrint "Removed registry entries."
     RMDir /r "$SMPROGRAMS\LAMSv2"
     DetailPrint "Removed start menu entries."
+    DetailPrint "Uninstall complete."
 SectionEnd
