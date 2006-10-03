@@ -31,8 +31,6 @@
 /**
  * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.
  * 
- * CONTENT_LOCKED ->CONTENT_IN_USE 
- * 
  * McStarterAction loads the default content and initializes the presentation Map
  * Requests can come either from authoring envuironment or from the monitoring environment for Edit Activity screen
  * 
@@ -234,9 +232,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		mcGeneralAuthoringDTO.setRequestedModule(requestedModule);
 
 	
-		/* in development this needs to be called only once.  */ 
-		/* McUtils.configureContentRepository(request); */
-		
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		
@@ -336,9 +331,6 @@ public class McStarterAction extends Action implements McAppConstants {
     		{
         		McUtils.cleanUpSessionAbsolute(request);
     			logger.debug("student activity occurred on this content:" + mcContent);
-	    		//persistError(request, "error.content.inUse");
-	    		//logger.debug("add error.content.inUse to ActionMessages.");
-				//return (mapping.findForward(ERROR_LIST));
     		}
         	mcContent=retrieveContent(request, mapping, mcAuthoringForm, mapQuestionContent, 
                     new Long(strToolContentID).longValue(),false, mcService, mcGeneralAuthoringDTO, sessionMap);
@@ -375,34 +367,43 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		sessionMap.put(MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
 		
+		
+		
+		AuthoringUtil authoringUtil =new AuthoringUtil();
+		List listAddableQuestionContentDTO=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
+		logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
+		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
+		
 		logger.debug("persisting sessionMap into session: " + sessionMap);
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		
-		AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map marksMap=authoringUtil.buildMarksMap();
 	    logger.debug("marksMap: " + marksMap);
 	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
 	    mcGeneralAuthoringDTO.setMarkValue("1");
 	    
 
-	    Map passMarksMap=authoringUtil.buildPassMarkMap();
+	    List listQuestionContentDTOLocal=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
+	    logger.debug("listQuestionContentDTOLocal: " + listQuestionContentDTOLocal);
+
+	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTOLocal, true);
 	    logger.debug("passMarksMap: " + passMarksMap);
 	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-
-	    String passMark=" ";
 	    
-	    //if (mcContent.getPassMark() != null)
-	    //    passMark=mcContent.getPassMark().toString();
+        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTOLocal);
+        logger.debug("totalMark: " + totalMark);
+        mcAuthoringForm.setTotalMarks(totalMark);
+        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	    
+	    String passMark=" ";
 	    
 	    if ((mcContent.getPassMark() != null) && (mcContent.getPassMark().intValue() != 0))
 	        passMark=mcContent.getPassMark().toString();
 	    
 	        
 	    mcGeneralAuthoringDTO.setPassMarkValue (passMark);
-
-	    
-	    
 	    
 	    Map correctMap=authoringUtil.buildCorrectMap();
 	    logger.debug("correctMap: " + correctMap);

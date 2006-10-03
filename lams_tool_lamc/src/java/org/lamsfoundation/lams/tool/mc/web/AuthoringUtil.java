@@ -190,6 +190,29 @@ public class AuthoringUtil implements McAppConstants {
 	}
     
     
+    protected static List removeBlankEntries(List list)
+    {
+        List newList= new LinkedList();
+        
+		Iterator listIterator=list.iterator();
+    	while (listIterator.hasNext())
+    	{
+    	    McCandidateAnswersDTO mcCandidateAnswersDTO=(McCandidateAnswersDTO)listIterator.next();
+    		logger.debug("mcCandidateAnswersDTO: " +  mcCandidateAnswersDTO);
+    		
+    		if (mcCandidateAnswersDTO != null)
+    		{
+    		    String ca=mcCandidateAnswersDTO.getCandidateAnswer();
+    		    logger.debug("ca: " + ca);
+    		    
+    		    if ((ca != null) && (ca.length() > 0))
+    		        newList.add(mcCandidateAnswersDTO);
+    		}
+    	}
+
+    	return newList;
+    }
+    
 
     /**
      * 
@@ -547,6 +570,14 @@ public class AuthoringUtil implements McAppConstants {
         McQuestionContentDTO replacedNode=extractNodeAtDisplayOrder(listQuestionContentDTO, replacedNodeIndex);
         logger.debug("replacedNode:" + replacedNode);
 
+        if ((mainNode == null) || (replacedNode == null))
+        {
+            logger.debug("mainNode/replacedNode is null");
+            return listQuestionContentDTO;
+        }
+
+        
+        
         List listFinalQuestionContentDTO=new LinkedList();
         
         listFinalQuestionContentDTO=reorderSwappedListQuestionContentDTO(listQuestionContentDTO, intOriginalQuestionIndex,
@@ -677,6 +708,14 @@ public class AuthoringUtil implements McAppConstants {
 
         McCandidateAnswersDTO replacedNode=extractCandidateAtOrder(listCandidates, replacedNodeIndex);
         logger.debug("replacedNode:" + replacedNode);
+        
+        if ((mainNode == null) || (replacedNode == null))
+        {
+            logger.debug("mainNode/replacedNode is null");
+            return listCandidates;
+        }
+        
+        
 
         List listFinalCandidateDTO=new LinkedList();
         
@@ -817,6 +856,35 @@ public class AuthoringUtil implements McAppConstants {
         return null;
     }
     
+    protected static String getTotalMark(List listQuestionContentDTO)
+    {
+        logger.debug("starting getTotalMark:" + listQuestionContentDTO);
+        
+        Map mapMarks = extractMapMarks(listQuestionContentDTO);
+        
+        int intTotalMark=0;
+    	Iterator itMap = mapMarks.entrySet().iterator();
+    	while (itMap.hasNext()) 
+    	{
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            String mark= (String)pairs.getValue();
+            logger.debug("mark: " +  mark);
+            
+            if (mark != null)
+            {
+                int intMark= new Integer(mark).intValue();
+                intTotalMark+=intMark;
+                logger.debug("current intTotalMark: " +  intTotalMark);
+            }
+		}
+    	logger.debug("final  intTotalMark: " +  intTotalMark);
+    	
+    	String strFinalTotalMark= new Integer(intTotalMark).toString();
+    	logger.debug("final strFinalTotalMark: " +  strFinalTotalMark);
+    	return strFinalTotalMark;
+    }
     
     
     /**
@@ -1678,7 +1746,55 @@ public class AuthoringUtil implements McAppConstants {
 	    }
         return mcContent;
     }
+
     
+    
+    protected Map buildDynamicPassMarkMap(List listQuestionContentDTO, boolean initialScreen)
+    {
+        logger.debug("starting buildDynamicPassMarkMap: " + listQuestionContentDTO);
+        logger.debug("initialScreen: " + initialScreen);
+        
+    	Map map= new TreeMap(new McComparator());
+    	
+        //if (initialScreen)
+        //   return map;
+        
+        
+        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
+        logger.debug("totalMark: " + totalMark);
+        
+        int intTotalMark=0;
+        if ((totalMark != null) && (totalMark.length() > 0))
+            intTotalMark= new Integer(totalMark).intValue();
+        
+        logger.debug("intTotalMark: " + intTotalMark);
+            
+        
+        Map passMarksMap=buildPassMarkMap(intTotalMark, false);
+        logger.debug("passMarksMap: " + passMarksMap);
+        return  passMarksMap;
+    }
+    
+    
+    protected Map buildPassMarkMap(int intTotalMark, boolean initialScreen)
+    {
+        logger.debug("building buildMarksMap: " + intTotalMark);
+        logger.debug("initialScreen: " + initialScreen);
+        
+    	Map map= new TreeMap(new McComparator());
+    	
+        if (initialScreen)
+            return map;
+        
+    	for (int i=1; i <= intTotalMark ; i++)
+		{
+    	    map.put(new Integer(i).toString(), new Integer(i).toString());
+		}
+    	logger.debug("return passmarks Map: " + map);
+    	return map;
+    }
+
+
     
     /**
      * Map buildMarksMap()
@@ -1702,6 +1818,7 @@ public class AuthoringUtil implements McAppConstants {
      * 
      * @return
      */
+    /*
     protected Map buildPassMarkMap()
     {
     	Map map= new TreeMap(new McComparator());
@@ -1715,6 +1832,7 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("return passmarks Map: " + map);
     	return map;
     }
+    */
 
     /**
      * Map buildCorrectMap()
@@ -1753,7 +1871,8 @@ public class AuthoringUtil implements McAppConstants {
             logger.debug("correct: " + correct);
 
             
-            if ((candidate != null) && (candidate.length() > 0))
+            //if ((candidate != null) && (candidate.length() > 0))
+            if (candidate != null)            
             {
                 McCandidateAnswersDTO mcCandidateAnswersDTO= new McCandidateAnswersDTO();
                 mcCandidateAnswersDTO.setCandidateAnswer(candidate);

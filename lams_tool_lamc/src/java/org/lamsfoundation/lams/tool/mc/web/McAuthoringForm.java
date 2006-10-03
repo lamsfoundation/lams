@@ -111,6 +111,8 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	protected String instructionsMonitoring;
 	protected String editActivityMonitoring;
 	protected String statsMonitoring;
+	
+	protected String clickedObj;
 
 	protected String edit;
 	private String contentFolderID;
@@ -118,6 +120,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	private String defineLaterInEditMode;
 	private String feedback;
 	private String candidateIndex;
+	private String totalMarks;
 	
 	public void resetUserAction()
     {
@@ -958,4 +961,28 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
         this.candidateIndex = candidateIndex;
     }
 
+    /**
+     * @return Returns the totalMarks.
+     */
+    public String getTotalMarks() {
+        return totalMarks;
+    }
+    /**
+     * @param totalMarks The totalMarks to set.
+     */
+    public void setTotalMarks(String totalMarks) {
+        this.totalMarks = totalMarks;
+    }
+    /**
+     * @return Returns the clickedObj.
+     */
+    public String getClickedObj() {
+        return clickedObj;
+    }
+    /**
+     * @param clickedObj The clickedObj to set.
+     */
+    public void setClickedObj(String clickedObj) {
+        this.clickedObj = clickedObj;
+    }
 }

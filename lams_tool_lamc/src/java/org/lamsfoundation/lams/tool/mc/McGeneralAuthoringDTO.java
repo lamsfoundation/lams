@@ -86,12 +86,15 @@ public class McGeneralAuthoringDTO implements Comparable
     protected String passMarkValue;
     protected Map passMarksMap;
     
+    protected String totalMarks;
 
 	public String toString() {
         return new ToStringBuilder(this)
             .append("toolContentID: ", toolContentID)
             .append("contentFolderID: ", contentFolderID)
             .append("httpSessionID: ", httpSessionID)
+            .append("passMarksMap: ", passMarksMap)
+            .append("totalMarks: ", totalMarks)
             .append("marksMap: ", marksMap)
             .append("currentTab: ", currentTab)            
             .append("markValue: ", markValue)
@@ -608,5 +611,17 @@ public class McGeneralAuthoringDTO implements Comparable
      */
     public void setPassMarksMap(Map passMarksMap) {
         this.passMarksMap = passMarksMap;
+    }
+    /**
+     * @return Returns the totalMarks.
+     */
+    public String getTotalMarks() {
+        return totalMarks;
+    }
+    /**
+     * @param totalMarks The totalMarks to set.
+     */
+    public void setTotalMarks(String totalMarks) {
+        this.totalMarks = totalMarks;
     }
 }

@@ -21,13 +21,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 
 	<table cellpadding="0">
-					<tr>
-						<td>							
-							<html:checkbox property="sln"  value="1" styleClass="noBorder">
-								<bean:message key="radiobox.sln" />
-							</html:checkbox>
-		      			</td>		      			
-			         </tr>
 			         
 					<tr>
 						<td>							
@@ -39,12 +32,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			         
 	   				<tr>
 						<td>							
-							<html:checkbox property="retries" value="1" styleClass="noBorder">
+							<html:checkbox property="retries" value="1"  onclick="javascript:updatePass(this);" styleClass="noBorder">
 								<bean:message key="radiobox.retries" />
 							</html:checkbox>
 		      			</td>		      			
 			        </tr>
-
+			        
+			        
 	   				<tr>
 						<td>							
 									<select name="passmark">
@@ -58,6 +52,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:forEach>		  	
 									</select>
 									<bean:message key="radiobox.passmark" />
+									
+									 <a href="javascript:submitMethod('updateMarksList')" class="button">
+								    	<bean:message key="label.update.list"/>
+								     </a>
+									
+									
+									
 		      			</td>		      			
 			        </tr>
 

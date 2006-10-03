@@ -29,13 +29,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<script language="JavaScript" type="text/JavaScript">
 
 			function submitMethod() {
-				document.McAuthoringForm.submit();
+				document.McMonitoringForm.submit();
 			}
 			
 			function submitMethod(actionMethod) {
-				document.McAuthoringForm.dispatch.value=actionMethod; 
-				document.McAuthoringForm.submit();
+				document.McMonitoringForm.dispatch.value=actionMethod; 
+				document.McMonitoringForm.submit();
 			}
+			
+
+			function submitModifyAddedCandidate(candidateIndexValue, actionMethod) 
+			{
+				document.McMonitoringForm.candidateIndex.value=candidateIndexValue; 
+				submitMethod(actionMethod);
+			}
+
+			function removeAddedCandidate(candidateIndexValue) 
+			{
+				document.McMonitoringForm.candidateIndex.value=candidateIndexValue; 
+				submitMethod("removeAddedCandidate");
+			}
+			
+			
 			
 		</script>		
 	</head>
@@ -69,6 +84,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 					</td>
 				</tr>
+				
+				
+				<tr>
+					<td>
+						<%@ include file="/monitoring/candidateAnswersAddList.jsp"%>					
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<html:submit onclick="javascript:submitMethod('newAddedCandidateBox');" style="float:right;width:150px"  styleClass="button-add-item">
+			            	<bean:message key="label.add.candidates" />
+						</html:submit>	 				 		  											
+					</td>
+				</tr>
+				
+
 				
 				<tr>
 					<td>

@@ -88,6 +88,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="contentFolderID"/>														
 			<html:hidden property="editableQuestionIndex"/>														
 			<html:hidden property="editQuestionBoxRequest" value="true"/>																	
+			<html:hidden property="totalMarks"/>														
 
 		
 			<tr>

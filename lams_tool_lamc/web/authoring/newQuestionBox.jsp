@@ -37,20 +37,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				document.McAuthoringForm.submit();
 			}
 			
-			function submitModifyAuthoringCandidate(questionIndexValue, candidateIndexValue, actionMethod) 
+
+			function submitModifyAddedAuthoringCandidate(candidateIndexValue, actionMethod) 
 			{
 				document.McAuthoringForm.candidateIndex.value=candidateIndexValue; 
-				document.McAuthoringForm.questionIndex.value=questionIndexValue; 
 				submitMethod(actionMethod);
 			}
 
-			function removeCandidate(questionIndexValue, candidateIndexValue) 
+			function removeAddedCandidate(candidateIndexValue) 
 			{
 				document.McAuthoringForm.candidateIndex.value=candidateIndexValue; 
-				document.McAuthoringForm.questionIndex.value=questionIndexValue; 
-				submitMethod("removeCandidate");
+				submitMethod("removeAddedCandidate");
 			}
-			
 			
 		</script>		
 	</head>
@@ -69,6 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="defineLaterInEditMode"/>										
 			<html:hidden property="contentFolderID"/>														
 			<html:hidden property="editQuestionBoxRequest" value="false"/>																				
+			<html:hidden property="totalMarks"/>														
 			
 			<tr>
 			<td>
@@ -84,6 +83,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor> 
 					</td>
 				</tr>
+
+
+				<tr>
+					<td>
+						<%@ include file="/authoring/candidateAnswersAddList.jsp"%>					
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<html:submit onclick="javascript:submitMethod('newAddedCandidateBox');" style="float:right;width:150px"  styleClass="button-add-item">
+			            	<bean:message key="label.add.candidates" />
+						</html:submit>	 				 		  											
+					</td>
+				</tr>
+
 
 
 				<tr>

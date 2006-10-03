@@ -28,11 +28,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <table id="itemTable" style="align:left;width:650px" >
     <c:set var="queIndex" scope="request" value="0"/>
     
+	<tr>
+		<td width="10%" align="right" class="field-name">
+			&nbsp
+		</td>
+
+		<td width="55%" align="left">
+			&nbsp
+		</td>		
+
+		<td width="5%" align="center">
+	 		<c:if test="${totalQuestionCount > 0}"> 				
+		 		<b> <fmt:message key="label.question.marks" /> </b>
+			</c:if> 			
+		</td>
+		
+		<td width="10%" align="right">
+		 		&nbsp
+		</td>
+		
+
+		<td width="10%" align="right">
+			&nbsp
+		</td>
+
+		<td width="10%" align="right">
+			&nbsp		
+		</td>
+	</tr>
     
     <c:forEach items="${listQuestionContentDTO}" var="currentDTO" varStatus="status">
 	<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 	<c:set var="question" scope="request" value="${currentDTO.question}"/>
 	<c:set var="feedback" scope="request" value="${currentDTO.feedback}"/>
+	<c:set var="mark" scope="request" value="${currentDTO.mark}"/>
 	<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}"/>	
 
 	<tr>
@@ -40,9 +69,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<fmt:message key="label.question" />:
 		</td>
 
-		<td width="60%" align="left">
+		<td width="55%" align="left">
 			<c:out value="${question}" escapeXml="false"/> 
 		</td>		
+
+
+		<td width="5%" align="center">
+			  <c:out value="${mark}" />  
+		</td>
 
 
 

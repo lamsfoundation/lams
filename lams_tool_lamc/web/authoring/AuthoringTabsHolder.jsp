@@ -62,13 +62,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.McAuthoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
+		
+
+		function updatePass(clickedObj)
+		{
+			if (clickedObj.checked)
+			{
+				document.McAuthoringForm.passmark.disabled= false;
+				
+			}else
+			{
+				document.McAuthoringForm.passmark.value= ' ';
+				document.McAuthoringForm.passmark.disabled= true;
+			}
+		}
+
+		
 
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
-        
+
         function init(){
+	            
 			if (document.McAuthoringForm.activeModule.value != 'defineLater')
 			{
+				updatePass(document.McAuthoringForm.retries);
+				
 	            initTabSize(3);
 	            
 	            var tag = document.getElementById("currentTab");
@@ -135,6 +154,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="defaultContentIdStr"/>								
 		<html:hidden property="defineLaterInEditMode"/>										
 		<html:hidden property="contentFolderID"/>												
+		<html:hidden property="totalMarks"/>														
 		
 		<%@ include file="/common/messages.jsp"%>
 		   

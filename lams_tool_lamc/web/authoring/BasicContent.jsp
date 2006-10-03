@@ -107,7 +107,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}"> 							
 						<tr>
 							<td colspan="2">
-									<a href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}"/>');"
+									<a href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}"/>');"
 										style="float:right;width:150px" class="button-add-item"> <fmt:message
 										key="label.add.new.question" /> </a>
 							</td>

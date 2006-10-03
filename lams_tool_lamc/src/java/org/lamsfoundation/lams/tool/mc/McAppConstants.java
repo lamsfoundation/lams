@@ -91,6 +91,10 @@ public interface McAppConstants {
     public static final String CURRENT_UID								="currentUid";
     public static final String NEW_QUESTION_BOX_DTO						="newQuestionBoxDTO";
     public static final String NEW_QUESTION_BOX_DTO_KEY					="newQuestionBoxDTOKey";
+    public static final String PASSMARK_MAP								="passmarkMap";
+    public static final String NEW_ADDABLE_QUESTION_CONTENT				="newAddableQuestionContent";
+    public static final String NEW_ADDABLE_QUESTION_CONTENT_KEY			="newAddableQuestionContentKey";
+    public static final String NEW_ADDABLE_QUESTION_CONTENT_LIST		="newAddableQuestionContentList";
     
 
 	public static final String AUTHORING								="authoring";
