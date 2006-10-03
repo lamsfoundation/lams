@@ -1,13 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams">
-	<lams:LAMSURL/>
+	<lams:LAMSURL />
 </c:set>
 <c:set var="tool">
-	<lams:WebAppURL/>
+	<lams:WebAppURL />
 </c:set>
 
-<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+<script type="text/javascript"
+	src="${lams}includes/javascript/prototype.js"></script>
 
 <script type="text/javascript">
 	setTimeout("refreshPage()",5000)
@@ -64,16 +65,20 @@
 				<lams:out value="${reportDTO.entryText}" />
 			</p>
 
-			<html:textarea property="report(${reportDTO.uid})" rows="4" cols="20"
-				value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
+			<c:if test="${not scribeUserDTO.finishedActivity}">
+				<html:textarea property="report(${reportDTO.uid})" rows="4"
+					cols="20" value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
+			</c:if>
 
 		</c:forEach>
 
-		<p>
-			<html:submit styleClass="button">
-				<fmt:message key="button.submitReport" />
-			</html:submit>
-		</p>
+		<c:if test="${not scribeUserDTO.finishedActivity}">
+			<p>
+				<html:submit styleClass="button">
+					<fmt:message key="button.submitReport" />
+				</html:submit>
+			</p>
+		</c:if>
 
 	</html:form>
 
