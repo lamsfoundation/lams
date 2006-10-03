@@ -96,8 +96,7 @@
 	</table>
 
 	<c:if test="${dto.reflectOnActivity}">
-
-		<div class="field-name" class="space-left" style="text-align: left">
+		<div class="field-name" style="text-align: left">
 			<fmt:message key="heading.reflections" />
 		</div>
 		<table class="alternative-color">
@@ -139,7 +138,6 @@
 					</c:if>
 				</tr>
 			</c:forEach>
-
 		</table>
 	</c:if>
 </c:forEach>
