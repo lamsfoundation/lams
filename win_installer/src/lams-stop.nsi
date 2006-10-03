@@ -36,8 +36,8 @@ Function .onInit
 FunctionEnd
 
 Section
-    nsExec::ExecToStack 'sc.exe stop LAMSv2'
+    nsExec::ExecToStack 'sc stop LAMSv2'
     Pop $0
     Pop $1
-    MessageBox MB_OK "Stopping LAMSv2 service...$\r$\n$1."
+    MessageBox MB_OK "Stopped LAMSv2 service."
 SectionEnd
