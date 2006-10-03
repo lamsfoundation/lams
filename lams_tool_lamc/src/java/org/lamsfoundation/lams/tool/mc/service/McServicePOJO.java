@@ -2521,10 +2521,8 @@ public class McServicePOJO implements
     	toolContentObj.setUpdateDate(now);
     	toolContentObj.setMcContentId(toolContentId);
     	toolContentObj.setQuestionsSequenced(false);
-    	// I can't find a use for these.
+    	// I can't find a use for setShowReport anywhere
     	toolContentObj.setShowReport(false);
-    	// not supported in 1.0.2 so set to blank. Fields are mandatory in the database 
-    	//toolContentObj.setEndLearningMessage("");
     	
     	
 		try {
