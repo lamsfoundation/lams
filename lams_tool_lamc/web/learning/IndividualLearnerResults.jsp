@@ -114,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table align=left>
 								<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
 								
-							dto.attemptCorrect: 	<c:out value="${dto.attemptCorrect}" escapeXml="false"/> <br>
+								<c:out value="${dto.attemptCorrect}" escapeXml="false"/> <br>
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
 											<b> <bean:message key="label.question.col"/> </b>
