@@ -177,16 +177,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			
 			//if we are on the bin - trash it
-			if (ca.hitTest(_canvasModel.getCanvas().bin)){
-				trace("Activity "+ca.activity.title+" has hit the bin")
-				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-					trace("Complex Activity has hit the bin")
-					_canvasModel.removeComplexActivity(ca);
-				}else {
-					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
-					//_canvasModel.setDirty();
-				}
-			}
+			isActivityOnBin(ca);
 			
 			//get a view if ther is not one
 			if(!_canvasView){
@@ -320,19 +311,32 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   }else{
 			if(_canvasModel.isDragging){
 				ca.stopDrag();
-				if (ca.hitTest(_canvasModel.getCanvas().bin)){
+				
+				//if we are on the bin - trash it
+				isActivityOnBin(ca);
+				
+				/**if (ca.hitTest(_canvasModel.getCanvas().bin)){
 					//_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
 					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
-				}
+				}*/
 				
 			}
 		   
 		}
-		
-
-
 	}
    
+	private function isActivityOnBin(ca:Object):Void{
+				
+		if (ca.hitTest(_canvasModel.getCanvas().bin)){
+			trace("Activity "+ca.activity.title+" has hit the bin")
+			if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				trace("Complex Activity has hit the bin")
+				_canvasModel.removeComplexActivity(ca);
+			}else {
+				_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
+			}
+		}
+	}
    
     public function transitionClick(ct:CanvasTransition):Void{
 	   Debugger.log('transitionClick Transition:'+ct.transition.uiID,Debugger.GEN,'transitionClick','CanvasController');
