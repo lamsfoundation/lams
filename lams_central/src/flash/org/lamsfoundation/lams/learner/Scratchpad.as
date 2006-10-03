@@ -103,9 +103,10 @@ class Scratchpad extends MovieClip {
 		_lessonModel = _lessonModel;
 		_lessonController = _lessonController;
 		_scratchpad_mc = this;
-		_spadIsExpended = false;
-		maxIcon._visible = false;
-		_lessonModel.setSpadHeight(spadHeightHide);
+		_spadIsExpended = true;
+		maxIcon._visible = true;
+		minIcon._visible = false;
+		_lessonModel.setSpadHeight(spadHeightFull);
 		setLabels();
 		resize(Stage.width);
 		
