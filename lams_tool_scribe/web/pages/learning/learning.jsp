@@ -51,7 +51,7 @@
 		</c:forEach>
 
 		<p>
-			<c:if test="${scribeUserDTO.reportApproved eq false}">
+			<c:if test="${not scribeUserDTO.reportApproved}">
 				<html:submit styleClass="button">
 					<fmt:message key="button.agree" />					
 				</html:submit>

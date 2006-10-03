@@ -71,7 +71,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
- * @struts.action-forward name="voteCount" path="/pages/learning/voteCount.jsp"
+ * @struts.action-forward name="voteCount" path="/pages/learning/parts/voteCount.jsp"
+ * @struts.action-forward name="voteConfirmation" path="/pages/learning/parts/voteConfirmation.jsp"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -295,8 +296,14 @@ public class LearningAction extends LamsDispatchAction {
 		setupDTOs(request, session, scribeUser);
 		
 		scribeService.saveOrUpdateScribeUser(scribeUser);
-
-		return mapping.findForward("learning");
+		
+		if (session.getAppointedScribe().equals(scribeUser)) {
+			// send updated voteCount
+			return getVoteCount(mapping, form, request, response);
+		} else {
+			// load learning page.
+			return mapping.findForward("learning");
+		}
 	}
 	
 	public ActionForward getVoteCount(ActionMapping mapping, ActionForm form,

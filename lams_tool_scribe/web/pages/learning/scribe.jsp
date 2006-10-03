@@ -28,6 +28,22 @@
 				
 		setTimeout("refreshPage()",5000)		
 	}
+	
+	function submitApproval() {
+		var url = '${tool}learning.do';
+		var params = 'dispatch=submitApproval&toolSessionID=${scribeSessionDTO.sessionID}';
+		
+		var myAjax = new Ajax.Updater(
+			'voteDisplay',
+			url,
+			{
+				method: 'get',
+				parameters: params
+		});
+		
+		// remove the Agree button.
+		document.getElementById("agreeButton").innerHTML = "";
+	}
 </script>
 
 <div id="content">
@@ -73,13 +89,17 @@
 		</c:forEach>
 
 		<c:if test="${not scribeUserDTO.finishedActivity}">
-			<p>
-				<html:submit styleClass="button">
-					<fmt:message key="button.submitReport" />
-				</html:submit>
-			</p>
+			<html:submit styleClass="button">
+				<fmt:message key="button.submitReport" />
+			</html:submit>
 		</c:if>
 
+		<span id="agreeButton">
+			<c:if test="${not scribeUserDTO.reportApproved}">
+				<a id="agreeButton" class="button" onclick="submitApproval();">
+					<fmt:message key="button.agree" /> </a>
+			</c:if>
+		</span>
 	</html:form>
 
 	<c:if test="${MODE == 'learner' || MODE == 'author'}">
