@@ -53,7 +53,7 @@
 		<p>
 			<c:if test="${scribeUserDTO.reportApproved eq false}">
 				<html:submit styleClass="button">
-					<fmt:message key="button.approve" />					
+					<fmt:message key="button.agree" />					
 				</html:submit>
 			</c:if>
 		</p>
