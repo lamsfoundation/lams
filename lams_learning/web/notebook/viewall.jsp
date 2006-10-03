@@ -77,7 +77,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<html:rewrite page="/notebook.do?method=viewEntry&uid=" /><c:out value="${entry.uid}"/>
 						</c:set> 
 						<html:link href="${viewnote}">
-							<c:out value="${entry.title}"/>
+							<c:out value="${entry.title}" escapeXml="false"/>
 						</html:link>
 					</td><td>&nbsp;</td>
 					<td><lams:Date value="${entry.createDate}"/></td>

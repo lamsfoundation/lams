@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:when test="${param.mode == 'edit'}">
 					<fmt:message key="mynotes.edit.heading">
 						<fmt:param>
-							<c:out value="${entry.title}"/>
+							<c:out value="${entry.title}" escapeXml="false"/>
 						</fmt:param>
 					</fmt:message>
 				</c:when>
@@ -76,14 +76,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<div class="field-name" style="text-align: left;">
 										<fmt:message key="mynotes.entry.entry.label"></fmt:message>
 									</div>
-									<lams:STRUTS-textarea property="entry" styleId="entry" style="width: 100%" rows="10" value="${entry.entry}" />
+									<html:textarea property="entry" styleId="entry" style="width: 100%" rows="10" value="${entry.entry}" />
 								</td>
 							</tr>
 				</c:when>
 				<c:otherwise>
 					<tr>
 						<td>
-							<p><c:out value="${entry.entry}"/></p>
+							<p><c:out value="${entry.entry}" escapeXml="false"/></p>
 						</td>
 					</tr>
 				</c:otherwise>
