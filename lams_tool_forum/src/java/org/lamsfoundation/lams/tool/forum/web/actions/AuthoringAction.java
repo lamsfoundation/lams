@@ -177,6 +177,7 @@ public class AuthoringAction extends Action {
 		ForumForm forumForm = (ForumForm)form;
 		forumForm.setSessionMapID(sessionMap.getSessionID());
 		forumForm.setContentFolderID(contentFolderID);
+		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 		
 		//get back the topic list and display them on page
 		forumService = getForumManager();

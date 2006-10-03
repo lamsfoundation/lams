@@ -14,6 +14,8 @@
 			<%@ include file="/common/messages.jsp"%>
 			<html:form action="/authoring/createTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
 				<html:hidden property="sessionMapID"/>
+				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}"/>
 				<tr>
 					<td>
 						<b><bean:message key="message.label.subject" />*</b><BR>
@@ -24,7 +26,7 @@
 				<tr>
 					<td>
 						<b><bean:message key="message.label.body" />*</b><BR>
-						<lams:FCKEditor id="message.body" value="" toolbarSet="Default-Learner"></lams:FCKEditor>
+						<lams:FCKEditor id="message.body" value=""  contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 						<html:errors property="message.body" />
 					</td>
 				</tr>

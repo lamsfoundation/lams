@@ -20,6 +20,8 @@
 			<html:form action="/authoring/updateTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
 				<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
 				<html:hidden property="sessionMapID"/>
+				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}"/>
 
 				<tr>
 					<td>
@@ -33,7 +35,7 @@
 					<td>
 						<b><bean:message key="message.label.body" />*</b>
 						<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-						<lams:FCKEditor id="message.body" value="${formBean.message.body}" toolbarSet="Default-Learner"></lams:FCKEditor>
+						<lams:FCKEditor id="message.body" value="${formBean.message.body}" contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 						<html:errors property="message.body" />
 					</td>
 				</tr>
