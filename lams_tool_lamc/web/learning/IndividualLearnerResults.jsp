@@ -114,6 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table align=left>
 								<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
 								
+							dto.attemptCorrect: 	<c:out value="${dto.attemptCorrect}" escapeXml="false"/> <br>
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
 											<b> <bean:message key="label.question.col"/> </b>
@@ -124,6 +125,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  	<td NOWRAP align=left valign=top> 
 											<c:out value="${dto.question}" escapeXml="false"/> &nbsp[ <b> <bean:message key="label.mark"/> </b>
 										  	<c:out value="${dto.mark}"/> ]
+
+											&nbsp
+									      	<c:if test="${dto.attemptCorrect == 'true'}"> 					
+										      	<img src="<c:out value="${tool}"/>images/tick.gif" border="0">
+											</c:if> 											      	
+									      	<c:if test="${dto.attemptCorrect != 'true'}"> 					
+										      	<img src="<c:out value="${tool}"/>images/cross.gif" border="0">
+											</c:if> 											      	
+
 									  	</td>
 									  </tr>
 									
