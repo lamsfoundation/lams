@@ -167,6 +167,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="selectedToolSessionId"/>							
 		<input type="hidden" name="isToolSessionChanged"/>	
 		
+		<lams:help toolSignature="<%= VoteAppConstants.MY_SIGNATURE %>" module="monitoring"/>
+		
 			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 			<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 			<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />

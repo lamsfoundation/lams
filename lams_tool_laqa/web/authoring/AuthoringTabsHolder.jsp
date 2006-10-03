@@ -62,10 +62,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.QaAuthoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
-
-
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
         
         function init(){
 			if (document.QaAuthoringForm.activeModule.value != 'defineLater')
@@ -139,6 +135,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<%@ include file="/common/messages.jsp"%>
 		
+		<lams:help toolSignature="<%= QaAppConstants.MY_SIGNATURE %>" module="authoring"/>
 		
 		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->

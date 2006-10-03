@@ -114,11 +114,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMethod(actionMethod);
 		}
 
-
-
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
         function init(){
         
             initTabSize(4);
@@ -166,6 +161,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="httpSessionID"/>		
 		<html:hidden property="defaultContentIdStr"/>						
 		<html:hidden property="contentFolderID"/>						
+		
+		<lams:help toolSignature="<%= QaAppConstants.MY_SIGNATURE %>" module="monitoring"/>
 
 		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
