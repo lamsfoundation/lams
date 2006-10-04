@@ -331,7 +331,9 @@ public class WebUtil
     public static ToolAccessMode readToolAccessModeParam(HttpServletRequest request, String param_mode,boolean optional)
     {
         String mode = readStrParam(request, param_mode,optional);
-        if(mode.equals(ToolAccessMode.AUTHOR.toString()))
+        if (mode == null) {
+        	return null;
+        } else if(mode.equals(ToolAccessMode.AUTHOR.toString()))
             return ToolAccessMode.AUTHOR;
         else if(mode.equals(ToolAccessMode.LEARNER.toString()))
             return ToolAccessMode.LEARNER;
