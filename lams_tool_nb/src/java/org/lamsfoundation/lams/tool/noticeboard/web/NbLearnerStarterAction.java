@@ -141,6 +141,10 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 			throw new NbApplicationException(error);
 		}   
 
+        if ( isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER) ) {
+            return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
+	    }
+
 	    request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
 	    
 	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
@@ -176,10 +180,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         
         learnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
         
-        if ( isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER) ) {
-            return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
-	    }
-
 	    /*
          * Checks to see if the runOffline flag is set.
          * If the particular flag is set, control is forwarded to jsp page
