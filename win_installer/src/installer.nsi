@@ -24,7 +24,6 @@
 
 /*
  * TODO: uninstaller option to keep database/lams.xml/repository
- * TODO: jsmath option to install as compressed war
  * TODO: custom lams admin user
  * TODO: desktop icons, readme?
  */
@@ -78,8 +77,8 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 # installer screen progression
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\license.txt"
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE CompLeave
 !insertmacro MUI_PAGE_COMPONENTS
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirectoryLeave
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom PreMySQLConfig PostMySQLConfig
 Page custom PreLAMSConfig PostLAMSConfig
@@ -181,6 +180,108 @@ Var LAMS_PASS
 Var WILDFIRE_DOMAIN
 Var WILDFIRE_USER
 Var WILDFIRE_PASS
+
+
+# installer sections
+#
+SectionGroup /e "!Install LAMS"
+    Section "JBoss 4.0.2" jboss
+        SectionIn RO
+        SetOutPath $INSTDIR
+        File /a /r /x all /x minimal /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
+    SectionEnd
+
+    Section "LAMS ${VERSION}" lams
+        SectionIn RO
+        
+        SetOutPath $INSTDIR
+        
+        Call DeployConfig
+        Call ImportDatabase
+        
+        CreateDirectory "$INSTDIR\temp"
+        CreateDirectory "$INSTDIR\dump"
+        CreateDirectory "$LAMS_REPOSITORY"
+        
+        SetOutPath $LAMS_CONF
+        File /a ${SOURCE_LAMS_CONF}\*.dtd
+        File /a ${SOURCE_LAMS_CONF}\authentication.xml
+
+        # Log mode is set to INFO in this template
+        SetOutPath "$INSTDIR\jboss-4.0.2\server\default\conf"
+        File /a "..\templates\log4j.xml"
+        
+        Call WriteRegEntries
+        
+        SetOutPath $INSTDIR
+        File /a "..\build\lams-start.exe"
+        File /a "..\build\lams-stop.exe"
+        Call SetupStartMenu
+        
+        WriteUninstaller "$INSTDIR\lams-uninstall.exe"
+    SectionEnd
+    
+    Section "Install as Service" service
+        SectionIn RO
+        SetOutPath "$INSTDIR\jboss-4.0.2\bin"
+        File /a "..\wrapper-windows-x86-32-3.2.1\bin\wrapper.exe"
+        File /a "/oname=$INSTDIR\jboss-4.0.2\bin\InstallLAMS-NT.bat" "..\wrapper-windows-x86-32-3.2.1\bin\InstallTestWrapper-NT.bat"
+        File /a "/oname=$INSTDIR\jboss-4.0.2\bin\UninstallLAMS-NT.bat" "..\wrapper-windows-x86-32-3.2.1\bin\UninstallTestWrapper-NT.bat"
+        SetOutPath "$INSTDIR\jboss-4.0.2\lib"
+        File /a "..\wrapper-windows-x86-32-3.2.1\lib\wrapper.dll"
+        File /a "..\wrapper-windows-x86-32-3.2.1\lib\wrapper.jar"
+        CreateDirectory "$INSTDIR\jboss-4.0.2\conf"
+        CopyFiles "$INSTDIR\wrapper.conf" "$INSTDIR\jboss-4.0.2\conf\wrapper.conf"
+        CreateDirectory "$INSTDIR\jboss-4.0.2\logs"
+        nsExec::ExecToStack '$INSTDIR\jboss-4.0.2\bin\InstallLAMS-NT.bat'
+        Pop $0
+        ${If} $0 == 0
+            DetailPrint "LAMSv2 successfully setup as a service. ($0)"
+        ${Else}
+            DetailPrint "LAMSv2 was not setup as a service. ($0)"
+            MessageBox MB_OK|MB_ICONEXCLAMATION "LAMSv2 was not installed as a service.  However you may start LAMS by double-clicking $INSTDIR\jboss-4.0.2\bin\run.bat."
+        ${EndIf}            
+    SectionEnd
+SectionGroupEnd
+
+SectionGroup /e "Optional"
+    Section /o "jsMath (compressed)" jsmathc
+        SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy"
+        ;File /a /r "${SOURCE_JBOSS_HOME}\server\default\deploy\jsMath.war"
+        File /a /r  "..\..\jsmath\build\lib\jsMath.war"
+    SectionEnd
+    
+    Section /o "jsMath (expanded)" jsmathe
+        SetOutPath "$TEMP"
+        File /a  "..\..\jsmath\build\lib\jsMath.war"
+        CreateDirectory "$INSTDIR\jboss-4.0.2\server\default\deploy\jsMath.war"
+        SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jsMath.war"
+        DetailPrint "Expanding jsMath.war..."
+        nsExec::ExecToStack "$JDK_DIR\bin\jar xf $TEMP\jsMath.war"
+        Pop $0
+        Pop $1
+        ${If} $0 != 0
+            DetailPrint "Failed to expand jsMath.war."
+        ${EndIf}
+    SectionEnd
+SectionGroupEnd
+
+
+# descriptions
+#
+LangString DESC_jboss ${LANG_ENGLISH} "JBoss Application Server."
+LangString DESC_lams ${LANG_ENGLISH} "LAMS Application."
+LangString DESC_service ${LANG_ENGLISH} "Install as a Windows service."
+LangString DESC_jsmathc ${LANG_ENGLISH} "Include a compressed jsMath.war to be able to write and display mathematical symbols and equations."
+LangString DESC_jsmathe ${LANG_ENGLISH} "Include an expanded jsMath.war to be able to write and display mathematical symbols and equations."
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${jboss} $(DESC_jboss)
+    !insertmacro MUI_DESCRIPTION_TEXT ${lams} $(DESC_lams)
+    !insertmacro MUI_DESCRIPTION_TEXT ${service} $(DESC_service)
+    !insertmacro MUI_DESCRIPTION_TEXT ${jsmathc} $(DESC_jsmathc)
+    !insertmacro MUI_DESCRIPTION_TEXT ${jsmathe} $(DESC_jsmathe)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
 # functions
@@ -301,6 +402,40 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams2.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "mysql.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "wildfire.ini"
+    
+    # set jsmath exploded size (assumes 4KB cluster size on destination hdd)
+    SectionSetSize ${jsmathe} 81816
+    
+    # init mutually exclusive checkbox status
+    SectionGetFlags ${jsmathc} $8
+    SectionGetFlags ${jsmathc} $9
+FunctionEnd
+
+
+Function .onSelChange
+    # mutually exclusive checkboxes
+    SectionGetFlags ${jsmathc} $0
+    ;MessageBox MB_OK "old c: $8 e: $9 $\r$\n new c: $0"
+    IntCmp $0 $8 next 0 0
+    IntCmp $0 ${SF_SELECTED} 0 next next
+    SectionGetFlags ${jsmathe} $1
+    IntOp $1 $1 & ${SECTION_OFF}
+    SectionSetFlags "${jsmathe}" $1
+    Goto done
+    
+    next:
+    SectionGetFlags ${jsmathe} $0
+    ;MessageBox MB_OK "old c: $8 e: $9 $\r$\n new e: $0"
+    IntCmp $0 $9 done 0 0
+    IntCmp $0 ${SF_SELECTED} 0 done done
+    SectionGetFlags ${jsmathc} $1
+    IntOp $1 $1 & ${SECTION_OFF}
+    SectionSetFlags "${jsmathc}" $1
+    
+    done:
+        SectionGetFlags ${jsmathc} $8
+        SectionGetFlags ${jsmathe} $9
+        ;MessageBox MB_OK "c: $8 e: $9"
 FunctionEnd
 
 
@@ -325,13 +460,20 @@ Function CheckMySQL
 FunctionEnd
 
 
-Function CompLeave
+Function DirectoryLeave
+    # check for spaces in instdir
+    ${StrStr} $0 $INSTDIR " "
+    ${If} $0 != ""
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Please choose a location without a space."
+        Abort
+    ${EndIf}
     # check LAMS 1
     ReadRegStr $0 HKLM "SOFTWARE\LAMS\Server" "install_dir"
     ReadRegStr $1 HKLM "SOFTWARE\LAMS\Server" "install_status"
     ReadRegStr $2 HKLM "SOFTWARE\LAMS\Server" "install_version"
-    ${If} $0 == $INSTDIR
-        ${If} $1 == "successful"
+    ${If} $1 == "successful"
+        MessageBox MB_OK|MB_ICONINFORMATION "If you have LAMS $2 on your system, remember not to run it at the same time as LAMS ${VERSION} (unless you know what you're doing)."
+        ${If} $0 == $INSTDIR
             MessageBox MB_OK|MB_ICONEXCLAMATION "There appears to be a LAMS $2 installation at $INSTDIR - please chose another location."
             Abort
         ${EndIf}
@@ -443,10 +585,10 @@ Function PostWildfireConfig
     !insertmacro MUI_INSTALLOPTIONS_READ $WILDFIRE_USER "wildfire.ini" "Field 5" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $WILDFIRE_PASS "wildfire.ini" "Field 7" "State"
 
-    # check wildfire is running
+    # check wildfire is running by checking client connection port 5222
     SetOutPath $TEMP
     File "..\build\LocalPortScanner.class"
-    nsExec::ExecToStack '$JDK_DIR\bin\java LocalPortScanner 9090'
+    nsExec::ExecToStack '$JDK_DIR\bin\java LocalPortScanner 5222'
     Pop $0
     Pop $1
     ${If} $0 == 0
@@ -716,90 +858,6 @@ Function .onInstSuccess
     RMDir /r "$INSTDIR\apache-ant-1.6.5"
 FunctionEnd
 
-
-# installer sections
-#
-SectionGroup /e "!Install LAMS"
-    Section "JBoss 4.0.2" jboss
-        SectionIn RO
-        SetOutPath $INSTDIR
-        File /a /r /x all /x minimal /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
-    SectionEnd
-
-    Section "LAMS ${VERSION}" lams
-        SectionIn RO
-        
-        SetOutPath $INSTDIR
-        
-        Call DeployConfig
-        Call ImportDatabase
-        
-        CreateDirectory "$INSTDIR\temp"
-        CreateDirectory "$INSTDIR\dump"
-        CreateDirectory "$LAMS_REPOSITORY"
-        
-        SetOutPath $LAMS_CONF
-        File /a ${SOURCE_LAMS_CONF}\*.dtd
-        File /a ${SOURCE_LAMS_CONF}\authentication.xml
-
-        # Log mode is set to INFO in this template
-        SetOutPath "$INSTDIR\jboss-4.0.2\server\default\conf"
-        File /a "..\templates\log4j.xml"
-        
-        Call WriteRegEntries
-        
-        SetOutPath $INSTDIR
-        File /a "..\build\lams-start.exe"
-        File /a "..\build\lams-stop.exe"
-        Call SetupStartMenu
-        
-        WriteUninstaller "$INSTDIR\lams-uninstall.exe"
-    SectionEnd
-    
-    Section "Install as Service" service
-        SectionIn RO
-        SetOutPath "$INSTDIR\jboss-4.0.2\bin"
-        File /a "..\wrapper-windows-x86-32-3.2.1\bin\wrapper.exe"
-        File /a "/oname=$INSTDIR\jboss-4.0.2\bin\InstallLAMS-NT.bat" "..\wrapper-windows-x86-32-3.2.1\bin\InstallTestWrapper-NT.bat"
-        File /a "/oname=$INSTDIR\jboss-4.0.2\bin\UninstallLAMS-NT.bat" "..\wrapper-windows-x86-32-3.2.1\bin\UninstallTestWrapper-NT.bat"
-        SetOutPath "$INSTDIR\jboss-4.0.2\lib"
-        File /a "..\wrapper-windows-x86-32-3.2.1\lib\wrapper.dll"
-        File /a "..\wrapper-windows-x86-32-3.2.1\lib\wrapper.jar"
-        CreateDirectory "$INSTDIR\jboss-4.0.2\conf"
-        CopyFiles "$INSTDIR\wrapper.conf" "$INSTDIR\jboss-4.0.2\conf\wrapper.conf"
-        CreateDirectory "$INSTDIR\jboss-4.0.2\logs"
-        nsExec::ExecToStack '$INSTDIR\jboss-4.0.2\bin\InstallLAMS-NT.bat'
-        Pop $0
-        ${If} $0 == 0
-            DetailPrint "LAMSv2 successfully setup as a service. ($0)"
-        ${Else}
-            DetailPrint "LAMSv2 was not setup as a service. ($0)"
-            MessageBox MB_OK|MB_ICONEXCLAMATION "LAMSv2 was not installed as a service.  However you may start LAMS by double-clicking $INSTDIR\jboss-4.0.2\bin\run.bat."
-        ${EndIf}            
-    SectionEnd
-SectionGroupEnd
-
-SectionGroup /e "Optional"
-    Section /o "jsMath" jsmath
-        SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy"
-        ;File /a /r "${SOURCE_JBOSS_HOME}\server\default\deploy\jsMath.war"
-    SectionEnd
-SectionGroupEnd
-
-
-# descriptions
-#
-LangString DESC_jboss ${LANG_ENGLISH} "JBoss Application Server."
-LangString DESC_lams ${LANG_ENGLISH} "LAMS Application."
-LangString DESC_service ${LANG_ENGLISH} "Install as a Windows service."
-LangString DESC_jsmath ${LANG_ENGLISH} "Include jsMath to be able to write and display mathematical symbols and equations."
-
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${jboss} $(DESC_jboss)
-    !insertmacro MUI_DESCRIPTION_TEXT ${lams} $(DESC_lams)
-    !insertmacro MUI_DESCRIPTION_TEXT ${service} $(DESC_service)
-    !insertmacro MUI_DESCRIPTION_TEXT ${jsmath} $(DESC_jsmath)
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
 # Uninstaller
