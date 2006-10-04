@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
+import com.sun.java_cup.internal.internal_error;
+
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private static final long serialVersionUID = -2829707715037631881L;
@@ -118,7 +120,23 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// construct session DTO.
 		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
-
+		
+		int numberOfVotes = 0;
+		for (Iterator iter = scribeSession.getScribeUsers().iterator(); iter.hasNext();) {
+			ScribeUser elem = (ScribeUser) iter.next();
+			
+			if(elem.isReportApproved()) {
+				numberOfVotes++;
+			}
+				
+		}
+		
+		int numberOfLearners = scribeSession.getScribeUsers().size();
+		
+		sessionDTO.setNumberOfLearners(numberOfLearners);
+		sessionDTO.setNumberOfVotes(numberOfVotes);
+		sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
+		
 		// if reflectOnActivity is enabled add userDTO.
 		if (scribeSession.getScribe().isReflectOnActivity()) {
 			ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
@@ -137,7 +155,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			}
 			sessionDTO.getUserDTOs().add(scribeUserDTO);
 		}
-
+		
 		ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
 		scribeDTO.getSessionDTOs().add(sessionDTO);
 
