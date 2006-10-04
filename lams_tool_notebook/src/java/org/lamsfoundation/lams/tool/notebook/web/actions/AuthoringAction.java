@@ -99,6 +99,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		String contentFolderID = WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+		
 		// set up notebookService
 		if (notebookService == null) {
 			notebookService = NotebookServiceProxy.getNotebookService(this
@@ -122,11 +124,13 @@ public class AuthoringAction extends LamsDispatchAction {
 					request).getMessage("error.content.locked"));
 			return mapping.findForward("message_page");
 		}
-
-		// Set the defineLater flag so that learners cannot use content while we
-		// are editing. This flag is released when updateContent is called.
-		notebook.setDefineLater(true);
-		notebookService.saveOrUpdateNotebook(notebook);
+		
+		if (mode != null && mode.isTeacher() ) {
+			// Set the defineLater flag so that learners cannot use content while we
+			// are editing. This flag is released when updateContent is called.
+			notebook.setDefineLater(true);
+			notebookService.saveOrUpdateNotebook(notebook);
+		}		
 
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;

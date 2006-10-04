@@ -111,13 +111,16 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		String contentFolderID = WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+		
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+				
 		// set up scribeService
 		if (scribeService == null) {
 			scribeService = ScribeServiceProxy.getScribeService(this
 					.getServlet().getServletContext());
 		}
-
+		
+		
 		// retrieving Scribe with given toolContentID
 		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
 		if (scribe == null) {
@@ -134,11 +137,13 @@ public class AuthoringAction extends LamsDispatchAction {
 					request).getMessage("error.content.locked"));
 			return mapping.findForward("message_page");
 		}
-
-		// Set the defineLater flag so that learners cannot use content while we
-		// are editing. This flag is released when updateContent is called.
-		scribe.setDefineLater(true);
-		scribeService.saveOrUpdateScribe(scribe);
+		
+		if (mode != null && mode.isTeacher()) {
+			// Set the defineLater flag so that learners cannot use content while we
+			// are editing. This flag is released when updateContent is called.
+			scribe.setDefineLater(true);
+			scribeService.saveOrUpdateScribe(scribe);
+		}
 
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;

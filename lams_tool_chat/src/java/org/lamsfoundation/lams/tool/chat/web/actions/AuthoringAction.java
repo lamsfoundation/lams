@@ -99,6 +99,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		
 		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+		
 		// set up chatService
 		if (chatService == null) {
 			chatService = ChatServiceProxy.getChatService(this.getServlet()
@@ -121,11 +123,13 @@ public class AuthoringAction extends LamsDispatchAction {
 					request).getMessage("error.content.locked"));
 			return mapping.findForward("message_page");
 		}
-
-		// Set the defineLater flag so that learners cannot use content while we
-		// are editing. This flag is released when updateContent is called.
-		chat.setDefineLater(true);
-		chatService.saveOrUpdateChat(chat);
+		
+		if (mode != null && mode.isTeacher()) {
+			// Set the defineLater flag so that learners cannot use content while we
+			// are editing. This flag is released when updateContent is called.
+			chat.setDefineLater(true);
+			chatService.saveOrUpdateChat(chat);
+		}
 
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
