@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.scribe.web.actions;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,14 +52,13 @@ import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
+import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.tool.scribe.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
-import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 
 /**
  * @author
@@ -74,6 +72,7 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  * @struts.action-forward name="voteDisplay" path="/pages/parts/voteDisplay.jsp"
+ * @struts.action-forward name="report" path="tiles:/learning/report"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -145,11 +144,17 @@ public class LearningAction extends LamsDispatchAction {
 		if (scribe.isRunOffline()) {
 			return mapping.findForward("runOffline");
 		}
-
+		
+		if (scribeSession.isForceComplete()) {
+			// go to report page
+			return mapping.findForward("report");
+		}
+		
 		// check if current user is the scribe.
 		if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
 			return mapping.findForward("scribe");
 		}
+		
 		return mapping.findForward("learning");
 
 	}
@@ -336,7 +341,29 @@ public class LearningAction extends LamsDispatchAction {
 		
 		return mapping.findForward("voteDisplay");
 	}
-
+	
+	public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		LearningForm lrnForm = (LearningForm) form;
+		
+		ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+		
+		ScribeSession session = scribeUser.getScribeSession();
+		
+		if (session.getAppointedScribe().getUid() == scribeUser.getUid()) {
+			session.setForceComplete(true);
+		} else {
+			// TODO need to implement this.
+			log.error("ScribeUserUID: " + scribeUser.getUid() + " is not allowed to forceComplete this session");
+		}
+		
+		request.setAttribute("MODE", lrnForm.getMode());
+		setupDTOs(request, session, scribeUser);
+		
+		scribeService.saveOrUpdateScribeUser(scribeUser);
+		
+		return mapping.findForward("report");
+	}
 	
 	// Private methods.
 	

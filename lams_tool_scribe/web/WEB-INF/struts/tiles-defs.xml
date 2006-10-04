@@ -122,6 +122,10 @@
 
 	<definition name="tiles:/learning/notebook" extends="tiles:/layout:learning">
 		<put name="body" value="/pages/learning/notebook.jsp" />
+	</definition>
+	
+	<definition name="tiles:/learning/report" extends="tiles:/layout:learning">
+		<put name="body" value="/pages/learning/report.jsp" />	
 	</definition>	
 	<!-- End: Learning -->
 

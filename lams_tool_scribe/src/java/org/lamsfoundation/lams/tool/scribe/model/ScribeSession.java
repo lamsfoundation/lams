@@ -66,6 +66,8 @@ public class ScribeSession implements java.io.Serializable {
 	
 	private ScribeUser appointedScribe;
 	
+	private boolean forceComplete;
+	
 	// Constructors
 
 	/** default constructor */
@@ -208,7 +210,18 @@ public class ScribeSession implements java.io.Serializable {
 	public void setAppointedScribe(ScribeUser appointedScribe) {
 		this.appointedScribe = appointedScribe;
 	}
+	
+	/**
+	 * @hibernate.property column="force_complete" 
+	 */
+	public boolean isForceComplete() {
+		return forceComplete;
+	}
 
+	public void setForceComplete(boolean forceComplete) {
+		this.forceComplete = forceComplete;
+	}
+	
 	/**
 	 * toString
 	 * 

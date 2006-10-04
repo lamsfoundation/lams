@@ -51,9 +51,12 @@ public class ScribeSessionDTO implements Comparable {
 	
 	Set<ScribeReportEntryDTO> reportDTOs;
 	
+	boolean forceComplete;
+	
 	public ScribeSessionDTO(ScribeSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
+		this.forceComplete = session.isForceComplete();
 		
 		ScribeUser appointedScribe = session.getAppointedScribe();
 		if (appointedScribe == null) {
@@ -148,5 +151,13 @@ public class ScribeSessionDTO implements Comparable {
 
 	public void setVotePercentage(int votePercentage) {
 		VotePercentage = votePercentage;
+	}
+
+	public boolean isForceComplete() {
+		return forceComplete;
+	}
+
+	public void setForceComplete(boolean forceComplete) {
+		this.forceComplete = forceComplete;
 	}
 }

@@ -52,10 +52,6 @@
 		</p>
 
 	</html:form>
-	<c:if test="${MODE == 'learner' || MODE == 'author'}">
-		<%@ include file="parts/finishButton.jsp"%>
-
-	</c:if>
 
 	<div class="space-bottom"></div>
 

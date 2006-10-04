@@ -98,9 +98,14 @@
 		</span>
 	</html:form>
 
-	<c:if test="${MODE == 'learner' || MODE == 'author'}">
-		<%@ include file="parts/finishButton.jsp"%>
-	</c:if>
+	<html:form action="learning">
+		<html:hidden property="dispatch" value="forceCompleteActivity"/>
+		<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}"/>
+		<html:hidden property="mode" />
+		<html:submit styleClass="button right-buttons">
+			<fmt:message key="button.forceComplete"/>
+		</html:submit>
+	</html:form>
 
 	<div class="space-bottom"></div>
 
