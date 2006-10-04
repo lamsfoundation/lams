@@ -94,6 +94,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -1105,7 +1106,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     	chat.setDefineLater(Boolean.FALSE);
     	chat.setFilterKeywords(null);
     	chat.setFilteringEnabled(Boolean.FALSE);
-    	chat.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	chat.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	chat.setLockOnFinished(Boolean.FALSE);
     	chat.setOfflineInstructions(null);
     	chat.setOnlineInstructions(null);

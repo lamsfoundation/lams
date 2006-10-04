@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -510,7 +511,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
     	notebook.setCreateBy(new Long(user.getUserID().longValue()));
     	notebook.setCreateDate(now);
     	notebook.setDefineLater(Boolean.FALSE);
-    	notebook.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	notebook.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	notebook.setLockOnFinished(Boolean.TRUE);
     	notebook.setOfflineInstructions(null);
     	notebook.setOnlineInstructions(null);

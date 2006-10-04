@@ -40,6 +40,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -47,8 +49,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.dao.DataAccessException;
 
 
@@ -1058,7 +1059,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     {
     	Date now = new Date();
     	NoticeboardContent toolContentObj = new NoticeboardContent();
-    	toolContentObj.setContent((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	String content = WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setContent(content);
     	toolContentObj.setContentInUse(false);
     	toolContentObj.setCreatorUserId(user.getUserID().longValue());
     	toolContentObj.setDateCreated(now);

@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -2123,7 +2124,8 @@ public class QaServicePOJO
     	
     	// set up question from body 	
     	QaQueContent question = new QaQueContent();
-    	question.setQuestion((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	String content = WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	question.setQuestion(content);
     	question.setDisplayOrder(1);
     	question.setQaContent(toolContentObj);
     	toolContentObj.getQaQueContents().add(question);

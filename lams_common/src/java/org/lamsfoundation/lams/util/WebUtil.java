@@ -443,5 +443,12 @@ public class WebUtil
     }
     
 
+    /** Convert any newslines in a string to <BR/>. If input = null, returns null. */
+    public static String convertNewlines(String input) {
+    	if ( input != null )
+    		return input.replaceAll("[\n\r\f]", "<BR/>");
+    	else
+    		return null;
+    }
 
 }

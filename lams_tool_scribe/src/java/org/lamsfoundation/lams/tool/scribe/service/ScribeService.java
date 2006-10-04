@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -624,7 +625,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     		for (int i=0; i < headings.length ; i++) {
     			ScribeHeading sHeading = new ScribeHeading();
     			sHeading.setDisplayOrder(i);
-    			sHeading.setHeadingText(headings[i]);
+    			sHeading.setHeadingText(WebUtil.convertNewlines(headings[i]));
     			sHeading.setScribe(scribe);
 				set.add(sHeading);
     		}

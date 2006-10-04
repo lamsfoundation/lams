@@ -94,6 +94,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -852,8 +853,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	    	toolContentObj.setContentId(toolContentId);
 	    	toolContentObj.setContentInUse(Boolean.FALSE);
 	    	toolContentObj.setCreated(now);
-	    	toolContentObj.setDefineLater(Boolean.FALSE);
-	    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+	    	toolContentObj.setDefineLater(Boolean.FALSE);		    	
+	    	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	    	toolContentObj.setLimitedChar(5000); // this is the default value
    	    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    	toolContentObj.setReflectInstructions(null);
@@ -922,7 +923,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	    			message.setUpdated(msgDate);
 	    			message.setLastReplyDate(msgDate);
 	    			message.setSubject((String)messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    			message.setBody((String)messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE));
+	    			message.setBody(WebUtil.convertNewlines((String)messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE)));
 	    			// ignore the old subject field - it wasn't updated by the old interface.
 	    			message.setHideFlag(Boolean.FALSE);
 	    			message.setIsAnonymous(Boolean.FALSE);

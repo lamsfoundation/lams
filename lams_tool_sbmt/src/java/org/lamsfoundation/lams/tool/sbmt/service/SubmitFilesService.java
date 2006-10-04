@@ -91,6 +91,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -791,7 +792,7 @@ public class SubmitFilesService implements ToolContentManager,
     	toolContentObj.setContentInUse(Boolean.FALSE);
     	toolContentObj.setCreated(now);
     	toolContentObj.setDefineLater(Boolean.FALSE);
-    	toolContentObj.setInstruction((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setInstruction(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	toolContentObj.setOfflineInstruction(null);
     	toolContentObj.setOnlineInstruction(null);
     	toolContentObj.setRunOffline(Boolean.FALSE);

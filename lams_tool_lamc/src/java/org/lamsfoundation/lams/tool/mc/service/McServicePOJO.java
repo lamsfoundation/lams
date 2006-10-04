@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -2509,7 +2510,7 @@ public class McServicePOJO implements
     	toolContentObj.setCreatedBy(user.getUserID().longValue());
     	toolContentObj.setCreationDate(now);
     	toolContentObj.setDefineLater(Boolean.FALSE.booleanValue());
-    	toolContentObj.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
  	    toolContentObj.setReflect(Boolean.FALSE);
@@ -2567,7 +2568,7 @@ public class McServicePOJO implements
 		question.setDisplayOrder( WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_Q_ORDER) );
 		
 		question.setFeedback((String)questionMap.get(CONTENT_Q_FEEDBACK));
-		question.setQuestion((String)questionMap.get(CONTENT_Q_QUESTION));
+		question.setQuestion(WebUtil.convertNewlines((String)questionMap.get(CONTENT_Q_QUESTION)));
 		
 		// In 1.0.2 all questions are implicitly assumed to be 1 and be of equal weight
 		// I think the weights are actually ignored, so just set to 0 (FM) 
