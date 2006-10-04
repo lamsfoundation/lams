@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
+import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.tool.scribe.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -156,8 +157,11 @@ public class MonitoringAction extends LamsDispatchAction {
 				
 				sessionDTO.getUserDTOs().add(userDTO);
 			}
-			sessionDTO.setNumberOfLearners(session.getScribeUsers().size());
+			int numberOfLearners = session.getScribeUsers().size();
+			
 			sessionDTO.setNumberOfVotes(numberOfVotes);
+			sessionDTO.setNumberOfLearners(numberOfLearners);
+			sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
 			scribeDTO.getSessionDTOs().add(sessionDTO);
 		}
 		

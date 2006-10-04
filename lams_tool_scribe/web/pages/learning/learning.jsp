@@ -22,14 +22,7 @@
 		${scribeDTO.instructions}
 	</p>
 	
-	<div class="field-name" style="text-align: left">
-		<fmt:message key="heading.numberOfVotes" />
-	</div>
-	
-	<p>
-		${scribeSessionDTO.numberOfVotes}
-	</p>
-
+	<%@include file="/pages/parts/voteDisplay.jsp" %>
 
 	<div class="field-name" style="text-align: left">
 		<fmt:message key="heading.report" />

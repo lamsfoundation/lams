@@ -45,6 +45,8 @@ public class ScribeSessionDTO implements Comparable {
 	
 	int numberOfLearners;
 	
+	int VotePercentage;
+	
 	String appointedScribe;
 	
 	Set<ScribeReportEntryDTO> reportDTOs;
@@ -138,5 +140,13 @@ public class ScribeSessionDTO implements Comparable {
 
 	public void setAppointedScribe(String appointedScribe) {
 		this.appointedScribe = appointedScribe;
+	}
+
+	public int getVotePercentage() {
+		return VotePercentage;
+	}
+
+	public void setVotePercentage(int votePercentage) {
+		VotePercentage = votePercentage;
 	}
 }

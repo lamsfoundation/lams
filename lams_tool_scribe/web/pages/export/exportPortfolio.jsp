@@ -54,22 +54,8 @@
 							${session.appointedScribe}
 						</p>
 
-						<div class="field-name" style="text-align: left">
-							<fmt:message key="heading.totalLearners" />							
-						</div>
-												
-						<p>
-							${session.numberOfLearners}
-						</p>						
-						
-						<div class="field-name" style="text-align: left">
-							<fmt:message key="heading.numberOfVotes" />
-						</div>
-												
-						<p>
-							${session.numberOfVotes}
-						</p>
-						
+						<c:set var="scribeSessionDTO" value="${session}" scope="request"> </c:set>
+						<%@include file="/pages/parts/voteDisplay.jsp" %>						
 
 						<div class="field-name" style="text-align: left">
 							<fmt:message key="heading.report" />

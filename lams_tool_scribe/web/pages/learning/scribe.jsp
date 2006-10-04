@@ -16,7 +16,7 @@
 	function refreshPage() {
 		
 		var url = '${tool}learning.do';
-		var params = 'dispatch=getVoteCount&toolSessionID=${scribeSessionDTO.sessionID}';
+		var params = 'dispatch=getVoteDisplay&toolSessionID=${scribeSessionDTO.sessionID}';
 		
 		var myAjax = new Ajax.Updater(
 			'voteDisplay',
@@ -60,14 +60,10 @@
 		<html:hidden property="dispatch" value="submitReport"></html:hidden>
 		<html:hidden property="toolSessionID"></html:hidden>
 		<html:hidden property="mode"></html:hidden>
-
-		<div class="field-name" style="text-align: left">
-			<fmt:message key="heading.numberOfVotes" />
+		
+		<div id="voteDisplay">
+			<%@include file="/pages/parts/voteDisplay.jsp" %>
 		</div>
-
-		<p id="voteDisplay">
-			${scribeSessionDTO.numberOfVotes}
-		</p>
 
 		<div class="field-name" style="text-align: left">
 			<fmt:message key="heading.report" />

@@ -60,6 +60,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
+import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
+
 /**
  * @author
  * @version
@@ -71,8 +73,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
- * @struts.action-forward name="voteCount" path="/pages/learning/parts/voteCount.jsp"
- * @struts.action-forward name="voteConfirmation" path="/pages/learning/parts/voteConfirmation.jsp"
+ * @struts.action-forward name="voteDisplay" path="/pages/parts/voteDisplay.jsp"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -298,34 +299,42 @@ public class LearningAction extends LamsDispatchAction {
 		scribeService.saveOrUpdateScribeUser(scribeUser);
 		
 		if (session.getAppointedScribe().equals(scribeUser)) {
-			// send updated voteCount
-			return getVoteCount(mapping, form, request, response);
+			// send updated voteDisplay
+			return getVoteDisplay(mapping, form, request, response);
 		} else {
 			// load learning page.
 			return mapping.findForward("learning");
 		}
 	}
 	
-	public ActionForward getVoteCount(ActionMapping mapping, ActionForm form,
+	public ActionForward getVoteDisplay(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		
 		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 		
 		ScribeSession session = scribeService.getSessionBySessionId(toolSessionID);
 		
-		int voteCount = 0;
+		int numberOfVotes = 0;
 		
 		for (Iterator iter = session.getScribeUsers().iterator(); iter.hasNext();) {
 			ScribeUser user = (ScribeUser) iter.next();
 			
 			if (user.isReportApproved()) {
-				voteCount++;			
+				numberOfVotes++;			
 			}
 		}
 		
-		request.setAttribute("voteCount", voteCount);
+		int numberOfLearners = session.getScribeUsers().size();
+		int votePercentage = ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners);
+					
+		ScribeSessionDTO sessionDTO = new ScribeSessionDTO();
+		sessionDTO.setNumberOfVotes(numberOfVotes);
+		sessionDTO.setNumberOfLearners(numberOfLearners);
+		sessionDTO.setVotePercentage(votePercentage);
 		
-		return mapping.findForward("voteCount");
+		request.setAttribute("scribeSessionDTO", sessionDTO);
+		
+		return mapping.findForward("voteDisplay");
 	}
 
 	
@@ -346,9 +355,12 @@ public class LearningAction extends LamsDispatchAction {
 			}
 		}
 		
-		// TODO
+		int numberOfLearners = scribeSession.getScribeUsers().size();
+		
 		sessionDTO.setNumberOfVotes(numberOfVotes);
-		sessionDTO.setNumberOfLearners(scribeSession.getScribeUsers().size());
+		sessionDTO.setNumberOfLearners(numberOfLearners);
+		sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
+		
 		request.setAttribute("scribeSessionDTO", sessionDTO);
 		
 		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);

@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeAttachmentDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeDAO;
-import org.lamsfoundation.lams.tool.scribe.dao.IScribeHeadingDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeSessionDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeUserDAO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
