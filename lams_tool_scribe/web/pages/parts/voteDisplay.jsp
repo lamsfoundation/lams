@@ -11,6 +11,9 @@
 </div>
 
 <p>	
-	${scribeSessionDTO.numberOfVotes} out of
-	${scribeSessionDTO.numberOfLearners} agree (${scribeSessionDTO.votePercentage}%)
+	<fmt:message key="message.voteStatistics">
+		<fmt:param value="${scribeSessionDTO.numberOfVotes}"></fmt:param>
+		<fmt:param value="${scribeSessionDTO.numberOfLearners}"></fmt:param>
+	</fmt:message>
+	(${scribeSessionDTO.votePercentage}%)
 </p>
