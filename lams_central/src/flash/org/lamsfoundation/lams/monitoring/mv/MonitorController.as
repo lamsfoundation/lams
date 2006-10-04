@@ -245,6 +245,13 @@ class MonitorController extends AbstractController {
 		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 	}
 
+	private function openJournalEntries():Void{
+		var journals_url:String = _root.serverURL+"learning/notebook.do?method=viewAllJournals&lessonID="+_root.lessonID;
+		
+		JsPopup.getInstance().launchPopupWindow(journals_url, 'JournalEntries', 570, 796, true, true, false, false, false);
+	
+	}
+
 	public function click(evt):Void{
 		trace(evt.target);
 		var tgt:String = new String(evt.target);
@@ -265,6 +272,9 @@ class MonitorController extends AbstractController {
 		}else if(tgt.indexOf("help_btn") != -1){
 			trace('you clicked help button..');
 			_monitorModel.tabHelp();
+		}else if(tgt.indexOf("viewJournals_btn") != -1){
+			trace('you clicked journal entries button..');
+			openJournalEntries();
 		}
 	}
 

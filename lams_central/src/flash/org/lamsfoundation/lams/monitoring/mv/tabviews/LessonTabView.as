@@ -181,6 +181,8 @@ public function update (o:Observable,infoObj:Object):Void{
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
 					//mm.getMonitor().getMV().getMonitorScp().contentPath = this;
 					hideMainExp(mm);
+					mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
+						
 					//mm.setDirty();
 					//MovieClipUtils.doLater(Proxy.create(this,draw));
 					
@@ -203,6 +205,8 @@ public function update (o:Observable,infoObj:Object):Void{
 					trace("ContentPath: "+this)
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
 					hideMainExp(mm);
+					mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
+					
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 					
 					

@@ -142,6 +142,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 						//this._visible = true;
 						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = true;
 						hideMainExp(mm);
+						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true)
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						
 						if (mm.activitiesDisplayed.isEmpty()){

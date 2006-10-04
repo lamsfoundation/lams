@@ -465,7 +465,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 /**
 	*Called by the controller when a complex activity is dropped on bin.
 	*/
-	public function removeComplexActivity(ca:CanvasActivity){
+	public function removeComplexActivity(ca){
 		
 		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
 		trace("Number of Children are: "+ca.actChildren.length)

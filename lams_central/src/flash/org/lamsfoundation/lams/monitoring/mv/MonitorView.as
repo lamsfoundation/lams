@@ -78,6 +78,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var refresh_btn:Button;
 	private var help_btn:Button;
 	private var exportPortfolio_btn:Button;
+	private var viewJournals_btn:Button;
 	//private var _activityLayerComplex_mc:MovieClip;
 	//private var _activityLayer_mc:MovieClip;
 	
@@ -167,6 +168,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 			case 'EXPORTSHOWHIDE' :
 				exportShowHide(infoObj.data);
 				break;
+			case 'JOURNALSSHOWHIDE' :
+				journalsShowHide(infoObj.data);
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -184,6 +188,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private function exportShowHide(v:Boolean):Void{
 		exportPortfolio_btn.visible = v;
+	}
+	
+	private function journalsShowHide(v:Boolean):Void{
+		viewJournals_btn.visible = v;
 	}
 	
 	/**
@@ -217,6 +225,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		refresh_btn.addEventListener("click",mcontroller);
 		help_btn.addEventListener("click",mcontroller);
 		exportPortfolio_btn.addEventListener("click", mcontroller);
+		viewJournals_btn.addEventListener("click", mcontroller);
 		
 		refresh_btn.onRollOver = Proxy.create(this,this['showToolTip'], refresh_btn, "refresh_btn_tooltip");
 		refresh_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
@@ -226,6 +235,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		exportPortfolio_btn.onRollOver = Proxy.create(this,this['showToolTip'], exportPortfolio_btn, "class_exportPortfolio_btn_tooltip");
 		exportPortfolio_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		viewJournals_btn.onRollOver = Proxy.create(this,this['showToolTip'], viewJournals_btn, "learner_viewJournals_btn_tooltip");
+		viewJournals_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		
@@ -316,6 +328,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		refresh_btn.setStyle('styleName',styleObj);
 		exportPortfolio_btn.setStyle('styleName',styleObj);
 		help_btn.setStyle('styleName',styleObj);
+		viewJournals_btn.setStyle('styleName', styleObj);
 		
 	}
 	
@@ -323,6 +336,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		refresh_btn.label = Dictionary.getValue('refresh_btn');
 		help_btn.label = Dictionary.getValue('help_btn');
 		exportPortfolio_btn.label = Dictionary.getValue('learner_exportPortfolio_btn');
+		viewJournals_btn.label = Dictionary.getValue('learner_viewJournals_btn');
 	}
 		
 	/**
@@ -338,6 +352,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x,s.h-monitorLesson_scp._y);
 		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x,s.h-monitorSequence_scp._y);
 		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x,s.h-monitorLearner_scp._y);
+		viewJournals_btn._x = s.w - 260;
 		exportPortfolio_btn._x = s.w - 260;
 		refresh_btn._x = s.w - 160
 		help_btn._x = s.w - 80
