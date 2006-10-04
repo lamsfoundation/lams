@@ -860,7 +860,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	    	toolContentObj.setReflectInstructions(null);
 
 	    	// lockOnFinsh = ! isReusable
-	    	Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_MB_REUSABLE);
+	    	Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
 	    	toolContentObj.setLockWhenFinished(bool != null ? ! bool.booleanValue() : false);
 	    	toolContentObj.setMaximumReply(0);
 	    	toolContentObj.setMinimumReply(0);
