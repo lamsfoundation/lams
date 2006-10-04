@@ -86,18 +86,14 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveySessionComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
-import org.lamsfoundation.lams.tool.survey.util.SurveyUserComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-
-import sun.reflect.generics.tree.Tree;
 
 /**
  * 
@@ -614,8 +610,15 @@ public class SurveyServiceImpl implements
 	
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		Survey toolContentObj = surveyDao.getByContentId(toolContentId);
+ 		if(toolContentObj == null) {
+ 			try {
+				toolContentObj = getDefaultSurvey();
+			} catch (SurveyApplicationException e) {
+				throw new DataMissingException(e.getMessage());
+			}
+ 		}
  		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find default content for the survey tool");
  		
  		//set SurveyToolContentHandler as null to avoid copy file node in repository again.
  		toolContentObj = Survey.newInstance(toolContentObj,toolContentId,null);
@@ -770,6 +773,73 @@ public class SurveyServiceImpl implements
 
 	/* ===============Methods implemented from ToolContentImport102Manager =============== */
 
+	/* Sample content for import:
+	 * <struct>
+		<var name='objectType'><string>content</string></var>
+		<var name='id'><number>34.0</number></var>
+		<var name='questions'><array length='3'>
+		<struct>
+			<var name='order'><number>1.0</number></var>
+			<var name='isOptional'><boolean value='true'/></var>
+			<var name='question'><string>Sample Multiple choice - only one response allowed?</string></var>
+			<var name='questionType'><string>simpleChoice</string></var>
+			<var name='isTextBoxEnabled'><boolean value='false'/></var>
+			<var name='candidates'><array length='3'>
+				<struct>
+					<var name='order'><number>1.0</number></var>
+					<var name='answer'><string>Option 1</string></var>
+				</struct>
+				<struct>
+					<var name='order'><number>2.0</number></var>
+					<var name='answer'><string>Option 2</string></var>
+				</struct>
+				<struct>
+					<var name='order'><number>3.0</number></var>
+					<var name='answer'><string>Option 3</string></var>
+				</struct>
+			</array></var>
+		</struct>
+		<struct>
+			<var name='order'><number>2.0</number></var>
+			<var name='isOptional'><boolean value='false'/></var>
+			<var name='question'><string>Sample Multiple choice - multiple response allowed?</string></var>
+			<var name='questionType'><string>choiceMultiple</string></var>
+			<var name='isTextBoxEnabled'><boolean value='true'/></var>
+			<var name='candidates'><array length='3'>
+				<struct>
+					<var name='order'><number>1.0</number></var>
+					<var name='answer'><string>Option 1</string></var>
+				</struct><struct>
+					<var name='order'><number>2.0</number></var>
+					<var name='answer'><string>Option 2</string></var>
+				</struct><struct>
+					<var name='order'><number>3.0</number></var>
+					<var name='answer'><string>Option 3</string></var>
+				</struct>
+			</array></var>
+		</struct>
+		<struct>
+			<var name='order'><number>3.0</number></var>
+			<var name='isOptional'><boolean value='true'/></var>
+			<var name='question'><string>Sample Free text question?</string></var>
+			<var name='questionType'><string>textEntry</string></var>
+			<var name='isTextBoxEnabled'><boolean value='false'/></var>
+			<var name='candidates'><array length='0'></array></var>
+		</struct>
+		</array></var>
+		<var name='contentDefineLater'><boolean value='false'/></var>
+		<var name='body'><string>Put instructions here.</string></var>
+		<var name='contentShowUser'><boolean value='false'/></var>
+		<var name='isHTML'><boolean value='false'/></var>
+		<var name='summary'><string>Thank you for your participation!</string></var> xxxxxxxxxx
+		<var name='title'><string>Put Title Here</string></var>
+		<var name='description'><string>Survey Questions</string></var>
+		<var name='contentType'><string>surveycontent</string></var>
+		<var name='isReusable'><boolean value='false'/></var>
+		</struct></array></var>
+		<var name='firstActivity'><number>31.0</number></var>
+	*/
+	
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
@@ -790,7 +860,8 @@ public class SurveyServiceImpl implements
 	    	toolContentObj.setRunOffline(Boolean.FALSE);
 	    	toolContentObj.setUpdated(now);
 
-	    	toolContentObj.setLockWhenFinished(Boolean.FALSE);
+   	   		Boolean isReusable = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
+	    	toolContentObj.setLockWhenFinished(isReusable != null ? ! isReusable.booleanValue() : true);
 	    	
 	    	SurveyUser ruser = new SurveyUser();
 	    	ruser.setUserId(new Long(user.getUserID().longValue()));
@@ -801,35 +872,64 @@ public class SurveyServiceImpl implements
 		    toolContentObj.setCreatedBy(ruser);
 	
 	    	//survey questions
-	    	Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
-	    	if ( urls != null ) {
-	    		Iterator iter = urls.iterator();
+		    toolContentObj.setQuestions(new HashSet<SurveyQuestion>());
+		    
+	    	Vector questions = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTIONS);
+	    	if ( questions != null ) {
+		    	int dummySequenceNumber = questions.size(); // dummy number in case we can't convert question order
+	    		Iterator iter = questions.iterator();
 	    		while ( iter.hasNext() ) {
-	    			Hashtable urlMap = (Hashtable) iter.next();
+	    			Hashtable questionMap = (Hashtable) iter.next();
 	    			
 	    			SurveyQuestion item = new SurveyQuestion();
 	    			item.setCreateDate(now);
 	    			item.setCreateBy(ruser);
-	
-	    			Vector instructions = (Vector) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
-	    			if ( instructions != null && instructions.size() > 0 ) {
+
+	    			// try to set the type from the map. if that doesn't work then assume it is a text entry
+	    			String surveyType = (String) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION_TYPE);
+	    			if ( ToolContentImport102Manager.CONTENT_SURVEY_TYPE_SINGLE.equals(surveyType)) {
+	    				item.setType((short)1);
+	    				item.setAllowMultipleAnswer(false);
+	    			}
+	    			else if ( ToolContentImport102Manager.CONTENT_SURVEY_TYPE_MULTIPLE.equals(surveyType)) {
+	    				item.setType((short)2);
+	    				item.setAllowMultipleAnswer(true);
+	    			} else { 
+	    				item.setType((short)3);	    			
+	    				item.setAllowMultipleAnswer(false);
+	    			}
+
+					Integer order = WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_SURVEY_ORDER);
+					item.setSequenceId(order!=null?order.intValue():dummySequenceNumber++);
+					
+					item.setDescription((String)questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION));
+					
+					// completion message purposely not supported in 2.0, so value can be dropped.
+
+					Boolean appendText = WDDXProcessor.convertToBoolean(questionMap, ToolContentImport102Manager.CONTENT_SURVEY_TEXTBOX_ENABLED);
+					item.setAppendText(appendText != null ? appendText.booleanValue() : false);
+					
+					Boolean isOptional = WDDXProcessor.convertToBoolean(questionMap, ToolContentImport102Manager.CONTENT_SURVEY_OPTIONAL);
+					item.setOptional(isOptional != null ? isOptional.booleanValue() : false);
+					
+					Vector candidates = (Vector) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_CANDIDATES);
+	    			if ( candidates != null && candidates.size() > 0 ) {
 	    				item.setOptions(new HashSet());
-	    				Iterator insIter = instructions.iterator();
-	    				while (insIter.hasNext()) {
-	    					Hashtable instructionEntry = (Hashtable) insIter.next();
-							String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-							Integer order = WDDXProcessor.convertToInteger(instructionEntry, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-							SurveyOption instruction = new SurveyOption();
-							instruction.setDescription(instructionText);
-							instruction.setSequenceId(order);
-							item.getOptions().add(instruction);
+	    		    	int dummyCandidateOrder = candidates.size(); // dummy number in case we can't convert question order
+	    				Iterator candIter = candidates.iterator();
+	    				while (candIter.hasNext()) {
+	    					Hashtable candidateEntry = (Hashtable) candIter.next();
+							String candidateText = (String) candidateEntry.get(ToolContentImport102Manager.CONTENT_SURVEY_ANSWER);
+							Integer candidateOrder = WDDXProcessor.convertToInteger(candidateEntry, ToolContentImport102Manager.CONTENT_SURVEY_ORDER);
+							
+							SurveyOption option = new SurveyOption();
+							option.setDescription(candidateText);
+							option.setSequenceId(candidateOrder != null ? candidateOrder.intValue() : dummyCandidateOrder++);
+							item.getOptions().add(option);
 						}
 	    			}
 	
-	    			String surveyType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
-	
-	    			// TODO add the order field - no support for it in forum at present.
-	    			// public static final String CONTENT_URL_URL_VIEW_ORDER = "order";
+
 	    			toolContentObj.getQuestions().add(item);
 	    		}
 	    	}

@@ -78,6 +78,8 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * An implementation of the IScribeService interface.
@@ -238,9 +240,11 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	public void exportToolContent(Long toolContentId, String rootPath)
 			throws DataMissingException, ToolException {
 		Scribe scribe = scribeDAO.getByContentId(toolContentId);
+		if (scribe == null) {
+			scribe = getDefaultContent();
+		}
 		if (scribe == null)
-			throw new DataMissingException(
-					"Unable to find tool content by given id :" + toolContentId);
+ 			throw new DataMissingException("Unable to find default content for the scribe tool");
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.
@@ -595,7 +599,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     	scribe.setCreateBy(new Long(user.getUserID().longValue()));
     	scribe.setCreateDate(now);
     	scribe.setDefineLater(Boolean.FALSE);
-    	scribe.setInstructions((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY));
+    	scribe.setInstructions(null);
     	scribe.setOfflineInstructions(null);
     	scribe.setOnlineInstructions(null);
     	scribe.setReflectInstructions(null);
@@ -604,6 +608,30 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     	scribe.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	scribe.setToolContentId(toolContentId);
     	scribe.setUpdateDate(now);
+    	scribe.setAutoSelectScribe(true);
+    	
+    	try {
+    		Boolean isReusable = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
+    		scribe.setLockOnFinished(isReusable != null ? ! isReusable.booleanValue() : true);
+       	} catch (WDDXProcessorConversionException e) {
+       		logger.error("Unable to content for activity "+scribe.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
+    		throw new ToolException("Invalid import data format for activity "+scribe.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+    	}
+
+	    	String headingList = (String)importValues.get(ToolContentImport102Manager.CONTENT_BODY);
+    	if (headingList != null && headingList.length()>0) {
+    		String[] headings = headingList.split("\\^");
+			Set<ScribeHeading> set = new HashSet<ScribeHeading>();
+    		for (int i=0; i < headings.length ; i++) {
+    			ScribeHeading sHeading = new ScribeHeading();
+    			sHeading.setDisplayOrder(i);
+    			sHeading.setHeadingText(headings[i]);
+    			sHeading.setScribe(scribe);
+				set.add(sHeading);
+    		}
+			scribe.setScribeHeadings(set);
+    	}
+    	
     	// leave as empty, no need to set them to anything.
     	//setScribeAttachments(Set scribeAttachments);
     	//setScribeSessions(Set scribeSessions);
