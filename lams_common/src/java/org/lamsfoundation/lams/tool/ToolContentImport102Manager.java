@@ -56,6 +56,7 @@ public interface ToolContentImport102Manager {
 	public static final String TAGS_SIMPLE_ASSESSMENT = "simpleassessment";
 	public static final String TAGS_URLCONTENT = "urlcontent";
 	public static final String TAGS_HTMLNOTICBOARD = "htmlnb";
+	public static final String TAGS_SURVEY = "survey";
 	
 	// the following tools haven't supported for a while or can't be supported by 
 	// import as they are tied to files which won't be in the import, 
@@ -72,6 +73,7 @@ public interface ToolContentImport102Manager {
 	public static final String CONTENT_DEFINE_LATER = "contentDefineLater"; // boolean // used
 	public static final String CONTENT_TITLE = "title"; // used
 	public static final String CONTENT_ID = "id"; // used
+	public static final String CONTENT_REUSABLE = "isReusable"; //type boolean
 	
 	// contentType is based on the content class used - doesn't persist
 	public static final String CONTENT_TYPE = "contentType";
@@ -112,7 +114,6 @@ public interface ToolContentImport102Manager {
 	public static final String CONTENT_MB_POSTING_NOTIFIED = "isPostingNotified"; // type boolean
 	public static final String CONTENT_MB_POSTING_MODERATED = "isPostingModerated"; // type boolean
 	public static final String CONTENT_MB_NEW_TOPIC_ALLOWED = "isNewTopicAllowed"; //type boolean
-	public static final String CONTENT_MB_REUSABLE = "isReusable"; //type boolean
 	public static final String CONTENT_MB_TOPICS = "topics"; // array
 	
 	public static final String CONTENT_MB_TOPIC_SUBJECT = "subject"; // string
@@ -130,6 +131,21 @@ public interface ToolContentImport102Manager {
 	public static final String CONTENT_Q_FEEDBACK = "feedback"; // string
 	public static final String CONTENT_Q_CANDIDATES = "candidates"; // array of string 
 	public static final String CONTENT_Q_ANSWER = "answer"; // string 
+	
+	// Survey content
+	public static final String CONTENT_SURVEY_TEXTBOX_ENABLED = "isTextBoxEnabled"; // boolean
+	public static final String CONTENT_SURVEY_QUESTION_TYPE = "questionType"; // string	
+	public static final String CONTENT_SURVEY_OPTIONAL = "isOptional"; // boolean
+	public static final String CONTENT_SURVEY_QUESTIONS = "questions"; // string
+	public static final String CONTENT_SURVEY_QUESTION = "question"; // string
+	public static final String CONTENT_SURVEY_CANDIDATES = "candidates"; // array of maps, each map contain order and answer
+	public static final String CONTENT_SURVEY_ORDER= "order"; // integer	
+	public static final String CONTENT_SURVEY_ANSWER = "answer"; // string 
+	public static final String CONTENT_SURVEY_COMPLETION_MESSAGE = "summary"; // string 
+
+	public static final String CONTENT_SURVEY_TYPE_SINGLE = "simpleChoice";  
+	public static final String CONTENT_SURVEY_TYPE_MULTIPLE = "choiceMultiple";  
+	public static final String CONTENT_SURVEY_TYPE_TEXTENTRY = "textEntry"; 
 	
 	// for file upload - SingleResource, HTMLNoticeboard, Image tools
 	public static final String DIRECTORY_NAME = "directoryName";

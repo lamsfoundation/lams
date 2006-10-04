@@ -129,8 +129,10 @@ public class LD102Importer implements ApplicationContextAware{
 	/** store the content by content id field, ready for use when the matching activity is processed */
 	private Map<Integer, Hashtable> contentMap = new HashMap<Integer, Hashtable>();
 
-	/** images to use for each tool, based on the library activities in the database. Key is tool id, value is url. */
-	private Map<Long, String> libraryActivityUiImages;
+	/** basic library activity used for the image and activityCategoryID
+	 * to use for each tool, based on the library activities in the database. 
+	 * Key is tool id, value is ToolActivity. */
+	private Map<Long, ToolActivity> libraryActivityForTool;
 	/** Map of the 1.0.2 tool signature (key) to the tool which now supports it (value) */
 	private Map<String, Tool> toolImportSupport;
 
@@ -317,7 +319,7 @@ public class LD102Importer implements ApplicationContextAware{
 	
 	public Long storeLDDataWDDX(String ldWddxPacket, User importer, WorkspaceFolder folder, List<String> toolsErrorMsgs) throws ImportToolContentException
 	{
-		this.libraryActivityUiImages = getLibraryActivityUiImages();
+		this.libraryActivityForTool = getLibraryActivityForTool();
 		this.toolImportSupport = getToolImportSupport();
 		this.toolsErrorMsgs = toolsErrorMsgs;
 			
@@ -758,7 +760,7 @@ public class LD102Importer implements ApplicationContextAware{
 			activity = setupGroupingActivity(taskDetails, contentId, taskUIID, parentActivityId);
 		}
 		else {
-			activity = setupToolActivity(taskDetails, contentId, taskUIID);
+			activity = setupToolActivity(taskDetails, contentId, taskUIID, parentTitle, parentDescription);
 		}
 		
 		if ( activity != null ) {
@@ -772,12 +774,6 @@ public class LD102Importer implements ApplicationContextAware{
 	}
 
 	private void processCommonActivityFields(Hashtable taskDetails, Integer xCoOrd, Integer yCoOrd, Activity activity) throws WDDXProcessorConversionException {
-		// Don't overwrite title and description if they have already be set up from the content. 
-		if ( activity.getDescription() == null && keyExists(taskDetails, WDDXTAGS102.DESCRIPTION))
-		    activity.setDescription(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.DESCRIPTION));
-		if ( activity.getTitle() == null && keyExists(taskDetails, WDDXTAGS102.TITLE))
-		    activity.setTitle(WDDXProcessor.convertToString(taskDetails,WDDXTAGS102.TITLE));
-
 		// define later will have already been set up for tool activities
 		if ( activity.getDefineLater() == null )  {
 			activity.setDefineLater(Boolean.FALSE);
@@ -823,7 +819,7 @@ public class LD102Importer implements ApplicationContextAware{
 		while ( iter.hasNext() )
 		{
 			Hashtable subTask = (Hashtable) iter.next();
-			Activity subActivity = createActivityFromTask(subTask, null, null, null, null, parentTitle, parentDescription);
+			Activity subActivity = createActivityFromTask(subTask, null, null, null, null, null, null);
 			if ( subActivity != null ) {
 				// won't be created if it can't find a matching tool.
 				subActivity.setParentActivity(activity);
@@ -888,23 +884,27 @@ public class LD102Importer implements ApplicationContextAware{
 		return groupingActivity;
 	}
 
-	private ToolActivity setupToolActivity(Hashtable taskDetails, Integer wddxContentId, Integer taskUIID) {
+	private ToolActivity setupToolActivity(Hashtable taskDetails, Integer wddxContentId, Integer taskUIID,  String overrideTitle, String overrideDescription) {
 		ToolActivity activity = new ToolActivity();
 		
 	    activity.setActivityUIID(taskUIID);
 		activity.setActivityTypeId(Activity.TOOL_ACTIVITY_TYPE);
-	    activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
 		
 	    // first, find the matching new tool and set up the tool, tool content details.  
 	    String toolType = (String) taskDetails.get(WDDXTAGS102.TASK_TOOLTYPE);
-	    String title = (String) taskDetails.get(WDDXTAGS102.TITLE);
+	    String toolTitle = (String) taskDetails.get(WDDXTAGS102.TITLE);
+	    String toolDescription = (String) taskDetails.get(WDDXTAGS102.DESCRIPTION);
 	    Tool tool = toolType != null ? toolImportSupport.get(toolType) : null;
 	    if ( tool == null ) {
-			String message = "Unable to find a tool that supports the activity "+title+". This activity will be skipped. Activity is "+taskDetails;
+			String message = "Unable to find a tool that supports the activity "+toolTitle+". This activity will be skipped. Activity is "+taskDetails;
 			log.warn(message);
 			toolsErrorMsgs.add(message);
 	    	return null;
 	    }
+	    
+	    
+		activity.setTitle( overrideTitle != null ? overrideTitle : toolTitle);
+		activity.setDescription( overrideDescription != null ? overrideDescription : toolDescription);
 
 	    ToolContent newContent = new ToolContent(tool);
 	    toolContentDAO.saveToolContent(newContent);
@@ -924,19 +924,25 @@ public class LD102Importer implements ApplicationContextAware{
 			    ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(tool.getServiceName());
 		    	toolService.import102ToolContent(toolContentId, importerDTO, content);
 	    	} catch ( Exception e ) {
-		    	String message = "Tool content for activity "+title+" cannot be set up due to an error. Activity will be use the default content. Activity is "+taskDetails; 
+		    	String message = "Tool content for activity "+toolTitle+" cannot be set up due to an error. Activity will be use the default content. Activity is "+taskDetails; 
 				log.warn(message,e);
 				toolsErrorMsgs.add(message);
 	    	}
 	    } else {
-	    	String message = "Tool content for activity "+title+" is missing. Activity will be set up with default content. Activity is "+taskDetails; 
+	    	String message = "Tool content for activity "+toolTitle+" is missing. Activity will be set up with default content. Activity is "+taskDetails; 
 			log.warn(message);
 			toolsErrorMsgs.add(message);
 	    }
 
 	    // Now find an icon for the activity. The icon is in the activity tables so look for a library activity that matches this tool.
 	    // It may not always find the right icon if there is more than one possible match but its a start!
-	    activity.setLibraryActivityUiImage(libraryActivityUiImages.get(tool.getToolId()));
+	    ToolActivity ta = libraryActivityForTool.get(tool.getToolId());
+	    if ( ta != null ) {
+	    	activity.setLibraryActivityUiImage(ta.getLibraryActivityUiImage());
+	    	activity.setActivityCategoryID(ta.getActivityCategoryID());
+	    } else {
+		    activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
+	    }
 		return activity;
 	}
 
@@ -1050,11 +1056,14 @@ public class LD102Importer implements ApplicationContextAware{
 				optionsActivity.setMinNumberOfOptions(WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.OPTACT_MIN_NUMBER_COMPLETE));
 			optionsActivity.setMaxNumberOfOptions(null); // not supported in 1.0.2.
 			optionsActivity.setOptionsInstructions(null); // not supported in 1.0.2. 
+			optionsActivity.setDescription((String) optionObj.get(WDDXTAGS102.DESCRIPTION));
+			optionsActivity.setTitle((String) optionObj.get(WDDXTAGS102.TITLE));
 		
 			Integer xCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_X);
 			Integer yCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_Y);
+
 			processCommonActivityFields(optionObj, xCoOrd, yCoOrd, optionsActivity);
-		
+			
 			// work out the child activities and move them from the main activity set to the optional activity.
 			Vector subActivityUIIDs = (Vector) optionObj.get(WDDXTAGS102.OPTACT_ACTIVITIES);
 			int orderId = 1;
@@ -1239,30 +1248,41 @@ public class LD102Importer implements ApplicationContextAware{
 		return activity;
 	}
 
-	/** Get all the tool icons based on the library activities
+	/** Get all the tool icons based on the library activities. Goes through all the library
+	 * activities and pulls out the first occurance of each tool. Can't just go through the 
+	 * tool activities as not all tools have a standalone activity e.g. scribe
 	 * @return Map of tool icons - key is tool id, value is url. */
-	private Map<Long, String> getLibraryActivityUiImages() {
+	private Map<Long, ToolActivity> getLibraryActivityForTool() {
 		
-		HashMap<Long, String> imageURLS = new HashMap<Long, String>();
+		HashMap<Long, ToolActivity> activityMap = new HashMap<Long, ToolActivity>();
 		Iterator iterator = learningLibraryDAO.getAllLearningLibraries().iterator();
 		while(iterator.hasNext()){
 			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();		
 			List templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
 			Iterator actIterator = templateActivities.iterator();
 			while ( actIterator.hasNext() ) {
-				Activity activity = (Activity) actIterator.next();
-				if ( activity.isToolActivity() ) {
-					ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId(), ToolActivity.class);
-					Tool tool = toolActivity.getTool();
-					if ( ! imageURLS.containsKey(tool.getToolId()) ) {
-						imageURLS.put(tool.getToolId(), activity.getLibraryActivityUiImage());
-					}
-				}
+				getLibraryActivityFromActivity((Activity)actIterator.next(), activityMap);
 			}
 		}
-		return imageURLS;
+		return activityMap;
 	}
-	
+
+	private void getLibraryActivityFromActivity( Activity activity, HashMap<Long, ToolActivity> activityMap ) {
+		if ( activity.isToolActivity() ) {
+			ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId(), ToolActivity.class);
+			Tool tool = toolActivity.getTool();
+			if ( ! activityMap.containsKey(tool.getToolId()) ) {
+				activityMap.put(tool.getToolId(), toolActivity);
+			}
+		} else if ( activity.isComplexActivity() ) {
+			ComplexActivity complex = (ComplexActivity) activity;
+			Iterator actIterator = complex.getActivities().iterator();
+			while ( actIterator.hasNext() ) {
+				getLibraryActivityFromActivity((Activity)actIterator.next(), activityMap);
+			}
+		}
+	}
+
 	/** Get all Map of the current tools that support the 1.0.2 signatures. */
 	private Map<String, Tool> getToolImportSupport() {
 		
