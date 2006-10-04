@@ -27,7 +27,9 @@ package org.lamsfoundation.lams.notebook.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 public interface ICoreNotebookService {
@@ -36,6 +38,8 @@ public interface ICoreNotebookService {
 			Integer userID, String title, String entry);
 
 	List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
+	
+	List<NotebookEntry> getEntry(Long id, Integer idType, String signature);
 	
 	List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID);
 	
@@ -46,6 +50,8 @@ public interface ICoreNotebookService {
 	void updateEntry(NotebookEntry notebookEntry);
 	
 	void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry);
+	
+	IUserManagementService getUserManagementService();
 	
 	MessageService getMessageService();
 }

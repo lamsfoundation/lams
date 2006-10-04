@@ -31,7 +31,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreNotebookService{
@@ -39,20 +42,26 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 	private static Logger log = Logger.getLogger(CoreNotebookService.class);
 
 	private INotebookEntryDAO notebookEntryDAO;
+
+	protected IUserManagementService userManagementService;
 	
 	protected MessageService messageService;
 	
 	public Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String title, String entry) {
-
+		User user = (User)getUserManagementService().findById(User.class, userID);
 		NotebookEntry notebookEntry = new NotebookEntry(id, idType, signature,
-				userID, title, entry, new Date());
+				user, title, entry, new Date());
 		saveOrUpdateNotebookEntry(notebookEntry);
 		return notebookEntry.getUid();
 	}
 
 	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID) {
 		return notebookEntryDAO.get(id, idType, signature, userID);
+	}
+	
+	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature) {
+		return notebookEntryDAO.get(id, idType, signature);
 	}
 	
 	public List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID) {
@@ -100,6 +109,18 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 
 	public void setNotebookEntryDAO(INotebookEntryDAO notebookEntryDAO) {
 		this.notebookEntryDAO = notebookEntryDAO;
+	}
+	
+	/**
+     * 
+     * @param IUserManagementService The userManagementService to set.
+     */
+	public void setUserManagementService(IUserManagementService userManagementService) {
+		this.userManagementService = userManagementService;
+	}
+	
+	public IUserManagementService getUserManagementService() {
+		return userManagementService;
 	}
 	
 	/**

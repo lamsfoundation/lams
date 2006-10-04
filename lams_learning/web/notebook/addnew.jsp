@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<div class="field-name" style="text-align: left;">
 							<fmt:message key="mynotes.entry.entry.label"></fmt:message>
 						</div>
-						<lams:textarea property="entry" styleId="entry" style="width: 100%" rows="10" />
+						<html:textarea property="entry" styleId="entry" style="width: 100%" rows="10" />
 					</td>
 				</tr>
 			</table>

@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<div align="left" width="90">
 			<c:forEach var="entry" items="${portfolio.notebookPortfolios}" varStatus="status">
 			<p>
-				<b><c:out value="${entry.title}"/></b>
+				<b><c:out value="${entry.title}" escapeXml="false"/></b>
 				<br><i>
 				<c:choose>
 					<c:when test="${entry.teacherViewable}"><fmt:message key="export.portfolio.notebook.public.label"/></c:when>
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:param><lams:Date value="${entry.modified}"/></fmt:param>
 					</fmt:message></i>
 			</p>
-			<p><c:out value="${entry.entry}"/></p>
+			<p><lams:out value="<c:out value="${entry.entry}" escapeXml="false"/>"/></p>
 			<hr>
 			</c:forEach>
 		</div>

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -81,7 +82,9 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 				notebookEntry.setExternalSignature(WDDXProcessor.convertToString(table, WDDXTAGS.EXTERNAL_SIG));
 			}
 			if (keyExists(table, WDDXTAGS.USER_ID)) {
-				notebookEntry.setUserID(WDDXProcessor.convertToInteger(table, WDDXTAGS.USER_ID));
+				User user = (User) notebookService.getUserManagementService().findById(User.class,WDDXProcessor.convertToInteger(table, WDDXTAGS.USER_ID));
+				
+				notebookEntry.setUser(user);
 			}
 			if (keyExists(table, WDDXTAGS.TITLE)) {
 				notebookEntry.setTitle(WDDXProcessor.convertToString(table, WDDXTAGS.TITLE));

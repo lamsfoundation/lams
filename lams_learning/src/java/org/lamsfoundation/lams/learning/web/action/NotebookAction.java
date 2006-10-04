@@ -50,9 +50,14 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.notebook.service.IExtendedCoreNotebookService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.util.WebUtil;
 
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -70,6 +75,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  *                
  * @struts.action-forward name = "viewAll" path = ".notebookViewAll"
  * @struts.action-forward name= "viewSingle" path = ".notebookViewSingle"
+ * @struts.action-forward name= "viewJournals" path = ".notebookViewJournals"
  * @struts.action-forward name = "addNew" path = ".notebookAddNew"
  * @struts.action-forward name = "saveSuccess" path = ".notebookSaveSuccess"
  * ----------------XDoclet Tags--------------------
@@ -86,6 +92,7 @@ public class NotebookAction extends LamsDispatchAction
 	
 	private static final String VIEW_ALL = "viewAll";
 	private static final String VIEW_SINGLE = "viewSingle";
+	private static final String VIEW_JOURNALS = "viewJournals";
 	private static final String ADD_NEW = "addNew";
 	private static final String SAVE_SUCCESS = "saveSuccess";
 
@@ -125,8 +132,69 @@ public class NotebookAction extends LamsDispatchAction
 		
 	}
 	
+	
 	/**
-	 * View all notebook entries
+	 * View all journals entries from a lesson call
+	 */
+	public ActionForward viewAllJournals(
+				ActionMapping mapping,
+				ActionForm actionForm,
+				HttpServletRequest request,
+				HttpServletResponse response) 
+				throws IOException, ServletException {
+	
+		// List of Journal entries
+		List<NotebookEntry> journals = null;
+		
+		DynaActionForm notebookForm = (DynaActionForm)actionForm;
+        
+        // lesson service
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+        // getting requested object according to coming parameters
+		Integer userID = LearningWebUtil.getUserId();
+		
+		// lessonID
+		Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+		Lesson lesson = learnerService.getLesson(lessonID);
+		
+		// check user has permission
+		User user = (User)LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(User.class,userID);
+		
+		if ( lesson.getUser() != null && lesson.getUser().getUserId().equals(userID) ) {
+			journals = getJournals(lesson.getLessonId());
+		}
+		
+		if ( lesson == null || lesson.getLessonClass()==null || !lesson.getLessonClass().isStaffMember(user) ) {
+		    throw new UserAccessDeniedException("User "+userID+" may not retrieve journal entries for lesson "+lesson.getLessonId());
+		} else if(journals == null){
+			journals = getJournals(lesson.getLessonId());
+		}
+		
+		request.getSession().setAttribute("journals", journals);
+		request.setAttribute("lessonID", lessonID);
+		
+        return mapping.findForward(VIEW_JOURNALS);
+	}
+	
+	/**
+	 * 
+	 * @param lessonID	Lesson to get the journals from.
+	 * @return	List of Journal entries
+	 */
+	private List<NotebookEntry> getJournals(Long lessonID) {
+		// initialize service object
+        ICoreNotebookService notebookService = (ICoreNotebookService) getNotebookService();
+        
+		if(lessonID == null)
+			return null;
+		
+		return notebookService.getEntry(lessonID, CoreNotebookConstants.SCRATCH_PAD, CoreNotebookConstants.JOURNAL_SIG);
+		
+	}
+	
+	/**
+	 * View single notebook entry
 	 */
 	public ActionForward viewEntry(
 				ActionMapping mapping,
@@ -141,6 +209,7 @@ public class NotebookAction extends LamsDispatchAction
         DynaActionForm notebookForm = (DynaActionForm)actionForm;
         Long uid = (Long) notebookForm.get("uid");
         String mode = WebUtil.readStrParam(request, "mode", true);
+        
         
         NotebookEntry entry = notebookService.getEntry(uid);
         
@@ -209,7 +278,7 @@ public class NotebookAction extends LamsDispatchAction
 		
         // check entry is being edited by it's owner
 		Integer userID = LearningWebUtil.getUserId();
-        if(userID != entryObj.getUserID()) {
+        if(userID != entryObj.getUser().getUserId()) {
         	// throw exception
         }
         

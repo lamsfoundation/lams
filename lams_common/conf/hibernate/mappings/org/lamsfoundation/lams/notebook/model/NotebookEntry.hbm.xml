@@ -49,13 +49,18 @@
             column="external_signature"
         />
 
-        <property
-            name="userID"
-            type="java.lang.Integer"
+        <many-to-one
+            name="user"
+            class="org.lamsfoundation.lams.usermanagement.User"
+            cascade="none"
+            outer-join="auto"
             update="true"
             insert="true"
-            column="user_id"
-        />
+        >
+            <column
+                name="user_id" 
+            />
+        </many-to-one>
 
         <property
             name="title"

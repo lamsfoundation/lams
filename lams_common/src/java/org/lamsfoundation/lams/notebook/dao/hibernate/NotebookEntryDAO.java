@@ -36,6 +36,9 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG = "from " + NotebookEntry.class.getName() 
 							+ " where external_id=? and external_id_type=? and external_signature=? and user_id=?"
 							+ " order by create_date desc";
+	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG_ALL = "from " + NotebookEntry.class.getName() 
+							+ " where external_id=? and external_id_type=? and external_signature=?"
+							+ " order by user_id asc, create_date desc";
 	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName() 
 							+ " where external_id=? and external_id_type=? and user_id=?"
 							+ " order by create_date desc";
@@ -45,6 +48,7 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 							+ " where user_id=? and external_id_type=?"
 							+ " order by external_signature desc, create_date desc";
 	
+	
 	public void saveOrUpdate(NotebookEntry notebookEntry) {
 		this.getHibernateTemplate().saveOrUpdate(notebookEntry);
 		this.getHibernateTemplate().flush();
@@ -52,6 +56,10 @@ public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
 
 	public List<NotebookEntry> get(Long id, Integer idType, String signature, Integer userID) {
 		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG, new Object[]{id, idType, signature, userID}));
+	}
+	
+	public List<NotebookEntry> get(Long id, Integer idType, String signature) {
+		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG_ALL, new Object[]{id, idType, signature}));
 	}
 	
 	public List<NotebookEntry> get(Long id, Integer idType, Integer userID) {

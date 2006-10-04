@@ -24,21 +24,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
-	<c:set var="addnote">
-			<html:rewrite page="/notebook/add.do?lessonID=" /><c:out value="${lessonID}"/>
-	</c:set> 
 	<div id="content">
-		<h1><fmt:message key="mynotes.title"/></h1>
+		<h1><fmt:message key="mynotes.journals.title"/></h1>
 	
 		<h2><fmt:message key="mynotes.view.all.button"/></h2>
 		<p>&nbsp;</p>
-		<table class="alternative-color">		
-			<c:forEach var="entry" items="${entries}" varStatus="status">
+		<table class="alternative-color">
+					
+			<c:forEach var="entry" items="${journals}" varStatus="status">
 				
-				<!-- set sig check flag -->
+				<!-- set user check flag -->
 				<c:if test="${status.first}">
-					<c:set var="sigToCheck" value="${entry.externalSignature}"/>
-					<h2><fmt:message key="mynotes.signature.${sigToCheck}.heading"/></h2>
+					<c:set var="userToCheck" value="${entry.user.userId}"/>
+					<h2><c:out value="${entry.user.fullName}" escapeXml="false"/></h2>
 						<tr>
 							<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label"/></th>
 							<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label"/></th>
@@ -46,23 +44,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 				</c:if>
 				
-				<c:if test="${!empty sigToCheck && sigToCheck != entry.externalSignature}">
+				<c:if test="${!empty userToCheck && userToCheck != entry.user.userId}">
 					<!-- do segment separator -->
 					</table>
 					
-					<table>
-						<tr>
-							<td>
-								<div class="right-buttons">
-									<a href="${addnote}" class="button" id="addNewBtn"><fmt:message key="mynotes.add.new.button"/></a>
-								</div>
-							</td>
-						</tr>
-					</table>
-					
-					<c:set var="sigToCheck" value="${entry.externalSignature}"/>
-					<h2><fmt:message key="mynotes.signature.${sigToCheck}.heading"/></h2>
-					
+					<c:set var="userToCheck" value="${entry.user.userId}"/>
+					<h2><c:out value="${entry.user.fullName}" escapeXml="false"/></h2>
 					<table class="alternative-color">
 						<tr>
 							<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label"/></th>
@@ -74,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td align="left" width="28%">
 						<c:set var="viewnote">
-							<html:rewrite page="/notebook.do?method=viewEntry&uid=" /><c:out value="${entry.uid}"/>
+							<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=" /><c:out value="${entry.uid}"/>
 						</c:set> 
 						<html:link href="${viewnote}">
 							<c:out value="${entry.title}" escapeXml="false"/>
@@ -90,7 +77,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr>
 				<td>
 				<div class="right-buttons">
-					<a href="${addnote}" class="button" id="addNewBtn"><fmt:message key="mynotes.add.new.button"/></a>
+					<a href="#" class="button" id="addNewBtn" onClick="window.close();"><fmt:message key="label.close.button"/></a>
 				</div>
 				</td>
 			</tr>

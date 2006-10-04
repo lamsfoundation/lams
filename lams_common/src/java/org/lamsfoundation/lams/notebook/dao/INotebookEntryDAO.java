@@ -45,4 +45,7 @@ public interface INotebookEntryDAO {
 	
 	List<NotebookEntry> get(Long id, Integer idType, String signature,
 			Integer userID);
+	
+	List<NotebookEntry> get(Long id, Integer idType, String signature);
+
 }

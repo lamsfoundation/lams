@@ -43,7 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="signature"/>
 			<html:hidden property="lessonID" value="${entry.externalID}"/>
 	
-		<h1><fmt:message key="mynotes.title"/></h1>
+		<h1><c:choose><c:when test="${mode == 'teacher'}"><fmt:message key="mynotes.journals.title"/></c:when><c:otherwise><fmt:message key="mynotes.title"/></c:otherwise></c:choose></h1>
 		
 		<!-- title -->
 		<h2><c:choose>
@@ -83,9 +83,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:otherwise>
 					<tr>
 						<td>
-							<p><c:out value="${entry.entry}" escapeXml="false"/></p>
+							<c:set var="entryTxt"><c:out value="${entry.entry}" escapeXml="false"/></c:set>
+							<p><lams:out value="${entryTxt}" /></p>
 						</td>
 					</tr>
+					<c:if test="${mode == 'teacher'}">
+						<tr>
+							<td>
+								<p><i><fmt:message key="mynotes.entry.submitted.by">
+									<fmt:param>
+										<c:out value="${entry.user.fullName}" escapeXml="false"/>
+									</fmt:param>
+								</fmt:message></i></p>
+							</td>
+						</tr>
+					</c:if>	
 				</c:otherwise>
 			</c:choose>
 			<tr>
