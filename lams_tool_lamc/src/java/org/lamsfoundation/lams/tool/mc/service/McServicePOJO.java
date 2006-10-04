@@ -2545,18 +2545,10 @@ public class McServicePOJO implements
 	    	Vector questions = (Vector) importValues.get(CONTENT_Q_QUESTION_INFO);
 	    	if ( questions != null ) {
 	    		
-	    		// work out what weights to give questions. 1.0.2 didn't have weights so try to make
-	    		// them all equal. But should add up 100% so may have to fudge the first one.
-	    		int numQuestions =  questions.size();
-		    	int standardPercentage = 100/numQuestions;
-		    	int firstPercentage = numQuestions > 1 ? 100 - (numQuestions - 1)* standardPercentage : 100;
-		    	boolean isFirst = true;
-		    	
 	    		Iterator iter = questions.iterator();
 	    		while (iter.hasNext()) {
 	    			Hashtable questionMap = (Hashtable) iter.next();
-	    			create102Question(questionMap, isFirst ? firstPercentage : standardPercentage, toolContentObj );
-	    			isFirst = false;
+	    			create102Question(questionMap, toolContentObj );
 				}    	
 	
 	    	}
@@ -2570,14 +2562,17 @@ public class McServicePOJO implements
     }
 
 
-    private void create102Question( Hashtable questionMap, Integer weight, McContent toolContentObj) throws WDDXProcessorConversionException {
+    private void create102Question( Hashtable questionMap, McContent toolContentObj) throws WDDXProcessorConversionException {
 		McQueContent question = new McQueContent();
 		question.setDisplayOrder( WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_Q_ORDER) );
-		// only one feedback field in 1.0.2, so use it for both
-		//question.setFeedbackCorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
-		//question.setFeedbackIncorrect((String)questionMap.get(CONTENT_Q_FEEDBACK));
+		
+		question.setFeedback((String)questionMap.get(CONTENT_Q_FEEDBACK));
 		question.setQuestion((String)questionMap.get(CONTENT_Q_QUESTION));
-		question.setWeight( weight );
+		
+		// In 1.0.2 all questions are implicitly assumed to be 1 and be of equal weight
+		// I think the weights are actually ignored, so just set to 0 (FM) 
+		question.setWeight( 0 );
+		question.setMark( 1 );
 		
 		String correctAnswer = (String)questionMap.get(CONTENT_Q_ANSWER);
 
