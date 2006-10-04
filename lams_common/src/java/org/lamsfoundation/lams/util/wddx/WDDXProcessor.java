@@ -29,7 +29,6 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Hashtable;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.xml.sax.InputSource;
@@ -75,8 +74,9 @@ public class WDDXProcessor {
 		String ret = null;
 		if ( inputPacket != null )
 		{
-			ret = StringUtils.replace(inputPacket,"%0D%0A","\r\n");
-			ret = StringUtils.replace(ret,"<char code='0a'/><char code='0a'/>","\r\n");
+			ret = inputPacket.replace("%0D%0A","\r\n");
+			ret = ret.replace("<char code='0a'/>","\n");
+			ret = ret.replace("<char code=\"0a\"/>","\n");
 		}
 		return ret;
 	}
