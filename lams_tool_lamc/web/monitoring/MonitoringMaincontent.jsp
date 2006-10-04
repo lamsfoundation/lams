@@ -48,9 +48,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<script type="text/javascript">
 	
-	   	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-	
         function init(){
         
             initTabSize(4);
@@ -166,6 +163,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="currentUid"/>
 		<html:hidden property="selectedToolSessionId"/>							
 		<input type="hidden" name="isToolSessionChanged"/>	
+		
+		<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="monitoring"/>
 		
 			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 			<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />

@@ -158,6 +158,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<%@ include file="/common/messages.jsp"%>
 		   
+		<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="authoring"/>
 		
 		<c:if test="${mcGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
 			<!-- tab content 1 (Basic) -->
