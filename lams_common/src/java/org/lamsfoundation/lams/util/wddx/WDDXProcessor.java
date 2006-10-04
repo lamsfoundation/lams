@@ -76,6 +76,7 @@ public class WDDXProcessor {
 		if ( inputPacket != null )
 		{
 			ret = StringUtils.replace(inputPacket,"%0D%0A","\r\n");
+			ret = StringUtils.replace(ret,"<char code='0a'/><char code='0a'/>","\r\n");
 		}
 		return ret;
 	}
