@@ -27,7 +27,6 @@
  * TODO: jsmath option to install as compressed war
  * TODO: custom lams admin user
  * TODO: desktop icons, readme?
- * TODO: detect LAMS 1 installation
  */
 
 # includes
@@ -79,6 +78,7 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 # installer screen progression
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\license.txt"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE CompLeave
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom PreMySQLConfig PostMySQLConfig
@@ -325,6 +325,20 @@ Function CheckMySQL
 FunctionEnd
 
 
+Function CompLeave
+    # check LAMS 1
+    ReadRegStr $0 HKLM "SOFTWARE\LAMS\Server" "install_dir"
+    ReadRegStr $1 HKLM "SOFTWARE\LAMS\Server" "install_status"
+    ReadRegStr $2 HKLM "SOFTWARE\LAMS\Server" "install_version"
+    ${If} $0 == $INSTDIR
+        ${If} $1 == "successful"
+            MessageBox MB_OK|MB_ICONEXCLAMATION "There appears to be a LAMS $2 installation at $INSTDIR - please chose another location."
+            Abort
+        ${EndIf}
+    ${EndIf}
+FunctionEnd
+
+
 Function PreMySQLConfig
     Call CheckMySQL
     !insertmacro MUI_INSTALLOPTIONS_WRITE "mysql.ini" "Field 3" "State" "$MYSQL_DIR"
@@ -346,11 +360,8 @@ Function PostMySQLConfig
     Pop $1
     ${StrStr} $0 $1 "5.0"
     ${If} $0 == "" ; if not 5.0.x, check 5.1.x
-        nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
-        Pop $2
-        Pop $3
-        ${StrStr} $2 $3 "5.1"
-        ${If} $2 == ""
+        ${StrStr} $0 $1 "5.1"
+        ${If} $0 == ""
             MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$\r$\n$1"
         ${EndIf}
     ${EndIf}
@@ -367,13 +378,13 @@ Function PostMySQLConfig
     # check root password is correct
     ${StrStr} $2 $1 "Access denied"
     ${If} $2 != ""
-        MessageBox MB_OK|MB_ICONSTOP "The MySQL root password appears to be incorrect - please re-enter your password."
+        MessageBox MB_OK|MB_ICONEXCLAMATION "The MySQL root password appears to be incorrect - please re-enter your password."
         Abort
     ${EndIf}
     # check mysql is running
     ${StrStr} $2 $1 "mysqld is alive"
     ${If} $2 == ""
-        MessageBox MB_OK|MB_ICONSTOP "MySQL does not appear to be running - please make sure it is running before continuing."
+        MessageBox MB_OK|MB_ICONEXCLAMATION "MySQL does not appear to be running - please make sure it is running before continuing."
         Abort
     ${EndIf}
 FunctionEnd
@@ -400,7 +411,7 @@ Function PostLAMSConfig
     Pop $1
     ${StrStr} $0 $1 "1.5"
     ${If} $0 == ""
-        MessageBox MB_OK|MB_ICONSTOP "Could not verify Java JDK 1.5, please check your JDK directory."
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, please check your JDK directory."
         Abort
     ${EndIf}
 FunctionEnd
@@ -925,7 +936,7 @@ Section "Uninstall"
         Pop $0
         Pop $1
         ${If} $0 == 1
-            MessageBox MB_OK|MB_ICONSTOP "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
             DetailPrint "Failed to remove LAMS database."
         ${EndIf}
     ${EndIf}
@@ -938,7 +949,7 @@ Section "Uninstall"
     ; can't call StrStr from within uninstaller unless it's a un. function
     ${un.StrStr} $2 $1 "SUCCESS"
     ${If} $2 == ""
-        MessageBox MB_OK|MB_ICONSTOP "Couldn't remove LAMSv2 service.$\r$\n$\r$\n$1"
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMSv2 service.$\r$\n$\r$\n$1"
         DetailPrint "Failed to remove LAMSv2 service."
     ${Else}
         DetailPrint "Removed LAMSv2 service."
