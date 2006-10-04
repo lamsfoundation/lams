@@ -25,7 +25,9 @@
 /*
  * TODO: uninstaller option to keep database/lams.xml/repository
  * TODO: jsmath option to install as compressed war
- *
+ * TODO: custom lams admin user
+ * TODO: desktop icons, readme?
+ * TODO: detect LAMS 1 installation
  */
 
 # includes
@@ -58,8 +60,8 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 
 # set welcome page
 !define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n \
-    Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x.\r\n\r\n \
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\
+    Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x.\r\n\r\n\
     Click Next to continue."
 
 # set components page type
@@ -70,6 +72,10 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
+# display finish page stuff
+!define MUI_FINISHPAGE_LINK "Visit LAMS Community"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
+
 # installer screen progression
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\license.txt"
@@ -77,6 +83,7 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom PreMySQLConfig PostMySQLConfig
 Page custom PreLAMSConfig PostLAMSConfig
+Page custom PreLAMS2Config PostLAMS2Config
 Page custom PreWildfireConfig PostWildfireConfig
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -149,6 +156,7 @@ UninstPage custom un.PreUninstall un.PostUninstall
 # reserve files
 #
 ReserveFile "lams.ini"
+ReserveFile "lams2.ini"
 ReserveFile "mysql.ini"
 ReserveFile "wildfire.ini"
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
@@ -168,6 +176,8 @@ Var LAMS_PORT
 Var LAMS_LOCALE
 Var LAMS_REPOSITORY
 Var LAMS_CONF
+Var LAMS_USER
+Var LAMS_PASS
 Var WILDFIRE_DOMAIN
 Var WILDFIRE_USER
 Var WILDFIRE_PASS
@@ -288,6 +298,7 @@ Function .onInit
     
     # extract custom page display config
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams.ini"
+    !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams2.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "mysql.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "wildfire.ini"
 FunctionEnd
@@ -317,7 +328,7 @@ FunctionEnd
 Function PreMySQLConfig
     Call CheckMySQL
     !insertmacro MUI_INSTALLOPTIONS_WRITE "mysql.ini" "Field 3" "State" "$MYSQL_DIR"
-    !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access" "Choose a MySQL database and user account for LAMS.  If unsure, use the default."
+    !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access (1/4)" "Choose a MySQL database and user account for LAMS.  If unsure, use the defaults."
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "mysql.ini"
 FunctionEnd
 
@@ -371,20 +382,17 @@ FunctionEnd
 Function PreLAMSConfig
     Call CheckJava
     !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
-    !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 10" "State" "$INSTDIR\repository"
-    !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 12" "State" "C:\lamsconf"
-    !insertmacro MUI_HEADER_TEXT "Setting Up LAMS" "Configure the LAMS Server.  If unsure, use the default."
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 6" "State" "C:\lamsconf"
+    !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (2/4)" "Configure the LAMS Server.  If unsure, use the defaults."
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
 FunctionEnd
 
 
 Function PostLAMSConfig
     !insertmacro MUI_INSTALLOPTIONS_READ $JDK_DIR "lams.ini" "Field 2" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_DOMAIN "lams.ini" "Field 4" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PORT "lams.ini" "Field 6" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_LOCALE "lams.ini" "Field 8" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams.ini" "Field 10" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_CONF "lams.ini" "Field 12" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams.ini" "Field 4" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_CONF "lams.ini" "Field 6" "State"
 
     # check java version using given dir
     nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
@@ -398,8 +406,23 @@ Function PostLAMSConfig
 FunctionEnd
 
 
+Function PreLAMS2Config
+    !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (3/4)" "Configure the LAMS Server, and choose an admin username and password."
+    !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams2.ini"
+FunctionEnd
+
+
+Function PostLAMS2Config
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_DOMAIN "lams2.ini" "Field 8" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PORT "lams2.ini" "Field 9" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_LOCALE "lams2.ini" "Field 12" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_USER "lams2.ini" "Field 2" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PASS "lams2.ini" "Field 5" "State"
+FunctionEnd
+
+
 Function PreWildfireConfig
-    !insertmacro MUI_HEADER_TEXT "Setting Up Wildfire Chat Server" "Configure Wildfire, chat server for LAMS.  If unsure, use the default."
+    !insertmacro MUI_HEADER_TEXT "Setting Up Wildfire Chat Server (4/4)" "Configure Wildfire, chat server for LAMS.  If unsure, use the default."
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "wildfire.ini"
 FunctionEnd
 
@@ -773,7 +796,7 @@ LangString DESC_jsmath ${LANG_ENGLISH} "Include jsMath to be able to write and d
 Var UNINSTALL_DB
 
 Function un.onInit
-    !insertmacro MUI_LANGDLL_DISPLAY
+    ;!insertmacro MUI_LANGDLL_DISPLAY
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "uninstall.ini"
     
     # check if LAMS is stopped
