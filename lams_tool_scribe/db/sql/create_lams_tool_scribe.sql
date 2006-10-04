@@ -22,6 +22,7 @@ alter table tl_lascrb11_session add index FK89732793E46919FF (appointed_scribe_u
 alter table tl_lascrb11_user add index FK187DAFEE1C266FAE (scribe_session_uid), add constraint FK187DAFEE1C266FAE foreign key (scribe_session_uid) references tl_lascrb11_session (uid);
 
 INSERT INTO tl_lascrb11_scribe (
+	uid,
 	title,
 	instructions,
 	online_instructions,
@@ -34,6 +35,7 @@ INSERT INTO tl_lascrb11_scribe (
 	reflect_on_activity,
 	auto_select_scribe) 
 VALUES(
+	1,
 	"LAMS Scribe",
 	"Scribe Instruction",
 	"Online instructions",
@@ -46,5 +48,16 @@ VALUES(
 	0,
 	1
 );
+
+INSERT INTO tl_lascrb11_heading(
+	heading,
+	scribe_uid,
+	display_order)
+VALUES(
+	"Scribe Heading",
+	1,
+	0
+);
+
 
 SET FOREIGN_KEY_CHECKS=1;
