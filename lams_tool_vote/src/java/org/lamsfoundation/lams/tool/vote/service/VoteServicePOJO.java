@@ -2222,7 +2222,7 @@ public class VoteServicePOJO implements
 			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);
 	    	toolContentObj.setAllowText(bool!=null?bool:false);
 
-	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_MB_REUSABLE);
+	    	bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
 	    	toolContentObj.setLockOnFinish(bool!=null?bool:true);
 
 	    	Integer maxCount = WDDXProcessor.convertToInteger(importValues, ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);

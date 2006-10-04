@@ -95,6 +95,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -1113,6 +1115,16 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     	chat.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	chat.setToolContentId(toolContentId);
     	chat.setUpdateDate(now);
+    	
+    	try {
+    		Boolean isReusable = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
+    		chat.setLockOnFinished(isReusable != null ? ! isReusable.booleanValue() : true);
+		} catch (WDDXProcessorConversionException e) {
+			logger.error("Unable to content for activity "+chat.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
+			throw new ToolException("Invalid import data format for activity "+chat.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+		}
+
+
     	// leave as empty, no need to set them to anything.
     	//setChatAttachments(Set chatAttachments);
     	//setChatSessions(Set chatSessions);
