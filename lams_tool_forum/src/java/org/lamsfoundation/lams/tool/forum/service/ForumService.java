@@ -24,7 +24,8 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.forum.service;
 
-import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE; 
+import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,9 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -878,58 +877,67 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
             // isHTML - no equivalent in 2.0
             // terminationType=moderator - no equivalent in 2.0
 
+	    	ForumUser forumUser = new ForumUser();
+			forumUser.setUserId(new Long(user.getUserID().longValue()));
+			forumUser.setFirstName(user.getFirstName());
+			forumUser.setLastName(user.getLastName());
+			forumUser.setLoginName(user.getLogin());
+			createUser(forumUser);
+	    	toolContentObj.setCreatedBy(forumUser);
+	
+	    	// leave as empty, no need to set them to anything.
+	    	//toolContentObj.setAttachments(attachments);
+	    	forumDao.saveOrUpdate(toolContentObj);
+	
+	    	// topics in the XML file are ordered using the "number" field, not in their order in the vector.
+	    	TreeMap<Integer, Map> messageMaps = new TreeMap<Integer, Map>();
+	    	Vector topics = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_MB_TOPICS);
+			Date msgDate = null;
+	    	if ( topics != null ) {
+	    		Iterator iter = topics.iterator();
+	    		while ( iter.hasNext() ) {
+	    			Hashtable messageMap = (Hashtable) iter.next();
+	    	    	Integer order = WDDXProcessor.convertToInteger(messageMap, ToolContentImport102Manager.CONTENT_MB_TOPIC_NUMBER);
+	    			messageMaps.put(order, messageMap);
+	    		}
+	    		
+	        	iter = messageMaps.values().iterator();
+	        	while ( iter.hasNext() ) {
+	        			
+	    			Map messageMap = (Map) iter.next();
+	
+	    			Message message = new Message();
+	    			message.setIsAuthored(true);
+	    			
+	    			// topics are ordered by date, so I need to try to assign each entry a different date. Won't work if this is too quick.
+	    			if ( msgDate != null ) {
+	    				try {
+	    					Thread.sleep(1000);
+	    				} catch (Exception e) {}
+	    			}
+	    			msgDate = new Date();
+	
+	    			message.setCreated(msgDate);
+	    			message.setCreatedBy(forumUser);
+	    			message.setUpdated(msgDate);
+	    			message.setLastReplyDate(msgDate);
+	    			message.setSubject((String)messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
+	    			message.setBody((String)messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE));
+	    			// ignore the old subject field - it wasn't updated by the old interface.
+	    			message.setHideFlag(Boolean.FALSE);
+	    			message.setIsAnonymous(Boolean.FALSE);
+	    			
+	    			createRootTopic(toolContentObj.getUid(),null,message);
+	    			
+	        	}
+	    	}
+	    	
 		} catch (WDDXProcessorConversionException e) {
 			log.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
 			throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 		}
 
 
-    	ForumUser forumUser = new ForumUser();
-		forumUser.setUserId(new Long(user.getUserID().longValue()));
-		forumUser.setFirstName(user.getFirstName());
-		forumUser.setLastName(user.getLastName());
-		forumUser.setLoginName(user.getLogin());
-		createUser(forumUser);
-    	toolContentObj.setCreatedBy(forumUser);
-
-    	// leave as empty, no need to set them to anything.
-    	//toolContentObj.setAttachments(attachments);
-    	forumDao.saveOrUpdate(toolContentObj);
-
-    	log.warn("Unable to order the forum topics in "+toolContentObj.getTitle()
-				+" tool content id "+toolContentObj.getContentId());
-		
-    	Vector topics = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_MB_TOPICS);
-		Date msgDate = null;
-    	if ( topics != null ) {
-    		Iterator iter = topics.iterator();
-    		while ( iter.hasNext() ) {
-    			Map messageMap = (Map) iter.next();
-    			
-    			Message message = new Message();
-    			message.setIsAuthored(true);
-    			
-    			// topics are ordered by date, so I need to try to assign each entry a different date. Won't work if this is too quick.
-    			if ( msgDate != null ) {
-    				try {
-    					Thread.sleep(1000);
-    				} catch (Exception e) {}
-    			}
-				msgDate = new Date();
-
-				message.setCreated(msgDate);
-    			message.setCreatedBy(forumUser);
-    			message.setUpdated(msgDate);
-    			message.setLastReplyDate(msgDate);
-    			message.setSubject((String)messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-    			message.setBody((String)messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE));
-    			// ignore the old subject field - it wasn't updated by the old interface.
-    			message.setHideFlag(Boolean.FALSE);
-    			message.setIsAnonymous(Boolean.FALSE);
-    			
-    			createRootTopic(toolContentObj.getUid(),null,message);
-    		}
-    	}
 
     }
 
