@@ -217,6 +217,9 @@ INSERT INTO lams_tool_import_support VALUES (7, 'lachat11', 'chat');
 INSERT INTO lams_tool_import_support VALUES (8, 'larsrc11', 'urlcontent');
 INSERT INTO lams_tool_import_support VALUES (11, 'lavote11', 'ranking');
 INSERT INTO lams_tool_import_support VALUES (12, 'lantbk11', 'journal');
+INSERT INTO lams_tool_import_support VALUES (13, 'lascrb11', 'groupreporting');
+INSERT INTO lams_tool_import_support VALUES (14, 'lasurv11', 'survey');
+
 
 -- external server mapping to a lams organisation
 INSERT INTO lams_ext_server_org_map VALUES
