@@ -15,5 +15,5 @@ FCKConfig.ToolbarSets["Default-Learner"] = [
 	['FontFormat','FontName','FontSize']
 ] ;
 
-FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../css/default.css' ;
+FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../css/defaultHTML.css' ;
 FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/office2003/' ;
