@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -29,7 +30,9 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class RegisterServiceSoapBindingImpl implements org.lamsfoundation.lams.webservice.Register{
+public class RegisterServiceSoapBindingImpl implements Register{
+	
+	Logger log = Logger.getLogger(RegisterServiceSoapBindingImpl.class);
 	
 	private static final String DEMO_ORG_NAME = "Demo Organisation";
 	
@@ -38,31 +41,38 @@ public class RegisterServiceSoapBindingImpl implements org.lamsfoundation.lams.w
 	private static IUserManagementService service = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext()).getBean("userManagementService");
 
 	public boolean createUser(String username, String password, String firstName, String lastName, String email) throws java.rmi.RemoteException {
-		User user = new User();
-		user.setLogin(username);
-		user.setPassword(password);
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setEmail(email);
-        user.setAuthenticationMethod((AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
-        user.setCreateDate(new Date());
-        user.setDisabledFlag(false);
-        user.setLocale(getLocale());
-		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-		List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
-		if (list!=null && list.size()>0) {
-			CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
-			user.setFlashTheme(flashTheme);
+		try {
+			if(service.getUserByLogin(username)!= null) return false;
+			User user = new User();
+			user.setLogin(username);
+			user.setPassword(password);
+			user.setFirstName(firstName);
+			user.setLastName(lastName);
+			user.setEmail(email);
+			user.setAuthenticationMethod((AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
+			user.setCreateDate(new Date());
+			user.setDisabledFlag(false);
+			user.setLocale(getLocale());
+			String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
+			List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
+			if (list!=null && list.size()>0) {
+				CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
+				user.setFlashTheme(flashTheme);
+			}
+			String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+			list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
+			if (list!=null && list.size()>0) {
+				CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
+				user.setHtmlTheme(htmlTheme);
+			}
+			service.save(user);
+			addMemberships(user,getDemoOrg(user));
+			return true;
+		} catch (RuntimeException e) {
+			// catch RuntimeException for easy debug
+			e.printStackTrace();
+			throw new java.rmi.RemoteException(e.getMessage());
 		}
-		String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-		list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-		if (list!=null && list.size()>0) {
-			CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
-			user.setHtmlTheme(htmlTheme);
-		}
-		service.save(user);
-		addMemberships(user,getDemoOrg(user));
-        return true;
     }
 
 	private SupportedLocale getLocale(){
@@ -71,6 +81,7 @@ public class RegisterServiceSoapBindingImpl implements org.lamsfoundation.lams.w
 	}
 	
 	private void addMemberships(User user, Organisation org){
+		log.debug("adding memberships for user "+user.getUserId()+" in "+org.getName());
 		UserOrganisation uo = new UserOrganisation(user,org);
 		service.save(uo);
 		Integer[] roles = new Integer[]{Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_COURSE_MANAGER, Role.ROLE_LEARNER};
@@ -84,7 +95,11 @@ public class RegisterServiceSoapBindingImpl implements org.lamsfoundation.lams.w
 	}
 	
 	private Organisation getDemoOrg(User user){
-		Organisation org = (Organisation)service.findByProperty(Organisation.class, "name", "DEMO_ORG_NAME");
+		Organisation org = null;
+		List list = service.findByProperty(Organisation.class, "name", DEMO_ORG_NAME);
+		if(list != null && list.size() > 0){
+			org = (Organisation)list.get(0);
+		}
 		if(org == null){
 			org = new Organisation();
 			org.setName(DEMO_ORG_NAME);
@@ -94,6 +109,7 @@ public class RegisterServiceSoapBindingImpl implements org.lamsfoundation.lams.w
 			org.setLocale(getLocale());
 			service.saveOrganisation(org, user.getUserId());
 		}
+		log.debug(" Got org "+org.getOrganisationId());
 		return org;
 	}
 
