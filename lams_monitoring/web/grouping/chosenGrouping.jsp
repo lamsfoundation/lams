@@ -216,7 +216,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		function addGroup(){
 			if(document.getElementById("newgroupname").value.replace(/^\s*|\s*$/g,"").length==0){
-				alert("<fmt:message key="${error.grouping.add.group}"/>");
+				alert("<fmt:message key="error.grouping.add.group"/>");
 				document.getElementById("newgroupname").focus();
 			}else{
 				url="<lams:WebAppURL/>/grouping.do?method=addGroup&activityID=<c:out value="${activityID}"/>&name="+document.getElementById("newgroupname").value;
