@@ -734,22 +734,22 @@ text-align:right;
 font-size:1.2em;
 }
 #login-right-col p.login-button{
-margin-top:-23px; 
+margin-top:0px; 
 margin-right:50px; 
 text-align:right;
 }
 #login-right-col a.button {
-background:url('../images/css/btn_off.gif') no-repeat 0px 20px; 
+background:url('../images/css/btn_off.gif') no-repeat 0px 0px; 
 color:#333; 
 border:0px none; 
-padding:25px 20px;
+padding:5px 20px;
 text-decoration:none; }
 
 #login-right-col a:hover.button {
-background:url('../images/css/btn_over.gif') no-repeat 0px 20px; 
+background:url('../images/css/btn_over.gif') no-repeat 0px 0px; 
 color:#349018; 
 border:0px none; 
-padding:25px 20px;
+padding:5px 20px;
 text-decoration:none;}
 
 #login-page #footer { /*layout of the footer - the bottom of the box */
@@ -804,17 +804,17 @@ background:url('../images/css/footer_bg_learner.jpg') no-repeat bottom;
 
 /*layout of a general button*/
 #content-learner a.button {
-background:url('../images/css/btn_off.gif') no-repeat 0px 20px; 
+background:url('../images/css/btn_off.gif') repeat-x 0px 0px; 
 color:#333; 
 border:0px none; 
-padding:25px 20px;
+padding:5px 20px;
 text-decoration:none; 
 }
 #content-learner a:hover.button {
-background:url('../images/css/btn_over.gif') no-repeat 0px 20px; 
+background:url('../images/css/btn_over.gif') repeat-x 0px 0px; 
 color:#349018; 
 border:0px none; 
-padding:25px 20px;
+padding:5px 20px;
 text-decoration:none;
 }
 
