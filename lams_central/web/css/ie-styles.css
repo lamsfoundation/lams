@@ -3,13 +3,13 @@
 #header { /*layout of the header */
 	width:707px; 
 	height:64px; 
-	background:url('../images/top_bg.jpg') no-repeat bottom;
+	background:url ('../images/top_bg.jpg') no-repeat bottom;
 	}
 	
 #header-my-courses { /*layout of the header */
 	width: 707px;
 	height:65px;
-	background: url('../images/css/top_bg.jpg') no-repeat bottom;
+	background: url ('../images/css/top_bg.jpg') no-repeat bottom;
 }
 
 .nav-box-right {
@@ -31,7 +31,7 @@
 .mycourses-right-buttons {float:right; height:24px; padding-top:5px; margin-top:4px;}
 
 #content a.add-lesson-button {
-	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	background: url ('../images/css/add_lesson.jpg') no-repeat 0px 0px;
 	color: #666;
 	border: 0px none;
 	padding: 5px 12px 6px 30px;
@@ -41,7 +41,7 @@
 }
 
 #content a:hover.add-lesson-button {
-	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	background: url ('../images/css/add_lesson.jpg') no-repeat 0px 0px;
 	color: #47bc23;
 	border: 0px none;
 	padding: 5px 12px 6px 30px;
@@ -52,7 +52,7 @@
 }
 
 #content a.manage-group-button {
-	background: url('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	background: url ('../images/css/manage_groups.jpg') no-repeat 0px 0px;
 	color: #666;
 	border: 0px none;
 	padding: 5px 12px 6px 30px;
@@ -63,7 +63,7 @@
 }
 
 #content a:hover.manage-group-button {
-	background: url('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	background: url ('../images/css/manage_groups.jpg') no-repeat 0px 0px;
 	color: #47bc23;
 	border: 0px none;
 	padding: 5px 12px 6px 30px;
