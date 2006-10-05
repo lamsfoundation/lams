@@ -66,6 +66,19 @@
 		<parameter name="allowedMethods" value="*" />
 	</service>
 
+	<service name="RegisterService" provider="java:RPC" style="rpc"
+		use="encoded">
+		<parameter name="wsdlTargetNamespace"
+			value="http://webservice.lams.lamsfoundation.org" />
+		<parameter name="wsdlServiceElement" value="RegisterService" />
+		<parameter name="wsdlServicePort" value="RegisterService" />
+		<parameter name="className"
+			value="org.lamsfoundation.lams.webservice.RegisterServiceSoapBindingSkeleton" />
+		<parameter name="wsdlPortType" value="Register" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="allowedMethods" value="*" />
+	</service>
+
 	<transport name="http">
 		<requestFlow>
 			<handler type="URLMapper" />
