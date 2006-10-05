@@ -68,9 +68,8 @@ public class RegisterServiceSoapBindingImpl implements Register{
 			service.save(user);
 			addMemberships(user,getDemoOrg(user));
 			return true;
-		} catch (RuntimeException e) {
-			// catch RuntimeException for easy debug
-			e.printStackTrace();
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
 			throw new java.rmi.RemoteException(e.getMessage());
 		}
     }
