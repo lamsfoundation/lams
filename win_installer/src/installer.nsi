@@ -263,6 +263,7 @@ SectionGroup /e "Optional"
         ${If} $0 != 0
             DetailPrint "Failed to expand jsMath.war."
         ${EndIf}
+        Delete "$TEMP\jsMath.war"
     SectionEnd
 SectionGroupEnd
 
