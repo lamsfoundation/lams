@@ -29,6 +29,7 @@
 			<c:url value="/authoring.do" var="authoringUrl">
 				<c:param name="toolContentID" value="${dto.toolContentId}" />
 				<c:param name="mode" value="teacher" />
+				<c:param name="contentFolderID" value="${contentFolderID}" />
 			</c:url>
 			<html:link href="${authoringUrl}" styleClass="button" target="_blank">
 				<fmt:message key="button.editActivity" />

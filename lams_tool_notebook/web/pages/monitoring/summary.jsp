@@ -3,9 +3,15 @@
 <c:set var="dto" value="${notebookDTO}" />
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
-	<h2>
-		${session.sessionName}
-	</h2>
+	<table>
+		<tr>
+			<td>
+				<h2>
+					${session.sessionName}
+				</h2>
+			</td>
+		</tr>
+	</table>
 
 	<table cellpadding="0">
 		<tr>

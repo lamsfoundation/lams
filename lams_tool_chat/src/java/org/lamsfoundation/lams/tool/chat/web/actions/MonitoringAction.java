@@ -85,6 +85,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
+		
+		String contentFolderID = WebUtil.readStrParam(request,
+				AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 		// set up chatService
 		if (chatService == null) {
@@ -145,6 +148,8 @@ public class MonitoringAction extends LamsDispatchAction {
 			chatDTO.getSessionDTOs().add(sessionDTO);
 		}
 		request.setAttribute("monitoringDTO", chatDTO);
+		request.setAttribute("contentFolderID", contentFolderID);
+		
 		return mapping.findForward("success");
 	}
 

@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -68,6 +69,9 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
+		String contentFolderID = WebUtil.readStrParam(request,
+				AttributeNames.PARAM_CONTENT_FOLDER_ID);
+				
 		Notebook notebook = notebookService
 				.getNotebookByContentId(toolContentID);
 
@@ -78,6 +82,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		NotebookDTO notebookDT0 = new NotebookDTO(notebook);
 
 		request.setAttribute("notebookDTO", notebookDT0);
+		request.setAttribute("contentFolderID", contentFolderID);
 		return mapping.findForward("success");
 	}
 
