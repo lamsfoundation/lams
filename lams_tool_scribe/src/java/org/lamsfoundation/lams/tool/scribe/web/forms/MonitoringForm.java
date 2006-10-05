@@ -36,6 +36,7 @@ public class MonitoringForm extends ActionForm {
 	
 	String dispatch;
 	Long toolSessionID;
+	String contentFolderID;
 	Long appointedScribeUID;
 
 	public String getDispatch() {
@@ -55,5 +56,11 @@ public class MonitoringForm extends ActionForm {
 	}
 	public void setAppointedScribeUID(Long appointedScribeUID) {
 		this.appointedScribeUID = appointedScribeUID;
+	}
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
 	}
 }

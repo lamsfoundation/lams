@@ -77,6 +77,11 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
 
+		String contentFolderID = WebUtil.readStrParam(request,
+				AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		MonitoringForm monForm = (MonitoringForm)form;
+		monForm.setContentFolderID(contentFolderID);
+		
 		// set up scribeService
 		if (scribeService == null) {
 			scribeService = ScribeServiceProxy.getScribeService(this.getServlet()
@@ -87,6 +92,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		ScribeDTO scribeDTO = setupScribeDTO(scribe);
 		
 		request.setAttribute("monitoringDTO", scribeDTO);
+		request.setAttribute("contentFolderID", contentFolderID);
+		
 		return mapping.findForward("success");
 	}
 	
@@ -120,6 +127,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
 		
 		request.setAttribute("monitoringDTO", scribeDTO);
+		request.setAttribute("contentFolderID", monForm.getContentFolderID());
+		
 		return mapping.findForward("success");
 	}
 	

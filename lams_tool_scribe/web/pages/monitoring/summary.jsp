@@ -24,6 +24,7 @@
 									<html:hidden property="toolSessionID"
 										value="${session.sessionID}" />
 									<html:hidden property="dispatch" value="appointScribe" />
+									<html:hidden property="contentFolderID"/>
 
 									<fmt:message key="heading.selectScribe" />
 
@@ -37,7 +38,9 @@
 									</html:select>
 
 									<div>
-										<html:submit></html:submit>
+										<html:submit styleClass="button">
+											<fmt:message key="button.submit"/>
+										</html:submit>
 									</div>
 
 								</html:form>
