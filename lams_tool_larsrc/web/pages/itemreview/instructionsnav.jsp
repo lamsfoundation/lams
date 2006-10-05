@@ -64,7 +64,10 @@
 				<tr valign="top">
 					<td width="75%" valign="top">
 						<h2>
-		 					Step ${instructions.current} of ${instructions.total}
+							<fmt:message key="message.step.of">  
+								<fmt:param value="${instructions.current}"/>
+								<fmt:param value="${instructions.total}"/>
+							</fmt:message>
 						</h2>
 						<P>
 							<span style="align:center"> <c:choose>
