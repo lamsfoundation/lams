@@ -184,7 +184,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				log.debug("===> exception: " + e);
+				log.debug("===> exception: " + e,e);
 			}
 		}
 		return isValid;
