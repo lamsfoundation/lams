@@ -54,7 +54,7 @@ public class MockUser{
 	private static final String[] DELAY_MESSAGES = {" is deserting ", " is napping ", " is pondering ", " is in a daze ", " will have a cup of coffee for ", " is away for toilet "};
 	
 	private static final String LOGIN_PAGE_FLAG = "j_security_check";
-	private static final String INDEX_PAGE_FLAG = "Math.random()";
+	private static final String INDEX_PAGE_FLAG = "images/loading.gif";
 	
 	private static final String USERNAME = "j_username";
 	private static final String PASSWORD = "j_password";
