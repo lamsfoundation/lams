@@ -473,13 +473,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void cloneContentTopics(Long contentID, Long sessionID) {
 		//only session does not have content topcis
 		if(!messageDao.hasAuthoredTopics(sessionID)){
+			log.debug("Clone tool content [" + contentID +"] topics for session [" + sessionID + "]");
+			
 			Forum forum = (Forum) forumDao.getByContentId(contentID);
 			Set<Message> contentTopcis = forum.getMessages();
 			
 			//only forum has content topics, clone happens 
 			if(contentTopcis != null && contentTopcis.size() > 0){
 				for(Message msg : contentTopcis){
-					if(msg.getIsAuthored()){
+					if(msg.getIsAuthored() && msg.getToolSession() == null){
 						Message newMsg = Message.newInstance(msg, forumToolContentHandler);
 						createRootTopic(contentID, sessionID, newMsg);
 					}

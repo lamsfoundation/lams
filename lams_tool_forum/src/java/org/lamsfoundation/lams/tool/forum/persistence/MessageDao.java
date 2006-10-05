@@ -40,7 +40,7 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where is_authored = true and forum_uid=? order by create_date";
 	
 	private static final String SQL_QUERY_COUNT_SESSION_TOPICS_FROM_AUTHOR = "select count(*) from " + Message.class.getName()
-	+ " as m where m.isAuthored = true and m.toolSession.uid=?";
+	+ " as m where m.isAuthored = true and m.toolSession.sessionId=?";
 	
 	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
 					+ " where parent=?";
