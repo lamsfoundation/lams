@@ -103,7 +103,7 @@ public class CssTag extends TagSupport {
 			String ieLink = localLinkPath != null ? generateLocalURL(IE_STYLESHEET_NAME) : generateURL(IE_STYLESHEET_NAME,serverURL);
 			writer.println("<!--[if IE]>");
 			writer.println("<style type=\"text/css\">");
-			writer.println("@import url("+ieLink+");");
+			writer.println("@import url ("+ieLink+");");
 			writer.println("</style>");
 			writer.println("<![endif]-->");
 
