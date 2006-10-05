@@ -263,7 +263,7 @@ a.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:5px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 }
 
@@ -271,7 +271,7 @@ a:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:5px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 }
 
@@ -387,7 +387,7 @@ input.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:5px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
@@ -397,7 +397,7 @@ input:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:5px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
@@ -742,14 +742,14 @@ text-align:right;
 background:url('../images/css/btn_off.gif') no-repeat 0px 0px; 
 color:#333; 
 border:0px none; 
-padding:5px 20px;
+padding:5px 20px 6px 20px;
 text-decoration:none; }
 
 #login-right-col a:hover.button {
-background:url('../images/css/btn_over.gif') no-repeat 0px 0px; 
+background:url('../images/css/btn_over.gif') repeat-x 0px 0px; 
 color:#349018; 
 border:0px none; 
-padding:5px 20px;
+padding:5px 20px 6px 20px;
 text-decoration:none;}
 
 #login-page #footer { /*layout of the footer - the bottom of the box */
@@ -807,14 +807,14 @@ background:url('../images/css/footer_bg_learner.jpg') no-repeat bottom;
 background:url('../images/css/btn_off.gif') repeat-x 0px 0px; 
 color:#333; 
 border:0px none; 
-padding:5px 20px;
+padding:5px 20px 6px 20px;
 text-decoration:none; 
 }
 #content-learner a:hover.button {
 background:url('../images/css/btn_over.gif') repeat-x 0px 0px; 
 color:#349018; 
 border:0px none; 
-padding:5px 20px;
+padding:5px 20px 6px 20px;
 text-decoration:none;
 }
 

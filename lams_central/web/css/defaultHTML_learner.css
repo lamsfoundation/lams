@@ -257,9 +257,9 @@ Buttons
 /*  style to disbable input buttons */
 #content a.button .disabled {
 	color: #999;
-	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	border: 0px none;
-	padding:25px 20px;
+	padding:5px 20px 6px 20px;
 	}
 
 #content a:hover.button {
@@ -275,7 +275,7 @@ a.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:5px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 }
 
@@ -283,7 +283,7 @@ a:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:5px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 }
 
@@ -338,20 +338,20 @@ a:hover.button-add-item {
 
 /* Hovering submit button */
 input.button {
-	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:25px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
 }
 
 input:hover.button {
-	background: url('../images/css/btn_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:25px 20px;
+	padding:5px 20px 6px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
