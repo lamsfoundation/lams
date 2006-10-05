@@ -77,7 +77,7 @@ j_security_login_page
 				   <input name="j_password" type="password" size="16" style="width:125px" autocomplete="off" tabindex="2"/>
 				  </p>
 					<p class="login-button">
-					 <input type="submit" class="button" value="<fmt:message key="button.login"/>" onClick="javascript:submitForm()" tabindex="3"/>
+					 <a href="javascript:submitForm()" class="login-button" tabindex="3"/><fmt:message key="button.login"/></a>
 					 </p>
 				</form>	 
 				</div><!--closes right col-->
