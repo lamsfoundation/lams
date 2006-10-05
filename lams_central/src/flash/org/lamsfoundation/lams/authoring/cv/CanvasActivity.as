@@ -495,6 +495,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 
 	
+	public function set isSetSelected(v:Boolean):Void{
+		_isSelected = v;
+	}
 	
 	public function get activity():Activity{
 		return getActivity();
