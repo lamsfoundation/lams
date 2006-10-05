@@ -437,38 +437,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    		 </tr>
 		<tr>
 			<td width="34%">
-					<select id="groups" name="groups" size="15" onChange="getMembers(this)">
-					</select>
-				<p>
-					<input type="button" class="button" id="groupremove" name="groupremove" value="<fmt:message key="button.grouping.remove.selected.group"/>" onclick="removeGroup()" disabled=true />
-				</p>
+				<select id="groups" name="groups" size="15" onChange="getMembers(this)">
+				</select>
 			</td >
 			<td width="33%">
-					<select  id="nonmembers[]" name="nonmembers[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
-					</select>
-				<p>
-					<input type="button" class="button"  id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.grouping.add.user.to.group"/>" onclick="addMembersToGroup()" disabled=true  />
-				</p>
+				<select  id="nonmembers[]" name="nonmembers[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
+				</select>
 			</td>
 			<td width="33%">
-					<select  id="members[]" name="members[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
-					</select>
-        			<p>
-			        <input type="button" class="button" id="membersremove" name="membersremove" value="<fmt:message key="button.grouping.remove.user.from.group"/>" onclick="removeMembersFromGroup()" disabled=true  />
-				</p>
+				<select  id="members[]" name="members[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
+				</select>
 			</td>
 		</tr>
 		<tr>
-			<td><p>
-	   			<input id="newgroupname" name="newgroupname" type="text" size="25"  />
-				<input type="button" class="button" id="groupadd" name="groupadd" value="<fmt:message key="button.grouping.add.group"/>" onclick="addGroup()"  />
-				</p>
+			<td width="34%">
+				<input type="button" class="button" id="groupremove" name="groupremove" value="<fmt:message key="button.grouping.remove.selected.group"/>" onclick="removeGroup()" disabled="true"/>
 			</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
+			<td width="33%">
+				<input type="button" class="button"  id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.grouping.add.user.to.group"/>" onclick="addMembersToGroup()" disabled="true"/>
+			</td>
+			<td width="33%">
+				   <input type="button" class="button" id="membersremove" name="membersremove" value="<fmt:message key="button.grouping.remove.user.from.group"/>" onclick="removeMembersFromGroup()" disabled="true"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<input type="text" name="newgroupname" id="newgroupname" size="25"  /><br>
+				<input type="button" class="button" id="groupadd" name="groupadd" value="<fmt:message key="button.grouping.add.group"/>" onclick="addGroup()"  />
+			</td>
 		</tr>
 	</table>
-
 	<%@ include file="../template/finishbutton.jsp" %>
 	</form>
 
