@@ -245,9 +245,9 @@ Layout of main content section
 /*  style to disbable input buttons */
 #content a.button .disabled {
 	color: #999;
-	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	border: 0px none;
-	padding:25px 20px;
+	padding:5px 20px 6px 20px;
 	}
 
 #content a:hover.button {
@@ -278,50 +278,35 @@ a:hover.button {
 
 /*layout of adding a topic button */
 a.button-add-item {
-	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_off.gif') no-repeat 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:5px 20px 6px 25px;
     text-decoration: none;
 }
 
 a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_over.gif') no-repeat 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:5px 20px 6px 25px;
     text-decoration: none;
 }
 
 
 /*layout of adding a topic button */
 #content a.button-add-item {
-	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_off.gif') no-repeat 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:5px 20px 6px 25px;
 }
 
 #content a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_over.gif') no-repeat 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
-}
-
-/*layout of html editor button */
-#content a.button-html-editor {
-	background: url('../images/css/btn_htmled_off.gif') no-repeat 0px 20px;
-	color: #666;
-	border: 0px none;
-	padding:25px 15px 25px 28px;
-}
-
-#content a:hover.button-html-editor {
-	background: url('../images/css/btn_htmled_off.gif') no-repeat 0px 20px;
-	color: #333;
-	border: 0px none;
-	padding:25px 15px 25px 28px;
+	padding:5px 20px 6px 25px;
 }
 
 /************ The sequence name box **********/
@@ -399,20 +384,20 @@ a:hover.button-add-item {
 
 /* Hovering submit button */
 input.button {
-	background: url('../images/css/btn_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:25px 20px;
+	padding:5px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
 }
 
 input:hover.button {
-	background: url('../images/css/btn_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:25px 20px;
+	padding:5px 20px;
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
