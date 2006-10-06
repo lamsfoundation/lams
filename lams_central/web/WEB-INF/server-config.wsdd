@@ -79,6 +79,20 @@
 		<parameter name="allowedMethods" value="*" />
 	</service>
 
+	<service name="VerificationService" provider="java:RPC" style="rpc"
+		use="encoded">
+		<parameter name="wsdlTargetNamespace"
+			value="http://webservice.lams.lamsfoundation.org" />
+		<parameter name="wsdlServiceElement"
+			value="VerificationService" />
+		<parameter name="wsdlServicePort" value="VerificationService" />
+		<parameter name="className"
+			value="org.lamsfoundation.lams.webservice.VerificationServiceSoapBindingSkeleton" />
+		<parameter name="wsdlPortType" value="Verification" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="allowedMethods" value="*" />
+	</service>
+
 	<transport name="http">
 		<requestFlow>
 			<handler type="URLMapper" />
