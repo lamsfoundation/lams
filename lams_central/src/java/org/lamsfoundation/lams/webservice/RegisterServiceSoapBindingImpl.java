@@ -8,6 +8,8 @@
 package org.lamsfoundation.lams.webservice;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServlet;
@@ -15,6 +17,8 @@ import javax.servlet.http.HttpServlet;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -34,11 +38,12 @@ public class RegisterServiceSoapBindingImpl implements Register{
 	
 	Logger log = Logger.getLogger(RegisterServiceSoapBindingImpl.class);
 	
-	private static final String DEMO_ORG_NAME = "Demo Organisation";
+	private static final String DEMO_ORG_NAME = "Demo Course";
 	
 	private static MessageContext context = MessageContext.getCurrentContext();
 
 	private static IUserManagementService service = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext()).getBean("userManagementService");
+	private static ILessonService lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext()).getBean("lessonService");
 
 	public boolean createUser(String username, String password, String firstName, String lastName, String email) throws java.rmi.RemoteException {
 		try {
@@ -66,7 +71,9 @@ public class RegisterServiceSoapBindingImpl implements Register{
 				user.setHtmlTheme(htmlTheme);
 			}
 			service.save(user);
-			addMemberships(user,getDemoOrg(user));
+			Organisation org = getDemoOrg(user);
+			addMemberships(user,org);
+			addUsersToLessonClasses(org);
 			return true;
 		} catch (Exception e) {
 			log.debug(e.getMessage(), e);
@@ -79,6 +86,7 @@ public class RegisterServiceSoapBindingImpl implements Register{
 		return service.getSupportedLocale(defaultLocale.substring(0,2), defaultLocale.substring(3));
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addMemberships(User user, Organisation org){
 		log.debug("adding memberships for user "+user.getUserId()+" in "+org.getName());
 		UserOrganisation uo = new UserOrganisation(user,org);
@@ -91,6 +99,25 @@ public class RegisterServiceSoapBindingImpl implements Register{
 		}
 		user.addUserOrganisation(uo);
 		service.save(user);
+	}
+	
+	private void addUsersToLessonClasses(Organisation org){
+		List list = service.findByProperty(UserOrganisation.class, "organisation.organisationId", org.getOrganisationId());
+		if(list != null){
+			log.debug(list.size()+" user(s) in the org");
+			if(org.getLessons()!=null){
+				for(int i=0; i<list.size(); i++){
+					User user = ((UserOrganisation)list.get(i)).getUser();
+					Iterator iter2 = org.getLessons().iterator();
+					while(iter2.hasNext()){
+						Lesson lesson = (Lesson)iter2.next();
+						lessonService.addLearner(lesson.getLessonId(), user);
+						lessonService.addStaffMember(lesson.getLessonId(), user);
+						log.debug("Added "+user.getLogin()+" to "+lesson.getLessonName());
+					}
+				}
+			}
+		}
 	}
 	
 	private Organisation getDemoOrg(User user){
