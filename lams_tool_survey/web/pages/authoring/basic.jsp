@@ -48,11 +48,54 @@
 		    	}
 	    );
 	}
+	function upQuestion(idx,sessionMapID){
+		var url = "<c:url value="/authoring/upItem.do"/>";
+	    var reqIDVar = new Date();
+		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		deleteItemLoading();
+	    var myAjax = new Ajax.Updater(
+		    	surveyListTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:deleteItemComplete,
+		    		evalScripts:true
+		    	}
+	    );
+	}
+	function downQuestion(idx,sessionMapID){
+		var url = "<c:url value="/authoring/downItem.do"/>";
+	    var reqIDVar = new Date();
+		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		deleteItemLoading();
+	    var myAjax = new Ajax.Updater(
+		    	surveyListTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:deleteItemComplete,
+		    		evalScripts:true
+		    	}
+	    );
+	}
 	function deleteItemLoading(){
 		showBusy(surveyListTargetDiv);
 	}
 	function deleteItemComplete(){
 		hideBusy(surveyListTargetDiv);
+	}
+
+	function showBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.show(targetDiv+"_Busy");
+		}
+	}
+	function hideBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.hide(targetDiv+"_Busy");
+		}				
 	}
 
 </script>

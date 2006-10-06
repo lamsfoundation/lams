@@ -28,13 +28,33 @@
 				<fmt:message key="label.optional"/>
 			</c:if>
 		</td>
+		<c:if test="${not status.first}">
+			<td width="20px" align="center">
+				<a href="javascript:;" onclick="upQuestion(${status.index},'${sessionMapID}')">
+					<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0"  title="<fmt:message key="label.up"/>">
+				</a>
+			</td>
+			<c:if test="${status.last}">
+				<td>&nbsp;</td>
+			</c:if>
+		</c:if>
+		<c:if test="${not status.last}">
+			<c:if test="${status.first}">
+				<td>&nbsp;</td>
+			</c:if>
+			<td width="20px" align="center">
+				<a href="javascript:;" onclick="downQuestion(${status.index},'${sessionMapID}')">
+					<img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"  title="<fmt:message key="label.down"/>"> 
+				</a>
+			</td>
+		</c:if>
 		<td width="80px" align="center">
-			<a href="#" onclick="editItem(${status.index},${question.type},'${sessionMapID}','${contentFolderID}')" class="button">
+			<a href="javascript:;" onclick="editItem(${status.index},${question.type},'${sessionMapID}','${contentFolderID}')" class="button">
 				<fmt:message key="label.authoring.basic.survey.edit" />
 			</a>
 		</td>
 		<td width="80px" align="center">
-			<a href="#" onclick="deleteItem(${status.index},'${sessionMapID}')" class="button">
+			<a href="javascript:;" onclick="deleteItem(${status.index},'${sessionMapID}')" class="button">
 				<fmt:message key="label.authoring.basic.survey.delete" />
 			</a>
 		</td>

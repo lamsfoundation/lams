@@ -158,6 +158,12 @@ public class AuthoringAction extends Action {
         if (param.equals("removeItem")) {
         	return removeItem(mapping, form, request, response);
         }
+        if (param.equals("upItem")) {
+        	return upItem(mapping, form, request, response);
+        }
+        if (param.equals("downItem")) {
+        	return downItem(mapping, form, request, response);
+        }
         //-----------------------Survey Item Instruction function ---------------------------
 	  	if (param.equals("newInstruction")) {
        		return newInstruction(mapping, form, request, response);
@@ -194,6 +200,60 @@ public class AuthoringAction extends Action {
 			//add to delList
 			List delList = getDeletedSurveyItemList(sessionMap);
 			delList.add(item);
+		}	
+		
+		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		return mapping.findForward(SurveyConstants.SUCCESS);
+	}
+	/**
+	 * Move up current item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		return switchItem(mapping, request, true);
+	}
+	/**
+	 * Move down current item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		return switchItem(mapping, request, false);
+	}
+
+
+	private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+//		get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX),-1);
+		if(itemIdx != -1){
+			SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
+			List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+			//get current and the target item, and switch their sequnece
+			SurveyQuestion item = rList.get(itemIdx);
+			SurveyQuestion repItem;
+			if(up)
+				repItem = rList.get(--itemIdx);
+			else
+				repItem = rList.get(++itemIdx);
+			int upSeqId = repItem.getSequenceId();
+			repItem.setSequenceId(item.getSequenceId());
+			item.setSequenceId(upSeqId);
+			
+			//put back list, it will be sorted again
+			surveyList.clear();
+			surveyList.addAll(rList);
 		}	
 		
 		request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);

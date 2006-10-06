@@ -106,6 +106,17 @@
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		
+		<action path="/authoring/upItem"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"
+			parameter="upItem">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		<action path="/authoring/downItem"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"
+			parameter="downItem">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
 		<!-- ==========  Survey Instruction Item  ========== -->
 		<action path="/authoring/newInstruction"
 			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"
@@ -117,30 +128,7 @@
 			parameter="removeInstruction">
 			<forward name="success" path="/pages/authoring/parts/instructions.jsp" />
 		</action>
-		
-		<action path="/authoring/removeItemAttachment"
-			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"
-			parameter="removeItemAttachment">
-			<forward name="success" path="/pages/authoring/parts/itemattachment.jsp" />
-		</action>
-		
-		<!-- ==========  Display Item  ========== -->
-		<action path="/reviewItem"
-			type="org.lamsfoundation.lams.tool.survey.web.action.ViewItemAction"
-			parameter="reviewItem">
-			<forward name="success" path="/pages/itemreview/mainframe.jsp" />
-		</action>
-		<action path="/nextInstruction"
-			type="org.lamsfoundation.lams.tool.survey.web.action.ViewItemAction"
-			parameter="nextInstruction">
-			<forward name="success" path="/pages/itemreview/instructionsnav.jsp" />
-		</action>
-		<action path="/openUrlPopup"
-			type="org.lamsfoundation.lams.tool.survey.web.action.ViewItemAction"
-			parameter="openUrlPopup">
-			<forward name="success" path="/pages/itemreview/openurl.jsp" />
-		</action>
-		
+	
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
