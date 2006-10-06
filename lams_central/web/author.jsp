@@ -76,18 +76,18 @@ function authoring_DoFSCommand(command, args) {
 	}else if (command == "confirm"){
 		doConfirm(args);
 	}else if (command == "openPopUp"){
-		openPopUp(args);
+		openPopUpFS(args);
 	}else if(command == "openFilePopUp"){
 		openFilePopUp(args);
 	}else if (command == "setSaved"){
 		setSaved(args);
-	}else if (command == "closeUI"){
-		closeUI();
 	}else if(command == "openPreview"){
 		//this is called for Preview - to launch the learner UI. args will contain the sessionId to open
 		openPreview(args);
 	}else if(command == "closeWindow"){
-		closeWindow(args);
+		closeWindow();
+	}else if(command == "openURL"){
+		openURL(args, "_blank");
 	}
 
 }
@@ -125,6 +125,27 @@ function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolba
 	//}
 }
 
+function openPopUpFS(args){
+	var params = args.split(",");
+	
+	// assigned the args
+	var url = params[0];
+	var title = params[1];
+	var h = params[2];
+	var w = params[3];
+	var resize = params[4];
+	var status = params[5];
+	var scrollbar = params[6];
+	var menubar = params[7];
+	var toolbar = params[8];
+	
+	openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
+}
+
+function openURL(args){
+	window.open(args);
+}
+
 var learnWin = null;
 
 function openFilePopUp(args){
@@ -142,8 +163,14 @@ function openFilePopUp(args){
 	theFilePopUp.moveTo(xPos, yPos);
 }
 
-function closeUI(){
-	window.close();
+function closeWindow(){
+	if(isInternetExplorer) {
+		this.focus();
+		window.opener = this;
+		window.close();
+	} else {
+		window.location.href = "javascript: window.close()";
+	}
 }
 
 function getHostURL(){
@@ -165,7 +192,7 @@ function setSaved(args){
 }
 
 function myOnBeforeUnload(){
-//	alert("myOnBeforeUnload");
+	//alert("myOnBeforeUnload");
 	if(!saved){
 	  var message = '<fmt:message key="msg.design.not.saved"/>';
 	  if (typeof evt == 'undefined') {
@@ -178,8 +205,9 @@ function myOnBeforeUnload(){
 	}
 }
 
-// window.onbeforeunload = myOnBeforeUnload;
-
+if(window.attachEvent) { window.attachEvent("onbeforeunload", myOnBeforeUnload); }
+else { window.onbeforeunload = myOnBeforeUnload; }
+	
 //-->
 </script>
 <TITLE>Author :: LAMS</TITLE>

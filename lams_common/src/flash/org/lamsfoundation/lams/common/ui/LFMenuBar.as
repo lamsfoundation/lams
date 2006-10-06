@@ -307,7 +307,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMV().getLessonTabView().scheduleLessonStart();
 				break;
 			case eventObj.menu.exitItem:
-				getURL('javascript: window.close();');
+				fscommand("closeWindow", null);
 				break;
         }        
     }

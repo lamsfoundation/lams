@@ -82,7 +82,7 @@ class JsPopup{
 			//getURL(url,"_blank");
 			
 			// open popup window using javascript method in hosting jsp
-			getURL("javascript:openPopUp('"+url+"', '" + windowTitle + "', '" + height + "', '" + width + "', '" + getValue(resize) + "', '" + getValue(status) + "', '" + getValue(scrollbar) + "', '" + getValue(menubar) + "', '" + getValue(toolbar) + "');");
+			fscommand("openPopUp", [url, windowTitle, height, width,getValue(resize), getValue(status) , getValue(scrollbar) , getValue(menubar) , getValue(toolbar)]);
 			
 			//getURL("javascript:openPreview('"+url+"', '"+windowTitle+"');");
 			//openPreview

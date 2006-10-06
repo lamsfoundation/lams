@@ -441,7 +441,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.copyTypeID = r.copyTypeID;
 			
 			_ddm.modified = false;
-			getURL("javascript:setSaved('true');");
+			fscommand('setSaved', 'true');
 			LFMenuBar.getInstance().enableExport(true);
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
@@ -1088,7 +1088,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 		
 		_ddm.modified = true;
-		getURL("javascript:setSaved('false');");
+		
+		fscommand('setSaved', 'false');
 	}
 	
 	
@@ -1174,7 +1175,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
 			Debugger.log("Opening help page with locale " + _root.lang + _root.country + ": " + ca.activity.helpURL,Debugger.GEN,'getHelp','Canvas');
 			var locale:String = _root.lang + _root.country;
-			getURL(ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale, '_blank');
+			fscommand("openURL", ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale);
 		} else {
 			if (ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				var callback:Function = Proxy.create(this, openGroupHelp);
@@ -1192,14 +1193,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GROUP
 		var locale:String = _root.lang + _root.country;
 		var target:String = actToolSignature + app.module + '#' + actToolSignature+ app.module + '-' + locale;
-		getURL(url + target, '_blank');
+		fscommand("openURL", url + target);
 	}
 	
 	private function openGateHelp(url:String){
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GATE
 		var locale:String = _root.lang + _root.country;
 		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
-		getURL(url + target, '_blank');
+		fscommand("openURL", url + target);
 	}
 	
 	public function get toolActivityWidth():Number{

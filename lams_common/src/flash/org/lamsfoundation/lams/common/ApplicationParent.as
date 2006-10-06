@@ -145,7 +145,7 @@ class ApplicationParent {
 	public function openHelp(url:String) {
 		var locale:String = _root.lang + _root.country;
 		var target:String = this.module + '#' + this.module + '-' + locale;
-		getURL(url + target, '_blank');
+		fscommand("openURL", url + target);
 	}
 	
 	 /**

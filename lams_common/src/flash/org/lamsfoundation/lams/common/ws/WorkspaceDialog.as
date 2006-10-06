@@ -528,7 +528,7 @@ class WorkspaceDialog extends MovieClip{
 	public function openLicenseURL(evt:Object){
 		var urlToOpen:String = licenseID_cmb.value.url;
 		if(urlToOpen != undefined){
-			getURL(urlToOpen,'_blank');
+			fscommand("openURL", urlToOpen);
 		}
 	}
 	
