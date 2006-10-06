@@ -22,36 +22,35 @@
 </head>
 
 <body class="stripes">
-			<div id="content">
 			<h1>
 				${sessionMap.title}
 			</h1>
-			
+			<div id="content">
 				<table>
 					<tr>
 						<td>
-						<h2>
-							<fmt:message key="run.offline.message" />
-						</h2>
+							<h2>
+								<fmt:message key="run.offline.message" />
+							</h2>
 						</td>
 					</tr>
 				</table>						
-				<p>
-				<c:choose>
-					<c:when test="${sessionMap.reflectOn}">
-						<html:button property="FinishButton"  onclick="return continueReflect()" disabled="${sessionMap.finishedLock}"  styleClass="button">
-							<fmt:message key="label.continue" />
-						</html:button>
-					</c:when>
-					<c:otherwise>
-						<html:button property="FinishButton"  onclick="return finishSession()" disabled="${sessionMap.finishedLock}"  styleClass="button">
-							<fmt:message key="label.finished" />
-						</html:button>
-					</c:otherwise>
-				</c:choose>		
+				<div class="buttons-right">
+					<c:choose>
+						<c:when test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+							<html:button property="FinishButton"  onclick="return continueReflect()" styleClass="button">
+								<fmt:message key="label.continue" />
+							</html:button>
+						</c:when>
+						<c:otherwise>
+							<html:button property="FinishButton"  onclick="return finishSession()"  styleClass="button">
+								<fmt:message key="label.finished" />
+							</html:button>
+						</c:otherwise>
+					</c:choose>		
+				</div>
 			</div>
-	<div id="footer">
-		</div>
+	<div class="space-bottom"></div>
 		<!--closes footer-->
 
 </body>

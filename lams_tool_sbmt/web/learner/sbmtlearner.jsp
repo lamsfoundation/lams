@@ -21,9 +21,13 @@
 					location.href= tUrl;
 				else
 					return false;
+			}else if(uploadFileNum==0){
+				if(confirm("<fmt:message key='messsage.learner.finish.confirm'/>"))
+					location.href= tUrl;
+				else
+					return false;
 			}else
 				location.href= tUrl;
-		
 		}
 		function finish(){
 			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
@@ -186,21 +190,25 @@
 						</tr>
 						<tr>
 							<td colspan="2" align="center">
-								<html:submit disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" styleClass="button">
-									<fmt:message key="label.learner.upload" />
-								</html:submit>
-								<c:choose>
-									<c:when test="${sessionMap.reflectOn}">
-										<html:button property="notebookButton" onclick="javascript:notebook();" disabled="${sessionMap.finishLock}"  styleClass="button">
-											<fmt:message key="label.continue" />
-										</html:button>
-									</c:when>
-									<c:otherwise>
-										<html:button property="finishButton" onclick="javascript:finish();" disabled="${sessionMap.finishLock}" styleClass="button">
-											<fmt:message key="button.finish" />
-										</html:button>
-									</c:otherwise>
-								</c:choose>								
+								<span class="left-buttons">
+									<c:choose>
+										<c:when test="${sessionMap.reflectOn and (not sessionMap.finishLock)}">
+											<html:button property="notebookButton" onclick="javascript:notebook();" styleClass="button">
+												<fmt:message key="label.continue" />
+											</html:button>
+										</c:when>
+										<c:otherwise>
+											<html:button property="finishButton" onclick="javascript:finish();" styleClass="button">
+												<fmt:message key="button.finish" />
+											</html:button>
+										</c:otherwise>
+									</c:choose>
+								</span>						
+								<span class="right-buttons">
+									<html:submit disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" styleClass="button">
+										<fmt:message key="label.learner.upload" />
+									</html:submit>
+								</span>
 							</td>
 						</tr>
 					</table>

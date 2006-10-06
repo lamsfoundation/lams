@@ -31,22 +31,22 @@
 			<table>
 				<tr>
 					<td>
-						<p>
+						<h2>
 							<fmt:message key="run.offline.message" />
-						</p>
+						</h2>
 					</td>
 				</tr>
 			</table>
 			
 			<div class="right-buttons">
 				<c:choose>
-					<c:when test="${sessionMap.reflectOn}">
-						<html:button property="continueButton" onclick="javascript:notebook();" disabled="${sessionMap.finishLock}"  styleClass="button">
+					<c:when test="${sessionMap.reflectOn and (not sessionMap.finishLock)}">
+						<html:button property="continueButton" onclick="javascript:notebook();" styleClass="button">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:button property="finishButton" onclick="javascript:finish();" disabled="${sessionMap.finishLock}" styleClass="button">
+						<html:button property="finishButton" onclick="javascript:finish();" styleClass="button">
 							<fmt:message key="button.finish" />
 						</html:button>
 					</c:otherwise>

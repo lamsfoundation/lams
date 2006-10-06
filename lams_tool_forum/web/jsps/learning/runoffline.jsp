@@ -11,7 +11,9 @@
 	<table>
 		<tr>
 			<td>
-				<fmt:message key="run.offline.message" />
+				<h2>
+					<fmt:message key="run.offline.message" />
+				</h2>
 			</td>
 		</tr>
 	</table>
@@ -26,13 +28,13 @@
 
 		<div class="buttons-right">
 			<c:choose>
-				<c:when test="${sessionMap.reflectOn}">
-					<html:button property="continue" onclick="javascript:location.href='${continue}';"   disabled="${sessionMap.finishedLock}"  styleClass="button">
+				<c:when test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+					<html:button property="continue" onclick="javascript:location.href='${continue}';"  styleClass="button">
 						<fmt:message key="label.continue" />
 					</html:button>
 				</c:when>
 				<c:otherwise>
-					<html:button property="finish" onclick="javascript:location.href='${finish}';" disabled="${sessionMap.finishedLock}" styleClass="button">
+					<html:button property="finish" onclick="javascript:location.href='${finish}';" styleClass="button">
 						<fmt:message key="label.finish" />
 					</html:button>
 				</c:otherwise>

@@ -130,20 +130,20 @@
 				</c:if>
 			</table>
 			<div class="left-buttons">
-				<html:button property="checkNewButton" onclick="return checkNew()" disabled="${finishedLock}" styleClass="button">
+				<html:button property="checkNewButton" onclick="return checkNew()" styleClass="button">
 					<fmt:message key="label.check.for.new" />
 				</html:button>
 			</div>
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons">
 					<c:choose>
-						<c:when test="${sessionMap.reflectOn}">
-							<html:button property="FinishButton"  onclick="return continueReflect()" disabled="${finishedLock}"  styleClass="button">
+						<c:when test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+							<html:button property="FinishButton"  onclick="return continueReflect()"  styleClass="button">
 								<fmt:message key="label.continue" />
 							</html:button>
 						</c:when>
 						<c:otherwise>
-							<html:button property="FinishButton"  onclick="return finishSession()" disabled="${finishedLock}"  styleClass="button">
+							<html:button property="FinishButton"  onclick="return finishSession()" styleClass="button">
 								<fmt:message key="label.finished" />
 							</html:button>
 						</c:otherwise>

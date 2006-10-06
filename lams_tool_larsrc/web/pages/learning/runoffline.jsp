@@ -36,23 +36,24 @@
 						</td>
 					</tr>
 				</table>						
-				<p>
-				<c:choose>
-					<c:when test="${sessionMap.reflectOn}">
-						<html:button property="FinishButton"  onclick="return continueReflect()" disabled="${sessionMap.finishedLock}"  styleClass="button">
-							<fmt:message key="label.continue" />
-						</html:button>
-					</c:when>
-					<c:otherwise>
-						<html:button property="FinishButton"  onclick="return finishSession()" disabled="${sessionMap.finishedLock}"  styleClass="button">
-							<fmt:message key="label.finished" />
-						</html:button>
-					</c:otherwise>
-				</c:choose>		
+				<div class="right-buttons">
+					<c:choose>
+						<c:when test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+							<html:button property="FinishButton"  onclick="return continueReflect()"  styleClass="button">
+								<fmt:message key="label.continue" />
+							</html:button>
+						</c:when>
+						<c:otherwise>
+							<html:button property="FinishButton"  onclick="return finishSession()"  styleClass="button">
+								<fmt:message key="label.finished" />
+							</html:button>
+						</c:otherwise>
+					</c:choose>		
+				</div>
 			</div>
 	<div id="footer">
 		</div>
 		<!--closes footer-->
 
-f</body>
+</body>
 </html:html>

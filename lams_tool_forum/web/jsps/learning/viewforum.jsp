@@ -49,7 +49,7 @@
 							<fmt:message key="label.newtopic" />
 						</html:button>
 					</c:if>
-					<html:button property="refresh" onclick="javascript:location.href='${refresh}';" disabled="${sessionMap.finishedLock}" styleClass="button">
+					<html:button property="refresh" onclick="javascript:location.href='${refresh}';" styleClass="button">
 						<fmt:message key="label.refresh" />
 					</html:button>
 				</div>
@@ -58,13 +58,13 @@
 
 					<c:if test='${sessionMap.mode != "teacher"}'>
 						<c:choose>
-							<c:when test="${sessionMap.reflectOn}">
-								<html:button property="continue" onclick="javascript:location.href='${continue}';" disabled="${sessionMap.finishedLock}" styleClass="button">
+							<c:when test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+								<html:button property="continue" onclick="javascript:location.href='${continue}';" styleClass="button">
 									<fmt:message key="label.continue" />
 								</html:button>
 							</c:when>
 							<c:otherwise>
-								<html:button property="finish" onclick="javascript:location.href='${finish}';" disabled="${sessionMap.finishedLock}" styleClass="button">
+								<html:button property="finish" onclick="javascript:location.href='${finish}';" styleClass="button">
 									<fmt:message key="label.finish" />
 								</html:button>
 							</c:otherwise>
