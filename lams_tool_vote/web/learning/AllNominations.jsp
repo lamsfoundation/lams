@@ -36,6 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<title><bean:message key="activity.title" /></title>
 	
 	<script language="JavaScript" type="text/JavaScript">
