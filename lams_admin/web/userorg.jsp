@@ -28,7 +28,6 @@ function toggleCheckboxes(){
 <div align="center"><html-el:errors/></div>
 <table class="alternative-color" width=100%>
 <tr>
-	<th></th>
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.title"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
@@ -38,9 +37,6 @@ function toggleCheckboxes(){
 
 <logic:iterate id="user" name="userlist">
 	<tr>
-		<td>
-			<bean:write name="user" property="userId" />
-		</td>
 		<td>
 			<bean:write name="user" property="login" />
 		</td>
@@ -60,7 +56,7 @@ function toggleCheckboxes(){
 </logic:iterate>
 
 <tr>
-	<td colspan=6 align="right">
+	<td colspan=5 align="right">
 		<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
 		<html-el:reset><fmt:message key="admin.reset"/></html-el:reset>
 		<html-el:cancel><fmt:message key="admin.cancel"/></html-el:cancel>
