@@ -64,7 +64,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=" /><c:out value="${entry.uid}"/>
 						</c:set> 
 						<html:link href="${viewnote}">
-							<c:out value="${entry.title}" escapeXml="false"/>
+							<c:choose>
+								<c:when test="${empty entry.title}">
+									<fmt:message key="mynotes.entry.no.title.label"/>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${entry.title}" escapeXml="false"/>
+								</c:otherwise>
+							</c:choose>
 						</html:link>
 					</td><td>&nbsp;</td>
 					<td><lams:Date value="${entry.createDate}"/></td>

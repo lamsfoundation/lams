@@ -41,6 +41,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			var thePopUp = null;
 		
+			
+			var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
+			function learning_DoFSCommand(command, args) {
+				//alert("command:"+command+","+args);
+				if (command == "alert") {
+					doAlert(args);
+				}else if (command == "openPopUp"){
+					openPopUpFS(args);
+				}
+			
+			}
+			
+			// Hook for Internet Explorer.
+			if (navigator.appName && navigator.appName.indexOf("Microsoft") != -1 && navigator.userAgent.indexOf("Windows") != -1 && navigator.userAgent.indexOf("Windows 3.1") == -1) {
+				document.write('<script language=\"VBScript\"\>\n');
+				document.write('On Error Resume Next\n');
+				document.write('Sub learning_FSCommand(ByVal command, ByVal args)\n');
+				document.write('	Call learning_DoFSCommand(command, args)\n');
+				document.write('End Sub\n');
+				document.write('</script\>\n');
+			}
+						
 			function doAlert(arg){
 				alert(unescape(arg));
 			}
@@ -48,6 +70,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
 	
 				thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+			}
+			
+			
+			function openPopUpFS(args){
+				var params = args.split(",");
+				
+				// assigned the args
+				var url = params[0];
+				var title = params[1];
+				var h = params[2];
+				var w = params[3];
+				var resize = params[4];
+				var status = params[5];
+				var scrollbar = params[6];
+				var menubar = params[7];
+				var toolbar = params[8];
+				
+				openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
 			}
 		//-->
 		</script>

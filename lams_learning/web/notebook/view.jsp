@@ -45,17 +45,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<h1><c:choose><c:when test="${mode == 'teacher'}"><fmt:message key="mynotes.journals.title"/></c:when><c:otherwise><fmt:message key="mynotes.title"/></c:otherwise></c:choose></h1>
 		
+		<!-- set title -->
+		<c:set var="title">
+			<c:choose>
+				<c:when test="${empty entry.title}">
+					<fmt:message key="mynotes.entry.no.title.label"/>
+				</c:when>
+				<c:otherwise>
+					<c:out value="${entry.title}" escapeXml="false"/>
+				</c:otherwise>
+			</c:choose>
+		</c:set>
+		
 		<!-- title -->
 		<h2><c:choose>
 				<c:when test="${param.mode == 'edit'}">
 					<fmt:message key="mynotes.edit.heading">
 						<fmt:param>
-							<c:out value="${entry.title}" escapeXml="false"/>
+							<c:out value="${title}" escapeXml="false"/>
 						</fmt:param>
 					</fmt:message>
 				</c:when>
 				<c:otherwise>
-					<c:out value="${entry.title}"/>
+					<c:out value="${title}" escapeXml="false"/>
 				</c:otherwise>
 			</c:choose>
 		</h2>

@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<html:html locale="true" xhtml="true">
+<lams:html xhtml="true">
 
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -38,6 +38,48 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	<!--
+	
+		var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
+		
+		function monitor_DoFSCommand(command, args) {
+			//alert("command:"+command+","+args);
+			if (command == "openPopUp"){
+				openPopUpFS(args);
+			} else if(command == "closeWindow") {
+				closeWindow();
+			}else if(command == "openURL"){
+				openURL(args);
+			}
+			
+		}
+				
+		// Hook for Internet Explorer.
+		if (navigator.appName && navigator.appName.indexOf("Microsoft") != -1 && navigator.userAgent.indexOf("Windows") != -1 && navigator.userAgent.indexOf("Windows 3.1") == -1) {
+			document.write('<script language=\"VBScript\"\>\n');
+			document.write('On Error Resume Next\n');
+			document.write('Sub monitor_FSCommand(ByVal command, ByVal args)\n');
+			document.write('	Call monitor_DoFSCommand(command, args)\n');
+			document.write('End Sub\n');
+			document.write('</script\>\n');
+		}	
+		
+		function openPopUpFS(args){
+			var params = args.split(",");
+			
+			// assigned the args
+			var url = params[0];
+			var title = params[1];
+			var h = params[2];
+			var w = params[3];
+			var resize = params[4];
+			var status = params[5];
+			var scrollbar = params[6];
+			var menubar = params[7];
+			var toolbar = params[8];
+			
+			openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
+		}
+	
 		function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
 	// refocus code commented out as we want to replace contents due to tool's session issues. Code will be 
 	// wanted again the future.
@@ -47,6 +89,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	//}else{
 		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
 	//}
+		}
+		
+		function closeWindow() {
+			if(isInternetExplorer) {
+				this.focus();
+				window.opener = this;
+				window.close();
+			} else {
+				window.location.href = "javascript: window.close()";
+			}
+		}
+		
+		function openURL(args){
+			window.open(args, "_blank");
 		}
 		
 	//-->
@@ -99,4 +155,4 @@ String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATE
 		</object>
 	</noscript>
 </BODY>
-</html:html>
+</lams:html>
