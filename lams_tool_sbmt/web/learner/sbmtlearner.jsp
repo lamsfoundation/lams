@@ -21,19 +21,19 @@
 					location.href= tUrl;
 				else
 					return false;
-			}else{
-				if(confirm("<fmt:message key='messsage.learner.finish.confirm'/>"))
-					location.href= tUrl;
-				else
-					return false;
-			}
-//			}else if(uploadFileNum==0){
+//			}else{
 //				if(confirm("<fmt:message key='messsage.learner.finish.confirm'/>"))
 //					location.href= tUrl;
 //				else
 //					return false;
-//			}else
-//				location.href= tUrl;
+//			}
+			}else if(uploadFileNum==0){
+				if(confirm("<fmt:message key='messsage.learner.finish.confirm'/>"))
+					location.href= tUrl;
+				else
+					return false;
+			}else
+				location.href= tUrl;
 		}
 		function finish(){
 			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
