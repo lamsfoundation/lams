@@ -145,7 +145,8 @@ class WorkspaceDialog extends MovieClip{
 		license_comment_lbl.text = Dictionary.getValue('ws_license_comment_lbl');
 		
 		name_lbl.text = Dictionary.getValue('ws_dlg_filename');
-        
+        description_lbl.text = Dictionary.getValue('ws_dlg_description');
+		
 		//Set the text for buttons
 		ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
