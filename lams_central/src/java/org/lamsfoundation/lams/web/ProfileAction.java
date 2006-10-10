@@ -75,7 +75,7 @@ public class ProfileAction extends LamsDispatchAction {
             HttpServletResponse response) throws Exception {
 		
 		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		String fullName = requestor.getTitle()+" "+requestor.getFirstName()+" "+requestor.getLastName();
+		String fullName = (requestor.getTitle()!=null?requestor.getTitle()+" ":"")+requestor.getFirstName()+" "+requestor.getLastName();
 		
 		request.setAttribute("fullName", fullName);
 		request.setAttribute("email", requestor.getEmail());
