@@ -330,6 +330,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 	    generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 	    
+	    
 	    	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
@@ -410,6 +411,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	
     	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
     	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
+        generalLearnerFlowDTO.setRemainingQuestionCount(new Integer(mapQuestions.size()).toString());
+    	
     	
 	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 		logger.debug("GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
@@ -644,6 +647,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         String userFeedback=learningUtil.feedBackAnswersProgress(request,intCurrentQuestionIndex,totalQuestionCount);
         logger.debug("userFeedback: " + userFeedback);
         generalLearnerFlowDTO.setUserFeedback(userFeedback);
+        
+        String remQCount=learningUtil.getRemainingQuestionCount(intCurrentQuestionIndex,totalQuestionCount);
+        logger.debug("remQCount: " + remQCount);
+        generalLearnerFlowDTO.setRemainingQuestionCount(remQCount);
+        
         
         qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
         

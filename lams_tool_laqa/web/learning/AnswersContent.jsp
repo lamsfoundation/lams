@@ -90,17 +90,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false"/> 
 				</td></tr>
 	
-				<tr> <td NOWRAP>
-					 <c:out value="${generalLearnerFlowDTO.userFeedback}" escapeXml="true"/> 
-				</td></tr>
 			
 				<c:choose> 
 				  <c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
+		
+				  		<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}"> 							  		
+						  	<tr> <td NOWRAP>
+			 					<bean:message key="label.feedback.seq"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
+			 					<bean:message key="label.questions.simple"/>
+							</td></tr>
+						</c:if> 									
+				  		<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}"> 							  		
+						  	<tr> <td NOWRAP>				  		
+			 					<bean:message key="label.questions.remaining"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> 
+							</td></tr>			 					
+						</c:if> 													  		
+				  
 						<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
-					  </c:when> 
+				  </c:when> 
 
-					  <c:otherwise>
-						  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
+				  <c:otherwise>
+					  	<tr> <td NOWRAP>
+		 					<bean:message key="label.feedback.combined"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
+		 					<bean:message key="label.questions.simple"/>
+						</td></tr>
+				  
+					  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
 				  </c:otherwise>
 				</c:choose> 
 			</c:if> 		

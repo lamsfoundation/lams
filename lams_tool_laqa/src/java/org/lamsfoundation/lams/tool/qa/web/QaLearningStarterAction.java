@@ -392,8 +392,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	
     	String userFeedback= feedBackType + generalLearnerFlowDTO.getTotalQuestionCount() + QUESTIONS;
     	
-    	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
+    	//request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     	generalLearnerFlowDTO.setUserFeedback(userFeedback);
+    	
+    	logger.debug("remaining question count: " + generalLearnerFlowDTO.getTotalQuestionCount().toString());
+    	generalLearnerFlowDTO.setRemainingQuestionCount(generalLearnerFlowDTO.getTotalQuestionCount().toString());
+    	generalLearnerFlowDTO.setInitialScreen(new Boolean(true).toString());
     	
     	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
     	/* Is the request for a preview by the author?

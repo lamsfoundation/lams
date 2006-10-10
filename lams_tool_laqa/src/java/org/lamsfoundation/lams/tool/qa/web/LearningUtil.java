@@ -282,6 +282,15 @@ public class LearningUtil implements QaAppConstants{
 		return qaQueUsr;
 	}
 
+    protected String getRemainingQuestionCount(int currentQuestionIndex, String totalQuestionCount)
+    {
+    	logger.debug("totalQuestionCount: " + totalQuestionCount);
+    	int remainingQuestionCount=new Long(totalQuestionCount).intValue() - currentQuestionIndex +1;
+    	logger.debug("remainingQuestionCount: " + remainingQuestionCount);
+
+    	return new Integer(remainingQuestionCount).toString();
+    }
+
     
     /**
 	 * feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex)

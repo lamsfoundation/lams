@@ -63,6 +63,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String currentAnswer;
     
+    protected String remainingQuestionCount;
+    
     protected String teacherViewOnly;
     
     protected String notebookEntriesVisible;
@@ -98,6 +100,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     protected List listMonitoredAnswersContainerDTO;
     
     protected String currentMonitoredToolSession;
+    
+    protected String initialScreen;
     
     
     /**
@@ -229,6 +233,7 @@ public class GeneralLearnerFlowDTO implements Comparable
 	public String toString() {
         return new ToStringBuilder(this)
             .append("activityOffline: ", activityOffline)
+            .append("remainingQuestionCount: ", remainingQuestionCount)
             .append("totalQuestionCount : ", totalQuestionCount)
             .append("activityInstructions: ", activityInstructions)
             .append("teacherViewOnly: ", teacherViewOnly)
@@ -523,5 +528,29 @@ public class GeneralLearnerFlowDTO implements Comparable
      */
     public void setTeacherViewOnly(String teacherViewOnly) {
         this.teacherViewOnly = teacherViewOnly;
+    }
+    /**
+     * @return Returns the remainingQuestionCount.
+     */
+    public String getRemainingQuestionCount() {
+        return remainingQuestionCount;
+    }
+    /**
+     * @param remainingQuestionCount The remainingQuestionCount to set.
+     */
+    public void setRemainingQuestionCount(String remainingQuestionCount) {
+        this.remainingQuestionCount = remainingQuestionCount;
+    }
+    /**
+     * @return Returns the initialScreen.
+     */
+    public String getInitialScreen() {
+        return initialScreen;
+    }
+    /**
+     * @param initialScreen The initialScreen to set.
+     */
+    public void setInitialScreen(String initialScreen) {
+        this.initialScreen = initialScreen;
     }
 }
