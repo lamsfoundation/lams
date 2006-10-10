@@ -765,7 +765,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    {
 			attachment.setNbContent(null);
 			content.getNbAttachments().remove(attachment);
-			nbToolContentHandler.deleteFile(attachment.getUuid());
 			saveNoticeboard(content);
 	    }
 	    catch (DataAccessException e)

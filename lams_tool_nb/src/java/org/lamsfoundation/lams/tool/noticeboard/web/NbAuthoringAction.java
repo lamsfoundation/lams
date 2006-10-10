@@ -290,7 +290,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 				
 		    	try
 		    	{
-		    	// remove tool entry from db, includies removing entry from the content repository
+		    	// remove tool entry from db, does not removing entry from the content repository
 		    	// deleting a non-existent entry shouldn't cause any errors.
 					if ( attachment.getAttachmentId() != null ) {
 						nbService.removeAttachment(nbContent, attachment);
