@@ -228,7 +228,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
 		mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 		
-	    McUtils.saveTimeZone(request);
+	    //McUtils.saveTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    String toolContentID=mcMonitoringForm.getToolContentID();

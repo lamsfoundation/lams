@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -125,20 +124,7 @@ public abstract class McUtils implements McAppConstants {
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
 	
-	public static void saveTimeZone(HttpServletRequest request)
-	{
-		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
-	    logger.debug("current timezone id: " + timeZone.getID());
-	}
 	
-	public static String getCurrentTimeZone()
-	{
-		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    return timeZone.getDisplayName();
-	}
 	
 	
 	/**
@@ -167,85 +153,6 @@ public abstract class McUtils implements McAppConstants {
     	return mapOptionsContent;
 	}
 
-	
-
-	/**
-	 * void saveInSessionRichText(HttpServletRequest request, boolean requestByStarter)
-	 * 
-	 * @param request
-	 * @param requestByStarter
-	 */
-	public static void saveInSessionRichText(HttpServletRequest request, boolean requestByStarter)
-	{
-	    logger.debug("saveInSessionRichText, requestByStarter: " + requestByStarter);
-	    
-		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
-		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
-		
-		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
-		}
-		
-		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
-		}
-		
-	
-		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
-		logger.debug("read parameter richTextTitle: " + richTextTitle);
-		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
-		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
-		
-		
-		if (!requestByStarter)
-		{
-			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
-		}
-		
-		
-		String richTextIncorrectFeedback=request.getParameter(RICHTEXT_INCORRECT_FEEDBACK);
-		logger.debug("read parameter richTextIncorrectFeedback: " + richTextIncorrectFeedback);
-		
-		if ((richTextIncorrectFeedback != null) && (richTextIncorrectFeedback.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,richTextIncorrectFeedback);
-		}
-		else
-		{
-		    request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,DEFAULT_FEEDBACK_INCORRECT);
-		}
-		
-
-		String richTextCorrectFeedback=request.getParameter(RICHTEXT_CORRECT_FEEDBACK);
-		logger.debug("read parameter richTextCorrectFeedback: " + richTextCorrectFeedback);
-		
-		if ((richTextCorrectFeedback != null) && (richTextCorrectFeedback.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,richTextCorrectFeedback);
-		}
-		else
-		{
-		    request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,DEFAULT_FEEDBACK_CORRECT);
-		}
-
-		
-		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
-		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
-		
-		if ((richTextReportTitle != null) && (richTextReportTitle.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,richTextReportTitle);
-		}
-		
-		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
-	}
-	
-	
 	public static void configureContentRepository(HttpServletRequest request, IMcService mcService)
 	{
 		logger.debug("attempt configureContentRepository");
@@ -448,34 +355,6 @@ public abstract class McUtils implements McAppConstants {
 			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
 		}
 	}
-	
-
-    public static void debugMaps(HttpServletRequest request)
-    {
-    	Map mapQuestionsContent=(Map)request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
-    	Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-    	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-    	Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-    	Map mapStartupGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
-    	Map mapStartupGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
-    	Map mapDisabledQuestions=(Map)request.getSession().getAttribute(MAP_DISABLED_QUESTIONS);
-    	Map mapWeights=(Map)request.getSession().getAttribute(MAP_WEIGHTS);
-    	Map mapCheckBoxStates=(Map)request.getSession().getAttribute(MAP_CHECKBOX_STATES);
-    	Map mapSelectedOptions=(Map)request.getSession().getAttribute(MAP_SELECTED_OPTIONS);    	
-    	
-    	logger.debug("START DEBUGGING MAPS:");
-    	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
-    	logger.debug("mapOptionsContent:" + mapOptionsContent);
-    	logger.debug("mapGeneralOptionsContent:" + mapGeneralOptionsContent);
-    	logger.debug("mapGeneralSelectedOptionsContent:" + mapGeneralSelectedOptionsContent);
-    	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
-    	logger.debug("mapStartupGeneralSelectedOptionsContent:" + mapStartupGeneralSelectedOptionsContent);
-    	logger.debug("mapDisabledQuestions:" + mapDisabledQuestions);
-    	logger.debug("mapWeights:" + mapWeights);
-    	logger.debug("mapCheckBoxStates:" + mapCheckBoxStates);
-    	logger.debug("mapSelectedOptions:" + mapSelectedOptions);
-    	logger.debug("STOP DEBUGGING MAPS");
-    }
 	
 	
 	

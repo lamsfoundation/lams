@@ -104,62 +104,6 @@ public class LearningUtil implements McAppConstants {
 	}
 	
     
-    /**
-     * continueOptions(HttpServletRequest request)
-     * 
-     * @param request
-     * @return boolean
-     */
-    public static boolean continueOptions(HttpServletRequest request, IMcService mcService)
-    {
-    	logger.debug("continue options requested.");
-    	String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
-    	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
-    	
-    	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
-    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
-    	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-    	
-    	Long toolContentID= (Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-        logger.debug("TOOL_CONTENT_ID: " + toolContentID);
-        
-        McContent mcContent=mcService.retrieveMc(toolContentID);
-        logger.debug("mcContent: " + mcContent);
-        
-        /*
-    	 * fetch question content from content
-    	 */
-        logger.debug("newQuestionIndex: " + newQuestionIndex);
-    	Iterator contentIterator=mcContent.getMcQueContents().iterator();
-    	boolean questionFound=false;
-    	while (contentIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)contentIterator.next();
-    		if (mcQueContent != null)
-    		{
-    			int displayOrder=mcQueContent.getDisplayOrder().intValue();
-    			logger.debug("displayOrder: " + displayOrder);
-    			
-        		/* prepare the next question's candidate answers for presentation*/ 
-        		if (newQuestionIndex == displayOrder)
-        		{
-        			logger.debug("get the next question... ");
-        			Long uid=mcQueContent.getUid();
-        			logger.debug("uid : " + uid);
-        			/* get the options for this question */
-        			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
-        			logger.debug("listMcOptions : " + listMcOptions);
-        			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
-        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-        			questionFound=true;
-        		}
-    		}
-    	}
-    	logger.debug("questionFound: " + questionFound);
-		return questionFound;
-    }
-    
     
     /**
      * calculateWeights(Map mapLeanerAssessmentResults, Map mapQuestionWeights)
@@ -613,7 +557,8 @@ public class LearningUtil implements McAppConstants {
 	{
         logger.debug("starting createLearnerAttempt: ");
 		Date attempTime=McUtils.getGMTDateTime();
-		String timeZone= McUtils.getCurrentTimeZone();
+		//String timeZone= McUtils.getCurrentTimeZone();
+		String timeZone= "";
 		logger.debug("timeZone: " + timeZone);
 		
 		
@@ -757,49 +702,6 @@ public class LearningUtil implements McAppConstants {
     	return mapMarks;
     }
 
-    
-    /**
-     * 
-     * Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent, IMcService mcService)
-     * 
-     * @param request
-     * @param mcContent
-     * @param mcService
-     * @return
-     */    
-    public static Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent, IMcService mcService)
-    {
-    	Map mapQuestionsContent= new TreeMap(new McComparator());
-    	
-        Iterator contentIterator=mcContent.getMcQueContents().iterator();
-    	while (contentIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)contentIterator.next();
-    		if (mcQueContent != null)
-    		{
-    			int displayOrder=mcQueContent.getDisplayOrder().intValue();
-        		if (displayOrder != 0)
-        		{
-        			/* add the question to the questions Map in the displayOrder*/
-        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion() + " of weight: " + mcQueContent.getWeight().toString() + "%");
-        		}
-        		
-        		/* prepare the first question's candidate answers for presentation*/ 
-        		if (displayOrder == 1)
-        		{
-        			logger.debug("first question... ");
-        			Long uid=mcQueContent.getUid();
-        			logger.debug("uid : " + uid);
-        			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
-        			logger.debug("listMcOptions : " + listMcOptions);
-        			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
-        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-        		}
-    		}
-    	}
-    	return mapQuestionsContent;
-    }
     
 
     /**

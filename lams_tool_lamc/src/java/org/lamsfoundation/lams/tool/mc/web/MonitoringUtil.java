@@ -1151,30 +1151,6 @@ public class MonitoringUtil implements McAppConstants{
 	}
 	
 
-	/**
-	 * void setAttributeNoToolSessions(HttpServletRequest request, IMcService mcService, McContent mcContent)
-	 * 
-	 * @param request
-	 * @param mcService
-	 * @param mcContent
-	 */
-	public static void setAttributeNoToolSessions(HttpServletRequest request, IMcService mcService, McContent mcContent)
-	{
-		logger.debug("using mcContent: " + mcContent);
-		/*true means there is at least 1 response*/
-		if ((mcContent != null) && (mcService.studentActivityOccurredGlobal(mcContent)))
-		{
-				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
-		}
-		else
-		{
-			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
-		}
-	}
-	
-
 	
 	/**
 	 * cleans up the monitoring session
