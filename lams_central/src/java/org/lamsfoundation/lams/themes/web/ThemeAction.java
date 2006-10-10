@@ -61,12 +61,6 @@ public class ThemeAction extends LamsDispatchAction {
 	
 	private static Logger log = Logger.getLogger(ThemeAction.class);
 
-	/** If you want the output given as a jsp, set the request parameter "jspoutput" to 
-     * some value other than an empty string (e.g. 1, true, 0, false, blah). 
-     * If you want it returned as a stream (ie for Flash), do not define this parameter
-     */  
-	public static String USE_JSP_OUTPUT = "jspoutput";
-	
 	/** Id of theme to be retrieved from the db */
 	public static final String THEME_ID_PARAMETER = "themeID";
 	
@@ -103,15 +97,9 @@ public class ThemeAction extends LamsDispatchAction {
 	 */
 	private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
 	        		String wddxPacket, String parameterName) throws IOException {
-	    String useJSP = WebUtil.readStrParam(request, USE_JSP_OUTPUT, true);
-	    if ( useJSP != null && useJSP.length() >= 0 ) {
-		    request.getSession().setAttribute(parameterName,wddxPacket);
-		    return mapping.findForward("success");
-	    } else {
-	        PrintWriter writer = response.getWriter();
-	        writer.println(wddxPacket);
-	        return null;
-	    }
+		PrintWriter writer = response.getWriter();
+		writer.println(wddxPacket);
+		return null;
 	}
 	
 	
@@ -129,7 +117,6 @@ public class ThemeAction extends LamsDispatchAction {
 		Long themeId = new Long(WebUtil.readLongParam(request,THEME_ID_PARAMETER));
 		IThemeService themeService = getThemeService();
 		String message = themeService.getTheme(themeId);
-		request.getSession().setAttribute("message",message);
 		return outputPacket(mapping, request, response, message, "message");
 	}
 
@@ -149,7 +136,6 @@ public class ThemeAction extends LamsDispatchAction {
 	    
 	    IThemeService themeService = getThemeService();
 	    String message = themeService.getThemes();
-	    request.getSession().setAttribute("message",message);
 	    return outputPacket(mapping, request, response, message, "message");
 	}
 	
@@ -189,7 +175,6 @@ public class ThemeAction extends LamsDispatchAction {
 		} catch ( Exception e) {
 		     flashMessage = FlashMessage.getExceptionOccured("setTheme", e.getMessage());
 		}
-		request.getSession().setAttribute("message", flashMessage.serializeMessage());
 		return outputPacket(mapping, request, response, flashMessage.serializeMessage(), "message");
 		
 	}
