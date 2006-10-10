@@ -169,9 +169,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		for (ChatAttachment att : getAttList(KEY_DELETED_FILES, map)) {
-			// remove from repository and db
-			chatService.deleteFromRepository(att.getFileUuid(), att
-					.getFileVersionId());
+			// leave in repository but remove from db
 			attachments.remove(att);
 		}
 		

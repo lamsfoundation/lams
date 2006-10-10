@@ -430,20 +430,14 @@ public class Chat implements java.io.Serializable, Cloneable {
 			chat.setUid(null);
 
 			if (chatAttachments != null) {
-				// create a copy of the attachments
+				// create a copy of the attachments but do not duplicate node in repository
 				Iterator iter = chatAttachments.iterator();
 				Set<ChatAttachment> set = new HashSet<ChatAttachment>();
 				while (iter.hasNext()) {
 					ChatAttachment originalFile = (ChatAttachment) iter.next();
 					ChatAttachment newFile = (ChatAttachment) originalFile
 							.clone();
-					if (toolContentHandler != null) {
-						// duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(originalFile
-								.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-					}
+					
 					set.add(newFile);
 				}
 				chat.chatAttachments = set;
@@ -453,10 +447,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
 		} catch (CloneNotSupportedException cnse) {
 			log.error("Error cloning " + Chat.class);
-		} catch (ItemNotFoundException infe) {
-			log.error("Item Not found " + Chat.class);
-		} catch (RepositoryCheckedException rce) {
-			log.error("Repository checked exception " + Chat.class);
 		}
 		return chat;
 	}
