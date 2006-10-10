@@ -48,9 +48,19 @@
 							</tr>
 							<tr>
 								<td colspan="2">
-									<a href="javascript:history.back();" class="button">
-										<fmt:message key="label.cancel" />
-									</a>
+									<c:if test="${updateMode == 'listMark'}">
+										<c:set var="cancelUrl">
+											<c:url value="/monitoring.do"/>?method=listMark&userID=${fileInfo.owner.userID}&toolSessionID=${toolSessionID}
+										</c:set>
+									</c:if>
+									<c:if test="${updateMode == 'listAllMarks'}">
+										<c:set var="cancelUrl">
+											<c:url value="/monitoring.do"/>?method=listAllMarks&toolSessionID=${toolSessionID}
+										</c:set>
+									</c:if>
+										<a href="${cancelUrl}" class="button">
+											<fmt:message key="label.cancel" />
+										</a>
 									&nbsp;&nbsp;
 									<a href="javascript:document.getElementById('updateMarkForm').submit();" class="button">
 										<fmt:message key="label.monitoring.saveMarks.button" />
