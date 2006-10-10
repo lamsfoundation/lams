@@ -712,6 +712,7 @@ public class SubmitFilesService implements ToolContentManager,
 		while(iter.hasNext()){
 			details = (SubmissionDetails) iter.next();
 			report = details.getReport();
+			report.setDateMarksReleased(new Date());
 			submitFilesReportDAO.updateReport(report);
 		}
 		//current there is no false return
