@@ -68,7 +68,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:param><lams:Date value="${entry.modified}"/></fmt:param>
 					</fmt:message></i>
 			</p>
-			<p><lams:out value="<c:out value="${entry.entry}" escapeXml="false"/>"/></p>
+			<p>
+			<c:set var="entryTxt"><c:out value="${entry.entry}" escapeXml="false"/></c:set>
+			<lams:out value="entryTxt"/>
+			</p>
 			<hr>
 			</c:forEach>
 		</div>
