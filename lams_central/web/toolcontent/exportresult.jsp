@@ -20,28 +20,30 @@
 
 	<div id="content">
 
-	<h1><fmt:message key="msg.export.success" /></h1>
-		<c:choose>
-			<c:when test="${empty ldErrorMessages}">
-				<c:choose>
-					<c:when test="${empty toolsErrorMessages}">
-						<h2><fmt:message key="msg.export.failed" /></h2>
-					</c:when>
-					<c:otherwise>
-						<h2><fmt:message key="msg.export.failed" /></h2>
-						<h2><fmt:message key="msg.export.tool.error.prefix" /></h2>
-						<c:forEach var="toolError" items="${toolsErrorMessages}">
-							<p class="warning">${toolError}</p>
-						</c:forEach>
-					</c:otherwise>
-				</c:choose>
-			</c:when>
-			<c:otherwise>
-				<div id="content">
+	<c:choose>
+		<c:when test="${empty ldErrorMessages}">
+			<c:choose>
+				<c:when test="${empty toolsErrorMessages}">
+					<h1><fmt:message key="title.export" /></h1>
+					<h2><fmt:message key="msg.export.success" /></h2>
+				</c:when>
+				<c:otherwise>
+					<h1><fmt:message key="title.export" /></h1>
 					<h2><fmt:message key="msg.export.failed" /></h2>
-					<p class="warning"><fmt:message key="msg.reason.is" /> ${ldErrorMessages}</p>
-			</c:otherwise>
-		</c:choose>
+					<h2><fmt:message key="msg.export.tool.error.prefix" /></h2>
+					<c:forEach var="toolError" items="${toolsErrorMessages}">
+						<p class="warning">${toolError}</p>
+					</c:forEach>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
+		<c:otherwise>
+			<div id="content">
+				<h1><fmt:message key="title.export" /></h1>
+				<h2><fmt:message key="msg.export.failed" /></h2>
+				<p class="warning"><fmt:message key="msg.reason.is" /> ${ldErrorMessages}</p>
+		</c:otherwise>
+	</c:choose>
 		
 	<table><tr><td>
 		<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>

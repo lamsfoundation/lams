@@ -124,6 +124,7 @@ public class ExportToolContentAction extends LamsAction {
 			return null;
 		} catch (Exception e1) {
 			log.error("Unable to export tool content: " + e1.toString());
+			ldErrorMsgs.add(0,e1.getClass().getName());
 			request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
 			request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
 		}

@@ -177,7 +177,7 @@ public class ImportToolContentAction extends LamsAction {
         } catch (Exception e) {
         	String msg = e.getMessage();
         	log.error("Error occured during import",e);
-        	ldErrorMsgs.add(msg != null ? msg : e.toString());
+        	ldErrorMsgs.add(e.getClass().getName());
 		}
         
         request.setAttribute(ATTR_LD_ID,ldId);
