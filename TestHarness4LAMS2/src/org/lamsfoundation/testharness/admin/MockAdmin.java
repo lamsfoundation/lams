@@ -64,6 +64,7 @@ public class MockAdmin extends MockUser {
 	private static final String PASSWORD2 = "password2";
 	private static final String FIRST_NAME = "firstName";
 	private static final String LAST_NAME = "lastName";
+	private static final String EMAIL = "email";
 	private static final String COMMON_LAST_NAME = "Testharness";
 	private static final String ROLES = "roles";
 	private static final String AUTHOR_ROLE = "3";
@@ -147,6 +148,7 @@ public class MockAdmin extends MockUser {
 				params.put(PASSWORD2,name);
 				params.put(FIRST_NAME,name);
 				params.put(LAST_NAME,COMMON_LAST_NAME);
+				params.put(EMAIL, name+"@"+COMMON_LAST_NAME+"."+COMMON_LAST_NAME.toLowerCase());
 				resp = (WebResponse)new Call(wc, test, username + " submit user creation form",fillForm(resp,0,params)).execute();
 
 				// add the roles
