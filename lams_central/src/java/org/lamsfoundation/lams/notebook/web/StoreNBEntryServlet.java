@@ -27,15 +27,19 @@ import java.util.Hashtable;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -59,7 +63,19 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 		return (ICoreNotebookService) webContext.getBean("coreNotebookService");		
 	}
-
+	
+	 /**
+     * Helper method to retrieve the user data. Gets the id from the user details
+     * in the shared session
+     * @return the user id
+     */
+    public static Integer getUserId()
+    {
+        HttpSession ss = SessionManager.getSession();
+        UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        return learner != null ? learner.getUserID() : null;
+    }
+    
 	protected String process(String entryDetails, HttpServletRequest request) 
 		throws Exception
 		{
@@ -81,8 +97,10 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 			if (keyExists(table, WDDXTAGS.EXTERNAL_SIG)) {
 				notebookEntry.setExternalSignature(WDDXProcessor.convertToString(table, WDDXTAGS.EXTERNAL_SIG));
 			}
-			if (keyExists(table, WDDXTAGS.USER_ID)) {
-				User user = (User) notebookService.getUserManagementService().findById(User.class,WDDXProcessor.convertToInteger(table, WDDXTAGS.USER_ID));
+			Integer userID = getUserId();
+			if (userID != null) {
+					
+				User user = (User) notebookService.getUserManagementService().findById(User.class,userID);
 				
 				notebookEntry.setUser(user);
 			}

@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -66,9 +68,12 @@ import org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Manpreet Minhas
@@ -301,18 +306,15 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(table, WDDXTAGS.SAVE_MODE))
 			mode = WDDXProcessor.convertToInteger(table, WDDXTAGS.SAVE_MODE);
 		
-		if (keyExists(table, WDDXTAGS.USER_ID))
-		{
-		    Integer userId = WDDXProcessor.convertToInteger(table,WDDXTAGS.USER_ID);
-		    if( userId != null ) {
-				User user = (User)baseDAO.find(User.class,userId);
-				if(user!=null) {
-					learningDesign.setUser(user);
-				} else {
-					throw new ObjectExtractorException("userID missing");
-				}
+		Integer userId = getUserId();
+
+		if( userId != null ) {
+			User user = (User)baseDAO.find(User.class,userId);
+			if(user!=null) {
+				learningDesign.setUser(user);
+			} else {
+				throw new ObjectExtractorException("userID missing");
 			}
-		    //else dont do anything.
 		}
 	
 		if (keyExists(table, WDDXTAGS.LICENCE_ID))
@@ -1001,5 +1003,17 @@ public class ObjectExtractor implements IObjectExtractor {
 	public Integer getMode() {
 		return mode;
 	}
+	
+	/**
+     * Helper method to retrieve the user data. Gets the id from the user details
+     * in the shared session
+     * @return the user id
+     */
+    public static Integer getUserId()
+    {
+        HttpSession ss = SessionManager.getSession();
+        UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        return learner != null ? learner.getUserID() : null;
+    }
 }
 	

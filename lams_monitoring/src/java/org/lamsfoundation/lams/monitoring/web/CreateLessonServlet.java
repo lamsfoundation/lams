@@ -61,7 +61,7 @@ public class CreateLessonServlet  extends AbstractStoreWDDXPacketServlet {
 		//get User infomation from shared session.
 		HttpSession ss = SessionManager.getSession();
     	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+    	Integer userID = (user != null) ? user.getUserID() : null;
     	if(userID == null){
     		log.error("Can not find valid login user information");
     		FlashMessage flashMessage = new FlashMessage("createLesson",
