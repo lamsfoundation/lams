@@ -612,8 +612,14 @@ public class LearningAction extends Action {
 		setAttachment(messageForm, messagePO);
 
 		if ( makeAuditEntry ) {
+			Long userId = 0L;
+    		String loginName = "Default";
+    		if(message.getCreatedBy() == null){
+    			userId = message.getCreatedBy().getUserId();
+    			loginName = message.getCreatedBy().getLoginName();
+    		}
 			forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE,
-		 			messagePO.getCreatedBy().getUserId(), messagePO.getCreatedBy().getLoginName(),
+					userId,loginName,
 		 			oldMessageString, messagePO.toString());
 		 } 
 

@@ -110,6 +110,26 @@ alter table tl_lasurv11_user add index FK633F2588D14146E5 (survey_uid), add cons
 INSERT INTO `tl_lasurv11_survey` (`uid`, `create_date`, `update_date`, `create_by`, `title`, 
   `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`,
  `content_in_use`, `define_later`, `content_id`,`show_questions_on_one_page`,`reflect_on_activity`) VALUES
-  (2,NULL,NULL,NULL,'Survey','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},1,0);
+  (1,NULL,NULL,NULL,'Survey','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},1,0);
   
+INSERT INTO `tl_lasurv11_question` (`uid`, `sequence_id`, `description`, `create_by`, `create_date`, `question_type`, `append_text`, `optional`, `allow_multiple_answer`, `survey_uid`) VALUES 
+  (1,1,'Sample Multiple choice - only one response allowed?',null,NOW(),1,0,0,0,1);
+INSERT INTO `tl_lasurv11_question` (`uid`, `sequence_id`, `description`, `create_by`, `create_date`, `question_type`, `append_text`, `optional`, `allow_multiple_answer`, `survey_uid`) VALUES   
+  (2,2,'Sample Multiple choice - multiple response allowed?',null,NOW(),2,0,0,1,1);
+INSERT INTO `tl_lasurv11_question` (`uid`, `sequence_id`, `description`, `create_by`, `create_date`, `question_type`, `append_text`, `optional`, `allow_multiple_answer`, `survey_uid`) VALUES   
+  (3,3,'Sample Free text question?',null,NOW(),3,0,0,0,1);
+  
+
+INSERT INTO `tl_lasurv11_option` (`uid`, `description`, `sequence_id`, `question_uid`) VALUES 
+  (1,'Option 1',0,1);
+INSERT INTO `tl_lasurv11_option` (`uid`, `description`, `sequence_id`, `question_uid`) VALUES   
+  (2,'Option 2',1,1);
+INSERT INTO `tl_lasurv11_option` (`uid`, `description`, `sequence_id`, `question_uid`) VALUES 
+  (3,'Option 3',2,1);
+INSERT INTO `tl_lasurv11_option` (`uid`, `description`, `sequence_id`, `question_uid`) VALUES 
+  (4,'Option 1',0,2);
+INSERT INTO `tl_lasurv11_option` (`uid`, `description`, `sequence_id`, `question_uid`) VALUES 
+  (5,'Option 2',1,2);
+INSERT INTO `tl_lasurv11_option` (`uid`, `description`, `sequence_id`, `question_uid`) VALUES 
+  (6,'Option 3',2,2);  
 SET FOREIGN_KEY_CHECKS=1;

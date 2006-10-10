@@ -32,7 +32,13 @@
 				</c:if>
 			</td>
 			<td>
-				<c:out value="${topic.author}" />
+				<c:set var="author" value="${topic.author}"/>
+				<c:if test="${empty author}">
+					<c:set var="author">
+						<fmt:message key="label.default.user.name"/>
+					</c:set>
+				</c:if>
+				${author}						
 			</td>
 			<td>
 				<c:out value="${topic.message.replyNumber}" />

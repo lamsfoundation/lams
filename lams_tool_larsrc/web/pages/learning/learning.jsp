@@ -95,7 +95,7 @@
 					<tr>
 						<td align="center">
 							${item.title}
-							<c:if test="${!item.createByAuthor}">
+							<c:if test="${!item.createByAuthor && item.createBy != null}">
 								[${item.createBy.loginName}]
 							</c:if>
 						</td>

@@ -374,7 +374,7 @@ public class AuthoringAction extends Action {
 //		get back the survey and item list and display them on page
 		ISurveyService service = getSurveyService();
 
-		List questions = null;
+		List<SurveyQuestion> questions = null;
 		Survey survey = null;
 		SurveyForm surveyForm = (SurveyForm)form;
 		
@@ -392,11 +392,11 @@ public class AuthoringAction extends Action {
 		if(survey == null){
 			survey = service.getDefaultContent(contentId);
 			if(survey.getQuestions() != null){
-				questions = new ArrayList(survey.getQuestions());
+				questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
 			}else
 				questions = null;
 		}else
-			questions = new ArrayList(survey.getQuestions());
+			questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
 		
 		surveyForm.setSurvey(survey);
 
@@ -408,7 +408,21 @@ public class AuthoringAction extends Action {
 		//init it to avoid null exception in following handling
 		if(questions == null)
 			questions = new ArrayList();
-		
+		else{
+			SurveyUser surveyUser = null;
+			//handle system default question: createBy is null, now set it to current user
+			for (SurveyQuestion question : questions) {
+				if(question.getCreateBy() == null){
+					if(surveyUser == null){
+						//get back login user DTO
+						HttpSession ss = SessionManager.getSession();
+						UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+						surveyUser = new SurveyUser(user,survey);
+					}
+					question.setCreateBy(surveyUser);
+				}
+			}
+		}
 		//init survey item list
 		SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
 		surveyItemList.clear();

@@ -12,7 +12,14 @@
 		<tr>
 			<td class="first posted-by">
 				<fmt:message key="lable.topic.subject.by" />
-				<c:out value="${topic.author}" />
+				<c:set var="author" value="${topic.author}"/>
+				<c:if test="${empty author}">
+					<c:set var="author">
+						<fmt:message key="label.default.user.name"/>
+					</c:set>
+				</c:if>
+				${author}						
+				
 				-
 				<lams:Date value="${topic.message.created}"/>
 

@@ -61,7 +61,8 @@ public class MessageDTO {
 		
 		MessageDTO dto = new MessageDTO();
 		dto.setMessage(msg);
-		dto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
+		if(msg.getCreatedBy() != null)
+			dto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
 		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 			dto.setHasAttachment(false);
 		else
@@ -92,7 +93,8 @@ public class MessageDTO {
 			Message msg = (Message) iter.next();
 			MessageDTO msgDto = new MessageDTO();
 			msgDto.setMessage(msg);
-			msgDto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
+			if(msg.getCreatedBy() != null)
+				msgDto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
 			
 			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 				msgDto.setHasAttachment(false);

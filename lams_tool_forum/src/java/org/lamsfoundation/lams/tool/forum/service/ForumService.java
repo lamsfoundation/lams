@@ -215,12 +215,18 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	
     	Message message = getMessage(messageId);
     	if ( message !=null ) {
+    		Long userId = 0L;
+    		String loginName = "Default";
+    		if(message.getCreatedBy() == null){
+    			userId = message.getCreatedBy().getUserId();
+    			loginName = message.getCreatedBy().getLoginName();
+    		}
 			if ( hideFlag ) {
-				auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, message.getCreatedBy().getUserId(), 
-						message.getCreatedBy().getLoginName(), message.toString());
+				auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, userId, 
+						loginName, message.toString());
 			} else {
-				auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE, message.getCreatedBy().getUserId(), 
-						message.getCreatedBy().getLoginName(), message.toString());
+				auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE,userId, 
+						loginName, message.toString());
 			}
 
 	    	message.setHideFlag(hideFlag);
@@ -363,9 +369,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		while(iter.hasNext()){
 			msg = (Message) iter.next();
 			if(OLD_FORUM_STYLE)
-				map.put(msg.getLastReplyDate(),msg);
-			else
 				map.put(msg.getCreated(),msg);
+			else
+				map.put(msg.getLastReplyDate(),msg);
 		}
 		return 	MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 		
@@ -813,10 +819,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	}
     	
     	Forum defaultContent = getDefaultForum();
-    	//save default content by given ID.
+    	//get default content by given ID.
     	Forum content = new Forum();
     	content = Forum.newInstance(defaultContent,contentID,forumToolContentHandler);
-		//save topics in this forum
+    	
 		Set topics = content.getMessages();
 		if(topics != null){
 			Iterator iter = topics.iterator();

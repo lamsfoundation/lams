@@ -20,7 +20,13 @@
 				<td class="first posted-by">
 					<c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 						<fmt:message key="lable.topic.subject.by" />
-						<c:out value="${msgDto.author}" />
+						<c:set var="author" value="${msgDto.author}"/>
+						<c:if test="${empty author}">
+							<c:set var="author">
+								<fmt:message key="label.default.user.name"/>
+							</c:set>
+						</c:if>
+						${author}						
 								-
 						<lams:Date  value="${msgDto.message.created}" />
 					</c:if>

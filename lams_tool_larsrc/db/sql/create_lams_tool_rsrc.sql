@@ -111,6 +111,14 @@ alter table tl_larsrc11_user add index FK30113BFC309ED320 (resource_uid), add co
 
 
 
-INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_add_files`, `allow_add_urls`, `mini_view_resource_number`, `allow_auto_run`,`reflect_on_activity`) VALUES
-  (2,NULL,NULL,NULL,'Shared Resources','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},1,1,0,0,0);
+INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`,
+ `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_add_files`, 
+ `allow_add_urls`, `mini_view_resource_number`, `allow_auto_run`,`reflect_on_activity`) VALUES
+  (1,NULL,NULL,NULL,'Shared Resources','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},0,0,0,0,0);
+  
+INSERT INTO `tl_larsrc11_resource_item` (`uid`, `file_uuid`, `file_version_id`, `description`, `ims_schema`, `init_item`, `organization_xml`, `title`, `url`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `item_type`, `file_type`, `file_name`, `open_url_new_window`, `resource_uid`, `session_uid`) VALUES 
+  (1,NULL,NULL,NULL,NULL,NULL,NULL,'Web Search','http://www.google.com ',null,NOW(),1,0,1,NULL,NULL,0,1,NULL);
+INSERT INTO `tl_larsrc11_item_instruction` (`uid`, `description`, `sequence_id`, `item_uid`) VALUES 
+  (1,'Use Google to search on the web ',0,1);
+    
 SET FOREIGN_KEY_CHECKS=1;

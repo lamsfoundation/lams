@@ -123,6 +123,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         
 		// get root topic list and its children topics
         List<MessageDTO> msgDtoList = getSessionTopicList(toolSessionID, directoryName, forumService);
+        //set author flag, to decide if display mark of topics.Only author allow see his own mark. 
         setAuthorMark(msgDtoList);
         
         ForumToolSession session = forumService.getSessionBySessionId(toolSessionID);

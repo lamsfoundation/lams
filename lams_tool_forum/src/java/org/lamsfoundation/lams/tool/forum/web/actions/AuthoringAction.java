@@ -182,7 +182,7 @@ public class AuthoringAction extends Action {
 		//get back the topic list and display them on page
 		forumService = getForumManager();
 
-		List<Message> topics = null;
+		List<MessageDTO> topics = null;
 		Forum forum = null;
 		try {
 			forum = forumService.getForumByContentId(contentId);
@@ -195,13 +195,32 @@ public class AuthoringAction extends Action {
 					Iterator iter = forum.getMessages().iterator();
 					while(iter.hasNext()){
 						Message topic = (Message) iter.next();
+						if(topic.getCreatedBy() == null){
+							//get login user (author)
+							HttpSession ss = SessionManager.getSession();
+							//get back login user DTO
+							UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+							ForumUser fuser = new ForumUser(user,null);
+							topic.setCreatedBy(fuser);
+						}
 						map.put(topic.getCreated(),topic);
 					}
-					topics = new ArrayList(map.values());
+					topics = MessageDTO.getMessageDTO(new ArrayList(map.values()));
 				}else
 					topics = null;
 			}else{
 				topics = forumService.getAuthoredTopics(forum.getUid());
+				//failure tolerance: if current contentID is defaultID, the createBy will be null.
+				for (MessageDTO messageDTO : topics) {
+					if(StringUtils.isBlank(messageDTO.getAuthor())){
+						//get login user (author)
+						HttpSession ss = SessionManager.getSession();
+						//get back login user DTO
+						UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+						ForumUser fuser = new ForumUser(user,null);
+						messageDTO.setAuthor(fuser.getFirstName()+" "+fuser.getLastName());
+					}
+				}
 			}
 			//initialize attachmentList
 			List attachmentList = getAttachmentList(sessionMap);
@@ -217,7 +236,7 @@ public class AuthoringAction extends Action {
 		//set back STRUTS component value
 		//init it to avoid null exception in following handling
 		if(topics == null)
-			topics = new ArrayList<Message>();
+			topics = new ArrayList<MessageDTO>();
 		
 		sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");

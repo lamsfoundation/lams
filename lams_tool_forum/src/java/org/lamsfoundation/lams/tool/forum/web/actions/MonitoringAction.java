@@ -285,8 +285,7 @@ public class MonitoringAction extends Action {
 			sheet.setColumnWidth((short) 0, (short) 5000);
 			HSSFRow row = null;
 			HSSFCell cell;
-			Iterator iter = getTopicsSortedByAuthor(topicList).values()
-					.iterator();
+			Iterator iter = getTopicsSortedByAuthor(topicList).values().iterator();
 			Iterator dtoIter;
 			boolean first = true;
 			int idx = 0;
@@ -481,7 +480,7 @@ public class MonitoringAction extends Action {
 		request.setAttribute(ForumConstants.PARAM_UPDATE_MODE, updateMode);
 		
 		String mark = markForm.getMark();
-        ActionErrors errors = new ActionErrors();
+        ActionMessages errors = new ActionMessages();
         if (StringUtils.isBlank(mark)) {
           ActionMessage error = new ActionMessage("error.valueReqd");
           errors.add("report.mark", error);
@@ -507,7 +506,7 @@ public class MonitoringAction extends Action {
 		if(!errors.isEmpty()){
 			// each back to web page
 			request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
-        	saveMessages(request, errors);
+        	saveErrors(request, errors);
         	return mapping.getInputForward();
         }
 
@@ -803,6 +802,8 @@ public class MonitoringAction extends Action {
 		forumService = getForumService();
 		while (iter.hasNext()) {
 			MessageDTO dto = (MessageDTO) iter.next();
+			if(dto.getMessage().getIsAuthored())
+				continue;
 			dto.getMessage().getReport();
 			ForumUser user = (ForumUser) dto.getMessage().getCreatedBy().clone();
 			List<MessageDTO> list = (List) topicsByUser.get(user);

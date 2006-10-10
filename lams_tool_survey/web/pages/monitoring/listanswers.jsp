@@ -24,7 +24,7 @@
 					<table  class="alternative-color">
 					<tr>
 						<%-- <td><fmt:message key="label.question"/></td>--%>
-						<th colspan="2" class="first" width="50px"><c:out value="${question.description}" escapeXml="false"/></th>
+						<th colspan="2" class="first"><c:out value="${question.description}" escapeXml="false"/></th>
 					</tr>
 					<%-- 
 					<tr>
@@ -33,7 +33,7 @@
 					--%>
 					<c:forEach var="option" items="${question.options}" varStatus="optStatus">
 						<tr>
-							<td>
+							<td  width="50px">
 								<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
 							</td>
 							<td>
@@ -43,7 +43,7 @@
 					</c:forEach>
 					<c:if test="${question.appendText ||question.type == 3}">
 						<tr>
-							<td>
+							<td  width="50px">
 								<fmt:message key="label.open.response"/>
 							</td>
 							<td>&nbsp;</td>

@@ -369,7 +369,7 @@ public class AuthoringAction extends Action {
 //		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
 
-		List items = null;
+		List<ResourceItem> items = null;
 		Resource resource = null;
 		ResourceForm resourceForm = (ResourceForm)form;
 		
@@ -388,7 +388,7 @@ public class AuthoringAction extends Action {
 			if(resource == null){
 				resource = service.getDefaultContent(contentId);
 				if(resource.getResourceItems() != null){
-					items = new ArrayList(resource.getResourceItems());
+					items = new ArrayList<ResourceItem>(resource.getResourceItems());
 				}else
 					items = null;
 			}else
@@ -407,8 +407,22 @@ public class AuthoringAction extends Action {
 		
 		//init it to avoid null exception in following handling
 		if(items == null)
-			items = new ArrayList();
-		
+			items = new ArrayList<ResourceItem>();
+		else{
+			ResourceUser resourceUser = null;
+			//handle system default question: createBy is null, now set it to current user
+			for (ResourceItem item : items) {
+				if(item.getCreateBy() == null){
+					if(resourceUser == null){
+						//get back login user DTO
+						HttpSession ss = SessionManager.getSession();
+						UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+						resourceUser = new ResourceUser(user,resource);
+					}
+					item.setCreateBy(resourceUser);
+				}
+			}
+		}
 		//init resource item list
 		SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 		resourceItemList.clear();
