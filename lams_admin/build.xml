@@ -3,7 +3,7 @@
 <!-- -->
 <!DOCTYPE project [
 ]>
-<project name="Lams_Admin" default="usage" basedir=".">
+<project name="LAMS_Admin" default="usage" basedir=".">
 
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
