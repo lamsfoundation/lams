@@ -26,7 +26,7 @@
 <c:choose>
 	<c:when test="${not dto.contentInUse}">
 		<c:url value="/authoring.do" var="authoringUrl">
-			<c:param name="toolContentID" value="${dto.toolContentId}" />
+			<c:param name="toolContentID" value="${dto.toolContentID}" />
 			<c:param name="mode" value="teacher" />
 			<c:param name="contentFolderID" value="${contentFolderID}"></c:param>
 		</c:url>

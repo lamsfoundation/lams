@@ -38,7 +38,7 @@ public class ScribeDTO {
 
 	private static Logger logger = Logger.getLogger(ScribeDTO.class);
 
-	public Long toolContentId;
+	public Long toolContentID;
 
 	public String title;
 
@@ -69,7 +69,7 @@ public class ScribeDTO {
 	
 	
 	public ScribeDTO(Scribe scribe) {
-		toolContentId = scribe.getToolContentId();
+		toolContentID = scribe.getToolContentId();
 		title = scribe.getTitle();
 		instructions = scribe.getInstructions();
 		onlineInstructions = scribe.getOnlineInstructions();
@@ -155,12 +155,12 @@ public class ScribeDTO {
 		this.title = title;
 	}
 
-	public Long getToolContentId() {
-		return toolContentId;
+	public Long getToolContentID() {
+		return toolContentID;
 	}
 
-	public void setToolContentId(Long toolContentID) {
-		this.toolContentId = toolContentID;
+	public void setToolContentID(Long toolContentID) {
+		this.toolContentID = toolContentID;
 	}
 
 	public String getReflectInstructions() {

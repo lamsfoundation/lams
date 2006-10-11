@@ -37,11 +37,11 @@
 										</c:forEach>
 									</html:select>
 
-									<div>
+									
 										<html:submit styleClass="button">
 											<fmt:message key="button.submit"/>
 										</html:submit>
-									</div>
+									
 
 								</html:form>
 							</c:when>
@@ -131,3 +131,13 @@
 		</table>
 	</c:if>
 </c:forEach>
+
+<html:form action="/monitoring">
+	<html:hidden property="toolContentID" value="${dto.toolContentID}"/>
+	<html:hidden property="contentFolderID"/>
+	<p>
+		<html:submit styleClass="button">
+			<fmt:message key="button.refresh"/>
+		</html:submit>
+	</p>
+</html:form>

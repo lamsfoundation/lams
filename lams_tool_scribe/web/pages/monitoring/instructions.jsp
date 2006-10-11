@@ -42,7 +42,7 @@
 
 									<c:set var="deleteonline">
 										<html:rewrite
-											page="/authoring/deleteOnline.do?toolContentID=${dto.toolContentId}&amp;uuID=${file.fileUuid}&amp;versionID=${file.fileVersionId}" />
+											page="/authoring/deleteOnline.do?toolContentID=${dto.toolContentID}&amp;uuID=${file.fileUuid}&amp;versionID=${file.fileVersionId}" />
 									</c:set>
 									<html:link
 										href="javascript:loadDoc('${deleteonline}','onlinefile')">
@@ -100,7 +100,7 @@
 
 									<c:set var="deleteoffline">
 										<html:rewrite
-											page="/authoring/deleteOffline.do?toolContentID=${dto.toolContentId}&amp;uuID=${file.fileUuid}&amp;versionID=${file.fileVersionId}" />
+											page="/authoring/deleteOffline.do?toolContentID=${dto.toolContentID}&amp;uuID=${file.fileUuid}&amp;versionID=${file.fileVersionId}" />
 									</c:set>
 									<html:link
 										href="javascript:loadDoc('${deleteoffline}','offlinefile')">
