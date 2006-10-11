@@ -116,22 +116,13 @@ public class Forum implements Cloneable{
   				while(iter.hasNext()){
   					Attachment file = (Attachment)iter.next(); 
   					Attachment newFile = (Attachment) file.clone();
-  					//if toolContentHandle is null, just clone old file without duplicate it in repository
-  					if(toolContentHandler != null){
-						//duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-  					}
+  					//clone old file without duplicate it in repository
+ 
 					set.add(newFile);
   				}
   				forum.attachments = set;
   			}
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Forum.class + " failed");
-		} catch (ItemNotFoundException e) {
-			log.error("When clone " + Forum.class + " failed");
-		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + Forum.class + " failed");
 		}
   		

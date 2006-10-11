@@ -114,21 +114,18 @@ public class Message implements Cloneable{
   				while(iter.hasNext()){
   					Attachment file = (Attachment)iter.next();
   					Attachment newFile = (Attachment) file.clone();
-  					if(toolContentHandler != null){
-						//duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-  					}
+  					// use common file node in repository
+//  					if(toolContentHandler != null){
+//						//duplicate file node in repository
+//						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
+//						newFile.setFileUuid(keys.getUuid());
+//						newFile.setFileVersionId(keys.getVersion());
+//  					}
   					set.add(newFile);
   				}
   				msg.attachments = set;
   			}
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Forum.class + " failed");
-		} catch (ItemNotFoundException e) {
-			log.error("When clone " + Forum.class + " failed");
-		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + Forum.class + " failed");
 		}
   		

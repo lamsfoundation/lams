@@ -332,7 +332,7 @@ public class AuthoringAction extends Action {
 				Attachment delAtt = (Attachment) iter.next();
 				iter.remove();
 				//delete from repository
-				forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+				//forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 				//it is an existed att, then delete it from current attachmentPO
 				if(delAtt.getUid() != null){
 					Iterator attIter = attPOSet.iterator();
@@ -359,7 +359,7 @@ public class AuthoringAction extends Action {
 				Attachment delAtt = (Attachment) iter.next();
 				iter.remove();
 				//delete from repository
-				forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+				//forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 			}
 			
 			//Handle message
