@@ -115,12 +115,6 @@ public class Message implements Cloneable{
   					Attachment file = (Attachment)iter.next();
   					Attachment newFile = (Attachment) file.clone();
   					// use common file node in repository
-//  					if(toolContentHandler != null){
-//						//duplicate file node in repository
-//						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-//						newFile.setFileUuid(keys.getUuid());
-//						newFile.setFileVersionId(keys.getVersion());
-//  					}
   					set.add(newFile);
   				}
   				msg.attachments = set;
