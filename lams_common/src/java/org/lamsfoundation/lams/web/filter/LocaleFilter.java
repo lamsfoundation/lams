@@ -87,8 +87,8 @@ public class LocaleFilter extends OncePerRequestFilter {
     	//if request does not assign locale, then get it from database
     	if(preferredLocale == null){
 			HttpSession sharedsession = SessionManager.getSession(); 
-			UserDTO user = (UserDTO) sharedsession.getAttribute(AttributeNames.USER);
 			if(sharedsession != null){
+				UserDTO user = (UserDTO) sharedsession.getAttribute(AttributeNames.USER);
 				if(user != null){
 					direction = user.getDirection();
 					tz = user.getTimeZone();
@@ -131,7 +131,8 @@ public class LocaleFilter extends OncePerRequestFilter {
             LocaleContextHolder.setLocale(preferredLocale);
         }
 
-        chain.doFilter(request, response);
+        if(chain != null)
+        	chain.doFilter(request, response);
         
         // Reset thread-bound LocaleContext.
         LocaleContextHolder.setLocaleContext(null);
