@@ -31,7 +31,7 @@
 						<c:param name="toolContentID" value="${authoring.contentID}" />
 						<c:param name="contentFolderID" value="${contentFolderID}" />
 					</c:url>
-					<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+					<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
 						<fmt:message key="label.monitoring.edit.activity.edit" />
 					</html:link>
 				</td>
