@@ -39,6 +39,14 @@ j_security_login_page
 			  document.loginForm.j_password.value=hex_sha1(password);
 			  document.loginForm.submit();
 		}
+		
+		function onEnter(event){
+			intKeyCode = event.keyCode;
+			if (intKeyCode == 13) {
+				submitForm();
+			}
+		}
+		
 	</script>
 </head>
 
@@ -71,10 +79,10 @@ j_security_login_page
 						</div>
 					</c:if>	
 				 <p class="first"><fmt:message key="label.username"/>: 
-				   <input name="j_username" type="text" size="16" style="width:125px" tabindex="1"/>
+				   <input name="j_username" type="text" size="16" style="width:125px" tabindex="1" onkeypress="onEnter(event)"/>
 				  </p>
 				 <p><fmt:message key="label.password"/>: 
-				   <input name="j_password" type="password" size="16" style="width:125px" autocomplete="off" tabindex="2"/>
+				   <input name="j_password" type="password" size="16" style="width:125px" autocomplete="off" tabindex="2" onkeypress="onEnter(event)"/>
 				  </p>
 					<p class="login-button">
 					 <a href="javascript:submitForm()" class="button" tabindex="3"/><fmt:message key="button.login"/></a>
