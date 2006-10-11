@@ -52,6 +52,16 @@
 	function onlineComplete(){
 		hideBusy(onlineArea);
 	}
+	function showBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.show(targetDiv+"_Busy");
+		}
+	}
+	function hideBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.hide(targetDiv+"_Busy");
+		}				
+	}
 </script>
 <!-- Instruction Tab Content -->
 <table class="forms">
