@@ -553,12 +553,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         int mark=0;
         int userWeight=0;
         int userMarks=0;
+        int totalMarksPossible=0;
+        
         
         Set questionUids=parseLearnerInput(learnerInput, mcContent, mcService);
         logger.debug("set questionUids: " + questionUids);
         
         List questionAndCandidateAnswersList= new LinkedList();
         
+        int totalUserMarks= 0;
         Iterator setQuestionUidsIterator=questionUids.iterator();
         while (setQuestionUidsIterator.hasNext())
     	{
@@ -576,6 +579,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		mcLearnerAnswersDTO.setWeight(mcQueContent.getWeight().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
+    		
+    		int currentMark= mcQueContent.getMark().intValue();
+    		logger.debug("currentMark: " + currentMark);
+    		totalMarksPossible+=currentMark;
+    		
     		
     		String feedback=mcQueContent.getFeedback();
     		if (feedback == null) feedback="";
@@ -640,9 +648,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             	int weight=mcQueContent.getWeight().intValue();
             	logger.debug("weight: " +  weight);
             	
-            	int currentMark=mcQueContent.getMark().intValue();
-            	logger.debug("currentMark: " +  currentMark);
-            	
+            	totalUserMarks+=currentMark;	
             	
             	userWeight=userWeight + weight;
             	userMarks=userMarks + currentMark;;
@@ -653,6 +659,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             }
         	logger.debug("assesment complete");
         	logger.debug("mark:: " + mark);
+        	logger.debug("totalUserMarks: " + totalUserMarks);
         	
         	questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
     	}
@@ -660,11 +667,16 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("final mark: " + mark);
         logger.debug("final userWeight: " + userWeight);
         logger.debug("final userMarks: " + userMarks);
+        logger.debug("totalUserMarks: " + totalUserMarks);
+        logger.debug("totalMarksPossible: " + totalMarksPossible);
         
         
         mcTempDataHolderDTO.setLearnerMark(new Integer(mark).toString());
         mcTempDataHolderDTO.setTotalUserWeight(new Integer(userWeight).toString());
         mcTempDataHolderDTO.setTotalUserMark(new Integer(userMarks).toString());
+        mcTempDataHolderDTO.setTotalReportableUserMark(new Integer(totalUserMarks).toString());
+        mcTempDataHolderDTO.setTotalMarksPossible(new Integer(totalMarksPossible).toString());
+        
         
         logger.debug("mcTempDataHolderDTO before return : " + mcTempDataHolderDTO);
         
@@ -808,6 +820,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		String totalUserMark=mcTempDataHolderDTO.getTotalUserMark();
 		logger.debug("totalUserMark: " + totalUserMark);
 		
+		String totalMarksPossible=mcTempDataHolderDTO.getTotalMarksPossible(); 
+		logger.debug("totalMarksPossible: " + totalMarksPossible);
 		
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
     	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
@@ -816,6 +830,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	int totalQuestionCount=mcContent.getMcQueContents().size();
     	logger.debug("totalQuestionCount: " + totalQuestionCount);
     	mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(totalQuestionCount).toString());
+    	
+    	mcGeneralLearnerFlowDTO.setTotalUserMark(totalUserMark);
+    	mcGeneralLearnerFlowDTO.setTotalMarksPossible(totalMarksPossible);
     	
 		mcGeneralLearnerFlowDTO.setLearnerMark(learnerMark.toString());
     	

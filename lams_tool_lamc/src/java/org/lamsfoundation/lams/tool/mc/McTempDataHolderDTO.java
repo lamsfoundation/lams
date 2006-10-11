@@ -37,6 +37,8 @@ public class McTempDataHolderDTO implements Comparable
     protected String learnerMark;
     protected String totalUserWeight;
     protected String totalUserMark;
+    protected String totalReportableUserMark;
+    protected String totalMarksPossible;
 
     
 	public int compareTo(Object o)
@@ -54,6 +56,8 @@ public class McTempDataHolderDTO implements Comparable
             .append("learnerMark: ", learnerMark)
             .append("totalUserWeight : ", totalUserWeight)
             .append("totalUserMark : ", totalUserMark)
+            .append("totalReportableUserMark : ", totalReportableUserMark)
+            .append("totalMarksPossible : ", totalMarksPossible)
             .toString();
     }
     
@@ -92,5 +96,30 @@ public class McTempDataHolderDTO implements Comparable
      */
     public void setTotalUserMark(String totalUserMark) {
         this.totalUserMark = totalUserMark;
+    }
+    
+    /**
+     * @return Returns the totalReportableUserMark.
+     */
+    public String getTotalReportableUserMark() {
+        return totalReportableUserMark;
+    }
+    /**
+     * @param totalReportableUserMark The totalReportableUserMark to set.
+     */
+    public void setTotalReportableUserMark(String totalReportableUserMark) {
+        this.totalReportableUserMark = totalReportableUserMark;
+    }
+    /**
+     * @return Returns the totalMarksPossible.
+     */
+    public String getTotalMarksPossible() {
+        return totalMarksPossible;
+    }
+    /**
+     * @param totalMarksPossible The totalMarksPossible to set.
+     */
+    public void setTotalMarksPossible(String totalMarksPossible) {
+        this.totalMarksPossible = totalMarksPossible;
     }
 }

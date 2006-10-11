@@ -104,8 +104,23 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String questionListingMode;
     
+    protected String totalUserMark;
+    
+    protected String totalMarksPossible;
 
         
+    /**
+     * @return Returns the totalUserMark.
+     */
+    public String getTotalUserMark() {
+        return totalUserMark;
+    }
+    /**
+     * @param totalUserMark The totalUserMark to set.
+     */
+    public void setTotalUserMark(String totalUserMark) {
+        this.totalUserMark = totalUserMark;
+    }
     /**
      * @return Returns the questionListingMode.
      */
@@ -555,5 +570,17 @@ public class McGeneralLearnerFlowDTO implements Comparable
      */
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+    /**
+     * @return Returns the totalMarksPossible.
+     */
+    public String getTotalMarksPossible() {
+        return totalMarksPossible;
+    }
+    /**
+     * @param totalMarksPossible The totalMarksPossible to set.
+     */
+    public void setTotalMarksPossible(String totalMarksPossible) {
+        this.totalMarksPossible = totalMarksPossible;
     }
 }

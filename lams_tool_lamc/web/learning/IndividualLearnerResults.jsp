@@ -85,9 +85,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  <tr>
 					  	<td NOWRAP align=right valign=top colspan=2> 
 						  	<b> <bean:message key="label.mark"/> </b>
-							<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}"/>  &nbsp
+							<c:out value="${mcGeneralLearnerFlowDTO.totalUserMark}"/>  &nbsp
 							<bean:message key="label.outof"/> &nbsp
-						  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/>
+						  	<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}"/>
 					  	</td>
 					  </tr>	
 
@@ -114,7 +114,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table align=left>
 								<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
 								
-								<c:out value="${dto.attemptCorrect}" escapeXml="false"/> <br>
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
 											<b> <bean:message key="label.question.col"/> </b>
