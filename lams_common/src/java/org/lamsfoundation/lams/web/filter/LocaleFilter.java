@@ -36,8 +36,6 @@ import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -46,6 +44,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * Filter request to preferred locale according to user option in database, client browser locale or default locale.
  * The proity is user setting in database is highest, then browser locale, then the default locale. 
+ * <p> 
+ * <b>NOTICE: This filter must set after <code>org.lamsfoundation.lams.web.session.SystemSessionFilter</code>
+ *  in web.xml because it need get value from SystemSession .</b>
+ * 
  * @author Steve.Ni
  * 
  * @version $Revision$
@@ -86,15 +88,17 @@ public class LocaleFilter extends OncePerRequestFilter {
     	if(preferredLocale == null){
 			HttpSession sharedsession = SessionManager.getSession(); 
 			UserDTO user = (UserDTO) sharedsession.getAttribute(AttributeNames.USER);
-			if(user != null){
-				direction = user.getDirection();
-				tz = user.getTimeZone();
-				String lang = user.getLocaleLanguage();
-				String country = user.getLocaleCountry();
-				// would prefer both the language and country but that's not always feasible.
-				// so we may end up with some confusing situations.
-				if(!StringUtils.isEmpty(lang)){
-					preferredLocale = new Locale(lang,country!=null?country:"");
+			if(sharedsession != null){
+				if(user != null){
+					direction = user.getDirection();
+					tz = user.getTimeZone();
+					String lang = user.getLocaleLanguage();
+					String country = user.getLocaleCountry();
+					// would prefer both the language and country but that's not always feasible.
+					// so we may end up with some confusing situations.
+					if(!StringUtils.isEmpty(lang)){
+						preferredLocale = new Locale(lang,country!=null?country:"");
+					}
 				}
 			}
     	}
