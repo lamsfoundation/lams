@@ -23,11 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.security;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 /**
  * This utility class provides redirecting strategy support for form-based
@@ -61,6 +63,7 @@ public class JspRedirectStrategy {
 	 * @param response
 	 * @return true if response has been redirected; false if login page should
 	 *         continue.
+	 * @throws ServletException 
 	 *  
 	 */
 	public static boolean loginPageRedirected(HttpServletRequest request,HttpServletResponse response) throws java.io.IOException {
@@ -75,10 +78,19 @@ public class JspRedirectStrategy {
 		if (checkStatus == null) {
 			log.debug("===>LOGIN PAGE: there is no auth obj in session, auth obj created. session id: " + id);
 			session.setAttribute(AUTH_OBJECT_NAME, SECURITY_CHECK_NOT_PASSED);
+		
 			response.sendRedirect(WELCOME_PAGE);
 			return true;
 		} else if (checkStatus.equals(SECURITY_CHECK_NOT_PASSED)) {
 			log.debug("===>LOGIN PAGE: accessing login page before login succeed, display login page. session id: "+ id);
+			//set local information for login page. Because login.jsp does not pass thru any filters.
+			try {
+				LocaleFilter filter = new LocaleFilter();
+				filter.doFilter(request, response, null);
+				log.debug("Set locale information for login page:" + request.getLocale());
+			} catch (ServletException e) {
+				log.error("Failed set Locale to request.");
+			}
 			return false;
 		} else if (checkStatus.equals(SECURITY_CHECK_PASSED)) {
 			log.debug("===>LOGIN PAGE: accessing login after login succeed. Invalidate the session: " + id + " and redirect to "+ WELCOME_PAGE);
