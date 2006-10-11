@@ -105,6 +105,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -122,6 +123,7 @@ import com.thoughtworks.xstream.converters.Converter;
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
 	public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
+	public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
 	public static final String LD102IMPORTER_BEAN_NAME = "ld102Importer";
 	
 	//export tool content zip file prefix
@@ -134,8 +136,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public static final String TOOL_FILE_NAME = "tool.xml";
 	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
 	
+	private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
+	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
+	private static MessageService messageService;
 	private ApplicationContext applicationContext;
 	
 	//save list of all tool file node class information. One tool may have over one file node, such as 
@@ -502,6 +507,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 			//begin tool import
 			Map<Long,ToolContent> toolMapper = new HashMap<Long,ToolContent>();
+			Map<Long,AuthoringActivityDTO> removedActMap = new HashMap<Long,AuthoringActivityDTO>();
 			List<AuthoringActivityDTO> activities = ldDto.getActivities();
 			for(AuthoringActivityDTO activity : activities){
 				//skip non-tool activities
@@ -513,6 +519,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//To create a new toolContent according to imported tool signature name.
 				//get tool by signature
 				Tool newTool = new ToolCompatibleStrategy().getTool(activity.getToolSignature());
+				
+				//can not find a matching tool
+				if(newTool == null){
+					log.warn("A matching tool [" + activity.getToolSignature()+"] cannot be found.");
+					toolsErrorMsgs.add(getMessageService().getMessage(ERROR_TOOL_NOT_FOUND,activity.getToolSignature()));
+					
+					//remove this activity from LD
+					removedActMap.put(activity.getActivityID(), activity);
+					continue;
+				}
 				ToolContent newContent = new ToolContent(newTool);
 			    toolContentDAO.saveToolContent(newContent);
 			    
@@ -550,7 +566,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			}
 			
 			WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
-			return saveLearningDesign(ldDto,importer,folder,toolMapper);
+			return saveLearningDesign(ldDto,importer,folder,toolMapper,removedActMap);
 			
 		}catch (ToolException e) {
 			throw new ImportToolContentException(e);
@@ -733,6 +749,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private ILearningDesignService getLearningDesignService(){
 		return (ILearningDesignService) applicationContext.getBean(LEARNING_DESIGN_SERVICE_BEAN_NAME);		
 	}
+	private MessageService getMessageService(){
+		if(messageService != null)
+			return messageService;
+		
+		return (messageService = (MessageService) applicationContext.getBean(MESSAGE_SERVICE_BEAN_NAME));		
+	}
 	private LD102Importer getLD102Importer(){
 		return (LD102Importer) applicationContext.getBean(LD102IMPORTER_BEAN_NAME);		
 	}
@@ -743,7 +765,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
         return applicationContext.getBean(tool.getServiceName());
     }
 	
-	private Long saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, Map<Long,ToolContent> toolMapper)
+	private Long saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, 
+				Map<Long,ToolContent> toolMapper, Map<Long,AuthoringActivityDTO> removedActMap)
 			throws ImportToolContentException {
 
 		//grouping object list
@@ -766,12 +789,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
+		
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = getActivity(actDto,groupingMapper,toolMapper);
 			//so far, the activitiy ID is still old one, so setup the mapping relation between old ID and new activity.
 			activityMapper.put(act.getActivityId(),act);
-			actList.add(act);
-			
+			//if this act is removed, then does not save it into LD
+			if(!removedActMap.containsKey(actDto.getActivityID()))
+				actList.add(act);
 		}
 		//rescan the activity list and refresh their parent activity.
 		for(AuthoringActivityDTO actDto: actDtoList){
@@ -787,12 +812,68 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						set = new TreeSet<Activity>(new ActivityOrderComparator());
 						((ComplexActivity)parent).setActivities(set);
 					}
-					set.add(act);
+					if(!removedActMap.containsKey(actDto.getActivityID()))
+						set.add(act);
 				}
 			}
+			
 			//persist
-			act.setActivityId(null);
-			activityDAO.insert(act);
+			if(!removedActMap.containsKey(actDto.getActivityID())){
+				act.setActivityId(null);
+				activityDAO.insert(act);
+			}
+		}
+		
+		
+//		reset first activity UUID for LD if old first removed
+		//set first as remove activity's next existed one
+		Integer actUiid = dto.getFirstActivityUIID();
+		if(actUiid != null){
+			for(AuthoringActivityDTO actDto: actDtoList){
+				if(actUiid.equals(actDto.getActivityUIID())){
+					//if first activity is removed
+					if(removedActMap.containsKey(actDto.getActivityID())){
+						List<TransitionDTO> transDtoList = dto.getTransitions();
+						Long existFirstAct = null;
+						Long nextActId = actDto.getActivityID();
+						boolean found = false;
+						// try to find next availble activity
+						//1000 is failure tolerance: to avoid dead loop.
+						for(int idx=0;idx<1000;idx++){
+							if(transDtoList == null || transDtoList.isEmpty())
+								break;
+							boolean tranisionBreak = true;
+							for(TransitionDTO transDto: transDtoList){
+								//find out the transition of current first activity
+								if(nextActId.equals(transDto.getFromActivityID())){
+									tranisionBreak = false;
+									nextActId = transDto.getToActivityID();
+									if(nextActId != null && !removedActMap.containsKey(nextActId)){
+										existFirstAct = nextActId;
+										found = true;
+										break;
+									}else if(nextActId == null){
+										//no more activity
+										found = true;
+										break;
+									}
+									//already found the desire transition
+									break;
+								}
+							}
+							//hi, this acitivty also removed!!! then retrieve again
+							//if found is false, then the nextAct is still not available, then continue find.
+							//tranisionBreak mean the activity is removed but it can not find its transition to decide next available activity.
+							if(found || tranisionBreak)
+								break;
+						}
+						Activity next = activityMapper.get(existFirstAct);
+						dto.setFirstActivityUIID(next == null?null:next.getActivityUIID());
+					}
+					//find out the first activity, then break;
+					break;
+				}
+			}
 		}
 		//================== END handle activities ======================
 		
@@ -800,6 +881,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<TransitionDTO> transDtoList = dto.getTransitions();
 		Set<Transition> transList = new HashSet<Transition>();
 		for(TransitionDTO transDto: transDtoList){
+			//Any transitions relating with this tool will be removed!
+			Long fromId = transDto.getFromActivityID();
+			Long toId = transDto.getToActivityID();
+			if(fromId != null && removedActMap.containsKey(fromId)){
+				continue;
+			}
+			if(toId != null && removedActMap.containsKey(toId)){
+				continue;
+			}
 			Transition trans = getTransition(transDto,activityMapper);
 			transList.add(trans);
 			
@@ -990,9 +1080,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				act = new ToolActivity();
 				//get back the toolContent in new system by toolContentID in old system.
 				ToolContent content = toolMapper.get(actDto.getToolContentID());
-				((ToolActivity)act).setTool(content.getTool());
-				((ToolActivity)act).setToolContentId(content.getToolContentId());
-				((ToolActivity)act).setToolSessions(null);
+				//if activity can not find matching tool, the content should be null.
+				if(content != null){
+					((ToolActivity)act).setTool(content.getTool());
+					((ToolActivity)act).setToolContentId(content.getToolContentId());
+					((ToolActivity)act).setToolSessions(null);
+				}
 				break;
 			case Activity.GROUPING_ACTIVITY_TYPE:
 				act = new GroupingActivity();
