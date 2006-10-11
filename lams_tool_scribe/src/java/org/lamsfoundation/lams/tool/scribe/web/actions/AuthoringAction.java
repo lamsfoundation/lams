@@ -183,9 +183,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		for (ScribeAttachment att : getAttList(KEY_DELETED_FILES, map)) {
-			// remove from repository and db
-			scribeService.deleteFromRepository(att.getFileUuid(), att
-					.getFileVersionId());
+			// remove from db, leave in repository
 			attachments.remove(att);
 		}
 

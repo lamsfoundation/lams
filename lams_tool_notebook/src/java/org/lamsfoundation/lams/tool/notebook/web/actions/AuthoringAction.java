@@ -172,9 +172,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		for (NotebookAttachment att : getAttList(KEY_DELETED_FILES, map)) {
-			// remove from repository and db
-			notebookService.deleteFromRepository(att.getFileUuid(), att
-					.getFileVersionId());
+			// remove from db, leave in repository
 			attachments.remove(att);
 		}
 

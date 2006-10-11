@@ -136,13 +136,8 @@ public class Survey implements Cloneable{
   				while(iter.hasNext()){
   					SurveyAttachment file = (SurveyAttachment)iter.next(); 
   					SurveyAttachment newFile = (SurveyAttachment) file.clone();
-//  					if toolContentHandle is null, just clone old file without duplicate it in repository
-  					if(toolContentHandler != null){
-						//duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-  					}
+//  				clone old file without duplicate it in repository
+  					
 					set.add(newFile);
   				}
   				survey.attachments = set;
@@ -152,10 +147,6 @@ public class Survey implements Cloneable{
   				survey.setCreatedBy((SurveyUser) this.createdBy.clone());
   			}
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Survey.class + " failed");
-		} catch (ItemNotFoundException e) {
-			log.error("When clone " + Survey.class + " failed");
-		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + Survey.class + " failed");
 		}
   		

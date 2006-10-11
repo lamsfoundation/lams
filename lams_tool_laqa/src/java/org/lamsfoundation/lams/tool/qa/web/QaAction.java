@@ -2019,27 +2019,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
                 QaUploadedFile attachment = (QaUploadedFile) iter.next();
                 logger.debug("attachment: " + attachment);
                 
-                /*remove entry from content repository. deleting a non-existent entry 
-                 shouldn't cause any errors.*/
-                try 
-				{
-                	
-                    if(attachment.getUuid()!= null)
-                    {
-                    	getToolContentHandler().deleteFile(Long.getLong(attachment.getUuid()));
-                        logger.error("deleted file with uuid: " + attachment.getUuid());
-                    }
-                }
-                catch (RepositoryCheckedException e) {
-                    logger.error("Unable to delete file",e);
-                    /*
-                    ActionMessages am = new ActionMessages(); 
-                    am.add( ActionMessages.GLOBAL_MESSAGE,  
-                           new ActionMessage( "error.contentrepository" , 
-                                              attachment.getFileName())); 
-                    saveErrors( request, am );
-                    */ 
-                }
+                /* remove entry from db, leave in content repository. */
 
                 if ( attachment.getSubmissionId() != null ) {
                     qaService.removeFile(attachment.getSubmissionId());

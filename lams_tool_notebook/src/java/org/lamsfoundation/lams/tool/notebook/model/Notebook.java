@@ -395,13 +395,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 					NotebookAttachment originalFile = (NotebookAttachment) iter.next();
 					NotebookAttachment newFile = (NotebookAttachment) originalFile
 							.clone();
-					if (toolContentHandler != null) {
-						// duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(originalFile
-								.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-					}
 					set.add(newFile);
 				}
 				notebook.notebookAttachments = set;
@@ -411,10 +404,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
 		} catch (CloneNotSupportedException cnse) {
 			log.error("Error cloning " + Notebook.class);
-		} catch (ItemNotFoundException infe) {
-			log.error("Item Not found " + Notebook.class);
-		} catch (RepositoryCheckedException rce) {
-			log.error("Repository checked exception " + Notebook.class);
 		}
 		return notebook;
 	}

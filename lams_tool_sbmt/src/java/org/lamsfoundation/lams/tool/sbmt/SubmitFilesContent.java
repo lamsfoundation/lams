@@ -284,12 +284,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 				while(iter.hasNext()){
 					InstructionFiles file = (InstructionFiles)iter.next();
 					InstructionFiles newFile = (InstructionFiles) file.clone();
-					//duplicate file node in repository
-					if(toolContentHandler != null){
-						NodeKey keys = toolContentHandler.copyFile(file.getUuID());
-						newFile.setUuID(keys.getUuid());
-						newFile.setVersionID(keys.getVersion());
-					}
 					set.add(newFile);
 				}
 				((SubmitFilesContent)obj).instructionFiles= set;
@@ -299,10 +293,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	  			}
 			}
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + SubmitFilesContent.class + " failed");
-		} catch (ItemNotFoundException e) {
-			log.error("When clone " + SubmitFilesContent.class + " failed");
-		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + SubmitFilesContent.class + " failed");
 		}
 		

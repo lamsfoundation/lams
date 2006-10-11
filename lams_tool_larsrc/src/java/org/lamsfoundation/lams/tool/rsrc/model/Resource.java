@@ -128,13 +128,7 @@ public class Resource implements Cloneable{
   				while(iter.hasNext()){
   					ResourceItem item = (ResourceItem)iter.next(); 
   					ResourceItem newItem = (ResourceItem) item.clone();
-//  					if toolContentHandle is null, just clone old file without duplicate it in repository
-  					if(toolContentHandler != null && item.getFileUuid() != null){
-						//duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(item.getFileUuid());
-						newItem.setFileUuid(keys.getUuid());
-						newItem.setFileVersionId(keys.getVersion());
-  					}
+//  				just clone old file without duplicate it in repository
 					set.add(newItem);
   				}
   				resource.resourceItems = set;
@@ -146,13 +140,8 @@ public class Resource implements Cloneable{
   				while(iter.hasNext()){
   					ResourceAttachment file = (ResourceAttachment)iter.next(); 
   					ResourceAttachment newFile = (ResourceAttachment) file.clone();
-//  					if toolContentHandle is null, just clone old file without duplicate it in repository
-  					if(toolContentHandler != null){
-						//duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-  					}
+//  				just clone old file without duplicate it in repository
+  					
 					set.add(newFile);
   				}
   				resource.attachments = set;
@@ -162,10 +151,6 @@ public class Resource implements Cloneable{
   				resource.setCreatedBy((ResourceUser) this.createdBy.clone());
   			}
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Resource.class + " failed");
-		} catch (ItemNotFoundException e) {
-			log.error("When clone " + Resource.class + " failed");
-		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + Resource.class + " failed");
 		}
   		

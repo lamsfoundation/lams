@@ -243,8 +243,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		iter = deleteAttachmentList.iterator();
 		while(iter.hasNext()){
 			InstructionFiles delAtt = (InstructionFiles) iter.next();
-			//delete from repository
-			submitFilesService.deleteFromRepository(delAtt.getUuID(),delAtt.getVersionID());
 			//it is an existed att, then delete it from current attachmentPO
 			if(delAtt.getUid() != null){
 				Iterator attIter = attPOSet.iterator();

@@ -92,25 +92,11 @@ public class McUploadedFile implements Serializable, Comparable
 	{
     	McUploadedFile newMcUploadedFile=null;
 
-    	try
-		{
-    		String fileUuid = mcUploadedFile.getUuid(); 
-    		if(toolContentHandler != null){
-	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
-	        	logger.debug("copied NodeKey: " + copiedNodeKey);
-	        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
-	        	fileUuid = copiedNodeKey.getUuid().toString();
-    		}
-        	newMcUploadedFile = new McUploadedFile(fileUuid,
+        newMcUploadedFile = new McUploadedFile(mcUploadedFile.getUuid(),
         			mcUploadedFile.isFileOnline(),
         			mcUploadedFile.getFileName(),
 					newMcContent);
 
-		}
-		catch(RepositoryCheckedException e)
-		{
-			logger.debug("error occurred: " + e);
-		}
 		
     	return newMcUploadedFile;
 	}

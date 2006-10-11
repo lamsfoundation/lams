@@ -550,8 +550,6 @@ public class AuthoringAction extends Action {
 		while(iter.hasNext()){
 			ResourceAttachment delAtt = (ResourceAttachment) iter.next();
 			iter.remove();
-			//delete from repository
-			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 			//it is an existed att, then delete it from current attachmentPO
 			if(delAtt.getUid() != null){
 				Iterator attIter = attPOSet.iterator();
@@ -590,8 +588,6 @@ public class AuthoringAction extends Action {
     		iter.remove();
     		if(item.getUid() != null)
     			service.deleteResourceItem(item.getUid());
-    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
-    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
     	}
     	//handle resource item attachment file:
     	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
@@ -599,8 +595,6 @@ public class AuthoringAction extends Action {
 		while(iter.hasNext()){
 			ResourceItem delAtt = (ResourceItem) iter.next();
 			iter.remove();
-			//delete from repository
-			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 		}
 		
 		//if miniview number is bigger than available items, then set it topics size

@@ -434,13 +434,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 					ScribeAttachment originalFile = (ScribeAttachment) iter.next();
 					ScribeAttachment newFile = (ScribeAttachment) originalFile
 							.clone();
-					if (toolContentHandler != null) {
-						// duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(originalFile
-								.getFileUuid());
-						newFile.setFileUuid(keys.getUuid());
-						newFile.setFileVersionId(keys.getVersion());
-					}
 					set.add(newFile);
 				}
 				scribe.scribeAttachments = set;
@@ -467,10 +460,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
 		} catch (CloneNotSupportedException cnse) {
 			log.error("Error cloning " + Scribe.class);
-		} catch (ItemNotFoundException infe) {
-			log.error("Item Not found " + Scribe.class);
-		} catch (RepositoryCheckedException rce) {
-			log.error("Repository checked exception " + Scribe.class);
 		}
 		return scribe;
 	}

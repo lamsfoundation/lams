@@ -83,25 +83,11 @@ public class VoteUploadedFile implements Serializable, Comparable
 	{
     	VoteUploadedFile newMcUploadedFile=null;
 
-    	try
-		{
-    		String fileUuid = voteUploadedFile.getUuid(); 
-    		if(toolContentHandler != null){
-	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(voteUploadedFile.getUuid()));
-	        	logger.debug("copied NodeKey: " + copiedNodeKey);
-	        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
-	        	fileUuid = copiedNodeKey.getUuid().toString();
-    		}
-        	newMcUploadedFile = new VoteUploadedFile(fileUuid,
+        newMcUploadedFile = new VoteUploadedFile(voteUploadedFile.getUuid(),
         			voteUploadedFile.isFileOnline(),
         			voteUploadedFile.getFileName(),
 					newMcContent);
 
-		}
-		catch(RepositoryCheckedException e)
-		{
-			logger.debug("error occurred: " + e);
-		}
 		
     	return newMcUploadedFile;
 	}

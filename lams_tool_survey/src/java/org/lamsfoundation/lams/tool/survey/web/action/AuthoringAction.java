@@ -551,8 +551,6 @@ public class AuthoringAction extends Action {
 		while(iter.hasNext()){
 			SurveyAttachment delAtt = (SurveyAttachment) iter.next();
 			iter.remove();
-			//delete from repository
-			service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 			//it is an existed att, then delete it from current attachmentPO
 			if(delAtt.getUid() != null){
 				Iterator attIter = attPOSet.iterator();
