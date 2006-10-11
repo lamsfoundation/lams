@@ -38,7 +38,12 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 
  * @author Steve.Ni
- * 
+ * Create and manage system wide (across multiple webapps in JBOSS) session.
+ *  
+ * <p> 
+ * <b>NOTICE: This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code>
+ *  in web.xml because LocaleFilter need get value from SystemSession .</b>
+ *  
  * @version $Revision$
  */
 public class SystemSessionFilter implements Filter {
