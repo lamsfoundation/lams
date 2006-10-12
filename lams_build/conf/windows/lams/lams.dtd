@@ -11,11 +11,8 @@
 <!ELEMENT UploadFileMaxSize (#PCDATA)>
 <!ELEMENT UploadLargeFileMaxSize (#PCDATA)>
 <!ELEMENT UploadFileMaxMemorySize (#PCDATA)>
-<!ELEMENT ChatServerName (#PCDATA)>
-<!ELEMENT ChatPortNumber (#PCDATA)>
 <!ELEMENT FileManagerDir (#PCDATA)>
 <!ELEMENT ExecutableExtensions (#PCDATA)>
-<!ELEMENT TicketFile (#PCDATA)>
 <!ELEMENT UserInactiveTimeout (#PCDATA)>
 <!ELEMENT AllowMultipleLogin (#PCDATA)>
 <!ELEMENT UseCacheDebugListener (#PCDATA)>
