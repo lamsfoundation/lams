@@ -54,6 +54,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * <a href="LoginSaveAction.java.html"><i>View Source</i><a>
  * </p>
  * 
+ * Use DispatchAction for future extension convenience, e.g. add preview feature
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 
