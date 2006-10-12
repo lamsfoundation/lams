@@ -24,13 +24,22 @@
 
 /*
  * TODO: uninstaller option to keep database/lams.xml/repository
- * TODO: custom lams admin user
+ * TODO: detect if db exists and has data, ask whether to use or import fresh db
+ * TODO: custom lams admin user LDEV-27
  * TODO: desktop icons, readme?
+ * TODO: open login page when start server LDEV-28
+ * TODO: detect if already installed, prompt user to uninstall or first (or should the installer do this after getting the OK?)
+ * TODO: transaction isolation
  */
 
 # includes
+!include "TextFunc.nsh"
+!include "Functions.nsh"
 !include "MUI.nsh"
 !include "LogicLib.nsh"
+
+# function from TextFunc.nsh
+!insertmacro FileJoin
 
 # constants
 !define VERSION "2.0 RC1"
@@ -42,7 +51,8 @@
 !define MUI_ICON "..\graphics\lams2.ico"
 !define MUI_UNICON "..\graphics\lams2.ico"
 Name "LAMS ${VERSION}"
-;BrandingText "LAMS Foundation"
+;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
+BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
 OutFile "..\build\LAMS-${VERSION}.exe"
 InstallDir "C:\lams"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
@@ -288,112 +298,6 @@ LangString DESC_jsmathe ${LANG_ENGLISH} "Include an expanded jsMath.war to be ab
 # functions
 #
 
-# http://nsis.sourceforge.net/Another_String_Replace_%28and_Slash/BackSlash_Converter%29
-#
-; Push $filenamestring (e.g. 'c:\this\and\that\filename.htm')
-; Push "\"
-; Call StrSlash
-; Pop $R0
-; ;Now $R0 contains 'c:/this/and/that/filename.htm'
-Function StrSlash
-  Exch $R3 ; $R3 = needle ("\" or "/")
-  Exch
-  Exch $R1 ; $R1 = String to replacement in (haystack)
-  Push $R2 ; Replaced haystack
-  Push $R4 ; $R4 = not $R3 ("/" or "\")
-  Push $R6
-  Push $R7 ; Scratch reg
-  StrCpy $R2 ""
-  StrLen $R6 $R1
-  StrCpy $R4 "\"
-  StrCmp $R3 "/" loop
-  StrCpy $R4 "/"  
-loop:
-  StrCpy $R7 $R1 1
-  StrCpy $R1 $R1 $R6 1
-  StrCmp $R7 $R3 found
-  StrCpy $R2 "$R2$R7"
-  StrCmp $R1 "" done loop
-found:
-  StrCpy $R2 "$R2$R4"
-  StrCmp $R1 "" done loop
-done:
-  StrCpy $R3 $R2
-  Pop $R7
-  Pop $R6
-  Pop $R4
-  Pop $R2
-  Pop $R1
-  Exch $R3
-FunctionEnd
-
-
-# http://nsis.sourceforge.net/StrStr
-#
-!define StrStr "!insertmacro StrStr"
- 
-!macro StrStr ResultVar String SubString
-  Push `${String}`
-  Push `${SubString}`
-  Call StrStr
-  Pop `${ResultVar}`
-!macroend
- 
-Function StrStr
-/*After this point:
-  ------------------------------------------
-  $R0 = SubString (input)
-  $R1 = String (input)
-  $R2 = SubStringLen (temp)
-  $R3 = StrLen (temp)
-  $R4 = StartCharPos (temp)
-  $R5 = TempStr (temp)*/
- 
-  ;Get input from user
-  Exch $R0
-  Exch
-  Exch $R1
-  Push $R2
-  Push $R3
-  Push $R4
-  Push $R5
- 
-  ;Get "String" and "SubString" length
-  StrLen $R2 $R0
-  StrLen $R3 $R1
-  ;Start "StartCharPos" counter
-  StrCpy $R4 0
- 
-  ;Loop until "SubString" is found or "String" reaches its end
-  ${Do}
-    ;Remove everything before and after the searched part ("TempStr")
-    StrCpy $R5 $R1 $R2 $R4
- 
-    ;Compare "TempStr" with "SubString"
-    ${IfThen} $R5 == $R0 ${|} ${ExitDo} ${|}
-    ;If not "SubString", this could be "String"'s end
-    ${IfThen} $R4 >= $R3 ${|} ${ExitDo} ${|}
-    ;If not, continue the loop
-    IntOp $R4 $R4 + 1
-  ${Loop}
- 
-/*After this point:
-  ------------------------------------------
-  $R0 = ResultVar (output)*/
- 
-  ;Remove part before "SubString" on "String" (if there has one)
-  StrCpy $R0 $R1 `` $R4
- 
-  ;Return output to user
-  Pop $R5
-  Pop $R4
-  Pop $R3
-  Pop $R2
-  Pop $R1
-  Exch $R0
-FunctionEnd
-
-
 Function .onInit
     # select language
     ;!insertmacro MUI_LANGDLL_DISPLAY
@@ -610,7 +514,7 @@ Function DeployConfig
     File "..\templates\run.bat"
     File "..\templates\wrapper.conf"
         
-    # create build.properties
+    # create installer.properties
     ClearErrors
     FileOpen $0 $TEMP\installer.properties w
     IfErrors 0 +2
@@ -677,12 +581,24 @@ Function DeployConfig
     CopyFiles "$TEMP\installer.properties" $INSTDIR
         
     # use Ant to copy configuration to destination LAMS_CONF
-    DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat configure-deploy'
-    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat configure-deploy'
+    FileOpen $0 "$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" w
+    IfErrors 0 +2
+        goto error
+    FileWrite $0 "@echo off$\r$\nset JAVACMD=$JDK_DIR\bin\java$\r$\n"
+    FileClose $0
+    ${FileJoin} "$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" "$INSTDIR\apache-ant-1.6.5\bin\ant.bat" ""
+    DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat configure-deploy'
+    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat configure-deploy'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "LAMS configure status: $0"
     DetailPrint "LAMS configure output: $1"
+    
+    FileOpen $R0 "$INSTDIR\installer_ant.log" w
+    IfErrors 0 +2
+        goto error
+    FileWrite $R0 $1
+    
     ${If} $0 == "error"
         goto error
     ${EndIf}
@@ -772,11 +688,15 @@ Function ImportDatabase
     
     # use Ant to import database
     DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat import-db'
-    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat import-db'
+    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat import-db'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "DB import status: $0"
     DetailPrint "DB import output: $1"
+    
+    FileWrite $R0 $1
+    FileClose $R0
+    
     ${StrStr} $0 $1 "BUILD SUCCESSFUL"
     ${If} $0 == ""
         goto error
@@ -785,7 +705,8 @@ Function ImportDatabase
     goto done
     
     error:
-        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root'
+        # Just leave database if there is an error (don't want to remove someone's existing db)
+        /*StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root'
         DetailPrint $0
         ${If} $9 != 0
             StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root -p$MYSQL_ROOT_PASS'
@@ -797,7 +718,7 @@ Function ImportDatabase
             DetailPrint "Undid create database action."
         ${Else}
             DetailPrint "Could not remove database '$DB_NAME'."
-        ${EndIf}
+        ${EndIf}*/
         MessageBox MB_OK|MB_ICONSTOP "Database setup failed.  Please check your MySQL configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
         Abort "Database setup failed."
     done:
