@@ -273,4 +273,16 @@ public class IntegrationService implements IIntegrationService{
 	private String buildName(String prefix, String name){
 		return prefix+'_'+name;
 	}
+
+	public List getAllExtServerOrgMaps() {
+		return service.findAll(ExtServerOrgMap.class);
+	}
+
+	public void saveExtServerOrgMap(ExtServerOrgMap map) {
+		service.save(map);
+	}
+
+	public ExtServerOrgMap getExtServerOrgMap(Integer sid) {
+		return (ExtServerOrgMap)service.findById(ExtServerOrgMap.class, sid);
+	}
 }

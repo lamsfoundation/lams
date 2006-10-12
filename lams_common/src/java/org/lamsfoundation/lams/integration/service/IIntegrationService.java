@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.integration.service;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -41,6 +43,11 @@ public interface IIntegrationService {
 	
 	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
 	
-	ExtServerOrgMap getExtServerOrgMap(String serverId);
+	ExtServerOrgMap getExtServerOrgMap(Integer sid);
 
+	ExtServerOrgMap getExtServerOrgMap(String serverId);
+	
+	List getAllExtServerOrgMaps();
+	
+	void saveExtServerOrgMap(ExtServerOrgMap map);
 }
