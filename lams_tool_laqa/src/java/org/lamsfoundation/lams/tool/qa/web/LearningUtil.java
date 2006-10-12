@@ -120,6 +120,7 @@ public class LearningUtil implements QaAppConstants{
             		
             		String feedback=qaQueContent.getFeedback();
             		logger.debug("feedback: " + feedback);
+            		if (feedback == null) feedback="";
             		
             		mapFeedback.put(new Integer(displayOrder).toString(), feedback.trim());
         		}
