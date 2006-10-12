@@ -44,7 +44,7 @@
 	<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	<init-param>
 		<param-name>toolContentHandlerBeanName</param-name>
-		<param-value>scribeToolContentHandler</param-value>
+		<param-value>lascrbScribeToolContentHandler</param-value>
 	</init-param>
 	<load-on-startup>3</load-on-startup>
 </servlet>
