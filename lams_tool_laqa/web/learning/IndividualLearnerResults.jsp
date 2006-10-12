@@ -107,18 +107,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									
 
 				  			  		<c:forEach var="feedbackEntry" items="${generalLearnerFlowDTO.mapFeedback}">
-										<c:if test="${feedbackEntry.key == questionEntry.key}"> 						  			  		
-										  <tr>
-											<td colspan=2> <b> <bean:message key="label.feedback"/>:  </b>  
-										  	</td>
-										  </tr>
-										  
-										  <tr>
-											<td colspan=2> 
-												  <c:out value="${feedbackEntry.value}" escapeXml="false"/>						  																	
-										  	</td>
-										  </tr>
-									  	</c:if> 				    
+										<c:if test="${(feedbackEntry.value != '') && (feedbackEntry.value != null) }"> 						  			  		
+					  			  			<c:if test="${feedbackEntry.key == questionEntry.key}"> 						  			  		
+											  <tr>
+												<td colspan=2> <b> <bean:message key="label.feedback"/>:  </b>  
+											  	</td>
+											  </tr>
+											  
+											  <tr>
+												<td colspan=2> 
+													  <c:out value="${feedbackEntry.value}" escapeXml="false"/>						  																	
+											  	</td>
+											  </tr>
+										  	</c:if> 				    
+									  	</c:if> 				    										  	
 									</c:forEach>
 									
 									

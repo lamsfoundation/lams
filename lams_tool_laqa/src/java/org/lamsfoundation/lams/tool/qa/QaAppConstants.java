@@ -32,7 +32,6 @@ public interface QaAppConstants {
 	public static final String MY_SIGNATURE 							="laqa11";
 	public static final long   DEFAULT_CONTENT_ID 						=0;
     public static final long   DEFAULT_QUE_CONTENT_ID 					=1;
-	//public static final String TOOL_SERVICE								="tool_service";
 	public static final String ERROR_QAAPPLICATION 						= "error.exception.QaApplication";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
 	public static final String MAP_QUESTION_CONTENT_KEY					= "mapQuestionContentKey";

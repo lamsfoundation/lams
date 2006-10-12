@@ -117,7 +117,11 @@ public class LearningUtil implements QaAppConstants{
     	    		 *  add the question to the questions Map in the displayOrder
     	    		 */
             		mapQuestions.put(new Integer(displayOrder).toString(),qaQueContent.getQuestion());
-            		mapFeedback.put(new Integer(displayOrder).toString(),qaQueContent.getFeedback());
+            		
+            		String feedback=qaQueContent.getFeedback();
+            		logger.debug("feedback: " + feedback);
+            		
+            		mapFeedback.put(new Integer(displayOrder).toString(), feedback.trim());
         		}
     		}
     	}
