@@ -100,7 +100,7 @@ public class ServerMaintainAction extends LamsDispatchAction {
 		if(list == null){
 			list = new ArrayList();
 		}
-		list.add(dummy);
+		list.add(0,dummy);
 		request.setAttribute("orgs", list);
 		DynaActionForm serverOrgMapForm = (DynaActionForm)form;
 		Integer sid = WebUtil.readIntParam(request,"sid",true);
