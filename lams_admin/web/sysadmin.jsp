@@ -7,7 +7,9 @@
 <br />
 <p><a href="cache.do"><fmt:message key="cache.title"/></a></p>
 
-<p><a href="<lams:LAMSURL/>/admin/loginmaintain.do"><fmt:message key="sysadmin.maintain.loginpage"/></a>
+<p><a href="<lams:LAMSURL/>admin/loginmaintain.do"><fmt:message key="sysadmin.maintain.loginpage"/></a></p>
+
+<p><a href="<lams:LAMSURL/>admin/serverlist.do"><fmt:message key="sysadmin.maintain.external.servers"/></a></p>
 
 <p><fmt:message key="sysadmin.manage.config.file"/></p>
 
@@ -15,5 +17,5 @@
 <p><fmt:message key="sysadmin.batch.description"/>.</p>
 
 <p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
-<p><a href="<lams:LAMSURL/>/monitoring/monitoring.do?method=deleteOldPreviewLessons"><fmt:message key="sysadmin.batch.preview.delete"/></a></p>
+<p><a href="<lams:LAMSURL/>monitoring/monitoring.do?method=deleteOldPreviewLessons"><fmt:message key="sysadmin.batch.preview.delete"/></a></p>
 
