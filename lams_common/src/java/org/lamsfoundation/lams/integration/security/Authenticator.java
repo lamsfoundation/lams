@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 public class Authenticator {
 	public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method, String hashValue) throws AuthenticationException{
 		if(map==null) throw new AuthenticationException("The third party server is not configured on LAMS server");
+		if(map.getDisabled()) throw new AuthenticationException("The third party server is disabled");
 		String plaintext = datetime.toLowerCase().trim() +
 		                   username.toLowerCase().trim() +
 		                   method.toLowerCase().trim() +
@@ -46,12 +47,14 @@ public class Authenticator {
     
 	public static void authenticate(ExtServerOrgMap map, String datetime, String username, String hashValue) throws AuthenticationException{
 		if(map==null) throw new AuthenticationException("The third party server is not configured on LAMS server");
+		if(map.getDisabled()) throw new AuthenticationException("The third party server is disabled");
 		String plaintext = datetime.toLowerCase().trim()+username.toLowerCase().trim()+map.getServerid().toLowerCase().trim()+map.getServerkey().toLowerCase().trim();
 		checkHash(plaintext, hashValue);
 	}
 	
 	public static void authenticate(ExtServerOrgMap map, String datetime, String hashValue) throws AuthenticationException{
 		if(map==null) throw new AuthenticationException("The third party server is not configured on LAMS server");
+		if(map.getDisabled()) throw new AuthenticationException("The third party server is disabled");
 		String plaintext = datetime.toLowerCase().trim()+map.getServerid().toLowerCase().trim()+map.getServerkey().toLowerCase().trim();
 		checkHash(plaintext, hashValue);
 	}
