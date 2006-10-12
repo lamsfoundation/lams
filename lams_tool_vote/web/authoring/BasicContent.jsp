@@ -143,15 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									    <a href="javascript:submitMethod('submitAllContent')" class="button">
 								        	<bean:message key="label.save"/></a>
 									</p>
-									
 								</c:if> 					
-					
-						      	<c:if test="${voteGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
-									<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-									<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
-									cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-									contentFolderID="${formBean.contentFolderID}" />
-								</c:if> 						      	
 							</td> 
 					  	</tr>
 				 </table>
