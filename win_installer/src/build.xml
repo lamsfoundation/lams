@@ -65,7 +65,8 @@
 			classpath="${EARDIR}/mysql-connector-java-3.1.12-bin.jar" 
 			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
 			userid="${DB_USER}" 
-			password="${DB_PASS}">
+			password="${DB_PASS}"
+			encoding="utf8">
 			<transaction src="${TEMP}/dump.sql" />
 		</sql>
 	</target>
