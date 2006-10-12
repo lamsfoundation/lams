@@ -141,13 +141,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</p>
 									
 								</c:if> 					
-					
-						      	<c:if test="${qaGeneralAuthoringDTO.activeModule == 'authoring'}"> 					
-									<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-									<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
-									cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-									contentFolderID="${formBean.contentFolderID}" />
-								</c:if> 						      	
 							</td> 
 					  	</tr>
 				 </table>
