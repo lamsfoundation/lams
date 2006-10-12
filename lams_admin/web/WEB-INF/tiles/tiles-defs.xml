@@ -76,5 +76,15 @@
 		<put name="title" value="admin.error"/>
 		<put name="content" value="error.jsp" />	
 	</definition>
+
+	<definition name=".serverlist" path="/template.jsp">
+		<put name="title" value="sysadmin.maintain.external.servers"/>
+		<put name="content" value="serverlist.jsp" />	
+	</definition>
+
+	<definition name=".servermaintain" path="/template.jsp">
+		<put name="title" value="sysadmin.maintain.server.edit"/>
+		<put name="content" value="servermaintain.jsp" />	
+	</definition>
 	
 </tiles-definitions>
