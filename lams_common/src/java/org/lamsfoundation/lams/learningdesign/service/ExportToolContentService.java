@@ -46,6 +46,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -160,20 +161,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private ILearningLibraryDAO learningLibraryDAO;
 	private IToolImportSupportDAO toolImportSupportDAO;
 	
-	/**
-	 * Class to sort activity DTO according to the rule: Paretns is before their children.
-	 */
-	private class ActDTOParentComparator implements Comparator<AuthoringActivityDTO>{
-
-		public int compare(AuthoringActivityDTO a1, AuthoringActivityDTO a2) {
-			//if a1 is a2's parent, then a1 is before a2.
-			if(a1.getActivityID().equals(a2.getParentActivityID()))  
-				return -1;
-			else 
-				return 1;
-		}
-		
-	}
 	/**
 	 * Class of tool attachment file handler class and relative fields information container.
 	 */
@@ -783,10 +770,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		//================== Start handle activities ======================
 		//activity object list
-		Set<AuthoringActivityDTO> actDtoList = new TreeSet<AuthoringActivityDTO>(new ActDTOParentComparator());
 		//sort them to ensure parent before its children.
-		actDtoList.addAll(dto.getActivities());
+		List<AuthoringActivityDTO> actDtoList = getSortedParentList(dto.getActivities());
 		
+		if(log.isDebugEnabled()){
+			int idx=0;
+			for (AuthoringActivityDTO activityDTO : actDtoList) {
+				log.debug(idx + ": ActivityID is [" + activityDTO.getActivityID() + "], parent ID is [" + activityDTO.getParentActivityID() + "]");
+				idx++;
+			}
+		}
 		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		
@@ -804,16 +797,22 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 			if(actDto.getParentActivityID() != null){
 				Activity parent = activityMapper.get(actDto.getParentActivityID());
-				act.setParentActivity(parent);
-				//also add child as Complex activity: It is useless for persist data, but helpful for validate in learning design!
-				if(isComplexActivity(parent)){
-					Set<Activity> set = ((ComplexActivity)parent).getActivities();
-					if(set == null){
-						set = new TreeSet<Activity>(new ActivityOrderComparator());
-						((ComplexActivity)parent).setActivities(set);
+				//remove children if parent already removed
+				if(removedActMap.containsKey(parent.getActivityId())){
+					act.setParentActivity(null);
+					act.setParentUIID(null);
+				}else{
+					act.setParentActivity(parent);
+					//also add child as Complex activity: It is useless for persist data, but helpful for validate in learning design!
+					if(isComplexActivity(parent)){
+						Set<Activity> set = ((ComplexActivity)parent).getActivities();
+						if(set == null){
+							set = new TreeSet<Activity>(new ActivityOrderComparator());
+							((ComplexActivity)parent).setActivities(set);
+						}
+						if(!removedActMap.containsKey(actDto.getActivityID()))
+							set.add(act);
 					}
-					if(!removedActMap.containsKey(actDto.getActivityID()))
-						set.add(act);
 				}
 			}
 			
@@ -919,6 +918,43 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		return ld.getLearningDesignId();
 	}
 	
+	 
+	 /**
+	  * Method to sort activity DTO according to the rule: Paretns is before their children. 
+	  * @param activities
+	  * @return
+	  */
+	private List<AuthoringActivityDTO> getSortedParentList(List<AuthoringActivityDTO> activities) {
+		List<AuthoringActivityDTO> result = new ArrayList<AuthoringActivityDTO>();
+		List<Long> actIdList = new ArrayList<Long>();
+		
+		int failureToleranceCount = 5000;
+		while(!activities.isEmpty() && failureToleranceCount > 0){
+			Iterator<AuthoringActivityDTO> iter = activities.iterator();
+			while (iter.hasNext()) {
+				AuthoringActivityDTO actDto = iter.next();
+				if(actDto.getParentActivityID() == null){
+					result.add(actDto);
+					actIdList.add(actDto.getActivityID());
+					iter.remove();
+				}else if(actIdList.contains(actDto.getParentActivityID())){
+					result.add(actDto);
+					actIdList.add(actDto.getActivityID());
+					iter.remove();
+				}
+			}
+			failureToleranceCount--;
+		}
+		if(!activities.isEmpty()){
+			log.warn("Some activities cannot found their parent actitivy.");
+			//just append these activies into result list 
+			for (AuthoringActivityDTO actDto : activities) {
+				log.warn("Activity ID[" + actDto.getActivityID() + "] cannot found parent [" + actDto.getParentActivityID() + "]");
+			}
+			result.addAll(activities);
+		}
+		return result;
+	}
 	/**
 	 * Get learning design object from this Learning design DTO object. It also following our
 	 * import rules:
