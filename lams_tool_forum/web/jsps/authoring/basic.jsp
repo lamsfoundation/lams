@@ -59,7 +59,7 @@
 		<td colspan="2" align="left">
 			<a
 				href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
-				style="float:left;width:150px" class="button"> <fmt:message
+				style="float:left;" class="button"> <fmt:message
 					key="label.authoring.create.new.topic" /> </a>
 		</td>
 	</tr>

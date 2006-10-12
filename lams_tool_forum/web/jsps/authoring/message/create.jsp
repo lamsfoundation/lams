@@ -5,6 +5,7 @@
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
+		<lams:css style="tabbed"/>
 	</head>
 	<body>
 		<div class="content">
@@ -18,21 +19,21 @@
 				<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}"/>
 				<tr>
 					<td>
-						<b><bean:message key="message.label.subject" />*</b><BR>
-						<html:text size="30" tabindex="1" property="message.subject" /><BR>
+						<fmt:message key="message.label.subject" />*<br/>
+						<html:text size="30" tabindex="1" property="message.subject" /><br/>
 						<html:errors property="message.subject" />
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<b><bean:message key="message.label.body" />*</b><BR>
+						<fmt:message key="message.label.body" />*<br/>
 						<lams:FCKEditor id="message.body" value=""  contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 						<html:errors property="message.body" />
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<b><bean:message key="message.label.attachment" /></b>
+						<fmt:message key="message.label.attachment" />
 						<html:file tabindex="3" property="attachmentFile" />
 					</td>
 				</tr>
