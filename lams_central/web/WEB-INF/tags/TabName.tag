@@ -37,10 +37,11 @@
 
 <c:set var="limit">10</c:set>
 <c:set var="fullname"><jsp:doBody/></c:set>
-<c:set var="hasAlt" value="false"/>
+<c:set var="titleValue" value=""/>
 
 <c:choose>
 	<c:when test="${fn:length(fullname) > limit}">
+			<c:set var="titleValue" value="${fullname}"/>
 			<c:set var="tabname" value="${fn:substring(fullname, 0, limit)}..."/>
 	</c:when>
 	<c:otherwise>
@@ -50,6 +51,6 @@
 
 
 
-<a class="tab-middle-link" href="<c:out value='${url}' />" title="<c:out value='${fullname}'/>">
+<a class="tab-middle-link" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>">
 	<c:out value="${tabname}" escapeXml="false"/>	
 </a>

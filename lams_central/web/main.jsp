@@ -44,9 +44,7 @@
 			<div class="nav-box-right">
 				<div class="tab-left"></div>
 				<div class="tab-middle">
-					<a class="tab-middle-link" href="<c:out value='${headerlink.url}'/>">
-						<fmt:message key="${headerlink.name}" />
-					</a>
+						<lams:TabName url="${headerlink.url}"><fmt:message key="${headerlink.name}" /></lams:TabName>
 				</div>
 				<div class="tab-right"></div>
 			</div>
