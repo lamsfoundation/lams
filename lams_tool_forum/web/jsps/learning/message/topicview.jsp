@@ -1,3 +1,4 @@
+<%@ include file="/includes/taglibs.jsp"%>
 
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level*3}" />
