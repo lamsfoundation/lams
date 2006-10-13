@@ -11,7 +11,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  *         table="lams_ext_server_org_map"
  *     
 */
-public class ExtServerOrgMap implements Serializable {
+public class ExtServerOrgMap implements Serializable, Comparable {
 
 	private static final long serialVersionUID = 337894825609071182L;
 
@@ -281,5 +281,9 @@ public class ExtServerOrgMap implements Serializable {
             .append("servername", getServername())
             .toString();
     }
+
+	public int compareTo(Object o) {
+		return serverid.compareToIgnoreCase(((ExtServerOrgMap)o).getServerid());
+	}
 
 }

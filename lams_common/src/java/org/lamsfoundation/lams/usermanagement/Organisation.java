@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
  *         table="lams_organisation"
  *     
 */
-public class Organisation implements Serializable {
+public class Organisation implements Serializable, Comparable {
 
 	private static final long serialVersionUID = -6742443056151585129L;
 
@@ -447,6 +447,10 @@ public class Organisation implements Serializable {
 
 	public void setLocale(SupportedLocale locale) {
 		this.locale = locale;
+	}
+
+	public int compareTo(Object o) {
+		return name.compareToIgnoreCase(((Organisation)o).getName());
 	}
 
 }
