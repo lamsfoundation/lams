@@ -58,6 +58,14 @@
 				<filter token="JAVA_HOME" value="${JDK_DIR_UNIX_SLASH}" />
 			</filterset>
 		</copy>
+		<copy overwrite="yes" todir="${INSTDIR}">
+			<fileset dir="${TEMP}">
+				<include name="index.html" />
+			</fileset>
+			<filterset>
+				<filter token="URL" value="${URL}" />
+			</filterset>
+		</copy>
 	</target>
 	
 	<target name="import-db">

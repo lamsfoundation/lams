@@ -25,10 +25,8 @@
 /*
  * TODO: uninstaller option to keep database/lams.xml/repository
  * TODO: detect if db exists and has data, ask whether to use or import fresh db
- * TODO: custom lams admin user LDEV-27
+ * TODO: custom lams admin user LI-27
  * TODO: desktop icons, readme?
- * TODO: open login page when start server LDEV-28
- * TODO: detect if already installed, prompt user to uninstall or first (or should the installer do this after getting the OK?)
  * TODO: transaction isolation
  */
 
@@ -48,8 +46,8 @@
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
 # installer settings
-!define MUI_ICON "..\graphics\lams2.ico"
-!define MUI_UNICON "..\graphics\lams2.ico"
+!define MUI_ICON "..\graphics\favicon.ico"
+!define MUI_UNICON "..\graphics\favicon.ico"
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
@@ -302,6 +300,13 @@ Function .onInit
     # select language
     ;!insertmacro MUI_LANGDLL_DISPLAY
     
+    # Abort install if already installed
+    ReadRegStr $0 HKLM "${REG_HEAD}" "version"
+    ${If} $0 != ""
+        MessageBox MB_OK|MB_ICONSTOP "LAMS $0 is installed.  Please uninstall before continuing."
+        Abort
+    ${EndIf}
+    
     # extract custom page display config
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams2.ini"
@@ -513,6 +518,7 @@ Function DeployConfig
     File "..\templates\server.xml"
     File "..\templates\run.bat"
     File "..\templates\wrapper.conf"
+    File "..\templates\index.html"
         
     # create installer.properties
     ClearErrors
@@ -767,6 +773,7 @@ Function RemoveTempFiles
     Delete "$TEMP\build.xml"
     Delete "$TEMP\installer.properties"
     Delete "$INSTDIR\wrapper.conf"
+    Delete "$TEMP\index.html"
 FunctionEnd
 
 Function .onInstFailed

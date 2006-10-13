@@ -24,6 +24,9 @@
 
 !include "MUI.nsh"
 !include "LogicLib.nsh"
+!include "Functions.nsh"
+
+!define REG_HEAD "Software\LAMS Foundation\LAMSv2"
   
 Name "Start LAMS"
 OutFile "..\build\lams-start.exe"
@@ -35,72 +38,33 @@ Function .onInit
     SetSilent silent
 FunctionEnd
 
-# http://nsis.sourceforge.net/StrStr
-#
-!define StrStr "!insertmacro StrStr"
- 
-!macro StrStr ResultVar String SubString
-  Push `${String}`
-  Push `${SubString}`
-  Call StrStr
-  Pop `${ResultVar}`
-!macroend
- 
-Function StrStr
-/*After this point:
-  ------------------------------------------
-  $R0 = SubString (input)
-  $R1 = String (input)
-  $R2 = SubStringLen (temp)
-  $R3 = StrLen (temp)
-  $R4 = StartCharPos (temp)
-  $R5 = TempStr (temp)*/
- 
-  ;Get input from user
-  Exch $R0
-  Exch
-  Exch $R1
-  Push $R2
-  Push $R3
-  Push $R4
-  Push $R5
- 
-  ;Get "String" and "SubString" length
-  StrLen $R2 $R0
-  StrLen $R3 $R1
-  ;Start "StartCharPos" counter
-  StrCpy $R4 0
- 
-  ;Loop until "SubString" is found or "String" reaches its end
-  ${Do}
-    ;Remove everything before and after the searched part ("TempStr")
-    StrCpy $R5 $R1 $R2 $R4
- 
-    ;Compare "TempStr" with "SubString"
-    ${IfThen} $R5 == $R0 ${|} ${ExitDo} ${|}
-    ;If not "SubString", this could be "String"'s end
-    ${IfThen} $R4 >= $R3 ${|} ${ExitDo} ${|}
-    ;If not, continue the loop
-    IntOp $R4 $R4 + 1
-  ${Loop}
- 
-/*After this point:
-  ------------------------------------------
-  $R0 = ResultVar (output)*/
- 
-  ;Remove part before "SubString" on "String" (if there has one)
-  StrCpy $R0 $R1 `` $R4
- 
-  ;Return output to user
-  Pop $R5
-  Pop $R4
-  Pop $R3
-  Pop $R2
-  Pop $R1
-  Exch $R0
-FunctionEnd
-
 Section
+    ReadRegStr $9 HKLM "${REG_HEAD}" "db_user"
+    ReadRegStr $8 HKLM "${REG_HEAD}" "db_pass"
+    ReadRegStr $7 HKLM "${REG_HEAD}" "dir_inst"
+    ReadRegStr $6 HKLM "${REG_HEAD}" "dir_mysql"
+
+    # check mysql password, mysql server status
+    StrLen $0 $8
+    ${If} $0 == 0
+        nsExec::ExecToStack '$6\bin\mysqladmin ping -u $9'
+    ${Else}
+        nsExec::ExecToStack '$6\bin\mysqladmin ping -u $9 -p$8'
+    ${EndIf}
+    Pop $0
+    Pop $1
+    # check mysql password is correct
+    ${StrStr} $2 $1 "Access denied"
+    ${If} $2 != ""
+        ; mysql password somehow changed - prompt user to update registry entry
+    ${EndIf}
+    # check mysql is running
+    ${StrStr} $2 $1 "mysqld is alive"
+    ${If} $2 == ""
+        MessageBox MB_OK|MB_ICONEXCLAMATION "MySQL does not appear to be running - please make sure it is running before starting LAMS."
+        Abort
+    ${EndIf}
+
     nsExec::ExecToStack 'sc start LAMSv2'
     Pop $0
     Pop $1
@@ -109,6 +73,7 @@ Section
         MessageBox MB_OK|MB_ICONSTOP "Could not start LAMSv2 service: $\r$\n$1"
     ${Else}
         MessageBox MB_OK "Started LAMSv2 service.  Please wait a minute or two while LAMS starts up."
+        ExecShell "open" '"$7\index.html"'
     ${EndIf}
 SectionEnd
 
