@@ -16,7 +16,6 @@
 		<th><fmt:message key="sysadmin.prefix" /></th>
 		<th><fmt:message key="sysadmin.disabled" /></th>
 		<th><fmt:message key="sysadmin.organisation" /></th>
-		<th>&nbsp;</th>
 	</tr>
 	<c:forEach items="${servers}" var="serverOrgMap">
 	<tr>
