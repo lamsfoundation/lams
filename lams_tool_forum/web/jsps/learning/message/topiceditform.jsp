@@ -1,3 +1,5 @@
+<%@ include file="/includes/taglibs.jsp"%>
+
 <table cellpadding="0">
 	<tr>
 		<td>

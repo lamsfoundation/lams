@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp" %>
+
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 <input type="hidden" name="hasAttachment" value="${topic.hasAttachment}"/>
 <c:if test="${topic.hasAttachment}">

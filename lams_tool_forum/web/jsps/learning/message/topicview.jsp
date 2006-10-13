@@ -9,7 +9,7 @@
 				<th class="first">
 					<c:choose>
 						<c:when test='${(sessionMap.mode == "teacher") || (not hidden)}'>
-							<b> <c:out value="${msgDto.message.subject}" /> </b>
+							<c:out value="${msgDto.message.subject}" />
 						</c:when>
 						<c:otherwise>
 							<fmt:message key="topic.message.subject.hidden" />
@@ -21,21 +21,22 @@
 				<td class="first posted-by">
 					<c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 						<fmt:message key="lable.topic.subject.by" />
-						<c:set var="author" value="${msgDto.author}"/>
+						<c:set var="author" value="${msgDto.author}" />
 						<c:if test="${empty author}">
 							<c:set var="author">
-								<fmt:message key="label.default.user.name"/>
+								<fmt:message key="label.default.user.name" />
 							</c:set>
 						</c:if>
 						${author}						
 								-
-						<lams:Date  value="${msgDto.message.created}" />
+						<lams:Date value="${msgDto.message.created}" />
 					</c:if>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
+					<c:if
+						test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 						<c:out value="${msgDto.message.body}" escapeXml="false" />
 					</c:if>
 					<c:if test='${hidden}'>
@@ -47,12 +48,15 @@
 			<c:if test="${not empty msgDto.message.attachments}">
 				<tr>
 					<td>
-						<c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
+						<c:if
+							test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 							<c:forEach var="file" items="${msgDto.message.attachments}">
 								<c:set var="downloadURL">
-									<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
+									<html:rewrite
+										page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 								</c:set>
-								<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
+								<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
+									<c:out value="${file.fileName}" /> </a>
 							</c:forEach>
 						</c:if>
 						<c:if test='${hidden}'>
@@ -61,21 +65,26 @@
 					</td>
 				</tr>
 			</c:if>
-			<c:if test="${((msgDto.released && msgDto.isAuthor) || sessionMap.mode=='teacher') && (not empty msgDto.mark)}">
+			<c:if
+				test="${((msgDto.released && msgDto.isAuthor) || sessionMap.mode=='teacher') && (not empty msgDto.mark)}">
 				<tr>
 					<td>
-						<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
+						<span class="field-name"><fmt:message
+								key="lable.topic.title.mark" />
+						</span>
 						<BR>
-							${msgDto.mark}
+						${msgDto.mark}
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<span class="field-name" ><fmt:message key="lable.topic.title.comment"/></span>
+						<span class="field-name"><fmt:message
+								key="lable.topic.title.comment" />
+						</span>
 						<BR>
 						<c:choose>
 							<c:when test="${empty msgDto.comment}">
-								<fmt:message key="message.not.avaliable"/>
+								<fmt:message key="message.not.avaliable" />
 							</c:when>
 							<c:otherwise>
 								<c:out value="${msgDto.comment}" escapeXml="false" />
@@ -94,16 +103,18 @@
 								<c:when test="${hidden}">
 									<!--  display a show link  -->
 									<c:set var="hidetopic">
-										<html:rewrite page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&msgId=${msgDto.message.uid}&hideFlag=false" />
+										<html:rewrite
+											page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&msgId=${msgDto.message.uid}&hideFlag=false" />
 									</c:set>
 									<html:link href="${hidetopic}" styleClass="button">
-										<fmt:message key="label.show" /> 
+										<fmt:message key="label.show" />
 									</html:link>
 								</c:when>
 								<c:otherwise>
 									<!--  display a hide link -->
 									<c:set var="hidetopic">
-										<html:rewrite page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=true" />
+										<html:rewrite
+											page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=true" />
 									</c:set>
 									<html:link href="${hidetopic}" styleClass="button">
 										<fmt:message key="label.hide" />
@@ -111,28 +122,37 @@
 								</c:otherwise>
 							</c:choose>
 						</c:if>
-						
+					</div>
+
+					<div class="right-buttons">
 						<!--  Edit Button -->
 						<c:if test="${not hidden}">
-							<c:if test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
+							<c:if
+								test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
 								<c:set var="edittopic">
-									<html:rewrite page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />
+									<html:rewrite
+										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />
 								</c:set>
 								<html:link href="${edittopic}" styleClass="button">
 									<fmt:message key="label.edit" />
 								</html:link>
 							</c:if>
 						</c:if>
+					</div>
 
+					<div class="right-buttons">
 						<!--  Reply Button -->
-						<c:if test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
+						<c:if
+							test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
 							<c:set var="replytopic">
-								<html:rewrite page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
+								<html:rewrite
+									page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
 							</c:set>
 							<html:link href="${replytopic}" styleClass="button">
 								<fmt:message key="label.reply" />
 							</html:link>
 						</c:if>
+					</div>
 					</div>
 				</td>
 			</tr>

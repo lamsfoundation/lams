@@ -1,3 +1,4 @@
+<%@ include file="/includes/taglibs.jsp"%>
 
 <table cellpadding="0" class="alternative-color">
 	<tbody>
