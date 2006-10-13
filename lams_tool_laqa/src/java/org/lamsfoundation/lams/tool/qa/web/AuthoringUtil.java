@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -55,57 +54,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class AuthoringUtil implements QaAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
     
-	
-    /**
-     * reconstructQuestionContentMapForAdd(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void
-     * adds a new entry to the Map
-     */
-    protected void reconstructQuestionContentMapForAdd(Map mapQuestionContent, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, 
-            HttpServletRequest request)
-    {
-    	logger.debug("pre-add Map content: " + mapQuestionContent);
-    	logger.debug("pre-add Map size: " + mapQuestionContent.size());
-    	
-    	//repopulateMap(mapQuestionContent, request);
-    	
-    	mapQuestionContent.put(new Long(mapQuestionContent.size()+1).toString(), "");
-    	//request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
-    	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-	     
-    	logger.debug("post-add Map is: " + mapQuestionContent);    	
-	   	logger.debug("post-add count " + mapQuestionContent.size());
-    }
-
-
-    /**
-     * reconstructQuestionContentMapForRemove(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void
-     * deletes the requested entry from the Map
-     */
-    protected Map reconstructQuestionContentMapForRemove(Map mapQuestionContent, HttpServletRequest request, 
-            QaAuthoringForm qaAuthoringForm, String activeModule)
-    {
-    		logger.debug("doing reconstructQuestionContentMapForRemove with activeModule: " + activeModule);
-    	 	String questionIndex =qaAuthoringForm.getQuestionIndex();
-    	 	logger.debug("pre-delete map content:  " + mapQuestionContent);
-    	 	logger.debug("questionIndex: " + questionIndex);
-    	 	logger.debug("final removableQuestionIndex: " + questionIndex);
-    	 	
-    	 	long longQuestionIndex= new Long(questionIndex).longValue();
-    	 	logger.debug("pre-delete count: " + mapQuestionContent.size());
-    	 	
-        	//repopulateMap(mapQuestionContent, request);
-        	//logger.debug("post-repopulateMap questionIndex: " + questionIndex);
-        	
-	 		mapQuestionContent.remove(new Long(longQuestionIndex).toString());	
-	 		logger.debug("removed the question content with index: " + longQuestionIndex);
-	 		
-	 		logger.debug("returning mapQuestionContent:" + mapQuestionContent);
-	 		return mapQuestionContent;
-
-    }
-
     
     protected static List swapNodes(List listQuestionContentDTO, String questionIndex, String direction)
     {
@@ -196,24 +144,6 @@ public class AuthoringUtil implements QaAppConstants {
             	tempNode.setFeedback(mainNode.getFeedback());
             }
 	        
-	        /*
-	        if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) 
-	        {
-	            logger.debug("placing swapped content1");
-	            qaQuestionContentDTO.setQuestion(replacedNode.getQuestion());
-	            qaQuestionContentDTO.setDisplayOrder(replacedNode.getDisplayOrder());
-	            qaQuestionContentDTO.setFeedback(replacedNode.getFeedback());
-	        }
-	        
-	        if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) 
-	        {
-	            logger.debug("placing swapped content2");
-	            qaQuestionContentDTO.setQuestion(mainNode.getQuestion());
-	            qaQuestionContentDTO.setDisplayOrder(mainNode.getDisplayOrder());
-	            qaQuestionContentDTO.setFeedback(mainNode.getFeedback());
-	        }
-	        */
-	        
 	        listFinalQuestionContentDTO.add(tempNode);
 	    }
 
@@ -292,37 +222,6 @@ public class AuthoringUtil implements QaAppConstants {
         }
         logger.debug("mapFeedbackContent:" + mapFeedbackContent);
         return mapFeedbackContent;
-    }
-
-    
-
-    
-    /**
-     * reconstructQuestionContentMapForSubmit(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void
-     * 
-    */
-    protected  void reconstructQuestionContentMapForSubmit(Map mapQuestionContent, HttpServletRequest request)
-    {
-    	logger.debug("pre-submit Map:" + mapQuestionContent);
-    	logger.debug("pre-submit Map size :" + mapQuestionContent.size());
-    	
-    	//repopulateMap(mapQuestionContent, request);
-    	Map mapFinalQuestionContent = new TreeMap(new QaComparator());
-    	
-    	Iterator itMap = mapQuestionContent.entrySet().iterator();
-	    while (itMap.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)itMap.next();
-	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-    		{
-	        	mapFinalQuestionContent.put(pairs.getKey(), pairs.getValue());
-	        	logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-    		}
-	    }
-	    
-	    mapQuestionContent=(TreeMap)mapFinalQuestionContent;
-	    request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
-	    logger.debug("final mapQuestionContent:" + mapQuestionContent);
     }
 
     
