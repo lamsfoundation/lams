@@ -120,36 +120,37 @@
 
 	<table cellpadding="0">
 		<tr>
-			<td align="right">
-				<html:form action="/learning/viewForum.do" target="_blank">
-					<html:hidden property="mode" value="teacher"/>
-					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-					<html:submit property="viewForum" styleClass="button">
-						<fmt:message key="label.monitoring.summary.view.forum" />
-					</html:submit>
-				</html:form>
-			</td>
-
-			<td align="center">
-				<html:form action="/monitoring/viewAllMarks" target="_blank">
-					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-					<html:submit property="Mark" styleClass="button">
-						<fmt:message key="lable.topic.title.mark" />
-					</html:submit>
-				</html:form>
-			</td>
-			<td align="left">
-				<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
-					<fmt:message key="button.release.mark" />
-				</html:button>
-			</td>
-			<td align="left">
-				<html:form action="/monitoring/downloadMarks">
-					<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-					<html:submit property="downloadMarks" styleClass="button">
-						<fmt:message key="message.download.marks" />
-					</html:submit>
-				</html:form>
+			<td>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/learning/viewForum.do" target="_blank">
+						<html:hidden property="mode" value="teacher"/>
+						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:submit property="viewForum" styleClass="button">
+							<fmt:message key="label.monitoring.summary.view.forum" />
+						</html:submit>
+					</html:form>
+				</div>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/monitoring/viewAllMarks" target="_blank">
+						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:submit property="Mark" styleClass="button">
+							<fmt:message key="lable.topic.title.mark" />
+						</html:submit>
+					</html:form>
+				</div>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
+						<fmt:message key="button.release.mark" />
+					</html:button>
+				</div>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/monitoring/downloadMarks">
+						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:submit property="downloadMarks" styleClass="button">
+							<fmt:message key="message.download.marks" />
+						</html:submit>
+					</html:form>
+				</div>
 			</td>
 		</tr>
 	</table>
