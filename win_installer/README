@@ -9,9 +9,11 @@ Notes
 
 Steps to build installer
 1. Build LAMS as usual.  If using an alternate location for JBOSS_HOME and 
-   LAMS_CONF, specify these at the top of src/installer.nsi.
+   LAMS_CONF, specify these at the top of src/installer.nsi
 2. Check out jsMath and run the build-war ant target (needed for
-   step 5).  
+   step 6)
 3. Run the dump-db and compile-java targets in the main build.xml file
 4. Compile src/lams-start.nsi and src/lams-stop.nsi
-5. Compile src/installer.nsi.
+5. Open your C:\lamsconf\lams.xml, and copy the flash client date/timestamps
+   into templates/lams.xml
+6. Compile src/installer.nsi.
