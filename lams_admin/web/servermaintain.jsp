@@ -30,7 +30,7 @@
 		<td><html:text property="servername" size="30"/> *</td>
 	</tr>
 	<tr>
-		<td><fmt:message key="sysadmin.serverdesc" />:</td>
+		<td valign="top"><fmt:message key="sysadmin.serverdesc" />:</td>
 		<td><html:textarea property="serverdesc" cols="40" rows="3"/> </td>
 	</tr>
 	<tr>
