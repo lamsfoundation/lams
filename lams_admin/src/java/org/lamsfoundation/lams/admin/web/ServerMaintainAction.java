@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,13 +94,14 @@ public class ServerMaintainAction extends LamsDispatchAction {
 		Map<String,Object> properties = new HashMap<String,Object>();
 		properties.put("organisationType.organisationTypeId", 1);
 		properties.put("organisationState.organisationStateId", 1);
-		List list = userManagementService.findByProperties(Organisation.class, properties);
+		List<Organisation> list = userManagementService.findByProperties(Organisation.class, properties);
 		Organisation dummy = new Organisation();
 		dummy.setOrganisationId(-1);
 		dummy.setName(getMessageService().getMessage("sysadmin.organisation.select"));
 		if(list == null){
 			list = new ArrayList();
 		}
+		Collections.sort(list);
 		list.add(0,dummy);
 		request.setAttribute("orgs", list);
 		DynaActionForm serverOrgMapForm = (DynaActionForm)form;

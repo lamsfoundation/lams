@@ -22,6 +22,9 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +32,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -52,11 +56,14 @@ public class ServerListAction extends Action {
 	
 	private static IIntegrationService service;
 	
+	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-		request.setAttribute("servers", getService().getAllExtServerOrgMaps());
+		List<ExtServerOrgMap> list = getService().getAllExtServerOrgMaps();
+		Collections.sort(list);
+		request.setAttribute("servers", list);
 		return mapping.findForward("serverlist");
 	}
 	
