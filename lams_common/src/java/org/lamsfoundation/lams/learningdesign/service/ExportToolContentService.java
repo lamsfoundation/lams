@@ -138,6 +138,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
 	
 	private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
+	private static final String ERROR_SERVICE_NOT_FOUND = "error.import.matching.service.not.found";
 	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
@@ -509,7 +510,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				
 				//can not find a matching tool
 				if(newTool == null){
-					log.warn("A matching tool [" + activity.getToolSignature()+"] cannot be found.");
+					log.warn("An activity can not found matching tool [" + activity.getToolSignature()+"].");
 					toolsErrorMsgs.add(getMessageService().getMessage(ERROR_TOOL_NOT_FOUND,activity.getToolSignature()));
 					
 					//remove this activity from LD
@@ -525,6 +526,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//Invoke tool's importToolContent() method.
 				try{
 					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
+					if(contentManager == null){
+						toolsErrorMsgs.add(getMessageService().getMessage(ERROR_SERVICE_NOT_FOUND,activity.getToolSignature()));
+						//remove this activity from LD
+						removedActMap.put(activity.getActivityID(), activity);
+						continue;
+					}
 					log.debug("Tool begin to import content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
 					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
 					log.debug("Tool content import success.");
@@ -534,12 +541,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					log.error(error);
 					toolsErrorMsgs.add(error);
 				}
-			}
+			} //end all activities import
 			
 			// begin fckeditor content folder import
 			try {
 				String contentZipFileName = EXPORT_LDCONTENT_ZIP_PREFIX + ldDto.getContentFolderID() + EXPORT_LDCONTENT_ZIP_SUFFIX;
-				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator + ldDto.getContentFolderID();
+				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR 
+						+ File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator + ldDto.getContentFolderID();
 				File contentZipFile = new File(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
 				
 				// unzip file to target secure dir if exists
@@ -552,6 +560,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				throw new ImportToolContentException(e);
 			}
 			
+			//save learning design
 			WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
 			return saveLearningDesign(ldDto,importer,folder,toolMapper,removedActMap);
 			
@@ -794,10 +803,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		//rescan the activity list and refresh their parent activity.
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = activityMapper.get(actDto.getActivityID());
+			if(removedActMap.containsKey(actDto.getActivityID()))
+				continue;
 			
 			if(actDto.getParentActivityID() != null){
 				Activity parent = activityMapper.get(actDto.getParentActivityID());
-				//remove children if parent already removed
+				//reset children's parent as null if parent already removed
 				if(removedActMap.containsKey(parent.getActivityId())){
 					act.setParentActivity(null);
 					act.setParentUIID(null);
@@ -817,10 +828,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			}
 			
 			//persist
-			if(!removedActMap.containsKey(actDto.getActivityID())){
-				act.setActivityId(null);
-				activityDAO.insert(act);
-			}
+			act.setActivityId(null);
+			activityDAO.insert(act);
 		}
 		
 		
@@ -858,6 +867,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 									}
 									//already found the desire transition
 									break;
+									//if found flag is false yet, then it means the 2nd node remove as well, 
+									//continue try 3rd...
 								}
 							}
 							//hi, this acitivty also removed!!! then retrieve again
@@ -928,6 +939,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<AuthoringActivityDTO> result = new ArrayList<AuthoringActivityDTO>();
 		List<Long> actIdList = new ArrayList<Long>();
 		
+		//NOTICE: this code can not handle all nodes have their parents, ie, there is at least one node parent is null(root). 
 		int failureToleranceCount = 5000;
 		while(!activities.isEmpty() && failureToleranceCount > 0){
 			Iterator<AuthoringActivityDTO> iter = activities.iterator();
