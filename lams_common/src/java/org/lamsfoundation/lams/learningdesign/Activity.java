@@ -531,12 +531,17 @@ public abstract class Activity implements Serializable,Nullable {
 		if (!(other instanceof Activity))
 			return false;
 		Activity castOther = (Activity) other;
-		return new EqualsBuilder().append(this.getActivityId(),
-				castOther.getActivityId()).isEquals();
+		return new EqualsBuilder()
+		.append(this.getActivityId(),castOther.getActivityId())
+		.append(this.getActivityUIID(),castOther.getActivityUIID())
+		.isEquals();
 	}
 
 	public int hashCode() {
-		return new HashCodeBuilder().append(getActivityId()).toHashCode();
+		return new HashCodeBuilder()
+			.append(getActivityId())
+			.append(getActivityUIID())
+			.toHashCode();
 	}
 
 	/**
