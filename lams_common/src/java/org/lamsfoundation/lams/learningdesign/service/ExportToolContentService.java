@@ -138,7 +138,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
 	
 	private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
-	private static final String ERROR_SERVICE_NOT_FOUND = "error.import.matching.service.not.found";
+	private static final String ERROR_SERVICE_ERROR = "error.import.tool.service.fail";
 	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
@@ -511,7 +511,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//can not find a matching tool
 				if(newTool == null){
 					log.warn("An activity can not found matching tool [" + activity.getToolSignature()+"].");
-					toolsErrorMsgs.add(getMessageService().getMessage(ERROR_TOOL_NOT_FOUND,activity.getToolSignature()));
+					toolsErrorMsgs.add(getMessageService().getMessage(ERROR_TOOL_NOT_FOUND,new Object[]{activity.getToolSignature()}));
 					
 					//remove this activity from LD
 					removedActMap.put(activity.getActivityID(), activity);
@@ -526,20 +526,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//Invoke tool's importToolContent() method.
 				try{
 					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
-					if(contentManager == null){
-						toolsErrorMsgs.add(getMessageService().getMessage(ERROR_SERVICE_NOT_FOUND,activity.getToolSignature()));
-						//remove this activity from LD
-						removedActMap.put(activity.getActivityID(), activity);
-						continue;
-					}
 					log.debug("Tool begin to import content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
 					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
 					log.debug("Tool content import success.");
 				}catch (Exception e) {
-					String error = "Unable to import tool content for tool "+newTool.getToolDisplayName() +". Cause by " 
-					+ e.toString();
+					String error = getMessageService().getMessage(ERROR_SERVICE_ERROR,new Object[]{newTool.getToolDisplayName(),e.toString()});
 					log.error(error);
 					toolsErrorMsgs.add(error);
+					//remove any unsucessed activities from new Learning design.
+					removedActMap.put(activity.getActivityID(), activity);
 				}
 			} //end all activities import
 			
@@ -761,7 +756,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
         return applicationContext.getBean(tool.getServiceName());
     }
 	
-	private Long saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, 
+	public Long saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, 
 				Map<Long,ToolContent> toolMapper, Map<Long,AuthoringActivityDTO> removedActMap)
 			throws ImportToolContentException {
 
