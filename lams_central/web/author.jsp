@@ -142,6 +142,10 @@ function openPopUpFS(args){
 	openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
 }
 
+function openPreview(args){
+	window.opener.openPreview(args);
+}
+
 function openURL(args){
 	window.open(args);
 }

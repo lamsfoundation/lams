@@ -35,14 +35,14 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
 
-<c:set var="limit">10</c:set>
+<c:set var="limit">12</c:set>
 <c:set var="fullname"><jsp:doBody/></c:set>
 <c:set var="titleValue" value=""/>
 
 <c:choose>
 	<c:when test="${fn:length(fullname) > limit}">
 			<c:set var="titleValue" value="${fullname}"/>
-			<c:set var="tabname" value="${fn:substring(fullname, 0, limit)}..."/>
+			<c:set var="tabname" value="${fn:substring(fullname, 0, limit-2)}..."/>
 	</c:when>
 	<c:otherwise>
 		<c:set var="tabname" value="${fullname}"/>
