@@ -84,6 +84,7 @@ public class LD102Importer implements ApplicationContextAware{
 
 	private static final String MSG_KEY_PERM_GATE = "imported.permission.gate.title";
 	private static final String MSG_KEY_SYNC_GATE = "imported.synchronise.gate.title";
+	private static final String MSG_KEY_VALIDATION_ERROR = "error.import.validation";
 			
 	private Logger log = Logger.getLogger(LD102Importer.class);
 	private ApplicationContext context;
@@ -376,18 +377,7 @@ public class LD102Importer implements ApplicationContextAware{
 		else if (isLearningDesign((String) ldHashTable.get(WDDXTAGS102.OBJECT_TYPE))){
 			
 			processLearningDesign(ldHashTable, folder);
-			
-			Vector<ValidationErrorDTO> listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(ldInProgress);
-			if (listOfValidationErrorDTOs.size() > 0) {
-				ldInProgress.setValidDesign(Boolean.FALSE);
-				log.info("Imported learning design is invalid. New learning design id "+ldInProgress.getLearningDesignId()+" title ");
-				for ( ValidationErrorDTO dto : listOfValidationErrorDTOs ) {
-					log.info("Learning design id "+ldInProgress.getLearningDesignId()+" validation error "+dto);
-				}
-			}
-			else {
-				ldInProgress.setValidDesign(Boolean.TRUE);
-			}
+			validateDesign(toolsErrorMsgs);
 			baseDAO.update(ldInProgress);
 		}
 		
@@ -398,6 +388,33 @@ public class LD102Importer implements ApplicationContextAware{
 		
 		return(ldInProgress != null ? ldInProgress.getLearningDesignId() : null);
 
+	}
+
+	private void validateDesign(List<String> toolsErrorMsgs) {
+		Vector<ValidationErrorDTO> listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(ldInProgress);
+		if (listOfValidationErrorDTOs.size() > 0) {
+			ldInProgress.setValidDesign(Boolean.FALSE);
+			log.info("Imported learning design is invalid. New learning design id "+ldInProgress.getLearningDesignId()+" title ");
+			
+			// Messages may be duplicated as the DTOs include the activity ids for Flash to indicate the problem activities in authoring.
+			// So stick them in a set so we don't get duplicates 
+			HashSet<String> messages = new HashSet<String>();  
+			for ( ValidationErrorDTO dto : listOfValidationErrorDTOs ) {
+				log.info("Learning design id "+ldInProgress.getLearningDesignId()+" validation error "+dto);
+				messages.add(dto.getMessage());
+			}
+			StringBuffer buf = new StringBuffer(100);
+			buf.append(messageService.getMessage(MSG_KEY_VALIDATION_ERROR));
+			buf.append(" ");
+			for ( String msg : messages ) {
+				buf.append(msg);
+				buf.append(" ");
+			}
+			toolsErrorMsgs.add(buf.toString());
+		}
+		else {
+			ldInProgress.setValidDesign(Boolean.TRUE);
+		}
 	}
 
 	/** 
@@ -768,6 +785,7 @@ public class LD102Importer implements ApplicationContextAware{
 			newActivityMap.put(activity.getActivityUIID(), activity);
 			flattenedActivityMap.put(parentActivityId, activity.getActivityUIID());
 			baseDAO.insert(activity);
+			ldInProgress.getActivities().add(activity);
 		}
 		
 		return activity;
@@ -955,10 +973,6 @@ public class LD102Importer implements ApplicationContextAware{
 	 */
 	private void parseGroupingValue(Object groupingIdRaw, Activity activity)
 	{
-		if ( log.isDebugEnabled())
-			log.debug("updateGroupingValue: groupingId"+(groupingIdRaw!=null?groupingIdRaw.toString():"null")
-				+ " task "+ activity.toString());
-		
 		Integer groupingId = null;		
 		if ( groupingIdRaw != null )
 		{
@@ -1077,10 +1091,12 @@ public class LD102Importer implements ApplicationContextAware{
 						log.warn(message);
 						toolsErrorMsgs.add(message);
 					} else { 
-						optionsActivity.getActivities().add(childActivity);
 						childActivity.setParentActivity(optionsActivity);
 						childActivity.setParentUIID(optionsActivity.getActivityUIID());
 						childActivity.setOrderId(new Integer(orderId++));
+						// order id must be set before adding to activity set, 
+						// or the order will be wrong (it's a sorted set!)
+						optionsActivity.getActivities().add(childActivity);
 					}
 				}
 			}
@@ -1120,7 +1136,7 @@ public class LD102Importer implements ApplicationContextAware{
 			    
 			    gateTransition = new Transition();
 		    	gateTransition.setTransitionUIID(maxId++);
-		    	gate.setTransitionTo(gateTransition);
+		    	gate.setTransitionFrom(gateTransition);
 		    	gateTransition.setFromActivity(gate);
 		    	gateTransition.setFromUIID(gate.getActivityUIID());
 		    }
