@@ -332,6 +332,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
 		    logger.debug("learnerProgress before presenting learner Progress screen: " + mcLearningForm.getLearnerProgress());
 		    
+		    
+		    request.setAttribute(REQUEST_BY_STARTER, new Boolean (true).toString());
 		    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 		}
     	
@@ -452,7 +454,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
 			    	}
 
-
+			    	request.setAttribute(REQUEST_BY_STARTER, new Boolean (true).toString());
 			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 		    	}
 	        }
@@ -517,6 +519,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		}
 
 
+		
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 	}

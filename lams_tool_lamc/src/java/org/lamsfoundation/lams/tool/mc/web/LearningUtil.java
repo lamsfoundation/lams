@@ -65,7 +65,7 @@ public class LearningUtil implements McAppConstants {
 	 */
 	public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm, boolean prepareViewAnswersDataMode)
 	{
-	    logger.debug("prepareViewAnswersDataMode: " + prepareViewAnswersDataMode);
+	    logger.debug("starting saveFormRequestData:");
 	    
 	 	String httpSessionID=request.getParameter("httpSessionID");
 	 	logger.debug("httpSessionID: " + httpSessionID);
@@ -100,7 +100,7 @@ public class LearningUtil implements McAppConstants {
 	 	mcLearningForm.setQuestionListingMode(questionListingMode);
 
 
-	 	logger.debug("done saving form request data.");
+	 	logger.debug("ending saveFormRequestData:");
 	}
 	
     
@@ -148,6 +148,36 @@ public class LearningUtil implements McAppConstants {
 		logger.debug("totalUserWeight: " + totalUserWeight);
 		return totalUserWeight;
 	}
+
+
+    public static String getTotalMarksPossible(McContent mcContent)
+    {
+        logger.debug("starting getTotalMarksPossible: " + mcContent);
+        
+        int totalMarksPossible=0;
+        Iterator itQuestions=mcContent.getMcQueContents().iterator() ;
+        while (itQuestions.hasNext())
+        {
+            McQueContent mcQueContent = (McQueContent)itQuestions.next(); 
+            logger.debug("mcQueContent: " + mcQueContent);
+            
+            Integer mark=mcQueContent.getMark();
+            logger.debug("mark: " + mark);
+            
+            int intMark=0;
+            if (mark != null)
+                intMark=mark.intValue();
+            
+            logger.debug("intMark: " + intMark);
+
+            totalMarksPossible+=intMark;
+        }
+        logger.debug("totalMarksPossible: " + totalMarksPossible);
+        
+        String strTotalMarksPossible= new Integer(totalMarksPossible).toString();
+        return strTotalMarksPossible;
+    }
+    
     
     
     /**
@@ -1053,55 +1083,5 @@ public class LearningUtil implements McAppConstants {
        logger.debug("returning mapWeightsExcludeHighestWeight: " + mapMarksExcludeHighestMark);
        return mapMarksExcludeHighestMark; 
 	}
-	
-	
     
-    /**
-     * 
-     * cleanUpLearningSession(HttpServletRequest request)
-     * removes Learning session attributes
-     * 
-     * @param request
-     */
-    public static void cleanUpLearningSession(HttpServletRequest request)
-    {
-    	request.getSession().removeAttribute(TOOL_CONTENT_ID);
-    	request.getSession().removeAttribute(TOOL_SESSION_ID);
-    	request.getSession().removeAttribute(QUESTION_LISTING_MODE);
-    	request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);
-    	request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
-    	request.getSession().removeAttribute(MAP_OPTIONS_CONTENT);
-    	request.getSession().removeAttribute(MAP_QUESTION_CONTENT_LEARNER);
-    	request.getSession().removeAttribute(TOTAL_QUESTION_COUNT);
-    	request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
-    	request.getSession().removeAttribute(LEARNER_LAST_ATTEMPT_ORDER);
-    	request.getSession().removeAttribute(LEARNER_BEST_MARK);
-    	request.getSession().removeAttribute(PASSMARK);
-    	request.getSession().removeAttribute(REPORT_TITLE_LEARNER);
-    	request.getSession().removeAttribute(IS_CONTENT_IN_USE);
-    	request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
-    	request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
-    	request.getSession().removeAttribute(IS_SHOW_FEEDBACK);
-    	request.getSession().removeAttribute(TOTAL_COUNT_REACHED);
-    	request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
-    	request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
-    	request.getSession().removeAttribute(TOP_MARK);
-    	request.getSession().removeAttribute(LOWEST_MARK);
-    	request.getSession().removeAttribute(AVERAGE_MARK);
-    	request.getSession().removeAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	request.getSession().removeAttribute(MAP_LEARNER_ASSESSMENT_RESULTS);
-    	request.getSession().removeAttribute(MAP_LEARNER_FEEDBACK_INCORRECT);
-    	request.getSession().removeAttribute(MAP_LEARNER_FEEDBACK_CORRECT);
-    	request.getSession().removeAttribute(MAP_QUE_ATTEMPTS);
-    	request.getSession().removeAttribute(MAP_QUE_CORRECT_ATTEMPTS);
-    	request.getSession().removeAttribute(MAP_QUE_INCORRECT_ATTEMPTS);
-    	request.getSession().removeAttribute(MAP_QUESTION_WEIGHTS);
-    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
-    	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
-    	request.getSession().removeAttribute(LEARNING_MODE);
-    	request.getSession().removeAttribute(PREVIEW_ONLY);
-    	request.getSession().removeAttribute(LEARNER_PROGRESS);
-    	request.getSession().removeAttribute(LEARNER_PROGRESS_USERID);
-    }
  }
