@@ -47,45 +47,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 		<td width="10%" align="right">
-	 		<c:if test="${totalQuestionCount != 1}"> 		
-	 		
-		 		<c:if test="${queIndex == 1}"> 		
-					<a title="<bean:message key='label.tip.moveQuestionDown'/>" href="javascript:;">
-	                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
-					</a> 
-				</c:if> 							
-
-		 		<c:if test="${queIndex == totalQuestionCount}"> 		
-					<a title="<bean:message key='label.tip.moveQuestionUp'/>" href="javascript:;" >
-	                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
-					</a> 
-				</c:if> 							
-				
-				<c:if test="${(queIndex != 1)  && (queIndex != totalQuestionCount)}"> 		
-					<a title="<bean:message key='label.tip.moveQuestionDown'/>" href="javascript:;" >
-	                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
-					</a> 
-
-					<a title="<bean:message key='label.tip.moveQuestionUp'/>" href="javascript:;" >
-	                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
-					</a> 
-				</c:if> 							
-			
-			</c:if> 			
 		</td>
        	
-		
-
 		<td width="10%" align="right">
-				<a title="<bean:message key='label.tip.editQuestion'/>" href="javascript:;" >
-	                    <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
-				</a> 
+
 		</td>
 
 		<td width="10%" align="right">
-				<a title="<bean:message key='label.tip.deleteQuestion'/>" href="javascript:;" >
-	                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
-				</a> 				
+
 		</td>
 	</tr>
 </c:forEach>
