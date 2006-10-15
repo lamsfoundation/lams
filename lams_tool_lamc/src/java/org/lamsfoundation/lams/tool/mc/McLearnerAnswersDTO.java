@@ -41,8 +41,6 @@ public class McLearnerAnswersDTO implements Comparable
     
     protected String questionUid;
     
-    protected String weight;
-    
     protected String mark;
     
     protected Map candidateAnswers;
@@ -81,20 +79,6 @@ public class McLearnerAnswersDTO implements Comparable
     public void setQuestion(String question) {
         this.question = question;
     }
-    /**
-     * @return Returns the weight.
-     */
-    public String getWeight() {
-        return weight;
-    }
-    /**
-     * @param weight The weight to set.
-     */
-    public void setWeight(String weight) {
-        this.weight = weight;
-    }
-    
-    
     
 	public String toString() {
         return new ToStringBuilder(this)

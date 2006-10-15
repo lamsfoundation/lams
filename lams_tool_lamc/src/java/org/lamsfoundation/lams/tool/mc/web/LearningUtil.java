@@ -557,10 +557,6 @@ public class LearningUtil implements McAppConstants {
 	{
         logger.debug("starting createLearnerAttempt: ");
 		Date attempTime=McUtils.getGMTDateTime();
-		//String timeZone= McUtils.getCurrentTimeZone();
-		String timeZone= "";
-		logger.debug("timeZone: " + timeZone);
-		
 		
 		Iterator itSelectedMap = selectedQuestionAndCandidateAnswersDTO.iterator();
 		while (itSelectedMap.hasNext())
@@ -580,7 +576,7 @@ public class LearningUtil implements McAppConstants {
 			logger.debug("isAttemptCorrect: " + isAttemptCorrect);
 			
 			logger.debug("requesting  createIndividualOptions");
-			createIndividualOptions(request, candidateAnswers, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, 
+			createIndividualOptions(request, candidateAnswers, mcQueContent, mcQueUsr, attempTime, mark, passed, 
 			        new Integer(highestAttemptOrder), isAttemptCorrect,mcService);
 		}
 		
@@ -598,7 +594,6 @@ public class LearningUtil implements McAppConstants {
      * @param mcQueContent
      * @param mcQueUsr
      * @param attempTime
-     * @param timeZone
      * @param mark
      * @param passed
      * @param highestAttemptOrder
@@ -606,7 +601,7 @@ public class LearningUtil implements McAppConstants {
      * @param mcService
      */
     public static void createIndividualOptions(HttpServletRequest request, Map candidateAnswers, McQueContent mcQueContent, 
-            McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect, 
+            McQueUsr mcQueUsr, Date attempTime, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect, 
             IMcService mcService)
     {
         logger.debug("starting createIndividualOptions");
@@ -630,7 +625,7 @@ public class LearningUtil implements McAppConstants {
                 	logger.debug("mcOptsContent: " + mcOptsContent);
                 	if (mcOptsContent != null)
                 	{
-                	    McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect).booleanValue());
+                	    McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect).booleanValue());
 	    			    mcService.createMcUsrAttempt(mcUsrAttempt);
                     	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);
                 	}
@@ -639,38 +634,6 @@ public class LearningUtil implements McAppConstants {
     	}
     }
     
-    
-    /**
-     * Map buildWeightsMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
-     * 
-     * @param request
-     * @param toolContentId
-     * @return Map
-     */
-    public static Map buildWeightsMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
-    {
-        logger.debug("starting buildWeightsMap : " + toolContentId);
-    	Map mapWeights= new TreeMap(new McComparator());
-    	McContent mcContent=mcService.retrieveMc(toolContentId);
-    	logger.debug("mcContent : " + mcContent);
-		
-    	List questionsContent=mcService.refreshQuestionContent(mcContent.getUid());
-    	logger.debug("questionsContent : " + questionsContent);
-    	
-    	Iterator listIterator=questionsContent.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent : " + mcQueContent);
-    		mapWeights.put(mapIndex.toString(),mcQueContent.getWeight().toString());
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
-    	logger.debug("mapWeights : " + mapWeights);
-    	return mapWeights;
-    }
-    
-
     /**
      * Map buildMarksMap(HttpServletRequest request, Long toolContentId, IMcService mcService)
      * 
@@ -775,7 +738,6 @@ public class LearningUtil implements McAppConstants {
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		
-    		mcLearnerAnswersDTO.setWeight(mcQueContent.getWeight().toString());
     		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
     		mcLearnerAnswersDTO.setCandidateAnswerUids(mapCandidateAnswerUids);
     		

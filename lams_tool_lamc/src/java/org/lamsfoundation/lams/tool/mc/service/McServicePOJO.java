@@ -2571,8 +2571,6 @@ public class McServicePOJO implements
 		question.setQuestion(WebUtil.convertNewlines((String)questionMap.get(CONTENT_Q_QUESTION)));
 		
 		// In 1.0.2 all questions are implicitly assumed to be 1 and be of equal weight
-		// I think the weights are actually ignored, so just set to 0 (FM) 
-		question.setWeight( 0 );
 		question.setMark( 1 );
 		
 		String correctAnswer = (String)questionMap.get(CONTENT_Q_ANSWER);

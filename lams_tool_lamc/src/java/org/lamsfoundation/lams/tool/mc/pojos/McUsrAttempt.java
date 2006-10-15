@@ -47,9 +47,6 @@ public class McUsrAttempt implements Serializable {
     /** nullable persistent field */
     private Date attemptTime;
 
-    /** nullable persistent field */
-    private String timeZone;
-    
     private Integer mark;
     
     private boolean finished;
@@ -74,29 +71,26 @@ public class McUsrAttempt implements Serializable {
     private org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent;
 
     /** full constructor */
-    public McUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
+    public McUsrAttempt(Long attemptId, Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
     		org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent) {
         this.attemptId = attemptId;
         this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
         this.mcQueContent = mcQueContent;
         this.mcQueUsr = mcQueUsr;
         this.mcOptionsContent = mcOptionsContent;
     }
 
-    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
+    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
     		org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent) {
         this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
         this.mcQueContent = mcQueContent;
         this.mcQueUsr = mcQueUsr;
         this.mcOptionsContent = mcOptionsContent;
     }
     
-    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
+    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
     		org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent, Integer mark, boolean passed) {
         this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
         this.mcQueContent = mcQueContent;
         this.mcQueUsr = mcQueUsr;
         this.mcOptionsContent = mcOptionsContent;
@@ -104,10 +98,9 @@ public class McUsrAttempt implements Serializable {
         this.passed = passed;
     }
     
-    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
+    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
     		org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent, Integer mark, boolean passed, Integer attemptOrder) {
         this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
         this.mcQueContent = mcQueContent;
         this.mcQueUsr = mcQueUsr;
         this.mcOptionsContent = mcOptionsContent;
@@ -116,10 +109,9 @@ public class McUsrAttempt implements Serializable {
         this.attemptOrder=attemptOrder;
     }
     
-    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
+    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, 
     		org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent, Integer mark, boolean passed, Integer attemptOrder, boolean attemptCorrect) {
         this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
         this.mcQueContent = mcQueContent;
         this.mcQueUsr = mcQueUsr;
         this.mcOptionsContent = mcOptionsContent;
@@ -164,14 +156,6 @@ public class McUsrAttempt implements Serializable {
 
     public void setAttemptTime(Date attemptTime) {
         this.attemptTime = attemptTime;
-    }
-
-    public String getTimeZone() {
-        return this.timeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
     }
 
     public org.lamsfoundation.lams.tool.mc.pojos.McQueContent getMcQueContent() {

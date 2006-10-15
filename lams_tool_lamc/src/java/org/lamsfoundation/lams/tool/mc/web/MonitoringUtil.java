@@ -128,10 +128,7 @@ public class MonitoringUtil implements McAppConstants{
 	    		McMonitoredAnswersDTO mcMonitoredAnswersDTO= new McMonitoredAnswersDTO();
 	    		mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
 	    		mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
-	    		mcMonitoredAnswersDTO.setWeight(mcQueContent.getWeight().toString());
 	    		mcMonitoredAnswersDTO.setMark(mcQueContent.getMark().toString());
-	    		
-	    		
     		
 	    		List listCandidateAnswers=mcService.findMcOptionNamesByQueId(mcQueContent.getUid());
 				logger.debug("listCandidateAnswers:..." + listCandidateAnswers);
@@ -188,7 +185,6 @@ public class MonitoringUtil implements McAppConstants{
 	    		McMonitoredAnswersDTO mcMonitoredAnswersDTO= new McMonitoredAnswersDTO();
 	    		mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
 	    		mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
-	    		mcMonitoredAnswersDTO.setWeight(mcQueContent.getWeight().toString());
 	    		mcMonitoredAnswersDTO.setMark(mcQueContent.getMark().toString());
 	    		
 	    		List listCandidateAnswers=mcService.findMcOptionNamesByQueId(mcQueContent.getUid());
@@ -509,7 +505,6 @@ public class MonitoringUtil implements McAppConstants{
 			}
 			logger.debug("final isAttemptCorrect: " + isAttemptCorrect);
 			logger.debug("mcUsrAttemptUser: " + mcUsrAttemptUser);
-			logger.debug("mcUsrAttemptUser weight: " + mcUsrAttemptUser.getMcQueContent().getWeight().toString());
 			
 			if (isAttemptCorrect)
 			{

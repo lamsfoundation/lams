@@ -40,8 +40,6 @@ public class McMonitoredAnswersDTO implements Comparable
 	
 	private String question;
 	
-	private String weight;
-	
 	private String mark;
 	
 	private String sessionId;
@@ -110,7 +108,6 @@ public class McMonitoredAnswersDTO implements Comparable
         return new ToStringBuilder(this)
             .append("questionUid: ", questionUid)
             .append("question: ", question)
-            .append("weight: ", weight)
             .append("candidateAnswers: ", candidateAnswers)            
             .append("questionAttempts: ", questionAttempts)
             .append("candidateAnswersCorrect:", candidateAnswersCorrect)
@@ -128,18 +125,6 @@ public class McMonitoredAnswersDTO implements Comparable
 			return (int) (new Long(questionUid).longValue() - new Long(mcMonitoredAnswersDTO.questionUid).longValue());
     }
 	
-    /**
-     * @return Returns the weight.
-     */
-    public String getWeight() {
-        return weight;
-    }
-    /**
-     * @param weight The weight to set.
-     */
-    public void setWeight(String weight) {
-        this.weight = weight;
-    }
     /**
      * @return Returns the candidateAnswersCorrect.
      */

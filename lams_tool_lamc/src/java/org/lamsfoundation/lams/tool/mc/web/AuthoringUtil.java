@@ -252,11 +252,10 @@ public class AuthoringUtil implements McAppConstants {
      * @param displayOrder
      */
     public static void updateExistingQuestionContent(HttpServletRequest request, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, 
-            McQueContent mcQueContent, String displayOrder, String weight, IMcService mcService)
+            McQueContent mcQueContent, String displayOrder, IMcService mcService)
     {
     	logger.debug("doing updateExistingQuestionContent...");
     	logger.debug("using displayOrder: " + displayOrder);
-    	logger.debug("using weight: " + weight);
     	
     	String incorrectFeedback=(String)mapFeedbackIncorrect.get(displayOrder);
     	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
@@ -264,7 +263,6 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("new correctFeedback will be :" + correctFeedback);
     	
     	mcQueContent.setDisplayOrder(new Integer(displayOrder));
-    	mcQueContent.setWeight(new Integer(weight));
     	
     	mcService.saveOrUpdateMcQueContent(mcQueContent);
 		logger.debug("updated mcQueContent in the db: " + mcQueContent);
@@ -1685,7 +1683,6 @@ public class AuthoringUtil implements McAppConstants {
 	        	
 	        	McQueContent queContent=  new McQueContent(pairs.getValue().toString(), 
 		        											new Integer(displayOrder),
-		        											new Integer(0),
 		        											new Integer(currentMark),
 		        											currentFeedback,
 															mcContent,

@@ -27,15 +27,6 @@
     </property>
     
     <property
-        name="timeZone"
-        type="java.lang.String"
-        access="property"
-        column="time_zone"
-        length="255"
-    >
-    </property>
-
-    <property
         name="mark"
         type="java.lang.Integer"
         access="property"        

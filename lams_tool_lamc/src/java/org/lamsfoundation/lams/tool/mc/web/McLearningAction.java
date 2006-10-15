@@ -551,7 +551,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         
         logger.debug("learnerInput: " + learnerInput);
         int mark=0;
-        int userWeight=0;
         int userMarks=0;
         int totalMarksPossible=0;
         
@@ -576,7 +575,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		
     		mcLearnerAnswersDTO.setQuestion(mcQueContent.getQuestion());
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
-    		mcLearnerAnswersDTO.setWeight(mcQueContent.getWeight().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
     		
@@ -645,12 +643,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             {
             	mcLearnerAnswersDTO.setFeedbackCorrect(mcQueContent.getFeedback());
             	++mark;
-            	int weight=mcQueContent.getWeight().intValue();
-            	logger.debug("weight: " +  weight);
             	
             	totalUserMarks+=currentMark;	
             	
-            	userWeight=userWeight + weight;
             	userMarks=userMarks + currentMark;;
             }
             else
@@ -665,14 +660,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	}
         logger.debug("final questionAndCandidateAnswersList: " + questionAndCandidateAnswersList);
         logger.debug("final mark: " + mark);
-        logger.debug("final userWeight: " + userWeight);
         logger.debug("final userMarks: " + userMarks);
         logger.debug("totalUserMarks: " + totalUserMarks);
         logger.debug("totalMarksPossible: " + totalMarksPossible);
         
         
         mcTempDataHolderDTO.setLearnerMark(new Integer(mark).toString());
-        mcTempDataHolderDTO.setTotalUserWeight(new Integer(userWeight).toString());
         mcTempDataHolderDTO.setTotalUserMark(new Integer(userMarks).toString());
         mcTempDataHolderDTO.setTotalReportableUserMark(new Integer(totalUserMarks).toString());
         mcTempDataHolderDTO.setTotalMarksPossible(new Integer(totalMarksPossible).toString());

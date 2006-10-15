@@ -70,10 +70,8 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
     	
     	McQueUsr mcQueUsr=mcUserDAO.findMcUserById(TEST_MY_USER_ID); 
 	    
-    	
 	    McUsrAttempt mcUsrAttempt= new McUsrAttempt(new Long(33),
 	    											new Date(System.currentTimeMillis()),
-													"Sydney",
 													mcQueContent,	
 													mcQueUsr,
 													mcOptionsContent					
@@ -81,7 +79,6 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
 
 	    McUsrAttempt mcUsrAttempt2= new McUsrAttempt(new Long(34),
 				new Date(System.currentTimeMillis()),
-				"ACT",
 				mcQueContent,	
 				mcQueUsr,
 				mcOptionsContent					

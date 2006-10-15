@@ -51,15 +51,6 @@
     </property>
     
     <property
-        name="weight"
-        type="java.lang.Integer"
-        column="weight"
-        length="5"
-    >
-    </property>
-
-
-    <property
 	        name="feedback"
 	        type="java.lang.String"
 	        access="property"

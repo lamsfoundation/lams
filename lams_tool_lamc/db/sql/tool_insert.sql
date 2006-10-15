@@ -34,7 +34,7 @@ VALUES
 'MCQ',
 'Multiple Choice Questions',
 'mc',
-'1.1',
+'20061015',
 NULL,
 NULL,
 0,

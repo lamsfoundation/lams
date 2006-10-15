@@ -55,9 +55,6 @@ public class McQueContent implements Serializable, Comparable {
     /** nullable persistent field */
     private Integer displayOrder;
     
-    /** nullable persistent field */
-    private Integer weight;
-    
     private Integer mark;
     
     private String feedback;
@@ -93,20 +90,9 @@ public class McQueContent implements Serializable, Comparable {
         this.mcOptionsContents = mcOptionsContents;
     }
     
-    public McQueContent(String question, Integer displayOrder, Integer weight,  McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, Integer displayOrder, Integer mark, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
-        this.weight = weight;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
-    }
-
-    
-    public McQueContent(String question, Integer displayOrder, Integer weight,  Integer mark, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.weight = weight;
         this.mark = mark;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
@@ -114,10 +100,9 @@ public class McQueContent implements Serializable, Comparable {
     }
 
     
-    public McQueContent(String question, Integer displayOrder, Integer weight, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, Integer displayOrder, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
-        this.weight = weight;
         this.feedback = feedback;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
@@ -125,10 +110,9 @@ public class McQueContent implements Serializable, Comparable {
     }
 
     
-    public McQueContent(String question, Integer displayOrder, Integer weight, Integer mark, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, Integer displayOrder, Integer mark, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
-        this.weight = weight;
         this.mark = mark;
         this.feedback = feedback;
         this.mcContent=mcContent;
@@ -146,20 +130,10 @@ public class McQueContent implements Serializable, Comparable {
         this.mcOptionsContents = mcOptionsContents;
     }
     
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer weight, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer mark, Set mcUsrAttempts, Set mcOptionsContents) {
         this.mcQueContentId = mcQueContentId;
         this.question = question;
         this.displayOrder = displayOrder;
-        this.weight=weight;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
-    }
-    
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer weight,Integer mark, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.mcQueContentId = mcQueContentId;
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.weight=weight;
         this.mark=mark;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
@@ -203,7 +177,6 @@ public class McQueContent implements Serializable, Comparable {
     	logger.debug("deep copying queContent: " + queContent);
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
-													  queContent.getWeight(),
 													  queContent.getMark(),
 													  queContent.getFeedback(),
 													  newMcContent,
@@ -313,20 +286,6 @@ public class McQueContent implements Serializable, Comparable {
 		this.mcContentId = mcContentId;
 	}
 
-	/**
-	 * @return Returns the weight.
-	 */
-	public Integer getWeight() {
-		return weight;
-	}
-	/**
-	 * @param weight The weight to set.
-	 */
-	public void setWeight(Integer weight) {
-		this.weight = weight;
-	}
-	
-	
     /**
      * @return Returns the logger.
      */
