@@ -116,18 +116,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	<c:out value="${mcGeneralLearnerFlowDTO.lowestMark}"/>
 					  	</td>
 					  </tr>	
-					  
 
 
-		 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
-	  	   		  <tr>
-				  	<td NOWRAP colspan=2  valign=top> 
+			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
+		  	   		  <tr>
+					  	<td NOWRAP valign=top> 
 					  			<html:submit property="redoQuestions" styleClass="button">
 									<bean:message key="label.redo.questions"/>
 								</html:submit>	 		
-				  	 </td>
-				  </tr>
-				</c:if> 																		
+					  	 </td>
+
+
+					  	<td NOWRAP valign=top> 					  	 
+       	  						<div class="right-buttons">	  	   		    
+									<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+											<html:submit property="learnerFinished"  styleClass="button">
+												<bean:message key="label.finished"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+						
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+											<html:submit property="forwardtoReflection" styleClass="button">
+												<bean:message key="label.continue"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+							  	   </c:if>	
+						  	   </div>						   						  	   
+					  	 </td>						  	   
+					  	 
+					  </tr>
+					</c:if> 				
+				
+				
 
 				<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
 	  	   		  <tr>

@@ -166,30 +166,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}"> 							  
 						<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
-						 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
-					  	   		  <tr>
-								  	<td NOWRAP valign=top> 
-								  			<html:submit property="redoQuestions" styleClass="button">
-												<bean:message key="label.redo.questions"/>
-											</html:submit>	 		
-						       
-					   						<html:submit property="viewSummary" styleClass="button">
-												<bean:message key="label.view.summary"/>
-											</html:submit>	 				 		  					
-								  	 </td>
-								  </tr>
-								</c:if> 																		
-			
-								<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
-					  	   		  <tr>
-					  	   		    <td  valign=top>
-						   						<html:submit property="viewSummary" styleClass="button">
-													<bean:message key="label.view.summary"/>
-												</html:submit>	 				 		  					
-								  	 </td>
-								  	 
-		 			  	   		    <td  valign=top>
-			    	  						<div class="right-buttons">
+
+					 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
+				  	   		  <tr>
+							  	<td NOWRAP valign=top> 
+							  			<html:submit property="redoQuestions" styleClass="button">
+											<bean:message key="label.redo.questions"/>
+										</html:submit>	 		
+					       
+				   						<html:submit property="viewSummary" styleClass="button">
+											<bean:message key="label.view.summary"/>
+										</html:submit>	 				 		  					
+							  	 </td>
+
+							  	<td NOWRAP valign=top> 							  	 
+             	  						<div class="right-buttons">	  	   		    
+											<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
 												<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 													<html:submit property="learnerFinished"  styleClass="button">
 														<bean:message key="label.finished"/>
@@ -201,12 +193,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<bean:message key="label.continue"/>
 													</html:submit>	 				
 											  	</c:if> 				    					
-											   
-											</div>
-								  	 </td>
-								  	 
-								  </tr>
-								</c:if> 																		
+									  	   </c:if>	
+									  	   
+									</div>								  	   
+							  	 </td>									
+							  </tr>
+							</c:if> 				
+			
+							<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
+				  	   		  <tr>
+				  	   		    <td  valign=top>
+					   						<html:submit property="viewSummary" styleClass="button">
+												<bean:message key="label.view.summary"/>
+											</html:submit>	 				 		  					
+							  	 </td>
+							  	 
+	 			  	   		    <td  valign=top>
+		    	  						<div class="right-buttons">
+											<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+												<html:submit property="learnerFinished"  styleClass="button">
+													<bean:message key="label.finished"/>
+												</html:submit>	 				
+										  	</c:if> 				    					
+							
+											<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+												<html:submit property="forwardtoReflection" styleClass="button">
+													<bean:message key="label.continue"/>
+												</html:submit>	 				
+										  	</c:if> 				    					
+										   
+										</div>
+							  	 </td>
+							  	 
+							  </tr>
+							</c:if> 																		
 						</c:if> 																								
 					</c:if> 					
 					

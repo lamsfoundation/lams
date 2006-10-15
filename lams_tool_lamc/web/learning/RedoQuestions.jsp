@@ -105,7 +105,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 					  
 				  <tr>
-				  	<td NOWRAP colspan=2 align=left valign=top> 
+				  	<td NOWRAP align=left valign=top> 
 				  			<html:submit property="viewAnswers" styleClass="button">
 								<bean:message key="label.view.answers"/>
 							</html:submit>	 		
@@ -114,9 +114,50 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<bean:message key="label.redo.questions"/>
 							</html:submit>	 				 		  					
 				  	 </td>
+
+				  	 
+		 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
+
+					  	<td NOWRAP valign=top> 
+    	  						<div class="right-buttons">					  	
+									<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+											<html:submit property="learnerFinished"  styleClass="button">
+												<bean:message key="label.finished"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+						
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+											<html:submit property="forwardtoReflection" styleClass="button">
+												<bean:message key="label.continue"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+							  	   </c:if>	
+							</div>						  	   
+					  	 </td>
+					</c:if>
+					
+					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
+ 			  	   		    <td  valign=top>
+	    	  						<div class="right-buttons">
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+										<html:submit property="learnerFinished"  styleClass="button">
+											<bean:message key="label.finished"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+					
+									<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+										<html:submit property="forwardtoReflection" styleClass="button">
+											<bean:message key="label.continue"/>
+										</html:submit>	 				
+								  	</c:if> 				    					
+								   
+								</div>
+					  	 </td>
+					</c:if> 																		
+				  	 
 				  </tr>
 			 </table>
-
 			
 		 	</div>
 

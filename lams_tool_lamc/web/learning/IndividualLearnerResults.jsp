@@ -162,10 +162,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</td>
 					</tr>
 
-					
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
 		  	   		  <tr>
-					  	<td NOWRAP colspan=2 valign=top> 
+					  	<td NOWRAP  valign=top> 
 					  			<html:submit property="redoQuestions" styleClass="button">
 									<bean:message key="label.redo.questions"/>
 								</html:submit>	 		
@@ -173,34 +172,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		   						<html:submit property="viewSummary" styleClass="button">
 									<bean:message key="label.view.summary"/>
 								</html:submit>	 				 		  					
-
-								<c:if test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
-									<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-										<html:submit property="learnerFinished"  styleClass="button">
-											<bean:message key="label.finished"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					
-									<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-										<html:submit property="forwardtoReflection" styleClass="button">
-											<bean:message key="label.continue"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-						  	   </c:if>	
-								<c:if test="${(mcGeneralLearnerFlowDTO.passMarkApplicable != 'true')}">
-									<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-										<html:submit property="learnerFinished"  styleClass="button">
-											<bean:message key="label.finished"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					
-									<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-										<html:submit property="forwardtoReflection" styleClass="button">
-											<bean:message key="label.continue"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-						  	   </c:if>	
 					  	 </td>
+
+					  	<td NOWRAP  valign=top> 
+		  						<div class="right-buttons">												
+									<c:if test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
+											<html:submit property="learnerFinished"  styleClass="button">
+												<bean:message key="label.finished"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+						
+										<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
+											<html:submit property="forwardtoReflection" styleClass="button">
+												<bean:message key="label.continue"/>
+											</html:submit>	 				
+									  	</c:if> 				    					
+							  	   </c:if>	
+							</div>						   						  	   
+					  	 </td>							
 					  </tr>
 					</c:if> 																		
 
