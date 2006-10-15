@@ -95,6 +95,7 @@ public interface McAppConstants {
     public static final String NEW_ADDABLE_QUESTION_CONTENT				="newAddableQuestionContent";
     public static final String NEW_ADDABLE_QUESTION_CONTENT_KEY			="newAddableQuestionContentKey";
     public static final String NEW_ADDABLE_QUESTION_CONTENT_LIST		="newAddableQuestionContentList";
+    public static final String TOTAL_MARKS_POSSIBLE						="totalMarksPossible";
     
 
 	public static final String AUTHORING								="authoring";
@@ -192,6 +193,8 @@ public interface McAppConstants {
     
     public static final String DEFAULT_FEEDBACK_INCORRECT				="Your answer is incorrect";
     public static final String DEFAULT_FEEDBACK_CORRECT					="Correct";    
+    public static final String PASSMARK_APPLICABLE						="passMarkApplicable";
+    public static final String USER_OVER_PASSMARK						="userOverPassMark";
     
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";
@@ -202,6 +205,7 @@ public interface McAppConstants {
     public static final String PASSMARK									="passMark";
     public static final String VIEW_ANSWERS								="viewAnswers";
     public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
+    public static final String REQUEST_BY_STARTER						="requestByStarter";
     
     public static final String ON										="ON";
     public static final String OFF										="OFF";
