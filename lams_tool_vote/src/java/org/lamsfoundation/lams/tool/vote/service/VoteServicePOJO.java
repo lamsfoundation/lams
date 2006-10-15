@@ -1670,7 +1670,7 @@ public class VoteServicePOJO implements
 	public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(VoteUploadedFile.class.getName()
-					,"uuid",null,"filename","fileProperty",null,null);
+					,"uuid",null,"fileName","fileProperty",null,null);
 			
 			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,voteToolContentHandler);
 			if(!(toolPOJO instanceof VoteContent))

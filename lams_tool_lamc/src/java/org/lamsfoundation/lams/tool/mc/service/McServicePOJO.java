@@ -1818,7 +1818,7 @@ public class McServicePOJO implements
 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(McUploadedFile.class.getName()
-					,"uuid",null,"filename","fileProperty",null,null);
+					,"uuid",null,"fileName","fileProperty",null,null);
 			
 			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,mcToolContentHandler);
 			if(!(toolPOJO instanceof McContent))
