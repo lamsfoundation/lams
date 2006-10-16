@@ -38,6 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			area.src=url;
 			area.style.display="block";
 		}
+		document.getElementById("saveCancelButtons").style.visibility="hidden";
 	}
 	function hideMessage(){
 		var area=document.getElementById("messageArea");
@@ -46,6 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			area.style.height="0px";
 			area.style.display="none";
 		}
+		document.getElementById("saveCancelButtons").style.visibility="visible";
 	}
 
 	function removeNomination(questionIndex)

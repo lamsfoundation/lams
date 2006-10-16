@@ -14,6 +14,7 @@
 			area.src=url;
 			area.style.display="block";
 		}
+		document.getElementById("saveCancelButtons").style.visibility="hidden";
 	}
 	function hideMessage(){
 		var area=document.getElementById("reourceInputArea");
@@ -22,6 +23,7 @@
 			area.style.height="0px";
 			area.style.display="none";
 		}
+		document.getElementById("saveCancelButtons").style.visibility="visible";
 	}
 
 	function previewItem(type,idx,sessionMapID){
