@@ -2581,12 +2581,14 @@ public class McServicePOJO implements
 			while (candIterator.hasNext()) {
 				Hashtable candidate = (Hashtable) candIterator.next();
 				String optionText = (String)candidate.get(CONTENT_Q_ANSWER);
-				// 1.0.2 has a display order but 2.0 doesn't ToolContentImport102Manager.CONTENT_Q_ORDER
-				McOptsContent options = new McOptsContent();
-				options.setCorrectOption(correctAnswer != null && correctAnswer.equals(optionText));
-				options.setMcQueOptionText(optionText);
-				options.setMcQueContent(question);
-				question.getMcOptionsContents().add(options);
+				if ( optionText != null && optionText.length() > 0 ) {
+					// 1.0.2 has a display order but 2.0 doesn't ToolContentImport102Manager.CONTENT_Q_ORDER
+					McOptsContent options = new McOptsContent();
+					options.setCorrectOption(correctAnswer != null && correctAnswer.equals(optionText));
+					options.setMcQueOptionText(optionText);
+					options.setMcQueContent(question);
+					question.getMcOptionsContents().add(options);
+				}
 			}
 		}
 		
