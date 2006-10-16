@@ -32,7 +32,7 @@ function closeEditPane() {
 
 <c:choose>
 	<c:when test="${empty session.messageDTOs}">
-		<fmt:message>No messages available</fmt:message>
+		<fmt:message key="message.noChatMessages"/>
 	</c:when>
 	<c:otherwise>
 		<div class="space-left space-right">
