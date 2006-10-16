@@ -14,7 +14,7 @@
 			area.style.display="block";
 		}
 		
-		document.getElementById("authoringButton").style.visibility="hidden";
+		document.getElementById("saveCancelButtons").style.visibility="hidden";
 	}
 	function hideMessage(){
 		var area=document.getElementById("iframeArea");
@@ -24,7 +24,7 @@
 			area.style.display="none";
 		}
 		
-		document.getElementById("authoringButton").style.visibility="visible";
+		document.getElementById("saveCancelButtons").style.visibility="visible";
 	}
 </script>
 
