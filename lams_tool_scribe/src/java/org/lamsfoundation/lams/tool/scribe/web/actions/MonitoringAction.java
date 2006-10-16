@@ -178,17 +178,17 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 	}
 	
-	private ScribeUser getCurrentUser(Long toolSessionId) {
+	private ScribeUser getCurrentUser(Long toolSessionID) {
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
 
-		// attempt to retrieve user using userId and toolSessionId
+		// attempt to retrieve user using userId and toolSessionID
 		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(
-				user.getUserID().intValue()), toolSessionId);
+				user.getUserID().intValue()), toolSessionID);
 
 		if (scribeUser == null) {
 			ScribeSession scribeSession = scribeService
-					.getSessionBySessionId(toolSessionId);
+					.getSessionBySessionId(toolSessionID);
 			scribeUser = scribeService.createScribeUser(user, scribeSession);
 		}
 

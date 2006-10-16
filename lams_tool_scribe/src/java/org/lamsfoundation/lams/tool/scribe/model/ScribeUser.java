@@ -59,6 +59,8 @@ public class ScribeUser implements java.io.Serializable {
 	
 	private boolean reportApproved;
 	
+	private boolean startedActivity;
+	
 	// Constructors
 
 	/** default constructor */
@@ -72,6 +74,7 @@ public class ScribeUser implements java.io.Serializable {
 		this.loginName = user.getLogin();
 		this.scribeSession = scribeSession;
 		this.finishedActivity = false;
+		this.startedActivity = false;
 	}
 
 	/** full constructor */
@@ -175,6 +178,17 @@ public class ScribeUser implements java.io.Serializable {
 
 	public void setReportApproved(boolean reportApproved) {
 		this.reportApproved = reportApproved;
+	}
+	
+	/**
+	 * @hibernate.property column="started_activity" 
+	 */
+	public boolean isStartedActivity() {
+		return startedActivity;
+	}
+
+	public void setStartedActivity(boolean startedActivity) {
+		this.startedActivity = startedActivity;
 	}
 	
 	/**

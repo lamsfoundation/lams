@@ -7,7 +7,7 @@
 			<c:set var="buttonLabel" value="button.finish" />
 			<c:if test="${scribeDTO.reflectOnActivity}">
 				<c:set var="dispatch" value="openNotebook" />
-				<c:set var="buttonLabel" value="button.reflect" />
+				<c:set var="buttonLabel" value="button.continue" />
 			</c:if>
 			<html:hidden property="dispatch" value="${dispatch}" />
 			<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />

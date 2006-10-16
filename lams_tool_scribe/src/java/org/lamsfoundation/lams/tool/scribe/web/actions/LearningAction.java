@@ -73,6 +73,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  * @struts.action-forward name="voteDisplay" path="/pages/parts/voteDisplay.jsp"
  * @struts.action-forward name="report" path="tiles:/learning/report"
+ * @struts.action-forward name="instructions" path="tiles:/learning/instructions"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -114,7 +115,7 @@ public class LearningAction extends LamsDispatchAction {
 
 		// Retrieve the current user
 		ScribeUser scribeUser = getCurrentUser(toolSessionID);
-
+		
 		// check whether scribe has been appointed
 		ScribeUser appointedScribe = scribeSession.getAppointedScribe();
 		if (appointedScribe == null) {
@@ -129,7 +130,8 @@ public class LearningAction extends LamsDispatchAction {
 				scribeService.saveOrUpdateScribeSession(scribeSession);
 			}
 		}
-			
+		
+		// setup dto's forms and attributes.
 		((LearningForm)form).setToolSessionID(scribeSession.getSessionId());
 		request.setAttribute("MODE", mode.toString());
 		setupDTOs(request, scribeSession, scribeUser);
@@ -145,9 +147,20 @@ public class LearningAction extends LamsDispatchAction {
 			return mapping.findForward("runOffline");
 		}
 		
+		// check force complete
 		if (scribeSession.isForceComplete()) {
 			// go to report page
 			return mapping.findForward("report");
+		}
+		
+		// check if user has started activity
+		if (!scribeUser.isStartedActivity()) {			
+			if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
+				request.setAttribute("role", "scribe");
+			} else {
+				request.setAttribute("role", "learner");
+			}			
+			return mapping.findForward("instructions");
 		}
 		
 		// check if current user is the scribe.
@@ -159,23 +172,48 @@ public class LearningAction extends LamsDispatchAction {
 
 	}
 
-	private ScribeUser getCurrentUser(Long toolSessionId) {
+	private ScribeUser getCurrentUser(Long toolSessionID) {
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
 
-		// attempt to retrieve user using userId and toolSessionId
+		// attempt to retrieve user using userId and toolSessionID
 		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(
-				new Long(user.getUserID().intValue()), toolSessionId);
+				new Long(user.getUserID().intValue()), toolSessionID);
 
 		if (scribeUser == null) {
 			ScribeSession scribeSession = scribeService
-					.getSessionBySessionId(toolSessionId);
+					.getSessionBySessionId(toolSessionID);
 			scribeUser = scribeService.createScribeUser(user, scribeSession);
 		}
 
 		return scribeUser;
 	}
 
+	public ActionForward startActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		LearningForm lrnForm = (LearningForm)form;
+		Long toolSessionID = lrnForm.getToolSessionID();
+		
+		ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
+		ScribeUser scribeUser = getCurrentUser(toolSessionID);
+		
+		// setup dto's, forms and attributes.
+		lrnForm.setToolSessionID(scribeSession.getSessionId());
+		request.setAttribute("MODE", lrnForm.getMode());
+		setupDTOs(request, scribeSession, scribeUser);
+		
+		// update scribe user and go to instructions page
+		scribeUser.setStartedActivity(true);
+		scribeService.saveOrUpdateScribeUser(scribeUser);
+		
+		// check if current user is the scribe.
+		if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
+			return mapping.findForward("scribe");
+		}
+		
+		return mapping.findForward("learning");
+	}
+	
 	public ActionForward finishActivity(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
