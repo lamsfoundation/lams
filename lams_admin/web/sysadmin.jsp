@@ -13,9 +13,5 @@
 
 <p><fmt:message key="sysadmin.manage.config.file"/></p>
 
-<h2><fmt:message key="sysadmin.batch.heading"/></h2>
-<p><fmt:message key="sysadmin.batch.description"/>.</p>
-
 <p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
-<p><a href="<lams:LAMSURL/>monitoring/monitoring.do?method=deleteOldPreviewLessons"><fmt:message key="sysadmin.batch.preview.delete"/></a></p>
 
