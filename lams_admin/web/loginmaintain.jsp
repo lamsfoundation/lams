@@ -7,8 +7,11 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 
-<h1 class=no-tabs-below><fmt:message key="sysadmin.maintain.loginpage"/></h1>
-<br />
+<h2>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
+	<fmt:message key="sysadmin.maintain.loginpage"/>
+</h2>
+<br/>
 <html:errors />
 <br />
 <html:form action="/loginsave.do?method=save" enctype="multipart/form-data" method="post">

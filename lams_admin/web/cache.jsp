@@ -4,8 +4,11 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 
-<H1 class=no-tabs-below><fmt:message key="cache.title"/></H1>
-
+<h2>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
+	<fmt:message key="cache.title"/>
+</h2>
+<br/>
 <p><fmt:message key="cache.explanation1"/></p>
 <p><fmt:message key="cache.explanation2"/></p>
 <p><fmt:message key="cache.explanation3"/></p>
