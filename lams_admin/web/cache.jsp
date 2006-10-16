@@ -18,7 +18,7 @@
 <p><ul>
 <c:forEach var="itemEntry" items="${cache}">
 
-<LI><c:out value="${itemEntry.key}"/> <A HREF="cache.do?method=remove&node=<c:out value="${itemEntry.key}"/>"><bean:message key="cache.button.remove"/></a><BR>
+<LI><c:out value="${itemEntry.key}"/> <A HREF="cache.do?method=remove&node=<c:out value="${itemEntry.key}"/>"><fmt:message key="cache.button.remove"/></a><BR>
 Children:
 	<c:forEach var="child" items="${itemEntry.value}">
 		<c:out value="${child}"/><BR>
