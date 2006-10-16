@@ -860,4 +860,11 @@ CREATE TABLE lams_tool_import_support (
      , PRIMARY KEY (id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_configuration (
+       config_key VARCHAR(30) NOT NULL
+     , config_value VARCHAR(255)
+     , PRIMARY KEY (config_key)
+);
+
+
  

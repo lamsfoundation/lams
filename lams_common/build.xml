@@ -282,8 +282,18 @@ Ant build file.
 	<!-- =================================================================== -->
 	<!-- Clean and rebuild the database. Also cleans out content repository  -->
 	<!-- =================================================================== -->
-	<target name="rebuild-db"
+	<target name="rebuild-db" depends="preparedirs"
 		description="rebuild LAMS database and clean out content repository. Mysql has to be running first">
+		<tstamp/>
+		<copy overwrite="yes" todir="${build}">
+			<fileset dir="${db.scripts}/">
+				<include name="${lamsconf.table.sql}" />
+			</fileset>
+	        <filterset>
+	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
+	        </filterset>
+		</copy>
+
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 				password="${db.password}" encoding="${db.encoding}">
 			<classpath>
@@ -296,14 +306,13 @@ Ant build file.
 			<transaction src="${db.scripts}/create_integration_tables.sql"/>
 			<transaction src="${db.scripts}/insert_users.sql"/> 
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
+			<transaction src="${build}/${lamsconf.table.sql}"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
 			<!-- Create tables for Core Notebook Service -->
 			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
-			
-			<!-- Test the scripts for translations
-            <transaction src="${db.scripts}/shaun/all.sql"/>
-            -->
+			<!-- Test the scripts for translations -->
+            <!-- <transaction src="${db.scripts}/shaun/all.sql"/> -->
 		</sql>
 		
 		<delete dir="${contentrepository.directory}"/>
