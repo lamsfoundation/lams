@@ -57,18 +57,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												        	<tr>
 												            	<td>
 												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<bean:message key="label.view" />
+												                   		<fmt:message key="label.view" />
 												                    </a>
 																	&nbsp&nbsp
 													            	<html:link page="<%=download%>" styleClass="button">
-													                	<bean:message key="label.download" />
+													                	<fmt:message key="label.download" />
 													                </html:link>
 																	&nbsp&nbsp
 													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}&onlineInstructions=${voteGeneralAuthoringDTO.onlineInstructions}&offlineInstructions=${voteGeneralAuthoringDTO.offlineInstructions}"
 													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
-													                	<bean:message key="button.delete" />
+													                	<fmt:message key="button.delete" />
 													                </html:link> 
 													            </td>
 												           	</tr>
@@ -93,14 +93,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<tr> 
 					<td class="field-name"> 
-	          				<bean:message key="label.onlineFiles" />
+	          				<fmt:message key="label.onlineFiles" />
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
 					 	<html:submit property="submitOnlineFile" 
                                      styleClass="linkbutton" 
                                      onclick="submitMethod('addNewFile');">
-								<bean:message key="button.upload"/>
+								<fmt:message key="button.upload"/>
 						</html:submit>
 					</td> 
 				
@@ -140,18 +140,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												        	<tr>
 												            	<td>
 												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<bean:message key="label.view" />
+												                   		<fmt:message key="label.view" />
 												                    </a>
 																	&nbsp&nbsp
 													            	<html:link page="<%=download%>" styleClass="button">
-													                	<bean:message key="label.download" />
+													                	<fmt:message key="label.download" />
 													                </html:link>
 																	&nbsp&nbsp
 													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}&onlineInstructions=${voteGeneralAuthoringDTO.onlineInstructions}&offlineInstructions=${voteGeneralAuthoringDTO.offlineInstructions}"
 													            	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
-													                	<bean:message key="button.delete" />
+													                	<fmt:message key="button.delete" />
 													                </html:link> 
 													            </td>
 												           	</tr>
@@ -175,14 +175,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td class="field-name"> 
-          				<bean:message key="label.offlineFiles" />
+          				<fmt:message key="label.offlineFiles" />
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
 					 	<html:submit property="submitOfflineFile" 
                                      styleClass="linkbutton" 
                                      onclick="submitMethod('addNewFile');">
-								<bean:message key="button.upload"/>
+								<fmt:message key="button.upload"/>
 						</html:submit>
 					</td> 
 				</tr>          		

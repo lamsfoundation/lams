@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr>
 							<td colspan=2 align=right>			
 				   				<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="button">
-									<bean:message key="label.edit"/>
+									<fmt:message key="label.edit"/>
 								</html:submit>	 				 		  					
 							</td>
 						</tr>

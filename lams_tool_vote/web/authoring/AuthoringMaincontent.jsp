@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:html locale="true">
 	<head>
-	<title> <bean:message key="activity.title"/>  </title>
+	<title> <fmt:message key="activity.title"/>  </title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
@@ -125,7 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes" onLoad="init();">
 
 <div id="page">
-	<h1> <bean:message key="label.authoring.vote"/> </h1>
+	<h1> <fmt:message key="label.authoring.vote"/> </h1>
 	
 	<div id="header">
 		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			

@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -73,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			  <tr>
 			  	<td NOWRAP valign=top align=center colspan=2> 
-					<b> <bean:message key="label.progressiveResults"/>  </b>
+					<b> <fmt:message key="label.progressiveResults"/>  </b>
 			  	</td>
 			  </tr>	
 
@@ -82,8 +82,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	<td NOWRAP align=center  valign=top> 
 							  	<table cellpadding="0" class="alternative-color">
 						  				<tr>
-									 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
-											<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
+									 		<td NOWRAP> <b>  <fmt:message key="label.nomination"/> </b> </td>
+											<td NOWRAP> <b>  <fmt:message key="label.total.votes"/> </b> </td>
 										</tr>
 										
 										<c:forEach var="currentNomination" items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
@@ -134,7 +134,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  	 		<c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
 											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-																	 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
+																	 &nbsp(<c:out value="${currentRate.value}"/> <fmt:message key="label.percent"/>) 
 														</c:if> 	    
 													</c:forEach>		  
 												</td>						
@@ -148,7 +148,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:set scope="request" var="viewURL">
 										<html:rewrite page="/chartGenerator?type=pie"/>
 									</c:set>
-									<a title="<bean:message key='label.tip.displayPieChart'/>" href="javascript:;" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+									<a title="<fmt:message key='label.tip.displayPieChart'/>" href="javascript:;" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 			                                    <img src="<c:out value="${tool}"/>images/piechart.gif" width=30 height=30 border="0">
 									</a> 
 									&nbsp
@@ -156,7 +156,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<html:rewrite page="/chartGenerator?type=bar"/>
 									</c:set>
 		
-									<a title="<bean:message key='label.tip.displayBarChart'/>" href="javascript:;" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+									<a title="<fmt:message key='label.tip.displayBarChart'/>" href="javascript:;" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 			                                    <img src="<c:out value="${tool}"/>images/columnchart.gif" width=30 height=30 border="0">
 									</a> 
 								</td>
@@ -171,7 +171,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center  valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.nominations"/> </b> 
+						  	 <b>  <fmt:message key="label.learner.nominations"/> </b> 
 					  	</td>
 					  </tr>
 
@@ -197,7 +197,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<table>
 									<tr> 
 					  	   		  		<td>
-											<b> <bean:message key="label.notebook.entries"/> </b>						
+											<b> <fmt:message key="label.notebook.entries"/> </b>						
 										 </td>
 									</tr>
 									
@@ -220,7 +220,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                                <html:submit property="refreshVotes" 
 		                                             styleClass="button" 
 		                                             onclick="submitMethod('viewAllResults');">
-		                                    <bean:message key="label.refresh"/>
+		                                    <fmt:message key="label.refresh"/>
 		                                </html:submit>
 		                                
 							<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   										  
@@ -228,7 +228,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                                <html:submit property="redoQuestionsOk" 
 		                                             styleClass="button" 
 		                                             onclick="submitMethod('redoQuestionsOk');">
-		                                    <bean:message key="label.retake"/>
+		                                    <fmt:message key="label.retake"/>
 		                                </html:submit>
 							</c:if> 		          					
 		                                
@@ -238,13 +238,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	                                
 									<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 										<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
-											<bean:message key="label.finished"/>
+											<fmt:message key="label.finished"/>
 										</html:submit>	 				
 								  	</c:if> 				    					
 					
 									<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
 										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-											<bean:message key="label.continue"/>
+											<fmt:message key="label.continue"/>
 										</html:submit>	 				
 								  	</c:if> 				    					
 

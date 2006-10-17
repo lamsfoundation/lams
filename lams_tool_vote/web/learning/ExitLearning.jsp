@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<table cellpadding="0" class="alternative-color">
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learning.forceFinishMessage"/> </b> 
+						  	 <b>  <fmt:message key="label.learning.forceFinishMessage"/> </b> 
 					  	</td>
 					  </tr>
 				
@@ -84,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				  <tr>
 				  	<td NOWRAP align=left valign=top colspan=2> 
-					  	 <b>  <bean:message key="label.learning.reportMessage"/> </b> 
+					  	 <b>  <fmt:message key="label.learning.reportMessage"/> </b> 
 				  	</td>
 				  </tr>
 				
@@ -102,7 +102,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                 <html:submit property="learnerFinished" 
                                              styleClass="button" 
                                              onclick="submitMethod('learnerFinished');">
-                                    <bean:message key="label.finished"/>
+                                    <fmt:message key="label.finished"/>
                                 </html:submit>
 					  	 </td>
 					  </tr>

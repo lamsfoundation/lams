@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -80,7 +80,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr>
 				<td class="right-buttons">
 					<html:submit property="submitReflection" onclick="javascript:submitMethod('submitReflection');" styleClass="button">					
-						<bean:message key="button.endLearning"/>
+						<fmt:message key="button.endLearning"/>
 					</html:submit>
 				</td>
 			</tr>

@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td>							
 						<html:checkbox property="voteChangable"  value="1" styleClass="noBorder">
-							<bean:message key="label.vote.changable" />
+							<fmt:message key="label.vote.changable" />
 						</html:checkbox>
 	      			</td>
 		         </tr>
@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td>							
 						<html:checkbox property="lockOnFinish"  value="1" styleClass="noBorder">
-							<bean:message key="label.vote.lockedOnFinish" />
+							<fmt:message key="label.vote.lockedOnFinish" />
 						</html:checkbox>
 	      			</td>
 		         </tr>
@@ -45,21 +45,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    				<tr>
 					<td>							
 						<html:checkbox property="allowText"  value="1" styleClass="noBorder">
-							<bean:message key="label.allowText" />
+							<fmt:message key="label.allowText" />
 						</html:checkbox>
 	      			</td>
 		        </tr>
 		         
 		         <tr> 
 					<td>							
-						<bean:message key="label.maxNomCount"/>: <html:text property="maxNominationCount" size="8" maxlength="3"/>
+						<fmt:message key="label.maxNomCount"/>: <html:text property="maxNominationCount" size="8" maxlength="3"/>
 			 		</td>
 			  	</tr>
 
    				<tr>
 					<td>							   				
 						<html:checkbox property="reflect"  value="1" styleClass="noBorder">
-							<bean:message key="label.reflect" />
+							<fmt:message key="label.reflect" />
 						</html:checkbox>
 			 		</td>						
 		        </tr>

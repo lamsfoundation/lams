@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
 										<table>			
 											<tr> 
-												<td align=center valign=top> <b> <bean:message key="label.group"/> </b>
+												<td align=center valign=top> <b> <fmt:message key="label.group"/> </b>
 														<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
 															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
@@ -77,7 +77,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
 										<table>			
 											<tr> 
-												<td align=center valign=top> <b> <bean:message key="label.group"/> </b>
+												<td align=center valign=top> <b> <fmt:message key="label.group"/> </b>
 														<select name="monitoredToolSessionIdStats" onchange="javascript:submitSession(this.value,'submitSession');">
 														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
 															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
@@ -120,19 +120,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 						<tr>
-					 		<td NOWRAP colspan=2 > <b>  <bean:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
+					 		<td NOWRAP colspan=2 > <b>  <fmt:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
 						</tr>
 
 
 	  					<tr>
-					 		<td NOWRAP> <b>  <bean:message key="label.total.students"/> </b> </td>
+					 		<td NOWRAP> <b>  <fmt:message key="label.total.students"/> </b> </td>
 					 		<td>  <c:out value="${voteGeneralMonitoringDTO.sessionUserCount}"/> </td>
 						</tr>
 
 	  					<tr>
-					 		<td NOWRAP> <b>  <bean:message key="label.total.completed.students"/> </b> </td> 
+					 		<td NOWRAP> <b>  <fmt:message key="label.total.completed.students"/> </b> </td> 
 					 		<td NOWRAP>  <c:out value="${voteGeneralMonitoringDTO.completedSessionUserCount}"/> 
-						 		&nbsp(<c:out value="${voteGeneralMonitoringDTO.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
+						 		&nbsp(<c:out value="${voteGeneralMonitoringDTO.completedSessionUserPercent}"/> <fmt:message key="label.percent"/>)
 					 		</td>
 						</tr>
 
@@ -164,7 +164,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:rewrite page="/chartGenerator?type=pie"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-											 	<bean:message key="label.view.piechart"/>  
+											 	<fmt:message key="label.view.piechart"/>  
 										</a>
 									</td>
 								</tr>
@@ -175,15 +175,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:rewrite page="/chartGenerator?type=bar"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-											 <bean:message key="label.view.barchart"/>  
+											 <fmt:message key="label.view.barchart"/>  
 										</a>
 									</td>
 								</tr>
 							</c:if> 								
 							
 									<tr>
-								 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
-										<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
+								 		<td NOWRAP> <b>  <fmt:message key="label.nomination"/> </b> </td>
+										<td NOWRAP> <b>  <fmt:message key="label.total.votes"/> </b> </td>
 									</tr>
 									
 									<c:forEach var="currentNomination" items="${voteGeneralMonitoringDTO.mapStandardNominationsHTMLedContent}">
@@ -238,7 +238,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  	 		<c:forEach var="currentRate" items="${voteGeneralMonitoringDTO.mapStandardRatesContent}">
 										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-																 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
+																 &nbsp(<c:out value="${currentRate.value}"/> <fmt:message key="label.percent"/>) 
 													</c:if> 	    
 												</c:forEach>		  
 											</td>								
@@ -267,15 +267,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							 		<td NOWRAP colspan=2>
 						 			<table align=left>
 												<tr>
-											 		<th NOWRAP colspan=3>  <bean:message key="label.openVotes"/>  </th>
+											 		<th NOWRAP colspan=3>  <fmt:message key="label.openVotes"/>  </th>
 												</tr>
 	
 												<tr> 
-													 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.vote"/>  </b> </td>  														 
-													 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.attemptTime"/> </b></td>
+													 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
+													 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.user"/>  </b> </td>  
+							  						 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.attemptTime"/> </b></td>
 							 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
-								  						 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.visible"/>  </b></td>								  						 
+								  						 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.visible"/>  </b></td>								  						 
 													 </c:if> 																					  						 
 									  			</tr>				 
 											
@@ -288,7 +288,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<td NOWRAP valign=top align=left> 
 																	<c:out value="${currentDto.question}" escapeXml="false"/> 
 																	<c:if test="${userData.visible != 'true' }"> 			
-												                                 <i><bean:message key="label.hidden"/> </i> 
+												                                 <i><fmt:message key="label.hidden"/> </i> 
 																	</c:if> 								
 																</td>
 																 
@@ -302,7 +302,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                                <html:submit property="hideOpenVote" 
 													                                             styleClass="linkbutton" 
 											                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
-													                                    <bean:message key="label.hide"/>
+													                                    <fmt:message key="label.hide"/>
 													                                </html:submit>
 																		</c:if> 													
 							
@@ -310,7 +310,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                                <html:submit property="showOpenVote" 
 													                                             styleClass="linkbutton" 
 											                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
-													                                    <bean:message key="label.show"/>
+													                                    <fmt:message key="label.show"/>
 													                                </html:submit>
 																		</c:if> 						
 																	</td>																			

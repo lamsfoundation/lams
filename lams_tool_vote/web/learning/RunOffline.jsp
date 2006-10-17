@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="userID"/>	
 	
 		<div id="content">
-			&nbsp&nbsp&nbsp&nbsp&nbsp <bean:message key="label.learning.forceOfflineMessage" />
+			&nbsp&nbsp&nbsp&nbsp&nbsp <fmt:message key="label.learning.forceOfflineMessage" />
 			
 			<table>	
 			<tr>	
@@ -65,13 +65,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 						<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
-							<bean:message key="label.finished"/>
+							<fmt:message key="label.finished"/>
 						</html:submit>	 										
 				  	</c:if> 				    					
 	
 					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
 						<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-							<bean:message key="label.continue"/>
+							<fmt:message key="label.continue"/>
 						</html:submit>	 				
 				  	</c:if> 				    					
 			  	

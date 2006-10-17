@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -82,7 +82,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	}
 
 	function alertTooManyVotes(maxVotes) {
-		var msg = "<bean:message key="error.maxNominationCount.reached"/> "+maxVotes+" <bean:message key="label.nominations"/>";
+		var msg = "<fmt:message key="error.maxNominationCount.reached"/> "+maxVotes+" <fmt:message key="label.nominations"/>";
 		alert(msg);
 	}
 	</script>
@@ -121,15 +121,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<table cellpadding="0">
 					<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}"> 			
 						<tr> <td class="error">
-							<bean:message key="label.learning.forceOfflineMessage"/>
+							<fmt:message key="label.learning.forceOfflineMessage"/>
 						</td></tr>
 					</c:if> 		
 					
 					<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}"> 			
 						<tr> <td class="error">
-							<bean:message key="error.maxNominationCount.reached"/> 
+							<fmt:message key="error.maxNominationCount.reached"/> 
 								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}"/>	
-							<bean:message key="label.nominations"/>
+							<fmt:message key="label.nominations"/>
 						</td></tr>
 					</c:if> 		
 					
@@ -158,7 +158,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<table align=left> 
 												<tr> <td>
 								      			 <b>
-											 		<bean:message key="label.other"/>: 
+											 		<fmt:message key="label.other"/>: 
 										      		</b> 
 										 			<html:text property="userEntry" size="30" maxlength="100"/>
 											 	</td> </tr>
@@ -173,7 +173,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	<td NOWRAP valign=top colspan=2> 
 		                            <html:submit property="continueOptionsCombined" 
 		                                         styleClass="button">
-										<bean:message key="label.submit.vote"/>
+										<fmt:message key="label.submit.vote"/>
 		                            </html:submit>
 					  	 </td>
 					  </tr>

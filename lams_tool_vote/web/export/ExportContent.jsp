@@ -32,12 +32,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 									<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}">
 										<tr>
-									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summary"/>  </th>
+									 		<th NOWRAP colspan=2>  <fmt:message key="label.class.summary"/>  </th>
 										</tr>
 										
 										<tr>
-									 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
-											<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
+									 		<td NOWRAP> <b>  <fmt:message key="label.nomination"/> </b> </td>
+											<td NOWRAP> <b>  <fmt:message key="label.total.votes"/> </b> </td>
 										</tr>
 
 										<c:forEach var="currentNomination" items="${exportPortfolioDto.mapStandardNominationsHTMLedContent}">
@@ -58,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  	 		<c:forEach var="currentRate" items="${exportPortfolioDto.mapStandardRatesContent}">
 											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-																	 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
+																	 &nbsp(<c:out value="${currentRate.value}"/> <fmt:message key="label.percent"/>) 
 														</c:if> 	    
 													</c:forEach>		  
 												</td>								
@@ -70,12 +70,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									 		<td NOWRAP colspan=2>
 								 			<table align=left>
 														<tr>
-													 		<th NOWRAP colspan=2>  <bean:message key="label.openVotes"/>  </th>
+													 		<th NOWRAP colspan=2>  <fmt:message key="label.openVotes"/>  </th>
 														</tr>
 			
 														<tr> 
-															 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.vote"/>  </b> </td>  														 
-									  						 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.attemptTime"/> </b></td>
+															 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
+									  						 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.attemptTime"/> </b></td>
 											  			</tr>				 
 													
 								 			
@@ -101,12 +101,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 									<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}">
 										<tr>
-									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summaryAll"/>  </th>
+									 		<th NOWRAP colspan=2>  <fmt:message key="label.class.summaryAll"/>  </th>
 										</tr>
 										
 										<tr>
-									 		<td NOWRAP> <b>  <bean:message key="label.nomination"/> </b> </td>
-											<td NOWRAP> <b>  <bean:message key="label.total.votes"/> </b> </td>
+									 		<td NOWRAP> <b>  <fmt:message key="label.nomination"/> </b> </td>
+											<td NOWRAP> <b>  <fmt:message key="label.total.votes"/> </b> </td>
 										</tr>
 										
 										<c:forEach var="currentNomination" items="${exportPortfolioDto.mapStandardNominationsHTMLedContent}">
@@ -127,7 +127,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  	 		<c:forEach var="currentRate" items="${exportPortfolioDto.mapStandardRatesContent}">
 											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
 										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-																	 &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) 
+																	 &nbsp(<c:out value="${currentRate.value}"/> <fmt:message key="label.percent"/>) 
 														</c:if> 	    
 													</c:forEach>		  
 												</td>								
@@ -139,13 +139,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							 		<td NOWRAP colspan=2>
 						 			<table align=left>
 												<tr>
-											 		<th NOWRAP colspan=3>  <bean:message key="label.openVotes"/>  </th>
+											 		<th NOWRAP colspan=3>  <fmt:message key="label.openVotes"/>  </th>
 												</tr>
 	
 												<tr> 
-													 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.vote"/>  </b> </td>  														 
-													 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top align=left> <b>   <bean:message key="label.attemptTime"/> </b></td>
+													 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
+													 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.user"/>  </b> </td>  
+							  						 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.attemptTime"/> </b></td>
 									  			</tr>				 
 											
 						 			
@@ -157,7 +157,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<td NOWRAP valign=top align=left> 
 																	<c:out value="${currentDto.question}" escapeXml="false"/> 
 																	<c:if test="${userData.visible != 'true' }"> 			
-												                                 <i><bean:message key="label.hidden"/> </i> 
+												                                 <i><fmt:message key="label.hidden"/> </i> 
 																	</c:if> 								
 																</td>
 																 
@@ -213,7 +213,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 			
 									<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}">
 										<tr>
-									 		<th NOWRAP>  <bean:message key="label.individual.learnerVotes"/>  </th>
+									 		<th NOWRAP>  <fmt:message key="label.individual.learnerVotes"/>  </th>
 										</tr>
 									</c:if>											
 	
@@ -221,7 +221,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 			
 									<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}">
 										<tr>
-									 		<th NOWRAP>  <bean:message key="label.all.learnerVotes"/>  </th>
+									 		<th NOWRAP>  <fmt:message key="label.all.learnerVotes"/>  </th>
 										</tr>
 									</c:if>											
 					 			
@@ -232,7 +232,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	 			<td> &nbsp&nbsp</td>
 						  	 		</tr>
 									<tr>			
-										<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
+										<td NOWRAP valign=top align=left><b>  <fmt:message key="label.nomination"/>: </b>
 											<c:out value="${currentDto.question}" escapeXml="false"/>
 										 </td>
 									</tr>	
@@ -241,8 +241,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<td NOWRAP class="formlabel" valign=top>
 											<table align=center>
 												<tr> 
-													 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+													 <td NOWRAP valign=top> <b>  <fmt:message key="label.user"/>  </b> </td>  
+							  						 <td NOWRAP valign=top> <b>  <fmt:message key="label.attemptTime"/> </b></td>
 									  			</tr>				 
 					  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 													<c:forEach var="sData" items="${questionAttemptData.value}">
@@ -269,7 +269,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	 			<td> &nbsp&nbsp</td>
 						  	 		</tr>
 									<tr>			
-										<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
+										<td NOWRAP valign=top align=left><b>  <fmt:message key="label.nomination"/>: </b>
 											<c:out value="${currentDto.question}" escapeXml="false"/>
 										 </td>
 									</tr>	
@@ -278,8 +278,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<td NOWRAP class="formlabel" valign=top>
 											<table align=center>
 												<tr> 
-													 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top> <b> <bean:message key="label.attemptTime"/> </b></td>
+													 <td NOWRAP valign=top> <b>  <fmt:message key="label.user"/>  </b> </td>  
+							  						 <td NOWRAP valign=top> <b> <fmt:message key="label.attemptTime"/> </b></td>
 									  			</tr>				 
 			
 					  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
@@ -316,7 +316,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								
 										<tr>			
 											<td colspan=3 valign=top align=center>
-												<b>  <bean:message key="label.reflection"/>  </b> 
+												<b>  <fmt:message key="label.reflection"/>  </b> 
 											 </td>
 										</tr>	
 								
@@ -329,7 +329,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
 										<tr>			
 											<td valign=top align=left>
-												<b> <bean:message key="label.user"/>:</b>
+												<b> <fmt:message key="label.user"/>:</b>
 											 </td>
 										
 											<td valign=top align=left>

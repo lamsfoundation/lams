@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${editActivityDTO.monitoredContentInUse == 'true'}"> 			
 		<table border="0" cellspacing="2" cellpadding="2">									
 			<tr> <td NOWRAP valign=top>
-					<bean:message key="error.content.inUse"/> 
+					<fmt:message key="error.content.inUse"/> 
 			</td> </tr>
 		</table>
 	</c:if> 																									

@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:html locale="true">
 	<head>
-	<title> <bean:message key="label.export"/> </title>
+	<title> <fmt:message key="label.export"/> </title>
 		<lams:css localLinkPath="../"/>
 	</head>
 	<body class="stripes">
@@ -39,8 +39,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<h1>
 		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions != 'true') }"> 	
-			<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
-			<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
+			<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
+			<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/> </h1></c:if>			
 		</c:if>
         </h1>
 	
@@ -48,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b>  <bean:message key="error.noLearnerActivity"/> </b>
+							<b>  <fmt:message key="error.noLearnerActivity"/> </b>
 						</td> 
 					<tr>
 				</table>

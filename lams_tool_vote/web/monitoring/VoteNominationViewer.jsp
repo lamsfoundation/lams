@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:html locale="true">
 	<head>
-	<title> <bean:message key="label.learnersVoted"/> </title>
+	<title> <fmt:message key="label.learnersVoted"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
@@ -38,11 +38,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="content">
 
     <table>
-	    <tr> <th NOWRAP colspan=2 align=center>  <bean:message key="label.learnersVoted"/> </th> </tr>
+	    <tr> <th NOWRAP colspan=2 align=center>  <fmt:message key="label.learnersVoted"/> </th> </tr>
 	
 		<tr> 
-	       <td NOWRAP align=center valign=top><b> <bean:message key="label.user"/> </b></td>
-		   <td NOWRAP align=center valign=top><b> <bean:message key="label.attemptTime"/> </b></td>
+	       <td NOWRAP align=center valign=top><b> <fmt:message key="label.user"/> </b></td>
+		   <td NOWRAP align=center valign=top><b> <fmt:message key="label.attemptTime"/> </b></td>
 	   </tr>
 	    
 		<c:forEach var="userData" items="${voteGeneralMonitoringDTO.mapStudentsVoted}">

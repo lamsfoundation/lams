@@ -49,23 +49,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 		<c:if test="${totalNominationCount != 1}"> 		
 		 		
 			 		<c:if test="${queIndex == 1}"> 		
-						<a title="<bean:message key='label.tip.moveNominationDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationDown');">
+						<a title="<fmt:message key='label.tip.moveNominationDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationDown');">
 		                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
 						</a> 
 					</c:if> 							
 	
 			 		<c:if test="${queIndex == totalNominationCount}"> 		
-						<a title="<bean:message key='label.tip.moveNominationUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationUp');">
+						<a title="<fmt:message key='label.tip.moveNominationUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationUp');">
 		                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
 						</a> 
 					</c:if> 							
 					
 					<c:if test="${(queIndex != 1)  && (queIndex != totalNominationCount)}"> 		
-						<a title="<bean:message key='label.tip.moveNominationDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationDown');">
+						<a title="<fmt:message key='label.tip.moveNominationDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationDown');">
 		                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
 						</a> 
 	
-						<a title="<bean:message key='label.tip.moveNominationUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationUp');">
+						<a title="<fmt:message key='label.tip.moveNominationUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationUp');">
 		                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
 						</a> 
 					</c:if> 							
@@ -76,13 +76,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 
 		<td width="10%" align="right">
-				<a title="<bean:message key='label.tip.editNomination'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');">
+				<a title="<fmt:message key='label.tip.editNomination'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');">
 	                    <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 				</a> 
 		</td>
 
 		<td width="10%" align="right">
-				<a title="<bean:message key='label.tip.deleteNomination'/>" href="javascript:;" onclick="removeNomination(${queIndex});">
+				<a title="<fmt:message key='label.tip.deleteNomination'/>" href="javascript:;" onclick="removeNomination(${queIndex});">
 	                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
 				</a> 				
 		</td>

@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -73,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=left  valign=top  colspan=2> 
-						  	 <b>  <bean:message key="label.learning.reportMessage"/> </b> 
+						  	 <b>  <fmt:message key="label.learning.reportMessage"/> </b> 
 					  	</td>
 					  </tr>
 				
@@ -103,14 +103,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                 <html:submit property="redoQuestions" 
                                              styleClass="button" 
                                              onclick="submitMethod('redoQuestions');">
-                                    <bean:message key="label.retake"/>
+                                    <fmt:message key="label.retake"/>
                                 </html:submit>
 
 								
                                 <html:submit property="viewAllResults" 
                                              styleClass="button" 
                                              onclick="submitMethod('viewAllResults');">
-                                    <bean:message key="label.overAllResults"/>
+                                    <fmt:message key="label.overAllResults"/>
                                 </html:submit>
 					  	 </td>
 					  </tr>
