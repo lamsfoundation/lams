@@ -42,11 +42,21 @@
 			</div>
 			<c:forEach var="headerlink" items="${headerLinks}">
 			<div class="nav-box-right">
-				<div class="tab-left"></div>
-				<div class="tab-middle">
+				
+				<c:set var="tabLeft" value="tab-left"/>
+				<c:set var="tabMiddle" value="tab-middle"/>
+				<c:set var="tabRight" value="tab-right"/>
+				<c:if test="${headerlink eq 'index.author'}">
+					<c:set var="tabLeft" value="tab-left-highlight"/>
+					<c:set var="tabMiddle" value="tab-middle-highlight"/>
+					<c:set var="tabRight" value="tab-right-highlight"/>				
+				</c:if>
+	
+				<div class="${tabLeft}"></div>
+				<div class="${tabMiddle}">
 						<lams:TabName url="${headerlink.url}"><fmt:message key="${headerlink.name}" /></lams:TabName>
 				</div>
-				<div class="tab-right"></div>
+				<div class="${tabRight}"></div>
 			</div>
 			</c:forEach>
 		</div>
