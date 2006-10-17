@@ -18,7 +18,10 @@
 			area.src=url;
 			area.style.display="block";
 		}
-		document.getElementById("saveCancelButtons").style.visibility="hidden";
+		var elem = document.getElementById("saveCancelButtons");
+		if (elem != null) {
+			elem.style.display="none";
+		}
 	}
 	function hideMessage(){
 		var area=document.getElementById("messageArea");
@@ -27,7 +30,10 @@
 			area.style.height="0px";
 			area.style.display="none";
 		}
-		document.getElementById("saveCancelButtons").style.visibility="visible";
+		var elem = document.getElementById("saveCancelButtons");
+		if (elem != null) {
+			elem.style.display="block";
+		}
 	}
 </script>
 
