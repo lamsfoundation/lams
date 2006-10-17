@@ -145,7 +145,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						      	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
 									<p align="right">
 									    <a href="javascript:submitMethod('submitAllContent')" class="button">
-								        	<bean:message key="label.save"/></a>
+								        	<fmt:message key="label.save"/></a>
 									</p>
 									
 								</c:if> 					

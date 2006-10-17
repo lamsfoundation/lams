@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:html locale="true">
 	<head>
 
-	<title> <bean:message key="label.monitoring"/> </title>
+	<title> <fmt:message key="label.monitoring"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
@@ -144,7 +144,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 	<div id="page">
-			<h1> <bean:message key="label.monitoring"/> </h1>
+			<h1> <fmt:message key="label.monitoring"/> </h1>
 
 	<div id="header">
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>

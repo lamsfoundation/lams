@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
-						  	 <bean:message key="label.assessment"/> 
+						  	 <fmt:message key="label.assessment"/> 
 					  	</td>
 					  </tr>
 					  
@@ -41,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	  <b> <bean:message key="label.withRetries"/> </b>
+						  	  <b> <fmt:message key="label.withRetries"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						    <b> <bean:message key="label.withoutRetries"/> </b>
+						    <b> <fmt:message key="label.withoutRetries"/> </b>
 					  	</td>
 					  </tr>
 					</c:if> 			
@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <bean:message key="label.learner.message"/> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}"/> )  </b>
+						  	 <b>  <fmt:message key="label.learner.message"/> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}"/> )  </b>
 						  	 
 					  	</td>
 					  </tr>
@@ -69,7 +69,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
 									  <tr>
 									  	<td NOWRAP align=left valign=top> 
-										  		<c:out value="${dto.question}"  escapeXml="false" /> &nbsp[ <b> <bean:message key="label.mark"/> </b>
+										  		<c:out value="${dto.question}"  escapeXml="false" /> &nbsp[ <b> <fmt:message key="label.mark"/> </b>
 										  		<c:out value="${dto.mark}"/> ]
 									  	</td>
 									  </tr>
@@ -103,7 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2 align=left valign=top> 
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
-								<bean:message key="button.continue"/>
+								<fmt:message key="button.continue"/>
 							</html:submit>	 				 		  					
 				  	 </td>
 				  </tr>

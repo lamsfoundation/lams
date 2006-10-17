@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<tr>
 						<td>							
 							<html:checkbox property="questionsSequenced" value="1" styleClass="noBorder">
-								<bean:message key="radiobox.onepq" />
+								<fmt:message key="radiobox.onepq" />
 							</html:checkbox>
 		      			</td>		      			
 			         </tr>
@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	   				<tr>
 						<td>							
 							<html:checkbox property="retries" value="1"  onclick="javascript:updatePass(this);" styleClass="noBorder">
-								<bean:message key="radiobox.retries" />
+								<fmt:message key="radiobox.retries" />
 							</html:checkbox>
 		      			</td>		      			
 			        </tr>
@@ -51,10 +51,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<option value="<c:out value="${passmarkEntry.value}"/>"  <c:out value="${SELECTED_PASS}"/>> <c:out value="${passmarkEntry.value}"/>  </option>																				
 										</c:forEach>		  	
 									</select>
-									<bean:message key="radiobox.passmark" />
+									<fmt:message key="radiobox.passmark" />
 									
 									 <a href="javascript:submitMethod('updateMarksList')" class="button">
-								    	<bean:message key="label.update.list"/>
+								    	<fmt:message key="label.update.list"/>
 								     </a>
 									
 									
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    				<tr>
 						<td>							
 							<html:checkbox property="reflect" value="1" styleClass="noBorder">
-								<bean:message key="label.reflect" />
+								<fmt:message key="label.reflect" />
 							</html:checkbox>
 		      			</td>		      			
 		        </tr>

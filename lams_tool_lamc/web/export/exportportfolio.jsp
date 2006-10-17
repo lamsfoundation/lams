@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:html locale="true">
 	<head>
-	<title> <bean:message key="label.exportPortfolio"/> </title>
+	<title> <fmt:message key="label.exportPortfolio"/> </title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<lams:css localLinkPath="../"/>
 	</head>
@@ -42,13 +42,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			<h1>
 			<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-				<c:if test="${(portfolioExportMode == 'learner')}"><bean:message key="label.export.learner"/></c:if>			
-				<c:if test="${(portfolioExportMode != 'learner')}"><bean:message key="label.export.teacher"/> </h1></c:if>			
+				<c:if test="${(portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
+				<c:if test="${(portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/> </h1></c:if>			
 			</c:if>
 	        </h1>
 
 				<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
-						<h2> <bean:message key="error.noLearnerActivity"/> </h2>
+						<h2> <fmt:message key="error.noLearnerActivity"/> </h2>
 				</c:if>			
 		
 				<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<table>				
 			  	 		<tr>
 						  	<th scope="col" valign=top> 
-							    <bean:message key="label.mcqSummary"/> 
+							    <fmt:message key="label.mcqSummary"/> 
 						  	</th>
 			  	 		</tr>
 						
@@ -70,13 +70,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td>&nbsp;</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
-									<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp; (<bean:message key="label.mark"/> 
+								<td NOWRAP valign=top align=left><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
+									<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp; (<fmt:message key="label.mark"/> 
 									<c:out value="${currentDto.mark}"/>)
 								 </td>
 							</tr>	
 							<tr>					
-								<td NOWRAP valign=top align=left>  <b> <bean:message key="label.mc.options.col"/>  </b> 
+								<td NOWRAP valign=top align=left>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
 									<table align=left>
 										<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 											<tr>			
@@ -84,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:out value="${answersData.candidateAnswer}" escapeXml="false"/> 
 													
 													<c:if test="${answersData.correct == 'true'}"> 		
-														&nbsp; (<bean:message key="label.correct"/>)
+														&nbsp; (<fmt:message key="label.correct"/>)
 													</c:if>																		
 												</td>	
 											</tr>
@@ -97,13 +97,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			  	 		<tr>
 			  	 			<td NOWRAP valign=top align=left> <b> 
-			  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/>  
+			  	 				<fmt:message key="label.passingMark"/> </b> <c:out value="${passMark}"/>  
 			  	 			</td>
 			  	 		</tr>
 					</table>
 		
 		
-					 <h2>    <bean:message key="label.studentMarks"/>  </h2>
+					 <h2>    <fmt:message key="label.studentMarks"/>  </h2>
 
 						<table class="forms">
 							<c:forEach var="sessionMarksDto" items="${listMonitoredMarksContainerDto}">
@@ -111,23 +111,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
 		
 								<tr>
-							 		<td NOWRAP colspan=2 > <b> <bean:message key="group.label"/> : </b>
+							 		<td NOWRAP colspan=2 > <b> <fmt:message key="group.label"/> : </b>
 							 		<c:out value="${sessionMarksDto.sessionName}"/>  </td>
 								</tr>
 		
 		
 					  	 		<tr>
-									 <td NOWRAP valign=top align=left> <b> <bean:message key="label.user"/> </b> </td>  
+									 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.user"/> </b> </td>  
 						  	 		<c:set var="queIndex" scope="request" value="0"/>
 									<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-										<td NOWRAP valign=top align=left> <b>  <bean:message key="label.question.only"/> 
+										<td NOWRAP valign=top align=left> <b>  <fmt:message key="label.question.only"/> 
 											<c:out value="${queIndex}"/></b>
-											 &nbsp (<bean:message key="label.mark"/> <c:out value="${currentDto.mark}"/>)
+											 &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/>)
 										</td>
 									</c:forEach>		  	
 									 
-									 <td NOWRAP valign=top align=left> <b> <bean:message key="label.total"/>  </b> </td>  
+									 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.total"/>  </b> </td>  
 						  	 		</tr>						 
 		
 											<c:forEach var="markData" items="${mapUserMarksDto}">						
@@ -176,13 +176,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	 			<td> &nbsp;</td>
 					  	 		</tr>
 								<tr>			
-									<td NOWRAP valign=top align=left><b>  <bean:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
-										<c:out value="${currentDto.question}"  escapeXml="false"/> &nbsp; (<bean:message key="label.mark"/> 
+									<td NOWRAP valign=top align=left><b>  <fmt:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
+										<c:out value="${currentDto.question}"  escapeXml="false"/> &nbsp; (<fmt:message key="label.mark"/> 
 										<c:out value="${currentDto.mark}"/>)
 									 </td>
 								</tr>	
 								<tr>					
-									<td NOWRAP valign=top align=left>  <b> <bean:message key="label.mc.options.col"/>  </b> 
+									<td NOWRAP valign=top align=left>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
 										<table align=left>
 											<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 												<tr>			
@@ -190,7 +190,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<c:out value="${answersData.candidateAnswer}"  escapeXml="false"/> 
 														
 														<c:if test="${answersData.correct == 'true'}"> 		
-															&nbsp; (<bean:message key="label.correct"/>)
+															&nbsp; (<fmt:message key="label.correct"/>)
 														</c:if>																		
 													</td>	
 												</tr>
@@ -207,7 +207,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  		  	 		<c:set var="aIndex" scope="request" value="1"/>
 										  		  	 		<tr>
 																<td NOWRAP align=left valign=top> 
-																			<b> <bean:message key="label.yourAnswers"/>  </b>
+																			<b> <fmt:message key="label.yourAnswers"/>  </b>
 																</td>
 																<td align=right valign=top>
 																	<c:forEach var="responseEntry" items="${mapResponses}">
@@ -250,14 +250,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				  	 		<tr>
 				  	 			<td NOWRAP valign=top align=left> <b> 
-				  	 				<bean:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
+				  	 				<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
 				  	 			</td>
 				  	 		</tr>
 		
 		
 				  	 		<tr>
 				  	 			<td NOWRAP valign=top align=left> <b> 
-				  	 				<bean:message key="label.studentMark"/>: </b> <c:out value="${learnerMark}"/> 
+				  	 				<fmt:message key="label.studentMark"/>: </b> <c:out value="${learnerMark}"/> 
 				  	 			</td>
 				  	 		</tr>
 						</table>					
@@ -278,7 +278,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								
 										<tr>			
 											<td colspan=3 valign=top align=center>
-												<b>  <bean:message key="label.reflection"/>  </b> 
+												<b>  <fmt:message key="label.reflection"/>  </b> 
 											 </td>
 										</tr>	
 								
@@ -291,7 +291,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
 										<tr>			
 											<td valign=top align=left>
-												<b> <bean:message key="label.user"/>:</b>
+												<b> <fmt:message key="label.user"/>:</b>
 											 </td>
 										
 											<td valign=top align=left>

@@ -84,24 +84,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<c:if test="${caCount != 1}"> 		
 			 		
 				 		<c:if test="${caIndex == 1}"> 		
-							<a title="<bean:message key='label.tip.moveCandidateDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateDown');">
+							<a title="<fmt:message key='label.tip.moveCandidateDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateDown');">
 			                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
 							</a> 
 						</c:if> 							
 		
 										
 				 		<c:if test="${caIndex == caCount}"> 		
-							<a title="<bean:message key='label.tip.moveCandidateUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateUp');">
+							<a title="<fmt:message key='label.tip.moveCandidateUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateUp');">
 			                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
 							</a> 
 						</c:if> 							
 						
 						<c:if test="${(caIndex != 1)  && (caIndex != caCount)}"> 		
-							<a title="<bean:message key='label.tip.moveCandidateDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateDown');">
+							<a title="<fmt:message key='label.tip.moveCandidateDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateDown');">
 			                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
 							</a> 
 		
-							<a title="<bean:message key='label.tip.moveCandidateUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateUp');">
+							<a title="<fmt:message key='label.tip.moveCandidateUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringCandidate('<c:out value="${queIndex}"/>', '<c:out value="${caIndex}"/>', 'moveCandidateUp');">
 			                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
 							</a> 
 						</c:if> 							
@@ -110,7 +110,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</td>
 				
 				<td width="10%" align="left">				
-						<a title="<bean:message key='label.tip.removeCandidate'/>" href="javascript:;" onclick="removeCandidate(${queIndex}, ${caIndex});">
+						<a title="<fmt:message key='label.tip.removeCandidate'/>" href="javascript:;" onclick="removeCandidate(${queIndex}, ${caIndex});">
 			                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
 						</a> 				
 				</td>						

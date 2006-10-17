@@ -95,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td>
 						<html:submit onclick="javascript:submitMethod('newAddedCandidateBox');" style="float:right;width:150px"  styleClass="button-add-item">
-			            	<bean:message key="label.add.candidates" />
+			            	<fmt:message key="label.add.candidates" />
 						</html:submit>	 				 		  											
 					</td>
 				</tr>
@@ -144,13 +144,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<tr>
 							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 								<a href="#" onclick="getElementById('newQuestionForm').submit();" class="button-add-item">
-									<bean:message key="label.save.question" />
+									<fmt:message key="label.save.question" />
 								</a>
 							</td> 
 	
 							<td>
 								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
-									<bean:message key="label.cancel" />
+									<fmt:message key="label.cancel" />
 								</a>
 							</td> 	
 							</tr>					

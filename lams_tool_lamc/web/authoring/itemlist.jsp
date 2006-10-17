@@ -84,23 +84,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 		<c:if test="${totalQuestionCount != 1}"> 		
 		 		
 			 		<c:if test="${queIndex == 1}"> 		
-						<a title="<bean:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
+						<a title="<fmt:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
 		                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
 						</a> 
 					</c:if> 							
 	
 			 		<c:if test="${queIndex == totalQuestionCount}"> 		
-						<a title="<bean:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
+						<a title="<fmt:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
 		                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
 						</a> 
 					</c:if> 							
 					
 					<c:if test="${(queIndex != 1)  && (queIndex != totalQuestionCount)}"> 		
-						<a title="<bean:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
+						<a title="<fmt:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
 		                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
 						</a> 
 	
-						<a title="<bean:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
+						<a title="<fmt:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
 		                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
 						</a> 
 					</c:if> 							
@@ -111,13 +111,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 
 		<td width="10%" align="right">
-				<a title="<bean:message key='label.tip.editQuestion'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}"/>');">
+				<a title="<fmt:message key='label.tip.editQuestion'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}"/>');">
 	                    <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 				</a> 
 		</td>
 
 		<td width="10%" align="right">
-				<a title="<bean:message key='label.tip.deleteQuestion'/>" href="javascript:;" onclick="removeQuestion(${queIndex});">
+				<a title="<fmt:message key='label.tip.deleteQuestion'/>" href="javascript:;" onclick="removeQuestion(${queIndex});">
 	                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
 				</a> 				
 		</td>

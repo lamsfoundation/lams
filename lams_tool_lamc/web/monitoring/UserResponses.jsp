@@ -25,4 +25,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 
-mc user responses

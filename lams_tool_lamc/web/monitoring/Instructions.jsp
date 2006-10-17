@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<table class="forms">
           		<tr> 
 					<td NOWRAP colspan=2 valign=top>
-                   		<b> <bean:message key="label.onlineInstructions.col" /> </b> 
+                   		<b> <fmt:message key="label.onlineInstructions.col" /> </b> 
                    		<c:out value="${mcGeneralMonitoringDTO.onlineInstructions}" escapeXml="false" />						
 					</td> 
 				</tr>
@@ -54,11 +54,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												        	<tr>
 												            	<td>
 												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<bean:message key="label.view" />
+												                   		<fmt:message key="label.view" />
 												                    </a>
 																	&nbsp&nbsp
 													            	<html:link page="<%=download%>" styleClass="button">
-													                	<bean:message key="label.download" />
+													                	<fmt:message key="label.download" />
 													                </html:link>
 													            </td>
 												           	</tr>
@@ -81,7 +81,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td colspan=2 NOWRAP> 
-                   		<b> <bean:message key="label.offlineInstructions.col" /> </b>	<c:out value="${mcGeneralMonitoringDTO.offlineInstructions}" escapeXml="false" />												
+                   		<b> <fmt:message key="label.offlineInstructions.col" /> </b>	<c:out value="${mcGeneralMonitoringDTO.offlineInstructions}" escapeXml="false" />												
 					</td> 
 				</tr>
 
@@ -109,11 +109,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												        	<tr>
 												            	<td>
 												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<bean:message key="label.view" />
+												                   		<fmt:message key="label.view" />
 												                    </a>
 																	&nbsp&nbsp
 													            	<html:link page="<%=download%>" styleClass="button">
-													                	<bean:message key="label.download" />
+													                	<fmt:message key="label.download" />
 													                </html:link>
 													            </td>
 												           	</tr>

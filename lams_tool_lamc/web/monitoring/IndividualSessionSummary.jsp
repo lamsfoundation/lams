@@ -35,22 +35,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:if test="${currentSessionId == currentMonitoredToolSession}"> 			
 						
 				  	 		<tr>
-						 		<td NOWRAP colspan=2 > <b>  <bean:message key="group.label"/>: </b>
+						 		<td NOWRAP colspan=2 > <b>  <fmt:message key="group.label"/>: </b>
 						 		<c:out value="${currentSessionName}"/>  </td>
 							</tr>
 						
 				  	 		<tr>
-								 <td NOWRAP valign=top align=left> <b> <bean:message key="label.user"/>  </b> </td>  
+								 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.user"/>  </b> </td>  
 					  	 		<c:set var="queIndex" scope="request" value="0"/>
 								<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 								<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-									<td NOWRAP valign=top align=left> <b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
-										 &nbsp (<bean:message key="label.mark"/> 
+									<td NOWRAP valign=top align=left> <b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
+										 &nbsp (<fmt:message key="label.mark"/> 
 										<c:out value="${currentDto.mark}"/> )
 									</td>
 								</c:forEach>		  	
 								 
-								 <td NOWRAP valign=top align=left> <b> <bean:message key="label.total"/>  </b> </td>  
+								 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.total"/>  </b> </td>  
 				  	 		</tr>						 
 						</c:if>																						  	 		
 			  	 		

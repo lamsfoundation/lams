@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b>  <bean:message key="error.noLearnerActivity"/> </b>
+							<b>  <fmt:message key="error.noLearnerActivity"/> </b>
 						</td> 
 					<tr>
 				</table>
@@ -39,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 						<tr> 
-						<td NOWRAP  valign=top align=center>  <b> <bean:message key="label.selectGroup"/> </b>
+						<td NOWRAP  valign=top align=center>  <b> <fmt:message key="label.selectGroup"/> </b>
 
 								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 								<c:forEach var="toolSessionName" items="${mcGeneralMonitoringDTO.summaryToolSessions}">
@@ -81,12 +81,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b>  <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
-								<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp (<bean:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
+							<td NOWRAP valign=top align=left><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
+								<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
 							 </td>
 						</tr>	
 						<tr>					
-							<td NOWRAP valign=top align=left>  <b> <bean:message key="label.mc.options.col"/>  </b> 
+							<td NOWRAP valign=top align=left>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
 								<table align=left>
 									<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 										<tr>			
@@ -95,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:out value="${answersData.candidateAnswer}" escapeXml="false"/> 
 												
 												<c:if test="${answersData.correct == 'true'}"> 		
-													&nbsp (<bean:message key="label.correct"/>)
+													&nbsp (<fmt:message key="label.correct"/>)
 												</c:if>																		
 											</td>	
 										</tr>
@@ -108,12 +108,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		  	 		<tr>
 		  	 			<td NOWRAP valign=top align=left> <b> 
-		  	 				<bean:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
+		  	 				<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
 		  	 			</td>
 		  	 		</tr>
 				</table>
 
-			 <h2>    <bean:message key="label.studentMarks"/>  </h2>
+			 <h2>    <fmt:message key="label.studentMarks"/>  </h2>
 
 
 				<c:if test="${mcGeneralMonitoringDTO.currentMonitoredToolSession =='All'}"> 						 

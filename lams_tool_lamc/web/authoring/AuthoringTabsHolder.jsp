@@ -130,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body onLoad="init();" class="stripes">
 
 <div id="page">
-	<h1>  <bean:message key="label.authoring.mc"/> </h1>
+	<h1>  <fmt:message key="label.authoring.mc"/> </h1>
 	
 	<div id="header">
 		<c:if test="${mcGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			

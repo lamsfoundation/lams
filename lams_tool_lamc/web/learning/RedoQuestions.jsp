@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 </head>
 
 <body class="stripes">
@@ -60,14 +60,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
-						    <bean:message key="label.assessment"/> 
+						    <fmt:message key="label.assessment"/> 
 					  	</th>
 					  </tr>
 				
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
-							  	 <b> <bean:message key="label.individual.results.withRetries"/> </b>
+							  	 <b> <fmt:message key="label.individual.results.withRetries"/> </b>
 						  	</td>
 						  </tr>
   					</c:if> 			
@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}"> 							  
 						  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
-								  <b>  <bean:message key="label.individual.results.withoutRetries"/> </b>
+								  <b>  <fmt:message key="label.individual.results.withoutRetries"/> </b>
 						  	</td>
 						  </tr>
 					</c:if> 			
@@ -83,7 +83,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	 <bean:message key="label.learner.redo"/> 
+						  	 <fmt:message key="label.learner.redo"/> 
 					  	</td>
 					  </tr>	
 
@@ -96,9 +96,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	 <bean:message key="label.learner.bestMark"/>
+						  	 <fmt:message key="label.learner.bestMark"/>
 						  	   <c:out value="${mcGeneralLearnerFlowDTO.learnerBestMark}"/> 
-						  	<bean:message key="label.outof"/> 
+						  	<fmt:message key="label.outof"/> 
 						  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/> 
 					  	</td>
 					  </tr>	
@@ -107,11 +107,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  <tr>
 				  	<td NOWRAP align=left valign=top> 
 				  			<html:submit property="viewAnswers" styleClass="button">
-								<bean:message key="label.view.answers"/>
+								<fmt:message key="label.view.answers"/>
 							</html:submit>	 		
 
 	   						<html:submit property="redoQuestionsOk" styleClass="button">
-								<bean:message key="label.redo.questions"/>
+								<fmt:message key="label.redo.questions"/>
 							</html:submit>	 				 		  					
 				  	 </td>
 
@@ -123,13 +123,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
 										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 											<html:submit property="learnerFinished"  styleClass="button">
-												<bean:message key="label.finished"/>
+												<fmt:message key="label.finished"/>
 											</html:submit>	 				
 									  	</c:if> 				    					
 						
 										<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
 											<html:submit property="forwardtoReflection" styleClass="button">
-												<bean:message key="label.continue"/>
+												<fmt:message key="label.continue"/>
 											</html:submit>	 				
 									  	</c:if> 				    					
 							  	   </c:if>	
@@ -142,13 +142,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    	  						<div class="right-buttons">
 										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 										<html:submit property="learnerFinished"  styleClass="button">
-											<bean:message key="label.finished"/>
+											<fmt:message key="label.finished"/>
 										</html:submit>	 				
 								  	</c:if> 				    					
 					
 									<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
 										<html:submit property="forwardtoReflection" styleClass="button">
-											<bean:message key="label.continue"/>
+											<fmt:message key="label.continue"/>
 										</html:submit>	 				
 								  	</c:if> 				    					
 								   

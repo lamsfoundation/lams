@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 								<tr>			
 									<td colspan=2 valign=top align=left>
-										<b>  <bean:message key="label.reflection"/>  </b> 
+										<b>  <fmt:message key="label.reflection"/>  </b> 
 									 </td>
 								</tr>	
 						
@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:url>
 		
 										<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}');" styleClass="button">
-											<bean:message key="label.view" />
+											<fmt:message key="label.view" />
 										</html:link>
 	
 									 </td>
