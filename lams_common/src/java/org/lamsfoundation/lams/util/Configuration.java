@@ -23,16 +23,66 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+
+import org.apache.log4j.Logger;
+
+import org.lamsfoundation.lams.config.ConfigurationItem;
+import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
+import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Configuration Object
  * 
  * @author Fei Yang
+ * @author Mitchell Seaton
  */
-public class Configuration {
+public class Configuration implements InitializingBean {
 
-	private static Map items = ConfigurationLoader.load();
+	protected Logger log = Logger.getLogger(Configuration.class);	
+	
+	private static Map items = null;
+
+	protected ConfigurationDAO configurationDAO;
+	
+	/**
+	 * @param configurationDAO The configurationDAO to set.
+	 */
+	public void setConfigurationDAO(ConfigurationDAO configurationDAO) {
+		this.configurationDAO = configurationDAO;
+	}
+	
+	public void afterPropertiesSet() {
+		Map itemsmap = Collections.synchronizedMap(new HashMap());
+		
+		try {
+			
+			List mapitems = configurationDAO.getAllItems();
+			
+			if(mapitems.size() > 0) {
+				Iterator it = mapitems.iterator();
+				while(it.hasNext()) {
+					ConfigurationItem item = (ConfigurationItem) it.next();
+					itemsmap.put(item.getKey(), item.getValue());
+				}
+				
+			}
+			
+		} catch (Exception e) {
+			 log.error("Exception has occurred: ",e);
+		}
+		
+		items = itemsmap;
+		
+	}
 	
 	public static String get(String key)
 	{

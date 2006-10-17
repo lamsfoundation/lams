@@ -75,6 +75,9 @@
 				<!-- Core Notebook Service related mapping files -->
 				<value>org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>
 				
+				<!--  Configuration related mapping files -->
+				<value>org/lamsfoundation/lams/config/ConfigurationItem.hbm.xml</value>
+				
 				<!-- Integration related mapping files -->
 				<value>org/lamsfoundation/lams/integration/ExtServerOrgMap.hbm.xml</value>
 				<value>org/lamsfoundation/lams/integration/ExtCourseClassMap.hbm.xml</value>
@@ -231,6 +234,11 @@
 		</property>
 	</bean>
 	
+	<!--  Configuration service -->
+	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration" singleton="true">
+		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
+	</bean>
+	
 	<!-- auditing service -->
 	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService"  singleton="true">
 		<property name="messageService"><ref bean="commonMessageService"/></property>
@@ -274,6 +282,11 @@
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
+	
+	<!--  Configuration related beans -->
+	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
 	
 	<!--  System Session bean -->
 	<bean id="SystemSession"
