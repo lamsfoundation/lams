@@ -47,8 +47,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class Configuration implements InitializingBean {
 
-	protected Logger log = Logger.getLogger(Configuration.class);	
 	
+	protected Logger log = Logger.getLogger(Configuration.class);	
+
 	private static Map items = null;
 
 	protected ConfigurationDAO configurationDAO;
@@ -60,28 +61,36 @@ public class Configuration implements InitializingBean {
 		this.configurationDAO = configurationDAO;
 	}
 	
+	/**
+	 * This class initialize method called by Spring framework.
+	 */
+	public void init(){
+
+	}
+	
 	public void afterPropertiesSet() {
+		if(items != null) {
+			return;
+		}
+		
 		Map itemsmap = Collections.synchronizedMap(new HashMap());
 		
 		try {
-			
 			List mapitems = configurationDAO.getAllItems();
-			
+				
 			if(mapitems.size() > 0) {
 				Iterator it = mapitems.iterator();
 				while(it.hasNext()) {
 					ConfigurationItem item = (ConfigurationItem) it.next();
 					itemsmap.put(item.getKey(), item.getValue());
-				}
-				
+				}	
 			}
+	
+			items = itemsmap;
 			
 		} catch (Exception e) {
 			 log.error("Exception has occurred: ",e);
 		}
-		
-		items = itemsmap;
-		
 	}
 	
 	public static String get(String key)
