@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!--question content goes here-->
 				<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 			  		<c:if test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}"> 			
-					  <tr> <td><b> <bean:message key="label.question"/> 
+					  <tr> <td><b> <fmt:message key="label.question"/> 
 						  	<c:out value="${questionEntry.key}" />:  </b> 
 					</td></tr>
 					  
@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </td></tr>
 					  
 
-					  <tr> <td><b> <bean:message key="label.answer"/> </b> 
+					  <tr> <td><b> <fmt:message key="label.answer"/> </b> 
 					</td></tr>
 				  	  
 				  	  
@@ -60,10 +60,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  				  (generalLearnerFlowDTO.totalQuestionCount != 1) }"> 
 					<td NOWRAP>
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
-									<bean:message key="button.getPreviousQuestion"/>
+									<fmt:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
-									<bean:message key="button.done"/>
+									<fmt:message key="button.done"/>
 						</html:submit>	 				 		  					
 					</td> 
 				  </c:when> 
@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  				  (generalLearnerFlowDTO.totalQuestionCount == 1) }"> 
 					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
-									<bean:message key="button.done"/>
+									<fmt:message key="button.done"/>
 						</html:submit>	 				 		  					
 					</td> 
 				  </c:when> 
@@ -82,10 +82,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 				  generalLearnerFlowDTO.currentQuestionIndex > 1}"> 
 					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
-									<bean:message key="button.getPreviousQuestion"/>
+									<fmt:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
-									<bean:message key="button.getNextQuestion"/>
+									<fmt:message key="button.getNextQuestion"/>
 						</html:submit>	 				 		  					
 					</td> 
   				  </c:when> 
@@ -93,7 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  <c:otherwise>
 					 <td NOWRAP valign=top> 
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
-									<bean:message key="button.getNextQuestion"/>
+									<fmt:message key="button.getNextQuestion"/>
 						</html:submit>	 				 		  					
 					</td> 
 				  </c:otherwise>

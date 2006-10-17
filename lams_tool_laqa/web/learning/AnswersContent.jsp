@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
 	
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
@@ -81,7 +81,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${generalLearnerFlowDTO.activityOffline == 'true'}"> 			
 				<tr> <td NOWRAP>
-					<bean:message key="label.learning.forceOfflineMessage"/>
+					<fmt:message key="label.learning.forceOfflineMessage"/>
 				</td></tr>
 			</c:if> 		
 		
@@ -96,13 +96,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				  		<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}"> 							  		
 						  	<tr> <td NOWRAP>
-			 					<bean:message key="label.feedback.seq"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
-			 					<bean:message key="label.questions.simple"/>
+			 					<fmt:message key="label.feedback.seq"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
+			 					<fmt:message key="label.questions.simple"/>
 							</td></tr>
 						</c:if> 									
 				  		<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}"> 							  		
 						  	<tr> <td NOWRAP>				  		
-			 					<bean:message key="label.questions.remaining"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> 
+			 					<fmt:message key="label.questions.remaining"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> 
 							</td></tr>			 					
 						</c:if> 													  		
 				  
@@ -111,8 +111,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				  <c:otherwise>
 					  	<tr> <td NOWRAP>
-		 					<bean:message key="label.feedback.combined"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
-		 					<bean:message key="label.questions.simple"/>
+		 					<fmt:message key="label.feedback.combined"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
+		 					<fmt:message key="label.questions.simple"/>
 						</td></tr>
 				  
 					  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 

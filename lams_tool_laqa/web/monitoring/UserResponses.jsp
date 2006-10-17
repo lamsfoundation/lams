@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
 
 			<c:if test="${userData.visible != 'true' }"> 			
-                         <i><bean:message key="label.response.hidden"/> </i> 
+                         <i><fmt:message key="label.response.hidden"/> </i> 
 			</c:if> 								
 			 </td>
 	
@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                             <html:submit property="hideResponse" 
                                          styleClass="linkbutton" 
                                          onclick="submitResponse(${responseUid}, 'hideResponse');">						                                             
-                                <bean:message key="label.hide"/>
+                                <fmt:message key="label.hide"/>
                             </html:submit>
 				</c:if> 													
 
@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                             <html:submit property="showResponse" 
                                          styleClass="linkbutton" 
                                          onclick="submitResponse(${responseUid}, 'showResponse');">						                                             
-                                <bean:message key="label.show"/>
+                                <fmt:message key="label.show"/>
                             </html:submit>
 				</c:if> 						
 			 	</td>	  	 
@@ -59,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 <td NOWRAP valign=top>  <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> 
 
 				<c:if test="${userData.visible != 'true' }"> 			
-	                         <i><bean:message key="label.response.hidden"/> </i> 
+	                         <i><fmt:message key="label.response.hidden"/> </i> 
 				</c:if> 								
 				 </td>
 		
@@ -70,7 +70,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                            <html:submit property="hideResponse" 
 		                                         styleClass="linkbutton" 
 		                                         onclick="submitResponse(${responseUid}, 'hideResponse');">						                                             
-		                                <bean:message key="label.hide"/>
+		                                <fmt:message key="label.hide"/>
 		                            </html:submit>
 						</c:if> 													
 		
@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                            <html:submit property="showResponse" 
 		                                         styleClass="linkbutton" 
 		                                         onclick="submitResponse(${responseUid}, 'showResponse');">						                                             
-		                                <bean:message key="label.show"/>
+		                                <fmt:message key="label.show"/>
 		                            </html:submit>
 						</c:if> 						
 				 	</td>	  	 
@@ -89,7 +89,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>	
 				 <td NOWRAP valign=top>   <c:out value="${userData.response}"/> 
 					<c:if test="${userData.visible != 'true' }"> 			
-		                         <i><bean:message key="label.response.hidden"/> </i> 
+		                         <i><fmt:message key="label.response.hidden"/> </i> 
 					</c:if> 								
 				 </td>
 		
@@ -100,7 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                            <html:submit property="hideResponse" 
 		                                         styleClass="linkbutton" 
 		                                         onclick="submitResponse(${responseUid}, 'hideResponse');">						                                             
-		                                <bean:message key="label.hide"/>
+		                                <fmt:message key="label.hide"/>
 		                            </html:submit>
 						</c:if> 													
 		
@@ -108,7 +108,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		                            <html:submit property="showResponse" 
 		                                         styleClass="linkbutton" 
 		                                         onclick="submitResponse(${responseUid}, 'showResponse');">						                                             
-		                                <bean:message key="label.show"/>
+		                                <fmt:message key="label.show"/>
 		                            </html:submit>
 						</c:if> 						
 					 	</td>	  	 

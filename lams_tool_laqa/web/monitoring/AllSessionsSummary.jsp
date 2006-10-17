@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		<c:set var="groupData" scope="request" value="${groupDto.groupData}"/>
 			  	 		
 			  	 		<tr>
-			  	 			<td> <b> <bean:message key="group.label"/> : </b> <c:out value="${sessionName}"/> </td>
+			  	 			<td> <b> <fmt:message key="group.label"/> : </b> <c:out value="${sessionName}"/> </td>
 			  	 		</tr>
 			  	 		
 									  	 		
@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			  	 		
 						<tr>			
-							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							<td valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -62,8 +62,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																 <td  valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 																 
 																  <td align=right valign=top width="150"> 
-																	<b> <bean:message key="label.edit"/> </b>
-																	<a title="<bean:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','editGroupResponse');">
+																	<b> <fmt:message key="label.edit"/> </b>
+																	<a title="<fmt:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','editGroupResponse');">
 								                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 																	</a> 
 																  </td>
@@ -73,7 +73,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                            <html:submit property="hideResponse" 
 													                                         styleClass="linkbutton" 
 													                                         onclick="submitGroupResponse(${sessionId}, ${responseUid}, 'hideGroupResponse');">						                                             
-													                                <bean:message key="label.hide"/>
+													                                <fmt:message key="label.hide"/>
 													                            </html:submit>
 																	</c:if> 													
 													
@@ -81,7 +81,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                            <html:submit property="showResponse" 
 													                                         styleClass="linkbutton" 
 													                                         onclick="submitGroupResponse(${sessionId}, ${responseUid}, 'showGroupResponse');">						                                             
-													                                <bean:message key="label.show"/>
+													                                <fmt:message key="label.show"/>
 													                            </html:submit>
 																	</c:if> 						
 															 	</td>	  	 
@@ -90,7 +90,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 															<tr>
 																 <td colspan=4  valign=top>   
 																	<c:if test="${userData.visible != 'true' }"> 			
-														                         <i><bean:message key="label.response.hidden"/> </i> 
+														                         <i><fmt:message key="label.response.hidden"/> </i> 
 																	</c:if> 								
 																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 																 </td>
@@ -109,9 +109,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																		 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 															
 																		  <td align=right valign=top width="150">  
-																		  	<b> <bean:message key="label.save"/> </b>
+																		  	<b> <fmt:message key="label.save"/> </b>
 		
-																			<a title="<bean:message key='label.tooltip.tick'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','updateGroupResponse');">
+																			<a title="<fmt:message key='label.tooltip.tick'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','updateGroupResponse');">
 										                                                <img src="<c:out value="${tool}"/>images/tick.gif" border="0">
 																			</a> 
 																		  </td>	  	 																	
@@ -122,7 +122,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 															                            <html:submit property="hideResponse" 
 															                                         styleClass="linkbutton" 
 															                                         onclick="submitGroupResponse(${sessionId}, ${responseUid}, 'hideGroupResponse');">						                                             
-															                                <bean:message key="label.hide"/>
+															                                <fmt:message key="label.hide"/>
 															                            </html:submit>
 																			</c:if> 													
 															
@@ -130,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 															                            <html:submit property="showResponse" 
 															                                         styleClass="linkbutton" 
 															                                         onclick="submitGroupResponse(${sessionId}, ${responseUid}, 'showGroupResponse');">						                                             
-															                                <bean:message key="label.show"/>
+															                                <fmt:message key="label.show"/>
 															                            </html:submit>
 																			</c:if> 						
 																	 	</td>	  	 
@@ -139,7 +139,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<tr>
 																		 <td colspan=4 valign=top>   
 																			<c:if test="${userData.visible != 'true' }"> 			
-																                         <i><bean:message key="label.response.hidden"/> </i> 
+																                         <i><fmt:message key="label.response.hidden"/> </i> 
 																			</c:if> 								
 											 						 			<textarea name="updatedResponse" rows=6 cols=60><c:out value="${userData.response}" escapeXml="false"/></textarea>
 																		 </td>
@@ -155,8 +155,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 	
 																	  <td align=right valign=top width="150"> 
-																		 <b> <bean:message key="label.edit"/> </b>
-																		<a title="<bean:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','editGroupResponse');">
+																		 <b> <fmt:message key="label.edit"/> </b>
+																		<a title="<fmt:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','editGroupResponse');">
 									                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 																		</a> 
 																	  </td>	  	 
@@ -166,7 +166,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														                            <html:submit property="hideResponse" 
 														                                         styleClass="linkbutton" 
 														                                         onclick="submitGroupResponse(${sessionId}, ${responseUid}, 'hideGroupResponse');">						                                             
-														                                <bean:message key="label.hide"/>
+														                                <fmt:message key="label.hide"/>
 														                            </html:submit>
 																		</c:if> 													
 														
@@ -174,7 +174,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														                            <html:submit property="showResponse" 
 														                                         styleClass="linkbutton" 
 														                                         onclick="submitGroupResponse(${sessionId}, ${responseUid}, 'showGroupResponse');">						                                             
-														                                <bean:message key="label.show"/>
+														                                <fmt:message key="label.show"/>
 														                            </html:submit>
 																		</c:if> 						
 																 	</td>	  	 
@@ -183,7 +183,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<tr>
 																	 <td colspan=4 valign=top>   
 																		<c:if test="${userData.visible != 'true' }"> 			
-															                         <i><bean:message key="label.response.hidden"/> </i> 
+															                         <i><fmt:message key="label.response.hidden"/> </i> 
 																		</c:if> 								
 																		 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 																	 </td>

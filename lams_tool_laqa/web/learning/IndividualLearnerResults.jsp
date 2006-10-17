@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
@@ -69,7 +69,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table class="forms">
 				  <tr><td align=center colspan=2>
-					  	<b> <bean:message key="label.learning.reportMessage"/> </b>
+					  	<b> <fmt:message key="label.learning.reportMessage"/> </b>
 		    	  	</td>
 				  </tr>
 
@@ -79,7 +79,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 									  <tr>
 										<td colspan=2>
-											<b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
+											<b> <fmt:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
 									  	 </td>
 									  </tr>
 									  
@@ -93,7 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  			  		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
 										  <tr>
-											<td colspan=2> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  
+											<td colspan=2> <b> <fmt:message key="label.learning.yourAnswer"/>  </b>  
 										  	</td>
 										  </tr>
 										  
@@ -110,7 +110,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<c:if test="${(feedbackEntry.value != '') && (feedbackEntry.value != null) }"> 						  			  		
 					  			  			<c:if test="${feedbackEntry.key == questionEntry.key}"> 						  			  		
 											  <tr>
-												<td colspan=2> <b> <bean:message key="label.feedback"/>:  </b>  
+												<td colspan=2> <b> <fmt:message key="label.feedback"/>:  </b>  
 											  	</td>
 											  </tr>
 											  
@@ -131,7 +131,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td></tr>
 					
 					<tr> <td align=left colspan=2>							
-								<bean:message key="label.responses.locked"/> 
+								<fmt:message key="label.responses.locked"/> 
 						</td>
 					</tr>
 							
@@ -141,7 +141,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                <html:submit property="redoQuestions" 
                                              styleClass="button" 
                                              onclick="submitMethod('redoQuestions');">
-                                    <bean:message key="label.redo"/>
+                                    <fmt:message key="label.redo"/>
                                 </html:submit>
 					  	 </td>
 	  	   		  
@@ -149,7 +149,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                               <html:submit property="viewAllResults" 
                                          styleClass="button" 
                                          onclick="submitMethod('viewAllResults');">
-                                <bean:message key="label.allResponses"/>
+                                <fmt:message key="label.allResponses"/>
                             </html:submit>
 					  	 </td>
 				  </tr>

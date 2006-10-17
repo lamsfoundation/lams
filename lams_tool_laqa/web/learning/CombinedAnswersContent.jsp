@@ -34,9 +34,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 					<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
 				  		<c:if test="${questionEntry.key == answerEntry.key}"> 			
-						  <tr> <td><b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b> </td></tr>
+						  <tr> <td><b> <fmt:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b> </td></tr>
 						  <tr> <td><c:out value="${questionEntry.value}" escapeXml="false"/> </td></tr>
-						  <tr> <td><b> <bean:message key="label.answer"/> </b> </td></tr>
+						  <tr> <td><b> <fmt:message key="label.answer"/> </b> </td></tr>
 					 	  <tr> <td><textarea name="answer<c:out value="${questionEntry.key}" />" rows=5 cols=60><c:out value="${answerEntry.value}" escapeXml="false"/></textarea> </td></tr>
 					 	  <tr> <td>&nbsp;</td></tr>
   	   					</c:if> 			
@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr>
 				 <td> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
-							<bean:message key="button.submitAllContent"/>
+							<fmt:message key="button.submitAllContent"/>
 						</html:submit>	 				 		  					
 				</td> 
 			</tr>

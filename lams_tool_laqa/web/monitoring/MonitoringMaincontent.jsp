@@ -144,7 +144,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes" onLoad="init();">
 
 <div id="page">
-	<h1> <bean:message key="label.monitoring"/> </h1>
+	<h1> <fmt:message key="label.monitoring"/> </h1>
 
 	<div id="header">
 			<lams:Tabs collection="${tabs}" useKey="true" control="true"/>	

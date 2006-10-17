@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <html:html locale="true">
 <head>
-	<title> <bean:message key="activity.title"/> </title>
+	<title> <fmt:message key="activity.title"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
@@ -74,7 +74,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
        	<table class="forms"> 	  
 			<tr> <th scope="col">
-				<bean:message key="label.learning.viewOnly"/>
+				<fmt:message key="label.learning.viewOnly"/>
 			 </th>
 			</tr>
 		</table>				
@@ -92,10 +92,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
 			       	<table class="forms" align=right> 	  
 							<tr> <td align=right> 
-								 <bean:message key="label.learning.forceFinish"/> &nbsp&nbsp
+								 <fmt:message key="label.learning.forceFinish"/> &nbsp&nbsp
 
 								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-									<bean:message key="button.endLearning"/>
+									<fmt:message key="button.endLearning"/>
 								</html:submit>	 				 		  					
 								</td> 
 							</tr>
@@ -106,7 +106,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			       	<table class="forms" align=right> 	  
 							<tr> <td align=right> 
 								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-									<bean:message key="button.endLearning"/>
+									<fmt:message key="button.endLearning"/>
 								</html:submit>	 				 		  					
 								</td> 
 							</tr>
@@ -119,7 +119,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:if test="${ requestLearningReportProgress == 'true'}"> 			
        	<table class="forms"> 	  
 			<tr> <th scope="col">
-				<bean:message key="label.learner.progress"/>
+				<fmt:message key="label.learner.progress"/>
 			 </th>
 			</tr>
 		</table>						 

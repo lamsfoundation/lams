@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b> <bean:message key="error.noLearnerActivity"/> </b>
+							<b> <fmt:message key="error.noLearnerActivity"/> </b>
 						</td> 
 					<tr>
 				</table>
@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b> <bean:message key="label.learners.answers"/> </b>
+							<b> <fmt:message key="label.learners.answers"/> </b>
 						</td> 
 					<tr>
 				</table>
@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<c:if test="${(generalLearnerFlowDTO.requestLearningReport != 'true')}"> 	
 						<tr> 
-							<td NOWRAP width="60" valign=top align=center> <b> <bean:message key="label.selectGroup"/> </b>
+							<td NOWRAP width="60" valign=top align=center> <b> <fmt:message key="label.selectGroup"/> </b>
 									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 									<c:forEach var="toolSessionName" items="${requestScope.summaryToolSessions}">
 										<c:forEach var="toolSessionId" items="${requestScope.summaryToolSessionsId}">

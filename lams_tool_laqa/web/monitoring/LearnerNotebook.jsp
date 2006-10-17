@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 	
 </head>
 
@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<div id="content">
 		
 			<h1>
-				<bean:message key="label.view.reflection"/>
+				<fmt:message key="label.view.reflection"/>
 			</h1>
 		
 			<table>
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td>
 						<a href="javascript:window.close();" class="button">
-							<bean:message key="label.close"/></a>
+							<fmt:message key="label.close"/></a>
 					</td>
 				</tr>
 			</table>

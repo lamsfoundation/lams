@@ -23,7 +23,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<table>
 						<tr> 
 						<td NOWRAP valign=top>
-				  				<b> <bean:message key="count.total.user" /> </b>
+				  				<b> <fmt:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
 							  	  <c:out value="${qaStatsDTO.countAllUsers}"/>
@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						<tr> 
 							<td NOWRAP valign=top>
-				  				<b>  <bean:message key="count.finished.session" /> </b>
+				  				<b>  <fmt:message key="count.finished.session" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
 							  	 <c:out value="${qaStatsDTO.countSessionComplete}"/>

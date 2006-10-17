@@ -108,7 +108,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes" onLoad="init();">
 
 <div id="page">
-	<h1>  <bean:message key="label.authoring.qa"/> </h1>
+	<h1>  <fmt:message key="label.authoring.qa"/> </h1>
 	
 	<div id="header">
 		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			

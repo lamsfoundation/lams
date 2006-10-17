@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
-	<title><bean:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		       	<table> 	  
 					<tr> <td>
-						<b> <bean:message key="label.other.answers"/> </b>
+						<b> <fmt:message key="label.other.answers"/> </b>
 					 </td>
 					</tr>
 				</table>				
@@ -88,7 +88,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		</tr>
 	
 						<tr>			
-							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							<td valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -125,7 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<table>
 									<tr> 
 					  	   		  		<td>
-											<b> <bean:message key="label.notebook.entries"/> </b>						
+											<b> <fmt:message key="label.notebook.entries"/> </b>						
 										 </td>
 									</tr>
 									
@@ -149,7 +149,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	                               <html:submit property="refreshAnswers" 
 	                                             styleClass="button" 
 	                                             onclick="submitMethod('viewAllResults');">
-	                                    <bean:message key="label.refresh"/>
+	                                    <fmt:message key="label.refresh"/>
 	                                </html:submit>
 						  	 </td>
 	
@@ -157,13 +157,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<div class="right-buttons">							
 										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 											<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
-												<bean:message key="button.endLearning"/>
+												<fmt:message key="button.endLearning"/>
 											</html:submit>	 				
 									  	</c:if> 				    					
 						
 										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
 											<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-												<bean:message key="label.continue"/>
+												<fmt:message key="label.continue"/>
 											</html:submit>	 				
 									  	</c:if> 				    					
 									</div> 		  															 		  												  	
@@ -181,7 +181,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}"> 			
 		       	<table> 	  
 					<tr> <td>
-						<b> <bean:message key="label.learnerReport"/> </b>
+						<b> <fmt:message key="label.learnerReport"/> </b>
 					 </td>
 					</tr>
 				</table>						 
@@ -199,7 +199,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td valign=top align=left><b>  <bean:message key="label.question"/> : </b> 
+							<td valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -236,7 +236,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<table>
 									<tr> 
 					  	   		  		<td>
-											<b> <bean:message key="label.notebook.entries"/> </b>						
+											<b> <fmt:message key="label.notebook.entries"/> </b>						
 										 </td>
 									</tr>
 									
@@ -261,7 +261,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	                               <html:submit property="refreshAnswers" 
 	                                             styleClass="button" 
 	                                             onclick="submitMethod('viewAllResults');">
-	                                    <bean:message key="label.refresh"/>
+	                                    <fmt:message key="label.refresh"/>
 	                                </html:submit>
 						  	 </td>
 							
@@ -269,13 +269,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<div class="right-buttons">
 										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 											<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
-												<bean:message key="button.endLearning"/>
+												<fmt:message key="button.endLearning"/>
 											</html:submit>	 				
 									  	</c:if> 				    					
 						
 										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
 											<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-												<bean:message key="label.continue"/>
+												<fmt:message key="label.continue"/>
 											</html:submit>	 				
 									  	</c:if> 				    					
 									</div> 		  															 		  					

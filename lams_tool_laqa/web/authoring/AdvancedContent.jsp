@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 					<td>							
 						<html:checkbox property="usernameVisible"  value="1" styleClass="noBorder">
-							<bean:message key="radiobox.usernameVisible" />
+							<fmt:message key="radiobox.usernameVisible" />
 						</html:checkbox>
 	      			</td>
 		         </tr>
@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    				<tr>
 					<td>							
 						<html:checkbox property="reflect"  value="1" styleClass="noBorder">
-							<bean:message key="label.reflect" />
+							<fmt:message key="label.reflect" />
 						</html:checkbox>
 	      			</td>
 		        </tr>
@@ -48,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    				<tr>
 					<td>							
 						<html:checkbox property="questionsSequenced"  value="1" styleClass="noBorder">
-							<bean:message key="radiobox.questionsSequenced" />
+							<fmt:message key="radiobox.questionsSequenced" />
 						</html:checkbox>
 	      			</td>
 		        </tr>
