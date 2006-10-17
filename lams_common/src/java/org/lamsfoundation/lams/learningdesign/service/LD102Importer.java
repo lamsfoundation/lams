@@ -583,6 +583,24 @@ public class LD102Importer implements ApplicationContextAware{
 		String description = WDDXProcessor.convertToString(activityDetails,WDDXTAGS102.DESCRIPTION);
 		List taskTransitions = 	(List)activityDetails.get(WDDXTAGS102.ACT_TASKTRAN);
 		
+		// We've seen a design (LDEV-873) that has two noticeboard tasks within one noticeboard activity.
+		// Both tasks had the same content id, so we are going to treat them as duplicates and delete the duplicates
+		// before going any further.
+		if ( taskTransitions.size() != 1 && taskTransitions.size() != 3 ) {
+			Set<Integer> knownToolContentIds = new HashSet<Integer>();
+			Iterator iter = taskTransitions.iterator();
+			while ( iter.hasNext() ) {
+				Hashtable task = (Hashtable) iter.next();
+				Integer toolContentId = WDDXProcessor.convertToInteger(task, WDDXTAGS102.TASK_INPUT_CONTENT);
+				if ( knownToolContentIds.contains(toolContentId) ) {
+					log.warn("Duplicate task found in activity. Task will be removed. Activity is "+activityDetails);
+					iter.remove();
+				} else {
+					knownToolContentIds.add(toolContentId);
+				}
+			}
+		}
+
 		if ( taskTransitions.size()==1 ) {
 			// standard case - a single tool, grouping or parallel activity
 			Hashtable task = (Hashtable) taskTransitions.get(0);
