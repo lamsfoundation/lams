@@ -457,9 +457,14 @@ public class UserManagementService implements IUserManagementService {
                     
                     save(organisation);
                     
-                    if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){ 	 
+                    if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){
+                    		Organisation pOrg = organisation.getParentOrganisation();
+                    		// set parent's child orgs
+                    		Set children = pOrg.getChildOrganisations();
+                    		children.add(organisation);
+                    		pOrg.setChildOrganisations(children);
                     		// get course managers and give them staff role in this new class
-                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(organisation.getParentOrganisation().getOrganisationId(),Role.COURSE_MANAGER, false);
+                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(pOrg.getOrganisationId(),Role.COURSE_MANAGER, false);
                     		for(UserDTO m: managers){
                     				User user = (User)findById(User.class,m.getUserID());
                     				UserOrganisation uo = new UserOrganisation(user,organisation);
