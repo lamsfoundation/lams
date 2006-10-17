@@ -280,13 +280,23 @@
 				<include name="log4j.xml" />
 				<include name="jboss-service.xml" />
 			</fileset>
+	        <filterset>
+	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
+	        </filterset>
 		</copy>
-		<tstamp/>
-		<copy overwrite="yes" todir="${lamsconf}">
+		
+		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
 			<fileset dir="${conf.auth}/">
 				<include name="*.xml" />
 				<include name="*.dtd" />
 			</fileset>
+	        <filterset>
+	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
+	        </filterset>
+		</copy>
+
+		<tstamp/>
+		<copy overwrite="yes" todir="${lamsconf}">
 			<fileset dir="${conf.lams}/">
 				<include name="*.xml" />
 				<include name="*.dtd" />
@@ -295,6 +305,7 @@
 	                <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
 	        </filterset>
 		</copy>
+
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
@@ -320,7 +331,7 @@
 		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
 		<ant antfile="../${lams_common}/build.xml" target="copy-lams-valve-jar" inheritAll="false"/>
 		<echo message="Please copy jboss-cache.jar and jgroups.jar from server/all/lib to server/default/lib"
-			level="warning"/>
+			level="warning"/> 
 	</target>
 
 	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">

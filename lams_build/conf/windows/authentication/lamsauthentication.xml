@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "file:///usr/local/lamsconf/authentication.dtd">
+<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "file:///@confdir@/lamsauthentication.dtd">
 
 <Authentication>
 
@@ -12,7 +12,13 @@
 	<Param Name="principalDNSuffix">,ou=mams,dc=melcoe,dc=mq,dc=edu,dc=au</Param>
 	<Param Name="dsJndiName">java:/MySqlDS</Param>
 	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
-	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+	<Param Name="rolesQuery">
+             	SELECT DISTINCT  r.name,'Roles' FROM
+             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+             	LEFT OUTER JOIN lams_role r USING (role_id)
+             	WHERE u.login=?
+	</Param>
 	<Param Name="truststore.path">D:/MQLdapTrustStore</Param>
 	<Param Name="truststore.password">webauth</Param>
 </Method>
@@ -36,7 +42,7 @@
 	<Param Name="DummyPasswordForWebAuthUser">dummy</Param>
 	<Param Name="dsJndiName">java:/MySqlDS</Param>
 	<Param Name="rolesQuery">
-	            SELECT DISTINCT  r.name,'Roles' FROM
+             	SELECT DISTINCT  r.name,'Roles' FROM
              	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
              	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
              	LEFT OUTER JOIN lams_role r USING (role_id)
