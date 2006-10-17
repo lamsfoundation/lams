@@ -202,8 +202,32 @@ Tab navigation styles
 	float: left
 }
 
+.tab-left-highlight { /* defines left side of selected tab */
+	height: 31px;
+	width: 8px;
+	background: url('../images/css/button_highlight_left.jpg') no-repeat top left;
+	float: left
+}
 
+.tab-middle-highlight { /* defines middle of selected tab */
+	height: 31px;
+	width: 90px;
+	background: url('../images/css/button_highlight_bg.jpg') repeat-x;
+	float: left;
 
+	padding:8px 5px 0px 5px;
+}
+
+#nav .tab-middle-highlight-link {
+	color: #FFFFFF
+}
+
+.tab-right-highlight { /* defines right side of selected tab */
+	height: 31px;
+	width: 8px;
+	background: url('../images/css/button_highlight_right.jpg') no-repeat top right;;
+	float: left
+}
 
 /*
 *************************************************
