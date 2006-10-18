@@ -53,7 +53,7 @@ h1.no-tabs-below {
 h2 {color:#47bc23; 
 	font-size:14px; 
 	margin-left:10px; 
-	margin-bottom:0px; 
+	margin-bottom:10px; 
 	margin-top:10px; } 
 
 
@@ -238,7 +238,9 @@ Layout of main content section
 #content { /*box around the main content area */
 	width: 707px;
 	background: url('../images/css/body_bg.jpg') repeat-y;
-	padding-bottom: 20px;
+	padding-bottom:40px;
+	padding-left:15px;
+	padding-right:15px;
 	font-size: 11px;
 	margin-top: -5px
 	
@@ -264,6 +266,7 @@ Layout of main content section
 	border: 0px none;
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
+	font-size:11px;
 }
 
 /*  style to disbable input buttons */
@@ -289,6 +292,8 @@ a.button {
 	border: 0px none;
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
+	font-size:11px;
+	
 }
 
 a:hover.button {
@@ -297,6 +302,7 @@ a:hover.button {
 	border: 0px none;
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
+	font-size:11px;
 }
 
 
@@ -307,6 +313,7 @@ a.button-add-item {
 	border: 0px none;
 	padding:5px 20px 6px 25px;
     text-decoration: none;
+	font-size:11px;
 }
 
 a:hover.button-add-item {
@@ -315,6 +322,7 @@ a:hover.button-add-item {
 	border: 0px none;
 	padding:5px 20px 6px 25px;
     text-decoration: none;
+	font-size:11px;
 }
 
 
@@ -324,6 +332,7 @@ a:hover.button-add-item {
 	color: #333;
 	border: 0px none;
 	padding:5px 20px 6px 25px;
+	font-size:11px;
 }
 
 #content a:hover.button-add-item {
@@ -331,6 +340,7 @@ a:hover.button-add-item {
 	color: #349018;
 	border: 0px none;
 	padding:5px 20px 6px 25px;
+	font-size:11px;
 }
 
 /************ The sequence name box **********/
@@ -439,10 +449,10 @@ input:hover.button {
 
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
-	 width:98%; 
-	 margin-left:7px; 
-	 padding-top:20px; 
-	 margin-bottom:30px;
+ 	 width:91%; 
+	 margin-left:17px; 
+	 padding-top:0px;
+	 margin-bottom:15px;
 	 text-align:left;
 }
 
@@ -460,7 +470,7 @@ table.alternative-color td {
 	padding-left: 20px;
 	font-size: 11px;
 	border-bottom: 1px solid #efefef;
-	vertical-align: middle;
+	vertical-align: top; 
 	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px
 }
 
@@ -546,7 +556,7 @@ table.chosengrouping td select {
 /*layout of the table with form elements */
 
 table { 
-	 width:98%;
+	 width:94%;
 	 margin-left:7px; 
 	 text-align:left; 
 	 }
@@ -562,27 +572,28 @@ td p{
 	line-height:18px;
 }
 
-/*layout of button in table */
-td p.button{
+/*layout of button in table 
+td .button{
 	margin:0px; 
 	padding:10px 10px 10px 0px; 
 	font-size:11px;
 	font-family: verdana, arial, helvetica, sans-serif;
 }
+*/
 
 
-
-/* */ /*layout of form styles */
+/*layout of form styles */
 .field-name {
 	color: #0087e5;
 	font-weight: bold;
-	text-align: right;
+	text-align: left;
+	padding-bottom:10px;
 }
 
 .field-name-alternative-color {
 	color: #47bc23;
 	font-weight: bold;
-	text-align: right;
+	padding-bottom:10px;
 }
 
 input {
@@ -612,12 +623,15 @@ textarea {
 	margin-bottom: 40px;
 }
 
-hr {
-	border:0px; 
+.small-space-bottom {
+	margin-bottom: 20px;
+}
+
+hr {border:0px;
 	border-top:1px solid #ccc; 
-	width: 650px;
+	width: 630px;
 	height: 1px;
-	margin-15px 25px 10px 25px;
+	
 	}
 
 /* Warning message style */
@@ -870,7 +884,7 @@ Floating button containers
 
 .left-buttons {float:left; padding-left:20px;}
 
-.right-buttons {float:right; padding-right:20px;}
+.right-buttons {float:right; padding-right:20px; padding-top:5px;}
 
 
 
@@ -1106,4 +1120,4 @@ padding-right:0px;
 border:0px;
 }
 
-.small-space-top {margin-top:6px;}
+.small-space-top {padding-top:6px;}
