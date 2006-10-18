@@ -6,6 +6,16 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <form>
+
+<logic:empty name="orgId">
+	<c:url var="cancel" value="usersearch.do" />
+</logic:empty>
+<logic:notEmpty name="orgId">
+	<c:url var="cancel" value="usermanage.do">
+		<c:param name="org" value="${orgId}" />
+	</c:url>
+</logic:notEmpty>
+
 <logic:equal name="method" value="disable">
 <h2><fmt:message key="admin.user.disable"/></h2>
 <p>&nbsp;</p>
@@ -21,7 +31,7 @@ You can enable the user account again by editing the user's profile.</p>
 	</c:url>
 <div style="float:right">
 <input type="button" value="Disable" onClick="javascript:document.location='<c:out value="${disableaction}"/>'" />
-<input type="button" value="Cancel" onClick="javascript:document.location='usermanage.do?org=<c:out value="${orgId}" />'" />
+<input type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
 </div>
 </logic:equal>
 
@@ -36,7 +46,7 @@ You can enable the user account again by editing the user's profile.</p>
 	</c:url>
 <div style="float:right">
 <input type="button" value="Delete" onClick="javascript:document.location='<c:out value="${deleteaction}"/>'" />
-<input type="button" value="Cancel" onClick="javascript:document.location='usermanage.do?org=<c:out value="${orgId}" />'" />
+<input type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
 </div>
 </logic:equal>
 </form>
