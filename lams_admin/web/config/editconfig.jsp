@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -12,6 +13,7 @@
 		<fmt:message key="sysadmin.config.settings.edit" />
 	</h2>
 	<br/>
+	<lams:help page="<%= Configuration.CONFIGURATION_HELP_PAGE %>"/>
 	<table class="alternative-color" width=100%>
 		<tr>
 			<th><fmt:message key="admin.config.key"/></th>
