@@ -135,6 +135,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	/** The tool's display name */
 	private String toolDisplayName;
+	
+	/** The tool's version */
+	private String toolVersion;
 
 	/** The url of the tool's authoring screen. */
 	private String authoringURL;
@@ -350,6 +353,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.moderationURL = toolActivity.getTool().getModerationUrl();
 		this.helpURL = toolActivity.getTool().getHelpUrl();
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
+		this.toolVersion = toolActivity.getTool().getToolVersion();
 	}
 	private void addGateActivityAttributes(Object activity){
 		if(activity instanceof SynchGateActivity)
@@ -924,5 +928,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setToolSignature(String toolSignature) {
 		this.toolSignature = toolSignature;
+	}
+	public String getToolVersion() {
+		return toolVersion;
+	}
+	public void setToolVersion(String toolVersion) {
+		this.toolVersion = toolVersion;
 	}
 }
