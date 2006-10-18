@@ -9,7 +9,7 @@
 
 <head>
 	<title>
-		<bean:message key="activity.title" />
+		<fmt:message key="activity.title" />
 	</title>
 	<link href="${tool}pages/learning/notebook_style.css" rel="stylesheet" type="text/css">
 	<lams:headItems />

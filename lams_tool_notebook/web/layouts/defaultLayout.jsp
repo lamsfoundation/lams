@@ -10,7 +10,7 @@
 			<tiles:useAttribute name="pageTitleKey" ignore="true"/>
 			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
 			<h1 class="no-tabs-below">
-				<bean:message key="${pTitleKey}" />
+				<fmt:message key="${pTitleKey}" />
 			</h1>
 			<div id="header-no-tabs"></div>
 			<div id="content">
