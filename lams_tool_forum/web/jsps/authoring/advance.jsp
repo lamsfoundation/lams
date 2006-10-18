@@ -2,106 +2,131 @@
 
 <!--   Advance Tab Content    -->
 
-<table cellpadding="0">
 
-	<!-- Advance options Row -->
-	<tr>
-		<td>
-			<html:checkbox property="forum.lockWhenFinished"  styleClass="noBorder">
-				<fmt:message key="label.authoring.advance.lock.on.finished" />
-			</html:checkbox>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:checkbox property="forum.allowEdit"  styleClass="noBorder">
-				<fmt:message key="label.authoring.advance.allow.edit" />
-			</html:checkbox>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:checkbox property="forum.allowUpload"  styleClass="noBorder">
-				<fmt:message key="label.authoring.advance.allow.upload" />
-			</html:checkbox>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:checkbox property="forum.allowRichEditor" styleId="richEditor"  styleClass="noBorder">
-				<fmt:message key="label.authoring.advance.use.richeditor" />
-			</html:checkbox>
-		</td>
-	</tr>	
-	<tr>
-		<td>
-			<html:checkbox property="forum.limitedInput" styleId="limitedInput" styleClass="noBorder">
-				<fmt:message key="label.authoring.advance.limited.input" />
-			</html:checkbox>
-			<html:text property="forum.limitedChar" styleId="limitedChar" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"  styleId="reflectOn">
-				<fmt:message key="advanced.reflectOnActivity" />
-			</html:checkbox>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:textarea property="forum.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<h1><fmt:message key="message.posting.limiting"/></h1>
-		</td>
-	</tr>	
-	<tr>
-		<td>
-			<html:radio property="forum.allowNewTopic" value="true" onclick="allowNewTopic()">
-				<fmt:message key="label.authoring.advance.allow.new.topics" />
-			</html:radio>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<html:radio property="forum.allowNewTopic" value="false" onclick="allowNewTopic()">
-				<fmt:message key="label.authoring.advance.number.reply" />
-			</html:radio>
-			<BR>&nbsp;&nbsp;
-			<fmt:message key="label.authoring.advance.minimum.reply" />
-			<html:select property="forum.minimumReply" styleId="minimumReply">
-				<html:option value="0"><fmt:message key="label.authoring.advance.no.minimum"/></html:option>
-				<html:option value="1">1</html:option>
-				<html:option value="2">2</html:option>
-				<html:option value="3">3</html:option>
-				<html:option value="4">4</html:option>
-				<html:option value="5">5</html:option>
-				<html:option value="6">6</html:option>
-				<html:option value="7">7</html:option>
-				<html:option value="8">8</html:option>
-				<html:option value="9">9</html:option>
-				<html:option value="10">10</html:option>
-			</html:select>
-			<fmt:message key="label.authoring.advance.maximum.reply" />
-			<html:select property="forum.maximumReply" styleId="maximumReply">
-				<html:option value="0"><fmt:message key="label.authoring.advance.no.maximum"/></html:option>
-				<html:option value="1">1</html:option>
-				<html:option value="2">2</html:option>
-				<html:option value="3">3</html:option>
-				<html:option value="4">4</html:option>
-				<html:option value="5">5</html:option>
-				<html:option value="6">6</html:option>
-				<html:option value="7">7</html:option>
-				<html:option value="8">8</html:option>
-				<html:option value="9">9</html:option>
-				<html:option value="10">10</html:option>				
-			</html:select>
-		</td>
-	</tr>	
-</table>
+
+<!-- Advance options Row -->
+
+<p class="small-space-top">
+
+	<html:checkbox property="forum.lockWhenFinished" styleClass="noBorder">
+		<span class="space-left"><fmt:message
+				key="label.authoring.advance.lock.on.finished" />
+		</span>
+	</html:checkbox>
+</p>
+
+<p>
+	<html:checkbox property="forum.allowEdit" styleClass="noBorder">
+		<span class="space-left"><fmt:message
+				key="label.authoring.advance.allow.edit" />
+		</span>
+	</html:checkbox>
+</p>
+
+
+<p><html:checkbox property="forum.allowUpload" styleClass="noBorder">
+		<span class="space-left"><fmt:message
+				key="label.authoring.advance.allow.upload" />
+		</span>
+	</html:checkbox></p>
+
+
+
+	<p><html:checkbox property="forum.allowRichEditor" styleId="richEditor"
+		styleClass="noBorder">
+		<span class="space-left"><fmt:message
+				key="label.authoring.advance.use.richeditor" />
+		</span>
+	</html:checkbox></p>
+
+
+	<p><html:checkbox property="forum.limitedInput" styleId="limitedInput"
+		styleClass="noBorder">
+		<span class="space-left"><fmt:message
+				key="label.authoring.advance.limited.input" />
+		</span>
+	</html:checkbox>
+	<html:text property="forum.limitedChar" styleId="limitedChar" /></p>
+
+
+
+	<p><html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"
+		styleId="reflectOn">
+		<span class="space-left"><fmt:message
+				key="advanced.reflectOnActivity" />
+		</span>
+	</html:checkbox></p>
+
+
+
+	<p><span class="space-left"><html:textarea
+			property="forum.reflectInstructions" styleId="reflectInstructions"
+			cols="30" rows="3" />
+	</span></p>
+
+
+
+<h2>
+	<fmt:message key="message.posting.limiting" />
+</h2>
+
+
+
+<p>
+<html:radio property="forum.allowNewTopic" value="true"
+	onclick="allowNewTopic()">
+	<span class="space-left"><fmt:message
+			key="label.authoring.advance.allow.new.topics" />
+	</span>
+</html:radio>
+</p>
+
+<p>
+<html:radio property="forum.allowNewTopic" value="false"
+	onclick="allowNewTopic()">
+	<span class="space-left"><fmt:message
+			key="label.authoring.advance.number.reply" />
+	</span>
+</html:radio>
+</p>
+
+<p>
+<fmt:message key="label.authoring.advance.minimum.reply" />
+<html:select property="forum.minimumReply" styleId="minimumReply">
+	<html:option value="0">
+		<fmt:message key="label.authoring.advance.no.minimum" />
+	</html:option>
+	<html:option value="1">1</html:option>
+	<html:option value="2">2</html:option>
+	<html:option value="3">3</html:option>
+	<html:option value="4">4</html:option>
+	<html:option value="5">5</html:option>
+	<html:option value="6">6</html:option>
+	<html:option value="7">7</html:option>
+	<html:option value="8">8</html:option>
+	<html:option value="9">9</html:option>
+	<html:option value="10">10</html:option>
+</html:select>
+
+
+<fmt:message key="label.authoring.advance.maximum.reply" />
+<html:select property="forum.maximumReply" styleId="maximumReply">
+	<html:option value="0">
+		<fmt:message key="label.authoring.advance.no.maximum" />
+	</html:option>
+	<html:option value="1">1</html:option>
+	<html:option value="2">2</html:option>
+	<html:option value="3">3</html:option>
+	<html:option value="4">4</html:option>
+	<html:option value="5">5</html:option>
+	<html:option value="6">6</html:option>
+	<html:option value="7">7</html:option>
+	<html:option value="8">8</html:option>
+	<html:option value="9">9</html:option>
+	<html:option value="10">10</html:option>
+</html:select>
+
+</p>
 
 <script type="text/javascript">
 			var limit = document.getElementById("limitedInput");

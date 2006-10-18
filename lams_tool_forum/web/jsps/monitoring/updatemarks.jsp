@@ -54,7 +54,7 @@
 				<%@ include file="/common/messages.jsp"%>
 			</td>
 		<tr>
-			<td class="field-name" width="100" style="text-align: left;">
+			<td class="field-name" width="100">
 				<fmt:message key="lable.topic.title.mark" />* 
 			</td>
 			<td>
