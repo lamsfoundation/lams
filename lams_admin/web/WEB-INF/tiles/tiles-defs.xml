@@ -88,7 +88,7 @@
 	</definition>
 	
 	<definition name=".config" path="/template.jsp">
-		<put name="title" value="admin.config.edit"/>
+		<put name="title" value="sysadmin.config.settings.edit"/>
 		<put name="content" value="/config/editconfig.jsp"/>
 	</definition>
 	

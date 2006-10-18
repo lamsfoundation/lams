@@ -9,7 +9,7 @@
 	<html:hidden property="method" value="save"/>
 	<h2 align="left">
 		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :  
-		<fmt:message key="admin.config.edit" />
+		<fmt:message key="sysadmin.config.settings.edit" />
 	</h2>
 	<br/>
 	<table class="alternative-color" width=100%>
