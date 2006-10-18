@@ -1465,11 +1465,11 @@ public class QaServicePOJO
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	 public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath) throws ToolException {
+	 public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath ,String fromVersion,String toVersion) throws ToolException {
 		 try {
 				exportContentService.registerFileClassForImport(QaUploadedFile.class.getName(),"uuid",null,"fileName","fileProperty",null,null);
 				
-				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,qaToolContentHandler);
+				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,qaToolContentHandler,fromVersion,toVersion);
 				if(!(toolPOJO instanceof QaContent))
 					throw new ImportToolContentException("Import QA tool content failed. Deserialized object is " + toolPOJO);
 				QaContent toolContentObj = (QaContent) toolPOJO;

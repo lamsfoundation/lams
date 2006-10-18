@@ -275,14 +275,14 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	 *             if any other error occurs
 	 */
 	public void importToolContent(Long toolContentId, Integer newUserUid,
-			String toolContentPath) throws ToolException {
+			String toolContentPath,String fromVersion,String toVersion) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(
 					ScribeAttachment.class.getName(), "fileUuid",
 					"fileVersionId", "fileName", "fileType", null, null);
 
 			Object toolPOJO = exportContentService.importToolContent(
-					toolContentPath, scribeToolContentHandler);
+					toolContentPath, scribeToolContentHandler,fromVersion,toVersion);
 			if (!(toolPOJO instanceof Scribe))
 				throw new ImportToolContentException(
 						"Import Scribe tool content failed. Deserialized object is "

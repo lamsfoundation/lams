@@ -635,13 +635,13 @@ public class SurveyServiceImpl implements
 	}
 
 
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath,String fromVersion,String toVersion) throws ToolException {
 	
 		try {
 			exportContentService.registerFileClassForImport(SurveyAttachment.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,null);
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,surveyToolContentHandler);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,surveyToolContentHandler,fromVersion,toVersion);
 			if(!(toolPOJO instanceof Survey))
 				throw new ImportToolContentException("Import survey tool content failed. Deserialized object is " + toolPOJO);
 			Survey toolContentObj = (Survey) toolPOJO;

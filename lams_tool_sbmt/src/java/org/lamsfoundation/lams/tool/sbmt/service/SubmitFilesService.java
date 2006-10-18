@@ -279,12 +279,12 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
  	
- 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+ 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath,String fromVersion,String toVersion) throws ToolException {
  		
 		try {
 			exportContentService.registerFileClassForImport(InstructionFiles.class.getName(),"uuID","versionID","name","type",null,null);
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,sbmtToolContentHandler);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,sbmtToolContentHandler,fromVersion,toVersion);
 			if(!(toolPOJO instanceof SubmitFilesContent))
 				throw new ImportToolContentException("Import Submit tool content failed. Deserialized object is " + toolPOJO);
 			SubmitFilesContent toolContentObj = (SubmitFilesContent) toolPOJO;

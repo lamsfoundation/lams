@@ -1667,12 +1667,12 @@ public class VoteServicePOJO implements
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath,String fromVersion,String toVersion) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(VoteUploadedFile.class.getName()
 					,"uuid",null,"fileName","fileProperty",null,null);
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,voteToolContentHandler);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,voteToolContentHandler,fromVersion,toVersion);
 			if(!(toolPOJO instanceof VoteContent))
 				throw new ImportToolContentException("Import Vote tool content failed. Deserialized object is " + toolPOJO);
 			VoteContent toolContentObj = (VoteContent) toolPOJO;

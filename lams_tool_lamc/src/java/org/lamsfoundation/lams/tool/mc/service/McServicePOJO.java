@@ -1815,12 +1815,16 @@ public class McServicePOJO implements
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath,String fromVersion,String toVersion) throws ToolException {
 		try {
+			//register File node class
 			exportContentService.registerFileClassForImport(McUploadedFile.class.getName()
 					,"uuid",null,"fileName","fileProperty",null,null);
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,mcToolContentHandler);
+			//register version filter class
+			exportContentService.registerImportVersionFilterClass(McImportContentVersionFilter.class);
+			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,mcToolContentHandler,fromVersion,toVersion);
 			if(!(toolPOJO instanceof McContent))
 				throw new ImportToolContentException("Import MC tool content failed. Deserialized object is " + toolPOJO);
 			McContent toolContentObj = (McContent) toolPOJO;

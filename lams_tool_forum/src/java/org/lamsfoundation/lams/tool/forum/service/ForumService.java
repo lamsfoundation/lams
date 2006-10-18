@@ -716,14 +716,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath ,String fromVersion,String toVersion)
+			throws ToolException {
 
 		
 		try {
 			exportContentService.registerFileClassForImport(Attachment.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,null);
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,forumToolContentHandler);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,forumToolContentHandler,fromVersion,toVersion);
 			if(!(toolPOJO instanceof Forum))
 				throw new ImportToolContentException("Import Forum tool content failed. Deserialized object is " + toolPOJO);
 			Forum toolContentObj = (Forum) toolPOJO;

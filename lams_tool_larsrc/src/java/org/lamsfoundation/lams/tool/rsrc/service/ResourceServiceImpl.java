@@ -851,7 +851,7 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath ,String fromVersion,String toVersion) throws ToolException {
 	
 		try {
 			exportContentService.registerFileClassForImport(ResourceAttachment.class.getName()
@@ -859,7 +859,7 @@ public class ResourceServiceImpl implements
 			exportContentService.registerFileClassForImport(ResourceItem.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,"initialItem");
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,resourceToolContentHandler);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,resourceToolContentHandler,fromVersion,toVersion);
 			if(!(toolPOJO instanceof Resource))
 				throw new ImportToolContentException("Import Share resources tool content failed. Deserialized object is " + toolPOJO);
 			Resource toolContentObj = (Resource) toolPOJO;

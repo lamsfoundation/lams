@@ -325,14 +325,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	 *             if any other error occurs
 	 */
 	public void importToolContent(Long toolContentId, Integer newUserUid,
-			String toolContentPath) throws ToolException {
+			String toolContentPath ,String fromVersion,String toVersion) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(
 					ChatAttachment.class.getName(), "fileUuid",
 					"fileVersionId", "fileName", "fileType", null, null);
 
 			Object toolPOJO = exportContentService.importToolContent(
-					toolContentPath, chatToolContentHandler);
+					toolContentPath, chatToolContentHandler,fromVersion,toVersion);
 			if (!(toolPOJO instanceof Chat))
 				throw new ImportToolContentException(
 						"Import Chat tool content failed. Deserialized object is "

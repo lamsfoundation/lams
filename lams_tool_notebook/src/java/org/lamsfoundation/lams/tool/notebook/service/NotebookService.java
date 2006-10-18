@@ -260,14 +260,14 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 	 *             if any other error occurs
 	 */
 	public void importToolContent(Long toolContentId, Integer newUserUid,
-			String toolContentPath) throws ToolException {
+			String toolContentPath,String fromVersion,String toVersion) throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(
 					NotebookAttachment.class.getName(), "fileUuid",
 					"fileVersionId", "fileName", "fileType", null, null);
 
 			Object toolPOJO = exportContentService.importToolContent(
-					toolContentPath, notebookToolContentHandler);
+					toolContentPath, notebookToolContentHandler,fromVersion,toVersion);
 			if (!(toolPOJO instanceof Notebook))
 				throw new ImportToolContentException(
 						"Import Notebook tool content failed. Deserialized object is "

@@ -944,12 +944,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	 public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	 public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath,String fromVersion,String toVersion) throws ToolException {
 		 try {
 				exportContentService.registerFileClassForImport(NoticeboardAttachment.class.getName()
 						,"uuid","versionId","filename","fileProperty",null,null);
 				
-				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,nbToolContentHandler);
+				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,nbToolContentHandler,fromVersion,toVersion);
 				if(!(toolPOJO instanceof NoticeboardContent))
 					throw new ImportToolContentException("Import Noteice board tool content failed. Deserialized object is " + toolPOJO);
 				NoticeboardContent toolContentObj = (NoticeboardContent) toolPOJO;
