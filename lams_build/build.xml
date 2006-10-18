@@ -265,14 +265,8 @@
 	<!-- ============================================================================== -->
 	<!-- Copy the third party jar files and cofiguration files for deployment           -->
 	<!-- ============================================================================== -->
-	<target name="makeconfdir">
-		<delete quiet="true">
-			<fileset dir="${lamsconf}" />
-		</delete>
-		<mkdir dir="${lamsconf}" />
-	</target>
 
-	<target name="copyfiles" depends="makeconfdir"
+	<target name="copyfiles"
 		description="copy lib and config files">
 		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
 			<fileset dir="${conf.jboss}/">
@@ -292,17 +286,6 @@
 			</fileset>
 	        <filterset>
 	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
-	        </filterset>
-		</copy>
-
-		<tstamp/>
-		<copy overwrite="yes" todir="${lamsconf}">
-			<fileset dir="${conf.lams}/">
-				<include name="*.xml" />
-				<include name="*.dtd" />
-			</fileset>
-	        <filterset>
-	                <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
 	        </filterset>
 		</copy>
 
