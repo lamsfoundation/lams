@@ -68,10 +68,10 @@
 	<!-- Instructions Row -->
 	<tr>
 		<td>
-			<div class="field-name" style="text-align: left;">
+			<div class="field-name">
 				<fmt:message key="label.authoring.online.instruction"></fmt:message>
 			</div>
-			<html:textarea property="onlineInstruction" cols="80" rows="3"></html:textarea>
+			<html:textarea property="onlineInstruction" cols="75" rows="3"></html:textarea>
 		</td>
 	</tr>
 	<tr>
@@ -85,13 +85,9 @@
 	</tr>
 	<tr>
 		<td class="field-name">
-			<div class="field-name" style="text-align: left">
+			<div class="field-name">
 				<fmt:message key="label.authoring.online.file" />
 			</div>
-		</td>
-	</tr>
-	<tr>
-		<td>
 			<html:file property="onlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
@@ -100,18 +96,20 @@
 					key="label.authoring.upload.online.button" /> </a>
 		</td>
 	</tr>
-</table>
 
-<hr />
+	<tr>
+		<td>
+			<hr />
+		</td>
+	</tr>
 
-<table>
 	<!-- Offline Instructions -->
 	<tr>
 		<td>
-			<div class="field-name-alternative-color" style="text-align: left;">
+			<div class="field-name-alternative-color">
 				<fmt:message key="label.authoring.offline.instruction"></fmt:message>
 			</div>
-			<html:textarea property="offlineInstruction" cols="80" rows="3"></html:textarea>
+			<html:textarea property="offlineInstruction" cols="75" rows="3"></html:textarea>
 		</td>
 	</tr>
 	<tr>
@@ -125,13 +123,9 @@
 	</tr>
 	<tr>
 		<td>
-			<div class="field-name-alternative-color" style="text-align: left">
+			<div class="field-name-alternative-color">
 				<fmt:message key="label.authoring.offline.file" />
 			</div>
-		</td>
-	</tr>
-	<tr>
-		<td>
 			<html:file property="offlineFile">
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>

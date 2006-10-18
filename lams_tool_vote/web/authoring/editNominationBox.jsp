@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				<tr>
 					<td>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.edit.nomination"></fmt:message>
 						</div>
 						

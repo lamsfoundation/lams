@@ -76,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<tr>
 							<td colspan="2">
-								<div class="field-name" style="text-align: left;">
+								<div class="field-name">
 									<fmt:message key="label.authoring.title.col"></fmt:message>
 								</div>
 								<html:text property="title" style="width: 100%;"></html:text>
@@ -86,7 +86,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<tr>
 							<td colspan="2">
-								<div class="field-name" style="text-align: left;">
+								<div class="field-name">
 									<fmt:message key="label.authoring.instructions.col"></fmt:message>
 								</div>
 								<lams:FCKEditor id="instructions"

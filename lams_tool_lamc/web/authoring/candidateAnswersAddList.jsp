@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<table class="innerforms">
 		<td>
-			<div class="field-name" style="text-align: left;">
+			<div class="field-name">
 				<fmt:message key="label.add.candidates"></fmt:message>
 			</div>
 		</td>

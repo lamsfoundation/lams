@@ -74,15 +74,15 @@
 	<table>
 		<tr>
 			<td colspan="2">
-				<div class="field-name" style="text-align: left;">
+				<div class="field-name">
 					<fmt:message key="label.authoring.basic.title"></fmt:message>
 				</div>
-				<html:text property="resource.title" style="width: 100%;"></html:text>
+				<html:text property="resource.title" style="width: 99%;"></html:text>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2">
-				<div class="field-name" style="text-align: left;">
+				<div class="field-name">
 					<fmt:message key="label.authoring.basic.instruction"></fmt:message>
 				</div>
 				<lams:FCKEditor id="resource.instructions"

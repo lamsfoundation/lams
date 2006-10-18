@@ -16,10 +16,10 @@
 <table>
 	<tr>
 		<td>
-			<div class="field-name" style="text-align: left;">
+			<div class="field-name">
 				<fmt:message key="instructions.onlineInstructions"></fmt:message>
 			</div>
-			<html:textarea property="onlineInstructions" rows="3" cols="80"></html:textarea>
+			<html:textarea property="onlineInstructions" rows="3" cols="75"></html:textarea>
 		</td>
 	</tr>
 
@@ -62,31 +62,30 @@
 
 	<tr>
 		<td>
-			<div class="field-name" style="text-align: left;">
+			<div class="field-name">
 				<fmt:message key="instructions.uploadOnlineInstr" />
 			</div>
-		</td>
-	</tr>
-	<tr>
-		<td>
+
 			<html:file property="onlineFile" />
-			<html:link href="javascript:doUpload();"
-				property="submit" styleClass="button">
+			<html:link href="javascript:doUpload();" property="submit"
+				styleClass="button">
 				<fmt:message key="button.upload" />
 			</html:link>
 		</td>
 	</tr>
-</table>
 
-<hr />
-
-<table>
 	<tr>
 		<td>
-			<div class="field-name-alternative-color" style="text-align: left;">
+			<hr />
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<div class="field-name-alternative-color">
 				<fmt:message key="instructions.offlineInstructions"></fmt:message>
 			</div>
-			<html:textarea property="offlineInstructions" rows="3" cols="80"></html:textarea>
+			<html:textarea property="offlineInstructions" rows="3" cols="75"></html:textarea>
 		</td>
 	</tr>
 
@@ -129,16 +128,13 @@
 
 	<tr>
 		<td>
-			<div class="field-name-alternative-color" style="text-align: left;">
+			<div class="field-name-alternative-color">
 				<fmt:message key="instructions.uploadOfflineInstr" />
 			</div>
-		</td>
-	</tr>
-	<tr>
-		<td>
+
 			<html:file property="offlineFile" />
-			<html:link href="javascript:doUpload();"
-				property="submit" styleClass="button">
+			<html:link href="javascript:doUpload();" property="submit"
+				styleClass="button">
 				<fmt:message key="button.upload" />
 			</html:link>
 		</td>

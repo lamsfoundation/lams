@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr>
 					<td NOWRAP colspan=2 valign=top>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.onlineInstructions.col"></fmt:message>
 						</div>
 						<html:textarea property="onlineInstructions" rows="3" cols="80"></html:textarea>
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
-													                	<fmt:message key="link.delete" />
+													                	<bean:message key="link.delete" />
 													                </html:link> 
 													            </td>
 												           	</tr>
@@ -93,14 +93,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<tr> 
 					<td class="field-name"> 
-	          				<fmt:message key="label.onlineFiles" />
+	          				<bean:message key="label.onlineFiles" />
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
 					 	<html:submit property="submitOnlineFile" 
                                      styleClass="linkbutton" 
                                      onclick="submitMethod('addNewFile');">
-								<fmt:message key="label.upload"/>
+								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
 				
@@ -109,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr>
 					<td NOWRAP colspan=2 valign=top>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.offlineInstructions.col"></fmt:message>
 						</div>
 						<html:textarea property="offlineInstructions" rows="3" cols="80"></html:textarea>
@@ -140,18 +140,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												        	<tr>
 												            	<td>
 												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<fmt:message key="link.view" />
+												                   		<bean:message key="link.view" />
 												                    </a>
 																	&nbsp&nbsp
 													            	<html:link page="<%=download%>" styleClass="button">
-													                	<fmt:message key="link.download" />
+													                	<bean:message key="link.download" />
 													                </html:link>
 																	&nbsp&nbsp
 													            	<html:link page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
 													            	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
-													                	<fmt:message key="link.delete" />
+													                	<bean:message key="link.delete" />
 													                </html:link> 
 													            </td>
 												           	</tr>
@@ -175,14 +175,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr> 
 					<td class="field-name"> 
-          				<fmt:message key="label.offlineFiles" />
+          				<bean:message key="label.offlineFiles" />
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
 					 	<html:submit property="submitOfflineFile" 
                                      styleClass="linkbutton" 
                                      onclick="submitMethod('addNewFile');">
-								<fmt:message key="label.upload"/>
+								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
 				</tr>          		

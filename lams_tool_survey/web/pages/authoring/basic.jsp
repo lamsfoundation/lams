@@ -9,7 +9,7 @@
 	function showMessage(url) {
 		var area=document.getElementById("questionInputArea");
 		if(area != null){
-			area.style.width="670px";
+			area.style.width="685px";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -111,15 +111,15 @@
 	<table>
 		<tr>
 			<td colspan="2">
-				<div class="field-name" style="text-align: left;">
+				<div class="field-name">
 					<fmt:message key="label.authoring.basic.title"></fmt:message>
 				</div>
-				<html:text property="survey.title" style="width: 100%;"></html:text>
+				<html:text property="survey.title" style="width: 99%;"></html:text>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2">
-				<div class="field-name" style="text-align: left;">
+				<div class="field-name">
 					<fmt:message key="label.authoring.basic.instruction"></fmt:message>
 				</div>
 				<lams:FCKEditor id="survey.instructions"

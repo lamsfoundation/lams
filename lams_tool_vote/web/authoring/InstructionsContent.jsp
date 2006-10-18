@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr>
 					<td NOWRAP colspan=2 valign=top>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.onlineInstructions.col"></fmt:message>
 						</div>
 						<html:textarea property="onlineInstructions" rows="3" cols="80"></html:textarea>
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 													                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 													                         	target="_self" styleClass="button">
-													                	<fmt:message key="button.delete" />
+													                	<bean:message key="button.delete" />
 													                </html:link> 
 													            </td>
 												           	</tr>
@@ -109,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr>
 					<td NOWRAP colspan=2 valign=top>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.offlineInstructions.col"></fmt:message>
 						</div>
 						<html:textarea property="offlineInstructions" rows="3" cols="80"></html:textarea>
