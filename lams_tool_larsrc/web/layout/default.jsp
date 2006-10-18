@@ -10,7 +10,7 @@
 		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
 		<logic:notEmpty name="pTitleKey">
 			<h1>
-				<bean:message key="<%=pTitleKey %>" />
+				<fmt:message key="<%=pTitleKey %>" />
 			</h1>
 		</logic:notEmpty>
 
