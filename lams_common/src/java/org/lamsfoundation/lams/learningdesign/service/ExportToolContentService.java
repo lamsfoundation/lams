@@ -631,7 +631,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 			//tool.xml full path
 			String toolFilePath = FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME);
-			if(filterClass != null){
+			if(filterClass != null && !StringUtils.equals(fromVersion,toVersion)){
 				filterVersion(toolFilePath,fromVersion,toVersion);
 			}
 			//clear and ensure next activity can get correct filter thru registerImportVersionFilterClass().
