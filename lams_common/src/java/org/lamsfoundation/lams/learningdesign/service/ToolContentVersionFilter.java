@@ -27,7 +27,8 @@ import com.thoughtworks.xstream.XStream;
  * </ol>
  * 
  * The XXX must be integer format, which is Tool version number.
- * 
+ * <p>
+ * For more detail, in <a href="http://wiki.lamsfoundation.org/display/lams/How+to+implement+export+and+import+tool+content">wiki</a>.
  * @author Dapeng.Ni
  *
  */
@@ -63,14 +64,34 @@ public class ToolContentVersionFilter {
 		}
 		
 	}
+	/**
+	 * When a field is removed to tool Hibernate POJO class, this method must be call in
+	 * upXXXToYYY()/downXXXToYYY() methods.
+	 *  
+	 * @param ownerClass
+	 * @param fieldname
+	 */
 	public void removeField(Class ownerClass, String fieldname){
 		removedFieldList.add(new RemovedField(ownerClass,fieldname));
 	}
 	
+	/**
+	 * When a field is added to tool Hibernate POJO class, this method is optional in
+	 * upXXXToYYY()/downXXXToYYY() methods. It could set default value for this added fields.
+	 *  
+	 * @param ownerClass
+	 * @param fieldname
+	 */
 	public void addField(Class ownerClass, String fieldname, Object defaultValue){
 		addedFieldList.add(new AddedField(ownerClass, fieldname, defaultValue));
 	}
 
+	/**
+	 * Call by lams import tool service core. Do not use it in tool version filter class.
+	 * @param toolFilePath
+	 * @throws JDOMException
+	 * @throws IOException
+	 */
 	public void transformXML(String toolFilePath) throws JDOMException, IOException{
 		File toolFile = new File(toolFilePath);
 		
