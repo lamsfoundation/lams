@@ -42,7 +42,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -57,7 +58,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -139,6 +139,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 	private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
 	private static final String ERROR_SERVICE_ERROR = "error.import.tool.service.fail";
+	private static final String ERROR_NO_VALID_TOOL = "error.no.valid.tool";
+	private static final String FILTER_METHOD_PREFIX_DOWN = "down";
+	private static final String FILTER_METHOD_PREFIX_UP = "up";
+	private static final String FILTER_METHOD_MIDDLE = "To";
 	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
@@ -148,6 +152,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	//save list of all tool file node class information. One tool may have over one file node, such as 
 	//in share resource tool, it has contnent attachment and shared resource item attachement. 
 	private List<NameInfo> fileHandleClassList;
+	private Class filterClass; 
 	
 	//spring injection properties
 	private IActivityDAO activityDAO;
@@ -461,8 +466,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		fileHandleClassList.add(this.new NameInfo(fileNodeClassName, fileUuidFieldName, fileVersionFieldName,
 				fileNameFieldName, filePropertyFieldName, mimeTypeFieldName, initialItemFieldName));
 	}
-	
-	
+	public void registerImportVersionFilterClass(Class filterClass) {
+		this.filterClass = filterClass;
+	}
+
 	/**
 	 * Import 1.0.2 learning design 
 	 * @return learningDesingID
@@ -517,6 +524,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					removedActMap.put(activity.getActivityID(), activity);
 					continue;
 				}
+				//save Tool into lams_tool table.
 				ToolContent newContent = new ToolContent(newTool);
 			    toolContentDAO.saveToolContent(newContent);
 			    
@@ -525,9 +533,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				
 				//Invoke tool's importToolContent() method.
 				try{
+					//begin to import
 					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
 					log.debug("Tool begin to import content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
-					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
+
+					//tool's importToolContent() method
+					//get from and to version
+					String toVersion = newTool.getToolVersion();
+					String fromVersion = activity.getToolVersion();
+					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath,fromVersion,toVersion);
+					
 					log.debug("Tool content import success.");
 				}catch (Exception e) {
 					String error = getMessageService().getMessage(ERROR_SERVICE_ERROR,new Object[]{newTool.getToolDisplayName(),e.toString()});
@@ -538,6 +553,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 			} //end all activities import
 			
+			//all activities can not imported, ignore this LD
+			if(removedActMap.size() == activities.size() ){
+				toolsErrorMsgs.add(getMessageService().getMessage(ERROR_NO_VALID_TOOL));
+				return -1L;
+			}
+				
 			// begin fckeditor content folder import
 			try {
 				String contentZipFileName = EXPORT_LDCONTENT_ZIP_PREFIX + ldDto.getContentFolderID() + EXPORT_LDCONTENT_ZIP_SUFFIX;
@@ -589,7 +610,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	/**
 	 * Import tool content 
 	 */
-	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
+	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler,String fromVersion,String toVersion) throws ImportToolContentException{
 		Object toolPOJO = null;
 //		change xml to Tool POJO 
 		XStream toolXml = new XStream();
@@ -608,7 +629,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<ValueInfo> valueList = null;
 		try {
 			
-			Reader toolFile = new InputStreamReader(new FileInputStream(FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME)),"UTF-8");
+			//tool.xml full path
+			String toolFilePath = FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME);
+			if(filterClass != null){
+				filterVersion(toolFilePath,fromVersion,toVersion);
+			}
+			//clear and ensure next activity can get correct filter thru registerImportVersionFilterClass().
+			filterClass = null;
+			
+			//read tool file after transform.
+			Reader toolFile = new InputStreamReader(new FileInputStream(toolFilePath),"UTF-8");
 			toolPOJO = toolXml.fromXML(toolFile);
 			
 			//upload file node if has
@@ -681,21 +711,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						BeanUtils.setProperty(fileNode.instance,fileNode.name.versionFieldName,key.getVersion());
 				}
 			}
-		} catch (FileNotFoundException e) {
-			throw new ImportToolContentException(e);
-		} catch (InvalidParameterException e) {
-			throw new ImportToolContentException(e);
-		} catch (RepositoryCheckedException e) {
-			throw new ImportToolContentException(e);
-		} catch (ZipFileUtilException e) {
-			throw new ImportToolContentException(e);
-		} catch (IllegalAccessException e) {
-			throw new ImportToolContentException(e);
-		} catch (InvocationTargetException e) {
-			throw new ImportToolContentException(e);
-		} catch (NoSuchMethodException e) {
-			throw new ImportToolContentException(e);
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			throw new ImportToolContentException(e);
 		}finally{
 			if(fileHandleClassList != null)
@@ -716,6 +732,64 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	//******************************************************************
 	// Private methods
 	//******************************************************************
+	
+	/**
+	 * Tansform tool XML file to correct version format.
+	 * @param toVersion 
+	 * @param fromVersion 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	private void filterVersion(String toolFilePath, String fromVersion, String toVersion) throws Exception {
+		float from = 0;
+		try {
+			from = NumberUtils.createFloat(fromVersion);
+		} catch (Exception e) {}
+		float to = 0;
+		try {
+			to = NumberUtils.createFloat(toVersion);
+		} catch (Exception e) {}
+		
+		String filterMethodPrefix;
+		if(from > to)
+			filterMethodPrefix = FILTER_METHOD_PREFIX_DOWN;
+		else
+			filterMethodPrefix = FILTER_METHOD_PREFIX_UP;
+		
+		log.debug("Version filter class will filter from version " + from + " to " + to);
+		
+		Object filter = filterClass.newInstance();
+		Method[] methods = filterClass.getDeclaredMethods();
+		Map<Float, Method> methodNeeds = new TreeMap<Float, Method>();
+		for (Method method : methods) {
+			String name = method.getName();
+			if(name.startsWith(filterMethodPrefix)){
+				String[] ver = name.split(filterMethodPrefix+"|"+FILTER_METHOD_MIDDLE);
+				Float mf = 0f;
+				Float mt = 0f;
+				for (int idx=0;idx<ver.length;idx++){
+					if(StringUtils.isBlank(ver[idx]))
+						continue;
+					mf = NumberUtils.createFloat(ver[idx]);
+					if(ver.length > idx)
+					mt = NumberUtils.createFloat(ver[++idx]);
+					break;
+				}
+				if(mf >= from && mt <= to){
+					methodNeeds.put(mf,method);
+				}
+			}
+		}
+		Collection<Method> calls = methodNeeds.values();
+		for (Method method : calls) {
+			method.invoke(filter, new Object[]{});
+			log.debug("Version filter class method " + method.getName() +" is executed.");
+		}
+		Method transform = filterClass.getMethod("transformXML",new Class[]{String.class});
+		transform.invoke(filter, new Object[]{toolFilePath});
+	
+		
+	}
 	/**
 	 * If there are any errors happen during tool exporting content. Writing failed message to file.
 	 */
@@ -1288,5 +1362,4 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
 		this.systemToolDAO = systemToolDAO;
 	}
-
 }

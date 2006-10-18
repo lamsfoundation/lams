@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -18,9 +19,22 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
 import com.thoughtworks.xstream.XStream;
-
+/**
+ * Super class for all Import content Version Filter. The child class method must follow name conversion.  
+ * <ol>
+ * 	<li>upXXXToXXX</li>
+ * 	<li>downXXXToXXX</li>
+ * </ol>
+ * 
+ * The XXX must be integer format, which is Tool version number.
+ * 
+ * @author Dapeng.Ni
+ *
+ */
 public class ToolContentVersionFilter {
 
+	private static final Logger log = Logger.getLogger(ToolContentVersionFilter.class);
+	
 	private List<RemovedField> removedFieldList;
 	private List<AddedField> addedFieldList;
 
@@ -78,6 +92,7 @@ public class ToolContentVersionFilter {
 		for (RemovedField remove : removedFieldList) {
 			if(StringUtils.equals(root.getName(),remove.ownerClass.getName())){
 				clzRemoveFlds.add(remove.fieldname);
+				log.debug("Field "+ remove.fieldname+" in class " + remove.ownerClass.getName() + " is going to leave.");
 			}
 		}
 		//add all new fields for this class
@@ -92,21 +107,31 @@ public class ToolContentVersionFilter {
 				Element eleRoot = eledoc.getRootElement();
 				eleRoot.setName(added.fieldname);
 				root.addContent(eleRoot);
+				
+				log.debug("Field "+ added.fieldname+" in class " + added.ownerClass.getName() + " is add by value " + added.defaultValue);
 			}
 		}
 		
+		//remove fields
 		List<Object> children = root.getChildren();
 		for (Object child: children) {
 			if(child instanceof Element){
 				Element ele = (Element)child;
+				//this node already removed, no necessary retrieve its children level
 				if(clzRemoveFlds.contains(ele.getName())){
 					continue;
 				}
+				//recusive current node's children level.
 				retrieveXML(ele);
 			}
 		}
-		for(String name:clzRemoveFlds)
-			root.removeChild(name);
+		//retrieve all current node's children, if found some element is in removed list, then remove it.
+		for(String name:clzRemoveFlds){
+			if(root.removeChild(name))
+				log.debug("Field "+ name + " is removed.");
+			else
+				log.debug("Failed remove field "+ name + ".");
+		}
 
 	}
 }

@@ -82,6 +82,8 @@ public interface IExportToolContentService {
 			String fileVersionFieldName, String fileNameFieldName, String filePropertyFieldName, String mimeTypeFieldName,
 			String initialItemFieldName);
 	
+	void registerImportVersionFilterClass(Class filterClass);
+	
 	/** Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
 	 * null then saves the design in the user's own workspace folder.
 	 * 
@@ -97,7 +99,7 @@ public interface IExportToolContentService {
 	 * Import the tool content. This is called by tools to do the actual content import, once the tool
 	 * has set up whatever it needs to do. 
 	 */
-	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler)
+	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler,String fromVersion,String toVersion)
 		throws ImportToolContentException;
 	
 	/**
