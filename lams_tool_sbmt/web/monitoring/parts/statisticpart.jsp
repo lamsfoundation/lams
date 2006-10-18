@@ -11,7 +11,7 @@
 		</tr>
 		<tr>
 			<td>
-				<bean:message key="monitoring.statistic.marked" />
+				<fmt:message key="monitoring.statistic.marked" />
 			</td>
 			<td>
 				<c:out value="${statistic.markedCount}" />
@@ -19,7 +19,7 @@
 		</tr>
 		<tr>
 			<td>
-				<bean:message key="monitoring.statistic.not.marked" />
+				<fmt:message key="monitoring.statistic.not.marked" />
 			</td>
 			<td>
 				<c:out value="${statistic.notMarkedCount}" />
@@ -27,7 +27,7 @@
 		</tr>
 		<tr>
 			<td>
-				<bean:message key="monitoring.statistic.total.uploaded.file" />
+				<fmt:message key="monitoring.statistic.total.uploaded.file" />
 			</td>
 			<td>
 				<c:out value="${statistic.totalUploadedFiles}" />

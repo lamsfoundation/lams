@@ -4,7 +4,7 @@
 <table cellpadding="0">
 	<tr>
 		<td class="field-name" width="30%">
-			<bean:message key="label.authoring.basic.title" />
+			<fmt:message key="label.authoring.basic.title" />
 			:
 		</td>
 		<td>
@@ -14,7 +14,7 @@
 	<!-- Instructions Row -->
 	<tr>
 		<td class="field-name" width="30%">
-			<bean:message key="label.authoring.basic.instruction" />
+			<fmt:message key="label.authoring.basic.instruction" />
 			:
 		</td>
 		<td>

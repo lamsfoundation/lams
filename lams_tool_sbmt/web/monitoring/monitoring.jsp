@@ -80,7 +80,7 @@
 <body class="stripes" onLoad="init()">
 	<div id="page">
 		<h1>
-			<bean:message key="label.monitoring.heading" />
+			<fmt:message key="label.monitoring.heading" />
 		</h1>
 		<div id="header">
 			<lams:Tabs control="true">

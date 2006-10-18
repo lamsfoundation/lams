@@ -31,7 +31,7 @@
 				<tr>
 					<td colspan="2">
 						<html:link href="javascript:window.close();" property="submit" styleClass="button">
-							<bean:message key="label.monitoring.done.button" />
+							<fmt:message key="label.monitoring.done.button" />
 						</html:link>
 					</td>
 				</tr>
