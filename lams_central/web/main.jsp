@@ -45,8 +45,8 @@
 				
 				<c:set var="tabLeft" value="tab-left"/>
 				<c:set var="tabMiddle" value="tab-middle"/>
-				<c:set var="tabRight" value="tab-right"/>
-				<c:if test="${headerlink eq 'index.author'}">
+				<c:set var="tabRight" value="tab-right"/>				
+				<c:if test="${headerlink.name eq 'index.author'}">
 					<c:set var="tabLeft" value="tab-left-highlight"/>
 					<c:set var="tabMiddle" value="tab-middle-highlight"/>
 					<c:set var="tabRight" value="tab-right-highlight"/>				
