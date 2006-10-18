@@ -21,56 +21,50 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
-<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
+<c:set scope="request" var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set scope="request" var="tool">
+	<lams:WebAppURL />
+</c:set>
 
-		
-	<table cellpadding="0">
-				<tr>
-					<td>							
-						<html:checkbox property="voteChangable"  value="1" styleClass="noBorder">
-							<fmt:message key="label.vote.changable" />
-						</html:checkbox>
-	      			</td>
-		         </tr>
-		         
-				<tr>
-					<td>							
-						<html:checkbox property="lockOnFinish"  value="1" styleClass="noBorder">
-							<fmt:message key="label.vote.lockedOnFinish" />
-						</html:checkbox>
-	      			</td>
-		         </tr>
-		         
-   				<tr>
-					<td>							
-						<html:checkbox property="allowText"  value="1" styleClass="noBorder">
-							<fmt:message key="label.allowText" />
-						</html:checkbox>
-	      			</td>
-		        </tr>
-		         
-		         <tr> 
-					<td>							
-						<fmt:message key="label.maxNomCount"/>: <html:text property="maxNominationCount" size="8" maxlength="3"/>
-			 		</td>
-			  	</tr>
+<p class="small-space-top">
+	<html:checkbox property="voteChangable" value="1" styleClass="noBorder" styleId="voteChangable">
+	</html:checkbox>
+	<label for="voteChangable">
+		<fmt:message key="label.vote.changable" />
+	</label>
+</p>
 
-   				<tr>
-					<td>							   				
-						<html:checkbox property="reflect"  value="1" styleClass="noBorder">
-							<fmt:message key="label.reflect" />
-						</html:checkbox>
-			 		</td>						
-		        </tr>
+<p>
+	<html:checkbox property="lockOnFinish" value="1" styleClass="noBorder" styleId="lockOnFinish">
+	</html:checkbox>
+	<label for="lockOnFinish">
+		<fmt:message key="label.vote.lockedOnFinish" />
+	</label>
+</p>
 
-   				<tr>
-					<td>							
- 						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
-	      			</td>
-		        </tr>
-		  	
-			  	
-			</table>	  	
+<p>
+	<html:checkbox property="allowText" value="1" styleClass="noBorder" styleId="allowText">
+	</html:checkbox>
+	<label for="allowText">
+		<fmt:message key="label.allowText" />
+	</label>
+</p>
 
-		
+
+<p>
+	<fmt:message key="label.maxNomCount" />
+	<html:text property="maxNominationCount" size="8" maxlength="3" />
+</p>
+
+<p>
+	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
+	</html:checkbox>
+	<label for="reflect">
+		<fmt:message key="label.reflect" />
+	</label>
+</p>
+<p>
+	<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea>
+</p>

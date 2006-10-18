@@ -7,15 +7,20 @@
 
 <p class="small-space-top">
 	<html:checkbox property="resource.lockWhenFinished"
-		styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
+		styleClass="noBorder" styleId="lockWhenFinished">
 	</html:checkbox>
+
+	<label for="lockWhenFinished">
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
 </p>
 
 <p>
-	<html:checkbox property="resource.runAuto" styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.run.content.auto" />
+	<html:checkbox property="resource.runAuto" styleClass="noBorder" styleId="runAuto">
 	</html:checkbox>
+	<label for="runAuto">
+		<fmt:message key="label.authoring.advance.run.content.auto" />
+	</label>
 </p>
 
 <p>
@@ -43,22 +48,28 @@
 </p>
 
 <p>
-	<html:checkbox property="resource.allowAddUrls" styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.allow.learner.add.urls" />
+	<html:checkbox property="resource.allowAddUrls" styleClass="noBorder" styleId="allowAddUrls">
 	</html:checkbox>
+	<label for="allowAddUrls">
+		<fmt:message key="label.authoring.advance.allow.learner.add.urls" />
+	</label>
 </p>
 
 <p>
-	<html:checkbox property="resource.allowAddFiles" styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.allow.learner.add.files" />
+	<html:checkbox property="resource.allowAddFiles" styleClass="noBorder" styleId="allowAddFiles">
 	</html:checkbox>
+	<label for="allowAddFiles">
+		<fmt:message key="label.authoring.advance.allow.learner.add.files" />
+	</label>
 </p>
 
 <p>
 	<html:checkbox property="resource.reflectOnActivity"
 		styleClass="noBorder" styleId="reflectOn">
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</html:checkbox>
+	<label for="reflectOn">
+		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+	</label>
 </p>
 
 <p>

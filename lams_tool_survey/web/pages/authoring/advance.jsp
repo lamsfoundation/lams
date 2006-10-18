@@ -6,22 +6,28 @@
 <!-- Advance Tab Content -->
 
 <p class="small-space-top">
-	<html:checkbox property="survey.lockWhenFinished" styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	<html:checkbox property="survey.lockWhenFinished" styleClass="noBorder" styleId="lockWhenFinished">
 	</html:checkbox>
+	<label for="lockWhenFinished">
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
 </p>
 
 <p>
-	<html:checkbox property="survey.showOnePage" styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.show.on.one.page" />
+	<html:checkbox property="survey.showOnePage" styleClass="noBorder" styleId="showOnePage">
 	</html:checkbox>
+	<label for="showOnePage">
+		<fmt:message key="label.authoring.advance.show.on.one.page" />
+	</label>
 </p>
 
 <p>
 	<html:checkbox property="survey.reflectOnActivity"
 		styleClass="noBorder" styleId="reflectOn">
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</html:checkbox>
+	<label for="reflectOn">
+		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+	</label>
 </p>
 
 <p>

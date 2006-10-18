@@ -20,66 +20,56 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-	<table cellpadding="0">
-			         
-					<tr>
-						<td>							
-							<html:checkbox property="questionsSequenced" value="1" styleClass="noBorder">
-								<fmt:message key="radiobox.onepq" />
-							</html:checkbox>
-		      			</td>		      			
-			         </tr>
-			         
-	   				<tr>
-						<td>							
-							<html:checkbox property="retries" value="1"  onclick="javascript:updatePass(this);" styleClass="noBorder">
-								<fmt:message key="radiobox.retries" />
-							</html:checkbox>
-		      			</td>		      			
-			        </tr>
-			        
-			        
-	   				<tr>
-						<td>							
-									<select name="passmark">
-										<c:forEach var="passmarkEntry" items="${mcGeneralAuthoringDTO.passMarksMap}">
-											<c:set var="SELECTED_PASS" scope="request" value=""/>
-											<c:if test="${passmarkEntry.value == mcGeneralAuthoringDTO.passMarkValue}"> 			
-														<c:set var="SELECTED_PASS" scope="request" value="SELECTED"/>
-											</c:if>						
+<p class="small-space-top">
+	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="questionsSequenced">
+		<fmt:message key="radiobox.onepq" />
+	</label>
+</p>
 
-												<option value="<c:out value="${passmarkEntry.value}"/>"  <c:out value="${SELECTED_PASS}"/>> <c:out value="${passmarkEntry.value}"/>  </option>																				
-										</c:forEach>		  	
-									</select>
-									<fmt:message key="radiobox.passmark" />
-									
-									 <a href="javascript:submitMethod('updateMarksList')" class="button">
-								    	<fmt:message key="label.update.list"/>
-								     </a>
-									
-									
-									
-		      			</td>		      			
-			        </tr>
+<p>
+	<html:checkbox property="retries" value="1" styleId="retries"
+		onclick="javascript:updatePass(this);" styleClass="noBorder">
+	</html:checkbox>
+	<label for="retries">
+		<fmt:message key="radiobox.retries" />		
+	</label>
+</p>
+
+<p>
+	<select name="passmark">
+		<c:forEach var="passmarkEntry"
+			items="${mcGeneralAuthoringDTO.passMarksMap}">
+			<c:set var="SELECTED_PASS" scope="request" value="" />
+			<c:if
+				test="${passmarkEntry.value == mcGeneralAuthoringDTO.passMarkValue}">
+				<c:set var="SELECTED_PASS" scope="request" value="SELECTED" />
+			</c:if>
+	
+			<option value="<c:out value="${passmarkEntry.value}"/>"
+				<c:out value="${SELECTED_PASS}"/>>
+				<c:out value="${passmarkEntry.value}" />
+			</option>
+		</c:forEach>
+	</select>
+	<fmt:message key="radiobox.passmark" />
+	
+	<a href="javascript:submitMethod('updateMarksList')" class="button">
+		<fmt:message key="label.update.list" /> </a>
+</p>
+
+<p>
+	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
+	</html:checkbox>
+	<label for="reflect">
+		<fmt:message key="label.reflect" />
+	</label>
+</p>
+<p>
+	<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea>
+</p>
 
 
-			        
 
-   				<tr>
-						<td>							
-							<html:checkbox property="reflect" value="1" styleClass="noBorder">
-								<fmt:message key="label.reflect" />
-							</html:checkbox>
-		      			</td>		      			
-		        </tr>
-
-   				<tr>
-					<td>							
- 						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea> 						
-	      			</td>
-		        </tr>
-		</table>
-		
-		
-
-		

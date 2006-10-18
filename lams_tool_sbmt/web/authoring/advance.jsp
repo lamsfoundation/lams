@@ -2,17 +2,21 @@
 
 <!-- Advance Tab Content -->
 
-<p>
-	<html:checkbox property="lockOnFinished" styleClass="noBorder">
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
+<p class="small-space-top">
+	<html:checkbox property="lockOnFinished" styleClass="noBorder" styleId="lockOnFinished">
 	</html:checkbox>
+	<label for="lockOnFinished">
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
 </p>
 
 <p>
 	<html:checkbox property="limitUpload" styleId="limitUpload"
 		styleClass="noBorder" onclick="limitUploadChange()">
-		<fmt:message key="label.limit.number.upload" />
 	</html:checkbox>
+	<label for="limitUpload">
+		<fmt:message key="label.limit.number.upload" />
+	</label>
 
 	<html:select property="limitUploadNumber" styleId="limitUploadNumber">
 		<html:option value="1">1</html:option>
@@ -26,8 +30,10 @@
 <p>
 	<html:checkbox property="reflectOnActivity" styleClass="noBorder"
 		styleId="reflectOn">
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</html:checkbox>
+	<label for="reflectOn">
+		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+	</label>
 </p>
 
 <p>

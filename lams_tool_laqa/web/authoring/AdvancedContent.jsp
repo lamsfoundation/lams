@@ -20,45 +20,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<table cellpadding="0">
+<p class="small-space-top">
+	<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="usernameVisible">
+		<fmt:message key="radiobox.usernameVisible" />
+	</label>
+</p>
 
-				<tr>
-					<td>							
-						<html:checkbox property="usernameVisible"  value="1" styleClass="noBorder">
-							<fmt:message key="radiobox.usernameVisible" />
-						</html:checkbox>
-	      			</td>
-		         </tr>
-		         
-   				<tr>
-					<td>							
-						<html:checkbox property="reflect"  value="1" styleClass="noBorder">
-							<fmt:message key="label.reflect" />
-						</html:checkbox>
-	      			</td>
-		        </tr>
+<p>
+	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
+	</html:checkbox>
+	<label for="reflect">
+		<fmt:message key="label.reflect" />
+	</label>
+</p>
+<p>
+	<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea>
+</p>
 
-   				<tr>
-					<td>							
- 						<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea>
-	      			</td>
-		        </tr>
-		        
-
-   				<tr>
-					<td>							
-						<html:checkbox property="questionsSequenced"  value="1" styleClass="noBorder">
-							<fmt:message key="radiobox.questionsSequenced" />
-						</html:checkbox>
-	      			</td>
-		        </tr>
-			  	
-</table>	  	
+<p>
+	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="questionsSequenced">
+		<fmt:message key="radiobox.questionsSequenced" />
+	</label>
+</p>
 
 
 
-		
-		
-		
 
-		
+
+
+
+
+
