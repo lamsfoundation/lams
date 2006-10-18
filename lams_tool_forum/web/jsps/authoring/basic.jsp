@@ -67,7 +67,7 @@
 
 			<p class="small-space-bottom"><a
 				href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
-				 class="button"> <fmt:message
+				 class="button-add-item"> <fmt:message
 					key="label.authoring.create.new.topic" /> </a></p>
 	
 			<iframe

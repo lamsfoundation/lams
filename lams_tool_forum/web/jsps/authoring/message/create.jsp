@@ -50,8 +50,8 @@
 						<a href="#" onclick="getElementById('topicFormId').submit();" class="button-add-item">
 							<fmt:message key="button.add" />
 						</a>
-						&nbsp; &nbsp;
-						<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
+						
+						<a href="#" onclick="javascript:window.parent.hideMessage()" class="button space-left">
 							<fmt:message key="button.cancel" />
 						</a>
 					

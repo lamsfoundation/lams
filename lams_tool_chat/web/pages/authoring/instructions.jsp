@@ -89,18 +89,12 @@
 			<div class="field-name">
 				<fmt:message key="instructions.uploadOnlineInstr" />
 			</div>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div class="space-left">
-				<html:file property="onlineFile">
-				</html:file>
-				<html:link href="javascript:doSubmit('uploadOnline');"
-					property="submit" styleClass="button">
-					<fmt:message key="button.upload" />
-				</html:link>
-			</div>
+			<html:file property="onlineFile">
+			</html:file>
+			<html:link href="javascript:doSubmit('uploadOnline');"
+				property="submit" styleClass="button">
+				<fmt:message key="button.upload" />
+			</html:link>
 		</td>
 	</tr>
 
@@ -200,18 +194,12 @@
 			<div class="field-name-alternative-color">
 				<fmt:message key="instructions.uploadOfflineInstr" />
 			</div>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div class="space-left">
-				<html:file property="offlineFile">
-				</html:file>
-				<html:link href="javascript:doSubmit('uploadOffline');"
-					property="submit" styleClass="button">
-					<fmt:message key="button.upload" />
-				</html:link>
-			</div>
+			<html:file property="offlineFile">
+			</html:file>
+			<html:link href="javascript:doSubmit('uploadOffline');"
+				property="submit" styleClass="button">
+				<fmt:message key="button.upload" />
+			</html:link>
 		</td>
 	</tr>
 
