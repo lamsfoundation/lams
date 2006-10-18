@@ -55,7 +55,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<div class="field-name" style="text-align: left">
+						<div class="field-name">
 							<fmt:message key="heading.appointedScribe" />
 						</div>
 
@@ -66,7 +66,7 @@
 						<c:set var="scribeSessionDTO" value="${session}" scope="request"> </c:set>
 						<%@include file="/pages/parts/voteDisplay.jsp" %>
 
-						<div class="field-name" style="text-align: left">
+						<div class="field-name">
 							<fmt:message key="heading.report" />
 						</div>
 						<hr />
@@ -86,7 +86,7 @@
 	</table>
 
 	<c:if test="${dto.reflectOnActivity}">
-		<div class="field-name" style="text-align: left">
+		<div class="field-name">
 			<fmt:message key="heading.reflections" />
 		</div>
 		<table class="alternative-color">

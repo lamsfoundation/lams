@@ -65,7 +65,7 @@
 			<%@include file="/pages/parts/voteDisplay.jsp" %>
 		</div>
 
-		<div class="field-name" style="text-align: left">
+		<div class="field-name">
 			<fmt:message key="heading.report" />
 		</div>
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">

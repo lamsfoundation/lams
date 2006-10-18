@@ -76,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				<tr>
 					<td>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.add.new.question"></fmt:message>
 						</div>
 						<lams:FCKEditor id="newQuestion"
@@ -127,7 +127,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<tr>
 					<td>
-						<div class="field-name" style="text-align: left;">
+						<div class="field-name">
 							<fmt:message key="label.feedback"></fmt:message>
 						</div>
 						<html:textarea property="feedback" rows="3" cols="70"></html:textarea>							

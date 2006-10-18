@@ -24,7 +24,7 @@
 	
 	<%@include file="/pages/parts/voteDisplay.jsp" %>
 
-	<div class="field-name" style="text-align: left">
+	<div class="field-name">
 		<fmt:message key="heading.report" />
 	</div>
 	<html:form action="learning">
