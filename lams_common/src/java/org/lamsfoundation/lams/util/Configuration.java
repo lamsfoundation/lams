@@ -50,7 +50,8 @@ public class Configuration implements InitializingBean {
 
 	
 	protected Logger log = Logger.getLogger(Configuration.class);	
-
+	
+	public static String CONFIGURATION_HELP_PAGE = "LAMS+Configuration";
 	private static Map items = null;
 
 	protected ConfigurationDAO configurationDAO;
