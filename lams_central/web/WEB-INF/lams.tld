@@ -95,7 +95,7 @@
       <attribute>
          <description>Help tag</description>
          <name>module</name>
-         <required>true</required>
+         <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
 
@@ -103,7 +103,15 @@
       <attribute>
          <description>Help tag</description>
          <name>toolSignature</name>
-         <required>true</required>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>page</name>
+         <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
 

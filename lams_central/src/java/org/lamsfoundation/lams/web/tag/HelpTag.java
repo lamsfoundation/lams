@@ -57,6 +57,7 @@ public class HelpTag extends TagSupport {
 
 	private static final Logger log = Logger.getLogger(HelpTag.class);
 	private String module = null;
+	private String page = null;
 	private String toolSignature = null;
 	
 	/**
@@ -74,42 +75,49 @@ public class HelpTag extends TagSupport {
 		    String country = null;
 		    String helpURL = null;
 		    String fullURL = null;
-		    String toolSig = getToolSignature();
 		    
         	JspWriter writer = pageContext.getOut();
-        	
+        	writer.println("<div class='right-buttons'>");
         	try {
-	        	// retrieve help URL for tool
-	        	ILamsToolService toolService = (ILamsToolService) getContext().getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
-				IToolVO tool = toolService.getToolBySignature(toolSig);
-				
-				helpURL = tool.getHelpUrl();
-				
-				if(helpURL == null)
-					return SKIP_BODY;
-				
-				// construct link
-				
-				Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-			    if ( locale != null ) {
-			    	language = locale.getLanguage();
-			    	country = locale.getCountry();
-			    }
-				
-			    fullURL = helpURL + module + "#" + toolSig + module + "-" + language + country;
-				writer.println("<div class='right-buttons'>");
-			    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
-			    writer.println("</div>");
-			    
+        		
+	        	if(toolSignature != null && module != null) {
+	        		// retrieve help URL for tool
+		        	ILamsToolService toolService = (ILamsToolService) getContext().getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+					IToolVO tool = toolService.getToolBySignature(toolSignature);
+					
+					helpURL = tool.getHelpUrl();
+					
+					if(helpURL == null)
+						return SKIP_BODY;
+					
+					// construct link
+					
+					Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
+				    if ( locale != null ) {
+				    	language = locale.getLanguage();
+				    	country = locale.getCountry();
+				    }
+				    
+				    fullURL = helpURL + module + "#" + toolSignature + module + "-" + language + country;
+					
+				    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+				   
+	        	} else if(page != null){
+	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + Configuration.get(ConfigurationKeys.HELP_URL) + page + "', 'help')\"/>");
+	        	} else {
+	        		log.error("HelpTag unable to write out due to unspecified values.");
+	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\"20\" height=\"20\"/>");
+	    			
+	        	}
         	} catch (NullPointerException npe) {
-    			log.error("HelpTag unable to write out due to NullPointerException. Most likely your Tool Signature was incorrect.", npe);
+    			log.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.", npe);
     			// don't throw a JSPException as we want the system to still function.
-    
-    			writer.println("<div class='right-buttons'>");
+    			
     			writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\"20\" height=\"20\"/>");
-    			writer.println("</div>");
     			
     		}
+        	
+        	writer.println("</div>");
         	
 		} catch (IOException e) {
 			log.error("HelpTag unable to write out due to IOException.", e);
@@ -124,7 +132,7 @@ public class HelpTag extends TagSupport {
 	/**
 	 * @return module
 	 * 
-	 * @jsp.attribute required="true"
+	 * @jsp.attribute required="false"
 	 * 				  rtexprvalue="true"
 	 * 				  description="Module Name"
 	 */
@@ -148,7 +156,7 @@ public class HelpTag extends TagSupport {
 	/**
 	 * @return
 	 * 
-	  * @jsp.attribute required="true"
+	  * @jsp.attribute required="false"
 	 * 				   rtexprvalue="true"
 	 * 				   description="Tool Signature"
 	 */
@@ -163,5 +171,25 @@ public class HelpTag extends TagSupport {
 	public void setToolSignature(String toolSignature) {
 		this.toolSignature = toolSignature;
 	}
+	
+	/**
+	 * @return page
+	 * 
+	 * @jsp.attribute required="false"
+	 * 				  rtexprvalue="true"
+	 * 				  description="Page Name"
+	 */
+	public String getPage() {
+		return module;
+	}
+	
+	/**
+	 * 
+	 * @param page
+	 */
+	public void setPage(String page) {
+		this.page = page;
+	}
 
+	
 }
