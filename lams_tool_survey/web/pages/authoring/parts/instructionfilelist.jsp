@@ -33,10 +33,11 @@
 						<html:rewrite
 							page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=false" />
 					</c:set>
-					<html:link href="javascript:launchPopup('${viewURL}','instructionfile')">
-						<fmt:message key="label.view"/>
-						
+					<html:link
+						href="javascript:launchPopup('${viewURL}','instructionfile')">
+						<fmt:message key="label.view" />
 					</html:link>
+					&nbsp;
 					<c:set var="downloadURL">
 						<html:rewrite
 							page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
@@ -44,6 +45,7 @@
 					<html:link href="${downloadURL}">
 						<fmt:message key="label.download" />
 					</html:link>
+					&nbsp;
 					<c:choose>
 						<c:when test="${fileTypeFlag==CONS_OFFLINE}">
 							<html:link href="#"

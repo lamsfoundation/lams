@@ -84,7 +84,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="field-name">
+		<td>
 			<div class="field-name">
 				<fmt:message key="label.authoring.online.file" />
 			</div>

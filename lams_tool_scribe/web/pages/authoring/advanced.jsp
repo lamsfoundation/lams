@@ -29,11 +29,16 @@
 </h2>
 
 <p>
-	<html:radio property="autoSelectScribe" value="true"></html:radio>
-
-	<fmt:message key="advanced.firstLearner" />
-
-	<html:radio property="autoSelectScribe" value="false"></html:radio>
-
-	<fmt:message key="advanced.selectInMonitor" />
+	<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1">
+	</html:radio>
+	<label for="autoSelectScribe1">
+		<fmt:message key="advanced.firstLearner" />
+	</label>
+</p>
+<p>
+	<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2">
+	</html:radio>
+	<label for="autoSelectScribe2">
+		<fmt:message key="advanced.selectInMonitor" />
+	</label>
 </p>
