@@ -11,7 +11,7 @@
 
 <p><a href="<lams:LAMSURL/>admin/serverlist.do"><fmt:message key="sysadmin.maintain.external.servers"/></a></p>
 
-<p><fmt:message key="sysadmin.manage.config.file"/></p>
+<p><a href="<lams:LAMSURL/>admin/config.do"><fmt:message key="sysadmin.manage.config.file"/></a></p>
 
 <p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
 

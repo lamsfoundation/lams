@@ -87,4 +87,9 @@
 		<put name="content" value="servermaintain.jsp" />	
 	</definition>
 	
+	<definition name=".config" path="/template.jsp">
+		<put name="title" value="admin.config.edit"/>
+		<put name="content" value="/config/editconfig.jsp"/>
+	</definition>
+	
 </tiles-definitions>

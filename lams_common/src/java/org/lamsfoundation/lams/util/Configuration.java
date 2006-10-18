@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -61,12 +62,6 @@ public class Configuration implements InitializingBean {
 		this.configurationDAO = configurationDAO;
 	}
 	
-	/**
-	 * This class initialize method called by Spring framework.
-	 */
-	public void init(){
-
-	}
 	
 	public void afterPropertiesSet() {
 		if(items != null) {
@@ -76,13 +71,13 @@ public class Configuration implements InitializingBean {
 		Map itemsmap = Collections.synchronizedMap(new HashMap());
 		
 		try {
-			List mapitems = configurationDAO.getAllItems();
-				
+			List mapitems = getAllItems();
+
 			if(mapitems.size() > 0) {
 				Iterator it = mapitems.iterator();
 				while(it.hasNext()) {
 					ConfigurationItem item = (ConfigurationItem) it.next();
-					itemsmap.put(item.getKey(), item.getValue());
+					itemsmap.put(item.getKey(), item);
 				}	
 			}
 	
@@ -93,10 +88,31 @@ public class Configuration implements InitializingBean {
 		}
 	}
 	
+	public List getAllItems() {
+		return configurationDAO.getAllItems();
+	}
+	
+	public static Map getAll() {
+		return items;
+	}
+	
+	public static String getItemValue(Object obj) {
+		ConfigurationItem item = (ConfigurationItem) obj;
+		if(item.getValue() != null)
+			return item.getValue();
+		return null;
+	}
+	
+	public static void setItemValue(Object obj, String value) {
+		ConfigurationItem item = (ConfigurationItem) obj;
+		item.setValue(value);
+	}
+	
 	public static String get(String key)
 	{
 		if ((items != null)&&(items.get(key)!=null))
-			return (String) items.get(key);
+			if(getItemValue(items.get(key)) != null)
+				return getItemValue(items.get(key));
 		return null;			
 	}
 
@@ -104,17 +120,26 @@ public class Configuration implements InitializingBean {
 	{
 		if ((items != null)&&(items.get(key)!=null))
 			//could throw NumberFormatException which is a RuntimeException
-			return new Integer((String)items.get(key)).intValue();
+			if(getItemValue(items.get(key)) != null)
+				return new Integer(getItemValue(items.get(key))).intValue();
 		return -1;			
 	}
 
 	public static boolean getAsBoolean(String key)
 	{
 		if((items != null)&&(items.get(key)!=null))
-		{
-			return new Boolean((String)items.get(key)).booleanValue();
-		}
+			if(getItemValue(items.get(key)) != null)
+				return new Boolean(getItemValue(items.get(key))).booleanValue();
 		return false;
+	}
+	
+	public static void updateItem(String key, String value) {
+		if(items.containsKey(key))
+			setItemValue(items.get(key), value);
+	}
+	
+	public void persistUpdate() {
+		configurationDAO.insertOrUpdateAll(items.values());
 	}
 	
 	public String toString()

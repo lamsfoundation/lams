@@ -76,3 +76,9 @@
 	<form-property name="newOrg" type="java.lang.Boolean" initial="false"/>
 	<form-property name="orgName" type="java.lang.String" />
 </form-bean>
+
+<form-bean name="ConfigForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="cKey" type="java.lang.String[]" />
+	<form-property name="cValue" type="java.lang.String[]" />
+	<form-property name="method" type="java.lang.String" />
+</form-bean>
