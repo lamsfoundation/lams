@@ -76,9 +76,10 @@ public class ProfileAction extends LamsDispatchAction {
 		
 		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
 		String fullName = (requestor.getTitle()!=null?requestor.getTitle()+" ":"")+requestor.getFirstName()+" "+requestor.getLastName();
+		String email = requestor.getEmail();
 		
 		request.setAttribute("fullName", fullName);
-		request.setAttribute("email", requestor.getEmail());
+		request.setAttribute("email", (email!=null ? email : ""));
 		request.setAttribute("portraitUuid", (requestor.getPortraitUuid()==null ? 0 : requestor.getPortraitUuid()));
 		return mapping.findForward("view");
 	}
