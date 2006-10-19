@@ -45,16 +45,18 @@
 				
 				<c:set var="tabLeft" value="tab-left"/>
 				<c:set var="tabMiddle" value="tab-middle"/>
-				<c:set var="tabRight" value="tab-right"/>				
+				<c:set var="tabRight" value="tab-right"/>	
+				<c:set var="highlight" value="false" />
 				<c:if test="${headerlink.name eq 'index.author'}">
 					<c:set var="tabLeft" value="tab-left-highlight"/>
 					<c:set var="tabMiddle" value="tab-middle-highlight"/>
-					<c:set var="tabRight" value="tab-right-highlight"/>				
+					<c:set var="tabRight" value="tab-right-highlight"/>	
+					<c:set var="highlight" value="true" />					
 				</c:if>
 	
 				<div class="${tabLeft}"></div>
 				<div class="${tabMiddle}">
-						<lams:TabName url="${headerlink.url}"><fmt:message key="${headerlink.name}" /></lams:TabName>
+						<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
 				</div>
 				<div class="${tabRight}"></div>
 			</div>
