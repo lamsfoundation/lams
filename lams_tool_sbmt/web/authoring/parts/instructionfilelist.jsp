@@ -39,6 +39,7 @@
 						href="javascript:launchPopup('${viewURL}','offlinefile')">
 						<fmt:message key="label.view" />
 					</html:link>
+					&nbsp;
 					<c:set var="downloadURL">
 						<html:rewrite
 							page="/download/?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
@@ -46,6 +47,7 @@
 					<html:link href="${downloadURL}">
 						<fmt:message key="label.download" />
 					</html:link>
+					&nbsp;
 					<c:choose>
 						<c:when test="${fileTypeFlag==CONS_OFFLINE}">
 							<html:link href="#"

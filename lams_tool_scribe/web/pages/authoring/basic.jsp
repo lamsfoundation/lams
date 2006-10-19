@@ -58,27 +58,29 @@
 				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 		</td>
 	</tr>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.heading" />
-			</div>
-			<div id="itemListArea">
-				<%@ include file="parts/headingList.jsp"%>
-			</div>
-			<br />
-			<a
-				href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${formBean.sessionMapID}"/>');"
-				class="button-add-item"> <fmt:message
-					key="label.authoring.basic.heading.add" /> </a>
-		</td>
-	</tr>
+
 
 </table>
-			<iframe
-				onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-				id="iframeArea" name="iframeArea"
-				style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-				scrolling="no">
-			</iframe>
+
+<h2 class="spacer-left">
+	<fmt:message key="label.authoring.basic.heading" />
+</h2>
+
+<div id="itemListArea">
+	<%@ include file="parts/headingList.jsp"%>
+</div>
+
+<p class="small-space-bottom">
+<a
+	href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${formBean.sessionMapID}"/>');"
+	class="button-add-item"> <fmt:message
+		key="label.authoring.basic.heading.add" /> </a>
+</p>
+
+<iframe
+	onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+	id="iframeArea" name="iframeArea"
+	style="width:0px;height:0px;border:0px;display:none" frameborder="no"
+	scrolling="no">
+</iframe>
 

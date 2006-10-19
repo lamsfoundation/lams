@@ -21,30 +21,41 @@
 				</div>
 			</td>
 
-			<td style="width: 10%">
+			<td width="10%">
+				<c:choose>
+					<c:when test="${index ne 0}">
+						<c:set var="moveUpURL">
+							<html:rewrite
+								page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
+						</c:set>
+						<img src="${tool}images/up.gif"
+							title="<fmt:message key="link.moveUp"/>"
+							onclick="showMessage('${moveUpURL}')"></img>
+					</c:when>
+					<c:otherwise>
+						<img src="${tool}images/up_disabled.gif"
+							title="<fmt:message key="link.moveUp"/>"></img>
+					</c:otherwise>
+				</c:choose>
 
-				<c:if test="${index ne 0}">
-					<c:set var="moveUpURL">
-						<html:rewrite
-							page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
-					</c:set>
-					<img src="${tool}images/up.gif"
-						title="<fmt:message key="link.moveUp"/>"
-						onclick="showMessage('${moveUpURL}')"></img>
-				</c:if>
-				
-				<c:if test="${index ne fn:length(sessionMap.headings)-1}">
-					<c:set var="moveDownURL">
-						<html:rewrite
-							page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
-					</c:set>
-					<img src="${tool}images/down.gif"
-						title="<fmt:message key="link.moveDown"/>"
-						onclick="showMessage('${moveDownURL}')"></img>
-				</c:if>
+				<c:choose>
+					<c:when test="${index ne fn:length(sessionMap.headings)-1}">
+						<c:set var="moveDownURL">
+							<html:rewrite
+								page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
+						</c:set>
+						<img src="${tool}images/down.gif"
+							title="<fmt:message key="link.moveDown"/>"
+							onclick="showMessage('${moveDownURL}')"></img>
+					</c:when>
+					<c:otherwise>
+						<img src="${tool}images/down_disabled.gif"
+							title="<fmt:message key="link.moveDown"/>"></img>
+					</c:otherwise>
+				</c:choose>
 			</td>
 
-			<td style="width: 10%">
+			<td>
 				<c:set var="editURL">
 					<html:rewrite
 						page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
@@ -54,7 +65,7 @@
 					onclick="showMessage('${editURL}')"></img>
 			</td>
 
-			<td style="width: 10%">
+			<td>
 				<c:set var="deleteURL">
 					<html:rewrite
 						page="/authoring.do?dispatch=deleteHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
