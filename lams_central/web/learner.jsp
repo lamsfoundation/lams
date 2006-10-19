@@ -5,7 +5,7 @@
 
 <lams:html>
 <HEAD>
-	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/main.jsp?lessonID=<c:out value="${lessonID}"/><c:if test="${mode}">&mode=<c:out value="${mode}"/></c:if>">
+	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/main.jsp?lessonID=<c:out value="${lessonID}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
 	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	<lams:css/>
