@@ -31,6 +31,7 @@
 <%@ tag body-content="scriptless" %>
 
 <%@ attribute name="url" required="true" rtexprvalue="true"%>
+<%@ attribute name="highlight" required="false" rtexprvalue="true" %>
 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
@@ -49,8 +50,10 @@
 	</c:otherwise>
 </c:choose>
 
+<c:if test="${highlight eq true}">
+	<c:set var="styleVar" value="color: #e7eef8;" />
+</c:if>
 
-
-<a class="tab-middle-link" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>">
+<a class="tab-middle-link" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>" style="${styleVar}">
 	<c:out value="${tabname}" escapeXml="false"/>	
 </a>
