@@ -268,6 +268,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		
     	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
     	
+    	qaLearningForm.resetAll();
 		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_RESULTS);
 		return (mapping.findForward(INDIVIDUAL_LEARNER_RESULTS));
 	}
@@ -416,6 +417,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	
 	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 		logger.debug("GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
+		
+		qaLearningForm.resetAll();
         logger.debug("forwarding to: " + LOAD_LEARNER);
 		return (mapping.findForward(LOAD_LEARNER));	
 	}
@@ -512,6 +515,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		logger.debug("fwd'ing to: " + INDIVIDUAL_LEARNER_REPORT);
 		
+		qaLearningForm.resetAll();
 		logger.debug("remove map holding MAP_ALL_RESULTS_KEY, httpSessionID: " + httpSessionID);
 		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 	}
@@ -562,6 +566,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	
     	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, true, false);
     	
+    	qaLearningForm.resetAll();
         return (mapping.findForward(LOAD_LEARNER));
     }
     
@@ -708,7 +713,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
     	populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, false, false);
-    	
+    
+    	qaLearningForm.resetAll();
         return (mapping.findForward(LOAD_LEARNER));
     }
     
@@ -815,6 +821,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    logger.debug("removing map with httpSessionID: " + httpSessionID);
 	    request.getSession().removeAttribute(httpSessionID);
 
+	    qaLearningForm.resetAll();
+	    
 	    String nextActivityUrl = qaService.leaveToolSession(new Long(toolSessionID), new Long(user.getUserID().longValue()));
 	    response.sendRedirect(nextActivityUrl);
 	    
@@ -925,6 +933,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
         
+		qaLearningForm.resetAll();
 		logger.debug("fwd'ing to: " + NOTEBOOK);
         return (mapping.findForward(NOTEBOOK));
 	}

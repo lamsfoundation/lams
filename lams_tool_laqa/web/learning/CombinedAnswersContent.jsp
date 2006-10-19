@@ -45,8 +45,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:forEach>
 			<tr>
 				 <td> 
-						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
+						<html:button property="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 							<fmt:message key="button.submitAllContent"/>
-						</html:submit>	 				 		  					
+						</html:button>	 				 		  					
 				</td> 
 			</tr>

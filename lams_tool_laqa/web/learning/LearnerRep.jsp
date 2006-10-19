@@ -146,25 +146,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				       	<table> 	  
 								<tr> 
 		  	   		  		<td>
-	                               <html:submit property="refreshAnswers" 
+	                               <html:button property="refreshAnswers" 
 	                                             styleClass="button" 
 	                                             onclick="submitMethod('viewAllResults');">
 	                                    <fmt:message key="label.refresh"/>
-	                                </html:submit>
+	                                </html:button>
 						  	 </td>
 	
 								<td  valign=top>
 									<div class="right-buttons">							
 										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-											<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
+											<html:button property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
 												<fmt:message key="button.endLearning"/>
-											</html:submit>	 				
+											</html:button>	 				
 									  	</c:if> 				    					
 						
 										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-											<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+											<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
 												<fmt:message key="label.continue"/>
-											</html:submit>	 				
+											</html:button>	 				
 									  	</c:if> 				    					
 									</div> 		  															 		  												  	
 								</td> 
@@ -258,25 +258,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				       	<table> 	  
 							<tr> 
 		  	   		  		<td>
-	                               <html:submit property="refreshAnswers" 
+	                               <html:button property="refreshAnswers" 
 	                                             styleClass="button" 
 	                                             onclick="submitMethod('viewAllResults');">
 	                                    <fmt:message key="label.refresh"/>
-	                                </html:submit>
+	                                </html:button>
 						  	 </td>
 							
 								<td>
 									<div class="right-buttons">
 										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-											<html:submit property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
+											<html:button property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
 												<fmt:message key="button.endLearning"/>
-											</html:submit>	 				
+											</html:button>	 				
 									  	</c:if> 				    					
 						
 										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-											<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
+											<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
 												<fmt:message key="label.continue"/>
-											</html:submit>	 				
+											</html:button>	 				
 									  	</c:if> 				    					
 									</div> 		  															 		  					
 									</td> 

@@ -53,14 +53,68 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String userID;
 	protected String entryText;
 	protected String viewAllResults;
+	protected String viewAll;
 	protected String redoQuestions;
 	protected String responseId;
+	
+	protected String btnCombined;
+	protected String btnGetPrevious;
+	protected String btnDone;
+	protected String btnGetNext;
 	
 	protected String requestLearningReport;
 	protected String requestLearningReportProgress;
 	protected String requestLearningReportViewOnly;
 	
 	
+    /**
+     * @return Returns the btnCombined.
+     */
+    public String getBtnCombined() {
+        return btnCombined;
+    }
+    /**
+     * @param btnCombined The btnCombined to set.
+     */
+    public void setBtnCombined(String btnCombined) {
+        this.btnCombined = btnCombined;
+    }
+    /**
+     * @return Returns the btnDone.
+     */
+    public String getBtnDone() {
+        return btnDone;
+    }
+    /**
+     * @param btnDone The btnDone to set.
+     */
+    public void setBtnDone(String btnDone) {
+        this.btnDone = btnDone;
+    }
+    /**
+     * @return Returns the btnGetNext.
+     */
+    public String getBtnGetNext() {
+        return btnGetNext;
+    }
+    /**
+     * @param btnGetNext The btnGetNext to set.
+     */
+    public void setBtnGetNext(String btnGetNext) {
+        this.btnGetNext = btnGetNext;
+    }
+    /**
+     * @return Returns the btnGetPrevious.
+     */
+    public String getBtnGetPrevious() {
+        return btnGetPrevious;
+    }
+    /**
+     * @param btnGetPrevious The btnGetPrevious to set.
+     */
+    public void setBtnGetPrevious(String btnGetPrevious) {
+        this.btnGetPrevious = btnGetPrevious;
+    }
 	/**
      * reset user actions in learning mode
      * @param qaAuthoringForm
@@ -76,7 +130,31 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
     	this.forwardtoReflection=null;
     }
     
-	
+    protected void resetAll()
+    {
+    	this.submitAnswersContent=null;
+    	this.getNextQuestion =null;
+    	this.getPreviousQuestion =null;
+    	this.endLearning =null;
+    	this.refreshAnswers =null;
+    	this.submitReflection =null;
+    	this.forwardtoReflection =null;
+
+    	this.viewAllResults =null;
+    	this.viewAll =null;
+    	this.redoQuestions =null;
+
+    	this.btnCombined=null;
+    	this.btnGetPrevious=null;
+    	this.btnDone=null;
+    	this.btnGetNext=null;
+    	
+    	this.requestLearningReport =null;
+    	this.requestLearningReportProgress =null;
+    	this.requestLearningReportViewOnly =null;
+    }
+    
+    
 	
 	/**
 	 * @return Returns the currentQuestionIndex.
@@ -363,5 +441,17 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
      */
     public void setSubmitReflection(String submitReflection) {
         this.submitReflection = submitReflection;
+    }
+    /**
+     * @return Returns the viewAll.
+     */
+    public String getViewAll() {
+        return viewAll;
+    }
+    /**
+     * @param viewAll The viewAll to set.
+     */
+    public void setViewAll(String viewAll) {
+        this.viewAll = viewAll;
     }
 }

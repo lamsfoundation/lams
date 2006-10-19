@@ -138,19 +138,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  	   		  <tr>
 	  	   		  		<td>
-                               <html:submit property="redoQuestions" 
+                               <html:button property="redoQuestions" 
                                              styleClass="button" 
                                              onclick="submitMethod('redoQuestions');">
                                     <fmt:message key="label.redo"/>
-                                </html:submit>
+                                </html:button>
 					  	 </td>
 	  	   		  
 						<td>
-                              <html:submit property="viewAllResults" 
-                                         styleClass="button" 
-                                         onclick="submitMethod('viewAllResults');">
-                                <fmt:message key="label.allResponses"/>
-                            </html:submit>
+							<html:button property="viewAllResults" onclick="submitMethod('viewAllResults');" styleClass="button">
+					                             <fmt:message key="label.allResponses"/>
+							</html:button>					  	 
 					  	 </td>
 				  </tr>
 

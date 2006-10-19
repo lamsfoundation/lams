@@ -59,21 +59,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  <c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount != 1) }"> 
 					<td NOWRAP>
-						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
+						<html:button property="btnGetPrevious" onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<fmt:message key="button.getPreviousQuestion"/>
-						</html:submit>	 				 		  					
-						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
+						</html:button>	 				 		  					
+						<html:button property="btnDone" onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<fmt:message key="button.done"/>
-						</html:submit>	 				 		  					
+						</html:button>	 				 		  					
 					</td> 
 				  </c:when> 
 
   				  <c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount == 1) }"> 
 					 <td NOWRAP valign=top> 
-						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
+						<html:button property="btnDone" onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<fmt:message key="button.done"/>
-						</html:submit>	 				 		  					
+						</html:button>	 				 		  					
 					</td> 
 				  </c:when> 
 				  
@@ -81,20 +81,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
  				  <c:when test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
 				 				  generalLearnerFlowDTO.currentQuestionIndex > 1}"> 
 					 <td NOWRAP valign=top> 
-						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
+						<html:button property="btnGetPrevious" onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<fmt:message key="button.getPreviousQuestion"/>
-						</html:submit>	 				 		  					
-						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
+						</html:button>	 				 		  					
+						<html:button property="btnGetNext" onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 									<fmt:message key="button.getNextQuestion"/>
-						</html:submit>	 				 		  					
+						</html:button>	 				 		  					
 					</td> 
   				  </c:when> 
   				  
 				  <c:otherwise>
 					 <td NOWRAP valign=top> 
-						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
+						<html:button property="btnGetNext" onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 									<fmt:message key="button.getNextQuestion"/>
-						</html:submit>	 				 		  					
+						</html:button>	 				 		  					
 					</td> 
 				  </c:otherwise>
 				</c:choose> 

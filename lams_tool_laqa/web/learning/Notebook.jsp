@@ -87,9 +87,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<tr>
 				<td class="right-buttons">
-					<html:submit property="submitReflection" onclick="javascript:submitMethod('submitReflection');" styleClass="button">					
+					<html:button property="submitReflection" onclick="javascript:submitMethod('submitReflection');" styleClass="button">					
 						<fmt:message key="button.endLearning"/>
-					</html:submit>
+					</html:button>
 				</td>
 			</tr>
 		</table>

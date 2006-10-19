@@ -70,15 +70,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<div class="right-buttons">
 
 					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-						<html:submit property="endLearning" onclick="javascript:submitMethod('endLearning');" styleClass="button">
+						<html:button property="endLearning" onclick="javascript:submitMethod('endLearning');" styleClass="button">
 							<fmt:message key="button.endLearning"/>
-						</html:submit>	 				
+						</html:button>	 				
 				  	</c:if> 				    					
 	
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-						<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"  styleClass="button">
+						<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"  styleClass="button">
 							<fmt:message key="label.continue"/>
-						</html:submit>	 				
+						</html:button>	 				
 				  	</c:if> 				    					
 			  	
 				</div> 		  															 		  					
