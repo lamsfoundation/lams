@@ -22,10 +22,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-
-
-
-
 <table>
 
 	<tr>
@@ -36,7 +32,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:textarea property="onlineInstructions" rows="3" cols="75"></html:textarea>
 		</td>
 	</tr>
-
 
 	<tr>
 		<td>
@@ -75,7 +70,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		</td>
 	</tr>
-
 
 	<tr>
 		<td>
@@ -124,12 +118,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 							<a
 								href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")'>
-								<fmt:message key="label.view" /> </a>
+								<fmt:message key="label.view" /> </a> &nbsp;
 
 							<html:link page="<%=download%>">
 								<fmt:message key="label.download" />
 							</html:link>
-
+							&nbsp;
 							<html:link
 								page="/authoring.do?dispatch=deleteFile&amp;httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&amp;toolContentID=${mcGeneralAuthoringDTO.toolContentID}&amp;contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&amp;activeModule=${mcGeneralAuthoringDTO.activeModule}&amp;defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&amp;sln=${mcGeneralAuthoringDTO.sln}&amp;questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&amp;retries=${mcGeneralAuthoringDTO.retries}&amp;reflect=${mcGeneralAuthoringDTO.reflect}&amp;reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&amp;passmark=${mcGeneralAuthoringDTO.passMarkValue}"
 								paramId="uuid" paramName="attachment" paramProperty="uuid"
