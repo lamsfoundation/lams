@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.util;
 
 import java.util.Collections;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,7 @@ public class Configuration implements InitializingBean {
 			return;
 		}
 		
-		Map itemsmap = Collections.synchronizedMap(new HashMap());
+		Map itemsmap = Collections.synchronizedMap(new LinkedHashMap());
 		
 		try {
 			List mapitems = getAllItems();
