@@ -342,195 +342,31 @@
 	</target>
 	
 	
-	<!-- Build the parallel activities and other complex activities. Must be done after -->
+	<!-- Build and deploy the parallel activities and other complex activities. Must be done after -->
 	<!-- the tools are deployed -->
-	
-	<!-- Generate the deployment package for share resources / forum parallel activity. -->
-	<target name="deploy-shareresourcesforum-deploy-package-library" depends="">
+	<target name="deploy-learning-libraries">
 
-			<path id="deploy.lib.classpath">
-				<fileset dir="${deploy.tool.dir}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
-				  
-			<property name="assembly.activity" value="${basedir}/assembly/shareresourcesforum"/>
-			<property name="package.cfg" value="librarypackages/shareresourcesforum"/>
-		
-			<mkdir dir="${assembly.activity}/"/>
-			<mkdir dir="${assembly.activity}/lib"/> 
-			<mkdir dir="${assembly.activity}/sql"/> 
-			<mkdir dir="${assembly.activity}/language"/> 
-		
-			<copy overwrite="yes" todir="${assembly.activity}/sql">
-				<fileset dir="${package.cfg}">
-					<include name="learninglibrary1_insert.sql"/>
-					<include name="libraryActivity1_insert.sql"/>
-					<include name="toolActivity1_insert.sql"/>
-					<include name="toolActivity2_insert.sql"/>
-				</fileset>
-			</copy>
+		<echo>Deploying Library Activities</echo>
 
-			<copy overwrite="yes" todir="${assembly.activity}/language">
-				<fileset dir="${package.cfg}/language">
-					<include name="*.*"/>
-				</fileset>
-			</copy>
+		<!-- Generate the deployment package for share resources / forum parallel activity. -->
+		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
+			<property name="assembly.activity" location="${basedir}/assembly/shareresourcesforum"/>
+			<property name="package.cfg" location="librarypackages/shareresourcesforum"/>
+		</ant> 
 
-		<copy overwrite="yes" file="${package.cfg}/deployLibrary.xml"
-					   	tofile="${assembly.activity}/deploy.xml" >
-			  <!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
-		        <filterchain>
-		            <striplinecomments>
-		               <comment value="!"/>
-		            </striplinecomments>
-		           <replacetokens>
-		                <token key="assemblydir" value="${assembly.activity}/sql"/>
-		            </replacetokens>
-		            <replacetokens>
-			            <token key="assemblylangdir" value="${assembly.activity}/language"/>
-			        </replacetokens>
-		            <replacetokens>
-			             <token key="lamsear" value="${jboss.deploy}"/>
-			        </replacetokens>
-		        </filterchain>
-		    </copy>
+		<!-- Generate the deployment package for chat / scribe parallel activity. -->
+		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
+			<property name="assembly.activity" value="${basedir}/assembly/chatscribe"/>
+			<property name="package.cfg" value="librarypackages/chatscribe"/>
+		</ant> 
 
-			<copy overwrite="yes" todir="${assembly.activity}/lib">
-				<fileset dir="${deploy.tool.dir}/lib">
-					<include name="*.jar"/>
-				</fileset>
-			</copy>
+		<!-- Generate the deployment package for forum / scribe parallel activity. -->
+		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
+			<property name="assembly.activity" value="${basedir}/assembly/forumscribe"/>
+			<property name="package.cfg" value="librarypackages/forumscribe"/>
+		</ant> 
+</target>
 
-			<taskdef name="generateDeployLibraryProperties" 
-				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
-			    <classpath refid="deploy.lib.classpath"/>
-			</taskdef>
-
-			<generateDeployLibraryProperties depends="compile" 
-				mode="development" 
-				outputPath="${assembly.activity}"
-				configFile="${assembly.activity}/deploy.xml"
-				dbPassword="${db.password}"
-				dbUsername="${db.username}"
-				dbDriverUrl="${db.url}"
-				dbDriverClass="com.mysql.jdbc.Driver"	
-				/>
-		
-			<!-- Do the actual deployment -->
-			<path id="deploy.classpath">
-				<fileset dir="${assembly.activity}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
-	
-			<java
-				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
-				classpathref="deploy.classpath"
-				fork="true">
-					<arg file="${assembly.activity}/deploy.xml"/>
-					<arg file="${assembly.activity}/language"/>
-			</java>
-		
-		</target>
-
-	<target name="deploy-chatscribe-deploy-package-library" depends="">
-
-			<path id="deploy.lib.classpath">
-				<fileset dir="${deploy.tool.dir}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
-				  
-			<property name="cs.assembly.activity" value="${basedir}/chatscribe"/>
-			<property name="cs.package.cfg" value="librarypackages/chatscribe"/>
-		
-			<mkdir dir="${cs.assembly.activity}/"/>
-			<mkdir dir="${cs.assembly.activity}/lib"/> 
-			<mkdir dir="${cs.assembly.activity}/sql"/> 
-			<mkdir dir="${cs.assembly.activity}/language"/> 
-		
-			<copy overwrite="yes" todir="${cs.assembly.activity}/sql">
-				<fileset dir="${cs.package.cfg}">
-					<include name="learninglibrary1_insert.sql"/>
-					<include name="libraryActivity1_insert.sql"/>
-					<include name="toolActivity1_insert.sql"/>
-					<include name="toolActivity2_insert.sql"/>
-				</fileset>
-			</copy>
-
-			<copy overwrite="yes" todir="${cs.assembly.activity}/language">
-				<fileset dir="${cs.package.cfg}/language">
-					<include name="*.*"/>
-				</fileset>
-			</copy>
-
-		<copy overwrite="yes" file="${cs.package.cfg}/deployLibrary.xml"
-					   	tofile="${cs.assembly.activity}/deploy.xml" >
-			  <!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
-		        <filterchain>
-		            <striplinecomments>
-		               <comment value="!"/>
-		            </striplinecomments>
-		           <replacetokens>
-		                <token key="assemblydir" value="${cs.assembly.activity}/sql"/>
-		            </replacetokens>
-		            <replacetokens>
-			            <token key="assemblylangdir" value="${cs.assembly.activity}/language"/>
-			        </replacetokens>
-		            <replacetokens>
-			             <token key="lamsear" value="${jboss.deploy}"/>
-			        </replacetokens>
-		        </filterchain>
-		    </copy>
-
-			<copy overwrite="yes" todir="${cs.assembly.activity}/lib">
-				<fileset dir="${deploy.tool.dir}/lib">
-					<include name="*.jar"/>
-				</fileset>
-			</copy>
-
-			<taskdef name="generateDeployLibraryProperties" 
-				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
-			    <classpath refid="deploy.lib.classpath"/>
-			</taskdef>
-
-			<generateDeployLibraryProperties depends="compile" 
-				mode="development" 
-				outputPath="${cs.assembly.activity}"
-				configFile="${cs.assembly.activity}/deploy.xml"
-				dbPassword="${db.password}"
-				dbUsername="${db.username}"
-				dbDriverUrl="${db.url}"
-				dbDriverClass="com.mysql.jdbc.Driver"	
-				/>
-		
-			<!-- Do the actual deployment -->
-			<path id="deploy.classpath">
-				<fileset dir="${cs.assembly.activity}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
-	
-			<java
-				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
-				classpathref="deploy.classpath"
-				fork="true">
-					<arg file="${cs.assembly.activity}/deploy.xml"/>
-					<arg file="${cs.assembly.activity}/language"/>
-			</java>
-		
-		</target>
-		<!-- deploy the complex activities to the library -->
-		<target name="deploy-learning-libraries" 
-			depends="deploy-shareresourcesforum-deploy-package-library,deploy-chatscribe-deploy-package-library">
-
-			<echo>Deploying Library Activities</echo>
-	
-		</target>
-
-
-	
 	<!-- Copy lams.tld and the lams tags from lams-central to the other projects -->
 	<target name="copy-tags" description="Copy lams.tld and the lams tags from lams-central to the other projects">
 		<ant antfile="../${lams_admin}/build.xml" target="copy-tags" inheritAll="false"/>
