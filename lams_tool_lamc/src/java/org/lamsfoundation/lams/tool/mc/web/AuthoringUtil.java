@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
+import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -302,7 +303,56 @@ public class AuthoringUtil implements McAppConstants {
     	return mapQuestionsContent;
     }
     
-	
+
+    public static Map rebuildFeedbackMapfromDB(HttpServletRequest request, Long toolContentId, IMcService mcService)
+    {
+    	Map map= new TreeMap(new McComparator());
+    	logger.debug("toolContentId:" + toolContentId);
+
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+    	List list=mcService.refreshQuestionContent(mcContent.getUid());
+		logger.debug("refreshed list:" + list);
+
+		Iterator listIterator=list.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    
+    		String feedback=mcQueContent.getFeedback();
+    		logger.debug("feedback:" + feedback);
+    		
+    		
+    		boolean isFeedbackTextMarkup=LearningUtil.isTextMarkup(feedback);
+    		logger.debug("isFeedbackTextMarkup: " + isFeedbackTextMarkup);
+
+    		String newFeedbackText=feedback;
+    		if (!isFeedbackTextMarkup)
+    		{
+    		    newFeedbackText= LearningUtil.getWrappedText(feedback, false);
+        		logger.debug("wrapped newFeedbackText: " + newFeedbackText);    		    
+    		}
+    		logger.debug("post warp newFeedbackText: " + newFeedbackText);
+    		
+    		
+    		newFeedbackText=McUtils.replaceNewLines(newFeedbackText);
+    		logger.debug("newFeedbackText after procesing new lines: " + newFeedbackText);
+
+    		
+    		map.put(mapIndex.toString(),newFeedbackText);
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+
+    	logger.debug("refreshed Map:" + map);
+    	return map;
+    }
+
+    
+    
+    
     /**
      * builds a map to hold persisted uid values for questions
      * rebuildQuestionUidMapfromDB(HttpServletRequest request, Long toolContentId)
@@ -1835,7 +1885,28 @@ public class AuthoringUtil implements McAppConstants {
     			logger.debug("feedback now: " + mcQueContent.getFeedback());
     			
     			
-    			mcQuestionContentDTO.setQuestion(mcQueContent.getQuestion());
+        		String question=mcQueContent.getQuestion();
+        		logger.debug("question: " + question);
+        		
+        		/*
+        		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
+        		logger.debug("isTextMarkup: " + isTextMarkup);
+        		
+        		String newQuestionText=question;
+        		if (!isTextMarkup)
+        		{
+            		newQuestionText= LearningUtil.getWrappedText(question, true);
+            		logger.debug("wrapped newQuestionText: " + newQuestionText);    		    
+        		}
+        		logger.debug("post warp newQuestionText: " + newQuestionText);
+
+        		
+        		newQuestionText=McUtils.replaceNewLines(newQuestionText);
+        		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
+        		*/
+    			
+    			
+    			mcQuestionContentDTO.setQuestion(question);
         		mcQuestionContentDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
         		mcQuestionContentDTO.setFeedback(feedback);
         		mcQuestionContentDTO.setMark(mcQueContent.getMark().toString());

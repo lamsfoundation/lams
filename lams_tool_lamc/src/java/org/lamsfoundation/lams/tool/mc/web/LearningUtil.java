@@ -764,7 +764,26 @@ public class LearningUtil implements McAppConstants {
     		Map mapCandidateAnswerUids=convertToStringMap(listCandidateAnswerUids);
     		logger.debug("mapCandidateAnswerUids: " + mapCandidateAnswerUids);
     		
-    		mcLearnerAnswersDTO.setQuestion(mcQueContent.getQuestion());
+    		
+    		String question=mcQueContent.getQuestion();
+    		logger.debug("question: " + question);
+    		
+    		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
+    		logger.debug("isTextMarkup: " + isTextMarkup);
+    		
+    		String newQuestionText=question;
+    		if (!isTextMarkup)
+    		{
+        		newQuestionText= LearningUtil.getWrappedText(question, false);
+        		logger.debug("wrapped newQuestionText: " + newQuestionText);    		    
+    		}
+    		logger.debug("post warp newQuestionText: " + newQuestionText);
+
+    		
+    		newQuestionText=McUtils.replaceNewLines(newQuestionText);
+    		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
+
+    		mcLearnerAnswersDTO.setQuestion(newQuestionText);
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		
@@ -1083,5 +1102,67 @@ public class LearningUtil implements McAppConstants {
        logger.debug("returning mapWeightsExcludeHighestWeight: " + mapMarksExcludeHighestMark);
        return mapMarksExcludeHighestMark; 
 	}
+	
+    public static boolean isTextMarkup(String text)
+    {
+        logger.debug("starting isTextMarkup: " + text);
+        
+        int markupSignPos=text.indexOf("<");
+        logger.debug("markupSignPos: " + markupSignPos);
+        
+        int markupSignPos2=text.indexOf(">");
+        logger.debug("markupSignPos2: " + markupSignPos2);
+        
+        if ((markupSignPos != -1) && (markupSignPos2) != -1)
+        {
+            logger.debug("text has markup in it: " + text);
+            return true;
+        }
+        return false;
+    }
+
+    public static String getWrappedText(String text, boolean authoring)
+    {
+        
+        logger.debug("starting getWrappedText: " + text);
+        logger.debug("authoring: " + authoring);
+    	
+        String newText="";
+        int breakPos=50;
+        
+        if (authoring)
+        	breakPos=30;
+        
+        if (text.length() > breakPos)
+    	{
+    		int counter=0;
+    		while (counter < 100)
+    		{
+    		    counter++;
+    		    logger.debug("using text: " + text);
+    		    
+    		    if (text.length() > breakPos)
+    		    {
+    		        newText += text.substring(0, breakPos+1) + "<br>" ;
+    		        text=text.substring(breakPos+1);
+        		    
+    		    }
+    		    else
+    		    {
+    		        newText +=text;
+    		        break;
+    		    }
+    		}
+
+    	}
+    	else
+    	{
+    	    newText=text;
+    	}
+        
+	    logger.debug("returning newText: " + newText);
+    	return newText;
+    }
+
     
  }

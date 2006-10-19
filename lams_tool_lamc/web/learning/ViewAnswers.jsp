@@ -161,6 +161,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</table>
 							</td>
 						</tr>
+						
+						
+
+						  <tr>
+						  	<td NOWRAP align=left valign=top colspan=2> 
+								<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
+									<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}"> 		
+									  	<i> <c:out value="${feedbackEntry.value}" escapeXml="false"/> </i>
+									</c:if> 			
+								</c:forEach>
+						  	</td>
+						  </tr>
+						
 					</c:forEach>
 
 

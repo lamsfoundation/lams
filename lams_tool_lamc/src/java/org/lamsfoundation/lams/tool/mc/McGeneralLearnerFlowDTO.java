@@ -107,8 +107,22 @@ public class McGeneralLearnerFlowDTO implements Comparable
     protected String totalUserMark;
     
     protected String totalMarksPossible;
+    
+    protected Map mapFeedbackContent;
 
         
+    /**
+     * @return Returns the mapFeedbackContent.
+     */
+    public Map getMapFeedbackContent() {
+        return mapFeedbackContent;
+    }
+    /**
+     * @param mapFeedbackContent The mapFeedbackContent to set.
+     */
+    public void setMapFeedbackContent(Map mapFeedbackContent) {
+        this.mapFeedbackContent = mapFeedbackContent;
+    }
     /**
      * @return Returns the totalUserMark.
      */
