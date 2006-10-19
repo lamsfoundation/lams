@@ -149,18 +149,18 @@
 		{
 			if(isMac)
 			{
-				previewWin = window.open('home.do?method=learner&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
+				previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
 			}
 			else
 			{
 				if(previewWin && !previewWin.closed )
 				{
-					previewWin.location = 'home.do?method=learner&lessonID='+lessonId;		
+					previewWin.location = 'home.do?method=learner&mode=preview&lessonID='+lessonId;		
 					previewWin.focus();
 				}
 				else
 				{
-					previewWin = window.open('home.do?method=learner&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
+					previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
 				}
 			}
 		}

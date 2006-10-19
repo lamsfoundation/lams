@@ -139,6 +139,8 @@ public class HomeAction extends DispatchAction {
 			log.debug("request learner");
 			
 			Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
+			String mode = WebUtil.readStrParam(req, AttributeNames.PARAM_MODE, true);
+			
 			UserDTO user = getUser();
 			if ( user == null ) {
 				log.error("learner: User missing from session. ");
@@ -153,6 +155,9 @@ public class HomeAction extends DispatchAction {
 					log.error("learner: User "+user.getLogin()+" is not a learner in the requested lesson. Cannot access the lesson.");
 					return displayMessage(mapping, req, "error.authorisation");
 				}
+				
+				if(mode != null)
+					req.setAttribute(AttributeNames.PARAM_MODE, mode);
 
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
