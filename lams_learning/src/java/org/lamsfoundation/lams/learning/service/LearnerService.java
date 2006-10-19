@@ -401,14 +401,23 @@ public class LearnerService implements ICoreLearnerService
         // in the future, we might want to see if the entire tool session is completed at this point. 
        
         LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), toolSession.getLesson().getLessonId());
-        
+       
+        // Need to synchronise the next bit of code so that if the tool calls
+        // this twice in quick succession, with the same parameters, it won't update
+        // the database twice! This may happen if a tool has a double submission problem.
+        // I don't want to synchronise on (this), as this could cause too much of a bottleneck,
+        // but if its not synchronised, we get db errors if the same tool session is completed twice
+        // (invalid index). I can'tfind another object on which to synchronise - Hibernate does not give me the 
+        // same object for tool session or current progress and user is cached via login, not userid.
         String returnURL = null;
-        if (currentProgress.getCompletedActivities().contains(toolSession.getToolActivity())) {
-        	// return close window url
-        	returnURL = ActivityMapping.getCloseURL();
-        } else {
-        	returnURL = completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
-        }
+        //  bottleneck synchronized (this) {
+        	if (currentProgress.getCompletedActivities().contains(toolSession.getToolActivity())) {
+        		// return close window url
+        		returnURL = ActivityMapping.getCloseURL();
+        	} else {
+        		returnURL = completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
+        	}
+        //}
         
         if ( log.isDebugEnabled() ) { 
         	log.debug("Moving onto next activity after tool session id "+toolSessionId+" learnerId "+learnerId+" url is "+returnURL);
