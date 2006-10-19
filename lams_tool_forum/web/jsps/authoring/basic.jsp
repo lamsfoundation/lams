@@ -13,7 +13,7 @@
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
 		if(area != null){
-			area.style.width="685px";
+			area.style.width="640px";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -65,15 +65,22 @@
 	<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
 </div>
 
-			<p class="small-space-bottom"><a
-				href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
-				 class="button-add-item"> <fmt:message
-					key="label.authoring.create.new.topic" /> </a></p>
-	
-			<iframe
-				onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-				id="messageArea" name="messageArea"
-				style="width:0px;height:0px;border:0px;display:none"
-				frameborder="no" scrolling="no">
-			</iframe>
-	
+<p class="small-space-bottom">
+	<a
+		href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
+		class="button-add-item"> <fmt:message
+			key="label.authoring.create.new.topic" /> </a>
+</p>
+
+<p>
+
+	<iframe
+		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		id="messageArea" name="messageArea"
+		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
+		scrolling="no">
+	</iframe>
+
+</p>
+
+
