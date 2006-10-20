@@ -11,5 +11,5 @@ values
 6,null,null,0,
 null,${learning_library_id},now(),0,
 null,null,null,null,
-null,null,null,'images/icon_groupreporting.swf',
+null,null,null,'images/icon_forum_and_scribe.swf',
 2,0,5);
