@@ -183,6 +183,7 @@
 	   			<!-- front end programs like HTML, JSP, CSS etc. -->
 	   			<fileset dir="${conf.web.dir}">
 						<include name="**/*.jsp"/>
+						<include name="file/lams_users_template.xls"/>
 				</fileset>
 	   			
 	   	   </war>

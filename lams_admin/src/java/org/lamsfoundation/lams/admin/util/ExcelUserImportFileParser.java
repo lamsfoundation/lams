@@ -23,31 +23,35 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.admin.util;
 
-import java.util.Set;
-import java.util.Iterator;
-import java.util.HashSet;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import java.io.IOException;
-
 import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-
-import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * TODO Add description here
+ * TODO add existing users to an org?
+ * TODO write audit log
  *
  * <p>
  * <a href="ExcelUserImportFileParser.java.html"><i>View Source</i></a>
@@ -56,284 +60,338 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class ExcelUserImportFileParser implements IUserImportFileParser{
+	
+	private static Logger log = Logger.getLogger(ExcelUserImportFileParser.class);
+	private static IUserManagementService service;
+	private static MessageService messageService;
 
-	public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException {
-		return null;
-	}
-
-/*	
-	 * start of definition of property keys used in the excel file
-	 
+	// spreadsheet column indexes
 	private static final short LOGIN = 0;
 	private static final short PASSWORD = 1;
-	private static final short AUTH_METHOD = 2;
-	private static final short ROLE = 3;
-	private static final short STATUS = 4;
-	private static final short TITLE = 5;
-	private static final short FIRST_NAME = 6;
-	private static final short LAST_NAME = 7;
+	private static final short TITLE = 2;
+	private static final short FIRST_NAME = 3;
+	private static final short LAST_NAME = 4;
+	private static final short ORGANISATION = 5;
+	private static final short ROLES = 6;
+	private static final short AUTH_METHOD = 7;
 	private static final short EMAIL = 8;
-	private static final short ADDRESS1 = 9;
-	private static final short ADDRESS2 = 10;
-	private static final short ADDRESS3 = 11;
-	private static final short CITY = 12;
-	private static final short STATE = 13;
-	private static final short COUNTRY = 14;
-	private static final short DAY_PHONE = 15;
-	private static final short EVE_PHONE = 16;
-	private static final short MOB_PHONE = 17;
-	private static final short FAX = 18;
+	private static final short FLASH_THEME = 9;
+	private static final short HTML_THEME = 10;
+	private static final short LOCALE = 11;
+	private static final short ADDRESS1 = 12;
+	private static final short ADDRESS2 = 13;
+	private static final short ADDRESS3 = 14;
+	private static final short CITY = 15;
+	private static final short STATE = 16;
+	private static final short POSTCODE = 17;
+	private static final short COUNTRY = 18;
+	private static final short DAY_PHONE = 19;
+	private static final short EVE_PHONE = 20;
+	private static final short MOB_PHONE = 21;
+	private static final short FAX = 22;
 	
-	
-	private static String[] errMsgArray = 
-		new String[]{LOGIN_REQUIRED,PASSWORD_REQUIRED,AUTH_METHOD_REQUIRED,ROLE_REQUIRED};
-	//end of definition	
-	
+	ArrayList<ArrayList> results = new ArrayList<ArrayList>();
+	ArrayList<String> rowResult = new ArrayList<String>();
 	private boolean emptyRow;
 	private boolean hasError;
-	private String errMsgForRow;
-	private IUserManagementService service;
 	
-	public ExcelUserImportFileParser(IUserManagementService service){
+	public ExcelUserImportFileParser(IUserManagementService service, MessageService messageService){
 		this.service = service;
+		this.messageService = messageService;
 	}
 
-	*//** 
+	/** 
 	 * @see org.lamsfoundation.lams.admin.util.IUserImportFileParser#parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly)
-	 *//*
-	public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException{
-		String errorMessage = "";
+	 */
+	public List parseSpreadsheet(FormFile fileItem) throws IOException{
 		POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 		HSSFWorkbook wb = new HSSFWorkbook(fs);
 		HSSFSheet sheet = wb.getSheetAt(0);
 		int startRow = sheet.getFirstRowNum();
 		int endRow = sheet.getLastRowNum();
-		int count = 0;
-		Double dbl;
-		Long l;
-		HSSFCell cell = null;
-		for (int i = startRow + 1; i < endRow + 1; i++)
-		{
+		
+		log.debug("sheet rows: "+startRow+".."+endRow);
+		
+		HSSFRow row;
+		User user = null;
+		Organisation org;
+		List<String> roles;
+		for (int i = startRow + 1; i < endRow + 1; i++) {
+			log.debug("starting row: "+i);
 			emptyRow = true;
 			hasError = false;
-			errMsgForRow = "";
-			HSSFRow row = sheet.getRow(i);
-			User user = new User();
-			Set roles = null;
-
-			user.setLogin(parseStringCell(row.getCell(LOGIN),i,LOGIN));
-			if(existingUsersOnly){//if existingUsersOnly, ignore all the other columns
-				user = service.getUserByLogin(user.getLogin());
-				if(user==null)
-				{
-					errMsgForRow = errMsgForRow + ROW + i + SKIP + parseStringCell(row.getCell(LOGIN),i,LOGIN) + USER_NOT_EXIST ;
-					hasError = true;
-				}
-				else{//check if the admin is authorised
-					List userOrgs = service.getUserOrganisationsForUser(user);
-					Iterator iter = userOrgs.iterator();
-					boolean userOrgExisted = false;
-					boolean authorised = false;
-					while(iter.hasNext()){
-						UserOrganisation userOrg = (UserOrganisation)iter.next();
-						if(userOrg.getOrganisation().getOrganisationId().equals(org.getOrganisationId())){
-							userOrgExisted = true;
-							break;
-						}
-						User admin = service.getUserByLogin(adminLogin);
-						Iterator iter2 = service.getUserOrganisationsForUser(admin).iterator();
-						while(iter2.hasNext()){
-							UserOrganisation adminOrg = (UserOrganisation)iter2.next();
-							if(adminOrg.getOrganisation().getOrganisationId().equals(userOrg.getOrganisation().getOrganisationId())){
-									authorised = true;
-									break;
-							}
-						}
-						if(authorised)
-							break;
-					}
-					if(!authorised)
-					{
-						errMsgForRow = errMsgForRow + ROW + i + SKIP + parseStringCell(row.getCell(LOGIN),i,LOGIN) + NO_AUTHORISATION;
-						hasError = true;
-					}
-					if(userOrgExisted){
-						errMsgForRow = errMsgForRow + ROW + i + SKIP + parseStringCell(row.getCell(LOGIN),i,LOGIN) + MEMBERSHIP_EXIST + org.getName();
-						hasError = true;
-					}
-					roles = parseRoleCell(row.getCell(ROLE),i,ROLE);
-				}
-			}else{
-				user.setPassword(parseStringCell(row.getCell(PASSWORD),i,PASSWORD));
-				user.setAuthenticationMethod(parseAuthMethodCell(row.getCell(AUTH_METHOD),i,AUTH_METHOD));
-				roles = parseRoleCell(row.getCell(ROLE),i,ROLE);
-				user.setDisabledFlag(parseStatusCell(row.getCell(STATUS),i));
-				user.setTitle(parseStringCell(row.getCell(TITLE),i,-1));
-				user.setFirstName(parseStringCell(row.getCell(FIRST_NAME),i,-1));
-				user.setLastName(parseStringCell(row.getCell(LAST_NAME),i,-1));
-				user.setEmail(parseStringCell(row.getCell(EMAIL),i,-1));
-				user.setAddressLine1(parseStringCell(row.getCell(ADDRESS1),i,-1));
-				user.setAddressLine2(parseStringCell(row.getCell(ADDRESS2),i,-1));
-				user.setAddressLine3(parseStringCell(row.getCell(ADDRESS3),i,-1));
-				user.setCity(parseStringCell(row.getCell(CITY),i,-1));
-				user.setState(parseStringCell(row.getCell(STATE),i,-1));
-				user.setCountry(parseStringCell(row.getCell(COUNTRY),i,-1));
-				user.setDayPhone(parseStringCell(row.getCell(DAY_PHONE),i,-1));
-				user.setEveningPhone(parseStringCell(row.getCell(EVE_PHONE),i,-1));
-				user.setMobilePhone(parseStringCell(row.getCell(MOB_PHONE),i,-1));
-				user.setFax(parseStringCell(row.getCell(FAX),i,-1));
-			}
-
-			if (emptyRow)
-			{
+			rowResult = new ArrayList<String>();
+			org = null;
+			roles = null;
+			row = sheet.getRow(i);
+			user = parseUser(row, i);
+			String orgId = parseStringCell(row.getCell(ORGANISATION));
+			if (orgId!=null) org = (Organisation)service.findById(Organisation.class, new Integer(orgId));
+			roles = parseRolesCell(row.getCell(ROLES));
+			
+			if (emptyRow) {
+				log.debug("emptyRow: "+emptyRow);
 				break;
 			}
-			if (hasError)
-			{
-				errorMessage = errorMessage + errMsgForRow;
+			if (hasError) {
+				log.debug("hasError: "+hasError);
+				results.add(rowResult);
 				continue;
-			}
-			else
-			{
-				try
-				{
-					if(!existingUsersOnly){
-						user.setCreateDate(new Date());
-						service.createUser(user);
+			} else {
+				try {
+					user.setCreateDate(new Date());
+					if (org!=null || roles!=null) {  // save user+roles if org or roles are set
+						log.debug("org: "+org+" roles: "+roles);
+						if (org!=null && roles!=null) {
+							service.save(user);
+							service.setRolesForUserOrganisation(user, org, roles);
+							//rowResult.add(org.getOrganisationId().toString());  // for stat summary in save action
+							log.debug("saved user: "+user.getUserId()+" with roles: "+roles);
+						} else {
+							String[] args = new String[1];
+							String error;
+							if (org!=null) {
+								args[0] = "("+parseStringCell(row.getCell(ROLES))+")";
+								error = messageService.getMessage("error.roles.invalid", args);
+							} else {
+								args[0] = "("+orgId+")";
+								error = messageService.getMessage("error.org.invalid", args);
+							}
+							rowResult.add(error);
+						}
+					} else {
+						service.save(user);
+						//rowResult.add(String.valueOf(0));  // for stat summary in save action
+						log.debug("saved user: "+user.getUserId());
 					}
-					UserOrganisation userOrg = new UserOrganisation();
-					userOrg.setUser(user);
-					userOrg.setOrganisation(org);
-					service.saveOrUpdateUserOrganisation(userOrg);
-					Iterator iter = roles.iterator();
-					while(iter.hasNext()){
-						UserOrganisationRole userOrgRole = new UserOrganisationRole();
-						userOrgRole.setUserOrganisation(userOrg);
-						userOrgRole.setRole((Role)iter.next());
-						service.saveOrUpdateUserOrganisationRole(userOrgRole);
-					}
-					count++;
+				} catch (Exception e) {
+					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
-				catch (Exception e)
-				{
-					errMsgForRow =
-						errMsgForRow
-							+ ROW
-							+ i
-							+ FAIL_ADD
-							+ user.getLogin()
-							+ SKIP
-							+ e.getMessage();
-					errorMessage = errorMessage + errMsgForRow;
-				}
+				log.debug("rowResult size: "+rowResult.size());
+				results.add(rowResult);
 			}
 		}
-		return (count + SUCCESS_ADD + errorMessage);
+		log.debug("found "+results.size()+" users in spreadsheet.");
+		return results;
 	}
 	
-	private String parseStringCell(HSSFCell cell, int row, int msgIndex){
-		if ((msgIndex!=-1)&&(cell == null))
-		{
-			if (hasError)
-			{
-				errMsgForRow = errMsgForRow + errMsgArray[msgIndex];
-			}
-			else
-			{
-				errMsgForRow = errMsgForRow + ROW + row + SKIP + errMsgArray[msgIndex];
-				hasError = true;
-			}
+	/**
+	 * gathers error messages for each cell as required, unless it's the login field in which case,
+	 * flags whole row as empty.
+	 */
+	private User parseUser(HSSFRow row, int rowIndex) {
+		User user = new User();
+		String[] args = new String[1];
+		
+		String login = parseStringCell(row.getCell(LOGIN));
+		if (login==null || login=="") {
+			rowResult.add(messageService.getMessage("error.login.required"));
+			hasError = true;
+			return null;
+		} else if (service.getUserByLogin(login)!=null) {
+			args[0] = "("+login+")";
+			rowResult.add(messageService.getMessage("error.login.unique", args));
+			hasError = true;
 			return null;
 		}
-		else if(cell!=null)
-		{
-			try{
+
+		user.setDisabledFlag(false);
+		user.setLogin(login);
+		
+		String password = HashUtil.sha1(parseStringCell(row.getCell(PASSWORD)));
+		user.setPassword(password);
+		
+		user.setTitle(parseStringCell(row.getCell(TITLE)));
+		
+		String fname = parseStringCell(row.getCell(FIRST_NAME));
+		if (fname==null || fname=="") {
+			rowResult.add(messageService.getMessage("error.firstname.required"));
+			hasError = true;
+		}
+		user.setFirstName(fname);
+		
+		String lname = parseStringCell(row.getCell(LAST_NAME));
+		if (lname==null || lname=="") {
+			rowResult.add(messageService.getMessage("error.lastname.required"));
+			hasError = true;
+		}
+		user.setLastName(lname);
+		
+		String authMethodName = parseStringCell(row.getCell(AUTH_METHOD));
+		AuthenticationMethod authMethod = getAuthMethod(authMethodName);
+		if (authMethod==null) {
+			args[0] = "("+authMethodName+")";
+			rowResult.add(messageService.getMessage("error.authmethod.invalid", args));
+			hasError = true;
+		}
+		user.setAuthenticationMethod(authMethod);
+		
+		user.setEmail(parseStringCell(row.getCell(EMAIL)));
+		
+		String flashId = parseStringCell(row.getCell(FLASH_THEME));
+		CSSThemeVisualElement flashTheme = getFlashTheme(flashId);
+		if (flashTheme==null) {
+			args[0] = "("+flashId+")";
+			rowResult.add(messageService.getMessage("error.flash.theme.invalid", args));
+			hasError = true;
+		}
+		user.setFlashTheme(flashTheme);
+
+		String htmlId = parseStringCell(row.getCell(HTML_THEME));
+		CSSThemeVisualElement htmlTheme = getHtmlTheme(htmlId);
+		if (htmlTheme==null) {
+			args[0] = "("+htmlId+")";
+			rowResult.add(messageService.getMessage("error.html.theme.invalid", args));
+			hasError = true;
+		}
+		user.setHtmlTheme(htmlTheme);
+		
+		String localeId = parseStringCell(row.getCell(LOCALE));
+		SupportedLocale locale = getLocale(localeId);
+		if (locale==null) {
+			args[0] = "("+localeId+")";
+			rowResult.add(messageService.getMessage("error.locale.invalid", args));
+			hasError = true;
+		}
+		user.setLocale(locale);
+		
+		user.setAddressLine1(parseStringCell(row.getCell(ADDRESS1)));
+		user.setAddressLine2(parseStringCell(row.getCell(ADDRESS2)));
+		user.setAddressLine3(parseStringCell(row.getCell(ADDRESS3)));
+		user.setCity(parseStringCell(row.getCell(CITY)));
+		user.setState(parseStringCell(row.getCell(STATE)));
+		user.setPostcode(parseStringCell(row.getCell(POSTCODE)));
+		user.setCountry(parseStringCell(row.getCell(COUNTRY)));
+		user.setDayPhone(parseStringCell(row.getCell(DAY_PHONE)));
+		user.setEveningPhone(parseStringCell(row.getCell(EVE_PHONE)));
+		user.setMobilePhone(parseStringCell(row.getCell(MOB_PHONE)));
+		user.setFax(parseStringCell(row.getCell(FAX)));
+		return (hasError ? null : user);
+	}
+	
+	/*
+	 * the methods below return legible data from individual cells
+	 * only specify msgIndex if you want to retrieve an error message, otherwise, use -1
+	 */
+	private String parseStringCell(HSSFCell cell){
+		if (cell!=null) {
+			try {
 				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-				if(cell.getStringCellValue()!= null){
-					if(cell.getStringCellValue().trim().length()!= 0){
+				if (cell.getStringCellValue()!= null) {
+					if (cell.getStringCellValue().trim().length()!= 0) {
 						emptyRow = false;
 					}
-				}else{
+				} else {
 					return null;
 				}
+				log.debug("string cell value: "+cell.getStringCellValue().trim());
 				return cell.getStringCellValue().trim();
-			}catch(Exception e)
-			{
+			} catch(Exception e) {
 				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 				double d = cell.getNumericCellValue();
 				emptyRow = false;
+				log.debug("numeric cell value: "+d);
 				return (new Long(new Double(d).longValue()).toString());
 			}
 		}
 		return null;
 	}
 	
-	private AuthenticationMethod parseAuthMethodCell(HSSFCell cell, int row, int msgIndex){
-		String authMethodName = parseStringCell(cell,row,msgIndex);
-		if(authMethodName==null){
-			return null;
-		}else{
-			return service.getAuthenticationMethodByName(authMethodName);
+	private AuthenticationMethod getAuthMethod(String authMethodName){
+		List list;
+		if (authMethodName==null || authMethodName=="") {
+			return (AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
+		} else {
+			list = service.findByProperty(AuthenticationMethod.class, "authenticationMethodName", authMethodName);
+			return (list==null || list.isEmpty() ? null : (AuthenticationMethod)list.get(0));
 		}
 	}
 	
-	private Set parseRoleCell(HSSFCell cell, int row, int msgIndex)
+	private List<String> parseRolesCell(HSSFCell cell)
 	{
 		String roleDescription = "";
-		if ((msgIndex!=-1)&&(cell == null))
-		{
-			if (hasError)
-			{
-				errMsgForRow = errMsgForRow + errMsgArray[msgIndex];
-			}
-			else
-			{
-				errMsgForRow = errMsgForRow + ROW + row + SKIP + errMsgArray[msgIndex];
-				hasError = true;
-			}
-			return null;
-		}
-		else if(cell!=null)
-		{
-			try{
+		if (cell!=null) {
+			try {
 				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-				if(cell.getStringCellValue()!= null){
-					if(cell.getStringCellValue().trim().length()!= 0){
-						emptyRow = false;
-					}
-				}else{
+				if (cell.getStringCellValue()!= null || cell.getStringCellValue().trim().length()!= 0) {
+					emptyRow = false;
+				} else {
+					log.debug("role cell is null");
 					return null;
 				}
 				roleDescription = cell.getStringCellValue().trim();
-			}catch(Exception e)
-			{
+			} catch(Exception e) {
+				log.debug("role cell exception");
 				return null;
 			}
-			
-		}
-		Set roles = new HashSet();
-		int fromIndex = 0;
-		int index = roleDescription.indexOf(SEPERATOR, fromIndex);
-		while (index != -1)
-		{
-			Role role = service.getRoleByName(roleDescription.substring(fromIndex, index));
-			if(role!=null)//ignore wrong spelled role
-			{
-				roles.add(role);
+			List<String> roles = new ArrayList<String>();
+			int fromIndex = 0;
+			int index = roleDescription.indexOf(SEPARATOR, fromIndex);
+			while (index != -1) {
+				log.debug("using role name: "+roleDescription.substring(fromIndex, index));
+				List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
+				Role role = (list==null ? null : (Role)list.get(0));
+				if (role!=null) { //ignore wrong spelled role
+					roles.add(role.getRoleId().toString());
+					log.debug("role: "+role.getName());
+				}
+				fromIndex = index + 1;
+				index = roleDescription.indexOf(SEPARATOR, fromIndex);
 			}
-			fromIndex = index + 1;
-			index = roleDescription.indexOf(SEPERATOR, fromIndex);
+			log.debug("using rolee name: "+roleDescription.substring(fromIndex, roleDescription.length()));
+			List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, roleDescription.length()));
+			Role role = (list==null ? null : (Role)list.get(0));
+			if (role!=null) {
+				roles.add(role.getRoleId().toString());
+				log.debug("rolee: "+role.getName());
+			}
+			return roles;
 		}
-		Role role = service.getRoleByName(roleDescription.substring(fromIndex, roleDescription.length()));
-		if(role!=null){
-			roles.add(role);
-		}
-		return roles;
+		return null;
 	}
 
-	private Boolean parseStatusCell(HSSFCell cell, int row)
-	{
-		String status = parseStringCell(cell,row,-1);
-		return new Boolean(STATUS_DISABLED.equals(status));
+	// set CSSThemeVisualElement to default flash theme if cell is empty
+	private CSSThemeVisualElement getFlashTheme(String flashId){
+		if (flashId==null || flashId=="") {
+			String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
+			List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
+			return (list != null && list.size() > 0) ? (CSSThemeVisualElement) list.get(0) : null;
+		} else {
+			try {
+				return (CSSThemeVisualElement)service.findById(CSSThemeVisualElement.class, new Long(flashId));
+			} catch (Exception e) {
+				return null;
+			}
+		}
 	}
-*/}
+	
+	// set CSSThemeVisualElement to default html theme if cell is empty
+	private CSSThemeVisualElement getHtmlTheme(String htmlId){
+		if (htmlId==null || htmlId=="") {
+			String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+			List list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
+			return (list != null && list.size() > 0) ? (CSSThemeVisualElement) list.get(0) : null;
+		} else {
+			try {
+				return (CSSThemeVisualElement)service.findById(CSSThemeVisualElement.class, new Long(htmlId));
+			} catch (Exception e) {
+				return null;
+			}
+		}
+	}
+	
+	// set locale to default system locale if cell is empty
+	private SupportedLocale getLocale(String localeId){
+		if (localeId==null || localeId=="") {
+			String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+			return service.getSupportedLocale(defaultLocale.substring(0, 2), defaultLocale.substring(3));
+		} else {
+			try {
+				return (SupportedLocale)service.findById(SupportedLocale.class, new Byte(localeId));
+			} catch (Exception e) {
+				return null;
+			}
+		}
+	}
+	
+}

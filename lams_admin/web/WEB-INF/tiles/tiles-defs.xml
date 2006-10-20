@@ -2,6 +2,16 @@
 
 <tiles-definitions>
 
+	<definition name=".importresult" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="import/importresult.jsp" />	
+	</definition>
+
+	<definition name=".importexcel" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="import/importexcel.jsp" />	
+	</definition>
+
 	<definition name=".disabledlist" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="disabledusers.jsp" />	

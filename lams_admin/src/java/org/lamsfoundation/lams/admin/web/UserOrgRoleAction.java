@@ -96,6 +96,7 @@ public class UserOrgRoleAction extends Action {
 					userBean.setMemberOfParent(false);
 			}
 			userOrgRoleForm.addUserBean(userBean);
+			log.debug("ready to assign role for user="+userBean.getUserId());
 		}
 		log.debug("ready to assign roles for "+userOrgRoleForm.getUserBeans().size()+" new users in organisation "+organisation.getName());
 
