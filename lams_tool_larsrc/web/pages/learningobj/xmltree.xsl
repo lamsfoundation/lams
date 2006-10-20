@@ -44,7 +44,7 @@ var TREE_ITEMS = [
    <xsl:template match="item">
 	<xsl:choose>
 		<xsl:when test="@resource">
-			['<xsl:value-of select="@title" />','<xsl:value-of select="$urlPrefix" /><xsl:value-of select="@resource"/><xsl:value-of select="urlSuffix" />',
+			['<xsl:value-of select="@title" />','<xsl:value-of select="$urlPrefix" /><xsl:value-of select="@resource"/><xsl:value-of select="$urlSuffix" />',
 		    <xsl:apply-templates/>
 		    ],
 		</xsl:when>
