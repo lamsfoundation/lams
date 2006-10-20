@@ -5,9 +5,9 @@
 	<property file="installer.properties" />
 
 	<target name="configure-deploy">
-		<copy overwrite="yes" todir="${LAMS_CONF}">
+		<copy overwrite="yes" todir="${INSTDIR}">
 			<fileset dir="${TEMP}">
-				<include name="lams.xml" />
+				<include name="update_lams_configuration.sql" />
 			</fileset>
 			<filterset>
 				<filter token="URL" value="${URL}" />
@@ -66,6 +66,22 @@
 				<filter token="URL" value="${URL}" />
 			</filterset>
 		</copy>
+		<copy overwrite="yes" todir="${INSTDIR}/jboss-4.0.2/server/default/conf">
+			<fileset dir="${TEMP}">
+				<include name="lamsauthentication.xml" />
+			</fileset>
+			<filterset>
+				<filter token="confdir" value="${INSTDIR}/jboss-4.0.2/server/default/conf" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${INSTDIR}/jboss-4.0.2/server/default/conf">
+			<fileset dir="${TEMP}">
+				<include name="login-config.xml" />
+			</fileset>
+			<filterset>
+				<filter token="confdir" value="${INSTDIR}/jboss-4.0.2/server/default/conf" />
+			</filterset>
+		</copy>
 	</target>
 	
 	<target name="import-db">
@@ -76,6 +92,7 @@
 			password="${DB_PASS}"
 			encoding="utf8">
 			<transaction src="${TEMP}/dump.sql" />
+			<transaction src="${INSTDIR}/update_lams_configuration.sql" />
 		</sql>
 	</target>
 	

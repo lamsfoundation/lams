@@ -23,11 +23,12 @@
 /* $$Id$$ */
 
 /*
- * TODO: uninstaller option to keep database/lams.xml/repository
+ * TODO: uninstaller option to keep database/repository
  * TODO: detect if db exists and has data, ask whether to use or import fresh db
  * TODO: custom lams admin user LI-27
  * TODO: desktop icons, readme?
  * TODO: transaction isolation
+ * TODO: checkbox to start lams on finish page
  */
 
 # includes
@@ -42,7 +43,6 @@
 # constants
 !define VERSION "2.0 RC1"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
-!define SOURCE_LAMS_CONF "C:\lamsconf"  ; location of lamsconf where lamsconf was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
 # installer settings
@@ -182,7 +182,6 @@ Var LAMS_DOMAIN
 Var LAMS_PORT
 Var LAMS_LOCALE
 Var LAMS_REPOSITORY
-Var LAMS_CONF
 Var LAMS_USER
 Var LAMS_PASS
 Var WILDFIRE_DOMAIN
@@ -211,10 +210,6 @@ SectionGroup /e "!Install LAMS"
         CreateDirectory "$INSTDIR\dump"
         CreateDirectory "$LAMS_REPOSITORY"
         
-        SetOutPath $LAMS_CONF
-        File /a ${SOURCE_LAMS_CONF}\*.dtd
-        File /a ${SOURCE_LAMS_CONF}\authentication.xml
-
         # Log mode is set to INFO in this template
         SetOutPath "$INSTDIR\jboss-4.0.2\server\default\conf"
         File /a "..\templates\log4j.xml"
@@ -255,7 +250,6 @@ SectionGroupEnd
 SectionGroup /e "Optional"
     Section /o "jsMath (compressed)" jsmathc
         SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy"
-        ;File /a /r "${SOURCE_JBOSS_HOME}\server\default\deploy\jsMath.war"
         File /a /r  "..\..\jsmath\build\lib\jsMath.war"
     SectionEnd
     
@@ -303,7 +297,7 @@ Function .onInit
     # Abort install if already installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "version"
     ${If} $0 != ""
-        MessageBox MB_OK|MB_ICONSTOP "LAMS $0 is installed.  Please uninstall before continuing."
+        MessageBox MB_OK|MB_ICONSTOP "LAMS $0 is already installed.  Please uninstall before continuing."
         Abort
     ${EndIf}
     
@@ -446,7 +440,6 @@ Function PreLAMSConfig
     Call CheckJava
     !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
     !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
-    !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 6" "State" "C:\lamsconf"
     !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (2/4)" "Configure the LAMS Server.  If unsure, use the defaults."
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
 FunctionEnd
@@ -455,7 +448,6 @@ FunctionEnd
 Function PostLAMSConfig
     !insertmacro MUI_INSTALLOPTIONS_READ $JDK_DIR "lams.ini" "Field 2" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams.ini" "Field 4" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_CONF "lams.ini" "Field 6" "State"
 
     # check java version using given dir
     nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
@@ -513,12 +505,14 @@ Function DeployConfig
     File /r "..\apache-ant-1.6.5"
     SetOutPath $TEMP
     File "build.xml"
-    File "..\templates\lams.xml"
     File "..\templates\mysql-ds.xml"
     File "..\templates\server.xml"
     File "..\templates\run.bat"
     File "..\templates\wrapper.conf"
     File "..\templates\index.html"
+    File "..\templates\lamsauthentication.xml"
+    File "..\templates\update_lams_configuration.sql"
+    File "..\templates\login-config.xml"
         
     # create installer.properties
     ClearErrors
@@ -532,13 +526,7 @@ Function DeployConfig
     Call StrSlash
     Pop $2
     FileWrite $0 "TEMP=$2$\r$\n"
-    
-    Push $LAMS_CONF
-    Push "\"
-    Call StrSlash
-    Pop $2
-    FileWrite $0 "LAMS_CONF=$2$\r$\n"
-        
+            
     Push $INSTDIR
     Push "\"
     Call StrSlash
@@ -586,7 +574,7 @@ Function DeployConfig
     # for debugging purposes
     CopyFiles "$TEMP\installer.properties" $INSTDIR
         
-    # use Ant to copy configuration to destination LAMS_CONF
+    # use Ant to write config to files
     FileOpen $0 "$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" w
     IfErrors 0 +2
         goto error
@@ -737,7 +725,6 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "dir_mysql" $MYSQL_DIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_inst" $INSTDIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_repository" $LAMS_REPOSITORY
-    WriteRegStr HKLM "${REG_HEAD}" "dir_conf" $LAMS_CONF
     WriteRegStr HKLM "${REG_HEAD}" "version" "${VERSION}"
     WriteRegStr HKLM "${REG_HEAD}" "db_name" $DB_NAME
     WriteRegStr HKLM "${REG_HEAD}" "db_user" $DB_USER
@@ -764,7 +751,6 @@ FunctionEnd
 # cleanup functions
 Function RemoveTempFiles
     Delete "$TEMP\LocalPortScanner.class"
-    Delete "$TEMP\lams.xml"
     Delete "$TEMP\mysql-ds.xml"
     Delete "$TEMP\server.xml"
     Delete "$TEMP\run.bat"
@@ -774,12 +760,15 @@ Function RemoveTempFiles
     Delete "$TEMP\installer.properties"
     Delete "$INSTDIR\wrapper.conf"
     Delete "$TEMP\index.html"
+    Delete "$TEMP\lamsauthentication.xml"
+    Delete "$TEMP\update_lams_configuration.sql"
+    Delete "$TEMP\login-config.xml"
+    Delete "$INSTDIR\update_lams_configuration.sql"
 FunctionEnd
 
 Function .onInstFailed
     Call RemoveTempFiles
     RMDir /r $INSTDIR
-    RMDir /r $LAMS_CONF
 FunctionEnd
 
 Function .onInstSuccess
