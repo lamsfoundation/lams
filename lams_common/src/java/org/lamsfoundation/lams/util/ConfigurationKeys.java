@@ -37,8 +37,6 @@ public class ConfigurationKeys {
 
 	public static String VERSION = "Version";
 
-	public static String LAMS_HOME = "LamsHome";
-
 	public static String LAMS_TEMP_DIR = "TempDir";
 
 	/**

@@ -1,6 +1,5 @@
 insert into lams_configuration (config_key, config_value) values ('ServerURL','http://localhost:8080/lams/');
 insert into lams_configuration (config_key, config_value) values ('Version','2.0 RC1');
-insert into lams_configuration (config_key, config_value) values ('LamsHome','C:/lams');
 insert into lams_configuration (config_key, config_value) values ('TempDir','C:/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','C:/lams/dump');
 insert into lams_configuration (config_key, config_value) values ('EARDir','d:/jboss-4.0.2/server/default/deploy/lams.ear');

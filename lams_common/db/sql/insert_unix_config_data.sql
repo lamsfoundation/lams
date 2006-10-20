@@ -1,6 +1,5 @@
 insert into lams_configuration (config_key, config_value) values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/');
 insert into lams_configuration (config_key, config_value) values ('Version','2.0 RC1');
-insert into lams_configuration (config_key, config_value) values ('LamsHome','/var/opt/lams');
 insert into lams_configuration (config_key, config_value) values ('TempDir','/var/opt/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','/var/opt/lams/dump');
 insert into lams_configuration (config_key, config_value) values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear');
