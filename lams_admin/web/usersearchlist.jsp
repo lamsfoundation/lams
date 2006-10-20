@@ -6,7 +6,20 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
+<script language="JavaScript" type="text/javascript">
+	function resetFields() {
+		document.UserSearchForm.sUserId.value = '';
+		document.UserSearchForm.sLogin.value = '';
+		document.UserSearchForm.sFirstName.value = '';
+		document.UserSearchForm.sLastName.value = '';
+	}
+</script>
+
 <h2><fmt:message key="admin.user.find"/></h2>
+
+<p align="right">
+	<input type="button" value='<fmt:message key="admin.user.import"/>' onclick=javascript:document.location='importexcel.do' />
+</p>
 
 <logic:notEqual name="isSysadmin" value="false">
 <html-el:form action="/usersearch.do" method="post">
@@ -18,7 +31,7 @@
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
 	<th><fmt:message key="admin.user.last_name"/></th>
-	<th width="15%"></th>
+	<th><fmt:message key="admin.user.actions"/></th>
 </tr>
 <tr>
 	<td><html-el:text property="sUserId" size="5" /></td>
@@ -55,7 +68,7 @@
 <tr>
 	<td colspan=5 align="right">
 		<html-el:submit><fmt:message key="admin.search"/></html-el:submit>
-		<html-el:reset><fmt:message key="admin.reset"/></html-el:reset>
+		<input type="button" value='<fmt:message key="admin.reset"/>' onclick="resetFields();" />
 	</td>
 </tr>
 </table>
