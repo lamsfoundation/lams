@@ -1,12 +1,12 @@
 insert into lams_configuration (config_key, config_value) values ('ServerURL','http://localhost:8080/lams/');
 insert into lams_configuration (config_key, config_value) values ('Version','2.0 RC1');
-insert into lams_configuration (config_key, config_value) values ('LamsHome','C:\\lams');
-insert into lams_configuration (config_key, config_value) values ('TempDir','C:\\lams\\temp');
-insert into lams_configuration (config_key, config_value) values ('DumpDir','C:\\lams\\dump');
+insert into lams_configuration (config_key, config_value) values ('LamsHome','C:/lams');
+insert into lams_configuration (config_key, config_value) values ('TempDir','C:/lams/temp');
+insert into lams_configuration (config_key, config_value) values ('DumpDir','C:/lams/dump');
 insert into lams_configuration (config_key, config_value) values ('EARDir','d:/jboss-4.0.2/server/default/deploy/lams.ear');
 insert into lams_configuration (config_key, config_value) values ('SMTPServer','mail.lib.mq.edu.au');
 insert into lams_configuration (config_key, config_value) values ('LamsSupportEmail','lams_support@melcoe.mq.edu.au');
-insert into lams_configuration (config_key, config_value) values ('ContentRepositoryPath','C:\\lams\\repository');
+insert into lams_configuration (config_key, config_value) values ('ContentRepositoryPath','C:/lams/repository');
 insert into lams_configuration (config_key, config_value) values ('UploadFileMaxSize','1048576');
 insert into lams_configuration (config_key, config_value) values ('UploadLargeFileMaxSize','10485760');
 insert into lams_configuration (config_key, config_value) values ('UploadFileMaxMemorySize','4096');
