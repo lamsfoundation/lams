@@ -106,6 +106,28 @@
 	<form-property name="cValue" type="java.lang.String[]" />
 	<form-property name="method" type="java.lang.String" />
 </form-bean>
+
+<form-bean name="RegisterForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="sitename" type="java.lang.String" />
+	<form-property name="serverurl" type="java.lang.String" />
+	<form-property name="serverversion" type="java.lang.String" />
+	<form-property name="serverbuild" type="java.lang.String" />
+	<form-property name="serverlocale" type="java.lang.String" />
+	<form-property name="servercountry" type="java.lang.String" />
+ 	<form-property name="countries" type="java.lang.String[]" />
+	<form-property name="langdate" type="java.lang.String" />
+	<form-property name="groupno" type="java.lang.Integer" />
+	<form-property name="subgroupno" type="java.lang.Integer" />
+	<form-property name="sysadminno" type="java.lang.Integer" />
+	<form-property name="adminno" type="java.lang.Integer" />
+	<form-property name="authorno" type="java.lang.Integer" />
+	<form-property name="monitorno" type="java.lang.Integer" />
+	<form-property name="managerno" type="java.lang.Integer" />
+	<form-property name="learnerno" type="java.lang.Integer" />
+	<form-property name="public" type="java.lang.Boolean" initial="true" />
+	<form-property name="rname" type="java.lang.String" />
+	<form-property name="remail" type="java.lang.String" />
+</form-bean>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -146,21 +168,6 @@
       />
     </action>
     <action
-      path="/usersearch"
-      type="org.lamsfoundation.lams.admin.web.UserSearchAction"
-      name="UserSearchForm"
-      scope="request"
-      input=".usersearchlist"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="usersearchlist"
-        path=".usersearchlist"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/orgmanage"
       type="org.lamsfoundation.lams.admin.web.OrgManageAction"
       unknown="false"
@@ -173,26 +180,17 @@
       />
     </action>
     <action
-      path="/joblist"
-      type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
+      path="/usersearch"
+      type="org.lamsfoundation.lams.admin.web.UserSearchAction"
+      name="UserSearchForm"
+      scope="request"
+      input=".usersearchlist"
       unknown="false"
       validate="false"
     >
       <forward
-        name="list"
-        path=".joblist"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/disabledmanage"
-      type="org.lamsfoundation.lams.admin.web.DisabledUserManageAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="disabledlist"
-        path=".disabledlist"
+        name="usersearchlist"
+        path=".usersearchlist"
         redirect="false"
       />
     </action>
@@ -239,36 +237,6 @@
       />
     </action>
     <action
-      path="/userorgrolesave"
-      type="org.lamsfoundation.lams.admin.web.UserOrgRoleSaveAction"
-      name="UserOrgRoleForm"
-      scope="session"
-      input=".userorgrole"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="userlist"
-        path="/usermanage.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/cache"
-      type="org.lamsfoundation.lams.admin.web.CacheAction"
-      name="CacheActionForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="cache"
-        path=".cache"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/serversave"
       type="org.lamsfoundation.lams.admin.web.ServerSaveAction"
       name="ServerOrgMapForm"
@@ -280,58 +248,6 @@
       <forward
         name="success"
         path="/serverlist.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/servermaintain"
-      type="org.lamsfoundation.lams.admin.web.ServerMaintainAction"
-      name="ServerOrgMapForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="servermaintain"
-        path=".servermaintain"
-        redirect="false"
-      />
-      <forward
-        name="serverlist"
-        path="/serverlist.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/userroles"
-      type="org.lamsfoundation.lams.admin.web.UserRolesAction"
-      name="UserRolesForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="userrole"
-        path=".userrole"
-        redirect="false"
-      />
-      <forward
-        name="userlist"
-        path="/usermanage.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/usermanage"
-      type="org.lamsfoundation.lams.admin.web.UserManageAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="userlist"
-        path=".userlist"
         redirect="false"
       />
     </action>
@@ -352,6 +268,26 @@
       <forward
         name="orglist"
         path="/orgmanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/userroles"
+      type="org.lamsfoundation.lams.admin.web.UserRolesAction"
+      name="UserRolesForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="userrole"
+        path=".userrole"
+        redirect="false"
+      />
+      <forward
+        name="userlist"
+        path="/usermanage.do"
         redirect="false"
       />
     </action>
@@ -408,6 +344,139 @@
       <forward
         name="userlist"
         path="/usermanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/loginsave"
+      type="org.lamsfoundation.lams.admin.web.LoginSaveAction"
+      name="LoginMaintainForm"
+      scope="request"
+      input=".loginmaintian"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="sysadmin"
+        path=".sysadmin"
+        redirect="false"
+      />
+      <forward
+        name="loginmaintain"
+        path=".loginmaintain"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/joblist"
+      type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="list"
+        path=".joblist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/disabledmanage"
+      type="org.lamsfoundation.lams.admin.web.DisabledUserManageAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="disabledlist"
+        path=".disabledlist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/cache"
+      type="org.lamsfoundation.lams.admin.web.CacheAction"
+      name="CacheActionForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="cache"
+        path=".cache"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/userorgrolesave"
+      type="org.lamsfoundation.lams.admin.web.UserOrgRoleSaveAction"
+      name="UserOrgRoleForm"
+      scope="session"
+      input=".userorgrole"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="userlist"
+        path="/usermanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/servermaintain"
+      type="org.lamsfoundation.lams.admin.web.ServerMaintainAction"
+      name="ServerOrgMapForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="servermaintain"
+        path=".servermaintain"
+        redirect="false"
+      />
+      <forward
+        name="serverlist"
+        path="/serverlist.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/register"
+      type="org.lamsfoundation.lams.admin.web.RegisterAction"
+      name="RegisterForm"
+      scope="request"
+      input=".register"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="register"
+        path=".register"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path=".sysadmin"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/usermanage"
+      type="org.lamsfoundation.lams.admin.web.UserManageAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="userlist"
+        path=".userlist"
         redirect="false"
       />
     </action>
@@ -491,27 +560,6 @@
       <forward
         name="userorg"
         path=".userorg"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/loginsave"
-      type="org.lamsfoundation.lams.admin.web.LoginSaveAction"
-      name="LoginMaintainForm"
-      scope="request"
-      input=".loginmaintian"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="sysadmin"
-        path=".sysadmin"
-        redirect="false"
-      />
-      <forward
-        name="loginmaintain"
-        path=".loginmaintain"
         redirect="false"
       />
     </action>

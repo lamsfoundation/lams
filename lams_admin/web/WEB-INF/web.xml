@@ -20,11 +20,6 @@
 	</param-value>
 </context-param>
 
-<mime-mapping>
-    <extension>xls</extension>
-    <mime-type>excel/ms-excel</mime-type>
-</mime-mapping>
-
   <filter>
        <filter-name>SystemSessionFilter</filter-name>
          <filter-class>

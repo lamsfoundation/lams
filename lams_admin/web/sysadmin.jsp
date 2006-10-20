@@ -15,3 +15,5 @@
 
 <p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
 
+<p><a href="<lams:LAMSURL/>admin/register.do"><fmt:message key="sysadmin.register.server"/></a><p>
+

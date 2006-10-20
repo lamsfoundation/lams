@@ -12,8 +12,8 @@
 		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :  
 		<fmt:message key="sysadmin.config.settings.edit" />
 	</h2>
-	<br/>
 	<lams:help page="<%= Configuration.CONFIGURATION_HELP_PAGE %>"/>
+	<br/>
 	<table class="alternative-color" width=100%>
 		<tr>
 			<th><fmt:message key="admin.config.key"/></th>

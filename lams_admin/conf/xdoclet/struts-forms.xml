@@ -82,3 +82,25 @@
 	<form-property name="cValue" type="java.lang.String[]" />
 	<form-property name="method" type="java.lang.String" />
 </form-bean>
+
+<form-bean name="RegisterForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="sitename" type="java.lang.String" />
+	<form-property name="rname" type="java.lang.String" />
+	<form-property name="remail" type="java.lang.String" />
+	<form-property name="serverurl" type="java.lang.String" />
+	<form-property name="serverversion" type="java.lang.String" />
+	<form-property name="serverbuild" type="java.lang.String" />
+	<form-property name="serverlocale" type="java.lang.String" />
+	<form-property name="servercountry" type="java.lang.String" />
+ 	<form-property name="countries" type="java.lang.String[]" />
+	<form-property name="langdate" type="java.lang.String" />
+	<form-property name="groupno" type="java.lang.Integer" />
+	<form-property name="subgroupno" type="java.lang.Integer" />
+	<form-property name="sysadminno" type="java.lang.Integer" />
+	<form-property name="adminno" type="java.lang.Integer" />
+	<form-property name="authorno" type="java.lang.Integer" />
+	<form-property name="monitorno" type="java.lang.Integer" />
+	<form-property name="managerno" type="java.lang.Integer" />
+	<form-property name="learnerno" type="java.lang.Integer" />
+	<form-property name="public" type="java.lang.Boolean" initial="true" />
+</form-bean>
