@@ -11,7 +11,7 @@
 </c:set>
 <html>
 	<head>
-		<title><bean:message key="activity.title" /></title>
+		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/learnerheader.jsp"%>
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";

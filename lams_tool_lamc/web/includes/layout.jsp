@@ -6,7 +6,7 @@
 
 <html>
 	<head>
-		<title><bean:message key="activity.title" /></title>
+		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
 	</head>
 	<body class="stripes">
@@ -15,7 +15,7 @@
 			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
 			<logic:notEmpty name="pTitleKey">
 				<h1 class="no-tabs-below">
-					<bean:message key="<%=pTitleKey %>" />
+					<fmt:message key="<%=pTitleKey %>" />
 				</h1>
 			</logic:notEmpty>
 

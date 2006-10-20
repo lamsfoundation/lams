@@ -18,13 +18,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
+<%@ include file="/common/taglibs.jsp"%>
 <tr>
 	<td>
 		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
 			<tr> 
 				<td NOWRAP valign="top"> 
-					<font size=2> <bean:message key="error.system.qa"/> </font>
+					<font size=2> <fmt:message key="error.system.qa"/> </font>
 				</td>
 			 </tr>
 		</table>

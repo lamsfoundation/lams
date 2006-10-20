@@ -19,22 +19,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<!-- taglib definition-->
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<!-- end of taglib definition -->
+<%@ include file="/common/taglibs.jsp"%>
 <tr>
 	<td>
 		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
 			<tr> 
 				<td NOWRAP valign="top"> 
-					<font size=2> <bean:message key="error.system.vote"/> </font>
+					<font size=2> <fmt:message key="error.system.vote"/> </font>
 				</td>
 			 </tr>
 		</table>

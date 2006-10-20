@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:html locale="true">
 	<head>
-	<title> <bean:message key="label.learning.report"/> </title>
+	<title> <fmt:message key="label.learning.report"/> </title>
 	
 	<%@ include file="/common/header.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content">
 		<table>
 				<tr>
-			 		<th NOWRAP>  <bean:message key="label.learner.progress"/>   </th>
+			 		<th NOWRAP>  <fmt:message key="label.learner.progress"/>   </th>
 				</tr>
 		</table>
 
@@ -77,7 +77,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td> &nbsp&nbsp</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
+								<td NOWRAP valign=top align=left><b>  <fmt:message key="label.nomination"/>: </b>
 									<c:out value="${currentDto.question}" escapeXml="false"/>
 								 </td>
 							</tr>	
@@ -86,8 +86,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<td NOWRAP valign=top>
 									<table align=center>
 										<tr> 
-											 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-					  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+											 <td NOWRAP valign=top> <b>  <fmt:message key="label.user"/>  </b> </td>  
+					  						 <td NOWRAP valign=top> <b>  <fmt:message key="label.attemptTime"/> </b></td>
 							  			</tr>				 
 			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											<c:forEach var="sData" items="${questionAttemptData.value}">
@@ -119,7 +119,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td> &nbsp&nbsp</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b>  <bean:message key="label.nomination"/>: </b>
+								<td NOWRAP valign=top align=left><b>  <fmt:message key="label.nomination"/>: </b>
 									<c:out value="${currentDto.question}" escapeXml="false"/>
 								 </td>
 							</tr>	
@@ -128,8 +128,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<td NOWRAP  valign=top>
 									<table align=center>
 										<tr> 
-											 <td NOWRAP valign=top> <b>  <bean:message key="label.user"/>  </b> </td>  
-					  						 <td NOWRAP valign=top> <b>  <bean:message key="label.attemptTime"/> </b></td>
+											 <td NOWRAP valign=top> <b>  <fmt:message key="label.user"/>  </b> </td>  
+					  						 <td NOWRAP valign=top> <b>  <fmt:message key="label.attemptTime"/> </b></td>
 							  			</tr>				 
 	
 			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
