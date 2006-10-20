@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
 		if(area != null){
-			area.style.width="670px";
+			area.style.width="640px";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -65,95 +65,70 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </script>
 
-			<html:hidden property="questionIndex"/>
-			<table cellpadding="0">
+<html:hidden property="questionIndex" />
+<table cellpadding="0">
+	<tr>
+		<td colspan="2">
+			<div class="field-name">
+				<fmt:message key="label.authoring.title.col"></fmt:message>
+			</div>
+			<html:text property="title" style="width: 99%;"></html:text>
+		</td>
+	</tr>
 
-						<tr>
-							<td colspan="2">
-								<div class="field-name">
-									<fmt:message key="label.authoring.title.col"></fmt:message>
-								</div>
-								<html:text property="title" style="width: 100%;"></html:text>
-							</td>
-						</tr>
-						
+	<tr>
+		<td colspan="2">
+			<div class="field-name">
+				<fmt:message key="label.authoring.instructions.col"></fmt:message>
+			</div>
+			<lams:FCKEditor id="instructions"
+				value="${mcGeneralAuthoringDTO.activityInstructions}"
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+		</td>
+	</tr>
+</table>
 
-						<tr>
-							<td colspan="2">
-								<div class="field-name">
-									<fmt:message key="label.authoring.instructions.col"></fmt:message>
-								</div>
-								<lams:FCKEditor id="instructions"
-									value="${mcGeneralAuthoringDTO.activityInstructions}"
-									contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
-							</td>
-						</tr>
-	
-				 		<tr>
-						<td colspan="2">
-							<div id="resourceListArea">
-						 		<c:if test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}"> 		
-									<%@ include file="/authoring/itemlist.jsp"%>
-								</c:if> 							
-						 		<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}"> 		
-									<%@ include file="/monitoring/itemlist.jsp"%>
-								</c:if> 							
-							</div>
-						</td>
-						</tr>
-						
+<div id="resourceListArea">
+	<c:if
+		test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
+		<%@ include file="/authoring/itemlist.jsp"%>
+	</c:if>
+	<c:if
+		test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
+		<%@ include file="/monitoring/itemlist.jsp"%>
+	</c:if>
+</div>
 
-			 		<c:if test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}"> 								
-						<tr>
-							<td colspan="2">
-									<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}"/>');"
-										style="float:right;width:150px" class="button-add-item"> <fmt:message
-										key="label.add.new.question" /> </a>
-							</td>
-						</tr>
-					</c:if> 												
-			 		<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}"> 							
-						<tr>
-							<td colspan="2">
-									<a href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}"/>');"
-										style="float:right;width:150px" class="button-add-item"> <fmt:message
-										key="label.add.new.question" /> </a>
-							</td>
-						</tr>
-					</c:if> 																		 		
+<p>
+	<c:if
+		test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
+		<a
+			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}"/>');"
+			class="button-add-item"> <fmt:message
+				key="label.add.new.question" /> </a>
+	</c:if>
+	<c:if
+		test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
+		<a
+			href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}"/>');"
+			class="button-add-item"> <fmt:message
+				key="label.add.new.question" /> </a>
 
-					<tr>
-						<td colspan="2">
-							<iframe
-								onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-								id="messageArea" name="messageArea"
-								style="width:0px;height:0px;border:0px;display:none"
-								frameborder="no" scrolling="no">
-							</iframe>
-						</td>
-					</tr>
+	</c:if>
+</p>
 
-			 </table>			
-				 
+<p>
+	<iframe
+		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		id="messageArea" name="messageArea"
+		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
+		scrolling="no">
+	</iframe>
+</p>
 
-
-				
-				<table cellpadding="0">
-					    <tr> <td> &nbsp </td> </tr>					    
-						<tr> 
-							<td>							
-						      	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
-									<p align="right">
-									    <a href="javascript:submitMethod('submitAllContent')" class="button">
-								        	<fmt:message key="label.save"/></a>
-									</p>
-									
-								</c:if> 					
-					
-							</td> 
-					  	</tr>
-				 </table>
-
-		
-
-				
+<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring'}">
+	<p align="right">
+		<a href="javascript:submitMethod('submitAllContent')" class="button">
+			<fmt:message key="label.save" /> </a>
+	</p>
+</c:if>

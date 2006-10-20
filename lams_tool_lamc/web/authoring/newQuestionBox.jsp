@@ -25,7 +25,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-		
+		<lams:css style="tabbed" />
+
 		<script language="JavaScript" type="text/JavaScript">
 
 			function submitMethod() {
@@ -50,115 +51,74 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				submitMethod("removeAddedCandidate");
 			}
 			
-		</script>		
+		</script>
 	</head>
-	
+
 	<body>
-		<table cellpadding="0">
-	
-
-			<html:form  action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">				
-			<html:hidden property="dispatch" value="addSingleQuestion"/>
-			<html:hidden property="toolContentID"/>
+		<html:form action="/authoring?validate=false"
+			styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
+			<html:hidden property="dispatch" value="addSingleQuestion" />
+			<html:hidden property="toolContentID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="activeModule"/>
-			<html:hidden property="httpSessionID"/>								
-			<html:hidden property="defaultContentIdStr"/>								
-			<html:hidden property="defineLaterInEditMode"/>										
-			<html:hidden property="contentFolderID"/>														
-			<html:hidden property="editQuestionBoxRequest" value="false"/>																				
-			<html:hidden property="totalMarks"/>														
-			
-			<tr>
-			<td>
-			<table class="innerforms">
-		
-				<tr>
-					<td>
-						<div class="field-name">
-							<fmt:message key="label.add.new.question"></fmt:message>
-						</div>
- 						<lams:FCKEditor id="newQuestion"
-							value="${mcGeneralAuthoringDTO.editableQuestionText}"
-							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor> 
-					</td>
-				</tr>
+			<html:hidden property="activeModule" />
+			<html:hidden property="httpSessionID" />
+			<html:hidden property="defaultContentIdStr" />
+			<html:hidden property="defineLaterInEditMode" />
+			<html:hidden property="contentFolderID" />
+			<html:hidden property="editQuestionBoxRequest" value="false" />
+			<html:hidden property="totalMarks" />
 
+			<div class="field-name space-top">
+				<fmt:message key="label.add.new.question"></fmt:message>
+			</div>
+			<lams:FCKEditor id="newQuestion"
+				value="${mcGeneralAuthoringDTO.editableQuestionText}"
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 
-				<tr>
-					<td>
-						<%@ include file="/authoring/candidateAnswersAddList.jsp"%>					
-					</td>
-				</tr>
-				
-				<tr>
-					<td>
-						<html:submit onclick="javascript:submitMethod('newAddedCandidateBox');" style="float:right;width:150px"  styleClass="button-add-item">
-			            	<fmt:message key="label.add.candidates" />
-						</html:submit>	 				 		  											
-					</td>
-				</tr>
+			<%@ include file="/authoring/candidateAnswersAddList.jsp"%>
 
+			<div class="space-bottom small-space-top">
+				<div class="right-buttons">
+					<html:submit
+						onclick="javascript:submitMethod('newAddedCandidateBox');"
+						styleClass="button">
+						<fmt:message key="label.add.candidates" />
+					</html:submit>
+				</div>
 
+				<fmt:message key="label.questions.worth"></fmt:message>
+				<select name="mark">
+					<c:forEach var="markEntry"
+						items="${mcGeneralAuthoringDTO.marksMap}">
+						<c:set var="SELECTED_MARK" scope="request" value="" />
+						<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}">
+							<c:set var="SELECTED_MARK" scope="request" value="SELECTED" />
+						</c:if>
 
-				<tr>
-					<td>
-						<fmt:message key="label.questions.worth"></fmt:message> 
+						<option value="<c:out value="${markEntry.value}"/>"
+							<c:out value="${SELECTED_MARK}"/>>
+							<c:out value="${markEntry.value}" />
+						</option>
+					</c:forEach>
+				</select>
+				<fmt:message key="label.marks"></fmt:message>
+			</div>
 
-									<select name="mark">
-										<c:forEach var="markEntry" items="${mcGeneralAuthoringDTO.marksMap}">
-											<c:set var="SELECTED_MARK" scope="request" value=""/>										
-											<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}"> 			
-														<c:set var="SELECTED_MARK" scope="request" value="SELECTED"/>
-											</c:if>						
+			<div class="field-name">
+				<fmt:message key="label.feedback"></fmt:message>
+			</div>
+			<html:textarea property="feedback" rows="3" cols="70"></html:textarea>
 
-												<option value="<c:out value="${markEntry.value}"/>"  <c:out value="${SELECTED_MARK}"/>> <c:out value="${markEntry.value}"/>  </option>																				
-										</c:forEach>		  	
-									</select>
+			<div class="space-bottom-top">
+				<a href="#" onclick="getElementById('newQuestionForm').submit();"
+					class="button-add-item"> <fmt:message key="label.save.question" />
+				</a>
 
+				<a href="#" onclick="javascript:window.parent.hideMessage()"
+					class="button space-left"> <fmt:message key="label.cancel" />
+				</a>
+			</div>
 
-						<fmt:message key="label.marks"></fmt:message> 
-					</td>
-				</tr>
-
-
-				<tr>
-					<td>
-						<div class="field-name">
-							<fmt:message key="label.feedback"></fmt:message>
-						</div>
-						<html:textarea property="feedback" rows="3" cols="70"></html:textarea>							
-					</td>
-				</tr>
-				
-
-				<tr>
-					<td align="center" valign="bottom">
-						<table>
-							<tr>
-							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="getElementById('newQuestionForm').submit();" class="button-add-item">
-									<fmt:message key="label.save.question" />
-								</a>
-							</td> 
-	
-							<td>
-								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
-									<fmt:message key="label.cancel" />
-								</a>
-							</td> 	
-							</tr>					
-						</table>						
-					</td>
-				</tr>
-				
-
-			</table>				
-			</td>
-			</tr>
-				
-			</html:form>
-		</table>
-
+		</html:form>
 	</body>
 </html>

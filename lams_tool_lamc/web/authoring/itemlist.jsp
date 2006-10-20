@@ -18,113 +18,106 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ include file="/common/taglibs.jsp" %>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="ctxPath" value="${pageContext.request.contextPath}"
+	scope="request" />
 <div id="itemList">
-<h2><fmt:message key="label.questions" /> </h2>
-<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" /></h2>
+	<h2 class="spacer-left">
+		<fmt:message key="label.questions" />
+	</h2>
+	<img src="${ctxPath}/includes/images/indicator.gif"
+		style="display:none" id="resourceListArea_Busy" />
+	</h2>
 
-<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-<table id="itemTable" style="align:left;width:650px" >
-    <c:set var="queIndex" scope="request" value="0"/>
-    
-	<tr>
-		<td width="10%" align="right" class="field-name">
-			&nbsp
-		</td>
+	<c:set var="formBean"
+		value="<%=request
+									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<table id="itemTable" class="alternative-color">
+		<c:set var="queIndex" scope="request" value="0" />
 
-		<td width="55%" align="left">
-			&nbsp
-		</td>		
+		<tr>
+			<th width="70%">
 
-		<td width="5%" align="center">
-	 		<c:if test="${totalQuestionCount > 0}"> 				
-		 		<b> <fmt:message key="label.question.marks" /> </b>
-			</c:if> 			
-		</td>
-		
-		<td width="10%" align="right">
-		 		&nbsp
-		</td>
-		
+			</th>
 
-		<td width="10%" align="right">
-			&nbsp
-		</td>
+			<th width="12%">
+				<c:if test="${totalQuestionCount > 0}">
+					<fmt:message key="label.question.marks" />
+				</c:if>
+			</th>
 
-		<td width="10%" align="right">
-			&nbsp		
-		</td>
-	</tr>
-    
-    <c:forEach items="${listQuestionContentDTO}" var="currentDTO" varStatus="status">
-	<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-	<c:set var="question" scope="request" value="${currentDTO.question}"/>
-	<c:set var="feedback" scope="request" value="${currentDTO.feedback}"/>
-	<c:set var="mark" scope="request" value="${currentDTO.mark}"/>
-	<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}"/>	
+			<th colspan="3">
+				&nbsp;
+			</th>
+		</tr>
 
-	<tr>
-		<td width="10%" align="right" class="field-name">
-			<fmt:message key="label.question" />:
-		</td>
+		<c:forEach items="${listQuestionContentDTO}" var="currentDTO"
+			varStatus="status">
+			<c:set var="queIndex" scope="request" value="${queIndex +1}" />
+			<c:set var="question" scope="request" value="${currentDTO.question}" />
+			<c:set var="feedback" scope="request" value="${currentDTO.feedback}" />
+			<c:set var="mark" scope="request" value="${currentDTO.mark}" />
+			<c:set var="displayOrder" scope="request"
+				value="${currentDTO.displayOrder}" />
 
-		<td width="55%" align="left">
-			<c:out value="${question}" escapeXml="false"/> 
-		</td>		
+			<tr>
+				<td>
+					<span class="field-name"> <fmt:message key="label.question" />
+						: </span>
+					<c:out value="${question}" escapeXml="false" />
+				</td>
 
 
-		<td width="5%" align="center">
-			  <c:out value="${mark}" />  
-		</td>
+				<td>
+					<c:out value="${mark}" />
+				</td>
 
+				<td width="12%">
+					<c:if test="${totalQuestionCount != 1}">
+						<c:if test="${queIndex == 1}">
+							<img src="<c:out value="${tool}"/>images/down.gif" border="0"
+								title="<fmt:message key='label.tip.moveQuestionDown'/>"
+								onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
+							<img src="<c:out value="${tool}"/>images/up_disabled.gif"
+								border="0">
+						</c:if>
 
+						<c:if test="${queIndex == totalQuestionCount}">
+							<img src="<c:out value="${tool}"/>images/down_disabled.gif"
+								border="0">
+							<img src="<c:out value="${tool}"/>images/up.gif" border="0"
+								title="<fmt:message key='label.tip.moveQuestionUp'/>"
+								onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
+						</c:if>
 
-			<td width="10%" align="right">
-		 		<c:if test="${totalQuestionCount != 1}"> 		
-		 		
-			 		<c:if test="${queIndex == 1}"> 		
-						<a title="<fmt:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
-		                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
-						</a> 
-					</c:if> 							
-	
-			 		<c:if test="${queIndex == totalQuestionCount}"> 		
-						<a title="<fmt:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
-		                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
-						</a> 
-					</c:if> 							
-					
-					<c:if test="${(queIndex != 1)  && (queIndex != totalQuestionCount)}"> 		
-						<a title="<fmt:message key='label.tip.moveQuestionDown'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
-		                            <img src="<c:out value="${tool}"/>images/down.gif" border="0">
-						</a> 
-	
-						<a title="<fmt:message key='label.tip.moveQuestionUp'/>" href="javascript:;" onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">
-		                            <img src="<c:out value="${tool}"/>images/up.gif" border="0">
-						</a> 
-					</c:if> 							
-				
-				</c:if> 			
-			</td>
+						<c:if
+							test="${(queIndex != 1)  && (queIndex != totalQuestionCount)}">
+							<img src="<c:out value="${tool}"/>images/down.gif" border="0"
+								title="<fmt:message key='label.tip.moveQuestionDown'/>"
+								onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');" />
+							<img src="<c:out value="${tool}"/>images/up.gif" border="0"
+								title="<fmt:message key='label.tip.moveQuestionUp'/>"
+								onclick="javascript:submitModifyAuthoringQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');" />
+						</c:if>
 
-		
+					</c:if>
+				</td>
 
-		<td width="10%" align="right">
-				<a title="<fmt:message key='label.tip.editQuestion'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}"/>');">
-	                    <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
-				</a> 
-		</td>
+				<td width="10%">
+					<img src="<c:out value="${tool}"/>images/edit.gif" border="0"
+						title="<fmt:message key='label.tip.editQuestion'/>"
+						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}"/>');">
+				</td>
 
-		<td width="10%" align="right">
-				<a title="<fmt:message key='label.tip.deleteQuestion'/>" href="javascript:;" onclick="removeQuestion(${queIndex});">
-	                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
-				</a> 				
-		</td>
-	</tr>
-</c:forEach>
+				<td width="10%">
+					<img src="<c:out value="${tool}"/>images/delete.gif" border="0"
+						title="<fmt:message key='label.tip.deleteQuestion'/>"
+						onclick="removeQuestion(${queIndex});">
+				</td>
+			</tr>
+		</c:forEach>
 
-</table>
+	</table>
 </div>
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
