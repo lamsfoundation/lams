@@ -63,15 +63,19 @@ h1.no-tabs-below {
 	padding-top:25px; }
 
 h2 {color:#47bc23; 
-	font-size:14px; 
+	font-size:12px; 
 	margin-left:10px; 
 	margin-bottom:10px; 
 	margin-top:10px; }
 	
 h2.no-space-left {
 	margin-left:0px;
-	}
-	
+}
+
+h2.spacer-left{
+	margin-left:25px;
+}
+
 h3 {color:#47bc23; 
 	font-size:12px; 
 	margin-left:10px; 
@@ -655,9 +659,18 @@ textarea {
 	margin-bottom: 40px;
 }
 
+.space-bottom-top {
+	padding-bottom: 20px;
+	padding-top: 20px;
+}
+
 .small-space-bottom {
 	margin-bottom: 20px;
 }
+
+.small-space-top {padding-top:6px;}
+
+.space-top {padding-top:20px;}
 
 hr {border:0px;
 	border-top:1px solid #ccc; 
@@ -1085,7 +1098,3 @@ vertical-align:middle;
 padding-right:0px;
 border:0px;
 }
-
-.small-space-top {padding-top:6px;}
-
-.space-top {padding-top:20px;}
