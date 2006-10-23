@@ -160,7 +160,7 @@ dynamic class Dictionary {
 			}
 			return v;
 		}else{
-			Debugger.log('Entry not found in '+getInstance()._currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'createFromData','Dictionary');
+			Debugger.log('Entry not found in '+getInstance()._currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'getValue','Dictionary');
 			return "?";
 		}
 		
