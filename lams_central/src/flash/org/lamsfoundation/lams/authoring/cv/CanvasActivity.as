@@ -540,7 +540,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 					styleObj = _tm.getStyleObject('ACTPanel4')
 					break;
 				case '5' :
-					styleObj = _tm.getStyleObject('ACTPanel0')
+					styleObj = _tm.getStyleObject('ACTPanel1')
 					break;
 				case '6' :
 					styleObj = _tm.getStyleObject('ACTPanel3')
@@ -591,13 +591,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 					//act_pnl.setStyle('styleName',styleObj);
 				//}else {
 					
-					styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
-					act_pnl.setStyle('styleName',styleObj);
+				styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
+				act_pnl.setStyle('styleName',styleObj);
 				//}
-			}else {
-					styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
-					act_pnl.setStyle('styleName',styleObj);
-				}
+			} else {
+				styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
+				act_pnl.setStyle('styleName',styleObj);
+			}
 			
 		}
 		

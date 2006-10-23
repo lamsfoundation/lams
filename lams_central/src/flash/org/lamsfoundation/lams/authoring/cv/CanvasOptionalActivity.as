@@ -331,7 +331,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 				styleObj = _tm.getStyleObject('ACTPanel4')
 				break;
 			case '5' :
-				styleObj = _tm.getStyleObject('ACTPanel0')
+				styleObj = _tm.getStyleObject('ACTPanel1')
 				break;
 			case '6' :
 				styleObj = _tm.getStyleObject('ACTPanel3')
