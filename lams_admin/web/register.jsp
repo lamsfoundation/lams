@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -13,20 +14,6 @@
 		<fmt:message key="sysadmin.register.server" />
 	</h2>
 	<br/>
-	
-	<html:hidden property="serverurl"/>
-	<html:hidden property="serverversion"/>
-	<html:hidden property="serverbuild"/>
-	<html:hidden property="serverlocale"/>
-	<html:hidden property="langdate"/>
-	<html:hidden property="groupno"/>
-	<html:hidden property="subgroupno"/>
-	<html:hidden property="sysadminno"/>
-	<html:hidden property="adminno"/>
-	<html:hidden property="authorno"/>
-	<html:hidden property="monitorno"/>
-	<html:hidden property="managerno"/>
-	<html:hidden property="learnerno"/>
 	
 	<table class="alternative-color" width=100%>
 			<tr>
@@ -297,6 +284,133 @@
 				<td>
 					<html:radio property="public" value="true">&nbsp;<fmt:message key="admin.register.directory.public"/></html:radio>&nbsp;&nbsp;
 					<html:radio property="public" value="false">&nbsp;<fmt:message key="admin.register.directory.private"/></html:radio>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">
+					<fmt:message key="admin.register.server.config.title"/>
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.register.server.config.url"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="serverurl"/>
+					<html:hidden property="serverurl"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.register.server.config.version"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="serverversion"/>
+					<html:hidden property="serverversion"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.register.server.config.build"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="serverbuild"/>
+					<html:hidden property="serverbuild"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.register.server.config.locale"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="serverlocale"/>
+					<html:hidden property="serverlocale"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.register.server.config.langdate"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="langdate"/>
+					<html:hidden property="langdate"/>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">
+					<fmt:message key="admin.register.server.stats.title"/>
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.course"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="groupno"/>
+					<html:hidden property="groupno"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.class"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="subgroupno"/>
+					<html:hidden property="subgroupno"/>
+				</td>
+			<tr>
+			<tr>
+				<td>
+					<fmt:message key="role.SYSADMIN"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="sysadminno"/>
+					<html:hidden property="sysadminno"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="role.GROUP.ADMIN"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="adminno"/>
+					<html:hidden property="adminno"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="role.GROUP.MANAGER"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="managerno"/>
+					<html:hidden property="managerno"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="role.AUTHOR"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="authorno"/>
+					<html:hidden property="authorno"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="role.MONITOR"/> 
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="monitorno"/>
+					<html:hidden property="monitorno"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="role.LEARNER"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="learnerno"/>
+					<html:hidden property="learnerno"/>	
 				</td>
 			</tr>
 	</table>
