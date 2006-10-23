@@ -255,7 +255,7 @@ public function viewUpdate(event:Object):Void{
 	}
    
 	public function initDrawTempTrans(){
-		
+		Debugger.log("Initialising drawing temp. Transition", Debugger.GEN, "initDrawTempTrans", "CanvasView");
 		_activityLayer_mc.createEmptyMovieClip("tempTrans", _activityLayer_mc.getNextHighestDepth());
 		_activityLayer_mc.attachMovie("squareHandle", "h1", _activityLayer_mc.getNextHighestDepth());
 		_activityLayer_mc.attachMovie("squareHandle", "h2", _activityLayer_mc.getNextHighestDepth());
@@ -278,13 +278,19 @@ public function viewUpdate(event:Object):Void{
 	   trace("startTransX: "+startTransX)
 	   trace("startTransY: "+startTransY)
 	   trace("_parent._parent: "+_parent._parent);
+	   Debugger.log("Started drawing temp. Transition", Debugger.GEN, "drawTempTrans", "CanvasView");
+	   
 	   this.clear();
+	   
+	   Debugger.log("Runtime movieclips cleared from CanvasView: clear()", Debugger.GEN, "drawTempTrans", "CanvasView");
+	   
 	   Draw.dashTo(this, _parent.h1._x, _parent.h1._y, _parent._parent._xmouse - 3, _parent._parent._ymouse - 3, 7, 4);
 	   _parent.h2._x = _parent._parent._xmouse - 3
 	   _parent.h2._y = _parent._parent._ymouse - 3
    }
 	
 	public function removeTempTrans(){
+	   Debugger.log("Stopped drawing temp. Transition", Debugger.GEN, "removeTempTrans", "CanvasView");
 		trace("stopped Drawing ")
 		delete _activityLayer_mc.tempTrans.onEnterFrame;
 		_activityLayer_mc.tempTrans.removeMovieClip();

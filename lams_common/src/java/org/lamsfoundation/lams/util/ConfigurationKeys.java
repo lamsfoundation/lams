@@ -95,6 +95,9 @@ public class ConfigurationKeys {
 	 */
 	public static String USE_CACHE_DEBUG_LISTENER = "UseCacheDebugListener";
 
+	/** Value for controlling style colour on Canvas Activities */
+	public static String AUTHORING_ACTS_COLOUR = "AuthoringActivitiesColour";
+	
 	/** Values for client updates */
 	public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
 

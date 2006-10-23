@@ -340,7 +340,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function transitionClick(ct:CanvasTransition):Void{
 	   Debugger.log('transitionClick Transition:'+ct.transition.uiID,Debugger.GEN,'transitionClick','CanvasController');
-	    _canvasModel.selectedItem = ct;
+	    _canvasModel.getCanvas().stopActiveTool();
+		
+		_canvasModel.selectedItem = ct;
 		_canvasModel.isDragging = true;
 		ct.startDrag(false);
 	   
@@ -361,7 +363,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
     }
    
     public function transitionRelease(ct:CanvasTransition):Void{
-	_canvasModel.getCanvas().stopActiveTool();
+	Debugger.log("transitionRelease Transition:" + ct.transition.uiID, Debugger.GEN, "transitionRelease", "CanvasController");
 		if(_canvasModel.isDragging){
 			ct.stopDrag();
 			

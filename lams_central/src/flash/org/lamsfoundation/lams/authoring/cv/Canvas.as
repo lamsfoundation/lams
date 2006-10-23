@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ws.Workspace
+import org.lamsfoundation.lams.common.ApplicationParent
 import org.lamsfoundation.lams.common.* 
 import mx.managers.*
 import mx.utils.*
@@ -836,7 +837,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function toggleGroupTool():Void{
 		var c:String = Cursor.getCurrentCursor();
-		if(c==Application.C_GROUP){
+		if(c==ApplicationParent.C_GROUP){
 			stopGroupTool();
 		}else{
 			startGroupTool();
@@ -845,7 +846,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function toggleGateTool():Void{
 		var c:String = Cursor.getCurrentCursor();
-		if(c==Application.C_GATE){
+		if(c==ApplicationParent.C_GATE){
 			stopGateTool();
 		}else{
 			startGateTool();
@@ -854,7 +855,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function toggleOptionalActivity():Void{
 		var c:String = Cursor.getCurrentCursor();
-		if(c==Application.C_OPTIONAL){
+		if(c==ApplicationParent.C_OPTIONAL){
 			stopOptionalActivity();
 		}else{
 			startOptionalActivity();
@@ -862,15 +863,20 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	public function toggleTransitionTool():Void{
+		Debugger.log('Switch on Transition Tool', Debugger.GEN,'toogleTransitionTool','Canvas');
 		var c:String = Cursor.getCurrentCursor();
-		if(c==Application.C_TRANSITION){
-			stopTransitionTool();
-		}else{
-			startTransitionTool();
+		Debugger.log('Current Cursor: ' + c, Debugger.GEN, 'toogleTransitionTool', 'Canvas');
+		
+		if(c==ApplicationParent.C_TRANSITION) {
+				stopTransitionTool();
+		} else {
+				startTransitionTool();
 		}
+		
 	}
 	
 	public function stopActiveTool(){
+		Debugger.log('Stopping Active Tool: ' + canvasModel.activeTool, Debugger.GEN,'stopActiveTool','Canvas');
 		switch(canvasModel.activeTool){
 			case CanvasModel.GATE_TOOL :
 				stopGateTool();
@@ -885,7 +891,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				stopTransitionTool();
 				break;
 			default :
-				Cursor.showCursor(Application.C_DEFAULT);
+				Debugger.log('No tool active. Setting Default.', Debugger.GEN,'stopActiveTool','Canvas');
+				Cursor.showCursor(ApplicationParent.C_DEFAULT);
 				canvasModel.activeTool = null;
 
 		}
@@ -893,37 +900,37 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function startGateTool(){
 		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
-		Cursor.showCursor(Application.C_GATE);
+		Cursor.showCursor(ApplicationParent.C_GATE);
 		canvasModel.activeTool = CanvasModel.GATE_TOOL;
 	}
 		
 	public function stopGateTool(){
 		Debugger.log('Stopping gate tool',Debugger.GEN,'stopGateTool','Canvas');
-		Cursor.showCursor(Application.C_DEFAULT);
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		canvasModel.activeTool = null;
 	}
 	
 	
 	public function startOptionalActivity(){
 		Debugger.log('Starting Optioanl Activity',Debugger.GEN,'startOptionalActivity','Canvas');
-		Cursor.showCursor(Application.C_OPTIONAL);
+		Cursor.showCursor(ApplicationParent.C_OPTIONAL);
 		canvasModel.activeTool = CanvasModel.OPTIONAL_TOOL;
 	}
 		
 	public function stopOptionalActivity(){
 		Debugger.log('Stopping Optioanl Activity',Debugger.GEN,'stopOptionalActivity','Canvas');
-		Cursor.showCursor(Application.C_DEFAULT);
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		canvasModel.activeTool = null;
 	}
 	public function startGroupTool(){
 		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
-		Cursor.showCursor(Application.C_GROUP);
+		Cursor.showCursor(ApplicationParent.C_GROUP);
 		canvasModel.activeTool = CanvasModel.GROUP_TOOL;
 	}
 	
 	public function stopGroupTool(){
 		Debugger.log('Stopping group tool',Debugger.GEN,'startGateTool','Canvas');
-		Cursor.showCursor(Application.C_DEFAULT);
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		canvasModel.activeTool = null;
 	}
 	
@@ -934,8 +941,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function startTransitionTool():Void{
-		//Debugger.log('Starting transition tool',Debugger.GEN,'startTransitionTool','Canvas');			
-		Cursor.showCursor(Application.C_TRANSITION);
+		Debugger.log('Starting transition tool',Debugger.GEN,'startTransitionTool','Canvas');			
+		Cursor.showCursor(ApplicationParent.C_TRANSITION);
 		canvasModel.lockAllComplexActivities();
 		canvasModel.startTransitionTool();
 		
@@ -947,8 +954,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function stopTransitionTool():Void{
-		//Debugger.log('Stopping transition tool',Debugger.GEN,'stopTransitionTool','Canvas');			
-		Cursor.showCursor(Application.C_DEFAULT);
+		Debugger.log('Stopping transition tool',Debugger.GEN,'stopTransitionTool','Canvas');			
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		canvasModel.unlockAllComplexActivities();
 		canvasModel.stopTransitionTool();
 	}

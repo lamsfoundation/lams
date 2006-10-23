@@ -43,6 +43,8 @@ class ApplicationParent {
 	public static var C_DEFAULT:String = "default";
 	public static var C_LICON:String = "c_licon";
 	
+	public static var TRANSITION:String = "transition";
+	
 	public static var SERIAL_NO = "0000-0000-0000-0001-AAAA";
 	public static var FLASH_TOOLSIGNATURE_GATE:String = "lagat11";
 	public static var FLASH_TOOLSIGNATURE_GROUP:String = "lagrp11";

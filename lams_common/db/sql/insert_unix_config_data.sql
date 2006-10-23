@@ -14,6 +14,7 @@ insert into lams_configuration (config_key, config_value) values ('ExecutableExt
 insert into lams_configuration (config_key, config_value) values ('UserInactiveTimeout','86400');
 insert into lams_configuration (config_key, config_value) values ('UseCacheDebugListener','false');
 insert into lams_configuration (config_key, config_value) values ('CleanupPreviewOlderThanDays','7');
+insert into lams_configuration (config_key, config_value) values ('AuthoringActivitiesColour', 'true');
 insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.@datetimestamp@');

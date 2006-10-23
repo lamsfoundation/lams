@@ -496,11 +496,17 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * Handles KEY Releases for Application
     */
 	private function onKeyUp(){
-		var c:String = Cursor.getCurrentCursor();
-		if(c == C_TRANSITION){	
-			_controlKeyPressed = "";
-			//Cursor.showCursor(C_DEFAULT);
-			_canvas.stopTransitionTool()
+		Debugger.log('Key released.',Debugger.GEN,'onKeyUp','Application');
+		if(!Key.isDown(Key.CONTROL)) {
+			if(_controlKeyPressed == ApplicationParent.TRANSITION)
+				Debugger.log('Control Key released.',Debugger.GEN,'onKeyUp','Application');
+				
+				var c:String = Cursor.getCurrentCursor();
+				
+				if(c == ApplicationParent.C_TRANSITION){	
+					_controlKeyPressed = "";
+					_canvas.stopTransitionTool()
+				}
 		}
 		
 	}
@@ -541,14 +547,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			
 			
         }else if(Key.isDown(Key.CONTROL)) {
-			//_canvas.toggleTransitionTool()
 			var c:String = Cursor.getCurrentCursor();
-			if(c != C_TRANSITION){	
-				_controlKeyPressed = "transition";
-				//Cursor.showCursor(C_TRANSITION);
-				//_canvas.model.selectedItem = null;
-				//_canvas.model.resetTransitionTool();
-				//_canvas.model.setActiveTool("TRANSITION") ;
+			if(c != ApplicationParent.C_TRANSITION){	
+				_controlKeyPressed = ApplicationParent.TRANSITION;
 				_canvas.startTransitionTool()
 			}
 			

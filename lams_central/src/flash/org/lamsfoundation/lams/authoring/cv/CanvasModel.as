@@ -250,6 +250,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	}
 	
 	public function lockAllComplexActivities():Void{
+		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){
@@ -262,6 +263,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	
 	public function unlockAllComplexActivities():Void{
+		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){

@@ -521,31 +521,37 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function getAssociatedStyle():Object{
 		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
 		var styleObj:Object = new Object();
-		switch (String(_activity.activityCategoryID)){
-			case '0' :
-				styleObj = _tm.getStyleObject('ACTPanel0')
-                break;
-            case '1' :
-			    styleObj = _tm.getStyleObject('ACTPanel1')
-                break;
-			case '2' :
-				styleObj = _tm.getStyleObject('ACTPanel2')
-				break;
-			case '3' :
-				styleObj = _tm.getStyleObject('ACTPanel5')
-				break;
-			case '4' :
-				styleObj = _tm.getStyleObject('ACTPanel4')
-				break;
-			case '5' :
-				styleObj = _tm.getStyleObject('ACTPanel0')
-				break;
-			case '6' :
-				styleObj = _tm.getStyleObject('ACTPanel3')
-				break;
-            default :
-                styleObj = _tm.getStyleObject('ACTPanel0')
+		
+		if(_root.actColour == "true") {
+			switch (String(_activity.activityCategoryID)){
+				case '0' :
+					styleObj = _tm.getStyleObject('ACTPanel0')
+					break;
+				case '1' :
+					styleObj = _tm.getStyleObject('ACTPanel1')
+					break;
+				case '2' :
+					styleObj = _tm.getStyleObject('ACTPanel2')
+					break;
+				case '3' :
+					styleObj = _tm.getStyleObject('ACTPanel5')
+					break;
+				case '4' :
+					styleObj = _tm.getStyleObject('ACTPanel4')
+					break;
+				case '5' :
+					styleObj = _tm.getStyleObject('ACTPanel0')
+					break;
+				case '6' :
+					styleObj = _tm.getStyleObject('ACTPanel3')
+					break;
+				default :
+					styleObj = _tm.getStyleObject('ACTPanel0')
+			}
+		} else {
+			styleObj = _tm.getStyleObject('ACTPanel');
 		}
+		
 		return styleObj;
 	}
 
