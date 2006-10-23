@@ -94,6 +94,7 @@
 		singleton="false"
 	>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>	
 	

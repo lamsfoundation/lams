@@ -23,14 +23,29 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * @author Manpreet Minhas
  */
 public class GroupDAO extends BaseDAO implements IGroupDAO {
+
+	private final static String NUM_GROUPS = "select count(*) from "
+		+ Group.class.getName() + " group "
+		+ " where group.users.userId = :userID";
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IGroupDAO#getGroupById(java.lang.Long)
@@ -47,4 +62,22 @@ public class GroupDAO extends BaseDAO implements IGroupDAO {
         getHibernateTemplate().delete(group);
 	}
 
+	/** 
+	 * Number of users groups for a particular user. Used to determine
+	 * if we can delete a user.
+	 * 
+	 * @param userID
+	 */
+	public Integer getCountGroupsForUser(final Integer userID) {
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+        return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+            public Object doInHibernate(Session session)
+                    throws HibernateException {
+    	    	Query query = session.createQuery(NUM_GROUPS);
+    	    	query.setInteger("userID", userID);
+    	    	Object value = query.uniqueResult();
+    	    	return new Integer (((Number)value).intValue()); 
+            }
+        });
+	}
 }

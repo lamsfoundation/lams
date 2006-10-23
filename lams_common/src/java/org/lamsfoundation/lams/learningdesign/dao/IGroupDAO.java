@@ -40,5 +40,13 @@ public interface IGroupDAO extends IBaseDAO {
 	public void saveGroup(Group group);
 
 	public void deleteGroup(Group group);
-	
+
+	/** 
+	 * Number of users groups for a particular user. Used to determine
+	 * if we can delete a user.
+	 * 
+	 * @param userID
+	 */
+	public Integer getCountGroupsForUser(Integer userID);
+
 }

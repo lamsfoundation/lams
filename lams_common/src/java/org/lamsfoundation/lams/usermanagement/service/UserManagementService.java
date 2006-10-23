@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.usermanagement.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +37,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * <p>
@@ -76,6 +75,7 @@ public class UserManagementService implements IUserManagementService {
 	private static final String SEQUENCES_FOLDER_NAME_KEY = "runsequences.folder.name";
 
 	private IBaseDAO baseDAO;
+	private IGroupDAO groupDAO; 
 	protected MessageService messageService;
 
 	/**
@@ -96,6 +96,10 @@ public class UserManagementService implements IUserManagementService {
 		this.baseDAO = baseDAO;
 	}
 	
+	public void setGroupDAO(IGroupDAO groupDAO) {
+		this.groupDAO = groupDAO;
+	}
+
 	public void save(Object object) {
 		try{
 			if(object instanceof User){
@@ -600,11 +604,10 @@ public class UserManagementService implements IUserManagementService {
 				return true;
 			}
 		}
-		if (user.getUserGroups()!=null) {
-			if (!user.getUserGroups().isEmpty()) {
-				log.debug("user has data, userGroups: "+user.getUserGroups().size());
-				return true;
-			}
+		int numLessonGroups = groupDAO.getCountGroupsForUser(user.getUserId());
+		if ( numLessonGroups > 0 ) {
+			log.debug("user has data, userGroups: "+numLessonGroups);
+			return true;
 		}
 		return false;
 	}
@@ -679,5 +682,6 @@ public class UserManagementService implements IUserManagementService {
 		
 		save(user);
 	}
+
 	
 }
