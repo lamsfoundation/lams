@@ -1,66 +1,86 @@
-<%@ include file="/common/taglibs.jsp" %>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="ctxPath" value="${pageContext.request.contextPath}"
+	scope="request" />
 <div id="itemList">
-<h2><fmt:message key="label.authoring.basic.survey.list.title" />
-<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="surveyListArea_Busy" /></h2>
+	<h2 class="spacer-left">
+		<fmt:message key="label.authoring.basic.survey.list.title" />
+		<img src="${ctxPath}/includes/images/indicator.gif"
+			style="display:none" id="surveyListArea_Busy" />
+	</h2>
 
-<table id="itemTable" style="align:left;width:650px" >
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+	<table id="itemTable" class="alternative-color">
+		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<c:forEach var="question" items="${sessionMap.questionList}" varStatus="status">
-	<tr>
-		<td width="20px" align="center">
-			<c:choose>
-				<c:when test="${question.type == 1}">
-					<img src="${ctxPath}/includes/images/icon_single.gif"/>
-				</c:when>
-				<c:when test="${question.type == 2}">
-					<img src="${ctxPath}/includes/images/icon_multiple.gif"/>
-				</c:when>
-				<c:when test="${question.type == 3}">
-					<img src="${ctxPath}/includes/images/icon_text.gif"/>
-				</c:when>
-			</c:choose>
-		</td>
-		<td>${question.shortTitle}</td>
-		<td width="80px" align="center">
-			<c:if test="${question.optional}">
-				<fmt:message key="label.optional"/>
-			</c:if>
-		</td>
-		<c:if test="${not status.first}">
-			<td width="20px" align="center">
-				<a href="javascript:;" onclick="upQuestion(${status.index},'${sessionMapID}')">
-					<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0"  title="<fmt:message key="label.up"/>">
-				</a>
-			</td>
-			<c:if test="${status.last}">
-				<td>&nbsp;</td>
-			</c:if>
-		</c:if>
-		<c:if test="${not status.last}">
-			<c:if test="${status.first}">
-				<td>&nbsp;</td>
-			</c:if>
-			<td width="20px" align="center">
-				<a href="javascript:;" onclick="downQuestion(${status.index},'${sessionMapID}')">
-					<img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"  title="<fmt:message key="label.down"/>"> 
-				</a>
-			</td>
-		</c:if>
-		<td width="80px" align="center">
-			<a href="javascript:;" onclick="editItem(${status.index},${question.type},'${sessionMapID}','${contentFolderID}')" class="button">
-				<fmt:message key="label.authoring.basic.survey.edit" />
-			</a>
-		</td>
-		<td width="80px" align="center">
-			<a href="javascript:;" onclick="deleteItem(${status.index},'${sessionMapID}')" class="button">
-				<fmt:message key="label.authoring.basic.survey.delete" />
-			</a>
-		</td>
-	</tr>
-</c:forEach>
-</table>
+		<c:forEach var="question" items="${sessionMap.questionList}"
+			varStatus="status">
+			<tr>
+				<td width="20px" align="center">
+					<c:choose>
+						<c:when test="${question.type == 1}">
+							<img src="${ctxPath}/includes/images/icon_single.gif" />
+						</c:when>
+						<c:when test="${question.type == 2}">
+							<img src="${ctxPath}/includes/images/icon_multiple.gif" />
+						</c:when>
+						<c:when test="${question.type == 3}">
+							<img src="${ctxPath}/includes/images/icon_text.gif" />
+						</c:when>
+					</c:choose>
+				</td>
+
+				<td>
+					${question.shortTitle}
+				</td>
+
+				<td width="80px" align="center">
+					<c:if test="${question.optional}">
+						<fmt:message key="label.optional" />
+					</c:if>
+				</td>
+
+				<td width="40px" align="center">
+					<c:if test="${not status.first}">
+						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
+							border="0" title="<fmt:message key="label.up"/>"
+							onclick="upQuestion(${status.index},'${sessionMapID}')">
+						<c:if test="${status.last}">
+							<img
+								src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+								border="0" title="<fmt:message key="label.down"/>">
+						</c:if>
+					</c:if>
+
+					<c:if test="${not status.last}">
+						<c:if test="${status.first}">
+							<img
+								src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+								border="0" title="<fmt:message key="label.up"/>">
+						</c:if>
+
+						<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
+							border="0" title="<fmt:message key="label.down"/>"
+							onclick="downQuestion(${status.index},'${sessionMapID}')">
+					</c:if>
+				</td>
+
+				<td width="20px" align="center">
+
+					<img src="<html:rewrite page='/includes/images/edit.gif'/>"
+						border="0"
+						title="<fmt:message key="label.authoring.basic.survey.edit"/>"
+						onclick="editItem(${status.index},${question.type},'${sessionMapID}','${contentFolderID}')">
+
+				</td>
+				<td width="20px" align="center">
+
+					<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0"
+						title="<fmt:message
+							key="label.authoring.basic.survey.delete" />"
+						onclick="deleteItem(${status.index},'${sessionMapID}')">
+				</td>
+			</tr>
+		</c:forEach>
+	</table>
 </div>
 <%-- This script will works when a new resoruce item submit in order to refresh "Survey List" panel. --%>
 <script lang="javascript">

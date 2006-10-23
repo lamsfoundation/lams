@@ -1,39 +1,60 @@
-<%@ include file="/common/taglibs.jsp" %>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
-<c:set var="listSize" value="${fn:length(instructionList)}"/>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="ctxPath" value="${pageContext.request.contextPath}"
+	scope="request" />
+<c:set var="listSize" value="${fn:length(instructionList)}" />
 <div id="instructionArea">
 	<form id="instructionForm">
-	<input type="hidden" name="instructionCount" id="instructionCount">
-	<table border="0" style="width:400px" id="questionTable">
-		<c:forEach var="item" items="${instructionList}" varStatus="status">
-			<tr id="instructionItem${status.index}">
-				<td width="3px">${status.index+1}</td>
-				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="60" value="${item}"></td>
-				
-				<td width="20px">
-					<%-- Don't display down icon if last line --%>
-					<c:if test="${0 != status.index}">
-						<a href="javascript:;" onclick="upItem('${status.index}')">
-							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0"  title="<fmt:message key="label.up"/>">
-						</a>
-					</c:if>
-				</td>
-				<td width="20px">
-					<%-- Don't display down icon if last line --%>
-					<c:if test="${listSize != status.count}">
-						<a href="javascript:;" onclick="downItem('${status.index}','${listSize}')">
-							<img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"  title="<fmt:message key="label.down"/>"> 
-						</a>
-					</c:if>
-				</td>
-				<td width="30px" align="center">
-					<a href="javascript:;" onclick="removeInstruction('${status.index}')">
-						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0" title="<fmt:message key="label.delete"/>">
-					</a>
-				</td>
-			</tr>
-		</c:forEach>
-	</table>
+		<input type="hidden" name="instructionCount" id="instructionCount">
+		<table id="questionTable">
+			<c:forEach var="item" items="${instructionList}" varStatus="status">
+				<tr id="instructionItem${status.index}">
+					<td width="3px">
+						${status.index+1}
+					</td>
+					<td width="100px">
+						<input type="text" name="instructionItemDesc${status.index}"
+							id="instructionItemDesc${status.index}" size="60" value="${item}">
+					</td>
+
+					<td width="40px">
+						<%-- Don't display down icon if last line --%>
+						<c:choose>
+							<c:when test="${0 != status.index}">
+								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>"
+									onclick="upItem('${status.index}')">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>">
+							</c:otherwise>
+						</c:choose>
+
+
+						<c:choose>
+							<c:when test="${listSize != status.count}">
+								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>"
+									onclick="downItem('${status.index}','${listSize}')">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>">
+							</c:otherwise>
+						</c:choose>
+
+						<%-- Don't display down icon if last line --%>
+					</td>
+					<td width="30px" align="center">
+						<img src="<html:rewrite page='/includes/images/cross.gif'/>"
+							border="0" title="<fmt:message key="label.delete"/>"
+							onclick="removeInstruction('${status.index}')">
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
 	</form>
 </div>
 
