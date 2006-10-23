@@ -25,65 +25,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
+		<lams:css style="tabbed" />
 	</head>
-	
+
 	<body>
-		<table cellpadding="0">
-	
-			<html:form  action="/authoring?validate=false" styleId="newNominationForm" enctype="multipart/form-data" method="POST">				
-			<html:hidden property="dispatch" value="addSingleNomination"/>
-			<html:hidden property="toolContentID"/>
+		<html:form action="/authoring?validate=false"
+			styleId="newNominationForm" enctype="multipart/form-data"
+			method="POST">
+			<html:hidden property="dispatch" value="addSingleNomination" />
+			<html:hidden property="toolContentID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="activeModule"/>
-			<html:hidden property="httpSessionID"/>								
-			<html:hidden property="defaultContentIdStr"/>								
-			<html:hidden property="defineLaterInEditMode"/>										
-			<html:hidden property="contentFolderID"/>														
-			<html:hidden property="editNominationBoxRequest" value="false"/>																				
-			
-			<tr>
-			<td>
-			<table class="innerforms">
-		
-				<tr>
-					<td>
-						<div class="field-name">
-							<fmt:message key="label.add.new.nomination"></fmt:message>
-						</div>
-						<lams:FCKEditor id="newNomination"
-							value="${voteGeneralAuthoringDTO.editableNominationText}"
-							contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
-					</td>
-				</tr>
-				
+			<html:hidden property="activeModule" />
+			<html:hidden property="httpSessionID" />
+			<html:hidden property="defaultContentIdStr" />
+			<html:hidden property="defineLaterInEditMode" />
+			<html:hidden property="contentFolderID" />
+			<html:hidden property="editNominationBoxRequest" value="false" />
 
-				<tr>
-					<td align="center" valign="bottom">
-						<table>
-							<tr>
-							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="getElementById('newNominationForm').submit();" class="button-add-item">
-									<fmt:message key="label.save.nomination" />
-								</a>
-							</td> 
-	
-							<td>
-								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
-									<fmt:message key="label.cancel" />
-								</a>
-							</td> 	
-							</tr>					
-						</table>						
-					</td>
-				</tr>
+			<div class="field-name">
+				<fmt:message key="label.add.new.nomination"></fmt:message>
+			</div>
+			<lams:FCKEditor id="newNomination"
+				value="${voteGeneralAuthoringDTO.editableNominationText}"
+				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 
+			<div class="space-bottom-top">
+				<a href="#" onclick="getElementById('newNominationForm').submit();"
+					class="button-add-item"> <fmt:message
+						key="label.save.nomination" /> </a>
 
-			</table>				
-			</td>
-			</tr>
-				
-			</html:form>
-		</table>
+				<a href="#" onclick="javascript:window.parent.hideMessage()"
+					class="button space-left"> <fmt:message key="label.cancel" />
+				</a>
+			</div>
 
+		</html:form>
 	</body>
 </html>

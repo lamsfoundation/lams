@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
 		if(area != null){
-			area.style.width="670px";
+			area.style.width="640px";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -65,94 +65,74 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </script>
 
-			<html:hidden property="questionIndex"/>
-			<table cellpadding="0">
+<html:hidden property="questionIndex" />
+<table cellpadding="0">
 
-						<tr>
-							<td colspan="2">
-								<div class="field-name">
-									<fmt:message key="label.authoring.title.col"></fmt:message>
-								</div>
-								<html:text property="title" style="width: 100%;"></html:text>
-							</td>
-						</tr>
-						
-
-						<tr>
-							<td colspan="2">
-								<div class="field-name">
-									<fmt:message key="label.authoring.instructions.col"></fmt:message>
-								</div>
-								<lams:FCKEditor id="instructions"
-									value="${qaGeneralAuthoringDTO.activityInstructions}"
-									contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
-							</td>
-						</tr>
-	
-				 		<tr>
-						<td colspan="2">
-							<div id="resourceListArea">
-						 		<c:if test="${qaGeneralAuthoringDTO.activeModule == 'authoring' || qaGeneralAuthoringDTO.activeModule == 'defineLater'}"> 		
-									<%@ include file="/authoring/itemlist.jsp"%>
-								</c:if> 							
-						 		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring' && qaGeneralAuthoringDTO.activeModule != 'defineLater'}"> 		
-									<%@ include file="/monitoring/itemlist.jsp"%>
-								</c:if> 							
-							</div>
-						</td>
-						</tr>
-						
-
-			 		<c:if test="${qaGeneralAuthoringDTO.activeModule == 'authoring' || qaGeneralAuthoringDTO.activeModule == 'defineLater'}"> 								
-						<tr>
-							<td colspan="2">
-									<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}"/>');"
-										style="float:right;width:150px" class="button-add-item"> <fmt:message
-										key="label.add.new.question" /> </a>
-							</td>
-						</tr>
-					</c:if> 												
-			 		<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring' && qaGeneralAuthoringDTO.activeModule != 'defineLater'}"> 							
-						<tr>
-							<td colspan="2">
-									<a href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}"/>');"
-										style="float:right;width:150px" class="button-add-item"> <fmt:message
-										key="label.add.new.question" /> </a>
-							</td>
-						</tr>
-					</c:if> 																		 		
-
-					<tr>
-						<td colspan="2">
-							<iframe
-								onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-								id="messageArea" name="messageArea"
-								style="width:0px;height:0px;border:0px;display:none"
-								frameborder="no" scrolling="no">
-							</iframe>
-						</td>
-					</tr>
-
-			 </table>			
-				 
+	<tr>
+		<td colspan="2">
+			<div class="field-name">
+				<fmt:message key="label.authoring.title.col"></fmt:message>
+			</div>
+			<html:text property="title" style="width: 100%;"></html:text>
+		</td>
+	</tr>
 
 
-				
-				<table cellpadding="0">
-					    <tr> <td> &nbsp </td> </tr>					    
-						<tr> 
-							<td>							
-						      	<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring'}"> 					
-									<p align="right">
-									    <a href="javascript:submitMethod('submitAllContent')" class="button">
-								        	<fmt:message key="label.save"/></a>
-									</p>
-									
-								</c:if> 					
-							</td> 
-					  	</tr>
-				 </table>
+	<tr>
+		<td colspan="2">
+			<div class="field-name">
+				<fmt:message key="label.authoring.instructions.col"></fmt:message>
+			</div>
+			<lams:FCKEditor id="instructions"
+				value="${qaGeneralAuthoringDTO.activityInstructions}"
+				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+		</td>
+	</tr>
+</table>
 
-		
 
-				
+<div id="resourceListArea">
+	<c:if
+		test="${qaGeneralAuthoringDTO.activeModule == 'authoring' || qaGeneralAuthoringDTO.activeModule == 'defineLater'}">
+		<%@ include file="/authoring/itemlist.jsp"%>
+	</c:if>
+	<c:if
+		test="${qaGeneralAuthoringDTO.activeModule != 'authoring' && qaGeneralAuthoringDTO.activeModule != 'defineLater'}">
+		<%@ include file="/monitoring/itemlist.jsp"%>
+	</c:if>
+</div>
+
+<p>
+	<c:if
+		test="${qaGeneralAuthoringDTO.activeModule == 'authoring' || qaGeneralAuthoringDTO.activeModule == 'defineLater'}">
+		<a
+			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}"/>');"
+			class="button-add-item"> <fmt:message
+				key="label.add.new.question" /> </a>
+
+	</c:if>
+	<c:if
+		test="${qaGeneralAuthoringDTO.activeModule != 'authoring' && qaGeneralAuthoringDTO.activeModule != 'defineLater'}">
+		<a
+			href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}"/>');"
+			class="button-add-item"> <fmt:message
+				key="label.add.new.question" /> </a>
+	</c:if>
+</p>
+
+<p>
+	<iframe
+		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		id="messageArea" name="messageArea"
+		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
+		scrolling="no">
+	</iframe>
+</p>
+
+<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring'}">
+	<p align="right">
+		<a href="javascript:submitMethod('submitAllContent')" class="button">
+			<fmt:message key="label.save" /> </a>
+	</p>
+
+</c:if>
