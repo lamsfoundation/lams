@@ -20,7 +20,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-
 <jsp:include page="/authoring/AuthoringTabsHolder.jsp" />
