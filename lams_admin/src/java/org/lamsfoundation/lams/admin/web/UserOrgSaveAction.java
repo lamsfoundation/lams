@@ -39,14 +39,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Jun-Dir Liew
@@ -79,6 +78,7 @@ public class UserOrgSaveAction extends Action{
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+		
 		DynaActionForm userOrgForm = (DynaActionForm)form;
 				
 		Integer orgId = (Integer)userOrgForm.get("orgId");
@@ -88,7 +88,10 @@ public class UserOrgSaveAction extends Action{
 			return mapping.findForward("userlist");
 		}
 		
-		Organisation organisation = (Organisation)getService().findById(Organisation.class, orgId);
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		if (rolelist==null) rolelist = service.findAll(Role.class);
+		
+		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
 		Set uos = organisation.getUserOrganisations();
 		
 		String[] userIds = (String[])userOrgForm.get("userIds");
@@ -102,7 +105,7 @@ public class UserOrgSaveAction extends Action{
 			Integer userId = uo.getUser().getUserId();
 			if(userIdList.indexOf(userId.toString())<0){
 				iter.remove();
-				User user = (User)getService().findById(User.class, userId);
+				User user = (User)service.findById(User.class, userId);
 				Set userUos = user.getUserOrganisations();
 				userUos.remove(uo);
 				user.setUserOrganisations(userUos);
@@ -123,14 +126,14 @@ public class UserOrgSaveAction extends Action{
 				}
 			}
 			if(!alreadyInOrg){
-				User user = (User)getService().findById(User.class,userId);
+				User user = (User)service.findById(User.class,userId);
 				UserOrganisation uo = new UserOrganisation(user,organisation);
 				newUserOrganisations.add(uo);
 			}
 		}
 		
 		organisation.setUserOrganisations(uos);
-		getService().save(organisation);
+		service.save(organisation);
 		
 		// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
 		if(newUserOrganisations.isEmpty()){
@@ -160,14 +163,5 @@ public class UserOrgSaveAction extends Action{
 		}
 		return allRoles;
 	}
-	
-	@SuppressWarnings("unchecked")
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-			rolelist = getService().findAll(Role.class);
-		}
-		return service;
-	}
+
 }

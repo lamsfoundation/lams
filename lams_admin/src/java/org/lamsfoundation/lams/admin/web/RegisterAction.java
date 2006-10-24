@@ -22,40 +22,28 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Role;
-
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * ConfigAction
@@ -75,7 +63,6 @@ public class RegisterAction extends LamsDispatchAction {
 
 	private static final Logger log = Logger.getLogger(RegisterAction.class);
 	private static IUserManagementService service;
-	private static MessageService messageService;
 	
 	public ActionForward unspecified(ActionMapping mapping,
             ActionForm form,
@@ -85,7 +72,8 @@ public class RegisterAction extends LamsDispatchAction {
 		// check permission
 		if(!request.isUserInRole(Role.SYSADMIN)){
 			request.setAttribute("errorName","RegisterAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
+			request.setAttribute("errorMessage",AdminServiceProxy.getMessageService(getServlet().getServletContext())
+				.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
@@ -142,20 +130,5 @@ public class RegisterAction extends LamsDispatchAction {
 		
 		return mapping.findForward("sysadmin");
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
-	
-	private MessageService getMessageService(){
-		if(messageService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			messageService = (MessageService)ctx.getBean("adminMessageService");
-		}
-		return messageService;
-	}
+
 }

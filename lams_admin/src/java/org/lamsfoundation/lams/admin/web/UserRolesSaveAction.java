@@ -40,13 +40,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
@@ -71,6 +70,12 @@ public class UserRolesSaveAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		if (rolelist==null) {
+			rolelist = service.findAll(Role.class);
+			Collections.sort(rolelist);
+		}
+		
 		ActionMessages errors = new ActionMessages();
 		DynaActionForm userRolesForm = (DynaActionForm) form;
 		Integer orgId = (Integer) userRolesForm.get("orgId");
@@ -84,8 +89,8 @@ public class UserRolesSaveAction extends Action {
 		}
 		
 		log.debug("userId: "+userId+", orgId: "+orgId+" will have "+roles.length+" roles");
-		Organisation org = (Organisation)getService().findById(Organisation.class, orgId);
-		User user = (User)getService().findById(User.class, userId);
+		Organisation org = (Organisation)service.findById(Organisation.class, orgId);
+		User user = (User)service.findById(User.class, userId);
 		
 		// user must have at least 1 role
 		if (roles.length < 1) {
@@ -103,11 +108,11 @@ public class UserRolesSaveAction extends Action {
 		OrganisationType orgType = org.getOrganisationType();
 		Organisation parentOrg = org.getParentOrganisation();
 		if (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE) 
-				&& getService().getUserOrganisation(userId, parentOrg.getOrganisationId())==null) {
+				&& service.getUserOrganisation(userId, parentOrg.getOrganisationId())==null) {
 			orgs.add(parentOrg);
 		}
 		for (Organisation o : orgs) {
-			getService().setRolesForUserOrganisation(user, o, (List<String>)Arrays.asList(roles));
+			service.setRolesForUserOrganisation(user, o, (List<String>)Arrays.asList(roles));
 		}
 		
 		return mapping.findForward("userlist");
@@ -128,16 +133,6 @@ public class UserRolesSaveAction extends Action {
 			allRoles.remove(role);
 		}
 		return allRoles;
-	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-			rolelist = service.findAll(Role.class);
-			Collections.sort(rolelist);
-		}
-		return service;
 	}
 
 }

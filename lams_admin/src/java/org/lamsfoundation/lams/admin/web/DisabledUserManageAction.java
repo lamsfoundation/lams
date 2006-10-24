@@ -34,12 +34,9 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
@@ -51,8 +48,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class DisabledUserManageAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(DisabledUserManageAction.class);
-	private static IUserManagementService service;
-	private static MessageService messageService;
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
@@ -61,30 +56,19 @@ public class DisabledUserManageAction extends Action {
 		
 		if (!request.isUserInRole(Role.SYSADMIN)) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",AdminServiceProxy
+					.getMessageService(getServlet().getServletContext())
+					.getMessage("error.need.sysadmin"));
 			return mapping.findForward("error");
 		}
 		
-		List users = getService().findByProperty(User.class, "disabledFlag", true);
+		List users = AdminServiceProxy
+			.getService(getServlet().getServletContext())
+			.findByProperty(User.class, "disabledFlag", true);
 		log.debug("got "+users.size()+" disabled users");
 		request.setAttribute("users", users);
 		
 		return mapping.findForward("disabledlist");
 	}
 
-	private IUserManagementService getService() {
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
-	
-	private MessageService getMessageService(){
-		if(messageService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			messageService = (MessageService)ctx.getBean("adminMessageService");
-		}
-		return messageService;
-	}
 }

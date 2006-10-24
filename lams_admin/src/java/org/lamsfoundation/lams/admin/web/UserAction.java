@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -47,10 +48,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Jun-Dir Liew
@@ -76,13 +74,19 @@ public class UserAction extends LamsDispatchAction {
 	private static Logger log = Logger.getLogger(UserAction.class);
 	private static IUserManagementService service;
 	private static MessageService messageService;
-	private static IAuditService auditService;
 	private static List<SupportedLocale> locales;
 	
 	public ActionForward edit(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		if (locales==null) {
+			locales = service.findAll(SupportedLocale.class);
+			Collections.sort(locales);
+		}
 		
 		DynaActionForm userForm = (DynaActionForm)form;
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
@@ -92,25 +96,25 @@ public class UserAction extends LamsDispatchAction {
 		Organisation org = null;
 		Boolean requestorHasRole = false;
 		if (orgId!=null) {
-			org = (Organisation)getService().findById(Organisation.class,orgId);
+			org = (Organisation)service.findById(Organisation.class,orgId);
 			OrganisationType orgType = org.getOrganisationType();
 			Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
 				? org.getParentOrganisation().getOrganisationId() : orgId;
-			User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-			requestorHasRole = getService().isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
-				|| getService().isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
+			User requestor = (User)service.getUserByLogin(request.getRemoteUser());
+			requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
+				|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
 		}
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 		
 		if (!(requestorHasRole || isSysadmin)) {
 			request.setAttribute("errorName", "UserAction");
-			request.setAttribute("errorMessage", getMessageService().getMessage("error.authorisation"));
+			request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 
 		// editing a user
 		if (userId!=null && userId!=0) {
-			User user = (User)getService().findById(User.class, userId);
+			User user = (User)service.findById(User.class, userId);
 			log.debug("got userid to edit: "+userId);
 			BeanUtils.copyProperties(userForm, user);
 			userForm.set("password", null);
@@ -120,7 +124,7 @@ public class UserAction extends LamsDispatchAction {
 			try {
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 				log.debug("using defaultLocale: "+defaultLocale);
-				SupportedLocale locale = getService().getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
+				SupportedLocale locale = service.getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
 				userForm.set("localeId", locale.getLocaleId());
 			} catch(Exception e) {
                 log.debug(e);				
@@ -138,17 +142,20 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		
 		if (!request.isUserInRole(Role.SYSADMIN)) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
 			return mapping.findForward("error");
 		}
 		
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		Integer userId = WebUtil.readIntParam(request,"userId");
-		User user = (User)getService().findById(User.class,userId);
+		User user = (User)service.findById(User.class,userId);
 		
-		Boolean hasData = getService().userHasData(user);
+		Boolean hasData = service.userHasData(user);
 
 		request.setAttribute("method", (hasData?"disable":"delete"));
 		request.setAttribute("orgId",orgId);
@@ -160,20 +167,22 @@ public class UserAction extends LamsDispatchAction {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 		
 		if (!request.isUserInRole(Role.SYSADMIN)) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
 			return mapping.findForward("error");
 		}
 		
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		Integer userId = WebUtil.readIntParam(request,"userId");
-		getService().disableUser(userId);
+		AdminServiceProxy.getService(getServlet().getServletContext()).disableUser(userId);
 		String[] args = new String[1];
 		args[0] = userId.toString();
-		String message = getMessageService().getMessage("audit.user.disable", args);
-		getAuditService().log(AdminConstants.MODULE_NAME, message);
+		String message = messageService.getMessage("audit.user.disable", args);
+		AdminServiceProxy.getAuditService(getServlet().getServletContext()).log(AdminConstants.MODULE_NAME, message);
 		
 		if (orgId==null || orgId==0) {
 			return mapping.findForward("usersearch");
@@ -188,16 +197,18 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		
 		if (!request.isUserInRole(Role.SYSADMIN)) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
 			return mapping.findForward("error");
 		}
 		
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		Integer userId = WebUtil.readIntParam(request,"userId");
 		try {
-			getService().removeUser(userId);
+			AdminServiceProxy.getService(getServlet().getServletContext()).removeUser(userId);
 		} catch (Exception e) {
 			request.setAttribute("errorName","UserAction");
 			request.setAttribute("errorMessage",e.getMessage());
@@ -205,8 +216,8 @@ public class UserAction extends LamsDispatchAction {
 		}
 		String[] args = new String[1];
 		args[0] = userId.toString();
-		String message = getMessageService().getMessage("audit.user.delete", args);
-		getAuditService().log(AdminConstants.MODULE_NAME, message);
+		String message = messageService.getMessage("audit.user.delete", args);
+		AdminServiceProxy.getAuditService(getServlet().getServletContext()).log(AdminConstants.MODULE_NAME, message);
 		
 		if (orgId==null || orgId==0) {
 			return mapping.findForward("usersearch");
@@ -222,48 +233,23 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		
 		if (!request.isUserInRole(Role.SYSADMIN)) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
 			return mapping.findForward("error");
 		}
 		
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
-		User user = (User)getService().findById(User.class,userId);
+		User user = (User)service.findById(User.class,userId);
 		
 		log.debug("enabling user: "+userId);
 		user.setDisabledFlag(false);
-		getService().save(user);
+		service.save(user);
 				
 		return mapping.findForward("disabledlist");
 	}
-	
-	@SuppressWarnings("unchecked")
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-			locales = service.findAll(SupportedLocale.class);
-			Collections.sort(locales);
-			//rolelist = service.findAll(Role.class);
-			//Collections.sort(rolelist);
-		}
-		return service;
-	}
-	
-	private MessageService getMessageService(){
-		if(messageService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			messageService = (MessageService)ctx.getBean("adminMessageService");
-		}
-		return messageService;
-	}
-	
-	private IAuditService getAuditService(){
-		if(auditService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			auditService = (IAuditService)ctx.getBean("auditService");
-		}
-		return auditService;
-	}
+
 }

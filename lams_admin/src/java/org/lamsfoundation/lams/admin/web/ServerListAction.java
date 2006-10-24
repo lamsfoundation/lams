@@ -32,10 +32,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
-import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * <p>
@@ -54,24 +52,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ServerListAction extends Action {
 	
-	private static IIntegrationService service;
-	
 	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-		List<ExtServerOrgMap> list = getService().getAllExtServerOrgMaps();
+		List<ExtServerOrgMap> list = AdminServiceProxy
+			.getIntegrationService(getServlet().getServletContext())
+			.getAllExtServerOrgMaps();
 		Collections.sort(list);
 		request.setAttribute("servers", list);
 		return mapping.findForward("serverlist");
 	}
-	
-	private IIntegrationService getService(){
-		if(service == null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IIntegrationService)ctx.getBean("integrationService");
-		}
-		return service;
-	}
+
 }

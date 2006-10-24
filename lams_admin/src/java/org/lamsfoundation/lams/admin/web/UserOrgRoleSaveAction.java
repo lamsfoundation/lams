@@ -26,9 +26,7 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,15 +36,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
@@ -78,11 +72,13 @@ public class UserOrgRoleSaveAction extends Action {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
 		ArrayList userBeans = userOrgRoleForm.getUserBeans();
 		log.debug("userBeans is null? "+userBeans==null);
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
-		Organisation organisation = (Organisation)getService().findById(Organisation.class, orgId);
+		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
 		request.setAttribute("org",orgId);
 		request.getSession().removeAttribute("UserOrgRoleForm");		
 		if(isCancelled(request)){
@@ -95,25 +91,17 @@ public class UserOrgRoleSaveAction extends Action {
 		// for subgroups, if user is not a member of the parent group then add to that as well.
 		for(int i=0; i<userBeans.size(); i++){
 			UserBean bean = (UserBean)userBeans.get(i);
-			User user = (User)getService().findById(User.class, bean.getUserId());
+			User user = (User)service.findById(User.class, bean.getUserId());
 			log.debug("userId: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
-			getService().setRolesForUserOrganisation(user, organisation, (List<String>)Arrays.asList(roleIds));
+			service.setRolesForUserOrganisation(user, organisation, (List<String>)Arrays.asList(roleIds));
 			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-				if (getService().getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
-					getService().setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
+				if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
+					service.setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
 				}
 			}
 		}
 		return mapping.findForward("userlist");
-	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
 	}
 
 }

@@ -36,8 +36,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -48,8 +48,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Jun-Dir Liew
@@ -78,15 +76,18 @@ public class UserOrgAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		ActionMessages errors = new ActionMessages();
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		
+		//ActionMessages errors = new ActionMessages();
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		log.debug("orgId: "+orgId);
         // get org name
-		Organisation organisation = (Organisation)getService().findById(Organisation.class,orgId);
+		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
 
 		if((orgId==null)||(orgId<=0)||organisation==null){
 			request.setAttribute("errorName","UserOrgAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.org.invalid"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
 			return mapping.findForward("error");
 		}
 		
@@ -105,19 +106,19 @@ public class UserOrgAction extends Action {
 		List users = new ArrayList<User>();
 		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
 		if(request.isUserInRole(Role.SYSADMIN)){
-			users = getService().findAll(User.class);
-		}else if(getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)
-				|| getService().isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
+			users = service.findAll(User.class);
+		}else if(service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)
+				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
 			if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
-				users = getService().findAll(User.class);
+				users = service.findAll(User.class);
 			}else if(orgType.equals(OrganisationType.CLASS_TYPE)){
-				users = getService().getUsersFromOrganisation(parentOrg.getOrganisationId());
+				users = service.getUsersFromOrganisation(parentOrg.getOrganisationId());
 			}else if(orgType.equals(OrganisationType.COURSE_TYPE)){
-				users = getService().getUsersFromOrganisation(orgId);
+				users = service.getUsersFromOrganisation(orgId);
 			}
 		}else{
 			request.setAttribute("errorName","UserOrgAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		users = removeDisabledUsers(users);
@@ -130,7 +131,7 @@ public class UserOrgAction extends Action {
 		userOrgForm.set("orgName",orgName);
 				
 		// create list of userids, members of this org
-		List<User> memberUsers = getService().getUsersFromOrganisation(orgId);
+		List<User> memberUsers = service.getUsersFromOrganisation(orgId);
 		String[] userIds = new String[memberUsers.size()];
 		for(int i=0; i<userIds.length; i++){
 			userIds[i] = memberUsers.get(i).getUserId().toString();
@@ -150,20 +151,5 @@ public class UserOrgAction extends Action {
 		}
 		return filteredList;
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
-	
-	private MessageService getMessageService(){
-		if(messageService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			messageService = (MessageService)ctx.getBean("adminMessageService");
-		}
-		return messageService;
-	}
+
 }

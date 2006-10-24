@@ -37,13 +37,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
@@ -72,6 +71,8 @@ public class UserOrgRoleAction extends Action {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
 		
 		// set list of roles appropriate for the organisation type
@@ -80,7 +81,7 @@ public class UserOrgRoleAction extends Action {
 		Collections.sort(roles);
 		request.setAttribute("roles",roles);
 		
-		Organisation organisation = (Organisation)getService().findById(Organisation.class, (Integer)request.getAttribute("orgId"));
+		Organisation organisation = (Organisation)service.findById(Organisation.class, (Integer)request.getAttribute("orgId"));
 		userOrgRoleForm.setOrgId(organisation.getOrganisationId());
 		
 		// populate form with users
@@ -92,7 +93,7 @@ public class UserOrgRoleAction extends Action {
 			// flag users that will be added to parent group if necessary
 			userBean.setMemberOfParent(true);
 			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-				if (getService().getUserOrganisation(user.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null)
+				if (service.getUserOrganisation(user.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null)
 					userBean.setMemberOfParent(false);
 			}
 			userOrgRoleForm.addUserBean(userBean);
@@ -102,13 +103,6 @@ public class UserOrgRoleAction extends Action {
 
 		return mapping.findForward("userorgrole");		
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
+
 
 }

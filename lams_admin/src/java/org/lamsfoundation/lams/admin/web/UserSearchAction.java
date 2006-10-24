@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -82,6 +83,7 @@ public class UserSearchAction extends Action {
 			return mapping.findForward("usersearchlist");
 		}
 
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		DynaActionForm userSearchForm = (DynaActionForm)form;
 		
 		String userId = ((String)userSearchForm.get("sUserId")).trim();
@@ -100,14 +102,14 @@ public class UserSearchAction extends Action {
 			if(login.length()>0) stringProperties.put("login","%"+login+"%");
 			if(firstName.length()>0) stringProperties.put("firstName","%"+firstName+"%");
 			if(lastName.length()>0) stringProperties.put("lastName","%"+lastName+"%");
-			if(!stringProperties.isEmpty()) userList = getService().searchByStringProperties(User.class,stringProperties);
+			if(!stringProperties.isEmpty()) userList = service.searchByStringProperties(User.class,stringProperties);
 		}else{
 			Map<String, Object> objectProperties = new HashMap<String,Object>();
 			objectProperties.put("userId",userId);
 			if(login.length()>0) objectProperties.put("login",login);
 			if(firstName.length()>0) objectProperties.put("firstName",firstName);
 			if(lastName.length()>0) objectProperties.put("lastName",lastName);
-			if(!objectProperties.isEmpty()) userList = getService().findByProperties(User.class,objectProperties);
+			if(!objectProperties.isEmpty()) userList = service.findByProperties(User.class,objectProperties);
 		}
 		
 		if(userList.isEmpty() && (Boolean)userSearchForm.get("searched")){
@@ -132,14 +134,6 @@ public class UserSearchAction extends Action {
 			}
 		}
 		return filteredList;
-	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
 	}
 	
 }

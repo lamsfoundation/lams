@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -49,8 +50,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
@@ -71,10 +70,18 @@ public class UserRolesAction extends Action {
 	private static MessageService messageService;
 	private static List<Role> rolelist;
 	
+	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		if (rolelist==null) {
+			rolelist = service.findAll(Role.class);
+			Collections.sort(rolelist);
+		}
 		
 		ActionMessages errors = new ActionMessages();
 		DynaActionForm userRolesForm = (DynaActionForm)form;
@@ -97,19 +104,19 @@ public class UserRolesAction extends Action {
 		log.debug("editing roles for userId: "+userId+" and orgId: "+orgId);
 		
 		// test requestor's permission
-		Organisation org = (Organisation)getService().findById(Organisation.class,orgId);
-		User user = (User)getService().findById(User.class, userId);
+		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+		User user = (User)service.findById(User.class, userId);
 		OrganisationType orgType = org.getOrganisationType();
 		Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
 			? org.getParentOrganisation().getOrganisationId() : orgId;
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		Boolean requestorHasRole = getService().isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
-			|| getService().isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
+		User requestor = (User)service.getUserByLogin(request.getRemoteUser());
+		Boolean requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
+			|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
 		
 		if (!(requestorHasRole || isSysadmin)) {
 			request.setAttribute("errorName","UserRolesAction");
-			request.setAttribute("errorMessage",getMessageService().getMessage("error.authorisation"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
@@ -121,7 +128,7 @@ public class UserRolesAction extends Action {
 		request.setAttribute("orgName", org.getName());
 		
 		String[] roles = null;
-		UserOrganisation uo = getService().getUserOrganisation(userId, orgId);
+		UserOrganisation uo = service.getUserOrganisation(userId, orgId);
 		if (uo != null) {
 		   	Iterator iter2 = uo.getUserOrganisationRoles().iterator();
 		   	roles = new String[uo.getUserOrganisationRoles().size()];
@@ -158,23 +165,5 @@ public class UserRolesAction extends Action {
 		}
 		return allRoles;
 	}
-	
-	@SuppressWarnings("unchecked")
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-			rolelist = service.findAll(Role.class);
-			Collections.sort(rolelist);
-		}
-		return service;
-	}
 
-	private MessageService getMessageService(){
-		if(messageService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			messageService = (MessageService)ctx.getBean("adminMessageService");
-		}
-		return messageService;
-	}
 }

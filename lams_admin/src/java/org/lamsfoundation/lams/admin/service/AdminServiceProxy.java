@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.admin.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -39,6 +41,8 @@ public class AdminServiceProxy {
 	
 	private static IUserManagementService manageService;
 	private static MessageService messageService;
+	private static IIntegrationService integrationService;
+	private static IAuditService auditService;
 	
 	public static final IUserManagementService getService(ServletContext servletContext){
 		if (manageService == null) {
@@ -56,5 +60,21 @@ public class AdminServiceProxy {
 		} else {
 			return messageService;
 		}
+	}
+	
+	public static final IIntegrationService getIntegrationService(ServletContext servletContext){
+		if(integrationService == null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+			integrationService = (IIntegrationService)ctx.getBean("integrationService");
+		}
+		return integrationService;
+	}
+	
+	public static final IAuditService getAuditService(ServletContext servletContext){
+		if(auditService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+			auditService = (IAuditService)ctx.getBean("auditService");
+		}
+		return auditService;
 	}
 }

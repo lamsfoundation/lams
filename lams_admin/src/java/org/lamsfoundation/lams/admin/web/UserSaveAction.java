@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -51,10 +52,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Jun-Dir Liew
@@ -83,6 +80,8 @@ public class UserSaveAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		
 		// action input
 		ActionMessages errors = new ActionMessages();
 		DynaActionForm userForm = (DynaActionForm) form;
@@ -92,7 +91,7 @@ public class UserSaveAction extends Action {
 		log.debug("orgId: " + orgId);
 		Boolean edit = false;
 		Boolean passwordChanged = true;
-		SupportedLocale locale = (SupportedLocale)getService().findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
+		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
 		log.debug("locale: " + locale);
 		
 		if (isCancelled(request)) {
@@ -136,7 +135,7 @@ public class UserSaveAction extends Action {
 		if (errors.isEmpty()) {
 			if (edit) { // edit user
 				log.debug("editing userId: " + userId);
-				user = (User)getService().findById(User.class, userId);
+				user = (User)service.findById(User.class, userId);
 				// hash the new password if necessary, and audit the fact
 				if (passwordChanged) {
 					writeAuditLog(user, new String[1]);
@@ -151,30 +150,30 @@ public class UserSaveAction extends Action {
 				userForm.set("password", HashUtil.sha1((String)userForm.get("password")));
 				BeanUtils.copyProperties(user, userForm);
 				log.debug("creating user... new login: " + user.getLogin());
-				if (getService().getUserByLogin(user.getLogin()) != null) {
+				if (service.getUserByLogin(user.getLogin()) != null) {
 					errors.add("login", new ActionMessage("error.login.unique"));
 				}
 				if (errors.isEmpty()) {
 					// TODO set flash/html themes according to user input instead of server default.
 					String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-					List list = getService().findByProperty(CSSThemeVisualElement.class, "name", flashName);
+					List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
 					if (list!=null) {
 						CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
 						user.setFlashTheme(flashTheme);
 					}
 					String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-					list = getService().findByProperty(CSSThemeVisualElement.class, "name", htmlName);
+					list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
 					if (list!=null) {
 						CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
 						user.setHtmlTheme(htmlTheme);
 					}
 					user.setDisabledFlag(false);
 					user.setCreateDate(new Date());
-					user.setAuthenticationMethod((AuthenticationMethod)getService().findByProperty(AuthenticationMethod.class,
+					user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,
 							"authenticationMethodName","LAMS-Database").get(0));
 					user.setUserId(null);
 					user.setLocale(locale);
-					getService().save(user);
+					service.save(user);
 					
 					// make 'create user' audit log entry
 					writeAuditLog(user, new String[2]);
@@ -205,29 +204,20 @@ public class UserSaveAction extends Action {
 	}
 
 	private void writeAuditLog(User user, String[] args) {
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-		IAuditService auditService = (IAuditService) ctx.getBean("auditService");
-		MessageService messageService = (MessageService)ctx.getBean("adminMessageService");
-		
 		if (args.length==1) {  // password changed
 			args[0] = user.getLogin()+"("+user.getUserId()+")";
-			String message = messageService.getMessage("audit.user.password.change",args);
-			auditService.log(AdminConstants.MODULE_NAME, message);
+			String message = AdminServiceProxy.getMessageService(getServlet().getServletContext())
+				.getMessage("audit.user.password.change",args);
+			AdminServiceProxy.getAuditService(getServlet().getServletContext())
+				.log(AdminConstants.MODULE_NAME, message);
 		} else if (args.length==2) {  // user created
 			args[0] = user.getLogin()+"("+user.getUserId()+")";
 			args[1] = user.getFullName();
-			String message = messageService.getMessage("audit.user.create", args);
-			auditService.log(AdminConstants.MODULE_NAME, message);
+			String message = AdminServiceProxy.getMessageService(getServlet().getServletContext())
+				.getMessage("audit.user.create", args);
+			AdminServiceProxy.getAuditService(getServlet().getServletContext())
+				.log(AdminConstants.MODULE_NAME, message);
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private IUserManagementService getService() {
-		if (service == null) {
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
 	}
 	
 }

@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -88,6 +89,7 @@ public class OrgSaveAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		DynaActionForm orgForm = (DynaActionForm)form;
 
 		if(isCancelled(request)){
@@ -104,24 +106,24 @@ public class OrgSaveAction extends Action {
 
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			SupportedLocale locale = (SupportedLocale)getService().findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
-			OrganisationState state = (OrganisationState)getService().findById(OrganisationState.class,(Integer)orgForm.get("stateId"));
+			SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
+			OrganisationState state = (OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId"));
 
 			if(orgId!=0){
-				org = (Organisation)getService().findById(Organisation.class,orgId);
+				org = (Organisation)service.findById(Organisation.class,orgId);
 				writeAuditLog(org, orgForm, state, locale);
 				BeanUtils.copyProperties(org,orgForm);
 			}else{
 				org = new Organisation();
 				BeanUtils.copyProperties(org,orgForm);
-				org.setParentOrganisation((Organisation)getService().findById(Organisation.class,(Integer)orgForm.get("parentId")));
-				org.setOrganisationType((OrganisationType)getService().findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
+				org.setParentOrganisation((Organisation)service.findById(Organisation.class,(Integer)orgForm.get("parentId")));
+				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 				writeAuditLog(org, orgForm, org.getOrganisationState(), org.getLocale());
 			}
 			org.setLocale(locale);
 			org.setOrganisationState(state);
 			log.debug("orgId:"+org.getOrganisationId()+" locale:"+org.getLocale()+" create date:"+org.getCreateDate());
-			org = getService().saveOrganisation(org, user.getUserID());
+			org = service.saveOrganisation(org, user.getUserID());
 			
 			request.setAttribute("org",orgForm.get("parentId"));
 			return mapping.findForward("orglist");
@@ -216,13 +218,5 @@ public class OrgSaveAction extends Action {
 			auditService.log(AdminConstants.MODULE_NAME, message);
 		}
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
-		}
-		return service;
-	}
-	
+
 }
