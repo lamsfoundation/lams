@@ -56,6 +56,8 @@ public class ActivityForm extends ActionForm {
 	/** Lesson to which this activity belongs. Id comes from the learner progress */
 	private Long lessonID;
 	
+	private boolean inFrame;
+	
 	/** 
 	 * Method reset
 	 * @param mapping
@@ -99,5 +101,13 @@ public class ActivityForm extends ActionForm {
 
 	public void setLessonID(Long lessonID) {
 		this.lessonID = lessonID;
+	}
+	
+	public boolean getInFrame() {
+		return inFrame;
+	}
+	
+	public void setInFrame(boolean inFrame) {
+		this.inFrame = inFrame;
 	}
 }

@@ -33,6 +33,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -87,8 +88,16 @@ public class ChooseActivityAction extends ActivityAction {
 
 		// need to do the choose first as the chooseActivity changes the progress details 
 		setupProgressString(actionForm, request);
-
-		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
+		
+		ActivityForm activityForm = (ActivityForm) actionForm;
+		ActionForward forward = null;
+		
+		if(activityForm.getInFrame())
+			// escape child frame and open url in parent frame
+			forward = actionMappings.getRedirectForward(progress, true);
+		else
+			forward = actionMappings.getActivityForward(activity, progress, true);
+		
 		return forward;
 	}
 

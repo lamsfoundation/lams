@@ -118,6 +118,11 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		setupProgressString(form, request);
 
 		String forward = "displayOptions";
+	
+		// set frame flag if last run activity was Parallel Activity
+		if(learnerProgress.getCurrentActivity().isParallelActivity())
+			form.setInFrame(true);
+		
 		return mapping.findForward(forward);
 	}
 	

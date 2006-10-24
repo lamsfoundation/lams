@@ -150,12 +150,7 @@ public class ActivityMapping implements Serializable
                 {
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
-                    String strutsAction = "/requestDisplay.do";
-                    String activityURL = this.getActivityURL(progress.getNextActivity());
-                    strutsAction += "?url=" + activityURL;
-                    actionForward = strutsActionToForward(strutsAction,
-                                                          null,
-                                                          redirect);
+                    this.getRedirectForward(progress, redirect);
                 }
                 else
                 {
@@ -173,6 +168,20 @@ public class ActivityMapping implements Serializable
             }
         }
         return actionForward;
+    }
+    
+    public ActionForward getRedirectForward(LearnerProgress progress, boolean redirect) {
+    	ActionForward actionForward = null;
+    	
+    	String strutsAction = "/requestDisplay.do";
+        String activityURL = this.getActivityURL(progress.getNextActivity());
+        strutsAction += "?url=" + activityURL;
+        
+    	actionForward = strutsActionToForward(strutsAction,
+    											null,
+    											redirect);
+    	return actionForward;
+    	
     }
 
     /**
