@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
@@ -94,8 +95,15 @@ public class CompleteActivityAction extends ActivityAction {
 		
 		// need to do the calculateProgress first as the chooseActivity changes the progress details 
 		setupProgressString(actionForm, request);
-
-		ActionForward forward = actionMappings.getProgressForward(progress,true,request, learnerService);
+		
+		ActivityForm activityForm = (ActivityForm) actionForm;
+		ActionForward forward = null;
+		
+		if(activityForm.getInFrame())
+			// escape child frame and open url in parent frame
+			forward = actionMappings.getRedirectForward(progress, true);
+		else
+			forward = actionMappings.getProgressForward(progress,true,request, learnerService);
 		
 		return forward;
 	}
