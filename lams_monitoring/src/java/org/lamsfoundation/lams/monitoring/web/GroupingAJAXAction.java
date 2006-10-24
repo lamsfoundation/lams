@@ -164,7 +164,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 			// go to a view only screen for random grouping
 	        SortedSet groups = new TreeSet(new GroupComparator());
 	        groups.addAll(grouping.getGroups());
-	        request.getSession().setAttribute(PARAM_GROUPS,groups);
+	        request.setAttribute(PARAM_GROUPS,groups);
 			return mapping.findForward(VIEW_GROUPS_SCREEN);
 		}
     	
