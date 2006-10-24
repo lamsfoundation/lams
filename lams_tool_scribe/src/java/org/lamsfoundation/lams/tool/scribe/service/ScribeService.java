@@ -149,6 +149,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		
 		session.setScribeReportEntries(reports);
 		session.setForceComplete(false);
+		session.setReportSubmitted(false);
 		scribeSessionDAO.saveOrUpdate(session);
 	}
 
