@@ -34,7 +34,7 @@ VALUES
 'Scribe',
 'Scribe',
 'scribe',
-'1.1',
+'20061024',
 NULL,
 NULL,
 0,
