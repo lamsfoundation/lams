@@ -63,7 +63,7 @@ public class CrCredential implements Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="credential_id"
      *             unsaved-value="0"

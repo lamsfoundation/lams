@@ -224,7 +224,7 @@ public class Lesson implements Serializable {
     // Getters and Setters
     //---------------------------------------------------------------------
     /** 
-     * @hibernate.id  generator-class="identity" type="java.lang.Long"
+     * @hibernate.id  generator-class="native" type="java.lang.Long"
      *                column="lesson_id"
      */
     public Long getLessonId() {

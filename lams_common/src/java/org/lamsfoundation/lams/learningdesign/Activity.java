@@ -324,7 +324,7 @@ public abstract class Activity implements Serializable,Nullable {
     // Getters and Setters
     //---------------------------------------------------------------------	
 	/**
-	 * @hibernate.activityUIID generator-class="identity" type="java.lang.Long"
+	 * @hibernate.activityUIID generator-class="native" type="java.lang.Long"
 	 *               column="activity_id"
 	 */
 	public Long getActivityId() {

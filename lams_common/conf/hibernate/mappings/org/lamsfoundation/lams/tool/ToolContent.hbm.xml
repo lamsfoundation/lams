@@ -28,13 +28,13 @@
     >
         <meta attribute="field-description">
            @hibernate.id
-            generator-class="identity"
+            generator-class="native"
             type="java.lang.Long"
             column="tool_content_id"
 
 
         </meta>
-        <generator class="identity" />
+        <generator class="native" />
     </id>
 
 	<many-to-one name="tool"

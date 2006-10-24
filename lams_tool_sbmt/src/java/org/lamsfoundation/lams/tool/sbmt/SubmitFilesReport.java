@@ -66,7 +66,7 @@ public class SubmitFilesReport implements Serializable,Cloneable{
     public SubmitFilesReport() {
 	}
     /** 
-     * @hibernate.id generator-class="identity" type="java.lang.Long" column="report_id"
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="report_id"
      */
     public Long getReportID() {
         return this.reportID;

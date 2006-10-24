@@ -134,7 +134,7 @@ public class Transition implements Serializable {
 	}
 
 	/**
-	 * @hibernate.transitionUIID generator-class="identity"
+	 * @hibernate.transitionUIID generator-class="native"
 	 *                           type="java.lang.Long" column="transition_id"
 	 *  
 	 */

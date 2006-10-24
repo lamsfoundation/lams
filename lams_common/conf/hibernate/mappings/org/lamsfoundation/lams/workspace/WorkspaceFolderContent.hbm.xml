@@ -11,7 +11,7 @@
 			column="folder_content_id"
 			type="java.lang.Long"
 		>
-		<generator class="identity"/>			
+		<generator class="native"/>			
 		</id>
 		
 		<property name="contentTypeID"

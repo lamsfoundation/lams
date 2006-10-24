@@ -70,7 +70,7 @@
 
         <property
             name="runOffline"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="run_offline"
@@ -79,7 +79,7 @@
 
         <property
             name="lockOnFinished"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="lock_on_finished"
@@ -88,7 +88,7 @@
 
         <property
             name="autoSelectScribe"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="auto_select_scribe"
@@ -96,7 +96,7 @@
 
         <property
             name="reflectOnActivity"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="reflect_on_activity"
@@ -132,7 +132,7 @@
 
         <property
             name="contentInUse"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="content_in_use"
@@ -141,7 +141,7 @@
 
         <property
             name="defineLater"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="define_later"
@@ -191,6 +191,25 @@
 
             <one-to-many
                   class="org.lamsfoundation.lams.tool.scribe.model.ScribeSession"
+            />
+
+        </set>
+
+        <set
+            name="scribeHeadings"
+            lazy="true"
+            inverse="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="scribe_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.scribe.model.ScribeHeading"
             />
 
         </set>

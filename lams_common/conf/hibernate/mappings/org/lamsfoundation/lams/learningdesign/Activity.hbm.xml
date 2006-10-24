@@ -16,8 +16,8 @@
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id name="activityId" type="java.lang.Long" column="activity_id">
-        <meta attribute="field-description">@hibernate.id generator-class="identity" type="java.lang.Long" column="activity_id"</meta>
-        <generator class="identity" />
+        <meta attribute="field-description">@hibernate.id generator-class="native" type="java.lang.Long" column="activity_id"</meta>
+        <generator class="native" />
     </id>
     
     <discriminator column="learning_activity_type_id" insert="false"/>

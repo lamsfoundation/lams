@@ -28,13 +28,13 @@
     >
         <meta attribute="field-description">
            @hibernate.id
-            generator-class="identity"
+            generator-class="native"
             type="java.lang.Long"
             column="group_id"
 
 
         </meta>
-        <generator class="identity" />
+        <generator class="native" />
     </id>
 
     <property

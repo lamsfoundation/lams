@@ -64,7 +64,7 @@ public class CrWorkspace implements IWorkspace,Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="workspace_id"
      *             unsaved-value="0"

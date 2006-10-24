@@ -16,7 +16,7 @@
         type="java.lang.Long"
         column="grouping_id"
     >
-        <generator class="identity" />
+        <generator class="native" />
     </id>
     
     <discriminator column="grouping_type_id" type="int" />

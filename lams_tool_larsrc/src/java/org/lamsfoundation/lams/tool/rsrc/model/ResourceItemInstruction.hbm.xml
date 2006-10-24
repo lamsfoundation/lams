@@ -16,7 +16,7 @@
             column="uid"
             type="java.lang.Long"
         >
-            <generator class="identity">
+            <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
                   hibernate-generator-params-ResourceItemInstruction.xml 

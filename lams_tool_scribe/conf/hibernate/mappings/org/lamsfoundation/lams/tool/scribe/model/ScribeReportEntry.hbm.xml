@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
-        table="tl_lasbmt11_instruction_files"
+        name="org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry"
+        table="tl_lascrb11_report_entry"
     >
 
         <id
@@ -19,51 +19,49 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-InstructionFiles.xml 
+                  hibernate-generator-params-ScribeReportEntry.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="uuID"
-            type="java.lang.Long"
+            name="entryText"
+            type="text"
             update="true"
             insert="true"
-            column="uuid"
-            length="20"
+            column="entry_text"
         />
 
-        <property
-            name="versionID"
-            type="java.lang.Long"
+        <many-to-one
+            name="scribeHeading"
+            class="org.lamsfoundation.lams.tool.scribe.model.ScribeHeading"
+            cascade="none"
+            outer-join="auto"
             update="true"
             insert="true"
-            column="version_id"
-            length="20"
-        />
+        >
+            <column
+                name="scribe_heading_uid" 
+            />
+        </many-to-one>
 
-        <property
-            name="type"
-            type="java.lang.String"
+        <many-to-one
+            name="scribeSession"
+            class="org.lamsfoundation.lams.tool.scribe.model.ScribeSession"
+            cascade="none"
+            outer-join="auto"
             update="true"
             insert="true"
-            column="type"
-            length="20"
-        />
-
-        <property
-            name="name"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="name"
-            length="255"
-        />
+        >
+            <column
+                name="scribe_session_uid" 
+            />
+        </many-to-one>
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-InstructionFiles.xml
+                hibernate-properties-ScribeReportEntry.xml
             containing the additional properties and place it in your merge dir.
         -->
 

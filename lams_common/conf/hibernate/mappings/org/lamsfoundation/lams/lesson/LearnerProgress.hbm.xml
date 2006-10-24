@@ -16,7 +16,7 @@
 
 		<id name="learnerProgressId" type="java.lang.Long"
 			column="learner_progress_id">
-			<generator class="identity" />
+			<generator class="native" />
 		</id>
 
 		<property name="lessonComplete" type="java.lang.Boolean"

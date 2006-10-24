@@ -94,7 +94,7 @@ public abstract class ToolSession implements Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="tool_session_id"
      *         

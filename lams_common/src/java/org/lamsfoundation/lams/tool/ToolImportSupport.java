@@ -67,7 +67,7 @@ public class ToolImportSupport implements Serializable {
 
 
     /** 
-     * @hibernate.id generator-class="identity" type="java.lang.Long"
+     * @hibernate.id generator-class="native" type="java.lang.Long"
      *             	 column="id"      
      */
     public Long getId() {

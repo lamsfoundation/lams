@@ -213,7 +213,7 @@ public class Tool implements Serializable {
     }
 
     /** 
-     * @hibernate.id generator-class="identity" type="java.lang.Long"
+     * @hibernate.id generator-class="native" type="java.lang.Long"
      *             	 column="tool_id"      
      */
     public Long getToolId() {

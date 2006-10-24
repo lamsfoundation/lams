@@ -74,7 +74,7 @@ public class CrNodeVersionProperty implements IValue,Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="id"
      *             unsaved-value="0"

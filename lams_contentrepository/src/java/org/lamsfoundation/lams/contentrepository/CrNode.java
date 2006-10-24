@@ -108,7 +108,7 @@ public class CrNode implements Serializable {
 */
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="node_id"
      *             unsaved-value="0"

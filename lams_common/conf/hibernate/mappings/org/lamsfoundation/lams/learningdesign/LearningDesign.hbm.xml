@@ -24,7 +24,7 @@
         column="learning_design_id"
     >
        
-        <generator class="identity" />
+        <generator class="native" />
     </id>
 
     <property

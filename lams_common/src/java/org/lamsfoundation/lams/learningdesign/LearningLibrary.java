@@ -90,7 +90,7 @@ public class LearningLibrary implements Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="learning_library_id"
      *         

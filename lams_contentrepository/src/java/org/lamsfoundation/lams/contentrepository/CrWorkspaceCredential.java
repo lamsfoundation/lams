@@ -58,7 +58,7 @@ public class CrWorkspaceCredential implements Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="wc_id"
      *             unsaved-value="0"

@@ -64,7 +64,7 @@ public class ResourceItemVisitLog {
 	}
 	
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
+	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
 	 * @return Returns the log Uid.
 	 */
 	public Long getUid() {

@@ -21,10 +21,10 @@
 		<id name="toolSessionId" type="java.lang.Long"
 			column="tool_session_id">
 			<meta attribute="field-description">
-				@hibernate.id generator-class="identity"
+				@hibernate.id generator-class="native"
 				type="java.lang.Long" column="tool_session_id"
 			</meta>
-			<generator class="identity" />
+			<generator class="native" />
 		</id>
 
 		<discriminator column="tool_session_type_id" type="int" />

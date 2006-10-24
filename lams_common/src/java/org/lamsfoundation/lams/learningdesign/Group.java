@@ -138,7 +138,7 @@ public class Group implements Serializable,Nullable,Comparable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="group_id"
      *         

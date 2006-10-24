@@ -101,7 +101,7 @@ public class CrNodeVersion implements Serializable {
 
     /** 
      *            @hibernate.id
-     *             generator-class="identity"
+     *             generator-class="native"
      *             type="java.lang.Long"
      *             column="nv_id"
      *             unsaved-value="0"

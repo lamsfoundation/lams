@@ -63,7 +63,7 @@
 
         <property
             name="finishedActivity"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="finishedActivity"
@@ -81,6 +81,22 @@
                 name="scribe_session_uid" 
             />
         </many-to-one>
+
+        <property
+            name="reportApproved"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="report_approved"
+        />
+
+        <property
+            name="startedActivity"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="started_activity"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

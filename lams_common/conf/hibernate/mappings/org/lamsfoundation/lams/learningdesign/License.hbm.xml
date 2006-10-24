@@ -8,7 +8,7 @@
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id name="licenseID" type="java.lang.Long" column="license_id">       
-        <generator class="identity" />
+        <generator class="native" />
     </id>
 
     <property name="name" type="java.lang.String" column="name" length="255" not-null="true" />

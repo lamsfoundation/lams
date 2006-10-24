@@ -12,7 +12,7 @@
 		<meta attribute="implement-equals" inherit="false">true</meta>
 
 		<id name="lessonId" type="java.lang.Long" column="lesson_id">
-			<generator class="identity" />
+			<generator class="native" />
 		</id>
     	<property name="lessonDescription" type="java.lang.String" 
     			 column="description" length="65535">

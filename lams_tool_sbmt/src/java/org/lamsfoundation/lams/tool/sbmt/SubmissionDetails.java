@@ -74,7 +74,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	public SubmissionDetails() {
 	}
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long"
+	 * @hibernate.id generator-class="native" type="java.lang.Long"
 	 *               column="submission_id"
 	 */
 	public Long getSubmissionID() {

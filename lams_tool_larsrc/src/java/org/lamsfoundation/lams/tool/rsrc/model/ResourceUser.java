@@ -95,7 +95,7 @@ public class ResourceUser implements Cloneable{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
+	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
 	 * @return Returns the uid.
 	 */
 	public Long getUid() {

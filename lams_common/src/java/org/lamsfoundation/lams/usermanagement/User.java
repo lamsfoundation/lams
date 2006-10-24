@@ -641,25 +641,6 @@ public class User implements Serializable,Comparable {
      *            @hibernate.collection-key
      *             column="user_id"
      *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.lesson.UserGroup"
-     *         
-     */
-    public Set getUserGroups() {
-        return this.userGroups;
-    }
-
-    public void setUserGroups(Set userGroups) {
-        this.userGroups = userGroups;
-    }
-
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="user_id"
-     *            @hibernate.collection-one-to-many
      *             class="org.lamsfoundation.lams.learningdesign.LearningDesign"
      *         
      */
