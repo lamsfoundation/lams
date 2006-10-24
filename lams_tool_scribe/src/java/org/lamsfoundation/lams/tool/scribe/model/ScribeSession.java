@@ -69,7 +69,8 @@ public class ScribeSession implements java.io.Serializable {
 	private ScribeUser appointedScribe;
 	
 	private boolean forceComplete;
-	
+
+	private boolean reportSubmitted;
 	// Constructors
 
 	/** default constructor */
@@ -233,6 +234,17 @@ public class ScribeSession implements java.io.Serializable {
 
 	public void setForceComplete(boolean forceComplete) {
 		this.forceComplete = forceComplete;
+	}
+	
+	/**
+	 * @hibernate.property column="report_submitted"
+	 */
+	public boolean isReportSubmitted() {
+		return reportSubmitted;
+	}
+
+	public void setReportSubmitted(boolean reportSubmitted) {
+		this.reportSubmitted = reportSubmitted;
 	}
 	
 	/**

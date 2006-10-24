@@ -53,10 +53,13 @@ public class ScribeSessionDTO implements Comparable {
 	
 	boolean forceComplete;
 	
+	boolean reportSubmitted;
+	
 	public ScribeSessionDTO(ScribeSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
 		this.forceComplete = session.isForceComplete();
+		this.reportSubmitted = session.isReportSubmitted();
 		
 		ScribeUser appointedScribe = session.getAppointedScribe();
 		if (appointedScribe == null) {
@@ -159,5 +162,13 @@ public class ScribeSessionDTO implements Comparable {
 
 	public void setForceComplete(boolean forceComplete) {
 		this.forceComplete = forceComplete;
+	}
+
+	public boolean isReportSubmitted() {
+		return reportSubmitted;
+	}
+
+	public void setReportSubmitted(boolean reportSubmitted) {
+		this.reportSubmitted = reportSubmitted;
 	}
 }

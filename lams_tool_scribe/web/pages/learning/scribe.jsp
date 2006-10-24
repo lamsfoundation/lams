@@ -89,9 +89,9 @@
 				<fmt:message key="button.submitReport" />
 			</html:submit>
 		</c:if>
-
+				
 		<span id="agreeButton">
-			<c:if test="${not scribeUserDTO.reportApproved}">
+			<c:if test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
 				<a id="agreeButton" class="button" onclick="submitApproval();">
 					<fmt:message key="button.agree" /> </a>
 			</c:if>
