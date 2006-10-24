@@ -43,6 +43,11 @@ if(StringUtils.isEmpty(langDate)){
 	_root.langDate = "01-01-1970";
 }
 
+if(StringUtils.isEmpty(actColour)){
+	_root.actColour = "true";
+}
+					   
+
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
