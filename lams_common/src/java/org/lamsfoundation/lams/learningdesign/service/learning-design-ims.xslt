@@ -23,7 +23,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:output method="xml" indent="yes"/>
 	<xsl:param name="lamsLanguage"/>
 	<xsl:param name="resourcesFile"/>
-	<xsl:param name="toolsFile"/>
+	<xsl:param name="transitionFile"/>
 	<xsl:template match="/">
 		<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" identifier="LAMS_example">
 			<metadata>
@@ -103,6 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</title>
 			<xsl:variable name="myid" select="*//activityID"/>
 			<xsl:for-each select="*">
+				<xsl:sort select="*//orderID" order="ascending"/>
 				<xsl:if test="*//parentActivityID = $myid">
 					<learning-activity-ref  xsl:use-attribute-sets="toolRef"/>
 				</xsl:if>
@@ -114,25 +115,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:template match="transitions">
 		<activity-structure identifier="A-sequence" structure-type="sequence">
 			<title>LAMS Learning design sequence</title>
-			<xsl:for-each select="*">
-				<learning-activity-ref  xsl:use-attribute-sets="toolRef"/>
-			</xsl:for-each>
+			<!-- copy sorted transition learning-activity-ref -->
+			<xsl:copy-of select="document($transitionFile)"/>
+			
 			<xsl:copy-of select="*"/>
 		</activity-structure>
 	</xsl:template>
 	<!-- ================================== Tools' content ================================== -->
 	<xsl:template match="activities" mode="env">
 		<environments>
-			<environment identifier="E-Noticeboard">
-				<title>Noticeboard</title>
-				<service identifier="S-Noticeboard" isvisible="true" parameters="">
+			<environment xsl:use-attribute-sets="toolEnvIdentifier"/>
+				<title>
+					<lams:langstring>
+						<xsl:value-of select="*//activityTitle"/>
+					</lams:langstring>
+				</title>
+				<service  xsl:use-attribute-sets="serviceAttr">
 					<tool_interface xmlns="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0">
 						<tool_id>
-							<identifier type="URN">URN:LAMS:SURVEY</identifier>
+							<identifier type="URN">URN:LAMS:<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/></identifier>
 						</tool_id>
-						<tool_version>1.0.0</tool_version>
+						<tool_version><xsl:value-of select="*//toolVersion"/></tool_version>
 						<tool_contents>
-							<xsl:copy-of select="document($toolsFile)"/>
+							<xsl:copy-of select="document(*//toolContentID+'.xml')"/>
 						</tool_contents>
 					</tool_interface>
 				</service>
@@ -173,10 +178,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</xsl:attribute>
 	</xsl:attribute-set>
 	
+	<xsl:attribute-set name="toolEnvIdentifier">
+		<xsl:attribute name="identifier">
+			E-<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/>
+		</xsl:attribute>
+	</xsl:attribute-set>	
 	<xsl:attribute-set name="toolEnvRef">
 		<xsl:attribute name="ref">
 			E-<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/>
 		</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="serviceAttr">
+		<xsl:attribute name="identifier">
+			S-<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/>
+		</xsl:attribute>
+		<xsl:attribute name="isvisible">
+			true
+		</xsl:attribute>
 	</xsl:attribute-set>	
+	
 	</xsl:stylesheet>
 
