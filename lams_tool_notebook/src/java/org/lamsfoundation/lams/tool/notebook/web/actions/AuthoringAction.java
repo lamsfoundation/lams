@@ -99,8 +99,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		String contentFolderID = WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
-		
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode",
+				true);
+
 		// set up notebookService
 		if (notebookService == null) {
 			notebookService = NotebookServiceProxy.getNotebookService(this
@@ -124,13 +125,14 @@ public class AuthoringAction extends LamsDispatchAction {
 					request).getMessage("error.content.locked"));
 			return mapping.findForward("message_page");
 		}
-		
-		if (mode != null && mode.isTeacher() ) {
-			// Set the defineLater flag so that learners cannot use content while we
+
+		if (mode != null && mode.isTeacher()) {
+			// Set the defineLater flag so that learners cannot use content
+			// while we
 			// are editing. This flag is released when updateContent is called.
 			notebook.setDefineLater(true);
 			notebookService.saveOrUpdateNotebook(notebook);
-		}		
+		}
 
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
@@ -261,28 +263,31 @@ public class AuthoringAction extends LamsDispatchAction {
 			savedFiles = getAttList(KEY_ONLINE_FILES, map);
 		}
 
-		// upload file to repository
-		NotebookAttachment newAtt = notebookService.uploadFileToContent(
-				authForm.getToolContentID(), file, type);
+		if (file.getFileName().length() != 0) {
 
-		// Add attachment to unsavedFiles
-		// check to see if file with same name exists
-		NotebookAttachment currAtt;
-		Iterator iter = savedFiles.iterator();
-		while (iter.hasNext()) {
-			currAtt = (NotebookAttachment) iter.next();
-			if (StringUtils.equals(currAtt.getFileName(), newAtt.getFileName())) {
-				// move from this this list to deleted list.
-				getAttList(KEY_DELETED_FILES, map).add(currAtt);
-				iter.remove();
-				break;
+			// upload file to repository
+			NotebookAttachment newAtt = notebookService.uploadFileToContent(
+					authForm.getToolContentID(), file, type);
+
+			// Add attachment to unsavedFiles
+			// check to see if file with same name exists
+			NotebookAttachment currAtt;
+			Iterator iter = savedFiles.iterator();
+			while (iter.hasNext()) {
+				currAtt = (NotebookAttachment) iter.next();
+				if (StringUtils.equals(currAtt.getFileName(), newAtt
+						.getFileName())) {
+					// move from this this list to deleted list.
+					getAttList(KEY_DELETED_FILES, map).add(currAtt);
+					iter.remove();
+					break;
+				}
 			}
+			unsavedFiles.add(newAtt);
+
+			request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
+			request.setAttribute("unsavedChanges", new Boolean(true));
 		}
-		unsavedFiles.add(newAtt);
-
-		request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
-		request.setAttribute("unsavedChanges", new Boolean(true));
-
 		return mapping.findForward("success");
 	}
 

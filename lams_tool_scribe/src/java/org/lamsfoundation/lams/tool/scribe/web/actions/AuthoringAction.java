@@ -111,16 +111,16 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		String contentFolderID = WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
-				
+
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode",
+				true);
+
 		// set up scribeService
 		if (scribeService == null) {
 			scribeService = ScribeServiceProxy.getScribeService(this
 					.getServlet().getServletContext());
 		}
-		
-		
+
 		// retrieving Scribe with given toolContentID
 		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
 		if (scribe == null) {
@@ -137,9 +137,10 @@ public class AuthoringAction extends LamsDispatchAction {
 					request).getMessage("error.content.locked"));
 			return mapping.findForward("message_page");
 		}
-		
+
 		if (mode != null && mode.isTeacher()) {
-			// Set the defineLater flag so that learners cannot use content while we
+			// Set the defineLater flag so that learners cannot use content
+			// while we
 			// are editing. This flag is released when updateContent is called.
 			scribe.setDefineLater(true);
 			scribeService.saveOrUpdateScribe(scribe);
@@ -197,10 +198,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		// update headings.
 		List<ScribeHeading> updatedHeadings = getHeadingList(map);
 		Set currentHeadings = scribe.getScribeHeadings();
-		currentHeadings.clear();		
+		currentHeadings.clear();
 		for (ScribeHeading heading : updatedHeadings) {
 			heading.setUid(null);
-			currentHeadings.add(heading);			
+			currentHeadings.add(heading);
 		}
 
 		// set the update date
@@ -265,14 +266,15 @@ public class AuthoringAction extends LamsDispatchAction {
 			HttpServletResponse response) {
 
 		String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
-		Integer headingIndex = WebUtil.readIntParam(request, "headingIndex", true);
+		Integer headingIndex = WebUtil.readIntParam(request, "headingIndex",
+				true);
 
 		AuthoringForm authForm = ((AuthoringForm) form);
-		
+
 		if (headingIndex == null) {
 			headingIndex = -1;
 		}
-		
+
 		authForm.setHeadingIndex(headingIndex);
 		authForm.setSessionMapID(sessionMapID);
 
@@ -295,7 +297,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		if (headingIndex == -1) {
 			// create a new heading
 			List<ScribeHeading> headings = getHeadingList(map);
-			
+
 			ScribeHeading scribeHeading = new ScribeHeading(headings.size());
 			scribeHeading.setScribe(scribe);
 			scribeHeading.setHeadingText(headingText);
@@ -304,32 +306,32 @@ public class AuthoringAction extends LamsDispatchAction {
 		} else {
 			// update the existing heading
 			ScribeHeading heading = getHeadingList(map).get(headingIndex);
-			heading.setHeadingText(headingText);			
+			heading.setHeadingText(headingText);
 		}
 
 		request.setAttribute("sessionMapID", map.getSessionID());
 		return mapping.findForward("heading_response");
 	}
-	
-	public ActionForward moveHeading(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
+
+	public ActionForward moveHeading(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap<String, Object> map = getSessionMap(request, authForm);
-		
+
 		int headingIndex = WebUtil.readIntParam(request, "headingIndex");
 		String direction = WebUtil.readStrParam(request, "direction");
-		
-		ListIterator<ScribeHeading> iter =  getHeadingList(map).listIterator(headingIndex);
-		
+
+		ListIterator<ScribeHeading> iter = getHeadingList(map).listIterator(
+				headingIndex);
+
 		ScribeHeading heading = iter.next();
 		iter.remove();
-		
+
 		// move to correct location
 		if (direction.equals("up")) {
 			if (iter.hasPrevious())
-				iter.previous();			
+				iter.previous();
 		} else if (direction.equals("down")) {
 			if (iter.hasNext())
 				iter.next();
@@ -337,37 +339,36 @@ public class AuthoringAction extends LamsDispatchAction {
 			// invalid direction, don't move anywhere.
 			log.error("moveHeading: received invalid direction : " + direction);
 		}
-		
+
 		// adding heading back into list
-		iter.add(heading);		
-		
+		iter.add(heading);
+
 		// update the displayOrder
 		int i = 0;
-		for(ScribeHeading elem : getHeadingList(map)) {
+		for (ScribeHeading elem : getHeadingList(map)) {
 			elem.setDisplayOrder(i);
 			i++;
 		}
-		
+
 		request.setAttribute("sessionMapID", map.getSessionID());
 		return mapping.findForward("heading_response");
 	}
 
-	public ActionForward deleteHeading(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
+	public ActionForward deleteHeading(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap<String, Object> map = getSessionMap(request, authForm);
-		
+
 		Integer headingIndex = authForm.getHeadingIndex();
-		
-		getHeadingList(map).remove(headingIndex.intValue());		
-		
+
+		getHeadingList(map).remove(headingIndex.intValue());
+
 		request.setAttribute("sessionMapID", map.getSessionID());
 		return mapping.findForward("heading_response");
-				
+
 	}
-	
+
 	/* ========== Private Methods ********** */
 
 	private ActionForward uploadFile(ActionMapping mapping,
@@ -389,27 +390,31 @@ public class AuthoringAction extends LamsDispatchAction {
 			savedFiles = getAttList(KEY_ONLINE_FILES, map);
 		}
 
-		// upload file to repository
-		ScribeAttachment newAtt = scribeService.uploadFileToContent((Long) map
-				.get(KEY_TOOL_CONTENT_ID), file, type);
+		if (file.getFileName().length() != 0) {
 
-		// Add attachment to unsavedFiles
-		// check to see if file with same name exists
-		ScribeAttachment currAtt;
-		Iterator iter = savedFiles.iterator();
-		while (iter.hasNext()) {
-			currAtt = (ScribeAttachment) iter.next();
-			if (StringUtils.equals(currAtt.getFileName(), newAtt.getFileName())) {
-				// move from this this list to deleted list.
-				getAttList(KEY_DELETED_FILES, map).add(currAtt);
-				iter.remove();
-				break;
+			// upload file to repository
+			ScribeAttachment newAtt = scribeService.uploadFileToContent(
+					(Long) map.get(KEY_TOOL_CONTENT_ID), file, type);
+
+			// Add attachment to unsavedFiles
+			// check to see if file with same name exists
+			ScribeAttachment currAtt;
+			Iterator iter = savedFiles.iterator();
+			while (iter.hasNext()) {
+				currAtt = (ScribeAttachment) iter.next();
+				if (StringUtils.equals(currAtt.getFileName(), newAtt
+						.getFileName())) {
+					// move from this this list to deleted list.
+					getAttList(KEY_DELETED_FILES, map).add(currAtt);
+					iter.remove();
+					break;
+				}
 			}
-		}
-		unsavedFiles.add(newAtt);
+			unsavedFiles.add(newAtt);
 
-		request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
-		request.setAttribute("unsavedChanges", new Boolean(true));
+			request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
+			request.setAttribute("unsavedChanges", new Boolean(true));
+		}
 
 		return mapping.findForward("success");
 	}
@@ -545,14 +550,14 @@ public class AuthoringAction extends LamsDispatchAction {
 				getAttList(KEY_ONLINE_FILES, map).add(attachment);
 			}
 		}
-		
+
 		// adding headings
 		iter = scribe.getScribeHeadings().iterator();
 		while (iter.hasNext()) {
 			ScribeHeading element = (ScribeHeading) iter.next();
 			getHeadingList(map).add(element);
 		}
-		
+
 		// sorting headings according to displayOrder.
 		Collections.sort(getHeadingList(map));
 
