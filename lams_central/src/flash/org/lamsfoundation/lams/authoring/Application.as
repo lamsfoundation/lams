@@ -498,15 +498,16 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	private function onKeyUp(){
 		Debugger.log('Key released.',Debugger.GEN,'onKeyUp','Application');
 		if(!Key.isDown(Key.CONTROL)) {
-			if(_controlKeyPressed == ApplicationParent.TRANSITION)
+			if(_controlKeyPressed == ApplicationParent.TRANSITION) {
 				Debugger.log('Control Key released.',Debugger.GEN,'onKeyUp','Application');
 				
 				var c:String = Cursor.getCurrentCursor();
 				
 				if(c == ApplicationParent.C_TRANSITION){	
 					_controlKeyPressed = "";
-					_canvas.stopTransitionTool()
+					_canvas.stopTransitionTool();
 				}
+			}
 		}
 		
 	}

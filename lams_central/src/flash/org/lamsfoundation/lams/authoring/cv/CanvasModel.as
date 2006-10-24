@@ -456,32 +456,40 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setDirty();
 		
 	}
-	
-	/**
-	 * Removes the activity from the Canvas Model
-	 * @usage   
-	 * @param   activityUIID 
-	 * @return  
-	 */
 	 
-	 /**
+	/**
 	*Called by the controller when a complex activity is dropped on bin.
 	*/
 	public function removeComplexActivity(ca){
+		Debugger.log('Removing Complex Activity: ' + ca.activity.activityUIID,Debugger.GEN,'removeComplexActivity','CanvasModel');
 		
-		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
-		trace("Number of Children are: "+ca.actChildren.length)
-		for (var k=0; k<ca.actChildren.length; k++){
-			trace("ca.actChildren[k].activityUIID - Child has UIID : "+ca.actChildren[k].activityUIID)
-			ca.actChildren[k].parentUIID = null;
-						
-			removeActivity(ca.actChildren[k].activityUIID);
-			_cv.ddm.removeActivity(ca.actChildren[k].activityUIID);
+		// recursively remove all children
+		removeComplexActivityChildren(ca.actChildren);
+		removeActivityOnBin(ca.activity.activityUIID);
 		
+		setDirty();
+	}
+	
+	public function removeComplexActivityChildren(children){
+		trace("Number of children to be removed are: " + children.length)
+		
+		for (var k=0; k<children.length; k++){
+			trace("Child has UIID : " + children[k].activityUIID);
+			Debugger.log('Removing Child ' + children[k].activity.activityUIID+ 'from : '+ children[k].activity.parentUIID,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
+		
+			children[k].parentUIID = null;
+			
+			if(children[k].activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
+				Debugger.log('Child is Complex Activity. Removing children with length: ' + children[k].children.length,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
+				this.removeComplexActivityChildren(_cv.ddm.getComplexActivityChildren(children[k].activityUIID));
+			} else {
+				removeActivity(children[k].activityUIID);
+			}
+			
+			_cv.ddm.removeActivity(children[k].activityUIID);
+			
 			
 		}
-		removeActivityOnBin(ca.activity.activityUIID);
-		setDirty();
 	}
 	
 	
