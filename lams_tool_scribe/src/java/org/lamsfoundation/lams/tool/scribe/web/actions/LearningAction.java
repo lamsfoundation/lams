@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 /**
  * @author
@@ -112,22 +113,34 @@ public class LearningAction extends LamsDispatchAction {
 		if (scribe.isDefineLater()) {
 			return mapping.findForward("defineLater");
 		}
+		
+		// Ensure that the content in use flag is set.
+		if (!scribe.isContentInUse()) {
+			scribe.setContentInUse(new Boolean(true));
+			scribeService.saveOrUpdateScribe(scribe);
+		}
 
 		// Retrieve the current user
 		ScribeUser scribeUser = getCurrentUser(toolSessionID);
 		
 		// check whether scribe has been appointed
-		ScribeUser appointedScribe = scribeSession.getAppointedScribe();
-		if (appointedScribe == null) {
-			// TODO need to look into synchronization issues.
-
+		while (scribeSession.getAppointedScribe() == null) {
 			// check autoSelectScribe
 			if (scribe.isAutoSelectScribe() == false) {
+				// learner needs to wait until a scribe has been appointed by teacher.
 				return mapping.findForward("defineLater");
+				
 			} else {
 				// appoint the currentUser as the scribe
 				scribeSession.setAppointedScribe(scribeUser);
-				scribeService.saveOrUpdateScribeSession(scribeSession);
+				
+				// attempt to update the scribeSession.  
+				try {
+					scribeService.saveOrUpdateScribeSession(scribeSession);
+				} catch (ObjectOptimisticLockingFailureException le){
+					// scribeSession has been modified.  Reload scribeSession and check again. 
+					scribeSession = scribeService.getSessionBySessionId(toolSessionID);
+				}
 			}
 		}
 		
@@ -135,12 +148,6 @@ public class LearningAction extends LamsDispatchAction {
 		((LearningForm)form).setToolSessionID(scribeSession.getSessionId());
 		request.setAttribute("MODE", mode.toString());
 		setupDTOs(request, scribeSession, scribeUser);
-		
-		// Ensure that the content is use flag is set.
-		if (!scribe.isContentInUse()) {
-			scribe.setContentInUse(new Boolean(true));
-			scribeService.saveOrUpdateScribe(scribe);
-		}
 
 		// check runOffline
 		if (scribe.isRunOffline()) {
@@ -166,9 +173,9 @@ public class LearningAction extends LamsDispatchAction {
 		// check if current user is the scribe.
 		if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
 			return mapping.findForward("scribe");
+		} else {
+			return mapping.findForward("learning");
 		}
-		
-		return mapping.findForward("learning");
 
 	}
 
