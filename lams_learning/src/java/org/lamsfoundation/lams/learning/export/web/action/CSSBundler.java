@@ -108,6 +108,10 @@ public class CSSBundler {
 	 */
 	private void bundleViaHTTP(HttpServletRequest request, Cookie[] cookies) throws MalformedURLException, FileNotFoundException, IOException {
 		
+		String cssDirectory = outputDirectory+File.separator+"css";
+		File cssDirectoryFile = new File(cssDirectory);
+		cssDirectoryFile.mkdirs();
+
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 
 		List themeList = CSSThemeUtil.getAllUserThemes();
@@ -119,15 +123,15 @@ public class CSSBundler {
 			String theme = (String)i.next();
 			
 			String url = basePath + "/lams/css/" + theme + ".css";
-			HttpUrlConnectionUtil.writeResponseToFile(url, outputDirectory, theme + ".css", cookies); //cookies aren't really needed here.
+			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, theme + ".css", cookies); //cookies aren't really needed here.
 
 			url = basePath + "/lams/css/" + theme + "_learner.css";
-			HttpUrlConnectionUtil.writeResponseToFile(url, outputDirectory, theme + "_learner.css", cookies); //cookies aren't really needed here.
+			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, theme + "_learner.css", cookies); //cookies aren't really needed here.
 }
 		
 		// include the special IE stylesheet
 		String url = basePath + "/lams/css/ie-styles.css";
-		HttpUrlConnectionUtil.writeResponseToFile(url, outputDirectory, "ie-styles.css", cookies); //cookies aren't really needed here.
+		HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, "ie-styles.css", cookies); //cookies aren't really needed here.
 		
 	}
 
@@ -173,7 +177,7 @@ public class CSSBundler {
 		}
 		
 		// include the special IE stylesheet
-		addThemeFile(cssDirectory, "ie-styles");
+		addThemeFile(cssDirectory, "ie-styles.css");
 	}
 
 	private void addThemeFile(String cssDirectory, String themeFilename) {
