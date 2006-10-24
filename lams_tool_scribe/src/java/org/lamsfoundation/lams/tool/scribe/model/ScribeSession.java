@@ -47,6 +47,8 @@ public class ScribeSession implements java.io.Serializable {
 
 	// Fields
 	private Long uid;
+	
+	private int version;
 
 	private Date sessionEndDate;
 
@@ -100,6 +102,17 @@ public class ScribeSession implements java.io.Serializable {
 		this.uid = uid;
 	}
 
+	/**
+	 * @hibernate.version column="version" 
+	 */
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+	
 	/**
 	 * @hibernate.property column="session_end_date"
 	 */
