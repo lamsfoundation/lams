@@ -37,7 +37,7 @@
 		<div id="nav-right">
 			<div class="nav-box-right">
 				<div class="tab-left-selected"></div>
-				<div class="tab-middle-selected"><a class="tab-middle-link-selected" href="#"><fmt:message key="index.mycourses"/> </a></div>
+				<div class="tab-middle-selected"><a class="tab-middle-link-selected" style="border:0;" href="#"><fmt:message key="index.mycourses"/> </a></div>
 				<div class="tab-right-selected"></div>
 			</div>
 			<c:forEach var="headerlink" items="${headerLinks}">
