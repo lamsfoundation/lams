@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -40,6 +42,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,10 +57,23 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -123,6 +139,8 @@ import com.thoughtworks.xstream.converters.Converter;
  * @version $Revision$
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
+	private static final int PACKAGE_FORMAT_IMS = 2;
+	
 	public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
 	public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
 	public static final String LD102IMPORTER_BEAN_NAME = "ld102Importer";
@@ -134,6 +152,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public static final String EXPORT_TOOLCONTNET_ZIP_SUFFIX = ".zip";
 	public static final String EXPORT_LDCONTENT_ZIP_SUFFIX = ".zip";
 	public static final String LEARNING_DESIGN_FILE_NAME = "learning_design.xml";
+	private static final String LEARNING_DESIGN_IMS_FILE_NAME = "learning_design_ims.xml";
 	public static final String TOOL_FILE_NAME = "tool.xml";
 	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
 	
@@ -144,6 +163,28 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String FILTER_METHOD_PREFIX_UP = "up";
 	private static final String FILTER_METHOD_MIDDLE = "To";
 	
+	//IMS format some tag name
+	private static final String IMS_TAG_RESOURCES="resources";
+	private static final String IMS_TAG_RESOURCE = "resource";
+	private static final String IMS_ATTR_IDENTIFIER = "identifier";
+	private static final String IMS_TAG_FILE = "file";
+	private static final String IMS_ATTR_HREF = "href";
+
+	private static final String IMS_PREFIX_RESOURCE_IDENTIFIER = "R_";
+
+		//this is not IMS standard tag, temporarily use to gather all tools node list
+	private static final String IMS_TAG_TOOLS = "tools";
+
+	//temporarily file for IMS XSLT file
+	private static final String IMS_RESOURCES_FILE_NAME = "resources.xml";
+	private static final String IMS_TOOLS_FILE_NAME = "imstools.xml";
+
+	private static final String IMS_TOOL_NS_PREFIX = "http://www.lamsfoundation/xsd/lams_tool_";
+
+	private static final String IMS_XSLT_NAME = "learning-design-ims.xslt";
+
+	
+	//Other fields
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
 	private static MessageService messageService;
@@ -318,7 +359,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.exportLearningDesign(Long)
 	 */
-	public String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs) throws ExportToolContentException{
+	public String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs,int format) throws ExportToolContentException{
 		try {
 			//root temp directory, put target zip file
 			String targetZipFileName = null;
@@ -340,11 +381,23 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			//iterator all activities in this learning design and export their content to given folder.
 			//The content will contain tool.xml and attachment files of tools from LAMS repository.
 			List<AuthoringActivityDTO> activities = ldDto.getActivities();
+			
+			//create resources Dom node list for IMS package.
+			Document resourcesDom = new Document();
+			Element resRoot = new Element(IMS_TAG_RESOURCES);
+			List<Element> resChildren = new ArrayList<Element>();
+			//create toolContent Dom node list for IMS package.
+			Document toolsDom = new Document();
+			Element toolRoot = new Element(IMS_TAG_TOOLS);
+			List<Element> toolChildren = new ArrayList<Element>();
+			
 			for(AuthoringActivityDTO activity : activities){
-				//skip non-tool activities
 
+				//skip non-tool activities
 				if(activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE)
 					continue;
+				
+				//find out current acitivites toolContentMananger and export tool content.
 				ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity.getToolID()));
 				log.debug("Tool export content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
 				try{
@@ -361,10 +414,94 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					writeErrorToToolFile(contentDir,activity.getToolContentID(),msg);
 					toolsErrorMsgs.add(msg);
 				} 
-			}
-			
-			//create zip file for fckeditor unique content folder
+				
+				//create resource node list for this activity
+				if(format == PACKAGE_FORMAT_IMS){
+					String toolPath = FileUtil.getFullPath(contentDir,activity.getToolContentID().toString());
+					File toolDir = new File(toolPath);
+					if(toolDir != null){
+						String[] allfiles = toolDir.list();
+						for (String filename: allfiles) {
+							//handle tool.xml file if it is
+							if(StringUtils.equals(filename, TOOL_FILE_NAME)){
+								String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FILE_NAME);
+								File toolFile = new File(toolFileName);
+								SAXBuilder sax = new SAXBuilder();
+								try {
+									Document doc = sax.build(new FileInputStream(toolFile));
+									Element root = doc.getRootElement();
+									root.setName(activity.getToolSignature());
+									Namespace ns = Namespace.getNamespace(IMS_TOOL_NS_PREFIX+activity.getToolSignature()+"_ims_" + activity.getToolVersion() + ".xsd");
+									root.setNamespace(ns);
+									toolChildren.add(root);
+								} catch (JDOMException e) {
+									log.error("IMS export occurs error when reading tool xml for " + toolFileName + ".");
+								}
+								//tool node already gather into LD root folder imstools.xml file, delete old tool.xml from tool folder
+								toolFile.delete();
+								continue;
+							}
+							
+							//handle other attachment files from tools, treat them as resource of IMS package
+							List<Element> fileChildren = new ArrayList<Element>();
+							//resource TAG
+							Element resEle = new Element(IMS_TAG_RESOURCE);
+							//the resource identifier should be "R_toolSignature_toolContentId"
+							Attribute resAtt = new Attribute(IMS_ATTR_IDENTIFIER,IMS_PREFIX_RESOURCE_IDENTIFIER+ activity.getToolSignature()+"_" + activity.getToolContentID().toString());
+							resEle.setAttribute(resAtt);
+							
+							//file TAG
+							Element fileEle = new Element(IMS_TAG_FILE);
+							Attribute fileAtt = new Attribute(IMS_ATTR_HREF,activity.getToolContentID()+"/" + filename);
+							fileEle.setAttribute(fileAtt);
+							
+							//build relations of TAGS
+							fileChildren.add(fileEle);
+							resEle.setChildren(fileChildren);
+							resChildren.add(resEle);
+							
+						}
+					}
+				}
+			} //end all acitivites export
 			try {
+				//handle IMS format
+				if(format == PACKAGE_FORMAT_IMS){
+					//create resources.xml file
+					resRoot.setChildren(resChildren);
+					resourcesDom.setRootElement(resRoot);
+					File resFile = new File(FileUtil.getFullPath(contentDir,IMS_RESOURCES_FILE_NAME));
+					XMLOutputter resOutput = new XMLOutputter();
+					resOutput.output(resourcesDom, new FileOutputStream(resFile));
+					
+					//create tools.xml file
+					toolRoot.setChildren(toolChildren);
+					toolsDom.setRootElement(toolRoot);
+					File toolsFile = new File(FileUtil.getFullPath(contentDir,IMS_TOOLS_FILE_NAME));
+					XMLOutputter toolOutput = new XMLOutputter();
+					toolOutput.output(toolsDom, new FileOutputStream(toolsFile));
+					
+					//call XSLT to create ims XML file
+					SAXBuilder sax = new SAXBuilder();
+					//read LAMS format learning design as input file
+					Document doc = sax.build(new FileInputStream(new File(ldFileName)));
+					
+					//get XSLT file
+					String xsltDir = this.getClass().getPackage().getName().replaceAll("\\.","//")+"/";
+					URL xsltUri = this.getClass().getClassLoader().getResource(xsltDir + IMS_XSLT_NAME);
+					File xslt = new File(xsltUri.getFile());
+					
+					//transform
+					Document odoc = transform(doc, xslt);
+					
+					//output IMS format LD XML
+					String imsLdFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_IMS_FILE_NAME);
+					XMLOutputter output = new XMLOutputter();
+					output.output(odoc, new FileOutputStream(new File(imsLdFileName)));
+					
+				}
+
+				//create zip file for fckeditor unique content folder
 				String targetContentZipFileName = EXPORT_LDCONTENT_ZIP_PREFIX + ldDto.getContentFolderID() + EXPORT_LDCONTENT_ZIP_SUFFIX;
 				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
 				String ldContentDir = FileUtil.getFullPath(secureDir,ldDto.getContentFolderID());
@@ -732,7 +869,42 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	//******************************************************************
 	// Private methods
 	//******************************************************************
-	
+	/**
+	 * Execute XSLT to generate IMS XML file.
+	 */
+	public Document transform(Document sourceDoc, File stylesheetFile) throws Exception {
+		// Set up the XSLT stylesheet 
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Templates stylesheet = transformerFactory.newTemplates(new StreamSource(stylesheetFile));
+		Transformer processor = stylesheet.newTransformer();
+		
+		// Use streams for source files
+		PipedInputStream sourceIn = new PipedInputStream();
+		PipedOutputStream sourceOut = new PipedOutputStream(sourceIn);
+		StreamSource source = new StreamSource(sourceIn);
+		
+		// Use streams for output files
+		PipedInputStream resultIn = new PipedInputStream();
+		PipedOutputStream resultOut = new PipedOutputStream(resultIn);
+		
+		// Convert the output target 
+		StreamResult result = new StreamResult(resultOut);
+		// Get a means for output of the JDOM Document
+		XMLOutputter xmlOutputter = new XMLOutputter();
+		// Output to the stream
+		xmlOutputter.output(sourceDoc, sourceOut);
+		sourceOut.close();
+		
+		// Feed the resultant I/O stream into the XSLT processor
+		processor.transform(source, result);
+		resultOut.close();
+		
+		// Convert the resultant transformed document back to JDOM
+		SAXBuilder builder = new SAXBuilder();
+		Document resultDoc = builder.build(resultIn);
+		return resultDoc;
+	}
+
 	/**
 	 * Tansform tool XML file to correct version format.
 	 * @param toVersion 

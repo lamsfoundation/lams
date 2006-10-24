@@ -40,10 +40,12 @@ public interface IExportToolContentService {
 	 * in this learning design.
 	 * 
 	 * @param learningDesignId
+	 * @param toolsErrorMsgs
+	 * @param format LAMS format or IMS format
 	 * @return the full file path of exported learning design zip file.
 	 * @throws ExportToolContentException
 	 */
-	String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs) throws ExportToolContentException;
+	String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs,int format) throws ExportToolContentException;
 	/**
 	 * Export tool content. 
 	 * 

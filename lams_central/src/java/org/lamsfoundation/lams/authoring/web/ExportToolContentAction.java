@@ -51,6 +51,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action name = "ExportAction"
  *   			  path = "/authoring/exportToolContent"
  * 				  validate = "false"
+ * @struts.action-forward name = "choice" path = "/toolcontent/exportchoice.jsp"
  * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"
  * @struts.action-forward name = "result" path = "/toolcontent/exportresult.jsp"
  *  
@@ -65,6 +66,7 @@ public class ExportToolContentAction extends LamsAction {
 	public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
 	public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
 	public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
+	private static final String PARAM_EXPORT_FORMAT = "format";
 
 	private Logger log = Logger.getLogger(ExportToolContentAction.class);
 	
@@ -72,22 +74,30 @@ public class ExportToolContentAction extends LamsAction {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String param = request.getParameter("method");
 		//-----------------------Resource Author function ---------------------------
-		if(StringUtils.equals(param,"export")){
-			return exportLD(mapping,request,response);
-		}else{
+		if(StringUtils.equals(param,"loading")){
 			Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
 			request.setAttribute(PARAM_LEARING_DESIGN_ID,learningDesignId);
-			//display initial page for upload
+			//display initial page for automatically loading download pgm
 			return mapping.findForward("loading");
+		}else if(StringUtils.equals(param,"export")){
+			//the export LD pgm
+			return exportLD(mapping,request,response);
+		}else{ //choice format
+			Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
+			request.setAttribute(PARAM_LEARING_DESIGN_ID,learningDesignId);
+			//display choose IMS or LAMS format page
+			return mapping.findForward("choice");
 		}
 	}
 	private ActionForward exportLD(ActionMapping mapping, HttpServletRequest request,HttpServletResponse response){
 		Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
+		int format = WebUtil.readIntParam(request,PARAM_EXPORT_FORMAT);
 		IExportToolContentService service = getExportService();
 		List<String> ldErrorMsgs = new ArrayList<String>();
 		List<String> toolsErrorMsgs = new ArrayList<String>();
+		
 		try {
-			String zipFilename = service.exportLearningDesign(learningDesignId,toolsErrorMsgs);
+			String zipFilename = service.exportLearningDesign(learningDesignId,toolsErrorMsgs,format);
 			
 			//write zip file as response stream. 
 			response.setContentType("application/zip");
