@@ -22,7 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"
 	scope="request" />
 <div id="itemList">
-	<h2 class="space-left">
+	<h2 class="spacer-left">
 		<fmt:message key="label.vote.nominations" />
 		<img src="${ctxPath}/includes/images/indicator.gif"
 			style="display:none" id="resourceListArea_Busy" />
