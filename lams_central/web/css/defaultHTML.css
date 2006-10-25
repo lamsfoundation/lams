@@ -672,6 +672,8 @@ textarea {
 
 .space-top {padding-top:20px;}
 
+.title-space-top {margin-top:12px;}
+
 hr {border:0px;
 	border-top:1px solid #ccc; 
 	width: 630px;
@@ -682,9 +684,10 @@ hr {border:0px;
 /* Warning message style */
 .warning {
 	color: #cc0000;
-	padding:25px 10px 10px 35px;
+	padding:8px 10px 10px 40px;
 	margin-top: 25px;
-	margin-left: 15px;
+	margin-left: auto;
+	margin-right: auto;
 	text-align: left;
 	font-weight: normal;
 	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
@@ -707,6 +710,7 @@ hr {border:0px;
 	border: 1px solid #E82A28;
 }
 
+b.error {color:#cc0000;} 
 
 /*
 *************************************************

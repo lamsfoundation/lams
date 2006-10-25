@@ -22,6 +22,18 @@ body.stripes {
 	background: url('../images/css/diagonal_bg.gif');
 }
 
+a {
+	color: #47bc23;
+	text-decoration: none;
+	border-bottom: 1px dotted #47bc23;
+}
+
+a:hover {
+	color: #47bc23;
+	text-decoration: none;
+	border-bottom: 1px solid #47bc23;
+}
+
 .row {
 	voice-family: "\"}\""; /* hide the following rules from IE5 */
 	voice-family: inherit;
@@ -70,8 +82,10 @@ p.instructions {
 p {
 	margin-right: 30px;
 	margin-bottom: 10px;
-	margin-top:5px;
+	margin-top:10px;
 }
+
+b.error {color:#cc0000;} 
 
 ul {
 	margin-left: 25px;
@@ -80,9 +94,11 @@ ul {
 
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
-	 width:95%; 
-	 margin-right:25px; 
-	 margin-bottom:10px;
+ 	 width:100%; 
+	 margin-left:0px; 
+	 padding-top:0px; 
+	 margin-bottom:15px; 
+	 margin-top:10px;
 	 text-align:left;
 }
 
@@ -100,22 +116,49 @@ table.alternative-color td {
 	padding-left: 20px;
 	font-size: 11px;
 	border-bottom: 1px solid #efefef;
-	vertical-align: middle;
-	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px;
+	vertical-align: top; 
+	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 0px
 }
 
-table.alternative-color td.first, table.alternative-color th.first {
-	border-left: none;
-	padding-left: 10px;
-}
 
-table.alternative-color td h4{
+/*layout of the forum tables with the colored table heading cell */
+table.forum { 
+	width:100%;
+	margin-left:0px; 
+	padding-top:5px; 
+	margin-bottom:10px;
+	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 49px; 
+	text-align:left; 
+	border-bottom:1px solid #efefef;}
+
+table.forum th { 
+	background: url('../images/css/green_bg_forum.jpg') repeat-x #f0f5df; 
+	height:20px; 
+	padding-top:5px; 
 	color:#47bc23; 
-	font-size:12px;
-	margin-top:0px;
-	padding-top:10px; 
-	padding-bottom:10px; 
-	}
+	padding-left:15px; 
+	border-left:1px solid #cacdd1;  
+	font-size:12px; 
+	vertical-align:middle;
+}
+
+table.forum td.posted-by {
+	background: url('../images/css/forum_postedby_bg.jpg') repeat-x; 
+	height:20px; 
+	padding-left:15px; 
+	padding-top:0px; 
+	font-size:10px;
+	vertical-align:top; 
+	border-left:1px solid #cacdd1; 
+	color:#666;
+}
+
+
+table.forum td {
+	padding-left:20px; 
+	font-size:11px; 
+	vertical-align:top; 
+}
 	
 /*layout of an inserted image */	
 .image-border {
@@ -153,16 +196,17 @@ td p.button{
 }
 
 /* */ /*layout of form styles */
-.field-name {
+.field-name{
 	color: #0087e5;
 	font-weight: bold;
-	text-align: right;
+	text-align: left;
+	padding-bottom:10px;
 }
 
 .field-name-alternative-color {
 	color: #47bc23;
 	font-weight: bold;
-	text-align: right;
+	text-align: left;
 }
 
 input {
@@ -192,19 +236,36 @@ textarea {
 	margin-bottom: 40px;
 }
 
-hr {
-	border:0px; 
-	border-top:1px solid #ccc; 
-	width: 650px;
-	height: 1px;
-	margin-15px 25px 10px 25px;
-	}
 
+.space-bottom-top {
+	padding-bottom: 20px;
+	padding-top: 20px;
+}
+
+
+
+.small-space-bottom {
+	margin-bottom: 20px;
+}
+
+.small-space-top {padding-top:6px;}
+
+.space-top {padding-top:20px;}
+
+.title-space-top {padding-top:12px;}
+
+hr {border:0px;
+	border-top:1px solid #ccc; 
+	width: 630px;
+	height: 1px;
+	
+	}
 .warning {
 	color: #cc0000;
-	padding:25px 10px 10px 35px;
+	padding:8px 10px 10px 40px;
 	margin-top: 25px;
-	margin-left: 15px;
+	margin-left: auto;
+	margin-right: auto;
 	text-align: left;
 	font-weight: normal;
 	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
@@ -221,12 +282,12 @@ Page layout
 	margin-top:20px;
 	margin-left:auto;
 	margin-right:auto;
-	margin-bottom:20px; 
-	width:89%; 
+	margin-bottom:30px; 
+	width:85%; 
 	height:100%; 
 	border:1px solid #d4d8da;
 	background-color:#fff;
-	padding:20px 30px;
+	padding:20px 25px;
 	}
 	
 #footer {
@@ -241,9 +302,9 @@ Buttons
 
 ********************************************** */
 
-.left-buttons {float:left; padding-left:20px;}
+.left-buttons {float:left;}
 
-.right-buttons {float:right; padding-right:20px;}
+.right-buttons {float:right;}
 
 /*layout of a general button*/
 #content a.button {
@@ -356,3 +417,5 @@ input:hover.button {
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
 }
+
+.text-area {width:99%}
