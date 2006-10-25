@@ -3,6 +3,7 @@
 	   	<web-resource-collection>
 	    	<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<url-pattern>/portfolioExport</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
@@ -13,21 +14,6 @@
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
-
-    <security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>Export</web-resource-name>
-		    <url-pattern>/portfolioExport</url-pattern>
-		    
-		 </web-resource-collection>
-    	<auth-constraint>
-    		<role-name>AUTHOR</role-name> <!-- have to change this to TEACHER have it as AUTHOR so that I can test it with user mmm -->
-			<role-name>LEARNER</role-name>
-    	</auth-constraint>
-    </security-constraint>
-    
-     
-  
 
 	<!--  Login Configuration -->
   	<login-config>
