@@ -72,10 +72,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                scope="request"
  *                validate="false"
  *
- * @struts:action-forward name="organisation"
- *                        path=".organisation"                
- * @struts:action-forward name="orglist"
- *                        path="/orgmanage.do"
+ * @struts:action-forward name="organisation" path=".organisation"                
+ * @struts:action-forward name="orglist" path="/orgmanage.do"
+ * @struts:action-forward name="userlist" path="/usermanage.do"
  */
 
 public class OrgSaveAction extends Action {
@@ -91,19 +90,26 @@ public class OrgSaveAction extends Action {
 		
 		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		DynaActionForm orgForm = (DynaActionForm)form;
-
+		Integer orgId = (Integer)orgForm.get("orgId");
+		Organisation org;
+		
 		if(isCancelled(request)){
-			request.setAttribute("org",orgForm.get("parentId"));
+			if(orgId!=0) {
+				request.setAttribute("org",orgId);
+				org = (Organisation)service.findById(Organisation.class,orgId);
+				if(org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE))
+					return mapping.findForward("userlist");
+			} else {
+				request.setAttribute("org",orgForm.get("parentId"));
+			}
 			return mapping.findForward("orglist");
 		}
+		
 		ActionMessages errors = new ActionMessages();
 		if((orgForm.get("name")==null)||(((String)orgForm.getString("name").trim()).length()==0)){
 			errors.add("name",new ActionMessage("error.name.required"));
 		}
 		if(errors.isEmpty()){
-			Integer orgId = (Integer)orgForm.get("orgId");
-			Organisation org;
-
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));

@@ -17,13 +17,16 @@ function toggleCheckboxes(){
 <html-el:form action="/userorgsave.do" method="post">
 <html-el:hidden property="orgId" />
 <h2 align="left">
+	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
     <logic:notEmpty name="pOrgId">
-        <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a> ::
+        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
     </logic:notEmpty>
-    <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgForm" property="orgId" />">
-      <bean:write name="UserOrgForm" property="orgName"/></a> ::
-    <fmt:message key="admin.user.add"/>
+    : <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgForm" property="orgId" />">
+		<bean:write name="UserOrgForm" property="orgName"/></a>
+    : <fmt:message key="admin.user.add"/>
 </h2>
+
+<p>&nbsp;</p>
 
 <div align="center"><html-el:errors/></div>
 <table class="alternative-color" width=100%>

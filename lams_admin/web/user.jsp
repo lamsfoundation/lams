@@ -10,13 +10,29 @@
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
 <h2 align="left">
+	<logic:notEmpty name="UserForm" property="orgId">
+		<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
+		<logic:notEmpty name="pOrgId">
+			: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />"><c:out value="${parentName}" /></a>
+			: <a href="usermanage.do?org=<bean:write name="UserForm" property="orgId" />"><c:out value="${orgName}" /></a>
+		</logic:notEmpty>
+		<logic:empty name="pOrgId">
+			: <a href="orgmanage.do?org=<bean:write name="UserForm" property="orgId" />"><c:out value="${orgName}" /></a>
+		</logic:empty>
+	</logic:notEmpty>
+	<logic:empty name="UserForm" property="orgId">
+		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		: <a href="usersearch.do"><fmt:message key="admin.user.find" /></a>
+	</logic:empty>
 	<logic:notEmpty name="UserForm" property="userId">
-		<fmt:message key="admin.user.edit"/>
+		: <fmt:message key="admin.user.edit"/>
 	</logic:notEmpty>
 	<logic:empty name="UserForm" property="userId">
-		<fmt:message key="admin.user.create"/>
+		: <fmt:message key="admin.user.create"/>
 	</logic:empty>
 </h2>
+
+<p>&nbsp;</p>
 
 <div align="center"><html-el:errors/></div>
 <table>

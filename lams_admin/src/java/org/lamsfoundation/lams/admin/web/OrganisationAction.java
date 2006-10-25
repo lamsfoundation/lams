@@ -89,6 +89,13 @@ public class OrganisationAction extends LamsDispatchAction {
 			request.setAttribute("errorName", "OrganisationAction");
 			request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
+		} else {
+			// creating new organisation
+			Integer parentId = WebUtil.readIntParam(request,"parentId",true);
+			if (parentId!=null) {
+				Organisation parentOrg = (Organisation)service.findById(Organisation.class,parentId);
+				orgForm.set("parentName", parentOrg.getName());
+			}
 		}
 		request.getSession().setAttribute("locales",locales);
 		request.getSession().setAttribute("status",status);

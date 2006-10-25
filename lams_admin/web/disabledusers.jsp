@@ -6,7 +6,9 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <form>
-<h2>Disabled Users</h2>
+<h2>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+	: <fmt:message key="admin.list.disabled.users"/></h2>
 <p>&nbsp;</p>
 <table class="alternative-color" width=100%>
 <tr>

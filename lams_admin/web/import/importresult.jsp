@@ -6,7 +6,12 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<h2><fmt:message key="admin.user.import" /></h2>
+<h2>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+	: <fmt:message key="admin.user.import" />
+</h2>
+
+<p>&nbsp;</p>
 
 <p>
 <c:out value="${successful}" /><br />
@@ -19,6 +24,8 @@
 	</logic:notEmpty>
 </logic:iterate>
 </p>
+
+<p>&nbsp;</p>
 
 <p>
 	<input type="submit" class="button" value="Ok"

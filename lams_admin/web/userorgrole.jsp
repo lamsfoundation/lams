@@ -3,19 +3,27 @@
 <%@ taglib uri="tags-html-el" prefix="html-el" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <script language="javascript" type="text/JavaScript">
 function toggleCheckboxes(roleIndex, object){
-	<logic-el:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex" >
+	<logic:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex" >
 	document.UserOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}" />*(<c:out value="${beanIndex}" />+1)].checked=object.checked;
-	</logic-el:iterate>
+	</logic:iterate>
 }
 </script>
 
-<h2><fmt:message key="admin.user.assign.roles" /></h2>
+<h2>
+	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
+    <logic:notEmpty name="pOrgId">
+        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
+    </logic:notEmpty>
+    : <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />">
+		<bean:write name="orgName"/></a>
+	: <fmt:message key="admin.user.assign.roles" />
+</h2>
 <p>&nbsp;</p>
 
 <html-el:form action="/userorgrolesave.do" method="post">
@@ -24,26 +32,26 @@ function toggleCheckboxes(roleIndex, object){
 <table class="alternative-color" width=100%>
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
-	<logic-el:iterate id="role" name="roles" indexId="roleIndex">
+	<logic:iterate id="role" name="roles" indexId="roleIndex">
 		<th><input type="checkbox" 
 					name="<c:out value="${roleIndex}" />" 
 					onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
 					onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />
 			<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
-	</logic-el:iterate>
+	</logic:iterate>
 </tr>
-<logic-el:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">
+<logic:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">
 	<tr>
 		<td>
 			<c:out value="${userBean.login}" /><c:if test="${!userBean.memberOfParent}"> *<c:set var="parentFlag" value="true" /></c:if>
 		</td>
-		<logic-el:iterate id="role" name="roles">
+		<logic:iterate id="role" name="roles">
 			<td>
 				<html-el:multibox property="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
 			</td>
-		</logic-el:iterate>
+		</logic:iterate>
 	</tr>
-</logic-el:iterate>
+</logic:iterate>
 <tr>
 	<td></td>
 	<td colspan=<c:out value="${numroles}" /> align="right">

@@ -94,7 +94,7 @@ public class UserOrgAction extends Action {
 		String orgName = organisation.getName();
 		log.debug("orgName: "+orgName);
 		Organisation parentOrg = organisation.getParentOrganisation();
-		if(parentOrg!=null){
+		if(parentOrg!=null && !parentOrg.equals(service.getRootOrganisation())){
 			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
 			request.setAttribute("pOrgName",parentOrg.getName());
 		}

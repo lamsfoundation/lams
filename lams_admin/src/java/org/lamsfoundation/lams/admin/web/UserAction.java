@@ -131,6 +131,17 @@ public class UserAction extends LamsDispatchAction {
 			}
 		}
 		userForm.set("orgId", (org==null ? null : org.getOrganisationId()));
+		
+		// for breadcrumb links
+		if (org!=null) {
+			request.setAttribute("orgName",org.getName());
+			Organisation parentOrg = org.getParentOrganisation();
+			if (parentOrg!=null && !parentOrg.equals(service.getRootOrganisation())) {
+				request.setAttribute("pOrgId", parentOrg.getOrganisationId());
+				request.setAttribute("parentName", parentOrg.getName());
+			}
+		}
+		
 		request.setAttribute("locales",locales);
 
 		return mapping.findForward("user");

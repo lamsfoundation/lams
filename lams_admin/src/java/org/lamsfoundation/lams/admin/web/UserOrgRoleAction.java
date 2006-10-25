@@ -84,6 +84,15 @@ public class UserOrgRoleAction extends Action {
 		Organisation organisation = (Organisation)service.findById(Organisation.class, (Integer)request.getAttribute("orgId"));
 		userOrgRoleForm.setOrgId(organisation.getOrganisationId());
 		
+		// display breadcrumb links
+		request.setAttribute("orgName", organisation.getName());
+		Organisation parentOrg = organisation.getParentOrganisation();
+		if(parentOrg!=null && !parentOrg.equals(service.getRootOrganisation())){
+			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
+			request.setAttribute("pOrgName",parentOrg.getName());
+		}
+		request.setAttribute("orgType",organisation.getOrganisationType().getOrganisationTypeId());
+		
 		// populate form with users
 		ArrayList userOrgs = (ArrayList)request.getAttribute("newUserOrganisations");
 		for(int i=0; i<userOrgs.size(); i++){

@@ -5,15 +5,21 @@
 
 <h1 class=no-tabs-below><fmt:message key="sysadmin.headline"/></h1>
 <br />
-<p><a href="cache.do"><fmt:message key="cache.title"/></a></p>
+<p><a href="<lams:LAMSURL/>admin/cache.do"><fmt:message key="cache.title"/></a></p>
+
+<p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
+
+<p><a href="<lams:LAMSURL/>admin/config.do"><fmt:message key="sysadmin.config.settings.edit"/></a></p>
+
+<p><a href="<lams:LAMSURL/>admin/usersearch.do"><fmt:message key="admin.user.find"/></a></p>
+
+<p><a href="<lams:LAMSURL/>admin/importexcel.do"><fmt:message key="admin.user.import"/></a></p>
+
+<p><a href="<lams:LAMSURL/>admin/disabledmanage.do"><fmt:message key="admin.list.disabled.users"/></a></p>
 
 <p><a href="<lams:LAMSURL/>admin/loginmaintain.do"><fmt:message key="sysadmin.maintain.loginpage"/></a></p>
 
 <p><a href="<lams:LAMSURL/>admin/serverlist.do"><fmt:message key="sysadmin.maintain.external.servers"/></a></p>
-
-<p><a href="<lams:LAMSURL/>admin/config.do"><fmt:message key="sysadmin.config.settings.edit"/></a></p>
-
-<p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
 
 <p><a href="<lams:LAMSURL/>admin/register.do"><fmt:message key="sysadmin.register.server"/></a><p>
 

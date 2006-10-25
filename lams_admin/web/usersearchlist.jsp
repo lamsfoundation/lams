@@ -15,11 +15,10 @@
 	}
 </script>
 
-<h2><fmt:message key="admin.user.find"/></h2>
-
-<p align="right">
-	<input type="button" value='<fmt:message key="admin.user.import"/>' onclick=javascript:document.location='importexcel.do' />
-</p>
+<h2>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> 
+	: <fmt:message key="admin.user.find"/>
+</h2>
 
 <logic:notEqual name="isSysadmin" value="false">
 <html-el:form action="/usersearch.do" method="post">

@@ -6,10 +6,14 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<h2><fmt:message key="admin.user.import" /></h2>
+<h2>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+	: <fmt:message key="admin.user.import" />
+</h2>
+
+<p>&nbsp;</p>
 
 <html:form action="/importexcelsave.do" method="post" enctype="multipart/form-data">
-
 <html:hidden property="orgId" />
 
 <table>

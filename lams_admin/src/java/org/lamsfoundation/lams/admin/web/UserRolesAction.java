@@ -122,10 +122,16 @@ public class UserRolesAction extends Action {
 		
 		userRolesForm.set("userId",userId);
 		userRolesForm.set("orgId", org.getOrganisationId());
+		// screen display vars
 		request.setAttribute("rolelist",filterRoles(rolelist,isSysadmin,orgType));
 		request.setAttribute("login", user.getLogin());
 		request.setAttribute("fullName", user.getFullName());
 		request.setAttribute("orgName", org.getName());
+		Organisation parentOrg = org.getParentOrganisation();
+		if (parentOrg!=null && !parentOrg.equals(service.getRootOrganisation())) {
+			request.setAttribute("pOrgId", parentOrg.getOrganisationId());
+			request.setAttribute("parentName", parentOrg.getName());
+		}
 		
 		String[] roles = null;
 		UserOrganisation uo = service.getUserOrganisation(userId, orgId);

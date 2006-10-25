@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * 				validate="false"
  * 
  * @struts:action-forward name="importresult" path=".importresult"
- * @struts:action-forward name="usersearch" path=".usersearchlist"
+ * @struts:action-forward name="sysadmin" path=".sysadmin"
  */
 public class ImportExcelSaveAction extends Action {
 	
@@ -60,7 +60,7 @@ public class ImportExcelSaveAction extends Action {
 		
 		if (isCancelled(request)) {
 			//return mapping.getInputForward();
-			return mapping.findForward("usersearch");
+			return mapping.findForward("sysadmin");
 		}
 		
 		ImportExcelForm importExcelForm = (ImportExcelForm)form;

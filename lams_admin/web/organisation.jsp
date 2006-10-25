@@ -11,29 +11,31 @@
 <html-el:hidden property="parentId" />
 <html-el:hidden property="typeId" />
 <h2>
+	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
+	
+	<logic:equal name="OrganisationForm" property="typeId" value="3">
+		: <a href="orgmanage.do?org=<bean:write name="OrganisationForm" property="parentId"  />"><bean:write name="OrganisationForm" property="parentName"/></a>
+	</logic:equal>
+	
 	<logic:notEmpty name="OrganisationForm" property="orgId">
-		<fmt:message key="admin.edit"/>
+		: <a href="
+			<logic:equal name="OrganisationForm" property="typeId" value="2">org</logic:equal>
+			<logic:equal name="OrganisationForm" property="typeId" value="3">user</logic:equal>manage.do?org=<bean:write name="OrganisationForm" property="orgId" />">
+				<bean:write name="OrganisationForm" property="name"/>
+			</a>
+		: <fmt:message key="admin.edit"/>
 	</logic:notEmpty>
 	<logic:empty name="OrganisationForm" property="orgId">
-		<fmt:message key="admin.create"/>
+		<logic:equal name="OrganisationForm" property="typeId" value="2">
+			: <fmt:message key="admin.course.add"/>
+		</logic:equal>
+		<logic:equal name="OrganisationForm" property="typeId" value="3">
+			: <fmt:message key="admin.class.add"/>
+		</logic:equal>
 	</logic:empty>
-	&nbsp;
-	<logic:equal name="OrganisationForm" property="typeId" value="2">
-		<fmt:message key="admin.course"/>
-	</logic:equal>
-	<logic:equal name="OrganisationForm" property="typeId" value="3">
-		<fmt:message key="admin.class"/>
-	</logic:equal>
-	&nbsp;
-	<fmt:message key="admin.in"/>&nbsp;
-	<logic:equal name="OrganisationForm" property="typeId" value="2">
-		<fmt:message key="admin.organisation"/>
-	</logic:equal>
-	<logic:equal name="OrganisationForm" property="typeId" value="3">
-		<fmt:message key="admin.course"/>
-	</logic:equal>
-	: <bean:write name="OrganisationForm" property="parentName"/>
 </h2>
+
+<p>&nbsp;</p>
 
 <div align="center"><html-el:errors/></div>
 <table>
