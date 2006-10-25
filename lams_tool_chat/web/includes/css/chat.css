@@ -5,7 +5,7 @@
 
 .private_message {
 	font-style: italic;
-	background-color: #e6e6fa;
+	background-color: #efefef;
 }
 
 .messageFrom {
@@ -44,7 +44,7 @@
 }
 
 .selected {
-	background-color: lime;
+	background-color: #ececec;
 	padding: 2px;
 	cursor: pointer;
 }
