@@ -21,13 +21,12 @@
 
 		<html:textarea cols="52" rows="6" property="entryText" styleClass="text-area" />
 
-		<div class="space-bottom-top">
-			<div class="right-buttons">
+		<div align="right" class="space-bottom-top">
 			<html:submit styleClass="button">
 				<fmt:message key="label.finish" />
 			</html:submit>
 			</div>
-		</div>
+		
 
 	</div>
 </html:form>

@@ -20,93 +20,98 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
-	<!--options content goes here-->
-				<table class="forms">
-					  <tr>
-					  	<th scope="col" valign=top colspan=2> 
-						  	 <fmt:message key="label.assessment"/> 
-					  	</td>
-					  </tr>
-					  
-					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" /> 
-					  	</td>
-					  </tr>
-					  
+<!--options content goes here-->
+
+
+		<h3>
+			<fmt:message key="label.assessment" />
+		</h3>
+		
+		<p>
+			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}"
+				escapeXml="false" />
+		</p>
+		
+		
+		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
+		
+		
+			<p>
+				<strong> <fmt:message key="label.withRetries" /> </strong>
+			</p>
+		
+		</c:if>
+		
+		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}">
+		
+			<p>
+				<strong> <fmt:message key="label.withoutRetries" /> </strong>
+			</p>
+		
+		</c:if>
+		
+		<c:if
+			test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
+		
+			<p>
+				 <fmt:message key="label.learner.message" /> ( <c:out
+						value="${mcGeneralLearnerFlowDTO.passMark}" /> )  
+			</p>
+		
+		
+		</c:if>
+		
+		
+		
+		<c:forEach var="dto" varStatus="status"
+			items="${requestScope.listQuestionCandidateAnswersDto}">
+		
+			<div class="shading-bg">
+				<c:out value="${dto.question}" escapeXml="false" />
+				&nbsp; [
+				<fmt:message key="label.mark" />
+				<c:out value="${dto.mark}" />
+				]
+			</div>
 			
-			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	  <b> <fmt:message key="label.withRetries"/> </b>
-					  	</td>
-					  </tr>
-					</c:if> 			
-				
-					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}"> 		
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						    <b> <fmt:message key="label.withoutRetries"/> </b>
-					  	</td>
-					  </tr>
-					</c:if> 			
-
-			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
-					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <fmt:message key="label.learner.message"/> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}"/> )  </b>
-						  	 
-					  	</td>
-					  </tr>
+			
+			<c:forEach var="ca" varStatus="status"
+				items="${dto.candidateAnswerUids}">
+			
+				<div class="indent"><input type="checkbox" name="checkedCa" class="noBorder"
+					value="${dto.questionUid}-${ca.value}">
+		
+				<c:forEach var="caText" varStatus="status"
+					items="${dto.candidateAnswers}">
+					
+					
+					
+					<c:if test="${ca.key == caText.key}">
+						<c:out value="${caText.value}" escapeXml="false" />
+						</div>
+						
+					
 					</c:if>
-
-				  <tr>						 
-					  	<td NOWRAP align=left valign=top colspan=2> 
-						<table align=left>
-								<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
-									  <tr>
-									  	<td NOWRAP align=left valign=top> 
-										  		<c:out value="${dto.question}"  escapeXml="false" /> &nbsp[ <b> <fmt:message key="label.mark"/> </b>
-										  		<c:out value="${dto.mark}"/> ]
-									  	</td>
-									  </tr>
-									
-									  <tr>
-									  	<td NOWRAP align=left valign=top> 
-											<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
-												<input type="checkbox" name="checkedCa" value="${dto.questionUid}-${ca.value}"> 
-													
-													<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
-														<c:if test="${ca.key == caText.key}"> 		
-																<c:out value="${caText.value}" escapeXml="false"/><BR>
-														</c:if>															
-													</c:forEach>
-											</c:forEach>
-									  	</td>
-									  </tr>
-								</c:forEach>								
-						</table>
-						</td>
-					</tr>
+				</c:forEach>
+			</c:forEach>
+		
+		</c:forEach>
 
 
-			  	   	<tr> 
-				 		<td NOWRAP colspan=2 valign=top> 
-				 		&nbsp
-				 		</td>
-			  	   </tr>
-			  	   
-			  	<html:hidden property="donePreview"/>						   
-	  	   		  <tr>
-				  	<td NOWRAP colspan=2 align=left valign=top> 
-				  			<html:submit property="continueOptionsCombined" styleClass="button">
-								<fmt:message key="button.continue"/>
-							</html:submit>	 				 		  					
-				  	 </td>
-				  </tr>
-		</table>
-	<!--options content ends here-->
+<html:hidden property="donePreview" />
+
+<div class="space-bottom-top" align="right">
+<html:submit property="continueOptionsCombined" styleClass="button">
+	<fmt:message key="button.continue" />
+</html:submit>
+</div>
+
+<!--options content ends here-->
 

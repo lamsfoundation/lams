@@ -58,40 +58,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</h1>
 
 	
-				<table class="forms">
-				  <tr>
-				  	<th scope="col" valign=top colspan=2> 
-					  	  <fmt:message key="label.assessment"/> 
-				  	</th>
-				  </tr>
-			
+				
+				  
+					  <h3><fmt:message key="label.assessment"/> 
+				  	</h3>
+				  	
+					
 		 			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
-						  <tr>
-						  	<td NOWRAP align=center valign=top colspan=2> 
-							  	  <b> <fmt:message key="label.withRetries.results.summary"/> </b>
-						  	</td>
-						  </tr>
-  					</c:if> 			
-
+						  <h3> <fmt:message key="label.withRetries.results.summary"/>	</h3> 
+					</c:if> 			
+				
+					
+					
 					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<b> <fmt:message key="label.withoutRetries.results.summary"/>  </b>
-					  	</td>
-					  </tr>
+					   
+						  <h3><fmt:message key="label.withoutRetries.results.summary"/> </h3>
+					   
 					</c:if> 			
 
 
-				  <tr>
-				  	<td NOWRAP align=left valign=top colspan=2> 
+			
+				 		<p>
 					  	  <c:out value="${mcGeneralLearnerFlowDTO.countSessionComplete}"/> 
 					  	  <fmt:message key="label.learnersFinished.simple"/> 
-				  	</td>
-				  </tr>	
-
-
+					  	</p>
+				 
+					
+					
+					<table class="alternative-color" cellspacing="1">
 					  <tr>
-					  	<td NOWRAP align=left valign=top> 
+					  	<td width="30%"> 
 						  	  <b> <fmt:message key="label.topMark"/> </b>
 						 </td> 
 						 <td NOWRAP align=left>	
@@ -116,19 +112,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	<c:out value="${mcGeneralLearnerFlowDTO.lowestMark}"/>
 					  	</td>
 					  </tr>	
-
+				</table>
 
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
-		  	   		  <tr>
-					  	<td NOWRAP valign=top> 
+		  	   		 
 					  			<html:submit property="redoQuestions" styleClass="button">
 									<fmt:message key="label.redo.questions"/>
 								</html:submit>	 		
-					  	 </td>
-
-
-					  	<td NOWRAP valign=top> 					  	 
-       	  						<div class="right-buttons">	  	   		    
+					  			  	 
+       	  						<div class="space-bottom-top" align="right">  		    
 									<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
 										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 											<html:submit property="learnerFinished"  styleClass="button">
@@ -143,16 +135,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  	</c:if> 				    					
 							  	   </c:if>	
 						  	   </div>						   						  	   
-					  	 </td>						  	   
-					  	 
-					  </tr>
+					  	
 					</c:if> 				
 				
 				
 
 				<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
-	  	   		  <tr>
-	  	   		    <td NOWRAP colspan=2 valign=top>
+	  	   		  
 	  						<div class="right-buttons">	  	   		    
 									<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
 										<html:submit property="learnerFinished"  styleClass="button">
@@ -166,10 +155,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</html:submit>	 				
 								  	</c:if> 				    					
 					  	   </div>						   
-				  	 </td>
-				  </tr>
+				  	
 				</c:if> 																		
-			</table>
+			
 </html:form>
 </div>
 

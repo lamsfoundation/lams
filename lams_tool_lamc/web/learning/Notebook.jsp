@@ -54,33 +54,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</h1>
 		
 
-		<table>
-			<tr>
-				<td>
+		
+					<p>
 					<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false"/> 
-				</td>
-			</tr>
-
-			<tr>
-				<td>
-					<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
-				</td>
-			</tr>
-
-			<tr>
-				<td class="right-buttons">
+				</p>
+				
+					<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>
+			
+				<div align="right" class="space-bottom-top">
 					<html:submit property="submitReflection" styleClass="button">					
 						<fmt:message key="button.endLearning"/>
 					</html:submit>
-				</td>
-			</tr>
-		</table>
+				</div>
 
 		
 		</div>
 	</html:form>	
 	
-	<div id="footer"></div>
+
 
 </body>
 </html:html>
