@@ -675,7 +675,7 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletRequest request,
             HttpServletResponse response)throws IOException,LamsToolServiceException{
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+    	Integer userID = getUserId();
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	
@@ -716,7 +716,7 @@ public class MonitoringAction extends LamsDispatchAction
     	String wddxPacket = null;
     	try {
     		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-	    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+	    	Integer userID = getUserId();
 	    	Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request,"folderID"));
 	    	wddxPacket = monitoringService.moveLesson(lessonID,targetWorkspaceFolderID,userID);
     	} catch (Exception e) {
@@ -735,7 +735,7 @@ public class MonitoringAction extends LamsDispatchAction
     	String wddxPacket = null;
     	try {
     		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-	    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+	    	Integer userID = getUserId();
 	    	String name = WebUtil.readStrParam(request,"name"); 
 	    	wddxPacket = monitoringService.renameLesson(lessonID,name,userID);
     	} catch (Exception e) {
@@ -795,13 +795,13 @@ public class MonitoringAction extends LamsDispatchAction
 		
 		try {
 		
-			int userID = WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID); 
+			Integer userID = getUserId(); 
 			long learningDesignID = WebUtil.readLongParam(request,AttributeNames.PARAM_LEARNINGDESIGN_ID);
 			String title = WebUtil.readStrParam(request,"title");
 			String desc = WebUtil.readStrParam(request,"description"); 
 			
 	        // initialize the lesson
-	        Lesson previewLesson = monitoringService.initializeLessonForPreview(title,desc,learningDesignID,new Integer(userID));
+	        Lesson previewLesson = monitoringService.initializeLessonForPreview(title,desc,learningDesignID,userID);
 	        if ( previewLesson != null ) {
 
 	        	long lessonID = previewLesson.getLessonId().longValue();

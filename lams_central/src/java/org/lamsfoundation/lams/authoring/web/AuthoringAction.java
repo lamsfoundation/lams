@@ -30,17 +30,20 @@ import java.util.Vector;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -63,6 +66,12 @@ public class AuthoringAction extends LamsDispatchAction{
 	public IAuthoringService getAuthoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);		
+	}
+	
+	private Integer getUserId() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getUserID() : null;
 	}
 	
 	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
@@ -106,7 +115,8 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {
-			Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+			Long userID = new Long(getUserId());
+			
 			wddxPacket = authoringService.getLearningDesignsForUser(userID);
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getLearningDesignsForUser", authoringService).serializeMessage();
