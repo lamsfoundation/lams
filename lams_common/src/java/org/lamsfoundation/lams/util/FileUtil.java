@@ -24,9 +24,11 @@
 package org.lamsfoundation.lams.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
@@ -360,4 +362,13 @@ public class FileUtil {
 		
 		return pathfile;
 	}
+	
+  public static void copyFile(File in, File out) throws Exception {
+	     FileChannel sourceChannel = new FileInputStream(in).getChannel();
+	     FileChannel destinationChannel = new FileOutputStream(out).getChannel();
+	     sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+	     sourceChannel.close();
+	     destinationChannel.close();
+   }
+  
 }

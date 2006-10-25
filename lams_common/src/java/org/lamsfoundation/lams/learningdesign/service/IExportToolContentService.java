@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.io.File;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -45,7 +46,7 @@ public interface IExportToolContentService {
 	 * @return the full file path of exported learning design zip file.
 	 * @throws ExportToolContentException
 	 */
-	String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs,int format) throws ExportToolContentException;
+	String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs,int format,File xslt) throws ExportToolContentException;
 	/**
 	 * Export tool content. 
 	 * 
