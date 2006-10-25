@@ -36,9 +36,7 @@
 <table class="alternative-color" width=100%>
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
-	<th><fmt:message key="admin.user.title"/></th>
-	<th><fmt:message key="admin.user.first_name"/></th>
-	<th><fmt:message key="admin.user.last_name"/></th>
+	<th><fmt:message key="admin.user.name"/></th>
 	<th><fmt:message key="admin.user.roles"/></th>
 	<th><fmt:message key="admin.user.actions"/></th>
 </tr>
@@ -48,13 +46,7 @@
 			<bean:write name="userManageBean" property="login" />
 		</td>
 		<td>
-			<bean:write name="userManageBean" property="title" />
-		</td>
-		<td>
-			<bean:write name="userManageBean" property="firstName" />
-		</td>
-		<td>
-			<bean:write name="userManageBean" property="lastName" />
+			<bean:write name="userManageBean" property="title" /> <bean:write name="userManageBean" property="firstName" /> <bean:write name="userManageBean" property="lastName" />
 		</td>
 		<td>
 		    <small>
