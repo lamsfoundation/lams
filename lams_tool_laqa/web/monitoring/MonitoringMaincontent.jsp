@@ -42,7 +42,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
