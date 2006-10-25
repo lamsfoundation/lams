@@ -52,7 +52,7 @@ class LessonView extends AbstractView {
 	private static var SCROLL_LOOP_FACTOR:Number = 2;
 	private static var STRING_CONT:String = "...";
 	
-	private var ScrollCheckIntervalID:Number;
+	private var ScrollCheckIntervalID:Number = null;
 	
 	private var _className = "LessonView";
 	private var _depth:Number;
@@ -315,7 +315,10 @@ class LessonView extends AbstractView {
 				}
 				
 				if(progress_scp.vScroller._visible) {
-					ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
+					Debugger.log('adjusting scrollbar position to target: ' + targetPos,Debugger.CRITICAL,'updateActivity','LessonView');
+					if(ScrollCheckIntervalID == null) {
+						ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
+					}
 				}
 			}
 		
@@ -339,8 +342,13 @@ class LessonView extends AbstractView {
 			count++;
 			
 			if(Math.round(currentVal) == Math.round(targetVal)) {
-				Debugger.log('clearing Scroll Check Interval: ' + targetVal,Debugger.CRITICAL,'adjustScrollBar','LessonView');
-				clearInterval(ScrollCheckIntervalID);
+				if(ScrollCheckIntervalID) {
+					Debugger.log('clearing Scroll Check Interval: ' + targetVal,Debugger.CRITICAL,'adjustScrollBar','LessonView');
+					clearInterval(ScrollCheckIntervalID);
+					ScrollCheckIntervalID = null;
+				}
+					
+				return;
 			} else {
 			
 				if(Math.round(currentVal) < Math.round(targetVal)) {
@@ -350,7 +358,7 @@ class LessonView extends AbstractView {
 				}
 				
 				progress_scp.vPosition = currentVal + offset;
-				Debugger.log('adjusting scroll position - offset: ' + offset+ ' - currentVal: ' + currentVal,Debugger.CRITICAL,'adjustScrollBar','LessonView');
+				Debugger.log('adjusting scroll position - offset: ' + offset+ ' - currentVal: ' + currentVal + ' - targetVal: ' + targetVal,Debugger.CRITICAL,'adjustScrollBar','LessonView');
 				
 			}
 		}
