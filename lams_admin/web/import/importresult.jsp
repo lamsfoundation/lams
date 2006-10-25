@@ -29,5 +29,5 @@
 
 <p>
 	<input type="submit" class="button" value="Ok"
-		onclick="javascript:document.location='usersearch.do';" />
+		onclick="javascript:document.location='sysadminstart.do';" />
 </p>
