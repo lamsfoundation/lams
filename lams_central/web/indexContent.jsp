@@ -2,7 +2,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c" %>
 
-	<div id="content">
+	
 		<div id="message" style="text-align: center;"></div>
 		<div style="display: block;" class="box">
 			<table cellpadding="0">
@@ -15,4 +15,4 @@
 				</tbody>
 			</table>
 		</div>
-	</div>
+	
