@@ -37,11 +37,11 @@
 		
 				<H2><fmt:message key="msg.export.choose.format.instruction" /></H2>
 				<table><tr><td>
-				<input type="radio" name="format" id="lams" value="1" checked="checked"><fmt:message key="msg.export.choose.format.lams" />
-				<BR>
-				<input type="radio" name="format" id="ims" value="2" ><fmt:message key="msg.export.choose.format.ims" />
+				<input type="radio" name="format" id="lams" value="1" checked="checked" class="noBorder"><fmt:message key="msg.export.choose.format.lams" />
+				<BR><BR>
+				<input type="radio" name="format" id="ims" value="2" class="noBorder"><fmt:message key="msg.export.choose.format.ims" />
 				<div class="right-buttons">
-					<a href="javascript:;" onclick="goDownload();" class="button"><fmt:message key="button.export" /></a>
+					<a href="#" onclick="goDownload();" class="button"><fmt:message key="button.export" /></a>
 					<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
 				</div>
 				</td></tr></table>

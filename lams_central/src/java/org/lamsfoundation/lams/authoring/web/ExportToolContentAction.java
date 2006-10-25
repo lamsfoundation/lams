@@ -77,6 +77,8 @@ public class ExportToolContentAction extends LamsAction {
 		if(StringUtils.equals(param,"loading")){
 			Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
 			request.setAttribute(PARAM_LEARING_DESIGN_ID,learningDesignId);
+			int format = WebUtil.readIntParam(request,PARAM_EXPORT_FORMAT);
+			request.setAttribute(PARAM_EXPORT_FORMAT,format);
 			//display initial page for automatically loading download pgm
 			return mapping.findForward("loading");
 		}else if(StringUtils.equals(param,"export")){

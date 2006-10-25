@@ -16,7 +16,7 @@
 		<script type="text/javascript">
 			// if the download starts and finishes too quickly, then the page doesn't get a chance to finish rendering. So slow it down a tad.
 			function doRealDownload() {
-				location.href="<c:url value='/authoring/exportToolContent.do?method=export&learningDesignID=${learningDesignID}'/>";
+				location.href="<c:url value='/authoring/exportToolContent.do?method=export&learningDesignID=${learningDesignID}&format=${format}'/>";
 			}
 			function download(){
 				setTimeout("doRealDownload()", 3);
