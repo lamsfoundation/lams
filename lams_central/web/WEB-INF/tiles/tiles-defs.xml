@@ -37,13 +37,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="content" value="editprofile.jsp"/>	
 	</definition>
 
-	<definition name=".login" path="/template.jsp">
-		<put name="titleKey" value="title.login.window"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="passwordChangeContent.jsp"/>	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
 	<definition name=".passwordChange" path="/template.jsp">
 		<put name="titleKey" value="title.change.password.window"/>
 		<put name="header" value="header.jsp"/>
