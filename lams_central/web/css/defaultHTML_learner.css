@@ -419,3 +419,9 @@ input:hover.button {
 }
 
 .text-area {width:99%}
+
+.shading-bg {padding:5px; padding-left:10px;  padding-top:10px; margin-top:20px; margin-bottom:10px; width:100%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px}
+
+.indent {margin-left:20px;}
+
+.middle {vertical-align:middle;}
