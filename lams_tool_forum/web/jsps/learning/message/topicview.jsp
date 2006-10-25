@@ -6,7 +6,7 @@
 	<div style="margin-left:<c:out value="${indentSize}"/>em;">
 		<table cellspacing="0" class="forum">
 			<tr>
-				<th class="first">
+				<th>
 					<c:choose>
 						<c:when test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 							<c:out value="${msgDto.message.subject}" />
@@ -18,7 +18,7 @@
 				</th>
 			</tr>
 			<tr>
-				<td class="first posted-by">
+				<td class="posted-by">
 					<c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 						<fmt:message key="lable.topic.subject.by" />
 						<c:set var="author" value="${msgDto.author}" />
@@ -138,9 +138,7 @@
 								</html:link>
 							</c:if>
 						</c:if>
-					</div>
-
-					<div class="right-buttons">
+					
 						<!--  Reply Button -->
 						<c:if
 							test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">

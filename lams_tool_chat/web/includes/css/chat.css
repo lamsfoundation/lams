@@ -15,7 +15,6 @@
 /* ==================== LEARNING PAGE STYLES ==================== */
 #chat_content {
 	width: 500 px;
-	padding: 12px;
 	/* compensate for content image border */
 	margin-left: 4px;
 }
@@ -27,7 +26,6 @@
 #iResp {
 	height: 260px;
 	margin-right: 12px;
-	margin-left: 12px;
 	overflow: scroll;
 	border-width: 1px;
 	border-style: solid;
@@ -58,7 +56,7 @@
 }
 
 #msgArea {
-	width: 410px;
+	width: 98%;
 }
 
 /* ================== MONITORING ================== */

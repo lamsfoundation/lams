@@ -40,13 +40,15 @@
 		<c:out value="${chatDTO.title}" escapeXml="false" />
 	</h1>
 
+	<p>
+		<c:out value="${chatDTO.instructions}" escapeXml="false" />
+	</p>
+	
 	<div id="chat_content">
 		<div id="chat_pane">
 			<form name="sendForm" action="" onSubmit="return sendMsg(this);">
 				<div>
-					<p>
-						<c:out value="${chatDTO.instructions}" escapeXml="false" />
-					</p>
+
 
 					<div id="roster"></div>
 					<div id="iResp">
@@ -55,24 +57,28 @@
 
 					<br />
 
-					<h4 style="margin-left: 12px;">
+					<div class="field-name">
 						<fmt:message>label.sendMessageTo</fmt:message>
 						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
 						</span><span id="sendToUser" style="display: none"></span>
-					</h4>
+					</div>
 
 
-					<div style="margin-left: 12px;">
+					
 						<textarea name="msg" onKeyPress="return checkEnter(event);"
 							id="msgArea" rows="2" cols="20"></textarea>
-
+						
+						
+						<div class="space-top">
 						<input id="sendButton" class="button" type="submit"
 							value='<fmt:message>button.send</fmt:message>' />
-					</div>
+						</div>
+					
+					
 				</div>
 			</form>
 
-			<br />
+			
 			<c:if test="${MODE == 'learner' || MODE == 'author'}">
 				<%@ include file="parts/finishButton.jsp"%>
 

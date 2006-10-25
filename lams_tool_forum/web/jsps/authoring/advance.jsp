@@ -41,8 +41,7 @@
 </p>
 
 <p>
-	<html:checkbox property="forum.limitedInput" styleId="limitedInput"
-		styleClass="noBorder">
+	<html:checkbox property="forum.limitedInput" styleId="limitedInput"	styleClass="noBorder">
 	</html:checkbox>
 	<label for="limitedInput">
 		<fmt:message key="label.authoring.advance.limited.input" />
@@ -52,8 +51,7 @@
 </p>
 
 <p>
-	<html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"
-		styleId="reflectOn">
+	<html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"	styleId="reflectOn">
 	</html:checkbox>
 	<label for="reflectOn">
 		<fmt:message key="advanced.reflectOnActivity" />
@@ -72,7 +70,7 @@
 
 <p>
 	<html:radio property="forum.allowNewTopic" value="true"
-		onclick="allowNewTopic()" styleId="allowNewTopic1">
+		onclick="allowNewTopic()" styleId="allowNewTopic1" styleClass="noBorder">
 	</html:radio>
 	<label for="allowNewTopic1">
 		<fmt:message key="label.authoring.advance.allow.new.topics" />
@@ -81,7 +79,7 @@
 
 <p>
 	<html:radio property="forum.allowNewTopic" value="false"
-		onclick="allowNewTopic()" styleId="allowNewTopic2">
+		onclick="allowNewTopic()" styleId="allowNewTopic2" styleClass="noBorder">
 	</html:radio>
 	<label for="allowNewTopic2">
 		<fmt:message key="label.authoring.advance.number.reply" />

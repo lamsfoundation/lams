@@ -18,7 +18,7 @@
 			area.src=url;
 			area.style.display="block";
 		}
-		document.getElementById("saveCancelButtons").style.display="none";
+		
 		var elem = document.getElementById("saveCancelButtons");
 		if (elem != null) {
 			elem.style.display="none";

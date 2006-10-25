@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <script type="text/javascript">
 	function refreshTopic(){
@@ -11,36 +11,39 @@
 
 <div id="content">
 
-<h1>
-	${sessionMap.title}
-</h1>
+	<h1>
+		${sessionMap.title}
+	</h1>
+<div>
+	
 
-	<h2>
-
-		<fmt:message key="title.message.view.topic" />
-	</h2>
-
-	<p>
+	<div class="right-buttons">
 		<c:set var="backToForum">
-			<html:rewrite page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
+			<html:rewrite
+				page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
 		</c:set>
-		<html:button property="backToForum" onclick="javascript:location.href='${backToForum}';" styleClass="button">
+		<html:button property="backToForum" onclick="javascript:location.href='${backToForum}';"
+			styleClass="button" >
 			<fmt:message key="label.back.to.forum" />
 		</html:button>
-	</p>
-	<%@ include file="message/topicview.jsp"%>
-	<table>
-	<tr><td>
-	<div class="left-buttons">
-		<c:set var="refreshTopicURL">
-			
-		</c:set>
-		<a href="javascript:refreshTopic();" class="button">
-			<fmt:message key="label.refresh"/>
-		</a>
+		
+		</div>
+		
+		<h2>
+
+		<fmt:message key="title.message.view.topic" />
+	</h2>	
+
 	</div>
-	</td></tr>
-	</table>
+
+
+	<%@ include file="message/topicview.jsp"%>
+	<c:set var="refreshTopicURL">
+
+	</c:set>
+
+	<div class="space-bottom-top">
+		<a href="javascript:refreshTopic();" class="button"> <fmt:message
+				key="label.refresh" /> </a>
+	</div>
 </div>
-
-

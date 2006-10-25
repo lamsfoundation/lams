@@ -1,32 +1,35 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<table cellpadding="0">
-	<tr>
-		<td>
-			<span  class="field-name"><fmt:message key="message.label.subject" /></span><BR>
-			<html:text size="30" tabindex="1" property="message.subject" />
+
+	
+			<div class="field-name title-space-top">
+				<fmt:message key="message.label.subject" />
+			</div>
+			
+			
+			<html:text size="50" tabindex="1" property="message.subject" />
 			<html:errors property="message.subject" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<span  class="field-name"><fmt:message key="message.label.body" />*</span><BR>
+		
+			<div class="field-name title-space-top">
+				<fmt:message key="message.label.body" />*
+			</div>
+			
 			<%@include file="bodyarea.jsp"%>
-		</td>
-	</tr>
-	<c:if test="${topic.hasAttachment || sessionMap.allowUpload}">
-		<tr>
-			<td>
-				<span class="field-name"><fmt:message key="message.label.attachment" /></span>
+		
+			<c:if test="${topic.hasAttachment || sessionMap.allowUpload}">
+		
+				<div class="field-name title-space-top">
+					<fmt:message key="message.label.attachment" />
+				</div>
+				
 				<c:set var="allowUpload" value="${sessionMap.allowUpload}" />
+				
 				<div id="itemAttachmentArea">
 					<%@ include file="/jsps/learning/message/msgattachment.jsp"%>
 				</div>		
-			</td>
-		</tr>
+			
 	</c:if>
-		<tr>
-			<td>
+		<div class="space-bottom-top">
 <div class="right-buttons">
 			<html:submit styleClass="button">
 				<fmt:message key="button.submit" />
@@ -37,7 +40,6 @@
 			<html:button property="goback" onclick="javascript:location.href='${backToTopic}';" styleClass="button">
 				<fmt:message key="button.cancel" />
 			</html:button>
-			</td>
-		</tr>
+			
 </div>
-</table>
+</div>
