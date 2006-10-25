@@ -102,11 +102,22 @@ public class UserSaveAction extends Action {
 			return mapping.findForward("userlist");
 		}
 
-		if (userId != 0) edit = true;
+		User user = null;
+		if (userId != 0) {
+			edit = true;
+			user = (User)service.findById(User.class, userId);
+		}
 
 		// (dyna)form validation
 		if ((userForm.get("login") == null) || (userForm.getString("login").trim().length() == 0)) {
 			errors.add("login", new ActionMessage("error.login.required"));
+		}
+		if (service.getUserByLogin(userForm.getString("login")) != null) {
+			if (user != null && StringUtils.equals(user.getLogin(),userForm.getString("login"))) {
+				// login exists - it's the user's current login
+			} else {
+				errors.add("login", new ActionMessage("error.login.unique", "("+userForm.getString("login")+")"));
+			}
 		}
 		if (!StringUtils.equals((String)userForm.get("password"),((String)userForm.get("password2")))) {
 			errors.add("password", new ActionMessage("error.newpassword.mismatch"));
@@ -131,11 +142,9 @@ public class UserSaveAction extends Action {
 			}
 		}
 		
-		User user = null;
 		if (errors.isEmpty()) {
 			if (edit) { // edit user
 				log.debug("editing userId: " + userId);
-				user = (User)service.findById(User.class, userId);
 				// hash the new password if necessary, and audit the fact
 				if (passwordChanged) {
 					writeAuditLog(user, new String[1]);
@@ -150,9 +159,6 @@ public class UserSaveAction extends Action {
 				userForm.set("password", HashUtil.sha1((String)userForm.get("password")));
 				BeanUtils.copyProperties(user, userForm);
 				log.debug("creating user... new login: " + user.getLogin());
-				if (service.getUserByLogin(user.getLogin()) != null) {
-					errors.add("login", new ActionMessage("error.login.unique"));
-				}
 				if (errors.isEmpty()) {
 					// TODO set flash/html themes according to user input instead of server default.
 					String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
