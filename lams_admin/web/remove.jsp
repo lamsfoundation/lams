@@ -19,11 +19,12 @@
 <logic:equal name="method" value="disable">
 <h2><fmt:message key="admin.user.disable"/></h2>
 <p>&nbsp;</p>
-<p>This user has lesson and/or sequence data associated with it and cannot be deleted.&nbsp;&nbsp;
-User will be disabled instead, maintaining their data, but the account will
-be treated as deleted.&nbsp;&nbsp;It will not appear in group/subgroup lists, nor
-will the user be able to login.<br />
-You can enable the user account again by editing the user's profile.</p>
+<p>
+	<fmt:message key="msg.disable.user.1"/>&nbsp;&nbsp;
+	<fmt:message key="msg.disable.user.2"/>&nbsp;&nbsp;
+	<fmt:message key="msg.disable.user.3"/><br />
+	<fmt:message key="msg.disable.user.4"/>
+</p>
 <c:url var="disableaction" value="user.do">
 		<c:param name="method" value="disable" />
 		<c:param name="userId" value="${userId}" />
@@ -38,7 +39,7 @@ You can enable the user account again by editing the user's profile.</p>
 <logic:equal name="method" value="delete">
 <h2><fmt:message key="admin.user.delete"/></h2>
 <p>&nbsp;</p>
-<p>User has no associated data and can be safely removed.&nbsp;&nbsp;Are you sure you want to delete this account?</p>
+<p><fmt:message key="msg.delete.user.1"/>&nbsp;&nbsp;<fmt:message key="msg.delete.user.2"/></p>
 <c:url var="deleteaction" value="user.do">
 		<c:param name="method" value="delete" />
 		<c:param name="userId" value="${userId}" />
