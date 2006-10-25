@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.authoring.web;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,6 +68,9 @@ public class ExportToolContentAction extends LamsAction {
 	public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
 	public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
 	private static final String PARAM_EXPORT_FORMAT = "format";
+	private static final String IMS_XSLT_NAME = "learning-design-ims.xslt";
+	private static final String IMS_XSLT_PATH = "/toolcontent";
+
 
 	private Logger log = Logger.getLogger(ExportToolContentAction.class);
 	
@@ -99,7 +103,8 @@ public class ExportToolContentAction extends LamsAction {
 		List<String> toolsErrorMsgs = new ArrayList<String>();
 		
 		try {
-			String zipFilename = service.exportLearningDesign(learningDesignId,toolsErrorMsgs,format);
+			File xslt = new File(this.getServlet().getServletContext().getRealPath(IMS_XSLT_PATH)+File.separator+IMS_XSLT_NAME);
+			String zipFilename = service.exportLearningDesign(learningDesignId,toolsErrorMsgs,format,xslt);
 			
 			//write zip file as response stream. 
 			response.setContentType("application/zip");
