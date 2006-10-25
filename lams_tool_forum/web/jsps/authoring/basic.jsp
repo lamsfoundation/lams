@@ -31,7 +31,7 @@
 			area.style.height="0px";
 			area.style.display="none";
 		}
-		document.getElementById("saveCancelButtons").style.display="block";
+
 		var elem = document.getElementById("saveCancelButtons");
 		if (elem != null) {
 			elem.style.display="block";
