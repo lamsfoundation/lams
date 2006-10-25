@@ -241,8 +241,14 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				}
 
 				try {
-					Principal p = super.createIdentity(name);
-					log.info("Assign user to role " + name);
+					Principal p;
+					if (name!=null) {
+						p = super.createIdentity(name);
+						log.info("Assign user to role " + name);
+					} else {
+						p = super.createIdentity("LEARNER");
+						log.info("Found no roles, assign user to role LEARNER");
+					}
 					group.addMember(p);
 				} catch (Exception e) {
 					log.debug("Failed to create principal: " + name, e);
