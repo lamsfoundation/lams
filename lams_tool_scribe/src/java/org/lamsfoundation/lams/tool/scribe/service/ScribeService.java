@@ -253,9 +253,15 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		scribe = Scribe.newInstance(scribe, toolContentId, null);
 		scribe.setToolContentHandler(null);
 		scribe.setScribeSessions(null);
+		// wipe out the links from ScribeAttachments, ScribeHeading back to Scribe, or it will try to 
+		// include the hibernate object version of the Scribe within the XML
 		Set<ScribeAttachment> atts = scribe.getScribeAttachments();
 		for (ScribeAttachment att : atts) {
 			att.setScribe(null);
+		}
+		Set<ScribeHeading> headings = scribe.getScribeHeadings();
+		for (ScribeHeading heading : headings) {
+			heading.setScribe(null);
 		}
 		try {
 			exportContentService

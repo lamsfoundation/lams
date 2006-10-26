@@ -434,6 +434,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
 					ScribeAttachment originalFile = (ScribeAttachment) iter.next();
 					ScribeAttachment newFile = (ScribeAttachment) originalFile
 							.clone();
+					newFile.setScribe(scribe);
 					set.add(newFile);
 				}
 				scribe.scribeAttachments = set;
@@ -446,6 +447,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
 				while (iter.hasNext()) {
 					ScribeHeading originalHeading = (ScribeHeading) iter.next();
 					ScribeHeading newHeading = (ScribeHeading)originalHeading.clone();
+					newHeading.setScribe(scribe);
 					set.add(newHeading);
 				}
 				scribe.scribeHeadings = set;
