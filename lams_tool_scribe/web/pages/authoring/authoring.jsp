@@ -1,18 +1,33 @@
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.tool.scribe.util.ScribeConstants"%>
+<%@ page
+	import="org.lamsfoundation.lams.tool.scribe.util.ScribeConstants"%>
 
-<div id="header">
-	<lams:Tabs control="true">
-		<lams:Tab id="1" key="button.basic" />
-		<lams:Tab id="2" key="button.advanced" />
-		<lams:Tab id="3" key="button.instructions" />
-	</lams:Tabs>
-</div>
-<!--closes header-->
+<html:form action="/authoring" styleId="authoringForm" method="post"
+	enctype="multipart/form-data">
 
-<div id="content">
-	<html:form action="/authoring" styleId="authoringForm" method="post"
-		enctype="multipart/form-data">
+	<c:set var="formBean"
+		value="<%=request
+										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+
+	<c:set var="defineLater" value="no" />
+	<c:if test="${sessionMap.mode == 'teacher'}">
+		<c:set var="defineLater" value="yes" />
+	</c:if>
+
+	<div id="header">
+		<lams:Tabs control="true">
+			<lams:Tab id="1" key="button.basic" />
+			<c:if test="${sessionMap.mode == 'author'}">
+				<lams:Tab id="2" key="button.advanced" />
+				<lams:Tab id="3" key="button.instructions" />
+			</c:if>
+		</lams:Tabs>
+	</div>
+	<!--closes header-->
+
+	<div id="content">
+
 		<div>
 			<html:hidden property="currentTab" styleId="currentTab" />
 			<html:hidden property="dispatch" value="updateContent" />
@@ -25,22 +40,15 @@
 			</c:if>
 		</div>
 
-		<lams:help toolSignature="<%= ScribeConstants.TOOL_SIGNATURE %>" module="authoring"/>
+		<lams:help toolSignature="<%=ScribeConstants.TOOL_SIGNATURE%>"
+			module="authoring" />
 
 		<%-- Page tabs --%>
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-		<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-		<lams:TabBody id="3" titleKey="button.instructions"
-			page="instructions.jsp" />
-
-		<c:set var="formBean"
-			value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-
-		<c:set var="defineLater" value="no" />
-		<c:if test="${sessionMap.mode == 'teacher'}">
-			<c:set var="defineLater" value="yes" />
+		<c:if test="${sessionMap.mode == 'author'}">
+			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
+			<lams:TabBody id="3" titleKey="button.instructions"
+				page="instructions.jsp" />
 		</c:if>
 
 		<lams:AuthoringButton formID="authoringForm"
@@ -51,8 +59,8 @@
 			customiseSessionID="${sessionMap.sessionID}"
 			contentFolderID="${sessionMap.contentFolderID}" />
 
-	</html:form>
-</div>
-<!--closes content-->
+	</div>
+	<!--closes content-->
+</html:form>
 
 <div id="footer"></div>
