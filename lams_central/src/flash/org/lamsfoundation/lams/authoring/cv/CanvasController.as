@@ -89,18 +89,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
    }
    
-   private function clearAllSelections(optionalOnCanvas:Array, parallelOnCanvas:Array){
+   public function clearAllSelections(optionalOnCanvas:Array, parallelOnCanvas:Array){
 	for (var i=0; i<optionalOnCanvas.length; i++){
 			for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
 				optionalOnCanvas[i].actChildren[j].setSelected(false);
 			}
-			optionalOnCanvas[i].init()
+			optionalOnCanvas[i].refreshChildren();
 		}
 		for (var m=0; m<parallelOnCanvas.length; m++){
 			for(var n=0; n < parallelOnCanvas[m].actChildren.length; n++){
 				parallelOnCanvas[m].actChildren[n].selectActivity = "false";
 			}
-			parallelOnCanvas[m].init()
+			parallelOnCanvas[m].refreshChildren();
 		}
    }
 	

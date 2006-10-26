@@ -104,8 +104,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		MovieClipUtils.doLater (Proxy.create (this, init));
 	}
 	
-	public function init () : Void	{
-		
+	public function init():Void {
 		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
@@ -122,13 +121,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		CHILD_OFFSET_X = 8;
 		CHILD_OFFSET_Y = 57;
-		//childActivities_mc = this;
+		
 		for (var j=0; j<children_mc.length; j++){
 			children_mc[j].removeMovieClip();
 		}
 		children_mc = new Array();
 		
-		//childActivities_mc.removeMovieClip();
 		for (var i = 0; i < _children.length; i ++)		{
 			if (fromModuleTab == "monitorMonitorTab"){
 				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring"});
@@ -145,6 +143,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		}
 		
 		MovieClipUtils.doLater (Proxy.create (this, draw));
+	}
+	
+	public function refreshChildren():Void {
+		for (var i = 0; i < children_mc.length; i ++)		{
+			children_mc[i].setSelected(false);
+		}
 	}
 	
 	private function showStatus(isVisible:Boolean){
@@ -306,7 +310,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	public function get actChildren():Array {
 		return _children;
-	} 
+	}
+	
+	public function get children():Array {
+		return children_mc;
+	}
+	
 	public function get getpanelHeight():Number {
 		return panelHeight;
 	}

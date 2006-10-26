@@ -348,6 +348,8 @@ public function viewUpdate(event:Object):Void{
 		
 		
 		
+		
+		
 		//position
 		//newActivity_mc._x = a.xCoord;
 		//newActivity_mc._y = a.yCoord;
@@ -413,12 +415,19 @@ public function viewUpdate(event:Object):Void{
 		Debugger.log('running..',Debugger.CRITICAL,'highlightActivity','CanvasView');
 		var ca = CanvasActivity(cm.selectedItem);
 		var a:Activity = ca.activity;	
-		//deselect everything else
-		var CAsArray:Array = cm.activitiesDisplayed.values();
-		Debugger.log('CAsArray:'+CAsArray.length,Debugger.CRITICAL,'highlightActivity','CanvasView');
-		for(var i=0; i < CAsArray.length; i++){
-			CAsArray[i].setSelected(false);
+		
+		// deselect previously selected item
+		if(cm.prevSelectedItem != null) {
+			// if child of an complex activity is previously selected, it is easiest to clear all the children
+			if(cm.prevSelectedItem.activity.parentUIID != null) {
+				var caComplex = cm.activitiesDisplayed.get(cm.prevSelectedItem.activity.parentUIID);
+				caComplex.refreshChildren();
+			} else {
+				var dca:CanvasActivity = cm.activitiesDisplayed.get(cm.prevSelectedItem.activity.activityUIID);
+				dca.setSelected(false);
+			}
 		}
+		
 		
 		//try to cast the selected item to see what we have (instance of des not seem to work)
 		if(CanvasActivity(cm.selectedItem) != null){

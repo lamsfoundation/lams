@@ -53,6 +53,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _isDirty:Boolean;
 	private var _activeTool:String;
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
+	private var _prevSelectedItem:Object;
 	private var _isDrawingTransition:Boolean;
 	private var _transitionActivities:Array;
 	private var _isDragging:Boolean;
@@ -992,6 +993,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	}
 	
 	private function setSelectedItem(newselectItem:Object){
+		prevSelectedItem = _selectedItem;
 		_selectedItem = newselectItem;
 		broadcastViewUpdate("SELECTED_ITEM");
 	}
@@ -1015,6 +1017,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function set selectedItem (newselectItem:Object):Void {
 		setSelectedItem(newselectItem);
 	}
+	
+	public function set prevSelectedItem (oldselectItem:Object):Void {
+		_prevSelectedItem = oldselectItem;
+	}
+	
+	public function get prevSelectedItem():Object {
+		return _prevSelectedItem;
+	}
+	
 	/**
 	 * 
 	 * @usage   

@@ -147,6 +147,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		
 	}
 	
+	public function refreshChildren():Void {
+		child1_mc.setSelected(false);
+		child2_mc.setSelected(false);
+	}
+	
 	private function showStatus(isVisible:Boolean){
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
