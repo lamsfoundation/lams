@@ -29,10 +29,14 @@
 
 				<div class="small-space-top">
 
-					<html:submit styleClass="button" titleKey="basic.title"></html:submit>
+					<html:submit styleClass="button" titleKey="basic.title">
+						<fmt:message key="button.submit" />
+					</html:submit>
 
-					<html:button property="Cancel" value="Cancel" styleClass="button"
-						onclick="window.top.hideMessage();"></html:button>
+					<html:button property="Cancel" styleClass="button"
+						onclick="window.top.hideMessage();">
+						<fmt:message key="button.cancel" />
+					</html:button>
 			</html:form>
 
 			</div>
