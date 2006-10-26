@@ -2,88 +2,88 @@
 
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 <c:forEach var="session" items="${dto.sessionDTOs}">
-	<table cellspacing="0">
-		<tr>
-			<td colspan="3">
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
+	<h2>
+		${session.sessionName}
+	</h2>
 
-		<tr>
-			<td>
-				<c:choose>
-					<c:when
-						test="${(not dto.autoSelectScribe) and  session.appointedScribe eq null}">
+	<c:choose>
+		<c:when
+			test="${(not dto.autoSelectScribe) and  session.appointedScribe eq null}">
 
-						<c:choose>
-							<c:when test="${not empty session.userDTOs}">
-								<html:form action="/monitoring">
+			<c:choose>
+				<c:when test="${not empty session.userDTOs}">
+					<html:form action="/monitoring">
 
-									<html:hidden property="toolSessionID"
-										value="${session.sessionID}" />
-									<html:hidden property="dispatch" value="appointScribe" />
-									<html:hidden property="contentFolderID"/>
+						<html:hidden property="toolSessionID" value="${session.sessionID}" />
+						<html:hidden property="dispatch" value="appointScribe" />
+						<html:hidden property="contentFolderID" />
 
-									<fmt:message key="heading.selectScribe" />
+						<fmt:message key="heading.selectScribe" />
 
-									<html:select property="appointedScribeUID"
-										style="min-width: 150px;">
-										<c:forEach var="user" items="${session.userDTOs}">
-											<html:option value="${user.uid}">
+						<html:select property="appointedScribeUID"
+							style="min-width: 150px;">
+							<c:forEach var="user" items="${session.userDTOs}">
+								<html:option value="${user.uid}">
 												${user.firstName} ${user.lastName}
 											</html:option>
-										</c:forEach>
-									</html:select>
+							</c:forEach>
+						</html:select>
 
-									
-										<html:submit styleClass="button">
-											<fmt:message key="button.submit"/>
-										</html:submit>
-									
+						<html:submit styleClass="button">
+							<fmt:message key="button.submit" />
+						</html:submit>
 
-								</html:form>
-							</c:when>
+					</html:form>
+				</c:when>
 
-							<c:otherwise>
-								<fmt:message key="message.noLearners" />
-							</c:otherwise>
+				<c:otherwise>
+					<p>
+						<fmt:message key="message.noLearners" />
+					</p>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
 
-						</c:choose>
+		<c:otherwise>
+			<div class="field-name">
+				<fmt:message key="heading.appointedScribe" />
+			</div>
 
-					</c:when>
+			<p>
+				${session.appointedScribe}
+			</p>
 
-					<c:otherwise>
-						<div class="field-name">
-							<fmt:message key="heading.appointedScribe" />
-						</div>
+			<c:set var="scribeSessionDTO" value="${session}" scope="request">
+			</c:set>
+			<%@include file="/pages/parts/voteDisplay.jsp"%>
 
-						<p>
-							${session.appointedScribe}
-						</p>
+			<div class="field-name">
+				<fmt:message key="heading.report" />
+			</div>
+			<hr />
+			<c:forEach var="report" items="${session.reportDTOs}">
+				<p>
+					<lams:out value="${report.headingDTO.headingText}" />
+				</p>
+				<p>
+					<lams:out value="${report.entryText}" />
+				</p>
+				<hr />
+			</c:forEach>
 
-						<c:set var="scribeSessionDTO" value="${session}" scope="request"> </c:set>
-						<%@include file="/pages/parts/voteDisplay.jsp" %>
+			<c:if test="${session.forceComplete eq false}">
+				<html:form action="monitoring">
+					<html:hidden property="dispatch" value="forceCompleteActivity" />
+					<html:hidden property="toolSessionID" value="${session.sessionID}" />
+					<html:hidden property="contentFolderID"/>
+					<html:submit styleClass="button">
+						<fmt:message key="button.forceComplete" />
+					</html:submit>
+				</html:form>
+			</c:if>
 
-						<div class="field-name">
-							<fmt:message key="heading.report" />
-						</div>
-						<hr />
-						<c:forEach var="report" items="${session.reportDTOs}">
-							<p>
-								<lams:out value="${report.headingDTO.headingText}" />
-							</p>
-							<p>
-								<lams:out value="${report.entryText}" />
-							</p>
-							<hr />
-						</c:forEach>
-					</c:otherwise>
-				</c:choose>
-			</td>
-		</tr>
-	</table>
+		</c:otherwise>
+	</c:choose>
 
 	<c:if test="${dto.reflectOnActivity}">
 		<div class="field-name">
@@ -130,14 +130,16 @@
 			</c:forEach>
 		</table>
 	</c:if>
+
+
 </c:forEach>
 
 <html:form action="/monitoring">
-	<html:hidden property="toolContentID" value="${dto.toolContentID}"/>
-	<html:hidden property="contentFolderID"/>
+	<html:hidden property="toolContentID" value="${dto.toolContentID}" />
+	<html:hidden property="contentFolderID" />
 	<p>
-		<html:submit styleClass="button">
-			<fmt:message key="button.refresh"/>
+		<html:submit styleClass="button right-buttons">
+			<fmt:message key="button.refresh" />
 		</html:submit>
 	</p>
 </html:form>

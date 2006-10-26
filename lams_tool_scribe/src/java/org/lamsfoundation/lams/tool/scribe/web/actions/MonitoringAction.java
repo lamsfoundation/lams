@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
+import org.lamsfoundation.lams.tool.scribe.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.scribe.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -132,6 +133,23 @@ public class MonitoringAction extends LamsDispatchAction {
 		return mapping.findForward("success");
 	}
 	
+	
+	public ActionForward forceCompleteActivity(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		MonitoringForm monForm = (MonitoringForm)form;
+
+		ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
+		session.setForceComplete(true);
+		scribeService.saveOrUpdateScribeSession(session);
+
+		ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
+		request.setAttribute("monitoringDTO", scribeDTO);
+		request.setAttribute("contentFolderID", monForm.getContentFolderID());
+		
+		return mapping.findForward("success");
+	}
 	/* Private Methods */
 
 	private ScribeDTO setupScribeDTO(Scribe scribe) {
