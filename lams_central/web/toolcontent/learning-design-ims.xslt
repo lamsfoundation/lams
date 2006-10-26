@@ -111,16 +111,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:template name="complex">
 		<activity-structure xsl:use-attribute-sets="complexAttr">
 			<title>
-				<xsl:value-of select="*//activityTitle"/>
+				<xsl:value-of select="activityTitle"/>
 			</title>
-			<xsl:variable name="myid" select="*//activityID"/>
-			<xsl:for-each select="*">
-				<xsl:sort select="*//orderID" order="ascending"/>
-				<xsl:if test="*//parentActivityID = $myid">
+			<xsl:variable name="myid" select="activityID"/>
+			<xsl:for-each select="//*">
+				<xsl:sort select="orderID" order="ascending"/>
+				<xsl:if test="//*/parentActivityID = $myid">
 					<learning-activity-ref  xsl:use-attribute-sets="toolRef"/>
 				</xsl:if>
 			</xsl:for-each>
-			<xsl:copy-of select="*"/>
+			<lams:lams-complex-activity>
+				<xsl:for-each select="node() | @*">
+					<xsl:element name="lams:{local-name()}" namespace="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				</xsl:for-each>
+			</lams:lams-complex-activity>
 		</activity-structure>
 	</xsl:template>
 	<!-- ================================== lams Tansitions ================================== -->
@@ -129,32 +133,47 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<title>LAMS Learning design sequence</title>
 			<!-- copy sorted transition learning-activity-ref -->
 			<xsl:copy-of select="document($transitionsFile)"/>
-			
-			<xsl:copy-of select="*"/>
+			<lams:transitions>
+				<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
+			</lams:transitions>
 		</activity-structure>
+	</xsl:template>
+	
+	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO">
+		<lams:transition>
+			<xsl:for-each select="node() | @*">
+				<xsl:element name="lams:{local-name()}" namespace="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+			</xsl:for-each>
+		</lams:transition>
+		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
 	</xsl:template>
 	<!-- ================================== Tools' content ================================== -->
 	<xsl:template match="activities" mode="env">
 		<environments>
-			<environment xsl:use-attribute-sets="toolEnvIdentifier">
-				<title>
-					<xsl:value-of select="*//activityTitle"/>
-				</title>
-				<service  xsl:use-attribute-sets="serviceAttr">
-					<tool_interface xmlns="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0">
-						<tool_id>
-							<identifier type="URN">URN:LAMS:<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/></identifier>
-						</tool_id>
-						<tool_version><xsl:value-of select="*//toolVersion"/></tool_version>
-						<tool_contents>
-							<xsl:copy-of select="document(*//toolContentID+'.xml')"/>
-						</tool_contents>
-					</tool_interface>
-				</service>
-			</environment>
+			<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="env"/>
 		</environments>
 	</xsl:template>
-	
+	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="env">
+		<environment xsl:use-attribute-sets="toolEnvIdentifier">
+			<title>
+				<xsl:value-of select="activityTitle"/>
+			</title>
+			<service  xsl:use-attribute-sets="serviceAttr">
+				<tool_interface xmlns="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0">
+					<tool_id>
+						<identifier type="URN">URN:LAMS:<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></identifier>
+					</tool_id>
+					<tool_version><xsl:value-of select="toolVersion"/></tool_version>
+					<tool_contents>
+						<xsl:variable name="filename">
+							<xsl:value-of select="toolContentID"/>.xml
+						</xsl:variable>
+						<xsl:copy-of select="document($filename)"/>
+					</tool_contents>
+				</tool_interface>
+			</service>
+		</environment>
+	</xsl:template>
 	<!-- ================================== some attributes ================================== -->		
 	<xsl:attribute-set name="toolIdentifier">
 		<xsl:attribute name="identifier">A-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>
@@ -181,7 +200,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="serviceAttr">
-		<xsl:attribute name="identifier">S-<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/></xsl:attribute>
+		<xsl:attribute name="identifier">S-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>
 		<xsl:attribute name="isvisible">true</xsl:attribute>
 	</xsl:attribute-set>	
 	
