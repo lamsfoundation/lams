@@ -1,10 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" %>
-
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-core" prefix="c" %>
+<%@ include file="/taglibs.jsp"%>
 
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :

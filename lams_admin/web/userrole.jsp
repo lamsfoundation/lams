@@ -1,11 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" %>
-
-<%@ taglib uri="tags-html-el" prefix="html-el" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/taglibs.jsp"%>
 
 <html-el:form action="/userrolessave.do" method="post">
 <html-el:hidden property="userId" />

@@ -1,11 +1,5 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/taglibs.jsp"%>
 
 <html:form action="/register" method="post">
 	<html:hidden property="method" value="register"/>

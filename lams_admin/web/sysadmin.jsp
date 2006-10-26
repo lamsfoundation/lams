@@ -1,7 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" %>
-
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/taglibs.jsp"%>
 
 <h1 class=no-tabs-below><fmt:message key="sysadmin.headline"/></h1>
 <br />

@@ -1,9 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean-el" prefix="bean-el" %>
-<%@ taglib uri="tags-core" prefix="c" %>
+<%@ include file="/taglibs.jsp"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
