@@ -3,18 +3,20 @@
 
 <%@ include file="/includes/taglibs.jsp"%>
 
-<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<%@ page
+	import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 
 <lams:html>
 <head>
 	<lams:headItems />
-	<title><fmt:message key="activity.title" /></title>
+	<title><fmt:message key="activity.title" />
+	</title>
 
 	<script type="text/javascript">
 		function init(){
 			var showBasicContent = "${requestScope.showBasicContent}";
 			if (showBasicContent != "true") {
-	            initTabSize(3);
+				// TODO fix this
 	        }
 	        
 	        var tag = document.getElementById("currentTab");
@@ -49,7 +51,7 @@
 			document.NbAuthoringForm.method.value = '<fmt:message key="button.upload" />';
 			document.NbAuthoringForm.submit();
 		}        
-     </script>  
+     </script>
 </head>
 
 <body class="stripes" onLoad="init()">
@@ -63,7 +65,8 @@
 			<html:hidden property="sessionMapID" />
 
 			<c:set var="formBean"
-				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				value="<%=request
+											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<c:set var="sessionMap"
 				value="${sessionScope[formBean.sessionMapID]}" scope="request" />
 
@@ -75,17 +78,10 @@
 				<!-- start tabs -->
 				<lams:Tabs control="true">
 					<lams:Tab id="1" key="label.authoring.heading.basic" />
-					<lams:Tab id="2" key="label.authoring.heading.advanced"
-						inactive="true" />
-					<c:choose>
-						<c:when test="${formBean.defineLater != 'true'}">
-							<lams:Tab id="3" key="label.authoring.heading.instructions" />
-						</c:when>
-						<c:otherwise>
-							<lams:Tab id="3" key="label.authoring.heading.instructions"
-								inactive="true" />
-						</c:otherwise>
-					</c:choose>
+					<c:if test="${formBean.defineLater != 'true'}">
+						<lams:Tab id="2" key="label.authoring.heading.advanced" />
+						<lams:Tab id="3" key="label.authoring.heading.instructions" />
+					</c:if>
 				</lams:Tabs>
 				<!-- end tab buttons -->
 			</div>
@@ -93,14 +89,19 @@
 			<div id="content">
 				<!-- show any error messages here -->
 				<%@ include file="../errorbox.jsp"%>
-				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="authoring"/>
+				<lams:help toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"
+					module="authoring" />
 				<!--  Set up tabs  -->
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic"
 					page="basic.jsp" />
-				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
-					page="advance.jsp" />
-				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions"
-					page="instructions.jsp" />
+				<c:if test="${formBean.defineLater != 'true'}">
+					<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
+						page="advance.jsp" />
+
+					<lams:TabBody id="3"
+						titleKey="label.authoring.heading.instructions"
+						page="instructions.jsp" />
+				</c:if>
 
 				<!-- Button Row -->
 				<c:set var="dispatchMethodName">
