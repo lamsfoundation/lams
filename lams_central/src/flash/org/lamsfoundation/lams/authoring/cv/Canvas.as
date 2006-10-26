@@ -505,8 +505,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function checkValidDesign(){
 		if(_ddm.validDesign){
 			Application.getInstance().getToolbar().setButtonState('preview',true);
+			LFMenuBar.getInstance().enableExport(true);
 		}else{
 			Application.getInstance().getToolbar().setButtonState('preview',false);
+			LFMenuBar.getInstance().enableExport(false);
 		}
 		
 	}
