@@ -476,4 +476,20 @@
 			</copy>
 	   </target>
 	
+	<target name="explode-tool" depends="" description="explode tool jar and war package to a war folder">
+		<!-- rename war file to avoid name conflict -->
+		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
+		<!-- explode the ear -->
+		<!-- Don't explode jar file, becuase classes in jar will conflict with those same classes files in war -->
+		<!--<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />-->
+		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<!-- delete war and jar files -->
+		<delete>
+			<fileset dir="${jboss.deploy}">
+				<include name="temp-${product}.war" />
+				<!--<include name="${product}.jar"/>-->
+			</fileset>
+		</delete>
+	</target>
+	
 </project>
