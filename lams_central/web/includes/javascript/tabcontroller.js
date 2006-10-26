@@ -1,11 +1,9 @@
-
-/* Anthony's version tab controller */
-var tabSize = 0;
 var selectedTabID = 0;
 /* Initialise the number of tabs in the page */
 function initTabSize(size) {
-    tabSize = size;
+	alert("The funtion initTabSize is deprecated, please remove"); 
 }
+
 function selectTab(tabID) {
     if (selectedTabID == tabID) {
         return;
@@ -30,9 +28,18 @@ function selectTab(tabID) {
     selectedTabID = tabID;
     
     //switch the the selected tab on
-    for(i = 1; i <= tabSize; i++) {
-      document.getElementById("tabbody" + i).style.display = (i == tabID) ? 'block':'none';
-    }
+    var i = 1;
+	var tabbody = null;
+	while(true) {
+		var tabbody = document.getElementById("tabbody" + i);
+		
+		if (tabbody != null) {
+			tabbody.style.display = (i == tabID) ? 'block':'none';
+			i++;
+		} else {
+			break;
+		}
+	}
 
     try {
         //trigger the custom event listener onSelectTab()
