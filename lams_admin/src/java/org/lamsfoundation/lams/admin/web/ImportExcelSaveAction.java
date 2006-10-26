@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.util.ExcelUserImportFileParser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author jliew
@@ -69,9 +70,10 @@ public class ImportExcelSaveAction extends Action {
 		
 		IUserManagementService service = AdminServiceProxy.getService(getServlet().getServletContext());
 		MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		IAuditService auditService = AdminServiceProxy.getAuditService(getServlet().getServletContext());
 		//Organisation org = (Organisation)service.findById(Organisation.class, orgId);
 		
-		ExcelUserImportFileParser parser = new ExcelUserImportFileParser(service, messageService);
+		ExcelUserImportFileParser parser = new ExcelUserImportFileParser(service, messageService, auditService);
 		List results = parser.parseSpreadsheet(file);
 		
 		int successful = 0;

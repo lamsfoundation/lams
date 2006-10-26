@@ -36,6 +36,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.admin.AdminConstants;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -47,6 +49,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * TODO Add description here
@@ -64,6 +67,7 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 	private static Logger log = Logger.getLogger(ExcelUserImportFileParser.class);
 	private static IUserManagementService service;
 	private static MessageService messageService;
+	private static IAuditService auditService;
 
 	// spreadsheet column indexes
 	private static final short LOGIN = 0;
@@ -95,9 +99,10 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 	private boolean emptyRow;
 	private boolean hasError;
 	
-	public ExcelUserImportFileParser(IUserManagementService service, MessageService messageService){
+	public ExcelUserImportFileParser(IUserManagementService service, MessageService messageService, IAuditService auditService){
 		this.service = service;
 		this.messageService = messageService;
+		this.auditService = auditService;
 	}
 
 	/** 
@@ -144,6 +149,7 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 						log.debug("org: "+org+" roles: "+roles);
 						if (org!=null && roles!=null) {
 							service.save(user);
+							writeAuditLog(user);
 							service.setRolesForUserOrganisation(user, org, roles);
 							//rowResult.add(org.getOrganisationId().toString());  // for stat summary in save action
 							log.debug("saved user: "+user.getUserId()+" with roles: "+roles);
@@ -161,6 +167,7 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 						}
 					} else {
 						service.save(user);
+						writeAuditLog(user);
 						//rowResult.add(String.valueOf(0));  // for stat summary in save action
 						log.debug("saved user: "+user.getUserId());
 					}
@@ -392,6 +399,14 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 				return null;
 			}
 		}
+	}
+	
+	private void writeAuditLog(User user) {
+		String[] args = new String[2];
+		args[0] = user.getLogin()+"("+user.getUserId()+")";
+		args[1] = user.getFullName();
+		String message = messageService.getMessage("audit.user.create", args);
+		auditService.log(AdminConstants.MODULE_NAME, message);
 	}
 	
 }
