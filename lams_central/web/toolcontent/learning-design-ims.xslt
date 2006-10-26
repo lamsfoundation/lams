@@ -19,13 +19,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lams="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"  version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lams="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" version="1.0">
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 	<xsl:param name="lamsLanguage"/>
 	<xsl:param name="resourcesFile"/>
 	<xsl:param name="transitionsFile"/>
 	<xsl:template match="/">
-		<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" identifier="LAMS_example">
+		<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xsl:use-attribute-sets="ldIdentifier">
 			<metadata>
 				<schema>IMS Metadata</schema>
 				<schemaversion>1.2</schemaversion>
@@ -52,7 +52,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</roles>
 						<activities>
 							<!-- ================================== lams activities ================================== -->
-							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO"/>
+							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool"/>
+							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex"/>
 							<!-- ================================== lams Tansitions ================================== -->
 							<xsl:apply-templates select="*/transitions"/>
 						</activities>
@@ -80,16 +81,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- ================================== Tempaltes ================================== -->
 	
 	<!-- ================================== lams activities ================================== -->
-	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO">
-		<xsl:if test="not((*//activityTypeID = 6) or (*//activityTypeID = 7) or (*//activityTypeID = 8))">
+	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool">
+		<xsl:if test="not((activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8))">
 			<xsl:call-template name="tool"/>
 		</xsl:if>
-		<xsl:if test="(*//activityTypeID = 6) or (*//activityTypeID = 7) or (*//activityTypeID = 8)">
-			<xsl:call-template name="complex"/>
-		</xsl:if>
-		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO"/>
+		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool"/>
 	</xsl:template>
 	
+	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex">
+		<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8)">
+			<xsl:call-template name="complex"/>
+		</xsl:if>
+		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex"/>
+	</xsl:template>
+
 	<!-- ================================== lams Tool activities ================================== -->
 	<xsl:template name="tool">
 		<learning-activity xsl:use-attribute-sets="toolIdentifier">
@@ -132,7 +137,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<activity-structure identifier="A-sequence" structure-type="sequence">
 			<title>LAMS Learning design sequence</title>
 			<!-- copy sorted transition learning-activity-ref -->
-			<xsl:copy-of select="document($transitionsFile)"/>
+			<xsl:copy-of select="document($transitionsFile)/*/*"/>
 			<lams:transitions>
 				<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
 			</lams:transitions>
@@ -147,13 +152,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</lams:transition>
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
 	</xsl:template>
-	<!-- ================================== Tools' content ================================== -->
+	<!-- ================================== Tools' content  Environments ================================== -->
 	<xsl:template match="activities" mode="env">
 		<environments>
 			<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="env"/>
 		</environments>
 	</xsl:template>
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="env">
+			<xsl:if test="not((activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8))">
 		<environment xsl:use-attribute-sets="toolEnvIdentifier">
 			<title>
 				<xsl:value-of select="activityTitle"/>
@@ -173,8 +179,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tool_interface>
 			</service>
 		</environment>
+			</xsl:if>
 	</xsl:template>
-	<!-- ================================== some attributes ================================== -->		
+	<!-- ================================== some attributes ================================== -->	
+	<xsl:attribute-set name="ldIdentifier">
+		<xsl:attribute name="identifier"><xsl:value-of select="/*/title"/></xsl:attribute>
+	</xsl:attribute-set>
+	
 	<xsl:attribute-set name="toolIdentifier">
 		<xsl:attribute name="identifier">A-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>
 	</xsl:attribute-set>
@@ -184,11 +195,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="complexAttr">
-		<xsl:attribute name="identifier">S-<xsl:value-of select="*//toolSignature"/>-<xsl:value-of select="*//toolContentID"/></xsl:attribute>
+		<xsl:attribute name="identifier">S-<xsl:if test="activityTypeID=6">PARALLEL</xsl:if><xsl:if test="activityTypeID=7">OPTIONS</xsl:if><xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>-<xsl:value-of select="activityID"/></xsl:attribute>
 		<xsl:attribute name="structure-type">
-			<xsl:if test="*//activityTypeID=6">PARALLEL</xsl:if>
-			<xsl:if test="*//activityTypeID=7">OPTIONS</xsl:if>
-			<xsl:if test="*//activityTypeID=8">SEQUENCE</xsl:if>
+			<xsl:if test="activityTypeID=6">PARALLEL</xsl:if>
+			<xsl:if test="activityTypeID=7">OPTIONS</xsl:if>
+			<xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>
 		</xsl:attribute>
 	</xsl:attribute-set>
 	
