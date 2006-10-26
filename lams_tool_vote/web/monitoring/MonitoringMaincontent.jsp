@@ -51,9 +51,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    var themeName="aqua";
 	
         function init(){
-        
-            initTabSize(4);
-            
             var tag = document.getElementById("currentTab");
 	    	if(tag.value != "")
 	    		selectTab(tag.value);

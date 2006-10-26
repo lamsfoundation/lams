@@ -23,7 +23,6 @@
 	<script type="text/javascript">
 
 		 function init(){
-            initTabSize(4);
             var tag = document.getElementById("currentTab");
 	    	if(tag != null && tag.value != "") {
 	    		selectTab(tag.value);

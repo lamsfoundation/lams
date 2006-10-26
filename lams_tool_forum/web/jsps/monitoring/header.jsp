@@ -9,7 +9,6 @@
 <script type="text/javascript">
      //<![CDATA[
 	function init(){
-		initTabSize(4);
 		selectTab(1);
 	}  
         

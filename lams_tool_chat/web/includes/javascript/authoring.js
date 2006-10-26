@@ -1,9 +1,5 @@
 
 function init() {
-
-	// initialising tabs
-	initTabSize(3);
-	
 	// open the current tab    
 	var tag = document.getElementById("currentTab");
 	if (tag.value != "") {

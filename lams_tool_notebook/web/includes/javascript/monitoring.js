@@ -1,6 +1,5 @@
 
 function init() {
-	initTabSize(4);
 	selectTab(1);
 }
 function doSelectTab(tabId) {

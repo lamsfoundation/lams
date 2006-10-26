@@ -52,8 +52,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         function init(){
 			if (document.VoteAuthoringForm.activeModule.value != 'defineLater')
 			{
-	            initTabSize(3);
-	            
 	            var tag = document.getElementById("currentTab");
 		    	if(tag.value != "")
 		    		selectTab(tag.value);
@@ -63,8 +61,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 			else
 			{
-	            initTabSize(1);
-	            
 	            var tag = document.getElementById("currentTab");
 		    	if(tag.value != "")
 		    		selectTab(tag.value);

@@ -22,9 +22,6 @@
 
 	<script>
         function init(){
-        
-            initTabSize(3);
-            
             var tag = document.getElementById("currentTab");
 	    	if(tag.value != "")
 	    		selectTab(tag.value);

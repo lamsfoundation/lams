@@ -10,8 +10,6 @@
 <script type="text/javascript">
      //<![CDATA[
 	function init(){
-		initTabSize(3);
-            
 		var tag = document.getElementById("currentTab");
 		if(tag == null || tag.value != "")
 			selectTab(tag.value);

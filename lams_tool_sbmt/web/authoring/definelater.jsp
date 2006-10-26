@@ -20,9 +20,6 @@
 	<script>
       
         function init(){
-        
-            initTabSize(1);
-            
             var tag = document.getElementById("currentTab");
             selectTab(1); //select the default tab;
         }     

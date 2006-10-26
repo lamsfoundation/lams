@@ -20,9 +20,6 @@
 	<script>
         
         function init(){
-        
-            initTabSize(1);
-            
             selectTab(1); //select the default tab;
             
             initEditor("Title");
