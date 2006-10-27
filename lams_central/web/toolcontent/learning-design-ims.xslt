@@ -19,7 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lams="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" version="1.0">
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 	<xsl:param name="lamsLanguage"/>
 	<xsl:param name="resourcesFile"/>
@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<schemaversion>1.2</schemaversion>
 			</metadata>
 			<organizations default="default">
-				<learning-design identifier="default" uri="" level="A" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:lams="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0">
+				<learning-design identifier="default" uri="" level="A" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0">
 					<title>
 						<lams:langstring>
 							<xsl:value-of select="*/title"/>
@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<!-- ================================== lams LD ================================== -->
 					<xsl:for-each select="/*/*">
 						<xsl:if test="(count(ancestor::*) =1) and (name(.) !='activities') and (name(.) != 'transitions')">
-								<xsl:element name="lams:{local-name()}" namespace="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+								<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 						</xsl:if>
 					</xsl:for-each>
 
@@ -107,7 +107,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</complete-activity>
 			<lams:lams-tool-activity>
 				<xsl:for-each select="node() | @*">
-					<xsl:element name="lams:{local-name()}" namespace="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 				</xsl:for-each>
 			</lams:lams-tool-activity>
 		</learning-activity>
@@ -119,15 +119,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<xsl:value-of select="activityTitle"/>
 			</title>
 			<xsl:variable name="myid" select="activityID"/>
-			<xsl:for-each select="//*">
+			<xsl:for-each select="/*/*/*">
 				<xsl:sort select="orderID" order="ascending"/>
-				<xsl:if test="//*/parentActivityID = $myid">
+				<xsl:if test="parentActivityID = $myid">
 					<learning-activity-ref  xsl:use-attribute-sets="toolRef"/>
 				</xsl:if>
 			</xsl:for-each>
 			<lams:lams-complex-activity>
 				<xsl:for-each select="node() | @*">
-					<xsl:element name="lams:{local-name()}" namespace="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 				</xsl:for-each>
 			</lams:lams-complex-activity>
 		</activity-structure>
@@ -147,7 +147,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO">
 		<lams:transition>
 			<xsl:for-each select="node() | @*">
-				<xsl:element name="lams:{local-name()}" namespace="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 			</xsl:for-each>
 		</lams:transition>
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
@@ -165,7 +165,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<xsl:value-of select="activityTitle"/>
 			</title>
 			<service  xsl:use-attribute-sets="serviceAttr">
-				<tool_interface xmlns="http://www.lmasfoundation.org/xsd/lams_ims_export_v1p0">
+				<tool_interface xmlns="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0">
 					<tool_id>
 						<identifier type="URN">URN:LAMS:<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></identifier>
 					</tool_id>

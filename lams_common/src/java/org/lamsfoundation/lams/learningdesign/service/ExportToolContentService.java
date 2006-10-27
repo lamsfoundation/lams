@@ -33,8 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -44,7 +42,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -154,7 +151,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public static final String EXPORT_TOOLCONTNET_ZIP_SUFFIX = ".zip";
 	public static final String EXPORT_LDCONTENT_ZIP_SUFFIX = ".zip";
 	public static final String LEARNING_DESIGN_FILE_NAME = "learning_design.xml";
-	private static final String LEARNING_DESIGN_IMS_FILE_NAME = "learning_design_ims.xml";
+	private static final String LEARNING_DESIGN_IMS_FILE_NAME = "imsmanifest.xml";
 	public static final String TOOL_FILE_NAME = "tool.xml";
 	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
 	
@@ -188,6 +185,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String IMS_TOOL_NS_PREFIX = "http://www.lamsfoundation/xsd/lams_tool_";
 
 	private static final String IMS_TAG_LEARING_ACTIIVTY_REF = "learning-activity-ref";
+
+	private static final String IMS_TOOL_MAIN_OBJECT = "mainObject";
+
+	//2 dirs for zip file and temporary IMS XSLT
+	private static final String DIR_CONTENT = "content";
+	private static final String DIR_XSLT_TEMP = "xslttmp";
+
+	//files name of IMS SCHEMA
+	private static final String SCHEMA_FILE_IMSCP = "imscp_v1p1.xsd";
+	private static final String SCHEMA_FILE_IMS_LD_LEVEL_A = "IMS_LD_Level_A.xsd";
+	private static final String SCHEMA_FILE_IMS_LD_LEVEL_B = "IMS_LD_Level_B.xsd";
+	private static final String SCHEMA_FILE_IMS_LD_LEVEL_C = "IMS_LD_Level_C.xsd";
 	
 	//Other fields
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
@@ -369,11 +378,22 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			//root temp directory, put target zip file
 			String targetZipFileName = null;
 			String rootDir = FileUtil.createTempDirectory(EXPORT_TOOLCONTNET_FOLDER_SUFFIX);
-			String contentDir = FileUtil.getFullPath(rootDir, "content");
+			String contentDir = FileUtil.getFullPath(rootDir,DIR_CONTENT);
 			FileUtil.createDirectory(contentDir);
 			
+			//this folder put all IMS XSLT transform temporary files, so try to keep content is clean for final package!
+			//The reason use temporary folder instead of delete temporary files from content folder is, sometimes, delete file does not work well
+			//this makes the final zip file should contain some rubbish files.
+			String xsltTempDir = FileUtil.getFullPath(rootDir, DIR_XSLT_TEMP);
+			if(format == PACKAGE_FORMAT_IMS){
+				FileUtil.createDirectory(xsltTempDir);
+			}
 			//learing design file name with full path
-			String ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
+			String ldFileName;
+			if(format == PACKAGE_FORMAT_IMS)
+				ldFileName = FileUtil.getFullPath(xsltTempDir,LEARNING_DESIGN_FILE_NAME);
+			else
+				ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
 			Writer ldFile = new OutputStreamWriter(new FileOutputStream(ldFileName),"UTF-8"); 
 			
 			//get learning desing and serialize it to XML file.
@@ -381,6 +401,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId);
 			XStream designXml = new XStream();
 			designXml.toXML(ldDto,ldFile);
+			ldFile.close();
+			
 			log.debug("Learning design xml export success");
 			
 			//iterator all activities in this learning design and export their content to given folder.
@@ -417,14 +439,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				
 				//create resource node list for this activity
 				if(format == PACKAGE_FORMAT_IMS){
-					handleIMS(contentDir, activity,resChildren);
+					handleIMS(rootDir, activity,resChildren);
 				}
 			} //end all acitivites export
 			
 			try {
 				//handle IMS format
 				if(format == PACKAGE_FORMAT_IMS){
-					transformIMS(resChildren,contentDir,ldDto,xslt);
+					transformIMS(resChildren,rootDir,ldDto,xslt);
 				}
 
 				//create zip file for fckeditor unique content folder
@@ -463,24 +485,42 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 	/**
 	 * Generate temporary files:  resources.xml and transitions.xml. <BR>
-	 * Transform LAMS format learning_design.xml with resources.xml and transitions.xml into ims_learning_design.xml file, and cleaning temporary files.
+	 * Transform LAMS format learning_design.xml with resources.xml and transitions.xml into ims_learning_design.xml file.
 	 * @param resChildren
-	 * @param contentDir
+	 * @param rootDir
 	 * @param ldDto
 	 * @throws Exception
 	 */
-	private void transformIMS(List<Element> resChildren, String contentDir,LearningDesignDTO ldDto,File xsltIn) throws Exception {
-		String ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
+	private void transformIMS(List<Element> resChildren, String rootDir,LearningDesignDTO ldDto,File xsltIn) throws Exception {
+		String contentDir = FileUtil.getFullPath(rootDir, DIR_CONTENT);
+		String xsltDir = FileUtil.getFullPath(rootDir, DIR_XSLT_TEMP);
+		
+		String ldFileName = FileUtil.getFullPath(xsltDir,LEARNING_DESIGN_FILE_NAME);
 		//copy XSLT file to contentDir, so that the XSLT document() function does not need absolute path file.
-		File xslt = new File(FileUtil.getFullPath(contentDir, "ims.xslt"));
+		File xslt = new File(FileUtil.getFullPath(xsltDir, "ims.xslt"));
 		FileUtil.copyFile(xsltIn, xslt);
+		
+		//copy schema files to content folder
+		String path = FileUtil.getFileDirectory(xslt.getCanonicalPath());
+		File imscpSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMSCP));
+		File imsldaSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMS_LD_LEVEL_A));
+		File imsldbSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMS_LD_LEVEL_B));
+		File imsldcSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMS_LD_LEVEL_C));
+		File imscpTar = new File(FileUtil.getFullPath(contentDir,SCHEMA_FILE_IMSCP));
+		File imsldaTar = new File(FileUtil.getFullPath(contentDir,SCHEMA_FILE_IMS_LD_LEVEL_A));
+		File imsldbTar = new File(FileUtil.getFullPath(contentDir,SCHEMA_FILE_IMS_LD_LEVEL_B));
+		File imsldcTar = new File(FileUtil.getFullPath(contentDir,SCHEMA_FILE_IMS_LD_LEVEL_C));
+		FileUtil.copyFile(imscpSrc, imscpTar);
+		FileUtil.copyFile(imsldaSrc, imsldaTar);
+		FileUtil.copyFile(imsldbSrc, imsldbTar);
+		FileUtil.copyFile(imsldcSrc, imsldcTar);
 		
 		//create resources.xml file
 		Document resourcesDom = new Document();
 		Element resRoot = new Element(IMS_TAG_RESOURCES);
 		resRoot.setChildren(resChildren);
 		resourcesDom.setRootElement(resRoot);
-		File resFile = new File(FileUtil.getFullPath(contentDir,IMS_RESOURCES_FILE_NAME));
+		File resFile = new File(FileUtil.getFullPath(xsltDir,IMS_RESOURCES_FILE_NAME));
 		XMLOutputter resOutput = new XMLOutputter();
 		resOutput.output(resourcesDom, new FileOutputStream(resFile));
 		
@@ -492,6 +532,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<Element> transChildren = new ArrayList<Element>();
 		//create transitions DOM file
 		List<AuthoringActivityDTO> sortedActList = getSortedActivities(ldDto);
+		//remove activities inside complex activities, the IMS package does not need that.
+		//I don't want to disturb getSortedActivities() method, so that I removed them here.
+		Iterator<AuthoringActivityDTO> iter = sortedActList.iterator();
+		while(iter.hasNext()){
+			AuthoringActivityDTO activityDTO = iter.next();
+			if(activityDTO.getParentActivityID() != null)
+				iter.remove();
+			if(activityDTO.getActivityTypeID() == Activity.SEQUENCE_ACTIVITY_TYPE
+				|| activityDTO.getActivityTypeID() == Activity.PARALLEL_ACTIVITY_TYPE
+				|| activityDTO.getActivityTypeID() == Activity.OPTIONS_ACTIVITY_TYPE)
+				iter.remove();
+		}
 		
 		for (AuthoringActivityDTO actDto : sortedActList) {
 			log.debug("Export IMS: Put actitivies " + actDto.getActivityTitle() + "[" +actDto.getToolContentID()+"] into Transition <learning-activity-ref> tag.");
@@ -519,32 +571,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		log.debug("Export IMS: Transform IMS XML by XSLT sucess.");
 		//output IMS format LD XML
-		String imsLdFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_IMS_FILE_NAME);
+		String imsLdFileName = FileUtil.getFullPath(xsltDir,LEARNING_DESIGN_IMS_FILE_NAME);
 		XMLOutputter output = new XMLOutputter();
 		output.output(odoc, new FileOutputStream(new File(imsLdFileName)));
 		
 		log.debug("Export IMS: IMS XML is saved sucessfully.");
 
-		//delete temporary files
-		resFile.delete();
-		transFile.delete();
-		xslt.delete();
-		File ldFile = new File(ldFileName);
-		if(ldFile.exists()){
-			ldFile.delete();
-		}else{
-			log.warn("Export IMS:  Can not delete learing_design XML:"+ldFileName);
-		}
-		List<AuthoringActivityDTO> activities = ldDto.getActivities();
-		for (AuthoringActivityDTO activityDTO : activities) {
-			File toolFile = new File(FileUtil.getFullPath(contentDir,activityDTO.getToolContentID()+".xml"));
-			if(toolFile.exists()){
-				toolFile.delete();
-			}else{
-				log.warn("Export IMS:  Can not delete tool file XML "+ activityDTO.getToolContentID()+".xml");
-			}
-		}
-		log.debug("Export IMS: Temporary files (resources.xml,transitions.xml, learing_design.xml etc.) are removed.");
 		
 	}
 	
@@ -658,13 +690,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * Move LAMS tool.xml from tool folder to export content root folder and modify it to {toolContentID}.xml file. Cache all attachement files
 	 * from this tool into ArrayList, which will be save into a temporary file (resources.xml) and used by XSLT. 
 	 * 
-	 * @param contentDir
+	 * @param rootDir
 	 * @param activity
 	 * @param resChildren
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
-	private void handleIMS(String contentDir, AuthoringActivityDTO activity, List<Element> resChildren) throws IOException, FileNotFoundException {
+	private void handleIMS(String rootDir, AuthoringActivityDTO activity, List<Element> resChildren) throws IOException, FileNotFoundException {
+		String contentDir = FileUtil.getFullPath(rootDir, DIR_CONTENT);
+		String xsltDir = FileUtil.getFullPath(rootDir, DIR_XSLT_TEMP);
+		
 		String toolPath = FileUtil.getFullPath(contentDir,activity.getToolContentID().toString());
 		File toolDir = new File(toolPath);
 		if(toolDir != null){
@@ -680,13 +715,21 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						
 						Document doc = sax.build(new FileInputStream(toolFile));
 						Element root = doc.getRootElement();
+						//cache DTO object class and transform it into a tag : for later import use by XStream.
+						String mainObject = root.getName();
 						root.setName(activity.getToolSignature());
 						Namespace ns = Namespace.getNamespace(IMS_TOOL_NS_PREFIX+activity.getToolSignature()+"_ims_" + activity.getToolVersion() + ".xsd");
 						root.setNamespace(ns);
+						
+						//add mainObject tag: it save the Tool DTO class name. It is useful when importing by XStream (perhaps a future function) 
+						Element mainObjectEle = new Element(IMS_TOOL_MAIN_OBJECT);
+						mainObjectEle.setText(mainObject);
+						root.addContent(mainObjectEle);
+						
 						//create a new tools.xml file with toolContentID.xml as name.
-						File toolsFile = new File(FileUtil.getFullPath(contentDir,activity.getToolContentID().toString()+".xml"));
+						File imsToolFile = new File(FileUtil.getFullPath(xsltDir,activity.getToolContentID().toString()+".xml"));
 						XMLOutputter toolOutput = new XMLOutputter();
-						toolOutput.output(doc, new FileOutputStream(toolsFile));
+						toolOutput.output(doc, new FileOutputStream(imsToolFile));
 						
 						log.debug("Export IMS: Tool.xml in " + activity.getActivityTitle() + "[" +activity.getToolContentID()+"] transform success.");
 					} catch (JDOMException e) {

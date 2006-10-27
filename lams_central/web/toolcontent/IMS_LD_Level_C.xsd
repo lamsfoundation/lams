@@ -1,0 +1,42 @@
+<xs:schema targetNamespace="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="IMS LD Level C version 1.0 Final Draft">
+	<!-- ******************** -->
+	<!-- ** Change History ** -->
+	<!-- ******************** -->
+	<xs:annotation>
+		<xs:documentation xml:lang="en">4 November 2002
+		Restructured the schemas that were submitted as public draft.
+		Redefined on-completion and then.
+		Changed the namespace.		
+		</xs:documentation>
+	</xs:annotation>
+	
+	<!-- ********************* -->
+	<!-- ** Include modules ** -->
+	<!-- ********************* -->
+	<xs:include schemaLocation="IMS_LD_Level_C_notification.xsd">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Include the notification element. </xs:documentation>
+		</xs:annotation>
+	</xs:include>
+	
+	<!-- ***************************** -->
+	<!-- ** Redefine content models ** -->
+	<!-- ***************************** -->
+	<xs:redefine schemaLocation="IMS_LD_Level_B.xsd">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The notification element need to be added to on-completion and into the then choice group.</xs:documentation>
+		</xs:annotation>
+		<xs:group name="grp.on-completion">
+			<xs:sequence>
+				<xs:group ref="grp.on-completion"/>
+				<xs:element ref="notification" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="grp.then">
+			<xs:choice>
+				<xs:group ref="grp.then"/>
+				<xs:element ref="notification"/>
+			</xs:choice>
+		</xs:group>
+	</xs:redefine>
+</xs:schema>

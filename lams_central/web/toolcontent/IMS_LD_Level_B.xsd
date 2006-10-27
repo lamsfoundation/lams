@@ -1,0 +1,404 @@
+<xs:schema targetNamespace="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="IMS LD Level B version 1.0 Final Draft">
+	<!-- ******************** -->
+	<!-- ** Change History ** -->
+	<!-- ******************** -->
+	<xs:annotation>
+		<xs:documentation xml:lang="en">24 October 2002
+		Restructured the schemas that were submitted as public draft.
+		Defined groups for those content models that need to be extended in level C. 
+		Nearly all attributes for the level B elements are declared inline, because they are not re-used in other elements.
+		Changed the namespace.
+		</xs:documentation>
+	</xs:annotation>
+	
+	<!-- ********************* -->
+	<!-- ** Include modules ** -->
+	<!-- ********************* -->
+	<xs:include schemaLocation="IMS_LD_Level_B_emaildata.xsd">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Include the email-data element.</xs:documentation>
+		</xs:annotation>
+	</xs:include>
+	<xs:include schemaLocation="IMS_LD_Level_B_expression_schema.xsd">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Include the expression schema.</xs:documentation>
+		</xs:annotation>
+	</xs:include>
+	
+	<!-- ***************************** -->
+	<!-- ** Redefine content models ** -->
+	<!-- ***************************** -->
+	<xs:redefine schemaLocation="IMS_LD_Level_A.xsd">
+		<xs:group name="grp.roles">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add properties into the content model of components, after roles.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:group ref="grp.roles"/>
+				<xs:element ref="properties" minOccurs="0"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="grp.complete-act">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add when-condition-ture and when-property-value-is-set into the choice group of complete-act.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:choice>
+				<xs:group ref="grp.complete-act"/>
+				<xs:element ref="when-condition-true"/>
+				<xs:element ref="when-property-value-is-set" maxOccurs="unbounded"/>
+			</xs:choice>
+		</xs:group>
+		<xs:group name="grp.complete-activity">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add when-property-value-is-set into the choice group of complete-activity.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:choice>
+				<xs:group ref="grp.complete-activity"/>
+				<xs:element ref="when-property-value-is-set" maxOccurs="unbounded"/>
+			</xs:choice>
+		</xs:group>
+		<xs:group name="grp.complete-play">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add when-property-value-is-set into the choice group of complete-play.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:choice>
+				<xs:group ref="grp.complete-play"/>
+				<xs:element ref="when-property-value-is-set" maxOccurs="unbounded"/>
+			</xs:choice>
+		</xs:group>
+		<xs:group name="grp.complete-unit-of-learning">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add when-property-value-is-set into the choice group of complete-unit-of-learning.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:choice>
+				<xs:group ref="grp.complete-unit-of-learning"/>
+				<xs:element ref="when-property-value-is-set" maxOccurs="unbounded"/>
+			</xs:choice>
+		</xs:group>
+		<xs:group name="grp.on-completion">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add change-property-value to on-completion.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:group ref="grp.on-completion"/>
+				<xs:element ref="change-property-value" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="grp.method">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add conditions to method.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:group ref="grp.method"/>
+				<xs:element ref="conditions" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="grp.service">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add monitor into the choice group of service.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:choice>
+				<xs:group ref="grp.service"/>
+				<xs:element ref="monitor"/>
+			</xs:choice>
+		</xs:group>
+		<xs:complexType name="time-limitType">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Add the attribute property-ref to "simple type" time-limit.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleContent>
+				<xs:extension base="time-limitType">
+					<xs:attribute name="property-ref" type="xs:IDREF"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:redefine>
+	
+	<!-- ********************** -->
+	<!-- ** Re-usable groups ** -->
+	<!-- ********************** -->
+	<xs:group name="grp.property">
+		<xs:sequence>
+			<xs:element ref="datatype"/>
+			<xs:element ref="initial-value" minOccurs="0"/>
+			<xs:element ref="restriction" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="grp.condition">
+		<xs:sequence>
+			<xs:element ref="if"/>
+			<xs:element ref="then"/>
+			<xs:element ref="else" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="grp.then">
+		<xs:choice>
+			<xs:element ref="show"/>
+			<xs:element ref="hide"/>
+			<xs:element ref="change-property-value"/>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="grp.show-hide">
+		<xs:choice>
+			<xs:element ref="class"/>
+			<xs:element ref="item-ref"/>
+			<xs:element ref="environment-ref"/>
+			<xs:element ref="learning-activity-ref"/>
+			<xs:element ref="support-activity-ref"/>
+			<xs:element ref="activity-structure-ref"/>
+			<xs:element ref="play-ref"/>
+			<xs:element ref="unit-of-learning-href"/>
+		</xs:choice>
+	</xs:group>
+	
+	<!-- ************************** -->
+	<!-- ** Element declarations ** -->
+	<!-- ************************** -->
+	<xs:element name="properties" type="propertiesType"/>
+	<xs:element name="loc-property" type="propertyType"/>
+	<xs:element name="locpers-property" type="propertyType"/>
+	<xs:element name="locrole-property" type="rolepropertyType"/>
+	<xs:element name="globpers-property" type="global-propertyType"/>
+	<xs:element name="glob-property" type="global-propertyType"/>
+	<xs:element name="property-group" type="property-groupType"/>
+	<xs:element name="when-property-value-is-set" type="when-property-value-is-setType"/>
+	<xs:element name="when-condition-true" type="when-condition-trueType"/>
+	<xs:element name="change-property-value" type="change-property-valueType"/>
+	<xs:element name="conditions" type="conditionsType"/>
+	<xs:element name="if" type="expressionType"/>
+	<xs:element name="then" type="thenType"/>
+	<xs:element name="else" type="elseType"/>
+	<xs:element name="show" type="show-hideType"/>
+	<xs:element name="hide" type="show-hideType"/>
+	<xs:element name="monitor" type="monitorType"/>
+	<xs:element name="property-value" type="property-valueType"/>
+	<xs:element name="calculate" type="expressionType"/>
+	<xs:element name="global-definition">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="title" minOccurs="0"/>
+				<xs:group ref="grp.property"/>
+				<xs:element ref="metadata" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="attr.uri.req"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="expression" type="expressionType"/>
+
+	<!-- *************** -->
+	<!-- ** Text only ** -->
+	<!-- *************** -->
+	<xs:element name="initial-value" type="xs:string"/>
+	<xs:element name="langstring" type="xs:string"/>
+
+	<!-- ******************************* -->
+	<!-- ** Text only with attributes ** -->
+	<!-- ******************************* -->
+	<xs:element name="datatype">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="datatype" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:token">
+								<xs:enumeration value="string"/>
+								<xs:enumeration value="boolean"/>
+								<xs:enumeration value="integer"/>
+								<xs:enumeration value="uri"/>
+								<xs:enumeration value="datetime"/>
+								<xs:enumeration value="file"/>
+								<xs:enumeration value="real"/>
+								<xs:enumeration value="text"/>
+								<xs:enumeration value="duration"/>
+								<xs:enumeration value="other"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="restriction">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="restriction-type">
+						<xs:simpleType>
+							<xs:restriction base="xs:token">
+								<xs:enumeration value="minExclusive"/>
+								<xs:enumeration value="minInclusive"/>
+								<xs:enumeration value="maxExclusive"/>
+								<xs:enumeration value="maxInclusive"/>
+								<xs:enumeration value="totalDigits"/>
+								<xs:enumeration value="fractionDigits"/>
+								<xs:enumeration value="length"/>
+								<xs:enumeration value="minLength"/>
+								<xs:enumeration value="maxLength"/>
+								<xs:enumeration value="enumeration"/>
+								<xs:enumeration value="whiteSpace"/>
+								<xs:enumeration value="pattern"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- *********** -->
+	<!-- ** Empty ** -->
+	<!-- *********** -->
+	<xs:element name="self">
+		<xs:complexType/>
+	</xs:element>
+	
+	<!-- *************************** -->
+	<!-- ** Empty with attributes ** -->
+	<!-- *************************** -->
+	<xs:element name="class">
+		<xs:complexType>
+			<xs:attributeGroup ref="attr.class"/>
+			<xs:attribute name="with-control" type="xs:boolean"/>
+			<xs:attribute name="title" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="existing">
+		<xs:complexType>
+			<xs:attributeGroup ref="attr.href.req"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="item-ref">
+		<xs:complexType>
+			<xs:attributeGroup ref="attr.ref.req"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="play-ref">
+		<xs:complexType>
+			<xs:attributeGroup ref="attr.ref.req"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="property-ref">
+		<xs:complexType>
+			<xs:attributeGroup ref="attr.ref.req"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="property-group-ref">
+		<xs:complexType>
+			<xs:attributeGroup ref="attr.ref.req"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- ******************* -->
+	<!-- ** Complex types ** -->
+	<!-- ******************* -->
+	<xs:complexType name="propertiesType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="loc-property"/>
+			<xs:element ref="locpers-property"/>
+			<xs:element ref="locrole-property"/>
+			<xs:element ref="globpers-property"/>
+			<xs:element ref="glob-property"/>
+			<xs:element ref="property-group"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="propertyType">
+		<xs:sequence>
+			<xs:element ref="title" minOccurs="0"/>
+			<xs:group ref="grp.property"/>
+			<xs:element ref="metadata" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="attr.identifier.req"/>
+	</xs:complexType>
+	<xs:complexType name="rolepropertyType">
+		<xs:sequence>
+			<xs:element ref="title" minOccurs="0"/>
+			<xs:element ref="role-ref"/>
+			<xs:group ref="grp.property"/>
+			<xs:element ref="metadata" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="attr.identifier.req"/>
+	</xs:complexType>
+	<xs:complexType name="global-propertyType">
+		<xs:choice>
+			<xs:element ref="existing"/>
+			<xs:element ref="global-definition"/>
+		</xs:choice>
+		<xs:attributeGroup ref="attr.identifier.req"/>
+	</xs:complexType>
+	<xs:complexType name="property-groupType">
+		<xs:sequence>
+			<xs:element ref="title" minOccurs="0"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="property-ref"/>
+				<xs:element ref="property-group-ref"/>
+			</xs:choice>
+			<xs:element ref="metadata" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="attr.identifier.req"/>
+	</xs:complexType>
+	<xs:complexType name="when-property-value-is-setType">
+		<xs:sequence>
+			<xs:element ref="property-ref"/>
+			<xs:element ref="property-value" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="change-property-valueType">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element ref="property-ref"/>
+			<xs:element ref="property-value"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="when-condition-trueType">
+		<xs:sequence>
+			<xs:element ref="role-ref"/>
+			<xs:element ref="expression"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="conditionsType">
+		<xs:sequence>
+			<xs:element ref="title" minOccurs="0"/>
+			<xs:group ref="grp.condition" maxOccurs="unbounded"/>
+			<xs:element ref="metadata" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="thenType">
+		<xs:group ref="grp.then" maxOccurs="unbounded"/>
+	</xs:complexType>
+	<xs:complexType name="elseType">
+		<xs:choice>
+			<xs:group ref="grp.then" maxOccurs="unbounded"/>
+			<xs:group ref="grp.condition"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="show-hideType">
+		<xs:group ref="grp.show-hide" maxOccurs="unbounded"/>
+	</xs:complexType>
+	<xs:complexType name="monitorType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element ref="role-ref"/>
+				<xs:element ref="self"/>
+			</xs:choice>
+			<xs:group ref="grp.itemmodel"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="property-valueType" mixed="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The element property-value should contain either text, or langstring, or calculate, or property-ref.</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0">
+			<xs:element ref="langstring"/>
+			<xs:element ref="calculate"/>
+			<xs:element ref="property-ref"/>
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>
