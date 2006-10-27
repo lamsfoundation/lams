@@ -664,6 +664,10 @@ public class AuthoringAction extends Action {
 		else
 			file = (FormFile) resourceForm.getOnlineFile();
 		
+		if(file == null || StringUtils.isBlank(file.getFileName()))
+			return mapping.findForward(ResourceConstants.SUCCESS);
+		
+		
 		IResourceService service = getResourceService();
 		//upload to repository
 		ResourceAttachment  att = service.uploadInstructionFile(file, type);
