@@ -77,7 +77,7 @@ public class HelpTag extends TagSupport {
 		    String fullURL = null;
 		    
         	JspWriter writer = pageContext.getOut();
-        	writer.println("<div class='right-buttons'>");
+        	writer.println("<div class='help'>");
         	try {
         		
 	        	if(toolSignature != null && module != null) {
