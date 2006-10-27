@@ -8,6 +8,9 @@
 <p>
 <fmt:message key="msg.edit.tool.content.1" />&nbsp;&nbsp;<fmt:message key="msg.edit.tool.content.2" />
 </p>
+<p>
+<fmt:message key="msg.edit.tool.content.3" />
+</p>
 
 <p>
 <table class="alternative-color">
