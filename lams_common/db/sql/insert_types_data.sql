@@ -12,6 +12,7 @@ INSERT INTO lams_privilege VALUES (10,'I','create new users');
 INSERT INTO lams_privilege VALUES (11,'J','create guest users');
 INSERT INTO lams_privilege VALUES (12,'K','change status of course');
 INSERT INTO lams_privilege VALUES (13,'L','browse all users in the system');
+INSERT INTO lams_privilege VALUES (14,'M','write/create/delete permissions in all course content folders');
 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
 INSERT INTO lams_role VALUES (2, 'COURSE MANAGER', 'Course Manager', NOW());
@@ -19,6 +20,7 @@ INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
 INSERT INTO lams_role VALUES (4, 'MONITOR', 'Member of Staff', NOW());
 INSERT INTO lams_role VALUES (5, 'LEARNER', 'Student', NOW());
 INSERT INTO lams_role VALUES (6, 'COURSE ADMIN', 'Course Administrator', NOW());
+INSERT INTO lams_role VALUES (7, 'AUTHOR ADMIN', 'Author Administrator', NOW());
 
 INSERT INTO lams_role_privilege VALUES (1,1,1);
 INSERT INTO lams_role_privilege VALUES (2,2,2);
@@ -41,6 +43,7 @@ INSERT INTO lams_role_privilege VALUES (18,6,2);
 INSERT INTO lams_role_privilege VALUES (19,6,10);
 INSERT INTO lams_role_privilege VALUES (20,6,12);
 INSERT INTO lams_role_privilege VALUES (21,6,13);
+INSERT INTO lams_role_privilege VALUES (22,7,14);
 
 
 INSERT INTO lams_auth_method_type VALUES(1, 'LAMS');

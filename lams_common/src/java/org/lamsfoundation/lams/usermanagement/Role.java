@@ -43,6 +43,8 @@ public class Role implements Serializable,Comparable{
 	
 	public static final String AUTHOR = "AUTHOR";
 	
+	public static final String AUTHOR_ADMIN = "AUTHOR ADMIN";
+	
 	public static final String COURSE_MANAGER = "COURSE MANAGER";
 	
 	public static final String COURSE_ADMIN = "COURSE ADMIN";
@@ -64,6 +66,7 @@ public class Role implements Serializable,Comparable{
 		public static final Integer ROLE_MONITOR =new Integer(4);
 		public static final Integer ROLE_LEARNER =new Integer(5);
 		public static final Integer ROLE_COURSE_ADMIN =new Integer(6);
+		public static final Integer ROLE_AUTHOR_ADMIN =new Integer(7);
 	/***********************************************************/
 	
     /** identifier field */
