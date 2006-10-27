@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
+	<definition name=".toolcontentlist" path="/template.jsp">
+		<put name="title" value="sysadmin.edit.default.tool.content"/>
+		<put name="content" value="toolcontent/toolcontentlist.jsp" />	
+	</definition>
 
 	<definition name=".importresult" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
