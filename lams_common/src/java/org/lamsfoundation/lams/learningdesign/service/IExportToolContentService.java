@@ -40,6 +40,28 @@ public interface IExportToolContentService {
 	 * Export given learning design tool content. It includes all tools content
 	 * in this learning design.
 	 * 
+	 * <P>
+	 * For IMS format learning design, it uses XSLT and some JDom code to transform Lams format learing_design.xml to imsmanifest.xml.
+	 * <BR>
+	 * It genereate 2 temporary files: resource.mxl and transitions.xml.<BR>
+	 * <ul>
+	 * <li>resource.mxl. It is used under resources tag, which contains all attachment files from tools </li>
+	 * <li>transtions.xml. It is used under &lt;activity-structure identifier="A-sequence"&gt; tag. It contains sorted &lt;learning-activity-ref&gt; tags.</li>
+	 * </ul>
+	 * </P>
+	 * <P>
+	 * During IMS exporting, it also copy all Lams format tool.xml to a temporary folder,"xslttemp", and makes below modifications from original tool.xml:
+	 * <ul>
+	 * <li>Change root tag from xxx.xxx.xxx.DTO to toolSignatur+toolContnetId. This make looks better</li>
+	 * <li>Add &lt;mainObject&gt; tag to hold original root tag, ie, the DTO class name. This is just for transfrom back to Lams format if some day need this function.</li> 
+	 * <li>Add lams tool's namespace to root tag</li>
+	 * </ul> 
+	 * </P>
+	 * <P>
+	 * During IMS exporting, it will copy all schema files to "content" folder for pacakge usage. It also copy XSLT to "xslttemp" folder for XSLT transform usage. It means all necessary 
+	 * files for XSLT will be in same folder to avoid abosulate/relative folder assign in XSLT. 
+	 * </P>
+	 * 
 	 * @param learningDesignId
 	 * @param toolsErrorMsgs
 	 * @param format LAMS format or IMS format
