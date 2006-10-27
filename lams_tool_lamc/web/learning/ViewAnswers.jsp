@@ -82,9 +82,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
 				<div class="shading-bg">
-					<p>
+					<div style="overflow: auto;">									  	
 						<c:out value="${questionEntry.value}" escapeXml="false" />
-					</p>
+					</div>																			  								
+
 
 					<!--  CANDIDATE ANSWERS  -->
 					<c:set var="queIndex" scope="request" value="0" />
@@ -155,10 +156,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="feedbackEntry"
 						items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
 						<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
-							<p>
-								<em> <c:out value="${feedbackEntry.value}" escapeXml="false" />
-								</em>
-							</p>
+							<div style="overflow: auto;">									  							
+								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="false" />
+							</div>								
 						</c:if>
 					</c:forEach>
 				</div>

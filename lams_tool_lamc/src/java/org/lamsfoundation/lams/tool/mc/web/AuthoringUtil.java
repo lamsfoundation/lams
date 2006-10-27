@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
-import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -325,7 +324,7 @@ public class AuthoringUtil implements McAppConstants {
     		String feedback=mcQueContent.getFeedback();
     		logger.debug("feedback:" + feedback);
     		
-    		
+    		/*
     		boolean isFeedbackTextMarkup=LearningUtil.isTextMarkup(feedback);
     		logger.debug("isFeedbackTextMarkup: " + isFeedbackTextMarkup);
 
@@ -340,9 +339,10 @@ public class AuthoringUtil implements McAppConstants {
     		
     		newFeedbackText=McUtils.replaceNewLines(newFeedbackText);
     		logger.debug("newFeedbackText after procesing new lines: " + newFeedbackText);
+    		*/
 
     		
-    		map.put(mapIndex.toString(),newFeedbackText);
+    		map.put(mapIndex.toString(),feedback);
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
 

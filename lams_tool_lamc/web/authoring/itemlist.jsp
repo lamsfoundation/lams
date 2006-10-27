@@ -30,8 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</h2>
 
 	<c:set var="formBean"
-		value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<table id="itemTable" class="alternative-color">
 		<c:set var="queIndex" scope="request" value="0" />
 
@@ -62,9 +61,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<tr>
 				<td>
-					<span class="field-name"> <fmt:message key="label.question" />
-						: </span>
-					<c:out value="${question}" escapeXml="false" />
+					<div style="overflow: auto;">
+						<strong> <fmt:message key="label.question" />: </strong>
+						<c:out value="${question}" escapeXml="false" />
+					</div>					
 				</td>
 
 

@@ -110,12 +110,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
 
 				<div class="shading-bg">
-					<p>
+
 						<strong> <fmt:message key="label.question.col" /> </strong>
 						
+						<div style="overflow: auto;">
+							<c:out value="${dto.question}" escapeXml="false" />
+						</div>									
 
-						<c:out value="${dto.question}" escapeXml="false" />
-						<br>
 						[
 						<strong> <fmt:message key="label.mark" /> </strong>
 						<c:out value="${dto.mark}" />
@@ -129,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
 						</c:if>
 
-					</p>
+
 					<p>
 						<c:forEach var="caText" varStatus="status"
 							items="${dto.candidateAnswers}">
@@ -139,9 +140,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					</p>
 
-					<p>
-						<i> <c:out value="${dto.feedback}" escapeXml="false" /> </i>
-					</p>
+					<div style="overflow: auto;">
+						<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
+					</div>									
 
 				</div>
 			</c:forEach>

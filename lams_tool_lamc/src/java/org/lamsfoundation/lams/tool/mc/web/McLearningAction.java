@@ -585,6 +585,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		String question=mcQueContent.getQuestion();
     		logger.debug("question: " + question);
     		
+    		/*
     		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
     		logger.debug("isTextMarkup: " + isTextMarkup);
     		
@@ -599,9 +600,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		
     		newQuestionText=McUtils.replaceNewLines(newQuestionText);
     		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
+    		*/
     		
     		
-    		mcLearnerAnswersDTO.setQuestion(newQuestionText);
+    		mcLearnerAnswersDTO.setQuestion(question);
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
@@ -615,6 +617,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		if (feedback == null) feedback="";
     		logger.debug("feedback: " + feedback);
     		
+    		/*
     		boolean isFeedbackTextMarkup=LearningUtil.isTextMarkup(feedback);
     		logger.debug("isFeedbackTextMarkup: " + isFeedbackTextMarkup);
 
@@ -629,8 +632,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		
     		newFeedbackText=McUtils.replaceNewLines(newFeedbackText);
     		logger.debug("newFeedbackText after procesing new lines: " + newFeedbackText);
+    		*/
     		
-    		mcLearnerAnswersDTO.setFeedback(newFeedbackText);
+    		mcLearnerAnswersDTO.setFeedback(feedback);
     		
     		Map caMap= new TreeMap(new McStringComparator());
     		Map caIdsMap= new TreeMap(new McStringComparator());

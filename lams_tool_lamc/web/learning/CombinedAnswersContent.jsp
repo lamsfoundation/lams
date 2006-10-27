@@ -72,11 +72,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			items="${requestScope.listQuestionCandidateAnswersDto}">
 		
 			<div class="shading-bg">
+				<div style="overflow: auto;">
 				<c:out value="${dto.question}" escapeXml="false" />
 				 [
 				<strong><fmt:message key="label.mark" /></strong>
 				<c:out value="${dto.mark}" />
 				]
+				</div>									
 			</div>
 			
 			

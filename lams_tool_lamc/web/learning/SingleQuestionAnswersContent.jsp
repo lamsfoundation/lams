@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 					  
 					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
+					  	<td align=left valign=top colspan=2> 
 						  	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" /> 
 					  	</td>
 					  </tr>
@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
+					  	<td align=center valign=top colspan=2> 
 						  	  <b> <fmt:message key="label.withRetries"/> </b>
 					  	</td>
 					  </tr>
@@ -48,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}"> 		
 					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
+					  	<td align=center valign=top colspan=2> 
 						    <b> <fmt:message key="label.withoutRetries"/> </b>
 					  	</td>
 					  </tr>
@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
 					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
+					  	<td align=left valign=top colspan=2> 
 						  	 <b>  <fmt:message key="label.learner.message"/> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}"/> )  </b>
 						  	 
 					  	</td>
@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if>
 
 				  <tr>						 
-					  	<td NOWRAP align=left valign=top colspan=2> 
+					  	<td align=left valign=top colspan=2> 
 						<table align=left>
 						
 								<html:hidden property="nextQuestionSelected"/>						
@@ -72,14 +72,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
 									<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}"> 										
 									  <tr>
-									  	<td NOWRAP align=left valign=top> 
+									  	<td align=left valign=top> 
+											<div style="overflow: auto;">									  	
 										  		<c:out value="${dto.question}" escapeXml="false"/> &nbsp[ <b> <fmt:message key="label.mark"/> </b>
 										  		<c:out value="${dto.mark}"/> ]
+											</div>																			  		
 									  	</td>
 									  </tr>
 									
 									  <tr>
-									  	<td NOWRAP align=left valign=top> 
+									  	<td align=left valign=top> 
 											<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
 												<input type="checkbox" name="checkedCa" value="${dto.questionUid}-${ca.value}"> 
 													
@@ -99,7 +101,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 			  	   	<tr> 
-				 		<td NOWRAP colspan=2 valign=top> 
+				 		<td colspan=2 valign=top> 
 				 		&nbsp
 				 		</td>
 			  	   </tr>
@@ -107,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	<html:hidden property="donePreview"/>						   
 		  		<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 			
 	  	   		  <tr>
-				  	<td NOWRAP colspan=2 valign=top> 
+				  	<td colspan=2 valign=top> 
 						  <img src="<c:out value="${tool}"/>images/green_arrow_down_right.gif" align=left onclick="javascript:submitNextQuestionSelected();"> 							
 				  	 </td>
 				  </tr>
@@ -115,7 +117,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		 		<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}"> 		
 	  	   		  <tr>
-				  	<td NOWRAP colspan=2 valign=top> 
+				  	<td colspan=2 valign=top> 
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<fmt:message key="button.continue"/>
 							</html:submit>	 				 		  					
@@ -125,7 +127,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 		 		<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}"> 		
 	  	   		  <tr>
-				  	<td NOWRAP colspan=2 valign=top> 
+				  	<td colspan=2 valign=top> 
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<fmt:message key="button.continue"/>
 							</html:submit>	 				 		  					

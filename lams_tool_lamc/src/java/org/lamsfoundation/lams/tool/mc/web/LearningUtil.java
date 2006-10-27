@@ -768,6 +768,7 @@ public class LearningUtil implements McAppConstants {
     		String question=mcQueContent.getQuestion();
     		logger.debug("question: " + question);
     		
+    		/*
     		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
     		logger.debug("isTextMarkup: " + isTextMarkup);
     		
@@ -782,8 +783,9 @@ public class LearningUtil implements McAppConstants {
     		
     		newQuestionText=McUtils.replaceNewLines(newQuestionText);
     		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
+    		*/
 
-    		mcLearnerAnswersDTO.setQuestion(newQuestionText);
+    		mcLearnerAnswersDTO.setQuestion(question);
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
     		
@@ -1121,6 +1123,7 @@ public class LearningUtil implements McAppConstants {
         return false;
     }
 
+    /*
     public static String getWrappedText(String text, boolean authoring)
     {
         
@@ -1163,6 +1166,7 @@ public class LearningUtil implements McAppConstants {
 	    logger.debug("returning newText: " + newText);
     	return newText;
     }
+    */
 
     
  }
