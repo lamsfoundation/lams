@@ -34,8 +34,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
@@ -48,49 +49,47 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		{
 			submitLearningMethod(actionMethod);
 		}
-	</script>		
-	
+	</script>
+
 </head>
 
 <body class="stripes">
-	
-	<html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-  		<html:hidden property="method"/>	 
-		<html:hidden property="toolSessionID"/>		
-		<html:hidden property="userID"/>										
-		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="totalQuestionCount"/>		
-	
+
+	<html:form action="/learning?validate=false"
+		enctype="multipart/form-data" method="POST" target="_self">
+		<html:hidden property="method" />
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="userID" />
+		<html:hidden property="httpSessionID" />
+		<html:hidden property="totalQuestionCount" />
+
 		<div id="content">
-			&nbsp&nbsp&nbsp&nbsp&nbsp <fmt:message key="label.learning.forceOfflineMessage" />
-			
-			<table>	
-			<tr>	
-			<td>
-				<div class="right-buttons">
+			<p>
+				<fmt:message key="label.learning.forceOfflineMessage" />
+			</p>
 
-					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-						<html:button property="endLearning" onclick="javascript:submitMethod('endLearning');" styleClass="button">
-							<fmt:message key="button.endLearning"/>
-						</html:button>	 				
-				  	</c:if> 				    					
-	
-					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-						<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"  styleClass="button">
-							<fmt:message key="label.continue"/>
-						</html:button>	 				
-				  	</c:if> 				    					
-			  	
-				</div> 		  															 		  					
-			</td> 
-			</tr>
-			</table>
+			<div align="right" class="space-bottom-top">
+
+				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
+					<html:button property="endLearning"
+						onclick="javascript:submitMethod('endLearning');"
+						styleClass="button">
+						<fmt:message key="button.endLearning" />
+					</html:button>
+				</c:if>
+
+				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
+					<html:button property="forwardtoReflection"
+						onclick="javascript:submitMethod('forwardtoReflection');"
+						styleClass="button">
+						<fmt:message key="label.continue" />
+					</html:button>
+				</c:if>
+
+			</div>
 		</div>
-	</html:form>	
-	
+	</html:form>
 	<div id="footer"></div>
-
-
 </body>
 </html:html>
 

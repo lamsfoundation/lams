@@ -35,42 +35,47 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 </head>
 
 <body class="stripes">
-	
-	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
-		<html:hidden property="toolContentID"/>						
-		<html:hidden property="toolSessionID"/>						
-		<html:hidden property="httpSessionID"/>			
-		<html:hidden property="userID"/>								
-		
+
+	<html:form action="/learning?method=displayMc&validate=false"
+		enctype="multipart/form-data" method="POST" target="_self">
+		<html:hidden property="toolContentID" />
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="httpSessionID" />
+		<html:hidden property="userID" />
+
 		<div id="content">
-			
-		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
-		</h1>
-		
 
-		
-					<p>
-					<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false"/> 
-				</p>
-				
-					<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>
-			
-				<div align="right" class="space-bottom-top">
-					<html:submit property="submitReflection" styleClass="button">					
-						<fmt:message key="button.endLearning"/>
-					</html:submit>
-				</div>
+			<h1>
+				<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"
+					escapeXml="false" />
+			</h1>
 
-		
+
+
+			<p>
+				<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}"
+					escapeXml="false" />
+			</p>
+
+			<html:textarea cols="60" rows="8" property="entryText"
+				styleClass="text-area"></html:textarea>
+
+			<div align="right" class="space-bottom-top">
+				<html:submit property="submitReflection" styleClass="button">
+					<fmt:message key="button.endLearning" />
+				</html:submit>
+			</div>
+
+
 		</div>
-	</html:form>	
-	
+	</html:form>
+
 
 
 </body>

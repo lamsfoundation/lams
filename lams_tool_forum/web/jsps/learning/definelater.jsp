@@ -1,11 +1,10 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<h1>&nbsp;</h1>
-
-
-
 <div id="content">
-	<lams:DefineLater/>
+	<h1>
+		<fmt:message key="activity.title" />
+	</h1>
+	<lams:DefineLater />
 </div>
 
 

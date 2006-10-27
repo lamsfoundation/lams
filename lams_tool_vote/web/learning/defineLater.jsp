@@ -35,18 +35,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 </head>
 
 <body class="stripes">
-	
 	<div id="content">
-		<lams:DefineLater defineLaterMessageKey="error.defineLater"/>
+		<h1>
+			<fmt:message key="activity.title" />
+		</h1>
+		<lams:DefineLater defineLaterMessageKey="error.defineLater" />
 	</div>
-	
 	<div id="footer"></div>
-
 </body>
 </html:html>
 

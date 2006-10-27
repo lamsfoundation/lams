@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <html:html>
 <head>
@@ -10,8 +10,9 @@
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
 
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
-	
+	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>"
+		rel="stylesheet" type="text/css">
+
 	<script type="text/javascript">
 		function submitCount(tUrl){
 			var lockOnFinished = <c:out value="${sessionMap.lockOnFinish}"/>;
@@ -49,178 +50,174 @@
 
 <body class="stripes">
 
-		<div id="content">
+	<div id="content">
 		<h1>
 			<c:out value="${sessionMap.title}" escapeXml="false" />
 		</h1>
 
-			<table cellpadding="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td colspan="2">
-						<h2>
-							<c:out value="${sessionMap.instruction}" escapeXml="false" />
-						</h2>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<%@include file="/common/messages.jsp"%>
-						<c:if test="${sessionMap.limitUpload}">
-							<fmt:message key="message.left.upload.limit">
-								 <fmt:param value="${learner.limitUploadLeft}"/>
-							</fmt:message>
-						</c:if>
-					</td>
-				</tr>
+		<p>
+			<c:out value="${sessionMap.instruction}" escapeXml="false" />
+		</p>
 
-				<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
-				<c:choose>
+		<%@include file="/common/messages.jsp"%>
+		<c:if test="${sessionMap.limitUpload}">
+			<fmt:message key="message.left.upload.limit">
+				<fmt:param value="${learner.limitUploadLeft}" />
+			</fmt:message>
+		</c:if>
 
-					<c:when test="${empty learner.filesUploaded}">
-						<tr>
-							<td>
-							<fmt:message key="label.learner.noUpload" />
-								<%-- 
-								<p>
-									<fmt:message key="label.learner.uploadMessage" />
-								</p>
-								--%>
-							</td>
-						</tr>
-					</c:when>
+		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
+		<c:choose>
 
-					<c:otherwise>
+			<c:when test="${empty learner.filesUploaded}">
+				<p>
+					<fmt:message key="label.learner.noUpload" />
+				</p>
+			</c:when>
 
-						<c:forEach var="file" items="${learner.filesUploaded}">
-							<tr>
-								<!--First Row displaying the name of the File -->
-								<td class="field-name">
-									<fmt:message key="label.learner.fileName" />
-								</td>
-								<td>
-									<c:out value="${file.filePath}" /> &nbsp;&nbsp;
-									<c:if test="${file.currentLearner}">
-										<c:set var="downloadURL">
-											<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true"/>
-										</c:set>
-										<a href="${downloadURL}"><fmt:message key="label.download"/> </a>
-									</c:if>
-								</td>
-							</tr>
-							<tr>
-								<!--Second Row displaying the description of the File -->
-								<td class="field-name">
-									<fmt:message key="label.learner.fileDescription" />
-								</td>
-								<td>
-									<lams:out value="${file.fileDescription}"/>
-								</td>
-							</tr>
-							<tr>
-								<!--Third row displaying the date of submission of the File -->
-								<td class="field-name">
-									<fmt:message key="label.learner.time" />
-								</td>
-								<td>
-									<lams:Date value="${file.dateOfSubmission}" />
-								</td>
-							</tr>
-							<tr>
-								<!--Fourth row displaying the comments -->
-								<td class="field-name">
-									<fmt:message key="label.learner.comments" />
-								</td>
-								<td>
-									<c:choose>
-										<c:when test="${empty file.comments}">
-											<fmt:message key="label.learner.notAvailable" />
-										</c:when>
-										<c:otherwise>
-											<c:out value="${file.comments}" escapeXml="false" />
-										</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-							<tr>
-								<!--Fifth row displaying the marks-->
-								<td class="field-name">
-									<fmt:message key="label.learner.marks" />
-								</td>
-								<td>
-									<c:choose>
-										<c:when test="${empty file.comments}">
-											<fmt:message key="label.learner.notAvailable" />
-										</c:when>
-										<c:otherwise>
-											<c:out value="${file.marks}" escapeXml="false" />
-										</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2">
-									<hr size="1" style="width:500px;"/>
-								</td>
-							</tr>
-						</c:forEach>
-
-					</c:otherwise>
-				</c:choose>
-
-			</table>
-
-			<c:if test="${sessionMap.mode != 'teacher'}">
-				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data">
-					<html:hidden property="sessionMapID"/>
+			<c:otherwise>
+				<c:forEach var="file" items="${learner.filesUploaded}">
+					
+					<div class="shading-bg">
 					<table>
-						<!-- Hidden fields -->
-						<html:hidden property="toolSessionID" value="${sessionMap.toolSessionID}" />
-
-						<!--File path row -->
 						<tr>
+							<!--First Row displaying the name of the File -->
 							<td class="field-name">
-								<fmt:message key="label.learner.filePath" />
+								<fmt:message key="label.learner.fileName" />
 							</td>
 							<td>
-								<html:file property="file" disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" size="40" tabindex="1" />
+								<c:out value="${file.filePath}" />
+
+								<c:if test="${file.currentLearner}">
+									<c:set var="downloadURL">
+										<c:url
+											value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+									</c:set>
+									<a href="${downloadURL}"><fmt:message key="label.download" />
+									</a>
+								</c:if>
 							</td>
 						</tr>
-						<!--File Description row -->
+
 						<tr>
+							<!--Second Row displaying the description of the File -->
 							<td class="field-name">
 								<fmt:message key="label.learner.fileDescription" />
 							</td>
 							<td>
-								<html:textarea rows="5" cols="40" tabindex="2" property="description" disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
+								<lams:out value="${file.fileDescription}" />
 							</td>
 						</tr>
+
 						<tr>
-							<td colspan="2" align="center">
-								<span class="left-buttons">
-									<c:choose>
-										<c:when test="${sessionMap.reflectOn and (not sessionMap.finishLock)}">
-											<html:button property="notebookButton" onclick="javascript:notebook();" styleClass="button">
-												<fmt:message key="label.continue" />
-											</html:button>
-										</c:when>
-										<c:otherwise>
-											<html:button property="finishButton" onclick="javascript:finish();" styleClass="button">
-												<fmt:message key="button.finish" />
-											</html:button>
-										</c:otherwise>
-									</c:choose>
-								</span>						
-								<span class="right-buttons">
-									<html:submit disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" styleClass="button">
-										<fmt:message key="label.learner.upload" />
-									</html:submit>
-								</span>
+							<!--Third row displaying the date of submission of the File -->
+							<td class="field-name">
+								<fmt:message key="label.learner.time" />
+							</td>
+							<td>
+								<lams:Date value="${file.dateOfSubmission}" />
+							</td>
+						</tr>
+
+						<tr>
+							<!--Fourth row displaying the comments -->
+							<td class="field-name">
+								<fmt:message key="label.learner.comments" />
+							</td>
+							<td>
+								<c:choose>
+									<c:when test="${empty file.comments}">
+										<fmt:message key="label.learner.notAvailable" />
+									</c:when>
+									<c:otherwise>
+										<c:out value="${file.comments}" escapeXml="false" />
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+
+						<tr>
+							<!--Fifth row displaying the marks-->
+							<td class="field-name">
+								<fmt:message key="label.learner.marks" />
+							</td>
+							<td>
+								<c:choose>
+									<c:when test="${empty file.comments}">
+										<fmt:message key="label.learner.notAvailable" />
+									</c:when>
+									<c:otherwise>
+										<c:out value="${file.marks}" escapeXml="false" />
+									</c:otherwise>
+								</c:choose>
 							</td>
 						</tr>
 					</table>
-				</html:form>
-			</c:if>
-		</div>
-		<div id="footer"></div>
+					</div>
+				</c:forEach>
+
+			</c:otherwise>
+		</c:choose>
+
+
+
+		<div class="last-item"></div>
+		
+		<c:if test="${sessionMap.mode != 'teacher'}">
+			<html:form action="/learner?method=uploadFile" method="post"
+				enctype="multipart/form-data">
+				<html:hidden property="sessionMapID" />
+
+				<!-- Hidden fields -->
+				<html:hidden property="toolSessionID"
+					value="${sessionMap.toolSessionID}" />
+
+				<!--File path row -->
+				<div class="field-name">
+					<fmt:message key="label.learner.filePath" />
+				</div>
+
+				<html:file property="file"
+					disabled="${sessionMap.finishLock || sessionMap.arriveLimit}"
+					size="40" tabindex="1" />
+
+				<!--File Description row -->
+				<div class="field-name space-top">
+					<fmt:message key="label.learner.fileDescription" />
+				</div>
+				<html:textarea rows="5" cols="40" tabindex="2" styleClass="text-area"
+					property="description"
+					disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
+
+				<div class="small-space-top">
+					<html:submit
+						disabled="${sessionMap.finishLock || sessionMap.arriveLimit}"
+						styleClass="button">
+						<fmt:message key="label.learner.upload" />
+					</html:submit>
+				</div>
+
+				<div class="space-bottom-top" align="right">
+					<c:choose>
+						<c:when
+							test="${sessionMap.reflectOn and (not sessionMap.finishLock)}">
+							<html:button property="notebookButton"
+								onclick="javascript:notebook();" styleClass="button">
+								<fmt:message key="label.continue" />
+							</html:button>
+						</c:when>
+						<c:otherwise>
+							<html:button property="finishButton"
+								onclick="javascript:finish();" styleClass="button">
+								<fmt:message key="button.finish" />
+							</html:button>
+						</c:otherwise>
+					</c:choose>
+				</div>
+
+			</html:form>
+		</c:if>
+	</div>
+	<div id="footer"></div>
 </body>
 </html:html>

@@ -41,8 +41,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		
 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
-		
-		
 			<p>
 				<strong> <fmt:message key="label.withRetries" /> </strong>
 			</p>
@@ -75,8 +73,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			<div class="shading-bg">
 				<c:out value="${dto.question}" escapeXml="false" />
-				&nbsp; [
-				<fmt:message key="label.mark" />
+				 [
+				<strong><fmt:message key="label.mark" /></strong>
 				<c:out value="${dto.mark}" />
 				]
 			</div>

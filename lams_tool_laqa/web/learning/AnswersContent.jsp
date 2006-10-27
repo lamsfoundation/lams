@@ -34,10 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html>
 <head>
 	<html:base />
-	
+
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	
+	<lams:css />
+
 	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
@@ -52,78 +52,80 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitLearningMethod(actionMethod);
 		}
 		
-	</script>	
+	</script>
 </head>
 
 <body class="stripes">
 
+	<div id="content">
+		<h1>
+			<c:out value="${generalLearnerFlowDTO.activityTitle}"
+				escapeXml="false" />
+		</h1>
+
+		<html:form action="/learning?validate=false"
+			enctype="multipart/form-data" method="POST" target="_self">
+			<html:hidden property="method" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="httpSessionID" />
+			<html:hidden property="questionIndex" />
+			<html:hidden property="totalQuestionCount" />
 
 
+			<html:errors />
 
-<div id="content">
-<h1>
-	<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
-</h1>
+			<c:if test="${generalLearnerFlowDTO.activityOffline == 'true'}">
+				<h3>
+				   <fmt:message key="label.learning.forceOfflineMessage" />
+				</h3>
+			</c:if>
 
-	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-  		<html:hidden property="method"/>	 
-		<html:hidden property="toolSessionID"/>						
-		<html:hidden property="userID"/>						
-		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="questionIndex"/>		
-		<html:hidden property="totalQuestionCount"/>		
+
+			<c:if test="${generalLearnerFlowDTO.activityOffline == 'false'}">
+				<p>
+				  <c:out value="${generalLearnerFlowDTO.activityInstructions}"
+						escapeXml="false" />
+				</p>
+				<c:choose>
+
+					<c:when
+						test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
+
+						<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
+							<p><fmt:message key="label.feedback.seq" />
 								
-			<table>
+								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+								
+								<fmt:message key="label.questions.simple" /></p>
+							
+						</c:if>
 
-			<tr> <td>
-				<html:errors/>
-			</td></tr>
+						<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
+							<p>
+								<fmt:message key="label.questions.remaining" />
+								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+							</p>
+						</c:if>
 
-			<c:if test="${generalLearnerFlowDTO.activityOffline == 'true'}"> 			
-				<tr> <td NOWRAP>
-					<fmt:message key="label.learning.forceOfflineMessage"/>
-				</td></tr>
-			</c:if> 		
-		
-			<c:if test="${generalLearnerFlowDTO.activityOffline == 'false'}"> 			
-				<tr><td NOWRAP>
-					<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false"/> 
-				</td></tr>
-	
-			
-				<c:choose> 
-				  <c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
-		
-				  		<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}"> 							  		
-						  	<tr> <td NOWRAP>
-			 					<fmt:message key="label.feedback.seq"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
-			 					<fmt:message key="label.questions.simple"/>
-							</td></tr>
-						</c:if> 									
-				  		<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}"> 							  		
-						  	<tr> <td NOWRAP>				  		
-			 					<fmt:message key="label.questions.remaining"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> 
-							</td></tr>			 					
-						</c:if> 													  		
-				  
-						<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
-				  </c:when> 
+						<jsp:include page="/learning/SequentialAnswersContent.jsp" />
+					</c:when>
 
-				  <c:otherwise>
-					  	<tr> <td NOWRAP>
-		 					<fmt:message key="label.feedback.combined"/> &nbsp <c:out value="${generalLearnerFlowDTO.remainingQuestionCount}"/> &nbsp
-		 					<fmt:message key="label.questions.simple"/>
-						</td></tr>
-				  
-					  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
-				  </c:otherwise>
-				</c:choose> 
-			</c:if> 		
-	 	</table>
-	</html:form>
-</div>
+					<c:otherwise>
 
-<div id="footer"></div>
+						<fmt:message key="label.feedback.combined" /> &nbsp <c:out
+							value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+						<fmt:message key="label.questions.simple" />
+
+						<jsp:include page="/learning/CombinedAnswersContent.jsp" />
+					</c:otherwise>
+				</c:choose>
+			</c:if>
+
+		</html:form>
+	</div>
+
+	<div id="footer"></div>
 
 </body>
 </html:html>
@@ -136,5 +138,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-	
-	
+
+

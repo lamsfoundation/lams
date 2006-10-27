@@ -100,9 +100,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 			</p>
 
-			<div class="field-name" style="margin-bottom:-20px;">
+			<h4>
 				<fmt:message key="label.yourAnswers" />
-			</div>
+			</h4>
 
 
 

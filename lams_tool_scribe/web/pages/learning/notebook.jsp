@@ -1,34 +1,29 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h1>
-	${scribeDTO.title}
-</h1>
 
 <div id="content">
+
+	<h1>
+		${scribeDTO.title}
+	</h1>
+
 	<html:form action="/learning" method="post">
-		<table>
-			<tr>
-				<td>
-					${scribeDTO.reflectInstructions}
-				</td>
-			</tr>
+		<html:hidden property="dispatch" value="submitReflection" />
+		<html:hidden property="scribeUserUID" />
 
-			<tr>
-				<td>
-					<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
-				</td>
-			</tr>
+		<p>
+			${scribeDTO.reflectInstructions}
+		</p>
 
-			<tr>
-				<td class="right-buttons">
-					<html:hidden property="dispatch" value="submitReflection" />
-					<html:hidden property="scribeUserUID" />
-					<html:submit styleClass="button">
-						<fmt:message>button.finish</fmt:message>
-					</html:submit>
-				</td>
-			</tr>
-		</table>
+		<html:textarea cols="60" rows="8" property="entryText"
+			styleClass="text-area"></html:textarea>
+
+		<div align="right" class="space-bottom-top">
+			<html:submit styleClass="button">
+				<fmt:message>button.finish</fmt:message>
+			</html:submit>
+		</div>
+
 	</html:form>
 </div>
 

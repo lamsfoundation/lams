@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
+	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
@@ -48,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		{
 			submitLearningMethod(actionMethod);
 		}
-	</script>	
+	</script>
 </head>
 
 <body class="stripes">
@@ -56,108 +56,104 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-<div id="content">
-<h1>
-	<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
-</h1>
-	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-  		<html:hidden property="method"/>	 
-		<html:hidden property="toolSessionID"/>		
-		<html:hidden property="userID"/>										
-		<html:hidden property="httpSessionID"/>								
-		<html:hidden property="totalQuestionCount"/>				
+	<div id="content">
+		<h1>
+			<c:out value="${generalLearnerFlowDTO.activityTitle}"
+				escapeXml="false" />
+		</h1>
+		<html:form action="/learning?validate=false"
+			enctype="multipart/form-data" method="POST" target="_self">
+			<html:hidden property="method" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="httpSessionID" />
+			<html:hidden property="totalQuestionCount" />
 
-				<table class="forms">
-				  <tr><td align=center colspan=2>
-					  	<b> <fmt:message key="label.learning.reportMessage"/> </b>
-		    	  	</td>
-				  </tr>
 
-			
-					<tr> <td align=left colspan=2>		
-						<table align="left">
-							<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-									  <tr>
-										<td colspan=2>
-											<b> <fmt:message key="label.question"/> <c:out value="${questionEntry.key}"/>:  </b>  
-									  	 </td>
-									  </tr>
-									  
-  									  <tr>
-										<td colspan=2>
-									  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
-									  	 </td>
-									  </tr>
-									  
-									  
-				  			  		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
-										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
-										  <tr>
-											<td colspan=2> <b> <fmt:message key="label.learning.yourAnswer"/>  </b>  
-										  	</td>
-										  </tr>
-										  
-										  <tr>
-											<td colspan=2> 
-												  <c:out value="${answerEntry.value}" escapeXml="false"/>						  																	
-										  	</td>
-										  </tr>
-									  	</c:if> 				    
-									</c:forEach>
-									
+			<p>
+				<strong><fmt:message key="label.learning.reportMessage" />
+				</strong>
+			</p>
 
-				  			  		<c:forEach var="feedbackEntry" items="${generalLearnerFlowDTO.mapFeedback}">
-										<c:if test="${(feedbackEntry.value != '') && (feedbackEntry.value != null) }"> 						  			  		
-					  			  			<c:if test="${feedbackEntry.key == questionEntry.key}"> 						  			  		
-											  <tr>
-												<td colspan=2> <b> <fmt:message key="label.feedback"/>:  </b>  
-											  	</td>
-											  </tr>
-											  
-											  <tr>
-												<td colspan=2> 
-													  <c:out value="${feedbackEntry.value}" escapeXml="false"/>						  																	
-											  	</td>
-											  </tr>
-										  	</c:if> 				    
-									  	</c:if> 				    										  	
-									</c:forEach>
-									
-									
-							  	  <tr><td> &nbsp </td> </tr>
-							  	  <tr><td> &nbsp </td> </tr>
-							</c:forEach>
-						</table>
-					</td></tr>
-					
-					<tr> <td align=left colspan=2>							
-								<fmt:message key="label.responses.locked"/> 
-						</td>
-					</tr>
-							
 
-	  	   		  <tr>
-	  	   		  		<td>
-                               <html:button property="redoQuestions" 
-                                             styleClass="button" 
-                                             onclick="submitMethod('redoQuestions');">
-                                    <fmt:message key="label.redo"/>
-                                </html:button>
-					  	 </td>
-	  	   		  
-						<td>
-							<html:button property="viewAllResults" onclick="submitMethod('viewAllResults');" styleClass="button">
-					                             <fmt:message key="label.allResponses"/>
-							</html:button>					  	 
-					  	 </td>
-				  </tr>
 
-				  
-				</table>
-	</html:form>
-</div>
+			<c:forEach var="questionEntry"
+				items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 
-<div id="footer"></div>	
+				<div class="shading-bg">
+					<p>
+						<strong><fmt:message key="label.question" /> <c:out
+								value="${questionEntry.key}" />:</strong>
+						<br>
+						<c:out value="${questionEntry.value}" escapeXml="false" />
+					</p>
+
+					<c:forEach var="answerEntry"
+						items="${generalLearnerFlowDTO.mapAnswersPresentable}">
+						<c:if test="${answerEntry.key == questionEntry.key}">
+
+
+
+							<p>
+								<strong> <fmt:message key="label.learning.yourAnswer" />
+								</strong>
+
+								<br>
+								<c:out value="${answerEntry.value}" escapeXml="false" />
+
+							</p>
+
+
+						</c:if>
+					</c:forEach>
+
+
+					<c:forEach var="feedbackEntry"
+						items="${generalLearnerFlowDTO.mapFeedback}">
+						<c:if
+							test="${(feedbackEntry.value != '') && (feedbackEntry.value != null) }">
+							<c:if test="${feedbackEntry.key == questionEntry.key}">
+
+								<span class="field-name"> <fmt:message
+										key="label.feedback" />: </span>
+
+								<c:out value="${feedbackEntry.value}" escapeXml="false" />
+
+							</c:if>
+						</c:if>
+					</c:forEach>
+
+				</div>
+
+			</c:forEach>
+
+			<div class="last-item">
+
+			</div>
+
+			<p>
+				<fmt:message key="label.responses.locked" />
+			</p>
+
+			<div class="space-bottom-top small-space-top">
+				<html:button property="redoQuestions" styleClass="button"
+					onclick="submitMethod('redoQuestions');">
+					<fmt:message key="label.redo" />
+				</html:button>
+
+
+
+				<html:button property="viewAllResults"
+					onclick="submitMethod('viewAllResults');" styleClass="button">
+					<fmt:message key="label.allResponses" />
+				</html:button>
+			</div>
+
+
+		</html:form>
+	</div>
+
+	<div id="footer"></div>
 
 </body>
 </html:html>
@@ -176,4 +172,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-	
+

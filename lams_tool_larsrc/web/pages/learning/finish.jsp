@@ -9,5 +9,5 @@
     </script>
 	
 	
-	<body class="stripes">
+	</body>
 </html>

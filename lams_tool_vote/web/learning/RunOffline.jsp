@@ -35,8 +35,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -45,43 +46,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteLearningForm.submit();
 		}
 	</script>
-	
+
 </head>
 
 <body class="stripes">
 
-	<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">	
-		<html:hidden property="dispatch"/>
-		<html:hidden property="toolSessionID"/>
-		<html:hidden property="userID"/>	
-	
-		<div id="content">
-			&nbsp&nbsp&nbsp&nbsp&nbsp <fmt:message key="label.learning.forceOfflineMessage" />
-			
-			<table>	
-			<tr>	
-			<td>
-				<div class="right-buttons">
+	<html:form action="/learning?validate=false"
+		enctype="multipart/form-data" method="POST" target="_self">
+		<html:hidden property="dispatch" />
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="userID" />
 
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-						<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
-							<fmt:message key="label.finished"/>
-						</html:submit>	 										
-				  	</c:if> 				    					
-	
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-						<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-							<fmt:message key="label.continue"/>
-						</html:submit>	 				
-				  	</c:if> 				    					
-			  	
-				</div> 		  															 		  					
-			</td> 
-			</tr>
-			</table>
+		<div id="content">
+
+			<p>
+				<fmt:message key="label.learning.forceOfflineMessage" />
+			</p>
+
+			<div align="right" class="space-bottom-top">
+
+				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+					<html:submit property="learnerFinished"
+						onclick="javascript:submitMethod('learnerFinished');"
+						styleClass="button">
+						<fmt:message key="label.finished" />
+					</html:submit>
+				</c:if>
+
+				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
+					<html:submit property="forwardtoReflection"
+						onclick="javascript:submitMethod('forwardtoReflection');"
+						styleClass="button">
+						<fmt:message key="label.continue" />
+					</html:submit>
+				</c:if>
+
+			</div>
+
 		</div>
-	</html:form>	
-	
+	</html:form>
+
 </body>
 </html:html>
 

@@ -88,27 +88,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<table class="alternative-color" cellspacing="1">
 					  <tr>
 					  	<td width="30%"> 
-						  	  <b> <fmt:message key="label.topMark"/> </b>
+						  	  <strong> <fmt:message key="label.topMark"/> </strong>
 						 </td> 
-						 <td NOWRAP align=left>	
+						 <td>	
 							  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
 					  	</td>
 					  </tr>	
 
 					  <tr>
-					  	<td NOWRAP align=left valign=top> 
-						  	<b> <fmt:message key="label.avMark"/> </b>
+					  	<td> 
+						  	 <strong><fmt:message key="label.avMark"/> </strong>
 					  	</td>
-					  	<td NOWRAP align=left>
+					  	<td>
 							  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
 					  	</td>
 					  </tr>	
 
 					  <tr>
-					  	<td NOWRAP align=left valign=top> 
-							  <b> <fmt:message key="label.loMark"/> </b>
+					  	<td> 
+							   <strong> <fmt:message key="label.loMark"/>  </strong>
 					  	</td>
-					  	<td NOWRAP align=left>
+					  	<td>
 							  	<c:out value="${mcGeneralLearnerFlowDTO.lowestMark}"/>
 					  	</td>
 					  </tr>	
@@ -161,7 +161,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </html:form>
 </div>
 
-<div id="footer"></div>
+
 
 </body>
 </html:html>

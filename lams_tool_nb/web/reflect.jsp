@@ -6,31 +6,19 @@
 </h1>
 
 	<html:form action="/learner" method="post">
-		<table width="100%">
-			<tr>
-				<td>
-					<lams:out value="${reflectInstructions}" />				
-				</td>
-			</tr>
-
-			<tr>
-				<td>
-					<html:textarea cols="60" rows="8" property="reflectionText"></html:textarea>
-				</td>
-			</tr>
-
-			<tr>
-				<td>
-					<div class="right-buttons">
+		 
+					<p><lams:out value="${reflectInstructions}" /></p>				
+			 
+					<html:textarea cols="60" rows="8" property="reflectionText" styleClass="text-area"></html:textarea>
+				 
+					<div align="right" class="space-bottom-top">
 						<html:hidden property="toolSessionID" />
 						<html:hidden property="mode" />
 						<html:submit property="method" styleClass="button">
 							<fmt:message key="button.finish" />
 						</html:submit>
 					</div>
-				</td>
-			</tr>
-		</table>
+			 
 	</html:form>
 </div>
 

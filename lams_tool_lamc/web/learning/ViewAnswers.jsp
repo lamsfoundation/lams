@@ -35,243 +35,208 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<lams:css/>
+	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 </head>
 
 <body class="stripes">
 
-<div id="content">
-	<h1>
-		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
-	</h1>
+	<div id="content">
+		<h1>
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"
+				escapeXml="false" />
+		</h1>
 
-		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-			<html:hidden property="toolContentID"/>						
-			<html:hidden property="toolSessionID"/>								
-			<html:hidden property="httpSessionID"/>											
-			<html:hidden property="userID"/>											
-			<html:hidden property="userOverPassMark"/>						
-			<html:hidden property="passMarkApplicable"/>										
-			<html:hidden property="learnerProgress"/>										
-			<html:hidden property="learnerProgressUserId"/>										
-			<html:hidden property="questionListingMode"/>													
-		
-				<table class="forms">
-					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
-					  <tr>
-					  	<th scope="col" valign=top colspan=2> 
-						  	 <fmt:message key="label.assessment"/> 
-					  	</th>
-					  </tr>
-					</c:if> 								  					  
+		<html:form action="/learning?method=displayMc&validate=false"
+			method="POST" target="_self">
+			<html:hidden property="toolContentID" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="httpSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="userOverPassMark" />
+			<html:hidden property="passMarkApplicable" />
+			<html:hidden property="learnerProgress" />
+			<html:hidden property="learnerProgressUserId" />
+			<html:hidden property="questionListingMode" />
+
+			<h2>
+				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
+					<fmt:message key="label.assessment" />
+				</c:if>
+			</h2>
+
+			<h2>
+				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
+					<fmt:message key="label.viewAnswers" />
+				</c:if>
+
+				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress == 'true'}">
+					<fmt:message key="label.learner.viewAnswers" />
+				</c:if>
+			</h2>
+
+			<!--  QUESTIONS  -->
+			<c:set var="mainQueIndex" scope="request" value="0" />
+			<c:forEach var="questionEntry"
+				items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
+				<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
+
+				<div class="shading-bg">
+					<p>
+						<c:out value="${questionEntry.value}" escapeXml="false" />
+					</p>
+
+					<!--  CANDIDATE ANSWERS  -->
+					<c:set var="queIndex" scope="request" value="0" />
+					<c:forEach var="mainEntry"
+						items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
+
+						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
+							<ul>
+								<c:forEach var="subEntry" items="${mainEntry.value}">
+									<li>
+										<c:out value="${subEntry.value}" escapeXml="false" />
+									</li>
+								</c:forEach>
+							</ul>
 
 
-					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	<b>  <fmt:message key="label.viewAnswers"/>  </b>
-					  	</td>
-					  </tr>
-					</c:if> 								  
 
-					<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress == 'true'}"> 							  
-					  <tr>
-					  	<td NOWRAP align=center valign=top colspan=2> 
-						  	 <b> <fmt:message key="label.learner.viewAnswers"/> </b>
-					  	</td>
-					  </tr>
-					</c:if> 								  
+							<!--  ATTEMPTS -->
+							<h4>
+								<fmt:message key="label.attempts" />
+							</h4>
 
-					
-  		  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
-					<c:forEach var="questionEntry" items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
-					<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
-						  <tr>
-						  	<td NOWRAP align=left valign=top colspan=2> 
-								  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
-						  	</td>
-						  </tr>
+							<c:forEach var="attemptEntry"
+								items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
+								<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
 
-								  								  
-						  <tr>						 
-							<td NOWRAP align=left>
-							<table align=left>
-			  		  	 		<c:set var="queIndex" scope="request" value="0"/>
-								<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
-									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-									
-										<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}"> 		
-									  		<c:forEach var="subEntry" items="${mainEntry.value}">
-				  								<tr> 
-													<td NOWRAP align=left valign=top> 
-						   								    <img src="<c:out value="${tool}"/>images/dot.jpg" align=left> &nbsp
-															<c:out value="${subEntry.value}" escapeXml="false"/> 
-													</td> 
-												</tr>	
-											</c:forEach>
+									<c:set var="aIndex" scope="request" value="1" />
+									<c:forEach var="i" begin="1" end="30" step="1">
 
-												<tr>												
-												<td NOWRAP colspan=2 align=left valign=top> 
-					   								   <b>  <fmt:message key="label.attempts"/> </b>
-												</td> 
-												</tr>
-												
-												
-												<tr>
-													<td  NOWRAP align=left valign=top> 											
-													<table align=left>
-														<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
 
-															<c:if test="${requestScope.mainQueIndex == attemptEntry.key}"> 		
- 											  		  	 		<c:set var="aIndex" scope="request" value="1"/>
-																 <c:forEach var="i" begin="1" end="30" step="1">
+										<c:forEach var="distinctAttemptEntry"
+											items="${attemptEntry.value}">
 
-					 													<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
-
-																				<c:if test="${distinctAttemptEntry.key == i}"> 	
-																					<tr>
-																						<td NOWRAP align=left valign=top> 
-																								<b> <fmt:message key="label.attempt"/> <c:out value="${requestScope.aIndex}"/>:  </b>
-																						</td>
-																						<c:set var="aIndex" scope="request" value="${requestScope.aIndex +1}"/>
-								 														<td align=left valign=top> 																					
-									 														<table align=left>
-											 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
-																									<tr>
-																										<td NOWRAP align=left valign=top>
-													 															<c:out value="${singleAttemptEntry.value}" escapeXml="false"/> 
-												 														</td>
-																									</tr>	
-																								</c:forEach>
-																							</table>	
-								 														</td>
-																					</tr>		
-																				</c:if> 																																						
-																		</c:forEach>
-																		
-																</c:forEach>
-															</c:if> 																		
+											<div>
+												<c:if test="${distinctAttemptEntry.key == i}">
+													<p>
+														<strong><fmt:message key="label.attempt" /> <c:out
+																value="${requestScope.aIndex}" />: </strong>
+													</p>
+													<c:set var="aIndex" scope="request"
+														value="${requestScope.aIndex +1}" />
+													<ul>
+														<c:forEach var="singleAttemptEntry"
+															items="${distinctAttemptEntry.value}">
+															<li>
+																<c:out value="${singleAttemptEntry.value}"
+																	escapeXml="false" />
+															</li>
 														</c:forEach>
-													</table>
-													</td>
-											  </tr>
-										</c:if> 			
-								</c:forEach>
-							</table>
-							</td>
-						</tr>
-						
-						
+													</ul>
 
-						  <tr>
-						  	<td NOWRAP align=left valign=top colspan=2> 
-								<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
-									<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}"> 		
-									  	<i> <c:out value="${feedbackEntry.value}" escapeXml="false"/> </i>
-									</c:if> 			
-								</c:forEach>
-						  	</td>
-						  </tr>
-						
+												</c:if>
+											</div>
+
+										</c:forEach>
+
+
+									</c:forEach>
+								</c:if>
+							</c:forEach>
+							<!-- END ATTEMPTS -->
+
+						</c:if>
 					</c:forEach>
+					<!--  END CANDIDATE ANSWERS -->
+
+					<c:forEach var="feedbackEntry"
+						items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
+						<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
+							<p>
+								<em> <c:out value="${feedbackEntry.value}" escapeXml="false" />
+								</em>
+							</p>
+						</c:if>
+					</c:forEach>
+				</div>
+			</c:forEach>
+			<!-- END QUESTION  -->
+
+			<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}">
+				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
+
+					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
+
+						<html:submit property="redoQuestions" styleClass="button">
+							<fmt:message key="label.redo.questions" />
+						</html:submit>
+						<html:submit property="viewSummary" styleClass="button">
+							<fmt:message key="label.view.summary" />
+						</html:submit>
+
+						<div class="right-buttons">
+							<c:if
+								test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+								<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+									<html:submit property="learnerFinished" styleClass="button">
+										<fmt:message key="label.finished" />
+									</html:submit>
+								</c:if>
+
+								<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+									<html:submit property="forwardtoReflection" styleClass="button">
+										<fmt:message key="label.continue" />
+									</html:submit>
+								</c:if>
+							</c:if>
+						</div>
+
+					</c:if>
 
 
-					<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}"> 							  
-						<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}"> 							  
+					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
 
-					 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
-				  	   		  <tr>
-							  	<td NOWRAP valign=top> 
-							  			<html:submit property="redoQuestions" styleClass="button">
-											<fmt:message key="label.redo.questions"/>
-										</html:submit>	 		
-					       
-				   						<html:submit property="viewSummary" styleClass="button">
-											<fmt:message key="label.view.summary"/>
-										</html:submit>	 				 		  					
-							  	 </td>
+						<html:submit property="viewSummary" styleClass="button">
+							<fmt:message key="label.view.summary" />
+						</html:submit>
 
-							  	<td NOWRAP valign=top> 							  	 
-             	  						<div class="right-buttons">	  	   		    
-											<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
-												<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-													<html:submit property="learnerFinished"  styleClass="button">
-														<fmt:message key="label.finished"/>
-													</html:submit>	 				
-											  	</c:if> 				    					
-								
-												<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-													<html:submit property="forwardtoReflection" styleClass="button">
-														<fmt:message key="label.continue"/>
-													</html:submit>	 				
-											  	</c:if> 				    					
-									  	   </c:if>	
-									  	   
-									</div>								  	   
-							  	 </td>									
-							  </tr>
-							</c:if> 				
-			
-							<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
-				  	   		  <tr>
-				  	   		    <td  valign=top>
-					   						<html:submit property="viewSummary" styleClass="button">
-												<fmt:message key="label.view.summary"/>
-											</html:submit>	 				 		  					
-							  	 </td>
-							  	 
-	 			  	   		    <td  valign=top>
-		    	  						<div class="right-buttons">
-											<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-												<html:submit property="learnerFinished"  styleClass="button">
-													<fmt:message key="label.finished"/>
-												</html:submit>	 				
-										  	</c:if> 				    					
-							
-											<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-												<html:submit property="forwardtoReflection" styleClass="button">
-													<fmt:message key="label.continue"/>
-												</html:submit>	 				
-										  	</c:if> 				    					
-										   
-										</div>
-							  	 </td>
-							  	 
-							  </tr>
-							</c:if> 																		
-						</c:if> 																								
-					</c:if> 					
-					
+						<div class="right-buttons">
+							<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+								<html:submit property="learnerFinished" styleClass="button">
+									<fmt:message key="label.finished" />
+								</html:submit>
+							</c:if>
 
-							<tr> 
-							<td valign=top>
-									<table>
-										<tr> 
-						  	   		  		<td>
-												<b> <fmt:message key="label.notebook.entries"/> </b>						
-											 </td>
-										</tr>
-										
-										<tr> 
-						  	   		  		<td>
-												<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
-											 </td>
-										</tr>
-								</table>
-		
-							</td>
-							</tr>
+							<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+								<html:submit property="forwardtoReflection" styleClass="button">
+									<fmt:message key="label.continue" />
+								</html:submit>
+							</c:if>
 
-					
-				  	<html:hidden property="doneLearnerProgress"/>						   
-				</table>
-	</html:form>
+						</div>
 
-</div>
+					</c:if>
 
-<div id="footer"></div>
 
+				</c:if>
+			</c:if>
+
+			<h2>
+				<fmt:message key="label.notebook.entries" />
+			</h2>
+
+			<p>
+				<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}"
+					escapeXml="false" />
+			</p>
+
+			<html:hidden property="doneLearnerProgress" />
+
+		</html:form>
+	</div>
 </body>
 </html:html>
 
@@ -283,5 +248,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-	
-	
+
+

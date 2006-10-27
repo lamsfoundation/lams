@@ -35,8 +35,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
@@ -45,51 +46,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteLearningForm.submit();
 		}
 	</script>
-	
+
 </head>
 
 <body class="stripes">
-	
-	
+	<html:form action="/learning?validate=false"
+		enctype="multipart/form-data" method="POST" target="_self">
 
-	<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+		<html:hidden property="dispatch" />
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="userID" />
 
-		<html:hidden property="dispatch"/>
-		<html:hidden property="toolSessionID"/>
-		<html:hidden property="userID"/>	
-	
 		<div id="content">
-		
-	<h1>
-		<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
-	</h1>
-	
-		<table>
-			<tr>
-				<td>
-					<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false"/> 
-				</td>
-			</tr>
+			<h1>
+				<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
+					escapeXml="false" />
+			</h1>
 
-			<tr>
-				<td>
-					<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
-				</td>
-			</tr>
+			<p>
+				<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}"
+					escapeXml="false" />
+			</p>
 
-			<tr>
-				<td class="right-buttons">
-					<html:submit property="submitReflection" onclick="javascript:submitMethod('submitReflection');" styleClass="button">					
-						<fmt:message key="button.endLearning"/>
-					</html:submit>
-				</td>
-			</tr>
-		</table>
+			<html:textarea cols="60" rows="8" property="entryText"
+				styleClass="text-area"></html:textarea>
 
-		
+			<div align="right" class="space-bottom-top">
+				<html:submit property="submitReflection"
+					onclick="javascript:submitMethod('submitReflection');"
+					styleClass="button">
+					<fmt:message key="button.endLearning" />
+				</html:submit>
+			</div>
+
 		</div>
-	</html:form>	
-	
+	</html:form>
 </body>
 </html:html>
 

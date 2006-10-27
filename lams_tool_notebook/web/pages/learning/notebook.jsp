@@ -1,66 +1,68 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div id="content">
-<h1>
-	${notebookDTO.title}
-</h1>
+	<h1>
+		${notebookDTO.title}
+	</h1>
 
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<html:form action="/learning" method="post">
 
-			<table>
-				<tr>
-					<td>
-						${notebookDTO.instructions}
-					</td>
-				</tr>
 
-				<tr>
-					<td>
-						<c:set var="lrnForm"
-							value="<%=request
+			<p>
+				${notebookDTO.instructions}
+			</p>
+
+			<c:set var="lrnForm"
+				value="<%=request
 											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-						<c:choose>
-							<c:when test="${contentEditable}">
-								<c:choose>
-									<c:when test="${notebookDTO.allowRichEditor}">
-										<c:set var="language"><lams:user property="localeLanguage"/></c:set>
-										<fck:editor id="entryText" basePath="/lams/fckeditor/"
-											imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-											linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-											flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-											imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-											linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-											flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-											toolbarSet="Default-Learner" defaultLanguage="${language}" autoDetectLanguage="false">
+			<c:choose>
+				<c:when test="${contentEditable}">
+					<c:choose>
+						<c:when test="${notebookDTO.allowRichEditor}">
+							<c:set var="language">
+								<lams:user property="localeLanguage" />
+							</c:set>
+							<fck:editor id="entryText" basePath="/lams/fckeditor/"
+								imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
+								linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+								flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
+								imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
+								linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
+								flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+								toolbarSet="Default-Learner" defaultLanguage="${language}"
+								autoDetectLanguage="false">
 												${lrnForm.entryText}
 										</fck:editor>
-									</c:when>
+						</c:when>
 
-									<c:otherwise>
-										<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
-									</c:otherwise>
-								</c:choose>
-							</c:when>
+						<c:otherwise>
+							<html:textarea cols="60" rows="8" property="entryText"
+								styleClass="text-area"></html:textarea>
+						</c:otherwise>
+					</c:choose>
+				</c:when>
 
-							<c:otherwise>
+				<c:otherwise>
 								${lrnForm.entryText}
 							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
+			</c:choose>
 
-				<tr>
-					<td class="right-buttons">
-						<html:hidden property="dispatch" value="finishActivity" />
-						<html:hidden property="toolSessionID" />
-						<html:submit styleClass="button">
-							<fmt:message>button.finish</fmt:message>
-						</html:submit>
-					</td>
-				</tr>
-			</table>
+
+			<div align="right" class="space-bottom-top">
+			
+			<html:hidden property="dispatch" value="finishActivity" />
+			<html:hidden property="toolSessionID" />
+			<html:submit styleClass="button">
+				<fmt:message>button.finish</fmt:message>
+			</html:submit>
+
 		</html:form>
+			</div>
+	
 	</c:if>
+
+
+
 </div>
 

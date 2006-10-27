@@ -7,17 +7,13 @@
 	<c:out value="${NbLearnerForm.title}" escapeXml="false" />
 </h1>
 
-	<table width="100%">
-		<tr>
-			<td>
-				<p><c:out value="${NbLearnerForm.content}" escapeXml="false" /></p>
-			</td>
-		</tr>
+	
+				<p class="indent"><c:out value="${NbLearnerForm.content}" escapeXml="false" /></p>
+		
 
 		<c:if test="${!NbLearnerForm.readOnly}">
-		<tr>
-			<td>
-					<div class="right-buttons">
+		
+					<div align="right" class="space-bottom-top">
 						<html:form action="/learner" target="_self">
 								<html:hidden property="toolSessionID" />
 								<html:hidden property="mode" />
@@ -35,10 +31,9 @@
 								</c:choose>
 						</html:form>
 					</div>
-				</td>
-			</tr>
+			
 		</c:if>
-	</table>
+	
 </div>
 
 

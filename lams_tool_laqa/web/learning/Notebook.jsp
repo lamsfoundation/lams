@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
+	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
@@ -49,57 +49,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitLearningMethod(actionMethod);
 		}
 		
-	</script>	
+	</script>
 
-	
+
 </head>
 
 <body class="stripes">
-	
-	
-	
-	
-	<html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-  		<html:hidden property="method"/>	 
-		<html:hidden property="toolSessionID"/>		
-		<html:hidden property="userID"/>										
-		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="totalQuestionCount"/>		
-	
+	<html:form action="/learning?validate=false"
+		enctype="multipart/form-data" method="POST" target="_self">
+		<html:hidden property="method" />
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="userID" />
+		<html:hidden property="httpSessionID" />
+		<html:hidden property="totalQuestionCount" />
+
 		<div id="content">
-		
-	<h1>
-		<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false"/> 		
-	</h1>
-	
-		<table>
-			<tr>
-				<td>
-					<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false"/> 
-				</td>
-			</tr>
 
-			<tr>
-				<td>
-					<html:textarea cols="60" rows="8" property="entryText"></html:textarea>
-				</td>
-			</tr>
+			<h1>
+				<c:out value="${generalLearnerFlowDTO.activityTitle}"
+					escapeXml="false" />
+			</h1>
 
-			<tr>
-				<td class="right-buttons">
-					<html:button property="submitReflection" onclick="javascript:submitMethod('submitReflection');" styleClass="button">					
-						<fmt:message key="button.endLearning"/>
-					</html:button>
-				</td>
-			</tr>
-		</table>
+			<p>
+				<c:out value="${generalLearnerFlowDTO.reflectionSubject}"
+					escapeXml="false" />
+			</p>
 
-		
+			<html:textarea cols="60" rows="8" property="entryText"
+				styleClass="text-area"></html:textarea>
+
+			<div align="right" class="space-bottom-top">
+				<html:button property="submitReflection"
+					onclick="javascript:submitMethod('submitReflection');"
+					styleClass="button">
+					<fmt:message key="button.endLearning" />
+				</html:button>
+			</div>
 		</div>
-	</html:form>	
-	
-	<div id="footer"></div>
+	</html:form>
 
+	<div id="footer"></div>
 
 </body>
 </html:html>

@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <html:html locale="true">
 <head>
 	<%@ include file="/common/header.jsp"%>
@@ -22,36 +22,34 @@
 </head>
 
 <body class="stripes">
-			<h1>
-				${sessionMap.title}
-			</h1>
-			<div id="content">
-				<table>
-					<tr>
-						<td>
-							<h2>
-								<fmt:message key="run.offline.message" />
-							</h2>
-						</td>
-					</tr>
-				</table>						
-				<div class="buttons-right">
-					<c:choose>
-						<c:when test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
-							<html:button property="FinishButton"  onclick="return continueReflect()" styleClass="button">
-								<fmt:message key="label.continue" />
-							</html:button>
-						</c:when>
-						<c:otherwise>
-							<html:button property="FinishButton"  onclick="return finishSession()"  styleClass="button">
-								<fmt:message key="label.finished" />
-							</html:button>
-						</c:otherwise>
-					</c:choose>		
-				</div>
-			</div>
-	<div class="space-bottom"></div>
-		<!--closes footer-->
+	<div id="content">
 
+		<h1>
+			${sessionMap.title}
+		</h1>
+
+		<p>
+			<fmt:message key="run.offline.message" />
+		</p>
+
+		<div align="right" class="space-bottom-top">
+			<c:choose>
+				<c:when
+					test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+					<html:button property="FinishButton"
+						onclick="return continueReflect()" styleClass="button">
+						<fmt:message key="label.continue" />
+					</html:button>
+				</c:when>
+				<c:otherwise>
+					<html:button property="FinishButton"
+						onclick="return finishSession()" styleClass="button">
+						<fmt:message key="label.finished" />
+					</html:button>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</div>
+	<!--closes footer-->
 </body>
 </html:html>
