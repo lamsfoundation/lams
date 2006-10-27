@@ -1,7 +1,7 @@
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ include file="/taglibs.jsp"%>
 
-<form action="http://lamscommunity.org/registration" method="post">
+<form action="http://lamscommunity.org/registration" method="get">
 	<h2 align="left">
 		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :  
 		<fmt:message key="sysadmin.register.server" />
@@ -470,7 +470,7 @@
 				</td>
 				<td>
 					<bean:write name="RegisterForm" property="authorno"/>
-					<input type="hidden" property="authorno" value="<bean:write name="RegisterForm" property="authorno"/>"/>
+					<input type="hidden" name="authorno" value="<bean:write name="RegisterForm" property="authorno"/>"/>
 				</td>
 			</tr>
 			<tr>
