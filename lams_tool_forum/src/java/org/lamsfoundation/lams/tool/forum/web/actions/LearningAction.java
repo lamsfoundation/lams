@@ -614,7 +614,7 @@ public class LearningAction extends Action {
 		if ( makeAuditEntry ) {
 			Long userId = 0L;
     		String loginName = "Default";
-    		if(message.getCreatedBy() == null){
+    		if(message.getCreatedBy() != null){
     			userId = message.getCreatedBy().getUserId();
     			loginName = message.getCreatedBy().getLoginName();
     		}
