@@ -17,7 +17,7 @@
 			<c:out value="${dto.activityTitle}" />
 		</td>
 		<td>
-			<a href="<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=12345678901234567890123456789012">
+			<a href="<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1">
 			<c:out value="${dto.toolDisplayName}" />
 			</a>
 		</td>
