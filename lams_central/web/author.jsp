@@ -40,6 +40,7 @@ var saved = true;
 var thePopUp = null;
 var theFilePopUp = null;
 
+var previewWin = null;
 var previewSessionId = null;
 
 function getWindowSize() {
@@ -143,9 +144,25 @@ function openPopUpFS(args){
 	openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
 }
 
-function openPreview(args){
-	window.opener.openPreview(args);
-}
+function openPreview( lessonId )
+		{
+			if(mac)
+			{
+				previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
+			}
+			else
+			{
+				if(previewWin && !previewWin.closed )
+				{
+					previewWin.location = 'home.do?method=learner&mode=preview&lessonID='+lessonId;		
+					previewWin.focus();
+				}
+				else
+				{
+					previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
+				}
+			}
+		}
 
 function openURL(args){
 	window.open(args);

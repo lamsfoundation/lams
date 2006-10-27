@@ -9,7 +9,6 @@
 		
 		var authorWin = null;
 		var learnWin = null;
-		var previewWin = null;
 		var monitorLessonWin = null;
 		var addLessonWin = null;
 		var epWin = null;
@@ -21,7 +20,6 @@
 		function closeAllChildren(){
 			if (authorWin && !authorWin.closed) authorWin.close();
 			if (learnWin && !learnWin.closed) learnWin.close();
-			if (previewWin && !previewWin.closed) previewWin.close();
 			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.close();
 			if (addLessonWin && !addLessonWin.closed) addLessonWin.close();
 			if (epWin && !epWin.closed) epWin.close();
@@ -145,25 +143,6 @@
 			}
 		}
 		
-		function openPreview( lessonId )
-		{
-			if(isMac)
-			{
-				previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
-			}
-			else
-			{
-				if(previewWin && !previewWin.closed )
-				{
-					previewWin.location = 'home.do?method=learner&mode=preview&lessonID='+lessonId;		
-					previewWin.focus();
-				}
-				else
-				{
-					previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
-				}
-			}
-		}
 		
 		function openExportPortfolio( lessonId )
 		{
