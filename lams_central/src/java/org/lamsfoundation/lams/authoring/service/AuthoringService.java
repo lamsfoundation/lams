@@ -25,13 +25,11 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -50,7 +48,6 @@ import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
@@ -64,8 +61,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -82,14 +77,11 @@ import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 
 /**
@@ -112,7 +104,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	protected ILamsCoreToolService lamsCoreToolService;
 	protected ILearningDesignService learningDesignService;
 	protected MessageService messageService;
-	protected ILoadedMessageSourceService toolActMessageService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
 	
@@ -195,20 +186,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 		this.lamsCoreToolService = lamsCoreToolService;
 	}
-	
-	/** Access a message service related to a programatically loaded message file.
-	 * Authoring uses this to access the message files for tools and activities.
-	 */
-	public ILoadedMessageSourceService getToolActMessageService() {
-		return toolActMessageService;
-	}
 
-	public void setToolActMessageService(ILoadedMessageSourceService toolActMessageService) {
-		this.toolActMessageService = toolActMessageService;
-	}
-
-
-	
 	public ILearningDesignService getLearningDesignService() {
 		return learningDesignService;
 	}
@@ -218,8 +196,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 */
 	public void setLearningDesignService(ILearningDesignService learningDesignService) {
 		this.learningDesignService = learningDesignService;
-	}
-	
+	}	
 
     /**
      * @param contentIDGenerator The contentIDGenerator to set.
@@ -616,59 +593,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
 	 */
 	public String getAllLearningLibraryDetails()throws IOException{
-		Iterator iterator= getAllLearningLibraries().iterator();
-		ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
-		while(iterator.hasNext()){
-			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();		
-			List templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
-			
-			if (templateActivities!=null & templateActivities.size()==0)
-			{
-				log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + " does not have a template activity");
-			}
-			// convert library to DTO format
-			LearningLibraryDTO libraryDTO = learningLibrary.getLearningLibraryDTO(templateActivities);
-			internationaliseActivities(libraryDTO.getTemplateActivities());
-			libraries.add(libraryDTO);
-		}
-		flashMessage = new FlashMessage("getAllLearningLibraryDetails",libraries);
+		flashMessage = new FlashMessage("getAllLearningLibraryDetails",learningDesignService.getAllLearningLibraryDetails());
 		return flashMessage.serializeMessage();
-	}
-
-	private void internationaliseActivities(Collection activities) {		
-		Iterator iter = activities.iterator();
-		Locale locale = LocaleContextHolder.getLocale();
-		while (iter.hasNext()) {
-			LibraryActivityDTO activity = (LibraryActivityDTO) iter.next();
-			// update the activity fields
-			String languageFilename = activity.getLanguageFile();
-			if ( languageFilename  != null ) {
-				MessageSource toolMessageSource = toolActMessageService.getMessageService(languageFilename);
-				if ( toolMessageSource != null ) {
-					activity.setActivityTitle(toolMessageSource.getMessage(Activity.I18N_TITLE,null,activity.getActivityTitle(),locale));
-					activity.setDescription(toolMessageSource.getMessage(Activity.I18N_DESCRIPTION,null,activity.getDescription(),locale));
-					activity.setHelpText(toolMessageSource.getMessage(Activity.I18N_HELP_TEXT,null,activity.getHelpText(),locale));
-				} else {
-					log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getActivityTitle()
-							+" message file "+activity.getLanguageFile()+". Activity Message source not available");
-				}
-
-				// update the tool field - note only tool activities have a tool entry.
-				if ( activity.getActivityTypeID()!=null && Activity.TOOL_ACTIVITY_TYPE == activity.getActivityTypeID().intValue() ) {
-					languageFilename = activity.getToolLanguageFile();
-					toolMessageSource = toolActMessageService.getMessageService(languageFilename);
-					if ( toolMessageSource != null ) {
-						activity.setToolDisplayName(toolMessageSource.getMessage(Tool.I18N_DISPLAY_NAME,null,activity.getToolDisplayName(),locale));
-					} else {
-						log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getActivityTitle()
-							+" message file "+activity.getLanguageFile()+". Tool Message source not available");
-					}
-				}
-			} else {
-				log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getActivityTitle()
-						+". No message file supplied.");
-			}
-		}
 	}
 	
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolContentID(java.lang.Long) */

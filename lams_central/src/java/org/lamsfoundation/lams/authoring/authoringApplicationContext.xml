@@ -47,7 +47,6 @@
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>
 		<property name="messageService"><ref bean="authoringMessageService"/></property>
-		<property name="toolActMessageService"><ref bean="loadedMessageSourceService"/></property>
 		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 	</bean>
 	

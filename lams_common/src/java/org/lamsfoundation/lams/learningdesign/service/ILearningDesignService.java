@@ -23,10 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 
 /**
@@ -51,4 +54,10 @@ public interface ILearningDesignService{
 	 */
 	public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
 	
+	/**
+	 * Get the DTO list of all learning libraries.
+	 * @return list of LearningLibraryDTO
+	 * @throws IOException
+	 */
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails() throws IOException;
 }
