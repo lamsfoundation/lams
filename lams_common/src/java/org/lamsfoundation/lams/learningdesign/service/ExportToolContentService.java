@@ -501,7 +501,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		FileUtil.copyFile(xsltIn, xslt);
 		
 		//copy schema files to content folder
-		String path = FileUtil.getFileDirectory(xslt.getCanonicalPath());
+		String path = FileUtil.getFileDirectory(xsltIn.getCanonicalPath());
 		File imscpSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMSCP));
 		File imsldaSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMS_LD_LEVEL_A));
 		File imsldbSrc = new File(FileUtil.getFullPath(path,SCHEMA_FILE_IMS_LD_LEVEL_B));
@@ -554,7 +554,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		transRoot.setChildren(transChildren);
 		transDom.setRootElement(transRoot);
-		File transFile = new File(FileUtil.getFullPath(contentDir,IMS_TRANSITION_FILE_NAME));
+		File transFile = new File(FileUtil.getFullPath(xsltDir,IMS_TRANSITION_FILE_NAME));
 		XMLOutputter transOutput = new XMLOutputter();
 		transOutput.output(transDom, new FileOutputStream(transFile));
 		log.debug("Export IMS: Transtion(<learning-activity-ref>) file generated sucess: " + transFile.getAbsolutePath());
@@ -571,7 +571,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		log.debug("Export IMS: Transform IMS XML by XSLT sucess.");
 		//output IMS format LD XML
-		String imsLdFileName = FileUtil.getFullPath(xsltDir,LEARNING_DESIGN_IMS_FILE_NAME);
+		String imsLdFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_IMS_FILE_NAME);
 		XMLOutputter output = new XMLOutputter();
 		output.output(odoc, new FileOutputStream(new File(imsLdFileName)));
 		
