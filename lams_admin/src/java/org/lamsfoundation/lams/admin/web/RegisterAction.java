@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action path="/register" parameter="method" name="RegisterForm" input=".register" scope="request" validate="false"
  * @struts.action-forward name="register" path=".register"
  * @struts.action-forward name="sysadmin" path=".sysadmin"
+ * @struts.action-forward name="success" path="http://lamscommunity.org/registration"
  * @struts.action-forward name="error" path=".error"
  */
 public class RegisterAction extends LamsDispatchAction {
@@ -117,18 +118,4 @@ public class RegisterAction extends LamsDispatchAction {
 		return mapping.findForward("register");
 	}
 	
-	public ActionForward register(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-		
-		if (isCancelled(request)) {
-			return mapping.findForward("sysadmin");
-		}
-		
-		DynaActionForm registerForm = (DynaActionForm) form;
-		
-		return mapping.findForward("sysadmin");
-	}
-
 }
