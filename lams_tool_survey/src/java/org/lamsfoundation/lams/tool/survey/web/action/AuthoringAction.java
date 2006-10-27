@@ -655,6 +655,10 @@ public class AuthoringAction extends Action {
 		else
 			file = (FormFile) surveyForm.getOnlineFile();
 		
+		if(file == null || StringUtils.isBlank(file.getFileName()))
+		    return mapping.findForward(SurveyConstants.SUCCESS);
+		
+		
 		ISurveyService service = getSurveyService();
 		//upload to repository
 		SurveyAttachment  att = service.uploadInstructionFile(file, type);
