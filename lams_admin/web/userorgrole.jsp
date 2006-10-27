@@ -13,8 +13,13 @@ function toggleCheckboxes(roleIndex, object){
     <logic:notEmpty name="pOrgId">
         : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
     </logic:notEmpty>
-    : <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />">
+    <logic:notEqual name="UserOrgRoleForm" property="orgId" value="1">
+		: <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />">
 		<bean:write name="orgName"/></a>
+	</logic:notEqual>
+	<logic:equal name="UserOrgRoleForm" property="orgId" value="1">
+		: <a href="usermanage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
+	</logic:equal>
 	: <fmt:message key="admin.user.assign.roles" />
 </h2>
 <p>&nbsp;</p>

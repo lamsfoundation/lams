@@ -12,7 +12,10 @@
 			<c:param name="typeId" value="2" />
 			<c:param name="parentId" value="${OrgManageForm.parentId}" />
 		</c:url>
-		<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
+		<p align="right">
+			<input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+			<input type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+		</p>
 	</logic:equal>
 </logic:equal>
 <logic:equal name="OrgManageForm" property="type" value="2">

@@ -10,7 +10,12 @@
 		: <a href="usermanage.do?org=<bean:write name="UserRolesForm" property="orgId" />"><c:out value="${orgName}" /></a>
 	</logic:notEmpty>
 	<logic:empty name="pOrgId">
-		: <a href="orgmanage.do?org=<bean:write name="UserRolesForm" property="orgId" />"><c:out value="${orgName}" /></a>
+		<logic:notEqual name="UserRolesForm" property="orgId" value="1">
+			: <a href="orgmanage.do?org=<bean:write name="UserRolesForm" property="orgId" />"><c:out value="${orgName}" /></a>
+		</logic:notEqual>
+		<logic:equal name="UserRolesForm" property="orgId" value="1">
+			: <a href="usermanage.do?org=<bean:write name="UserRolesForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
+		</logic:equal>
 	</logic:empty>
 	: <fmt:message key="admin.user.assign.roles"/>
 </h2>
