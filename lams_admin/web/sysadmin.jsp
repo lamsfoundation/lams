@@ -8,6 +8,8 @@
 
 <p><a href="config.do"><fmt:message key="sysadmin.config.settings.edit"/></a></p>
 
+<p><a href="toolcontentlist.do"><fmt:message key="sysadmin.edit.default.tool.content"/></a></p>
+
 <p><a href="usersearch.do"><fmt:message key="admin.user.find"/></a></p>
 
 <p><a href="importexcel.do"><fmt:message key="admin.user.import"/></a></p>
