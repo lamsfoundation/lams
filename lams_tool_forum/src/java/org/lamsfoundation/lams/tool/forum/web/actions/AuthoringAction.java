@@ -439,12 +439,9 @@ public class AuthoringAction extends Action {
 		else
 			file = (FormFile) forumForm.getOnlineFile();
 		
-		if(file == null || StringUtils.isBlank(file.getFileName())){
-			ActionMessages msg = new ActionMessages();
-			msg.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.uploading"));
-			saveErrors(request, msg);
+		if(file == null || StringUtils.isBlank(file.getFileName()))
 			return mapping.findForward("success");
-		}
+		
 		
 		forumService = getForumManager();
 		//upload to repository

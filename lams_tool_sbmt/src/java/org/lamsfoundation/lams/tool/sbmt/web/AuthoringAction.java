@@ -314,12 +314,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		else
 			file = (FormFile) authForm.getOnlineFile();
 		
-		if(file == null || StringUtils.isBlank(file.getFileName())){
-			ActionMessages msg = new ActionMessages();
-			msg.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("sbmt.web.action.upload.exception"));
-			saveErrors(request, msg);
+		if(file == null || StringUtils.isBlank(file.getFileName()))
 			return mapping.getInputForward();
-		}
 			
 		//upload to repository
 		InstructionFiles att = submitFilesService.uploadFileToContent(authForm.getToolContentID(), file, type);
