@@ -72,11 +72,11 @@ public class MessageForm extends ValidatorForm {
         ActionErrors errors = new ActionErrors(); 
         try{
             if (StringUtils.isBlank(message.getSubject())) {
-               ActionMessage error = new ActionMessage("error.valueReqd");
+               ActionMessage error = new ActionMessage("error.subject.required");
                errors.add("message.subject", error);
             }
             if (StringUtils.isBlank(message.getBody())) {
-            	ActionMessage error = new ActionMessage("error.valueReqd");
+            	ActionMessage error = new ActionMessage("error.body.required");
                errors.add("message.body", error);
             }
         } catch (Exception e) {

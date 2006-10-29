@@ -122,9 +122,7 @@
 								</c:otherwise>
 							</c:choose>
 						</c:if>
-					</div>
 
-					<div class="right-buttons">
 						<!--  Edit Button -->
 						<c:if test="${not hidden}">
 							<c:if
@@ -150,7 +148,6 @@
 								<fmt:message key="label.reply" />
 							</html:link>
 						</c:if>
-					</div>
 					</div>
 				</td>
 			</tr>
