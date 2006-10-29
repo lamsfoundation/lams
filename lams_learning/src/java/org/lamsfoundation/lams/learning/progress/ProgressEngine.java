@@ -241,8 +241,10 @@ public class ProgressEngine
             }
             //recurvisely call back to calculateProgress to calculate completed
             //parent activity.
-            else
+            else {
+    	        learnerProgress.setPreviousActivity(complexParent);
                 calculateProgress(learner, parent, learnerProgress);
+            }
         }
         //lesson is meant to be completed if there is no transition and no parent.
         else {

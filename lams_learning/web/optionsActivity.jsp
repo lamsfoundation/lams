@@ -57,7 +57,6 @@
 	
 	<html:form action="/ChooseActivity" method="POST">
 	<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-	<input type="hidden" name="inFrame" value="<c:out value="${optionsActivityForm.inFrame}" />" />
 	
 	<div id="content">
 
@@ -117,7 +116,6 @@
 	<html:form action="/CompleteActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityID}" />" />
-		<input type="hidden" name="inFrame" value="<c:out value="${optionsActivityForm.inFrame}" />" />
 		
 	</html:form>
 
