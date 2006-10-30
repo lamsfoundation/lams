@@ -84,16 +84,16 @@ public class IndexAction extends Action {
 		// only set header links if we are displaying 'active' organisations; i.e., on the index page
 		if(state.equals(OrganisationState.ACTIVE)){
 			List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
-			if (request.isUserInRole(Role.AUTHOR)) {
+			if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
 				log.debug("user is author");
 				headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 			}
 			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
-				log.debug("user is an admin or manager");
+				log.debug("user is a course admin or manager");
 				headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
 			}
-			if (request.isUserInRole(Role.SYSADMIN)) {
-				log.debug("user is sysadmin");
+			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
+				log.debug("user is sysadmin or author admin");
 				headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 			}
 			headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile()"));
