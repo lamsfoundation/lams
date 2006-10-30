@@ -67,9 +67,7 @@ public class ConfigurationKeys {
 
 	public static String CHAT_PORT_NUMBER = "ChatPortNumber";
 
-	public static String FILEMANAGER_DIRECTORY_NAME = "FileManagerDirectory";
-
-	public static String FILEMANAGER_EXE_EXTENSIONS = "ExecutableExtensions";
+	public static String EXE_EXTENSIONS = "ExecutableExtensions";
 
 	public static String LICENSE_TICKET_FILE = "TicketFile";
 
