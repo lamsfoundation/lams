@@ -96,7 +96,7 @@ public class UserRolesSaveAction extends Action {
 		if (roles.length < 1) {
 			errors.add("roles", new ActionMessage("error.roles.empty"));
 			saveErrors(request,errors);
-			request.setAttribute("rolelist",filterRoles(rolelist,request.isUserInRole(Role.SYSADMIN),org.getOrganisationType()));
+			request.setAttribute("rolelist",service.filterRoles(rolelist,request.isUserInRole(Role.SYSADMIN),org.getOrganisationType()));
 			request.setAttribute("login", user.getLogin());
 			request.setAttribute("fullName", user.getFullName());
 			return mapping.findForward("userroles");
@@ -116,23 +116,6 @@ public class UserRolesSaveAction extends Action {
 		}
 		
 		return mapping.findForward("userlist");
-	}
-	
-	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
-		List<Role> allRoles = new ArrayList<Role>();
-		allRoles.addAll(rolelist);
-		Role role = new Role();
-		if(!isSysadmin) {
-			role.setRoleId(Role.ROLE_SYSADMIN);
-			allRoles.remove(role);
-		}
-		if(orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-			role.setRoleId(Role.ROLE_COURSE_ADMIN);
-			allRoles.remove(role);
-			role.setRoleId(Role.ROLE_COURSE_MANAGER);
-			allRoles.remove(role);
-		}
-		return allRoles;
 	}
 
 }

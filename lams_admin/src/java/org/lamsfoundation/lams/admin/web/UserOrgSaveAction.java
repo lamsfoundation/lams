@@ -140,28 +140,11 @@ public class UserOrgSaveAction extends Action{
 			log.debug("no new users to add to orgId="+orgId);
 			return mapping.findForward("userlist");
 		}else{
-			request.setAttribute("roles",filterRoles(rolelist,false, organisation.getOrganisationType()));
+			request.setAttribute("roles",service.filterRoles(rolelist,false, organisation.getOrganisationType()));
 			request.setAttribute("newUserOrganisations",newUserOrganisations);
 			request.setAttribute("orgId",orgId);
 			return mapping.findForward("userorgrole");
 		}
-	}
-	
-	private List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType){
-		List<Role> allRoles = new ArrayList<Role>();
-		allRoles.addAll(rolelist);
-		Role role = new Role();
-		if(!isSysadmin) {
-			role.setRoleId(Role.ROLE_SYSADMIN);
-			allRoles.remove(role);
-		}
-		if(orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-			role.setRoleId(Role.ROLE_COURSE_ADMIN);
-			allRoles.remove(role);
-			role.setRoleId(Role.ROLE_COURSE_MANAGER);
-			allRoles.remove(role);
-		}
-		return allRoles;
 	}
 
 }
