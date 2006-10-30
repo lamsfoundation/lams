@@ -38,13 +38,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<tr>
 		<td width="10%" align="right">
-			<div style="overflow: auto;">		
 				<strong> <fmt:message key="label.question" />: </strong>
-			</div>								
 		</td>
 
 		<td width="60%" align="left">
-			<c:out value="${question}" escapeXml="false"/> 
+			<div style="overflow: auto;">				
+				<c:out value="${question}" escapeXml="false"/> 
+			</div>											
 		</td>		
 
 
