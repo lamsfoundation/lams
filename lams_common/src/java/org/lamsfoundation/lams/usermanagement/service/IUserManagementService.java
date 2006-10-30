@@ -30,13 +30,12 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 
 /**
@@ -321,4 +320,13 @@ public interface IUserManagementService {
 	 * @param rolesList
 	 */
 	public void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList);
+	
+	/**
+	 * Returns list of roles suitable for the given orgType.
+	 * @param rolelist
+	 * @param isSysadmin
+	 * @param orgType
+	 * @return
+	 */
+	public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType);
 }

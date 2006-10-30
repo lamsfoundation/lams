@@ -683,5 +683,29 @@ public class UserManagementService implements IUserManagementService {
 		save(user);
 	}
 
-	
+	public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType) {
+		List<Role> allRoles = new ArrayList<Role>();
+		allRoles.addAll(rolelist);
+		Role role = new Role();
+		if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE) || !isSysadmin) {
+			role.setRoleId(Role.ROLE_SYSADMIN);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_AUTHOR_ADMIN);
+			allRoles.remove(role);
+		} else {
+			role.setRoleId(Role.ROLE_AUTHOR);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_LEARNER);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_MONITOR);
+			allRoles.remove(role);
+		}
+		if(!orgType.getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
+			role.setRoleId(Role.ROLE_COURSE_ADMIN);
+			allRoles.remove(role);
+			role.setRoleId(Role.ROLE_COURSE_MANAGER);
+			allRoles.remove(role);
+		}
+		return allRoles;
+	}
 }
