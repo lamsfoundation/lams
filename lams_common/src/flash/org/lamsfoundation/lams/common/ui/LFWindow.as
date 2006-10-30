@@ -92,7 +92,7 @@ class LFWindow extends Window{
 		//Assign scroll pane content
 		content.contentPath = _scrollContentPath;
 		
-		if (_scrollContentPath = "AboutLams"){
+		if (_scrollContentPath == "AboutLams"){
 			resize_mc._visible = false
 		}
 
