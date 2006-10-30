@@ -195,7 +195,8 @@ public class AuthoringAction extends Action {
 					Iterator iter = forum.getMessages().iterator();
 					while(iter.hasNext()){
 						Message topic = (Message) iter.next();
-						if(topic.getCreatedBy() == null){
+						//contentFolderID != -1 means it is sysadmin: LDEV-906 
+						if(topic.getCreatedBy() == null && !StringUtils.equals(contentFolderID,"-1")){
 							//get login user (author)
 							HttpSession ss = SessionManager.getSession();
 							//get back login user DTO
@@ -211,16 +212,18 @@ public class AuthoringAction extends Action {
 			}else{
 				topics = forumService.getAuthoredTopics(forum.getUid());
 				//failure tolerance: if current contentID is defaultID, the createBy will be null.
-				for (MessageDTO messageDTO : topics) {
-					if(StringUtils.isBlank(messageDTO.getAuthor())){
-						//get login user (author)
-						HttpSession ss = SessionManager.getSession();
-						//get back login user DTO
-						UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-						ForumUser fuser = new ForumUser(user,null);
-						messageDTO.setAuthor(fuser.getFirstName()+" "+fuser.getLastName());
+				//contentFolderID != -1 means it is sysadmin: LDEV-906 
+				if(!StringUtils.equals(contentFolderID,"-1"))
+					for (MessageDTO messageDTO : topics) {
+						if(StringUtils.isBlank(messageDTO.getAuthor())){
+							//get login user (author)
+							HttpSession ss = SessionManager.getSession();
+							//get back login user DTO
+							UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+							ForumUser fuser = new ForumUser(user,null);
+							messageDTO.setAuthor(fuser.getFirstName()+" "+fuser.getLastName());
+						}
 					}
-				}
 			}
 			//initialize attachmentList
 			List attachmentList = getAttachmentList(sessionMap);
@@ -281,16 +284,20 @@ public class AuthoringAction extends Action {
 			forumService = getForumManager();
 			
 			//*******************************Handle user*******************
-			//try to get form system session
-			HttpSession ss = SessionManager.getSession();
-			//get back login user DTO
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
-			if(forumUser == null){
-				forumUser = new ForumUser(user,null);
-				forumService.createUser(forumUser);
-			}
-			
+			String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+			ForumUser forumUser = null;
+			//check whether it is sysadmin:LDEV-906 
+			if(!StringUtils.equals(contentFolderID,"-1" )){
+				//try to get form system session
+				HttpSession ss = SessionManager.getSession();
+				//get back login user DTO
+				UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+				forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
+				if(forumUser == null){
+					forumUser = new ForumUser(user,null);
+					forumService.createUser(forumUser);
+				}
+			}			
 			//**********************************Get Forum PO*********************
 			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
 			if(forumPO == null){
@@ -584,7 +591,9 @@ public class AuthoringAction extends Action {
 		
 		//check whether this user exist or not
 		ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
-		if(forumUser == null){
+		String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		//check whether it is sysadmin:LDEV-906 
+		if(forumUser == null && !StringUtils.equals(contentFolderID,"-1" )){
 			//if user not exist, create new one in database
 			forumUser = new ForumUser(user,null);
 		}
