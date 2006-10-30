@@ -242,7 +242,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String retVal="0";
 		String newName="";
 		
-		if(!commandStr.equals("FileUpload"))
+		if(!commandStr.equals("FileUpload") || !isEnabled(currentFolderStr))
 			retVal="203";
 		else {
 			DiskFileUpload upload = new DiskFileUpload();
@@ -354,6 +354,13 @@ public class LAMSConnectorServlet extends HttpServlet {
 	 */
 	private String getExtension(String fileName) {
 		return fileName.substring(fileName.lastIndexOf(".")+1);
+	}
+	
+	private boolean isEnabled(String contentID) {
+		if(contentID.equals("/-1/"))
+			return false;
+		else
+			return true;
 	}
 
 

@@ -140,9 +140,24 @@ public class LAMSUploadServlet extends HttpServlet {
 		response.setHeader("Cache-Control","no-cache");
 		PrintWriter out = response.getWriter();
 		
-
+		String retVal="0";
+		String newName="";
+		String fileUrl="";
+		String errorMessage="";
+		
 		String typeStr=request.getParameter("Type");
 		String currentFolderStr=request.getParameter("CurrentFolder");
+		
+		if(!isEnabled(currentFolderStr)) {
+			retVal="203";
+			out.println("<script type=\"text/javascript\">");
+			out.println("window.parent.OnUploadCompleted("+retVal+",'"+fileUrl+"','"+newName+"','"+errorMessage+"');");
+			out.println("</script>");
+			out.flush();
+			out.close();
+			return;
+		}
+			
 		
 		//String currentPath=baseDir+typeStr;
 		//String currentDirPath=getServletContext().getRealPath(currentPath);
@@ -168,11 +183,6 @@ public class LAMSUploadServlet extends HttpServlet {
 		}
 		
 		if (debug) System.out.println(currentDirPath);
-		
-		String retVal="0";
-		String newName="";
-		String fileUrl="";
-		String errorMessage="";
 		
 		if(enabled) {		
 			DiskFileUpload upload = new DiskFileUpload();
@@ -297,6 +307,13 @@ public class LAMSUploadServlet extends HttpServlet {
 	 				return false;
 	 
 	 		return false;
+	 }
+	 
+	 private boolean isEnabled(String contentID) {
+		 if(contentID.equals("/-1/"))
+			 return false;
+		 else
+			 return true;
 	 }
 
 }
