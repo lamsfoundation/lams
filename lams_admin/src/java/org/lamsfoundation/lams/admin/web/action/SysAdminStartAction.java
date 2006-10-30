@@ -1,0 +1,87 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.admin.web.action;
+
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.admin.web.dto.LinkBean;
+import org.lamsfoundation.lams.usermanagement.Role;
+
+/**
+ * @author jliew
+ *
+ * @struts.action path="/sysadminstart" validate="false"
+ * @struts.action-forward name="sysadmin" path=".sysadmin"
+ */
+public class SysAdminStartAction extends Action {
+	
+	public ActionForward execute(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		ArrayList<LinkBean> links = new ArrayList<LinkBean>();
+		if (request.isUserInRole(Role.SYSADMIN)) {
+			LinkBean linkBean = new LinkBean("cache.do", "cache.title");
+			links.add(linkBean);
+			linkBean = new LinkBean("config.do", "sysadmin.config.settings.edit");
+			links.add(linkBean);
+			linkBean = new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content");
+			links.add(linkBean);
+			linkBean = new LinkBean("usersearch.do", "admin.user.find");
+			links.add(linkBean);
+			linkBean = new LinkBean("importexcel.do", "admin.user.import");
+			links.add(linkBean);
+			linkBean = new LinkBean("disabledmanage.do", "admin.list.disabled.users");
+			links.add(linkBean);
+			linkBean = new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage");
+			links.add(linkBean);
+			linkBean = new LinkBean("serverlist.do", "sysadmin.maintain.external.servers");
+			links.add(linkBean);
+			linkBean = new LinkBean("register.do", "sysadmin.register.server");
+			links.add(linkBean);
+		} else if (request.isUserInRole(Role.AUTHOR_ADMIN)) {
+			LinkBean linkBean = new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content");
+			links.add(linkBean);
+		} else {
+			request.setAttribute("errorName", "SysAdminStartAction");
+			request.setAttribute("errorMessage", AdminServiceProxy
+					.getMessageService(getServlet().getServletContext())
+					.getMessage("error.authorisation"));
+			return mapping.findForward("error");
+		}
+		
+		request.setAttribute("links", links);
+		return mapping.findForward("sysadmin");
+	}
+
+}

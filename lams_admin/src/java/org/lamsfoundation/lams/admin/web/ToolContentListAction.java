@@ -63,7 +63,7 @@ public class ToolContentListAction extends Action {
             HttpServletResponse response) throws Exception {
 		
 		// check permission
-		if(!request.isUserInRole(Role.SYSADMIN)){
+		if(!(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN))){
 			request.setAttribute("errorName","ToolContentListAction");
 			request.setAttribute("errorMessage",AdminServiceProxy.getMessageService(getServlet().getServletContext())
 				.getMessage("error.authorisation"));

@@ -1,4 +1,0 @@
-    <action
-      path="/sysadminstart"
-      forward=".sysadmin"
-    />

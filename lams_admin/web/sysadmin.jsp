@@ -2,23 +2,13 @@
 
 <h1 class=no-tabs-below><fmt:message key="sysadmin.headline"/></h1>
 <br />
-<p><a href="cache.do"><fmt:message key="cache.title"/></a></p>
 
-<p><fmt:message key="sysadmin.batch.temp.file.delete"/></p>
+<logic:iterate name="links" id="linkBean">
+	<p>
+		<a href="<bean:write name="linkBean" property="link"/>">
+			<fmt:message><bean:write name="linkBean" property="name"/></fmt:message>
+		</a>
+	</p>
+</logic:iterate>
 
-<p><a href="config.do"><fmt:message key="sysadmin.config.settings.edit"/></a></p>
-
-<p><a href="toolcontentlist.do"><fmt:message key="sysadmin.edit.default.tool.content"/></a></p>
-
-<p><a href="usersearch.do"><fmt:message key="admin.user.find"/></a></p>
-
-<p><a href="importexcel.do"><fmt:message key="admin.user.import"/></a></p>
-
-<p><a href="disabledmanage.do"><fmt:message key="admin.list.disabled.users"/></a></p>
-
-<p><a href="loginmaintain.do"><fmt:message key="sysadmin.maintain.loginpage"/></a></p>
-
-<p><a href="serverlist.do"><fmt:message key="sysadmin.maintain.external.servers"/></a></p>
-
-<p><a href="register.do"><fmt:message key="sysadmin.register.server"/></a><p>
 
