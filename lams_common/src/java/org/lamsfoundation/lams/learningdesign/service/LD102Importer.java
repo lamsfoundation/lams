@@ -129,6 +129,12 @@ public class LD102Importer implements ApplicationContextAware{
 	private Map<Integer, Integer> flattenedActivityMap = new HashMap<Integer, Integer>();
 	/** store the content by content id field, ready for use when the matching activity is processed */
 	private Map<Integer, Hashtable> contentMap = new HashMap<Integer, Hashtable>();
+	/** Count the number of the top level activities that we find in the XML. Compare this to the number
+	 * of top level transitions and if there are more transitions than activities then we know we can ignore 
+	 * some transitions quite safely. */
+	private int numberOfTopLevelActivitiesInXML = 0;
+	/** Count the number of the top level transitions that we find in the XML. */
+	private int numberOfTopLevelTransitionsInXML = 0;
 
 	/** basic library activity used for the image and activityCategoryID
 	 * to use for each tool, based on the library activities in the database. 
@@ -323,6 +329,8 @@ public class LD102Importer implements ApplicationContextAware{
 		this.libraryActivityForTool = getLibraryActivityForTool();
 		this.toolImportSupport = getToolImportSupport();
 		this.toolsErrorMsgs = toolsErrorMsgs;
+		this.numberOfTopLevelActivitiesInXML = 0;
+		this.numberOfTopLevelTransitionsInXML = 0;
 			
 		if ( toolsErrorMsgs == null ) {
 			log.warn("The list toolsErrorMsgs supplied is null so any warnings will be logged but won't appear in the user's screen.");
@@ -459,8 +467,11 @@ public class LD102Importer implements ApplicationContextAware{
 		ldInProgress.setMaxID(maxId);
 		
 		// all activities are set up so now we can do the transitions
+		// some .las files have more transitions than activities - a bug in 1.0.2
+		// if this is the case, we ignore the extra transitions.
+		boolean showErrorOnTransitionWithNoActivity = (numberOfTopLevelTransitionsInXML < numberOfTopLevelActivitiesInXML);
 		for ( Hashtable transTable: transitionsToDo ) {
-			setupTransition(transTable);
+			setupTransition(transTable, showErrorOnTransitionWithNoActivity);
 		}
 		
 		// now set up the activity -> grouping defn links. Can't be done earlier as there
@@ -553,14 +564,17 @@ public class LD102Importer implements ApplicationContextAware{
 				}
 	
 				if ( isActivity(objectType) ) {
+					numberOfTopLevelActivitiesInXML++;
 					processActivity(clientObj, objId);
 				}
 				else if ( isOptionalActivity(objectType) ) {
 					// put aside for processing later.
+					numberOfTopLevelActivitiesInXML++;
 					optionalActivitiesToDo.add(clientObj);				
 				}	
 				else				{
 					// put aside for processing later.
+					numberOfTopLevelTransitionsInXML++;
 					transitionsToDo.add(clientObj);
 				}
 				
@@ -1138,7 +1152,7 @@ public class LD102Importer implements ApplicationContextAware{
 	 * @param ui_id - Flash assigned id.
 	 * @param transition - transition to update
 	 */
-	protected void setupTransition( Hashtable clientObj) {
+	protected void setupTransition( Hashtable clientObj, boolean showErrorOnTransitionWithNoActivity) {
 	
 		try {
 		    Transition transition = new Transition();
@@ -1178,8 +1192,10 @@ public class LD102Importer implements ApplicationContextAware{
 			} 
 			if ( transition.getToActivity() == null ) {
 				String msg = "Can't find matching activity "+toActivity+" for transition. Transition will be missing in the design. Transition "+clientObj;
-				log.error(msg);
-				toolsErrorMsgs.add(msg);
+				log.warn(msg);
+				if ( showErrorOnTransitionWithNoActivity ) {
+					toolsErrorMsgs.add(msg);
+				}
 				return;
 			}
 				
@@ -1194,8 +1210,10 @@ public class LD102Importer implements ApplicationContextAware{
 			} 
 			if ( transition.getFromActivity() == null ) {
 				String msg = "Can't find matching activity "+fromActivity+" for transition. Transition will be missing in the design. Transition "+clientObj;
-				log.error(msg);
-				toolsErrorMsgs.add(msg);
+				log.warn(msg);
+				if ( showErrorOnTransitionWithNoActivity ) {
+					toolsErrorMsgs.add(msg);
+				}
 				return;
 			}
 			
