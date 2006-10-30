@@ -910,7 +910,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					log.debug("Tool content import success.");
 				}catch (Exception e) {
 					String error = getMessageService().getMessage(ERROR_SERVICE_ERROR,new Object[]{newTool.getToolDisplayName(),e.toString()});
-					log.error(error);
+					log.error(error,e);
 					toolsErrorMsgs.add(error);
 					//remove any unsucessed activities from new Learning design.
 					removedActMap.put(activity.getActivityID(), activity);
