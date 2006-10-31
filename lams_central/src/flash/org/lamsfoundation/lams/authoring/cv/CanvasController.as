@@ -251,6 +251,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				}
 			}
 		}
+		_canvasModel.getCanvas().ddm.validDesign = false;
+		_canvasModel.getCanvas().checkValidDesign();
     }
    
 	/**
