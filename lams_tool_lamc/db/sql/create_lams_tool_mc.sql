@@ -109,7 +109,7 @@ CREATE TABLE tl_lamc11_uploadedfile (
                   REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced , created_by , run_offline , define_later,  offline_instructions, online_instructions, content_in_use, retries, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ Title', 'MCQ Instructions', NOW(), 0, 0, 1, 0, 0, 'offline instructions','online instructions', 0, 0, 0, 0);
+INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced , created_by , run_offline , define_later,  offline_instructions, online_instructions, content_in_use, retries, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ', 'Instructions', NOW(), 0, 0, 1, 0, 0, '','', 0, 0, 0, 0);
 
 INSERT INTO tl_lamc11_que_content  (uid,question, mark, display_order,  mc_content_id) VALUES (1, 'A Sample question?', 1,1,1);
 	

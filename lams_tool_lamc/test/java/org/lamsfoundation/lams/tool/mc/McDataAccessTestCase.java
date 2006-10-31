@@ -118,8 +118,8 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 		mc.setCreatedBy(0);
 		mc.setRunOffline(false);
 	    mc.setDefineLater(false);
-	    mc.setOnlineInstructions("online instructions...");
-	    mc.setOfflineInstructions("offline instructions...");
+	    mc.setOnlineInstructions("");
+	    mc.setOfflineInstructions("");
 	    mc.setContentInUse(false);
 	    mc.setRetries(false);
 	    mc.setMcQueContents(new HashSet());

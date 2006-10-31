@@ -64,13 +64,13 @@ public interface McAppConstants {
 	public static final String ACTIVITY_INSTRUCTIONS_KEY				= "activityInstructionsKey";
 	public static final String LIST_QUESTION_CONTENT_DTO				= "listQuestionContentDTO";
 	public static final String LIST_QUESTION_CONTENT_DTO_KEY			= "listQuestionContentDTOKey";
-	public static final String DEFAULT_ONLINE_INST						="online instructions";
-	public static final String DEFAULT_OFFLINE_INST						="offline instructions";
+	public static final String DEFAULT_ONLINE_INST						="";
+	public static final String DEFAULT_OFFLINE_INST						="";
 	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
 	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
 	public static final String MAP_QUESTION_CONTENT_KEY					= "mapQuestionContentKey";
-	public static final String DEFAULT_MC_TITLE							="MCQ Title";
-	public static final String DEFAULT_MC_INSTRUCTIONS					="MCQ Instructions";
+	public static final String DEFAULT_MC_TITLE							="MCQ";
+	public static final String DEFAULT_MC_INSTRUCTIONS					="Instructions";
 	public static final String LOAD_VIEW_ONLY							="loadViewOnly";
 	public static final String MC_GENERAL_AUTHORING_DTO					="mcGeneralAuthoringDTO";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
@@ -129,8 +129,8 @@ public interface McAppConstants {
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
     
-    public static final String DEFAULT_MCQ_TITLE 						= "MCQ Title";
-    public static final String DEFAULT_MCQ_INSTRUCTIONS					= "MCQ Instructions";
+    public static final String DEFAULT_MCQ_TITLE 						= "MCQ";
+    public static final String DEFAULT_MCQ_INSTRUCTIONS					= "Instructions";
     
     /*
      * refers to number of questions presented initially, we have a single record for default content
