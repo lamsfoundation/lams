@@ -77,6 +77,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	******************************************************************/
 	public static var TOOL_ACTIVITY_TYPE:Number = 1;
 	public static var GROUPING_ACTIVITY_TYPE:Number = 2;
+	public static var NO_GATE_ACTIVITY_TYPE:Number = 30
 	public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
 	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
@@ -191,6 +192,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static function getGateActivityTypes():Array{
 		var types:Array = [];
 		//types.addItem({label: Dictionary.getValue('none_act_lbl'), data: 0});
+		types.addItem({label: Dictionary.getValue('trans_dlg_nogate'), data: NO_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('synch_act_lbl'), data: SYNCH_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('sched_act_lbl'), data: SCHEDULE_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('perm_act_lbl'), data: PERMISSION_GATE_ACTIVITY_TYPE});
