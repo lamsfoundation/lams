@@ -196,6 +196,7 @@ class WorkspaceDialog extends MovieClip{
 		this.tabChildren = true;
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		setTabIndex();
+		
     }
 	
 	/**
@@ -585,6 +586,9 @@ class WorkspaceDialog extends MovieClip{
 			setPropertiesContentVisible(false);
 			//setTabIndex("LOCATION");
 			_currentTab = LOCATION_TAB;
+			if(_workspaceModel.currentMode == Workspace.MODE_OPEN){
+				switchView_tab.visible = false;
+			}
 						
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
