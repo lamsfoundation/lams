@@ -148,6 +148,19 @@
       <session-timeout>120</session-timeout>
    </session-config>
 
+	<error-page>
+        <error-code>500</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404.jsp</location>
+    </error-page>
+
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
    Organize mime-mappings.xml following this DTD slice:
