@@ -1,6 +1,7 @@
 -- CVS ID: $Id$
  
 SET FOREIGN_KEY_CHECKS=0;
+
 drop table if exists tl_lachat11_attachment;
 drop table if exists tl_lachat11_chat;
 drop table if exists tl_lachat11_message;
@@ -18,7 +19,30 @@ alter table tl_lachat11_message add index FKCC08C1DCCF3BF9B6 (from_user_uid), ad
 alter table tl_lachat11_session add index FK96E446B1A3926E3 (chat_uid), add constraint FK96E446B1A3926E3 foreign key (chat_uid) references tl_lachat11_chat (uid);
 alter table tl_lachat11_user add index FK4EB82169C8469FC (chat_session_uid), add constraint FK4EB82169C8469FC foreign key (chat_session_uid) references tl_lachat11_session (uid);
 
-INSERT INTO tl_lachat11_chat (title,instructions,online_instructions,offline_instructions,tool_content_id,run_offline,lock_on_finished,filtering_enabled, content_in_use,define_later, reflect_on_activity) 
-VALUES("LAMS Chat","Chat Instruction","Online instructions","Offline instructions",${default_content_id},0,0,0,0,0,0);
+INSERT INTO tl_lachat11_chat (
+	title,
+	instructions,
+	online_instructions,
+	offline_instructions,
+	tool_content_id,
+	run_offline,
+	lock_on_finished,
+	filtering_enabled,
+	content_in_use,
+	define_later,
+	reflect_on_activity) 
+VALUES(
+	"Chat",
+	"Instructions",
+	"",
+	"",
+	${default_content_id},
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
+);
 
 SET FOREIGN_KEY_CHECKS=1;

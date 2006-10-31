@@ -36,10 +36,10 @@ INSERT INTO tl_lascrb11_scribe (
 	auto_select_scribe) 
 VALUES(
 	1,
-	"LAMS Scribe",
-	"Scribe Instruction",
-	"Online instructions",
-	"Offline instructions",
+	"Scribe",
+	"Instructions",
+	"",
+	"",
 	${default_content_id},
 	0,
 	1,

@@ -13,7 +13,28 @@ alter table tl_lantbk11_attachment add index FK12090F57FC940906 (notebook_uid), 
 alter table tl_lantbk11_session add index FKB7C198E2FC940906 (notebook_uid), add constraint FKB7C198E2FC940906 foreign key (notebook_uid) references tl_lantbk11_notebook (uid);
 alter table tl_lantbk11_user add index FKCB8A58FFA3B0FADF (notebook_session_uid), add constraint FKCB8A58FFA3B0FADF foreign key (notebook_session_uid) references tl_lantbk11_session (uid);
 
-INSERT INTO tl_lantbk11_notebook (title,instructions,online_instructions,offline_instructions,tool_content_id,run_offline,lock_on_finished,content_in_use,define_later, allow_rich_editor) 
-VALUES("LAMS Notebook","Notebook Instruction","Online instructions","Offline instructions",${default_content_id},0,0,0,0,0);
+INSERT INTO tl_lantbk11_notebook (
+	title,
+	instructions,
+	online_instructions,
+	offline_instructions,
+	tool_content_id,
+	run_offline,
+	lock_on_finished,
+	content_in_use,
+	define_later,
+	allow_rich_editor) 
+VALUES(
+	"Notebook",
+	"Instructions",
+	"",
+	"",
+	${default_content_id},
+	0,
+	0,
+	0,
+	0,
+	0
+);
 
 SET FOREIGN_KEY_CHECKS=1;
