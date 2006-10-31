@@ -32,5 +32,11 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
  * methods to be implemented by the Hibernate or other implementation.
  */
 public interface IScribeHeadingDAO extends IBaseDAO {
-	
+
+	/**
+	 * Delete relative ScribeReportEntries for given ScribeHeading.
+	 * @param headingUid
+	 * @return
+	 */
+	boolean deleteReport(Long headingUid);
 }

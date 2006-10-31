@@ -24,9 +24,26 @@
 
 package org.lamsfoundation.lams.tool.scribe.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeHeadingDAO;
+import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 
 public class ScribeHeadingDAO extends BaseDAO implements IScribeHeadingDAO {
+
+	private static final String SQL_DELETE_REPORT="from " + ScribeReportEntry.class.getName() + " as r where r.scribeHeading.uid=?"; 
+	public boolean deleteReport(Long headingUid) {
+		List<ScribeReportEntry> reports = this.getHibernateTemplate().find(SQL_DELETE_REPORT,new Object[]{headingUid});
+		if(reports.isEmpty())
+			return false;
+		
+		for (ScribeReportEntry report: reports) {
+			getHibernateTemplate().delete(report);
+		}
+		
+		return true;
+	}
 	
+
 }

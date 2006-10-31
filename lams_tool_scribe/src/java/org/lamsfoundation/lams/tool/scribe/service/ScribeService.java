@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeAttachmentDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeDAO;
+import org.lamsfoundation.lams.tool.scribe.dao.IScribeHeadingDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeSessionDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeUserDAO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
@@ -80,6 +81,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 /**
  * An implementation of the IScribeService interface.
@@ -96,6 +98,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	private IScribeDAO scribeDAO = null;
 
 	private IScribeSessionDAO scribeSessionDAO = null;
+	
+	private IScribeHeadingDAO scribeHeadingDAO = null;
 
 	private IScribeUserDAO scribeUserDAO = null;
 
@@ -136,18 +140,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		Scribe scribe = scribeDAO.getByContentId(toolContentId);
 		session.setScribe(scribe);
 		
-		// creating scribeReports for each heading and add to session.
-		Set reports = new HashSet();
-		for (Iterator iter = scribe.getScribeHeadings().iterator(); iter.hasNext();) {
-			ScribeHeading heading = (ScribeHeading) iter.next();
-			
-			ScribeReportEntry report = new ScribeReportEntry();
-			report.setScribeHeading(heading);
-			
-			reports.add(report);			
-		}
-		
-		session.setScribeReportEntries(reports);
 		session.setForceComplete(false);
 		session.setReportSubmitted(false);
 		scribeSessionDAO.saveOrUpdate(session);
@@ -307,6 +299,37 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	}
 
 	/* ********** IScribeService Methods ************************************** */
+
+	public void createReportEntry(Long toolSessionId){
+		// creating scribeReports for each heading and add to session.
+		ScribeSession session = scribeSessionDAO.getBySessionId(toolSessionId);
+		
+		//these heading report already copied from content, the skipit.
+		Set entries = session.getScribeReportEntries();
+		if(entries != null && entries.size() > 0)
+			return;
+		
+		Scribe scribe = session.getScribe();
+		Set reports = session.getScribeReportEntries();
+		if(reports == null){
+			reports = new HashSet();
+			session.setScribeReportEntries(reports);
+		}
+		for (Iterator iter = scribe.getScribeHeadings().iterator(); iter.hasNext();) {
+			ScribeHeading heading = (ScribeHeading) iter.next();
+			
+			ScribeReportEntry report = new ScribeReportEntry();
+			report.setScribeHeading(heading);
+			
+			reports.add(report);
+		}
+		scribeSessionDAO.update(session);
+
+	}
+	public void deleteHeadingReport(Long uid) {
+		scribeHeadingDAO.deleteReport(uid);
+		
+	}
 	public Long getDefaultContentIdBySignature(String toolSignature) {
 		Long toolContentId = null;
 		toolContentId = new Long(toolService
@@ -661,4 +684,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     	scribe.setReflectInstructions(description);
     }
     //=========================================================================================
+
+	public void setScribeHeadingDAO(IScribeHeadingDAO scribeHeadingDAO) {
+		this.scribeHeadingDAO = scribeHeadingDAO;
+	}
 }

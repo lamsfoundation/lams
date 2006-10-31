@@ -102,6 +102,13 @@ public class LearningAction extends LamsDispatchAction {
 			scribeService = ScribeServiceProxy.getScribeService(this
 					.getServlet().getServletContext());
 		}
+		//try to clone scribe heading from content. This method will execute 
+		//for every new learner enter, but the heading only copied once.
+		try{
+			scribeService.createReportEntry(toolSessionID);
+		} catch (ObjectOptimisticLockingFailureException e) {
+			log.debug("Multiple learner get into scribe simultaneously. Cloning report entry skipped");
+		}
 
 		// Retrieve the session and content.
 		ScribeSession scribeSession = scribeService

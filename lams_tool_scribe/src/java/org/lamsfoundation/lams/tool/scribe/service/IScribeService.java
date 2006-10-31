@@ -149,4 +149,16 @@ public interface IScribeService {
 
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
+
+	/**
+	 * Delete heading's report by given heading UID.
+	 * @param uid
+	 */
+	public void deleteHeadingReport(Long uid);
+	
+	/**
+	 * Clone heading from scribe content.
+	 * @param toolSessionId
+	 */
+	public void createReportEntry(Long toolSessionId);
 }

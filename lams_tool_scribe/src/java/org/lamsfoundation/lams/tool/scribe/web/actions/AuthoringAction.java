@@ -198,11 +198,44 @@ public class AuthoringAction extends LamsDispatchAction {
 		// update headings.
 		List<ScribeHeading> updatedHeadings = getHeadingList(map);
 		Set currentHeadings = scribe.getScribeHeadings();
-		currentHeadings.clear();
 		for (ScribeHeading heading : updatedHeadings) {
-			heading.setUid(null);
-			currentHeadings.add(heading);
+			//it is update
+			if(heading.getUid() != null){
+				Iterator iter = currentHeadings.iterator();
+				while(iter.hasNext()){
+					ScribeHeading currHeading = (ScribeHeading) iter.next();
+					if(heading.getUid().equals(currHeading.getUid())){
+						//update fields
+						currHeading.setHeadingText(heading.getHeadingText());
+						currHeading.setDisplayOrder(heading.getDisplayOrder());
+						break;
+					}
+				}// go to next heading from page
+			}else{
+				currentHeadings.add(heading);
+			}
 		}
+		//remove deleted heading. 
+		Iterator iter = currentHeadings.iterator();
+		while(iter.hasNext()){
+			ScribeHeading currHeading = (ScribeHeading) iter.next();
+			//skip new added heading
+			if(currHeading.getUid() == null)
+				continue;
+			boolean find =false;
+			for (ScribeHeading heading : updatedHeadings) {
+				if(currHeading.getUid().equals(heading.getUid())){
+					find = true;
+					break;
+				}
+			}
+			if(!find){
+				//delete current heading's report first
+				scribeService.deleteHeadingReport(currHeading.getUid());
+				iter.remove();
+			}
+		}
+		
 
 		// set the update date
 		scribe.setUpdateDate(new Date());

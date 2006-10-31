@@ -34,6 +34,7 @@
 				<property name="scribeAttachmentDAO"><ref bean="lascrbScribeAttachmentDAO"/></property>
 				<property name="scribeSessionDAO"><ref bean="lascrbScribeSessionDAO"/></property>
 				<property name="scribeUserDAO"><ref bean="lascrbScribeUserDAO"/></property>
+				<property name="scribeHeadingDAO"><ref bean="lascrbScribeHeadingDAO"/></property>
 				<property name="scribeDAO"><ref bean="lascrbScribeDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
@@ -78,6 +79,9 @@
 		<property name="sessionFactory"><ref local="lascrbScribeSessionFactory"/></property>
 	</bean>
 	
+	<bean id="lascrbScribeHeadingDAO" class="org.lamsfoundation.lams.tool.scribe.dao.hibernate.ScribeHeadingDAO">
+		<property name="sessionFactory"><ref local="lascrbScribeSessionFactory"/></property>
+	</bean>
 	<bean id="lascrbScribeAttachmentDAO" class="org.lamsfoundation.lams.tool.scribe.dao.hibernate.ScribeAttachmentDAO">
 		<property name="sessionFactory"><ref local="lascrbScribeSessionFactory"/></property>
 	</bean>
