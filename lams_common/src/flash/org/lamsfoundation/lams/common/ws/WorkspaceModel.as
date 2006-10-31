@@ -313,8 +313,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			if(dto.contents[i].resourceType==RT_FOLDER){
 				cNode.attributes.isBranch=true;	
 				
+				// no longer force open Organisation virtual folder
 				// force open the Organisation virtual folder when opening My Workspace (root) virtual folder
-				if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
+				//if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
 			
 			}else{
 				

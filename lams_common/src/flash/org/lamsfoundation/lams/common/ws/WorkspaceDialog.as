@@ -355,10 +355,11 @@ class WorkspaceDialog extends MovieClip{
 			treeview.selectedNode = nodeToOpen.firstChild;
 			dispatchEvent({type:'change', target:this.treeview});
 			
-			var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
-			if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !treeview.getIsOpen(virNode)){
-				openFolder(virNode, wm);
-			}
+			// no longer force open the Organisation virtual folder
+			//var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
+			//if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !treeview.getIsOpen(virNode)){
+			//	openFolder(virNode, wm);
+			//}
 		}
 		
 		refreshTree();
