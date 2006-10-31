@@ -555,12 +555,12 @@ class PropertyInspectorNew extends MovieClip{
 		minsEnd_lbl.visible = v;
 		hours_stp.visible = v;
 		mins_stp.visible = v;
-		endHours_stp.visible = v;
-		endMins_stp.visible = v;
+		//endHours_stp.visible = v;
+		//endMins_stp.visible = v;
 		gateType_lbl.visible = v;
 		gateType_cmb.visible = v;
 		startOffset_lbl.visible = v;
-		endOffset_lbl.visible = v;
+		//endOffset_lbl.visible = v;
 		
 	}
 	
