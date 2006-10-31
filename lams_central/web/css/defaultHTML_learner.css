@@ -34,6 +34,8 @@ a:hover {
 	border-bottom: 1px solid #47bc23;
 }
 
+strong {color:#333;}
+
 .row {
 	voice-family: "\"}\""; /* hide the following rules from IE5 */
 	voice-family: inherit;
@@ -62,10 +64,11 @@ h3 {color:#47bc23;
 	margin-bottom:5px; } 
 
 
-h4 {color:#47bc23; 
-	font-size:12px;
-	margin-left:25px; 
-	padding-top:20px;
+h4 {color:#0087e5; 
+	font-size:11px;
+	margin-top:10px;
+	margin-bottom:10px;
+	padding:0;
 	}
 
 /*defines when instructions are given and places a blue arrow before the text */
@@ -91,6 +94,8 @@ ul {
 	margin-left: 25px;
 	margin-right: 30px;
 }
+
+li { list-style-type:square;}
 
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
@@ -178,12 +183,13 @@ table {
 
 td { 
 	padding:10px; 
-	font-size:12px;
+	font-size:11px;
+	vertical-align:top;
 }
 
 td p{ 
 	padding:10px; 
-	font-size:12px; 
+	font-size:11px; 
 	line-height:18px;
 }
 
@@ -420,7 +426,9 @@ input:hover.button {
 
 .text-area {width:99%}
 
-.shading-bg {padding:5px; padding-left:10px;  padding-top:10px; margin-top:20px; margin-bottom:10px; width:100%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px}
+.shading-bg {padding:5px; padding-left:10px;  padding-top:10px; margin-top:10px; margin-bottom:10px; width:99%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px}
+
+.last-item {border-top:1px solid #ccc; height:20px;}
 
 .indent {margin-left:20px;}
 
