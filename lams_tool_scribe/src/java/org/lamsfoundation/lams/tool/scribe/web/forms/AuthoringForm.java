@@ -51,8 +51,6 @@ public class AuthoringForm extends ActionForm {
 
 	String onlineInstruction;
 	
-	boolean lockOnFinished;
-
 	boolean reflectOnActivity;
 	
 	String reflectInstructions;
@@ -114,14 +112,6 @@ public class AuthoringForm extends ActionForm {
 
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
-	}
-	
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
-
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
 	}
 
 	public FormFile getOfflineFile() {

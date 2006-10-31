@@ -3,16 +3,6 @@
 <!-- ========== Advanced Tab ========== -->
 
 <p class="small-space-top">
-	<html:checkbox property="lockOnFinished" styleClass="noBorder"
-		styleId="lockOnFinished" disabled="true">
-	</html:checkbox>
-
-	<label for="lockOnFinished">
-		<fmt:message key="advanced.lockOnFinished" />
-	</label>
-</p>
-
-<p>
 	<html:checkbox property="reflectOnActivity" value="1"
 		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
 

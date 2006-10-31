@@ -493,7 +493,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		scribe.setInstructions(authForm.getInstructions());
 		scribe.setOfflineInstructions(authForm.getOnlineInstruction());
 		scribe.setOnlineInstructions(authForm.getOfflineInstruction());
-		scribe.setLockOnFinished(authForm.isLockOnFinished());
 		scribe.setReflectOnActivity(authForm.isReflectOnActivity());
 		scribe.setReflectInstructions(authForm.getReflectInstructions());
 		scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
@@ -511,7 +510,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setInstructions(scribe.getInstructions());
 		authForm.setOnlineInstruction(scribe.getOnlineInstructions());
 		authForm.setOfflineInstruction(scribe.getOfflineInstructions());
-		authForm.setLockOnFinished(scribe.isLockOnFinished());
 		authForm.setReflectOnActivity(scribe.isReflectOnActivity());
 		authForm.setReflectInstructions(scribe.getReflectInstructions());
 		authForm.setAutoSelectScribe(scribe.isAutoSelectScribe());
