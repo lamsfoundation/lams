@@ -24,11 +24,8 @@
 
 /*
  * TODO: uninstaller option to keep database/repository
- * TODO: detect if db exists and has data, ask whether to use or import fresh db
- * TODO: custom lams admin user LI-27
+ * TODO: installer option to use existing db/repo
  * TODO: desktop icons, readme?
- * TODO: transaction isolation
- * TODO: checkbox to start lams on finish page
  */
 
 # includes
@@ -37,8 +34,9 @@
 !include "MUI.nsh"
 !include "LogicLib.nsh"
 
-# function from TextFunc.nsh
+# functions from TextFunc.nsh
 !insertmacro FileJoin
+!insertmacro LineFind
 
 # constants
 !define VERSION "2.0 RC1"
@@ -79,6 +77,9 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # display finish page stuff
+!define MUI_FINISHPAGE_RUN $INSTDIR\lams-start.exe
+!define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now."
+;!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
 !define MUI_FINISHPAGE_LINK "Visit LAMS Community"
 !define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
 
@@ -195,7 +196,7 @@ SectionGroup /e "!Install LAMS"
     Section "JBoss 4.0.2" jboss
         SectionIn RO
         SetOutPath $INSTDIR
-        File /a /r /x all /x minimal /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
+        File /a /r /x all /x minimal /x robyn /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
     SectionEnd
 
     Section "LAMS ${VERSION}" lams
@@ -570,6 +571,8 @@ Function DeployConfig
     FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
     
     FileWrite $0 "LAMS_PORT=$LAMS_PORT$\r$\n"
+    FileWrite $0 "LAMS_USER=$LAMS_USER$\r$\n"
+    FileWrite $0 "LAMS_PASS=$LAMS_PASS$\r$\n"
     FileClose $0
     # for debugging purposes
     CopyFiles "$TEMP\installer.properties" $INSTDIR
@@ -585,13 +588,12 @@ Function DeployConfig
     nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat configure-deploy'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
-    DetailPrint "LAMS configure status: $0"
-    DetailPrint "LAMS configure output: $1"
     
     FileOpen $R0 "$INSTDIR\installer_ant.log" w
     IfErrors 0 +2
         goto error
     FileWrite $R0 $1
+    FileClose $R0
     
     ${If} $0 == "error"
         goto error
@@ -601,12 +603,29 @@ Function DeployConfig
         goto error
     ${EndIf}
     
+    # write my.ini if exists
+    # TODO doesn't check if tx_isolation is already READ-COMMITTED
+    # TODO doesn't take effect until mysql server is restarted
+    DetailPrint "Setting MySQL transaction-isolation to READ-COMMITTED"
+    ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
+    IfErrors 0 +2
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
+    DetailPrint "MySQL will need to be restarted for this to take effect."
+    
     goto done
     
     error:
+        DetailPrint "Ant configure-deploy failed."
         MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
         Abort "LAMS configuration failed."
     done:
+FunctionEnd
+
+
+Function WriteMyINI
+    FileWrite $R4 "[mysqld]$\r$\n"
+    FileWrite $R4 "transaction-isolation=READ-COMMITTED$\r$\n"
+    Push $0
 FunctionEnd
 
 
@@ -825,6 +844,7 @@ FunctionEnd
 Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
 FunctionEnd
+
 
 # http://nsis.sourceforge.net/StrStr
 #

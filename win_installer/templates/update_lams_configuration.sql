@@ -10,3 +10,4 @@ update lams_configuration set config_value='@WILDFIRE_DOMAIN@' where config_key=
 update lams_configuration set config_value='@WILDFIRE_CONFERENCE@' where config_key='XmppConference';
 update lams_configuration set config_value='@WILDFIRE_USER@' where config_key='XmppAdmin';
 update lams_configuration set config_value='@WILDFIRE_PASS@' where config_key='XmppPassword';
+update lams_user set login='@LAMS_USER@', password=sha1('@LAMS_PASS@') where user_id=1;

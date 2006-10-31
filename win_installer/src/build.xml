@@ -22,6 +22,8 @@
 				<filter token="WILDFIRE_CONFERENCE" value="${WILDFIRE_CONFERENCE}" />
 				<filter token="WILDFIRE_USER" value="${WILDFIRE_USER}" />
 				<filter token="WILDFIRE_PASS" value="${WILDFIRE_PASS}" />
+				<filter token="LAMS_USER" value="${LAMS_USER}" />
+				<filter token="LAMS_PASS" value="${LAMS_PASS}" />
 			</filterset>
 		</copy>
 		<copy overwrite="yes" todir="${DEPLOYDIR}">
