@@ -20,6 +20,11 @@
 	</param-value>
 </context-param>
 
+<mime-mapping>
+    <extension>xls</extension>
+    <mime-type>excel/ms-excel</mime-type>
+</mime-mapping>
+
   <filter>
        <filter-name>SystemSessionFilter</filter-name>
          <filter-class>
@@ -207,6 +212,7 @@
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
+    		<role-name>AUTHOR ADMIN</role-name>
     	    <role-name>COURSE MANAGER</role-name>
     		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
@@ -224,6 +230,9 @@
    	</login-config>
 
     <!--  Security Roles -->
+    <security-role>
+		<role-name>AUTHOR ADMIN</role-name>
+	</security-role>
     <security-role>
 		<role-name>COURSE MANAGER</role-name>
 	</security-role>
