@@ -38,6 +38,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethodParameter;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -229,6 +231,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				return roleSets;
 			}
 
+			ArrayList<String> groupMembers = new ArrayList<String>();
 			do {
 				String name = rs.getString(1);
 				String groupName = rs.getString(2);
@@ -244,12 +247,26 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 					Principal p;
 					if (name!=null) {
 						p = super.createIdentity(name);
-						log.info("Assign user to role " + name);
 					} else {
-						p = super.createIdentity("LEARNER");
-						log.info("Found no roles, assign user to role LEARNER");
+						p = super.createIdentity(Role.LEARNER);
+						log.info("Found no roles");
 					}
-					group.addMember(p);
+					//if (!group.isMember(p)) {
+					if (!groupMembers.contains(name)) {
+						log.info("Assign user to role " + p.getName());
+						group.addMember(p);
+						groupMembers.add(name);
+					}
+					if (name.equals(Role.SYSADMIN) || name.equals(Role.AUTHOR_ADMIN)) {
+						p = super.createIdentity(Role.AUTHOR);
+						log.info("Found "+name);
+						//if (!group.isMember(p)) {
+						if (!groupMembers.contains(Role.AUTHOR)) {
+							log.info("Assign user to role "+Role.AUTHOR);
+							group.addMember(p);
+							groupMembers.add(Role.AUTHOR);
+						}
+					}
 				} catch (Exception e) {
 					log.debug("Failed to create principal: " + name, e);
 				}
