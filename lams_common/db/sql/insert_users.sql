@@ -89,8 +89,8 @@ INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
 locale_id, flash_theme_id, html_theme_id)
-VALUES(1, 'sysadmin',SHA1('sysadmin'),'Mr','Fei','Yang',null,null,null,
-'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',
+VALUES(1, 'sysadmin',SHA1('sysadmin'),'The','System','Administrator',null,null,null,
+'Sydney','NSW','Australia',null,null,null,null,'sysadmin@x.x',
 0,NOW(),1,null,
 1,1,2);
 
