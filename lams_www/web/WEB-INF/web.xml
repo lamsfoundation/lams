@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
+ 	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  		<param-value>org.lamsfoundation.lams.central.ApplicationResources</param-value>
+	</context-param>
+
 	<context-param> 
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
@@ -19,6 +24,17 @@
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/*</url-pattern> 
 	</filter-mapping>
+
+	<filter>
+		<filter-name>LocaleFilter</filter-name>
+	         <filter-class>
+			   org.lamsfoundation.lams.web.filter.LocaleFilter
+	         </filter-class>
+	</filter>
+  	<filter-mapping>
+   	 	<filter-name>LocaleFilter</filter-name>
+   	 	<url-pattern>*.jsp</url-pattern>
+  	 </filter-mapping>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.

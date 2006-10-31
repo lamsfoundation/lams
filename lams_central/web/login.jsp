@@ -100,7 +100,11 @@ j_security_login_page
 		
 		<div id="footer">
 		
-		<p>&copy; <fmt:message key="msg.LAMS.copyright.short"/></p>
+		<p>			<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
+			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
+				&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
+			</a>
+		</p>
 		
 	  </div><!--closes footer-->
 		
