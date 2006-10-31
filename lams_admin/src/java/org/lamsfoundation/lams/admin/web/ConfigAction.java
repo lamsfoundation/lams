@@ -52,7 +52,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts.action path="/config" parameter="method" name="ConfigForm" input=".config" scope="request" validate="false"
  * @struts.action-forward name="config" path=".config"
- * @struts.action-forward name="sysadmin" path=".sysadmin"
+ * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
  */
 public class ConfigAction extends LamsDispatchAction {
 

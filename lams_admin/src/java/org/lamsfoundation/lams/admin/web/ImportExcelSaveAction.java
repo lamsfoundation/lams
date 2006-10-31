@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * 				validate="false"
  * 
  * @struts:action-forward name="importresult" path=".importresult"
- * @struts:action-forward name="sysadmin" path=".sysadmin"
+ * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
  */
 public class ImportExcelSaveAction extends Action {
 	

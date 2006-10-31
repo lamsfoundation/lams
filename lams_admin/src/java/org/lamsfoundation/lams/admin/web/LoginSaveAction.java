@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *                "method" scope = "request" input = ".loginmaintian" validate =
  *                "false"
  * 
- * @struts.action-forward name="sysadmin" path=".sysadmin"
+ * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
  * @struts.action-forward name="loginmaintain" path=".loginmaintain"
  */
 public class LoginSaveAction extends LamsDispatchAction {
