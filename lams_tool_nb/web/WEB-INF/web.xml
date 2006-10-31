@@ -226,6 +226,7 @@
     		<role-name>AUTHOR</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -238,6 +239,8 @@
 		 </web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
@@ -264,6 +267,7 @@
     		<role-name>TEACHER</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -276,5 +280,41 @@
     		<form-error-page>/login.jsp?failed=y</form-error-page>
    		</form-login-config>
    	</login-config>
+
+   	<!-- ======================================================== -->
+	<!--  Security Roles -->
+    <!-- ======================================================== -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+	<security-role>
+		<description>Student</description>
+		<role-name>TEACHER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can create/modify a learning design</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can running and monitoring a learning session</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>ADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+	<security-role>
+		<description>Can create/modify a learning design and edit default tool content</description>
+		<role-name>AUTHOR ADMIN</role-name>
+	</security-role>
 
 </web-app>

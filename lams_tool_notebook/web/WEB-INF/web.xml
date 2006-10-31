@@ -148,7 +148,14 @@
       <session-timeout>120</session-timeout>
    </session-config>
 
-	<error-page>
+   <!--
+   To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
+   Organize mime-mappings.xml following this DTD slice:
+
+   <!ELEMENT mime-mapping (extension, mime-type)>
+   -->
+
+      <error-page>
         <error-code>500</error-code>
         <location>/error.jsp</location>
     </error-page>
@@ -160,20 +167,6 @@
         <error-code>404</error-code>
         <location>/404.jsp</location>
     </error-page>
-
-   <!--
-   To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
-   Organize mime-mappings.xml following this DTD slice:
-
-   <!ELEMENT mime-mapping (extension, mime-type)>
-   -->
-
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
-
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
 
   	<jsp-config>
 
@@ -255,6 +248,7 @@
     		<role-name>AUTHOR</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -265,6 +259,8 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
@@ -290,6 +286,7 @@
     		<role-name>TEACHER</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -332,6 +329,10 @@
 	<security-role>
 		<description>Can add/remove users to the system, set up classes of users for sessions</description>
 		<role-name>SYSADMIN</role-name>
+	</security-role>
+	<security-role>
+		<description>Can create/modify a learning design and edit default tool content</description>
+		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
 
 </web-app>
