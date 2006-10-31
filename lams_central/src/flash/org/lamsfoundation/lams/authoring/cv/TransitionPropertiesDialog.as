@@ -85,7 +85,7 @@ class TransitionPropertiesDialog extends MovieClip{
         delete this.onEnterFrame;
         
 		//text for labels
-		section_lbl.text = Dictionary.getValue('trans_dlg_gate');
+		section_lbl.text = Dictionary.getValue('gate_btn');
 		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
 		
 		//Set the text for buttons
@@ -171,9 +171,16 @@ class TransitionPropertiesDialog extends MovieClip{
     private function ok(){
         trace('OK');
        //If validation successful commit + close parent window
-       //Fire callback with selectedId
-       dispatchEvent({type:'okClicked',target:this,gate:getSelectedGateType()});
+	   if (getSelectedGateType() == Activity.NO_GATE_ACTIVITY_TYPE){
+		   cancel()
+		   
+	   }else {
+		   //Fire callback with selectedId
+		   dispatchEvent({type:'okClicked',target:this,gate:getSelectedGateType()});
        _container.deletePopUp();
+	   }
+       
+       
     }
 	
 	
