@@ -1235,6 +1235,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 		boolean validateSingleCorrectCandidate=authoringUtil.validateSingleCorrectCandidate(caList);
 	    logger.debug("validateSingleCorrectCandidate: " + validateSingleCorrectCandidate);
+
+	    /*
+		boolean validateOnlyOneCorrectCandidate=authoringUtil.validateOnlyOneCorrectCandidate(caList);
+	    logger.debug("validateOnlyOneCorrectCandidate: " + validateOnlyOneCorrectCandidate);
+	    */
 	    
 	    
         ActionMessages errors = new ActionMessages();
@@ -1252,6 +1257,15 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             ActionMessage error = new ActionMessage("candidates.none.correct");
 			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
         }
+
+        /*
+        if (!validateOnlyOneCorrectCandidate)
+        {
+            ActionMessage error = new ActionMessage("candidates.duplicate.correct");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+        }
+        */
+        
         logger.debug("errors: " + errors);
 
 	 	if(!errors.isEmpty()){
@@ -1634,6 +1648,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		boolean validateSingleCorrectCandidate=authoringUtil.validateSingleCorrectCandidate(caList);
 	    logger.debug("validateSingleCorrectCandidate: " + validateSingleCorrectCandidate);
 	    
+	    /*
+		boolean validateOnlyOneCorrectCandidate=authoringUtil.validateOnlyOneCorrectCandidate(caList);
+	    logger.debug("validateOnlyOneCorrectCandidate: " + validateOnlyOneCorrectCandidate);
+	    */
+	    
 	    
         ActionMessages errors = new ActionMessages();
         
@@ -1649,14 +1668,20 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             ActionMessage error = new ActionMessage("candidates.none.correct");
 			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
         }
+
+        /*
+        if (!validateOnlyOneCorrectCandidate)
+        {
+            ActionMessage error = new ActionMessage("candidates.duplicate.correct");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+        }
+        */
         logger.debug("errors: " + errors);
 
 	 	if(!errors.isEmpty()){
 			saveErrors(request, errors);
 	        logger.debug("errors saved: " + errors);
 		}
-	    
-	    
 	    
         logger.debug("errors saved: " + errors);
 	    

@@ -49,8 +49,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				document.McMonitoringForm.candidateIndex.value=candidateIndexValue; 
 				submitMethod("removeAddedCandidate");
 			}
-			
-			
+
+			function validateDuplicateCorrectAnswers() 
+			{
+				var correctCount = 0;
+				for(i = 1; i < 51; i++)
+				{
+					var currentId="select".concat(i)
+					var currentField=document.getElementById(currentId);
+					
+					if (currentField != null)
+					{
+						if ((typeof(currentField) != 'undefined') && (typeof(currentField) != null))
+						{
+							if (currentField.value == 'Correct')
+							{
+								correctCount = correctCount + 1;
+							}
+						}
+					}
+				}
+				
+				if (correctCount > 1)
+				{
+					var msg = "<fmt:message key="candidates.duplicate.correct"/>";
+					alert(msg);
+				}
+			}
 			
 		</script>		
 	</head>
@@ -61,6 +86,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<html:form  action="/monitoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">				
 			<html:hidden property="dispatch" value="addSingleQuestion"/>
+			<html:hidden property="currentField" />
 			<html:hidden property="toolContentID"/>
 			<html:hidden property="currentTab" styleId="currentTab" />
 			<html:hidden property="activeModule"/>
@@ -143,7 +169,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table>
 							<tr>
 							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="getElementById('newQuestionForm').submit();" class="button-add-item">
+								<a href="#" onclick="validateDuplicateCorrectAnswers(); getElementById('newQuestionForm').submit();" class="button-add-item">
 									<fmt:message key="label.save.question" />
 								</a>
 							</td> 

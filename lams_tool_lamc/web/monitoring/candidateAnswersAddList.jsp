@@ -59,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<td width="16%" align="left">				
 
 
-					<select name="correct${caIndex}">
+					<select name="correct${caIndex}" id="select${caIndex}">
 						<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
 							<c:set var="SELECTED_ANSWER" scope="request" value=""/>
 							<c:if test="${correctEntry.value == currentCandidateDTO.correct}"> 			

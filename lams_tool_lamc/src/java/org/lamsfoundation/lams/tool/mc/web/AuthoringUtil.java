@@ -1836,7 +1836,7 @@ public class AuthoringUtil implements McAppConstants {
  	    	
  	    	if (correct.equals("Correct"))
  	    	{
- 	    	   logger.debug("there is at leat one Correct candidate, it is good.");
+ 	    	   logger.debug("there is at least one Correct candidate, it is good.");
  	    	   return true;
  	    	}
     	} 	    
@@ -1844,6 +1844,38 @@ public class AuthoringUtil implements McAppConstants {
  	    return false;
  	}
  	    	    
+
+    
+    protected boolean validateOnlyOneCorrectCandidate(List caList)
+    {
+        int correctCandidatesCount= 0;
+        
+        Iterator itCaList=  caList.iterator();
+        while (itCaList.hasNext())
+        {
+            McCandidateAnswersDTO mcCandidateAnswersDTO= (McCandidateAnswersDTO)itCaList.next();
+            logger.debug("mcCandidateAnswersDTO:" + mcCandidateAnswersDTO);
+
+ 	       	String candidateAnswer= mcCandidateAnswersDTO.getCandidateAnswer();
+ 	    	String correct= mcCandidateAnswersDTO.getCorrect();
+ 	    	logger.debug("correct:" + correct);
+ 	    	
+ 	    	if (correct.equals("Correct"))
+ 	    	{
+ 	    	   logger.debug("there is at leat one Correct candidate, it is good.");
+ 	    	   ++correctCandidatesCount;
+ 	    	}
+    	} 	    
+ 	   logger.debug("correctCandidatesCount: " + correctCandidatesCount);
+ 	   
+ 	   if (correctCandidatesCount > 1)
+ 	       return false; //not good
+ 	
+ 	   return true;
+ 	}
+    
+    
+    
     
     /**
      * buildDefaultQuestionContent(McContent mcContent, IMcService mcService)

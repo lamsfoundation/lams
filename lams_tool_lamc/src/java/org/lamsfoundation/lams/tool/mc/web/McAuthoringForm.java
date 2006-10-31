@@ -121,6 +121,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	private String feedback;
 	private String candidateIndex;
 	private String totalMarks;
+	protected String currentField;
 	
 	public void resetUserAction()
     {
@@ -984,5 +985,17 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      */
     public void setClickedObj(String clickedObj) {
         this.clickedObj = clickedObj;
+    }
+    /**
+     * @return Returns the currentField.
+     */
+    public String getCurrentField() {
+        return currentField;
+    }
+    /**
+     * @param currentField The currentField to set.
+     */
+    public void setCurrentField(String currentField) {
+        this.currentField = currentField;
     }
 }
