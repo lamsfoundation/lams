@@ -24,9 +24,6 @@
 
 package org.lamsfoundation.lams.tool.chat.util;
 
-import java.util.LinkedList;
-
-import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 
 public interface ChatConstants {
 	public static final String TOOL_SIGNATURE = "lachat11";

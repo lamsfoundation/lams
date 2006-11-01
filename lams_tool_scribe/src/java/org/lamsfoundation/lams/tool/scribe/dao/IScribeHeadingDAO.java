@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.scribe.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 
 /**
  * DAO for accessing the ScribeHeading objects - interface defining

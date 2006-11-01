@@ -81,7 +81,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 /**
  * An implementation of the IScribeService interface.

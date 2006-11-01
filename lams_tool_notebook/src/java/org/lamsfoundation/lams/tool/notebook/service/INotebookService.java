@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.tool.notebook.service;
 
-import java.util.List;
-
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;

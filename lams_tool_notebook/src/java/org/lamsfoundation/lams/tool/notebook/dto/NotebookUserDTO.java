@@ -27,8 +27,6 @@ package org.lamsfoundation.lams.tool.notebook.dto;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
-import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 
 public class NotebookUserDTO implements Comparable{
 	

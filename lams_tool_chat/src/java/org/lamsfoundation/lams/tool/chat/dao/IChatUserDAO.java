@@ -24,10 +24,7 @@
 
 package org.lamsfoundation.lams.tool.chat.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**

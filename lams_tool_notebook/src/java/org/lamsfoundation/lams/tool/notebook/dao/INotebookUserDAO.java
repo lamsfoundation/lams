@@ -24,10 +24,7 @@
 
 package org.lamsfoundation.lams.tool.notebook.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 
 /**

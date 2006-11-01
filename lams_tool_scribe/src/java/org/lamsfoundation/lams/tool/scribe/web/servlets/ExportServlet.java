@@ -52,8 +52,6 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-import com.sun.java_cup.internal.internal_error;
-
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private static final long serialVersionUID = -2829707715037631881L;

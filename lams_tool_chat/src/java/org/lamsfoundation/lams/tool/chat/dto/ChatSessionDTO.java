@@ -32,7 +32,6 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
-import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 public class ChatSessionDTO implements Comparable {
 	

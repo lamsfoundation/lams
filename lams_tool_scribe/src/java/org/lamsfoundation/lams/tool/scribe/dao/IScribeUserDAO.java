@@ -24,10 +24,7 @@
 
 package org.lamsfoundation.lams.tool.scribe.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 
 /**

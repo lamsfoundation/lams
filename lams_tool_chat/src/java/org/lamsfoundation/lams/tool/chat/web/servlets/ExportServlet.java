@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.chat.web.servlets;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
