@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -38,8 +37,6 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 /** 
@@ -295,7 +292,7 @@ public class User implements Serializable,Comparable {
 
     public String getFullName()
     {
-        return this.getFirstName()+", "+this.getLastName();
+        return this.getFirstName()+" "+this.getLastName();
     }
     /** 
      *            @hibernate.property
