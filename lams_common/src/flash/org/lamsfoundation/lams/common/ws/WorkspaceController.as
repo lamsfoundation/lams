@@ -421,6 +421,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		getView().workspaceDialogue.showHideBtn(true);
 	}
 	
+	public function getWSModel():WorkspaceModel{
+		return _workspaceModel;
+	}
+	
 	//override the super version
 	public function getView(){
 		var v = super.getView();
