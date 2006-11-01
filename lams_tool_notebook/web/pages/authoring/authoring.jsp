@@ -31,8 +31,6 @@
 	<!--closes header-->
 
 	<div id="content">
-
-		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="dispatch" value="updateContent" />
 		<html:hidden property="sessionMapID" />
@@ -57,9 +55,10 @@
 		<lams:AuthoringButton formID="authoringForm"
 			clearSessionActionUrl="/clearsession.do" toolSignature="lantbk11"
 			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
-			toolContentID="${formBean.toolContentID}"
+			toolContentID="${sessionMap.toolContentID}"
 			accessMode="${sessionMap.mode}" defineLater="${defineLater}"
-			customiseSessionID="${sessionMap.sessionID}" contentFolderID="abc" />
+			customiseSessionID="${sessionMap.sessionID}" 
+			contentFolderID="${sessionMap.contentFolderID}" />
 	</div>
 </html:form>
 

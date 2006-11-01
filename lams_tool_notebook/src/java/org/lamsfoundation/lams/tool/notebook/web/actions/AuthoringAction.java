@@ -71,6 +71,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	public INotebookService notebookService;
 
 	// Authoring SessionMap key names
+	private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
+
+	private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
+	
 	private static final String KEY_MODE = "mode";
 
 	private static final String KEY_ONLINE_FILES = "onlineFiles";
@@ -140,10 +144,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		// Set up sessionMap
 		SessionMap<String, Object> map = createSessionMap(notebook,
-				getAccessMode(request));
+				getAccessMode(request), contentFolderID, toolContentID);
 		authForm.setSessionMapID(map.getSessionID());
-
-		authForm.setContentFolderID(contentFolderID);
 
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
@@ -161,8 +163,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		SessionMap<String, Object> map = getSessionMap(request, authForm);
 
 		// get notebook content.
-		Notebook notebook = notebookService.getNotebookByContentId(authForm
-				.getToolContentID());
+		Notebook notebook = notebookService.getNotebookByContentId((Long) map
+				.get(KEY_TOOL_CONTENT_ID));
 
 		// update notebook content using form inputs.
 		updateNotebook(notebook, authForm);
@@ -267,7 +269,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 			// upload file to repository
 			NotebookAttachment newAtt = notebookService.uploadFileToContent(
-					authForm.getToolContentID(), file, type);
+					(Long) map.get(KEY_TOOL_CONTENT_ID), file, type);
 
 			// Add attachment to unsavedFiles
 			// check to see if file with same name exists
@@ -377,7 +379,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @return
 	 */
 	private void updateAuthForm(AuthoringForm authForm, Notebook notebook) {
-		authForm.setToolContentID(notebook.getToolContentId());
 		authForm.setTitle(notebook.getTitle());
 		authForm.setInstructions(notebook.getInstructions());
 		authForm.setOnlineInstruction(notebook.getOnlineInstructions());
@@ -393,11 +394,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param mode
 	 */
 	private SessionMap<String, Object> createSessionMap(Notebook notebook,
-			ToolAccessMode mode) {
+			ToolAccessMode mode, String contentFolderID, Long toolContentID) {
 
 		SessionMap<String, Object> map = new SessionMap<String, Object>();
 
 		map.put(KEY_MODE, mode);
+		map.put(KEY_CONTENT_FOLDER_ID, contentFolderID);
+		map.put(KEY_TOOL_CONTENT_ID, toolContentID);
 		map.put(KEY_ONLINE_FILES, new LinkedList<NotebookAttachment>());
 		map.put(KEY_OFFLINE_FILES, new LinkedList<NotebookAttachment>());
 		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<NotebookAttachment>());
@@ -437,25 +440,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		else
 			mode = ToolAccessMode.AUTHOR;
 		return mode;
-	}
-
-	/**
-	 * Set up SessionMap for first use. Creates empty lists and sets the access
-	 * mode.
-	 * 
-	 * @param map
-	 * @param request
-	 */
-	private void initSessionMap(SessionMap<String, Object> map,
-			HttpServletRequest request) {
-		map.put(KEY_MODE, getAccessMode(request));
-		map.put(KEY_ONLINE_FILES, new LinkedList<NotebookAttachment>());
-		map.put(KEY_OFFLINE_FILES, new LinkedList<NotebookAttachment>());
-		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<NotebookAttachment>());
-		map
-				.put(KEY_UNSAVED_OFFLINE_FILES,
-						new LinkedList<NotebookAttachment>());
-		map.put(KEY_DELETED_FILES, new LinkedList<NotebookAttachment>());
 	}
 
 	/**

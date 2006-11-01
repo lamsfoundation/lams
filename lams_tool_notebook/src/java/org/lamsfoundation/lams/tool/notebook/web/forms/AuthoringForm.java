@@ -52,10 +52,6 @@ public class AuthoringForm extends ActionForm {
 
 	String onlineInstruction;
 
-	Long toolContentID;
-	
-	String contentFolderID;
-
 	boolean lockOnFinished;
 	
 	boolean allowRichEditor;
@@ -162,17 +158,8 @@ public class AuthoringForm extends ActionForm {
 		this.title = title;
 	}
 
-	public Long getToolContentID() {
-		return toolContentID;
-	}
-
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
-
 	public void setSessionMap(SessionMap sessionMap) {
 		this.sessionMap = sessionMap;
-		
 	}
 
 	public SessionMap getSessionMap() {
@@ -193,13 +180,5 @@ public class AuthoringForm extends ActionForm {
 
 	public void setAllowRichEditor(boolean allowRichEditor) {
 		this.allowRichEditor = allowRichEditor;
-	}
-
-	public String getContentFolderID() {
-		return contentFolderID;
-	}
-
-	public void setContentFolderID(String contentFolderID) {
-		this.contentFolderID = contentFolderID;
 	}
 }
