@@ -298,7 +298,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException {
 		User user = (User)baseDAO.find(User.class,userID);
-		return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspace().getDefaultFolder());
+		return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", (user.getWorkspace()!=null)?user.getWorkspace().getDefaultFolder():null);
 	}
 	 
 	
@@ -375,7 +375,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public Integer getPermissions(WorkspaceFolder workspaceFolder, User user){
 		Integer permission = null;
-		WorkspaceFolder userDefaultFolder = user.getWorkspace().getDefaultFolder();
+		
 		if  ( workspaceFolder==null || user==null ) {
 			log.debug("no access due to null value(s) in user or workspaceFolder");
 			permission = WorkspaceFolder.NO_ACCESS;
@@ -385,10 +385,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		} else if(user.hasMemberAccess(workspaceFolder)) {
 			log.debug(user.getLogin()+" has membership access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
+		} else if (userMgmtService.hasRoleInOrganisation(user, Role.ROLE_AUTHOR_ADMIN)){
+			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
+			permission = WorkspaceFolder.OWNER_ACCESS;
 		} else {
 			log.debug(user.getLogin()+" has no access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.NO_ACCESS;
 		}
+		
 		return permission;
 	}
 	/** This method checks if the given workspaceFolder is a subFolder of the
@@ -1149,14 +1153,19 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		if (user != null) {
 			// TODO  get all the folders for the workspace but only return those that are at the "top" of the hierarchy
 			// for this user. Not needed at present but will be needed when we have multiple folders in a user's workspace (ie shared folders)
-			WorkspaceFolder privateFolder = user.getWorkspace().getDefaultFolder();
-			if ( privateFolder != null ) {
-				Integer permissions = getPermissions(privateFolder,user);
-				return new FolderContentDTO(privateFolder, permissions);
-			} else {
-				log.warn("getUserWorkspaceFolder: User "+userID+" does not have a root folder. Returning no folders.");
-			}
+			Workspace workspace = user.getWorkspace();
 			
+			if(workspace != null) {
+				WorkspaceFolder privateFolder = workspace.getDefaultFolder();
+				if ( privateFolder != null ) {
+					Integer permissions = getPermissions(privateFolder,user);
+					return new FolderContentDTO(privateFolder, permissions);
+				} else {
+					log.warn("getUserWorkspaceFolder: User "+userID+" does not have a root folder. Returning no folders.");
+				}
+			} else {
+				log.warn("getUserWorkspaceFolder: User "+userID+" does not have a workspace. Returning no folders.");
+			}
 		} else {
 			log.warn("getUserWorkspaceFolder: User "+userID+" does not exist. Returning no folders.");
 		}
@@ -1179,7 +1188,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		while (roleIterator.hasNext()) {
 			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) roleIterator.next();
 			Role role = userOrganisationRole.getRole();
-			if (role.isAuthor() || role.isSysAdmin() || role.isCourseManager())
+			if (role.isAuthor() || role.isSysAdmin() || role.isCourseManager() ||  role.isAuthorAdmin())
 				return true;
 		}
 		return false;
