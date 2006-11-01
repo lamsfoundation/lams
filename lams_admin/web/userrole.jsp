@@ -22,6 +22,8 @@
 
 <p>&nbsp;</p>
 
+<p><fmt:message key="msg.roles.mandatory"/></p>
+
 <div align="center"><html-el:errors/><html-el:messages id="roles" message="true"><bean:write name="roles" /></html-el:messages></div>
 <table>
     <tr>

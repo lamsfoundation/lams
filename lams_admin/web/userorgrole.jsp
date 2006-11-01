@@ -24,6 +24,8 @@ function toggleCheckboxes(roleIndex, object){
 </h2>
 <p>&nbsp;</p>
 
+<p><fmt:message key="msg.roles.mandatory.users"/></p>
+
 <html-el:form action="/userorgrolesave.do" method="post">
 <html-el:hidden property="orgId" />
 
