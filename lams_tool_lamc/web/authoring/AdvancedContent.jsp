@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<html:checkbox property="retries" value="1" styleId="retries"
-		onclick="javascript:updatePass(this);" styleClass="noBorder">
+		onclick="javascript:updatePass(this); submitMethod('updateMarksList');" styleClass="noBorder">
 	</html:checkbox>
 	<label for="retries">
 		<fmt:message key="radiobox.retries" />		
@@ -55,9 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:forEach>
 	</select>
 	<fmt:message key="radiobox.passmark" />
-	
-	<a href="javascript:submitMethod('updateMarksList')" class="button">
-		<fmt:message key="label.update.list" /> </a>
+
 </p>
 
 <p>
