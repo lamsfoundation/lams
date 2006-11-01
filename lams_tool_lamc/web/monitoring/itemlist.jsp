@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<tr>
 		<td width="10%" align="right">
-				<fmt:message key="label.question" />:
+			<strong> 	<fmt:message key="label.question" />: </strong>
 		</td>
 
 		<td width="60%" align="left">
