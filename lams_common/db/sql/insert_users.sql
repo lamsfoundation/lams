@@ -19,6 +19,7 @@ insert into lams_workspace (workspace_id, name, default_fld_id) values(6,'Two Te
 insert into lams_workspace (workspace_id, name, default_fld_id) values(7,'Three Test',7);
 insert into lams_workspace (workspace_id, name, default_fld_id) values(8,'Four Test',8);
 insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(50,'Moodle Test',40,41);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(51,'System Administrator',45);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(1,null,'ROOT',1,'20041223','20041223',1);
@@ -36,25 +37,28 @@ insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,use
 values(23,3,'Lesson Sequence Folder',1,'20041223','20041223',2);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(4,null,'Mary Morgan Folder',4,'20041223','20041223',1);
+values(4,null,'Mary Morgan',4,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(5,null,'One Test Workspace',5,'20041223','20041223',1);
+values(5,null,'One Test',5,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(6,null,'Two Test Workspace',6,'20041223','20041223',1);
+values(6,null,'Two Test',6,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(7,null,'Three Test Workspace',7,'20041223','20041223',1);
+values(7,null,'Three Test',7,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(8,null,'Four Test Workspace',8,'20041223','20041223',1);
+values(8,null,'Four Test',8,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(40,1,'Moodle Test',1,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(41,40,'Lesson Sequence Folder',1,'20041223','20041223',2);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(45,null,'System Administrator',1,'20061101','20061101',1);
 
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (1, 1,1);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (2, 2,2);
@@ -67,6 +71,7 @@ insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) valu
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (9, 7,7);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (10, 8,8);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (11, 50,40);
+insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (12, 51,45);
 
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
 	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,1,1,1);
@@ -91,7 +96,7 @@ disabled_flag,create_date,authentication_method_id,workspace_id,
 locale_id, flash_theme_id, html_theme_id)
 VALUES(1, 'sysadmin',SHA1('sysadmin'),'The','System','Administrator',null,null,null,
 'Sydney','NSW','Australia',null,null,null,null,'sysadmin@x.x',
-0,NOW(),1,null,
+0,NOW(),1,51,
 1,1,2);
 
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
