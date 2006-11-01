@@ -104,7 +104,7 @@ public class LearningAction extends LamsDispatchAction {
 		Notebook notebook = notebookSession.getNotebook();
 
 		// check defineLater
-		if (notebook.getDefineLater()) {
+		if (notebook.isDefineLater()) {
 			return mapping.findForward("defineLater");
 		}
 
@@ -115,18 +115,18 @@ public class LearningAction extends LamsDispatchAction {
 		NotebookDTO notebookDTO = new NotebookDTO();
 		notebookDTO.title = notebook.getTitle();
 		notebookDTO.instructions = notebook.getInstructions();
-		notebookDTO.allowRichEditor = notebook.getAllowRichEditor();
+		notebookDTO.allowRichEditor = notebook.isAllowRichEditor();
 		
 		request.setAttribute("notebookDTO", notebookDTO);
 
 		// Set the content in use flag.
-		if (!notebook.getContentInUse()) {
+		if (!notebook.isContentInUse()) {
 			notebook.setContentInUse(new Boolean(true));
 			notebookService.saveOrUpdateNotebook(notebook);
 		}
 
 		// check runOffline
-		if (notebook.getRunOffline()) {
+		if (notebook.isRunOffline()) {
 			return mapping.findForward("runOffline");
 		}
 
@@ -140,7 +140,7 @@ public class LearningAction extends LamsDispatchAction {
 		}
 		
 		// set readOnly flag.
-		if (notebook.getLockOnFinished() && notebookUser.getFinishedActivity()) {
+		if (notebook.isLockOnFinished() && notebookUser.isFinishedActivity()) {
 			request.setAttribute("contentEditable", false);
 		} else {
 			request.setAttribute("contentEditable", true);

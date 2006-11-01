@@ -122,7 +122,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// check if content in use is set
-		if (chat.getContentInUse()) {
+		if (chat.isContentInUse()) {
 			// Cannot edit, send to message page.
 			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(
 					request).getMessage("error.content.locked"));
@@ -384,10 +384,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setInstructions(chat.getInstructions());
 		authForm.setOnlineInstruction(chat.getOnlineInstructions());
 		authForm.setOfflineInstruction(chat.getOfflineInstructions());
-		authForm.setLockOnFinished(chat.getLockOnFinished());
-		authForm.setReflectOnActivity(chat.getReflectOnActivity());
+		authForm.setLockOnFinished(chat.isLockOnFinished());
+		authForm.setReflectOnActivity(chat.isReflectOnActivity());
 		authForm.setReflectInstructions(chat.getReflectInstructions());
-		authForm.setFilteringEnabled(chat.getFilteringEnabled());
+		authForm.setFilteringEnabled(chat.isFilteringEnabled());
 		authForm.setFilterKeywords(chat.getFilterKeywords());
 	}
 

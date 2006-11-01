@@ -58,7 +58,7 @@ public class ChatMessage implements java.io.Serializable {
 
 	private Date sendDate;
 
-	private Boolean hidden;
+	private boolean hidden;
 
 	/** default constructor */
 	public ChatMessage() {
@@ -153,11 +153,11 @@ public class ChatMessage implements java.io.Serializable {
 	 * 
 	 * @hibernate.property column="hidden"
 	 */
-	public Boolean getHidden() {
+	public boolean isHidden() {
 		return hidden;
 	}
 
-	public void setHidden(Boolean hidden) {
+	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
 	}
 

@@ -62,15 +62,15 @@ public class Chat implements java.io.Serializable, Cloneable {
 
 	private String instructions;
 
-	private Boolean runOffline;
+	private boolean runOffline;
 
-	private Boolean lockOnFinished;
+	private boolean lockOnFinished;
 	
-	private Boolean reflectOnActivity;
+	private boolean reflectOnActivity;
 	
 	private String reflectInstructions;
 
-	private Boolean filteringEnabled;
+	private boolean filteringEnabled;
 
 	private String filterKeywords;
 
@@ -78,9 +78,9 @@ public class Chat implements java.io.Serializable, Cloneable {
 
 	private String offlineInstructions;
 
-	private Boolean contentInUse;
+	private boolean contentInUse;
 
-	private Boolean defineLater;
+	private boolean defineLater;
 
 	private Long toolContentId;
 
@@ -99,10 +99,10 @@ public class Chat implements java.io.Serializable, Cloneable {
 
 	/** full constructor */
 	public Chat(Date createDate, Date updateDate, Long createBy, String title,
-			String instructions, Boolean runOffline, Boolean lockOnFinished,
-			Boolean filteringEnabled, String filterKeywords,
+			String instructions, boolean runOffline, boolean lockOnFinished,
+			boolean filteringEnabled, String filterKeywords,
 			String onlineInstructions, String offlineInstructions,
-			Boolean contentInUse, Boolean defineLater, Long toolContentId,
+			boolean contentInUse, boolean defineLater, Long toolContentId,
 			Set chatAttachments, Set chatSessions) {
 		this.createDate = createDate;
 		this.updateDate = updateDate;
@@ -206,11 +206,11 @@ public class Chat implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getRunOffline() {
+	public boolean isRunOffline() {
 		return this.runOffline;
 	}
 
-	public void setRunOffline(Boolean runOffline) {
+	public void setRunOffline(boolean runOffline) {
 		this.runOffline = runOffline;
 	}
 
@@ -219,22 +219,22 @@ public class Chat implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getLockOnFinished() {
+	public boolean isLockOnFinished() {
 		return this.lockOnFinished;
 	}
 
-	public void setLockOnFinished(Boolean lockOnFinished) {
+	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
 	}
 	
 	/**
 	 * @hibernate.property column="reflect_on_activity" length="1"
 	 */
-	public Boolean getReflectOnActivity() {
+	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
 
-	public void setReflectOnActivity(Boolean reflectOnActivity) {
+	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
 	
@@ -280,11 +280,11 @@ public class Chat implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getContentInUse() {
+	public boolean isContentInUse() {
 		return this.contentInUse;
 	}
 
-	public void setContentInUse(Boolean contentInUse) {
+	public void setContentInUse(boolean contentInUse) {
 		this.contentInUse = contentInUse;
 	}
 
@@ -293,11 +293,11 @@ public class Chat implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Boolean getDefineLater() {
+	public boolean isDefineLater() {
 		return this.defineLater;
 	}
 
-	public void setDefineLater(Boolean defineLater) {
+	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
 	}
 
@@ -347,11 +347,11 @@ public class Chat implements java.io.Serializable, Cloneable {
 	/**
 	 * @hibernate.property column="filtering_enabled" length="1"
 	 */
-	public Boolean getFilteringEnabled() {
+	public boolean isFilteringEnabled() {
 		return filteringEnabled;
 	}
 
-	public void setFilteringEnabled(Boolean filteringEnabled) {
+	public void setFilteringEnabled(boolean filteringEnabled) {
 		this.filteringEnabled = filteringEnabled;
 	}
 

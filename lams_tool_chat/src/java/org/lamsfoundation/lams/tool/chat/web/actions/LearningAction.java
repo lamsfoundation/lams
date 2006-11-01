@@ -109,7 +109,7 @@ public class LearningAction extends LamsDispatchAction {
 		ChatUser chatUser = getCurrentUser(toolSessionID);
 
 		// check defineLater
-		if (chat.getDefineLater()) {
+		if (chat.isDefineLater()) {
 			return mapping.findForward("defineLater");
 		}
 
@@ -129,7 +129,7 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		
 		ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
-		if (chatUser.getFinishedActivity()) {
+		if (chatUser.isFinishedActivity()) {
 			// get the notebook entry.
 			NotebookEntry notebookEntry = chatService.getEntry(toolSessionID,
 					CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -142,13 +142,13 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("chatUserDTO", chatUserDTO);		
 		
 		// Ensure that the content is use flag is set.
-		if (!chat.getContentInUse()) {
+		if (!chat.isContentInUse()) {
 			chat.setContentInUse(new Boolean(true));
 			chatService.saveOrUpdateChat(chat);
 		}
 		
 		// check runOffline
-		if (chat.getRunOffline()) {
+		if (chat.isRunOffline()) {
 			return mapping.findForward("runOffline");
 		}
 		

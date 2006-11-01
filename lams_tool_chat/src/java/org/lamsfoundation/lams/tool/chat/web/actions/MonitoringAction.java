@@ -187,7 +187,7 @@ public class MonitoringAction extends LamsDispatchAction {
 				.getMessageUID());
 
 		boolean hasChanged = false;
-		if (chatMessage.getHidden().booleanValue() != monitoringForm
+		if (chatMessage.isHidden() != monitoringForm
 				.isMessageHidden()) {
 			hasChanged = true;
 			chatService.auditHideShowMessage(chatMessage, monitoringForm

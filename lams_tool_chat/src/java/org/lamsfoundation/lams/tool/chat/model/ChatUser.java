@@ -57,7 +57,7 @@ public class ChatUser implements java.io.Serializable {
 	
 	private String jabberId;
 	
-	private Boolean finishedActivity;
+	private boolean finishedActivity;
 	
 	private String jabberNickname;
 
@@ -158,11 +158,11 @@ public class ChatUser implements java.io.Serializable {
 	/**
 	 * @hibernate.property column="finishedActivity" 
 	 */
-	public Boolean getFinishedActivity() {
+	public boolean isFinishedActivity() {
 		return finishedActivity;
 	}
 
-	public void setFinishedActivity(Boolean finishedActivity) {
+	public void setFinishedActivity(boolean finishedActivity) {
 		this.finishedActivity = finishedActivity;
 	}
 	

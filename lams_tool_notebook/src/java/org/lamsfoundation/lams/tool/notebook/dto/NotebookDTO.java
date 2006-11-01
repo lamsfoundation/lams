@@ -70,8 +70,8 @@ public class NotebookDTO {
 		instructions = notebook.getInstructions();
 		onlineInstructions = notebook.getOnlineInstructions();
 		offlineInstructions = notebook.getOfflineInstructions();
-		contentInUse = notebook.getContentInUse();
-		allowRichEditor = notebook.getAllowRichEditor();
+		contentInUse = notebook.isContentInUse();
+		allowRichEditor = notebook.isAllowRichEditor();
 
 		onlineInstructionsFiles = new TreeSet<NotebookAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<NotebookAttachmentDTO>();

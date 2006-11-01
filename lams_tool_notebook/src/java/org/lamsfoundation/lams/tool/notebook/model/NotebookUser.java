@@ -55,7 +55,7 @@ public class NotebookUser implements java.io.Serializable {
 
 	private NotebookSession notebookSession;
 	
-	private Boolean finishedActivity;
+	private boolean finishedActivity;
 	
 	private Long entryUID;
 
@@ -145,11 +145,11 @@ public class NotebookUser implements java.io.Serializable {
 	/**
 	 * @hibernate.property column="finishedActivity" 
 	 */
-	public Boolean getFinishedActivity() {
+	public boolean isFinishedActivity() {
 		return finishedActivity;
 	}
 
-	public void setFinishedActivity(Boolean finishedActivity) {
+	public void setFinishedActivity(boolean finishedActivity) {
 		this.finishedActivity = finishedActivity;
 	}
 	

@@ -49,7 +49,7 @@ public class ChatMessageDTO implements Comparable{
 		this.type = chatMessage.getType();
 		this.sendDate = chatMessage.getSendDate();
 		this.uid = chatMessage.getUid();
-		this.hidden = chatMessage.getHidden();
+		this.hidden = chatMessage.isHidden();
 	}
 
 	public String getBody() {

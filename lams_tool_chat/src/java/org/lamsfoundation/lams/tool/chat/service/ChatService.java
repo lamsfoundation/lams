@@ -813,7 +813,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	}
 	
 	private Pattern getFilterPattern(Chat chat) {
-		if (!chat.getFilteringEnabled()) {
+		if (!chat.isFilteringEnabled()) {
 			return null;
 		}
 		

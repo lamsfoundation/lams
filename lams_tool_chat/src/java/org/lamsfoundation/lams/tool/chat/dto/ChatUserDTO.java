@@ -56,7 +56,7 @@ public class ChatUserDTO implements Comparable{
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
 		this.userID = user.getUserId();
-		this.finishedActivity = user.getFinishedActivity();
+		this.finishedActivity = user.isFinishedActivity();
 		postCount=0; // this needs to be set manually.
 	}
 

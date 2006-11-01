@@ -70,10 +70,10 @@ public class ChatDTO {
 		instructions = chat.getInstructions();
 		onlineInstructions = chat.getOnlineInstructions();
 		offlineInstructions = chat.getOfflineInstructions();
-		contentInUse = chat.getContentInUse();
+		contentInUse = chat.isContentInUse();
 		reflectInstructions = chat.getReflectInstructions();
-		reflectOnActivity = chat.getReflectOnActivity();
-		lockOnFinish = chat.getLockOnFinished();
+		reflectOnActivity = chat.isReflectOnActivity();
+		lockOnFinish = chat.isLockOnFinished();
 
 		for (Iterator i = chat.getChatAttachments().iterator(); i.hasNext();) {
 			ChatAttachment att = (ChatAttachment) i.next();

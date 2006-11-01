@@ -124,7 +124,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		ChatSessionDTO sessionDTO = new ChatSessionDTO(chatSession, messageList);
 
 		// if reflectOnActivity is enabled add userDTO.
-		if (chatSession.getChat().getReflectOnActivity()) {
+		if (chatSession.getChat().isReflectOnActivity()) {
 			ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
 
 			// get the entry.
@@ -175,7 +175,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			ChatSessionDTO sessionDTO = new ChatSessionDTO(session);
 
 			// if reflectOnActivity is enabled add all userDTO.
-			if (session.getChat().getReflectOnActivity()) {
+			if (session.getChat().isReflectOnActivity()) {
 
 				for (Iterator iterator = session.getChatUsers().iterator(); iterator
 						.hasNext();) {

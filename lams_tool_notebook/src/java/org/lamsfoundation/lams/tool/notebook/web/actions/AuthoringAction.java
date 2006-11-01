@@ -123,7 +123,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// check if content in use is set
-		if (notebook.getContentInUse()) {
+		if (notebook.isContentInUse()) {
 			// Cannot edit, send to message page.
 			request.setAttribute(NotebookConstants.ATTR_MESSAGE, getResources(
 					request).getMessage("error.content.locked"));
@@ -383,8 +383,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setInstructions(notebook.getInstructions());
 		authForm.setOnlineInstruction(notebook.getOnlineInstructions());
 		authForm.setOfflineInstruction(notebook.getOfflineInstructions());
-		authForm.setLockOnFinished(notebook.getLockOnFinished());
-		authForm.setAllowRichEditor(notebook.getAllowRichEditor());
+		authForm.setLockOnFinished(notebook.isLockOnFinished());
+		authForm.setAllowRichEditor(notebook.isAllowRichEditor());
 	}
 
 	/**
