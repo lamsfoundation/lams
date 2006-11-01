@@ -15,6 +15,7 @@
     	    <role-name>COURSE MANAGER</role-name>
     		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -25,6 +26,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     
@@ -50,6 +52,7 @@
     	    <role-name>COURSE MANAGER</role-name>
     		<role-name>COURSE ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -90,4 +93,8 @@
 	<security-role>
 		<description>Can add/remove users to the system, set up classes of users for sessions</description>
 		<role-name>SYSADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
