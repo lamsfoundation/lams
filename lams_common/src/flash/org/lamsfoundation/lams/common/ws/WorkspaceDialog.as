@@ -196,7 +196,7 @@ class WorkspaceDialog extends MovieClip{
 		this.tabChildren = true;
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		setTabIndex();
-		
+		//removeProps(_workspaceView.getModel().
     }
 	
 	/**
@@ -213,7 +213,7 @@ class WorkspaceDialog extends MovieClip{
 		//get a ref to the controller and kkep it here to listen for events:
 		_workspaceController = _workspaceView.getController();
 		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
+		removeProps(_workspaceController.getWSModel())
 		
 		 //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
@@ -353,7 +353,7 @@ class WorkspaceDialog extends MovieClip{
 		
 		if(wm.isForced() && nodeToOpen.attributes.data.resourceID == WorkspaceModel.ROOT_VFOLDER){
 			// select users root workspace folder
-			treeview.selectedNode = nodeToOpen.firstChild;
+			//treeview.selectedNode = nodeToOpen.firstChild;
 			dispatchEvent({type:'change', target:this.treeview});
 			
 			// no longer force open the Organisation virtual folder
@@ -402,6 +402,21 @@ class WorkspaceDialog extends MovieClip{
 		_workspaceController.onTreeNodeOpen({type:'nodeOpen',target:treeview,node:nodeToOpen});
 	}
 	
+	private function removeProps(wm:WorkspaceModel):Void{
+		if (wm.currentMode == Workspace.MODE_OPEN){
+				switchView_tab.removeItemAt(1)
+		}	
+		
+	}
+	
+	private function restoreProps(wm:WorkspaceModel):Void{
+		if(wm.currentMode == Workspace.MODE_OPEN){	
+				if (typeof(switchView_tab.getItemAt(1)) != "object"){
+					switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_properties_button'), data:'PROPERTIES'});
+				}
+			}	
+		
+	}
 	
 	private function itemSelected(newSelectedNode:XMLNode,wm:WorkspaceModel){
 		//update the UI with the new info:
@@ -409,19 +424,23 @@ class WorkspaceDialog extends MovieClip{
 
 		//Only update the details if the node if its a resource:a
 		var nodeData = newSelectedNode.attributes.data;
-				
+		removeProps(wm);
 		if(nodeData.resourceType == _workspaceModel.RT_FOLDER){
+			
 			
 			resourceTitle_txi.text = "";
 			
 			if(wm.currentMode != Workspace.MODE_SAVEAS || wm.currentMode != Workspace.MODE_SAVE){	
+				
 				resourceDesc_txa.text = "";
 				license_txa.text = "";
 				licenseID_cmb.selectedIndex = 0;
 			}
+			removeProps(wm)
 			
 		}else{
 			
+			restoreProps(wm);
 			resourceTitle_txi.text = nodeData.name;
 			if(StringUtils.isNull(nodeData.description)){
 				resourceDesc_txa.text = "";
@@ -436,9 +455,14 @@ class WorkspaceDialog extends MovieClip{
 				for(var i=0; i<licenseID_cmb.dataProvider.length; i++){
 					if(licenseID_cmb.dataProvider[i].data.licenseID == nodeData.licenseID){
 						licenseID_cmb.selectedIndex = i;
+						
 					}
 				}
+				if(wm.currentMode == Workspace.MODE_OPEN){
+					licenseID_cmb.enabled = false;
+				}
 				onLicenseComboSelect();
+				
 				
 			}else{
 				licenseID_cmb.selectedIndex = 0;
@@ -473,6 +497,7 @@ class WorkspaceDialog extends MovieClip{
 			for(var i=0; i<licenseID_cmb.dataProvider.length; i++){
 				if(licenseID_cmb.dataProvider[i].data.licenseID == details.licenseID){
 					licenseID_cmb.selectedIndex = i;
+					
 				}
 			}
 			onLicenseComboSelect();
@@ -568,6 +593,8 @@ class WorkspaceDialog extends MovieClip{
 			license_comment_lbl.visible = false;
 			license_txa.visible = false;
 		}
+		
+		
 
 	}
 	
@@ -586,9 +613,7 @@ class WorkspaceDialog extends MovieClip{
 			setPropertiesContentVisible(false);
 			//setTabIndex("LOCATION");
 			_currentTab = LOCATION_TAB;
-			if(_workspaceModel.currentMode == Workspace.MODE_OPEN){
-				switchView_tab.visible = false;
-			}
+			//removeProps(wm);
 						
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
