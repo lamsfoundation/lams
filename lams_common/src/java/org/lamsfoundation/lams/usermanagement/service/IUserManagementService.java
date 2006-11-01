@@ -329,4 +329,18 @@ public interface IUserManagementService {
 	 * @return
 	 */
 	public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType);
+	
+
+	public boolean hasRoleInOrganisation(User user,  Integer roleId);
+	
+	/**
+	 * Returns true if user has the role in the given organisation. Otherwise false.
+	 * @param user
+	 * @param roleId
+	 * @param organisation
+	 * @return
+	 */
+	public boolean hasRoleInOrganisation(User user,  Integer roleId, Organisation organisation);
+	
+
 }

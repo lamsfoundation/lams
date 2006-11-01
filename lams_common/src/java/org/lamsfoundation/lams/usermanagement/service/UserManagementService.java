@@ -38,6 +38,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -76,6 +77,7 @@ public class UserManagementService implements IUserManagementService {
 
 	private IBaseDAO baseDAO;
 	private IGroupDAO groupDAO; 
+	private IRoleDAO roleDAO;
 	protected MessageService messageService;
 
 	/**
@@ -98,6 +100,10 @@ public class UserManagementService implements IUserManagementService {
 	
 	public void setGroupDAO(IGroupDAO groupDAO) {
 		this.groupDAO = groupDAO;
+	}
+	
+	public void setRoleDAO(IRoleDAO roleDAO) {
+		this.roleDAO = roleDAO;
 	}
 
 	public void save(Object object) {
@@ -707,5 +713,16 @@ public class UserManagementService implements IUserManagementService {
 			allRoles.remove(role);
 		}
 		return allRoles;
+	}
+	
+	public boolean hasRoleInOrganisation(User user,  Integer roleId) {
+		return hasRoleInOrganisation(user, roleId, getRootOrganisation());
+	}
+	
+	public boolean hasRoleInOrganisation(User user,  Integer roleId, Organisation organisation) {
+		if(roleDAO.getUserByOrganisationAndRole(user.getUserId(), roleId, organisation) != null)
+			return true;
+		else
+			return false;
 	}
 }

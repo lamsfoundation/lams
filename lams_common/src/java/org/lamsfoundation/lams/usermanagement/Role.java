@@ -230,4 +230,8 @@ public class Role implements Serializable,Comparable{
     public boolean isSysAdmin(){
     	return this.roleId.equals(ROLE_SYSADMIN);
     }
+    
+    public boolean isAuthorAdmin(){
+    	return this.roleId.equals(ROLE_AUTHOR_ADMIN);
+    }
 }
