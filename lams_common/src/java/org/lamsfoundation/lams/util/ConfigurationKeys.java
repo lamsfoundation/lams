@@ -114,15 +114,6 @@ public class ConfigurationKeys {
 	/** universal date of dictionary updates */
 	public static String DICTIONARY_DATE_CREATED = "DictionaryDateCreated";
 
-	/** deprecated */
-	public static String DICTIONARY = "Dictionary";
-	
-	/** deprecated */
-	public static String DICTIONARY_CREATE_DATE = "createDate";
-	
-	/** deprecated */
-	public static String DICTIONARY_LANGUAGE = "language";
-	
 	public static String HELP_URL = "HelpURL";
 	
 	public static String XMPP_DOMAIN = "XmppDomain";
@@ -137,4 +128,5 @@ public class ConfigurationKeys {
 	
 	public static String DEFAULT_HTML_THEME = "DefaultHTMLTheme";
 	
+	public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
 }
