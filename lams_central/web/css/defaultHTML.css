@@ -392,14 +392,28 @@ a:hover.button-add-item {
 	text-decoration: none;
 	border-bottom: 1px dotted #0087E5;
 	}
-	
-	
+		
 #content a:hover.sequence-name-link {
 	color:#0087E5;
 	text-decoration: none;
 	border-bottom: 1px solid #0087E5;
 	
 }
+
+#content a.disabled-sequence-name-link {
+	color:#FF6666;
+	text-decoration: none;
+	border-bottom: 1px dotted #FF6666;
+	}
+	
+	
+#content a:hover.disabled-sequence-name-link {
+	color:#FF6666;
+	text-decoration: none;
+	border-bottom: 1px solid #FF6666;
+	
+}
+
 
 #content a.sequence-action-link {
 	color:#47bc23;

@@ -21,9 +21,9 @@
 			<div class="sequence-name">
 				<p>
 					<c:if test="${empty lesson.url}">
-						<a class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
-						<c:if test="${lesson.state eq 4}">&nbsp;<font color="red"><fmt:message key="label.disabled"/></font></c:if>
-						<c:if test="${lesson.state eq 6}">&nbsp;<font color="red"><fmt:message key="label.archived"/></font></c:if>
+						<a class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+						<c:if test="${lesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
+						<c:if test="${lesson.state eq 6}">&nbsp;(<fmt:message key="label.archived"/>)</c:if>
 					</c:if>
 					<c:if test="${not empty lesson.url}">
 						<a href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
@@ -51,9 +51,9 @@
 			<c:forEach var="childLesson" items="${childOrg.lessons}">
 				<p>
 					<c:if test="${empty childLesson.url}">
-						<a class="sequence-name-link"> <c:out value="${childLesson.name}" /></a>
-						<c:if test="${childLesson.state eq 4}">&nbsp;<font color="red"><fmt:message key="label.disabled"/></font></c:if>
-						<c:if test="${childLesson.state eq 6}">&nbsp;<font color="red"><fmt:message key="label.archived"/></font></c:if>
+						<a class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
+						<c:if test="${childLesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
+						<c:if test="${childLesson.state eq 6}">&nbsp;(<fmt:message key="label.archived"/>)</c:if>
 					</c:if>
 					<c:if test="${not empty childLesson.url}">
 						<a href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
