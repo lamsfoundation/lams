@@ -36,6 +36,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -60,8 +62,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  *                scope="session"
  *                validate="false"
  *
- * @struts:action-forward name="userlist"
- *                        path="/usermanage.do"
+ * @struts:action-forward name="userlist" path="/usermanage.do"
+ * @struts:action-forward name="userorg" path="/userorg.do"
  */
 public class UserOrgRoleSaveAction extends Action {
 	
@@ -75,17 +77,20 @@ public class UserOrgRoleSaveAction extends Action {
 		
 		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
+		
 		ArrayList userBeans = userOrgRoleForm.getUserBeans();
 		log.debug("userBeans is null? "+userBeans==null);
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
+		log.debug("orgId: "+orgId);
+		
 		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
+		
 		request.setAttribute("org",orgId);
 		request.getSession().removeAttribute("UserOrgRoleForm");		
+		
 		if(isCancelled(request)){
 			return mapping.findForward("userlist");
 		}
-		
-		log.debug("orgId: "+orgId);
 		
 		// save UserOrganisation memberships, and the associated roles;
 		// for subgroups, if user is not a member of the parent group then add to that as well.
@@ -94,6 +99,14 @@ public class UserOrgRoleSaveAction extends Action {
 			User user = (User)service.findById(User.class, bean.getUserId());
 			log.debug("userId: "+bean.getUserId());
 			String[] roleIds = bean.getRoleIds();
+			if (roleIds.length==0) {
+				// TODO forward to userorgrole.do, not userorg.do
+				ActionMessages errors = new ActionMessages();
+				errors.add("roles", new ActionMessage("error.roles.empty"));
+				saveErrors(request,errors);
+				request.setAttribute("orgId", orgId);
+				return mapping.findForward("userorg");
+			}
 			service.setRolesForUserOrganisation(user, organisation, (List<String>)Arrays.asList(roleIds));
 			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 				if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
