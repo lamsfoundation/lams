@@ -275,6 +275,11 @@
       validate="false"
     >
       <forward
+        name="choice"
+        path="/toolcontent/exportchoice.jsp"
+        redirect="false"
+      />
+      <forward
         name="loading"
         path="/toolcontent/exportloading.jsp"
         redirect="false"
@@ -294,11 +299,6 @@
       unknown="false"
       validate="false"
     >
-      <forward
-        name="success"
-        path="/index.jsp"
-        redirect="false"
-      />
     </action>
     <action
       path="/portrait"
@@ -311,6 +311,29 @@
       <forward
         name="portrait"
         path=".portrait"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/launchlearner"
+      type="org.lamsfoundation.lams.web.LaunchLearnerAction"
+      parameter="mod"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="learner"
+        path="/launchlearner.jsp"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
         redirect="false"
       />
     </action>
