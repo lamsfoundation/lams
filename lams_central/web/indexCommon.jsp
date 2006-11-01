@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
 
 <c:forEach var="orgBean" items="${orgBeans}">
 	<div class="course-bg">
@@ -19,7 +20,13 @@
 		<c:forEach var="lesson" items="${orgBean.lessons}">
 			<div class="sequence-name">
 				<p>
-					<a href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+					<c:if test="${empty lesson.url}">
+						<a class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+						<c:if test="${lesson.state eq 4}">&nbsp;<font color="red"><fmt:message key="label.disabled"/></font></c:if>
+					</c:if>
+					<c:if test="${not empty lesson.url}">
+						<a href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+					</c:if>
 					<c:forEach var="lessonlink" items="${lesson.links}">
 						<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
 							<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="19" height="16" class="align-middle" /> 
@@ -42,9 +49,13 @@
 			</p>
 			<c:forEach var="childLesson" items="${childOrg.lessons}">
 				<p>
-					<a href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> 
-						<c:out value="${childLesson.name}" /> 
-					</a> 
+					<c:if test="${empty childLesson.url}">
+						<a class="sequence-name-link"> <c:out value="${childLesson.name}" /></a>
+						<c:if test="${childLesson.state eq 4}">&nbsp;<font color="red"><fmt:message key="label.disabled"/></font></c:if>
+					</c:if>
+					<c:if test="${not empty childLesson.url}">
+						<a href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
+					</c:if>
 					<c:forEach var="childlessonlink" items="${childLesson.links}">
 					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
 						<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="19" height="16" border="0" class="align-middle"> 

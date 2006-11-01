@@ -38,6 +38,7 @@ import java.util.List;
 public class IndexLessonBean implements Comparable{
 	private String name;
 	private String url;
+	private Integer state;
 	private List<IndexLinkBean> links;
 
 	public IndexLessonBean(String name, List<IndexLinkBean> links) {
@@ -76,5 +77,11 @@ public class IndexLessonBean implements Comparable{
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public Integer getState() {
+		return state;
+	}
+	public void setState(Integer state) {
+		this.state = state;
 	}
 }

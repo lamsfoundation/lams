@@ -194,6 +194,7 @@ public class IndexAction extends Action {
 					if(lessonLinks.size()>0 || url!=null){
 						IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
 						lessonBean.setUrl(url);
+						lessonBean.setState(lesson.getLessonStateId());
 						lessonBeans.add(lessonBean);
 					}
 				}
