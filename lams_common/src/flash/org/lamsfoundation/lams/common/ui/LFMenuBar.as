@@ -383,14 +383,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
                 break;
 			case eventObj.menu.drawTransitionalItem :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().toggleTransitionTool();
+				break;
 			case eventObj.menu.drawOptionalItem :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().toggleOptionalActivity();
-				break;
-			case eventObj.menu.archiveItem:
-				break;
-			case eventObj.menu.enableItem:
-				break;
-			case eventObj.menu.disableItem:
 				break;
         }        
     }    
