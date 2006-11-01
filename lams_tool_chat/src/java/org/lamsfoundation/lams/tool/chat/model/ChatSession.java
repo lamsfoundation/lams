@@ -60,7 +60,7 @@ public class ChatSession implements java.io.Serializable {
 
 	private Chat chat;
 
-	private Set chatUsers = new HashSet(0);
+	private Set chatUsers;
 	
 	private String jabberRoom;
 	

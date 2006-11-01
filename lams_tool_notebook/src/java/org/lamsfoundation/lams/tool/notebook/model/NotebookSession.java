@@ -60,7 +60,7 @@ public class NotebookSession implements java.io.Serializable {
 
 	private Notebook notebook;
 
-	private Set notebookUsers = new HashSet(0);
+	private Set notebookUsers;
 
 	// Constructors
 
