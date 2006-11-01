@@ -40,7 +40,6 @@ public class ForumDao extends HibernateDaoSupport {
 	public void saveOrUpdate(Forum forum) {
 		forum.updateModificationData();
 		this.getHibernateTemplate().saveOrUpdate(forum);
-		this.getHibernateTemplate().flush();
 	}
 
 	public Forum getById(Long forumId) {
@@ -56,7 +55,6 @@ public class ForumDao extends HibernateDaoSupport {
 	 */
 	public void delete(Forum forum) {
 		this.getHibernateTemplate().delete(forum);
-		this.getHibernateTemplate().flush();
 	}
 
 	public Forum getByContentId(Long contentID) {
@@ -66,8 +64,4 @@ public class ForumDao extends HibernateDaoSupport {
 		else
 			return null;
 	}
-	public void flush() {
-		this.getHibernateTemplate().flush();
-	}
-
 }

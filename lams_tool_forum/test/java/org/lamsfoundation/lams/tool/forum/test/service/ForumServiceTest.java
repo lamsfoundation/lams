@@ -193,15 +193,7 @@ public class ForumServiceTest extends DAOBaseTest{
 		forumDao.delete(forum);
 		forumUserDao.delete(user);
 	}
-	public void testUpdateSession() throws DataMissingException, ToolException{
-		ForumToolSession sessionA = TestUtils.getSessionA();
-		forumService.updateSession(sessionA);
-		ForumToolSession session = forumService.getSessionBySessionId(sessionA.getSessionId());
-		assertEquals(session,sessionA);
-		
-		//remove test data.
-		sessionManager.removeToolSession(sessionA.getSessionId());
-	}
+
 	public void testCreateUser(){
 		ForumUser userA = TestUtils.getUserA();
 		forumService.createUser(userA);

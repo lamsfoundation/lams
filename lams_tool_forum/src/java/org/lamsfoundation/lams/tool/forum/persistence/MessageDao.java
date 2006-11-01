@@ -39,9 +39,6 @@ public class MessageDao extends HibernateDaoSupport {
 	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
 					+ " where is_authored = true and forum_uid=? order by create_date";
 	
-	private static final String SQL_QUERY_COUNT_SESSION_TOPICS_FROM_AUTHOR = "select count(*) from " + Message.class.getName()
-	+ " as m where m.isAuthored = true and m.toolSession.sessionId=?";
-	
 	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
 					+ " where parent=?";
 	
@@ -57,12 +54,12 @@ public class MessageDao extends HibernateDaoSupport {
 	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
+		
 		this.getHibernateTemplate().saveOrUpdate(message);
 	}
 	
 	public void update(Message message) {
 		this.getHibernateTemplate().saveOrUpdate(message);
-		this.getHibernateTemplate().flush();
 	}
 
 	public Message getById(Long messageId) {
@@ -89,7 +86,6 @@ public class MessageDao extends HibernateDaoSupport {
 		Message msg = getById(uid);
 		if(msg != null){
 			this.getHibernateTemplate().delete(msg);
-			this.getHibernateTemplate().flush();
 		}
 	}
 	/**
@@ -129,13 +125,6 @@ public class MessageDao extends HibernateDaoSupport {
 			return ((Number)list.get(0)).intValue();
 		else
 			return 0;
-	}
-	public boolean hasAuthoredTopics(Long sessionId) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_COUNT_SESSION_TOPICS_FROM_AUTHOR,new Object[]{sessionId});
-		if(list != null && list.size() > 0)
-			return ((Number)list.get(0)).longValue() > 0 ? true:false;
-		else
-			return false;
 	}
 
 }

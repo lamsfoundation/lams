@@ -25,6 +25,12 @@
             </generator>
         </id>
 
+        <version
+            name="version"
+            column="version"
+            type="int"
+        />
+
         <property
             name="sessionEndDate"
             type="java.util.Date"

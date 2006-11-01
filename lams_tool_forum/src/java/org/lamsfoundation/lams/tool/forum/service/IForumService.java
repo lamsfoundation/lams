@@ -233,11 +233,7 @@ public interface IForumService {
 	 * @return
 	 */
 	public ForumToolSession getSessionBySessionId(Long sessionId);
-	/**
-	 * Update Forum Tool Session record in database. 
-	 * @param session
-	 */
-	public void updateSession(ForumToolSession session);
+
 	/**
 	 * Get session list according to content ID. 
 	 * @param contentID

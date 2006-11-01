@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -189,7 +190,11 @@ public class LearningAction extends Action {
 		
 		//try to clone topics from :See bug LDEV-649 
 		Long contentId = forum.getContentId();
-		forumService.cloneContentTopics(contentId, sessionId);
+		try {
+			forumService.cloneContentTopics(contentId, sessionId);
+		} catch (ObjectOptimisticLockingFailureException e) {
+			log.debug("Multiple learner get into forum simultaneously. Duplicated content root topics cloning skipped.");
+		}
 		
 		//set some option flag to HttpSession
 		Long forumId = forum.getUid();
@@ -458,8 +463,10 @@ public class LearningAction extends Action {
 		MessageDTO topic = getTopic(parentId);
 
 		if (topic != null && topic.getMessage() != null) {
+			String reTitle = topic.getMessage().getSubject();
 			// echo back current topic subject to web page
-			msgForm.getMessage().setSubject("Re:" + topic.getMessage().getSubject());
+			if(reTitle != null && !reTitle.trim().startsWith("Re:"))
+				msgForm.getMessage().setSubject("Re:" + reTitle);
 		}
 		SessionMap sessionMap = getSessionMap(request, msgForm);
 		sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);

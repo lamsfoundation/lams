@@ -40,7 +40,7 @@ public interface ForumConstants {
 	// should be at the top, reply date will descide the order etc.
 	public static final boolean OLD_FORUM_STYLE  = true;
 	
-	public static final int COMPLETED = 1;
+	public static final int STATUS_CONTENT_COPYED = 1;
 	public static final int SESSION_STATUS_FINISHED = 1;
 	
     public final static int MAX_FILE_SIZE = 250 * 1000;

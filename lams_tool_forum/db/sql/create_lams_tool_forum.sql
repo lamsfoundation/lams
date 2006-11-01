@@ -91,6 +91,7 @@ create table tl_lafrum11_report (
 )TYPE=InnoDB;
 create table tl_lafrum11_tool_session (
    uid bigint not null auto_increment,
+   version integer not null,
    session_end_date datetime,
    session_start_date datetime,
    status integer,
@@ -116,9 +117,9 @@ alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), a
 
 
 INSERT INTO tl_lafrum11_forum (uid,title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor, allow_new_topic,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,reflect_on_activity) 
-VALUES(1,"LAMS Forum","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0,0,1,0,1,1,0,0,1,5000,0);
+VALUES(1,"Forum","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,1,1,0,1,5000,0);
 
 INSERT INTO `tl_lafrum11_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `is_authored`, `is_anonymous`, `forum_session_uid`, `parent_uid`, `forum_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
-  (1,NOW(),NOW(),NOW(),null,null,'Topic Title','Topic message',1,0,NULL,NULL,1,0,0,NULL);
+  (1,NOW(),NOW(),NOW(),null,null,'Topic Heading','Topic message',1,0,NULL,NULL,1,0,0,NULL);
   
 SET FOREIGN_KEY_CHECKS=1;

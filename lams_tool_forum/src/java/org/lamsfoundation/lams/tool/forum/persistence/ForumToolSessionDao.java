@@ -45,7 +45,6 @@ public class ForumToolSessionDao extends HibernateDaoSupport {
 	
 	public void saveOrUpdate(ForumToolSession session){
 		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
 	}
 
 	public List getByContentId(Long contentID) {
@@ -56,11 +55,9 @@ public class ForumToolSessionDao extends HibernateDaoSupport {
 	public void delete(Long sessionId) {
 		ForumToolSession session = getBySessionId(sessionId);
 		this.getHibernateTemplate().delete(session);
-		this.getHibernateTemplate().flush();
 	}
 
 	public void delete(ForumToolSession session){
 		this.getHibernateTemplate().delete(session);
-		this.getHibernateTemplate().flush();
 	}
 }

@@ -418,9 +418,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 	}
 
-	public void updateSession(ForumToolSession session) {
-		forumToolSessionDao.saveOrUpdate(session);
-	}
 
     public Long getToolDefaultContentIdBySignature(String toolSignature)
     {
@@ -478,7 +475,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	
 	public void cloneContentTopics(Long contentID, Long sessionID) {
 		//only session does not have content topcis
-		if(!messageDao.hasAuthoredTopics(sessionID)){
+		ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
+		
+		if(session.getStatus() != ForumConstants.STATUS_CONTENT_COPYED){
+			
 			log.debug("Clone tool content [" + contentID +"] topics for session [" + sessionID + "]");
 			
 			Forum forum = (Forum) forumDao.getByContentId(contentID);
@@ -493,6 +493,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 					}
 				}
 			}
+			//update status to avoid duplicate clone when next learner get in.
+			session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
+			forumToolSessionDao.saveOrUpdate(session);
+			
 		}
 	}
     //***************************************************************************************************************
@@ -643,7 +647,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		forum.setDefineLater(true);
 		forum.setContentInUse(false);
-		forumDao.flush();
 	}
 
 	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
@@ -652,7 +655,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
 		forum.setRunOffline(true);
-		forumDao.flush();
+		
 	}
 
 	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
@@ -785,7 +788,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 		ForumToolSession session = forumToolSessionDao.getBySessionId(toolSessionId);
 		if(session != null){
-			session.setStatus(ForumConstants.COMPLETED);
 			forumToolSessionDao.saveOrUpdate(session);
 		}else{
 			log.error("Fail to leave tool Session.Could not find submit file " +
@@ -1080,5 +1082,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 		this.coreNotebookService = coreNotebookService;
 	}
+
 
 }

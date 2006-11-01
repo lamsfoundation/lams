@@ -48,7 +48,6 @@ public class ForumUserDao extends HibernateDaoSupport{
 	
 	public void save(ForumUser forumUser){
 		this.getHibernateTemplate().save(forumUser);
-		this.getHibernateTemplate().flush();
 	}
 	public ForumUser getByUserIdAndSessionId(Long userId, Long sessionId) {
 		List list =  this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID
@@ -75,7 +74,6 @@ public class ForumUserDao extends HibernateDaoSupport{
 
 	public void delete(ForumUser user) {
 		this.getHibernateTemplate().delete(user);
-		this.getHibernateTemplate().flush();
 	}
 
 
