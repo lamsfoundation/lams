@@ -71,9 +71,11 @@ public class UserOrgRoleAction extends Action {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-		
+				
 		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
+		// make sure we don't have left overs from any previous attempt
+		userOrgRoleForm.setUserBeans(new ArrayList());
 		
 		// set list of roles appropriate for the organisation type
 		List roles = (List)request.getAttribute("roles");
