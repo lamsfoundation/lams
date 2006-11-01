@@ -149,18 +149,4 @@ public class Configuration implements InitializingBean {
 			+ ( items!=null ? items.toString() : "none" ) ;
 	}
 	
-	/**
-	 * Retrieves the date in which the specified dictionary was created/updated.
-	 * If the dictionary isnt found, null is returned.
-	 * @return
-	 * @deprecated
-	 */
-	public static String getDictionaryDateForLanguage()
-	{
-		if ((items != null)&&(items.get(ConfigurationKeys.DICTIONARY_DATE_CREATED)!=null))
-			return (String)items.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
-		else
-			return null;
-	}
-
 }
