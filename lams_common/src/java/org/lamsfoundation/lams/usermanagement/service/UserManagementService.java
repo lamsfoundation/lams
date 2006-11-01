@@ -672,10 +672,10 @@ public class UserManagementService implements IUserManagementService {
 			save(uor);
 			log.debug("setting role: "+role.getName());
 			uors.add(uor);
-			if (role.getName().equals(Role.AUTHOR)) {
-				if (user.getWorkspace()==null) {
-					createWorkspaceForUser(user);
-				}
+			if (role.getName().equals(Role.AUTHOR) 
+					|| role.getName().equals(Role.AUTHOR_ADMIN)
+					|| role.getName().equals(Role.SYSADMIN)) {
+				if (user.getWorkspace()==null) createWorkspaceForUser(user);
 			}
 		}
 		uo.setUserOrganisationRoles(uors);
