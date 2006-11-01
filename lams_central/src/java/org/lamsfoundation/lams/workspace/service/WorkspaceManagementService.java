@@ -382,12 +382,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
 			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.OWNER_ACCESS;
-		} else if(user.hasMemberAccess(workspaceFolder)) {
-			log.debug(user.getLogin()+" has membership access to "+workspaceFolder.getName());
-			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 		} else if (userMgmtService.hasRoleInOrganisation(user, Role.ROLE_AUTHOR_ADMIN)){
 			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.OWNER_ACCESS;
+		} else if(user.hasMemberAccess(workspaceFolder)) {
+			log.debug(user.getLogin()+" has membership access to "+workspaceFolder.getName());
+			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 		} else {
 			log.debug(user.getLogin()+" has no access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.NO_ACCESS;
