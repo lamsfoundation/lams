@@ -153,7 +153,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		request.getSession().setAttribute("chatDTO", chatDTO);
 	}
 
-	public void doTeacherExport(HttpServletRequest request,
+	private void doTeacherExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
 			throws ChatException {
 
