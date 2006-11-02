@@ -353,7 +353,7 @@ class WorkspaceDialog extends MovieClip{
 		
 		if(wm.isForced() && nodeToOpen.attributes.data.resourceID == WorkspaceModel.ROOT_VFOLDER){
 			// select users root workspace folder
-			//treeview.selectedNode = nodeToOpen.firstChild;
+			treeview.selectedNode = nodeToOpen.firstChild;
 			dispatchEvent({type:'change', target:this.treeview});
 			
 			// no longer force open the Organisation virtual folder
@@ -459,7 +459,7 @@ class WorkspaceDialog extends MovieClip{
 					}
 				}
 				if(wm.currentMode == Workspace.MODE_OPEN){
-					licenseID_cmb.enabled = false;
+					//licenseID_cmb.enabled = false;
 				}
 				onLicenseComboSelect();
 				
@@ -585,6 +585,7 @@ class WorkspaceDialog extends MovieClip{
 		resourceDesc_txa.visible = v;
 		licenseImg_pnl.visible = v;
 		viewLicense_btn.visible = v;
+		
 		licenseID_cmb.visible = v;
 		if(licenseID_cmb.value.licenseID == OTHER_LICENSE_ID) {
 			license_comment_lbl.visible = v;
@@ -612,12 +613,19 @@ class WorkspaceDialog extends MovieClip{
 			setLocationContentVisible(true);
 			setPropertiesContentVisible(false);
 			//setTabIndex("LOCATION");
+			if(wm.currentMode=="OPEN"){
+				licenseID_cmb.enabled = true;
+			}
 			_currentTab = LOCATION_TAB;
+			
 			//removeProps(wm);
 						
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
 			setPropertiesContentVisible(true);
+			if(wm.currentMode=="OPEN"){
+				licenseID_cmb.enabled = false;
+			}
 			//setTabIndex("PROPERTIES");
 			_currentTab = PROP_TAB;
 		}
@@ -625,6 +633,7 @@ class WorkspaceDialog extends MovieClip{
 		//set the right label on the 'doit' button
 		if(wm.currentMode=="OPEN"){
 			ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
+			//licenseID_cmb.enabled = false;
 		}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
 			ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
 		}else if(wm.currentMode=="READONLY"){
