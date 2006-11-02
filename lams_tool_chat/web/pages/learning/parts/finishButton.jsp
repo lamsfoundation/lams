@@ -26,9 +26,12 @@
 		</c:when>
 		<c:otherwise>
 			<html:hidden property="dispatch" value="finishActivity" />
-			<html:submit styleClass="button right-buttons">
-				<fmt:message key="button.finish" />
-			</html:submit>
+
+			<div class="small-space-bottom" align="right">
+				<html:submit styleClass="button">
+					<fmt:message key="button.finish" />
+				</html:submit>
+			</div>
 		</c:otherwise>
 	</c:choose>
 </html:form>

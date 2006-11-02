@@ -34,11 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
+	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
-
 		function submitLearningMethod(actionMethod) 
 		{
 			document.QaLearningForm.method.value=actionMethod; 
@@ -49,247 +48,200 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		{
 			submitLearningMethod(actionMethod);
 		}
-		
-		
-	</script>		
+	</script>
 </head>
 
 <body class="stripes">
 
 	<div id="content">
-	<h1>
-		<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
-	</h1>
+		<h1>
+			<c:out value="${generalLearnerFlowDTO.activityTitle}"
+				escapeXml="false" />
+		</h1>
 
-		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}"> 			
-
-		       	<table> 	  
-					<tr> <td>
-						<b> <fmt:message key="label.other.answers"/> </b>
-					 </td>
-					</tr>
-				</table>				
-
-		
-			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		  		<html:hidden property="method"/>	 
-				<html:hidden property="toolSessionID"/>		
-				<html:hidden property="userID"/>										
-				<html:hidden property="httpSessionID"/>		
-				<html:hidden property="totalQuestionCount"/>		
-
-					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-			  	 		<tr>
-			  	 			<td> &nbsp</td>
-			  	 		</tr>
-	
-						<tr>			
-							<td valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
-								<c:out value="${currentDto.question}" escapeXml="false"/>
-							 </td>
-						</tr>	
-
-						
-						<tr> 
-							<td valign=top>
-								<table cellpadding="0" class="alternative-color">
-		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-										<c:forEach var="sData" items="${questionAttemptData.value}">
-								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
-								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
-
-	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-													<tr> 
-														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
-													</tr>
-													<tr> 															
-													 	<td colspan=2 valign=top>   <c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>														 
-													</tr>													 
-											</c:if>														  					 
-	 									</c:forEach>		  	
-									</c:forEach>		  	
-								</table>
-							</td>  
-			  			</tr>
-					</c:forEach>		  	
+		<c:if
+			test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}">
 
 
-				<c:if test="${generalLearnerFlowDTO.notebookEntriesVisible != 'false'}"> 			
-						<tr> 
-						<td valign=top>
-								<table>
-									<tr> 
-					  	   		  		<td>
-											<b> <fmt:message key="label.notebook.entries"/> </b>						
-										 </td>
-									</tr>
-									
-									<tr> 
-					  	   		  		<td>
-											<c:out value="${generalLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
-										 </td>
-									</tr>
-							</table>
-	
-						</td>
-						</tr>
-				</c:if>														  					 					
+			<h2>
+				<fmt:message key="label.other.answers" />
+			</h2>
 
+			<html:form action="/learning?validate=false"
+				enctype="multipart/form-data" method="POST" target="_self">
+				<html:hidden property="method" />
+				<html:hidden property="toolSessionID" />
+				<html:hidden property="userID" />
+				<html:hidden property="httpSessionID" />
+				<html:hidden property="totalQuestionCount" />
 
-				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 
-					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }"> 				
-				       	<table> 	  
-								<tr> 
-		  	   		  		<td>
-	                               <html:button property="refreshAnswers" 
-	                                             styleClass="button" 
-	                                             onclick="submitMethod('viewAllResults');">
-	                                    <fmt:message key="label.refresh"/>
-	                                </html:button>
-						  	 </td>
-	
-								<td  valign=top>
-									<div class="right-buttons">							
-										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-											<html:button property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
-												<fmt:message key="button.endLearning"/>
-											</html:button>	 				
-									  	</c:if> 				    					
-						
-										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-											<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-												<fmt:message key="label.continue"/>
-											</html:button>	 				
-									  	</c:if> 				    					
-									</div> 		  															 		  												  	
-								</td> 
-								
-								</tr>
-						</table>
-				  	</c:if> 				    				  					
-			  	</c:if> 				    				  
-		
-		
+				<c:forEach var="currentDto"
+					items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+					<c:set var="currentQuestionId" scope="request"
+						value="${currentDto.questionUid}" />
+
+					<div class="shading-bg">
+						<p>
+							<strong> <fmt:message key="label.question" /> : </strong>
+							<c:out value="${currentDto.question}" escapeXml="false" />
+						</p>
+
+						<c:forEach var="questionAttemptData"
+							items="${currentDto.questionAttempts}">
+							<c:forEach var="sData" items="${questionAttemptData.value}">
+								<c:set var="userData" scope="request" value="${sData.value}" />
+								<c:set var="responseUid" scope="request" value="${userData.uid}" />
+
+								<c:if test="${currentQuestionId == userData.questionUid}">
+									<p>
+										<span class="field-name"> <c:out
+												value="${userData.userName}" /> </span> -
+										<lams:Date value="${userData.attemptTime}" />
+									</p>
+									<p>
+										<c:out value="${userData.responsePresentable}"
+											escapeXml="false" />
+
+									</p>
+								</c:if>
+							</c:forEach>
+						</c:forEach>
+					</div>
+				</c:forEach>
+
+				<c:if
+					test="${generalLearnerFlowDTO.notebookEntriesVisible != 'false'}">
+					<h2>
+						<fmt:message key="label.notebook.entries" />
+					</h2>
+					<c:out value="${generalLearnerFlowDTO.notebookEntry}"
+						escapeXml="false" />
+				</c:if>
+
+				<c:if
+					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
+					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
+
+						<html:button property="refreshAnswers" styleClass="button"
+							onclick="submitMethod('viewAllResults');">
+							<fmt:message key="label.refresh" />
+						</html:button>
+
+						<div class="space-bottom-top" align="right">
+							<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
+								<html:button property="endLearning"
+									onclick="javascript:submitMethod('endLearning');"
+									styleClass="button">
+									<fmt:message key="button.endLearning" />
+								</html:button>
+							</c:if>
+
+							<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
+								<html:button property="forwardtoReflection"
+									onclick="javascript:submitMethod('forwardtoReflection');"
+									styleClass="button">
+									<fmt:message key="label.continue" />
+								</html:button>
+							</c:if>
+						</div>
+					</c:if>
+				</c:if>
 			</html:form>
-		</c:if> 				    
-		
-		<c:if test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}"> 			
-		       	<table> 	  
-					<tr> <td>
-						<b> <fmt:message key="label.learnerReport"/> </b>
-					 </td>
-					</tr>
-				</table>						 
-		
-			  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		  		<html:hidden property="method"/>	 
-				<html:hidden property="toolSessionID"/>						
-				<html:hidden property="userID"/>														
-				<html:hidden property="httpSessionID"/>		
-				<html:hidden property="totalQuestionCount"/>		
-						
-				<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-			  	 		<tr>
-			  	 			<td> &nbsp</td>
-			  	 		</tr>
-						<tr>			
-							<td valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
-								<c:out value="${currentDto.question}" escapeXml="false"/>
-							 </td>
-						</tr>	
-
-						
-						<tr> 
-							<td valign=top>
-								<table cellpadding="0" class="alternative-color">
-		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-										<c:forEach var="sData" items="${questionAttemptData.value}">
-								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
-								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
-
-	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-													<tr> 
-														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
- 														 <td NOWRAP valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>
-													</tr>
-													<tr>
-														 <td colspan=2 valign=top>  <c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>														 
-													</tr>															
-											</c:if>														  					 
-	 									</c:forEach>		  	
-									</c:forEach>		  	
-								</table>
-							</td>  
-			  			</tr>
-					</c:forEach>		  	
-					
-
-				<c:if test="${generalLearnerFlowDTO.notebookEntriesVisible != 'false'}"> 			
-						<tr> 
-						<td valign=top>
-								<table>
-									<tr> 
-					  	   		  		<td>
-											<b> <fmt:message key="label.notebook.entries"/> </b>						
-										 </td>
-									</tr>
-									
-									<tr> 
-					  	   		  		<td>
-											<c:out value="${generalLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
-										 </td>
-									</tr>
-							</table>
-	
-						</td>
-						</tr>
-				</c:if>														  					 					
-					
+		</c:if>
 
 
-				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }"> 								
-					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }"> 								
-				       	<table> 	  
-							<tr> 
-		  	   		  		<td>
-	                               <html:button property="refreshAnswers" 
-	                                             styleClass="button" 
-	                                             onclick="submitMethod('viewAllResults');">
-	                                    <fmt:message key="label.refresh"/>
-	                                </html:button>
-						  	 </td>
-							
-								<td>
-									<div class="right-buttons">
-										<c:if test="${generalLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-											<html:button property="endLearning"  onclick="javascript:submitMethod('endLearning');" styleClass="button">
-												<fmt:message key="button.endLearning"/>
-											</html:button>	 				
-									  	</c:if> 				    					
-						
-										<c:if test="${generalLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-											<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-												<fmt:message key="label.continue"/>
-											</html:button>	 				
-									  	</c:if> 				    					
-									</div> 		  															 		  					
-									</td> 
-								</tr>
-						</table>
-					</c:if> 				    					
-				</c:if> 				    
 
+		<c:if
+			test="${generalLearnerFlowDTO.requestLearningReportProgress == 'true'}">
+
+			<h2>
+				<fmt:message key="label.learnerReport" />
+			</h2>
+
+			<html:form action="/learning?validate=false"
+				enctype="multipart/form-data" method="POST" target="_self">
+				<html:hidden property="method" />
+				<html:hidden property="toolSessionID" />
+				<html:hidden property="userID" />
+				<html:hidden property="httpSessionID" />
+				<html:hidden property="totalQuestionCount" />
+
+				<c:forEach var="currentDto"
+					items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+					<c:set var="currentQuestionId" scope="request"
+						value="${currentDto.questionUid}" />
+
+					<div class="shading-bg">
+						<p>
+							<strong> <fmt:message key="label.question" /> : </strong>
+							<c:out value="${currentDto.question}" escapeXml="false" />
+						</p>
+
+						<c:forEach var="questionAttemptData"
+							items="${currentDto.questionAttempts}">
+							<c:forEach var="sData" items="${questionAttemptData.value}">
+								<c:set var="userData" scope="request" value="${sData.value}" />
+								<c:set var="responseUid" scope="request" value="${userData.uid}" />
+
+								<c:if test="${currentQuestionId == userData.questionUid}">
+									<p>
+										<span class="field-name"><c:out
+												value="${userData.userName}" /> </span> -
+										<lams:Date value="${userData.attemptTime}" />
+									</p>
+									<p>
+										<c:out value="${userData.responsePresentable}"
+											escapeXml="false" />
+									</p>
+								</c:if>
+							</c:forEach>
+						</c:forEach>
+					</div>
+				</c:forEach>
+
+				<c:if
+					test="${generalLearnerFlowDTO.notebookEntriesVisible != 'false'}">
+					<h2>
+						<fmt:message key="label.notebook.entries" />
+					</h2>
+					<p>
+						<c:out value="${generalLearnerFlowDTO.notebookEntry}"
+							escapeXml="false" />
+					</p>
+				</c:if>
+
+				<c:if
+					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
+					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
+
+						<html:button property="refreshAnswers" styleClass="button"
+							onclick="submitMethod('viewAllResults');">
+							<fmt:message key="label.refresh" />
+						</html:button>
+
+						<div class="space-bottom-top" align="right">
+							<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
+								<html:button property="endLearning"
+									onclick="javascript:submitMethod('endLearning');"
+									styleClass="button">
+									<fmt:message key="button.endLearning" />
+								</html:button>
+							</c:if>
+
+							<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
+								<html:button property="forwardtoReflection"
+									onclick="javascript:submitMethod('forwardtoReflection');"
+									styleClass="button">
+									<fmt:message key="label.continue" />
+								</html:button>
+							</c:if>
+						</div>
+					</c:if>
+				</c:if>
 			</html:form>
-		</c:if> 				    
-
+		</c:if>
 	</div>
-	
 	<div id="footer"></div>
-	
-
 </body>
 </html:html>
 
@@ -301,5 +253,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-	
-	
+
+
