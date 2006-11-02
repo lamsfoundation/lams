@@ -72,8 +72,8 @@ public interface VoteAppConstants {
     public static final String RESPONSE_ID								="responseId";
     public static final String CURRENT_UID								="currentUid";
     public static final String SELECTED_TOOL_SESSION_ID					="selectedToolSessionId";
-    public static final String DEFAULT_VOTING_TITLE						="Voting Title";
-    public static final String DEFAULT_VOTING_INSTRUCTIONS				="Voting Instructions";
+    public static final String DEFAULT_VOTING_TITLE						="Voting";
+    public static final String DEFAULT_VOTING_INSTRUCTIONS				="Instructions";
     public static final String NOTEBOOK_ENTRIES_EXIST					="notebookEntriesExist";
     public static final String NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST		="noSessionsNotebookEntriesExist";
     public static final String UUID                                     ="uuid";
@@ -105,8 +105,8 @@ public interface VoteAppConstants {
     public static final String LIST_NOMINATION_CONTENT_DTO				= "listNominationContentDTO";
     public static final String LIST_NOMINATION_CONTENT_DTO_KEY			= "listNominationContentDTOKey";
     
-	public static final String DEFAULT_ONLINE_INST						="online instructions";
-	public static final String DEFAULT_OFFLINE_INST						="offline instructions";
+	public static final String DEFAULT_ONLINE_INST						="";
+	public static final String DEFAULT_OFFLINE_INST						="";
 	public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
 	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
