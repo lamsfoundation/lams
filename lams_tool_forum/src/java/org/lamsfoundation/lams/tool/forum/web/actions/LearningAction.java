@@ -467,6 +467,8 @@ public class LearningAction extends Action {
 			// echo back current topic subject to web page
 			if(reTitle != null && !reTitle.trim().startsWith("Re:"))
 				msgForm.getMessage().setSubject("Re:" + reTitle);
+			else
+				msgForm.getMessage().setSubject(reTitle);
 		}
 		SessionMap sessionMap = getSessionMap(request, msgForm);
 		sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
