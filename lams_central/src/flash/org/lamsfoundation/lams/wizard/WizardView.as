@@ -619,10 +619,11 @@ class WizardView extends AbstractView {
 			location_treeview.selectedNode = nodeToOpen.firstChild;
 			dispatchEvent({type:'change', target:this.location_treeview});
 			
-			var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
-			if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !location_treeview.getIsOpen(virNode)){
-				openFolder(virNode, wm);
-			}
+			// no longer open the organisation folder
+			//var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
+			//if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !location_treeview.getIsOpen(virNode)){
+			//	openFolder(virNode, wm);
+			//}
 		}
 		
 		refreshTree();
