@@ -130,6 +130,7 @@
 						</html:submit>
 					</html:form>
 				</div>
+				<!-- 
 				<div style="float:left;padding:5px;margin-left:5px">
 					<html:form action="/monitoring/viewAllMarks" target="_blank">
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
@@ -138,6 +139,7 @@
 						</html:submit>
 					</html:form>
 				</div>
+				 -->
 				<div style="float:left;padding:5px;margin-left:5px">
 					<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
 						<fmt:message key="button.release.mark" />

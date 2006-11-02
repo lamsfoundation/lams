@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -238,30 +239,6 @@ public class MonitoringAction extends Action {
 	}
 
 	/**
-	 * View all user marks for a special Session ID
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-
-		Long sessionID = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID));
-		forumService = getForumService();
-		List topicList = forumService.getAllTopicsFromSession(sessionID);
-
-		Map topicsByUser = getTopicsSortedByAuthor(topicList);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
-		request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
-		request.setAttribute(ForumConstants.PARAM_UPDATE_MODE, "listAllMarks");
-		return mapping.findForward("success");
-	}
-
-	/**
 	 * Download marks for all users in a speical session.
 	 * 
 	 * @param mapping
@@ -383,165 +360,6 @@ public class MonitoringAction extends Action {
 		}
 
 		return null;
-	}
-
-	/**
-	 * View a special user's mark
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		Long userUid = new Long(WebUtil.readLongParam(request,
-				ForumConstants.USER_UID));
-		Long sessionId = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID));
-
-		forumService = getForumService();
-		List<MessageDTO> messageList = forumService.getMessagesByUserUid(userUid, sessionId);
-		ForumUser user = forumService.getUser(userUid);
-
-		// each back to web page
-		Map<ForumUser,List<MessageDTO>> report = new TreeMap(this.new ForumUserComparator());
-		report.put(user,messageList);
-		request.setAttribute(ForumConstants.ATTR_REPORT, report);
-		
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-		request.setAttribute(ForumConstants.PARAM_UPDATE_MODE, "listMarks");
-		return mapping.findForward("success");
-	}
-
-	/**
-	 * Edit a special user's mark.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward editMark(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		Long userUid = new Long(WebUtil.readLongParam(request,
-				ForumConstants.USER_UID));
-		Long messageId = new Long(WebUtil.readLongParam(request,
-				ForumConstants.MESSAGE_UID));
-		Long sessionId = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID));
-		String updateMode = request.getParameter(ForumConstants.PARAM_UPDATE_MODE);
-		
-		// get Message and User from database
-		forumService = getForumService();
-		Message msg = forumService.getMessage(messageId);
-		ForumUser user = forumService.getUser(userUid);
-
-		// echo back to web page
-		MarkForm markForm = (MarkForm) form;
-		if (msg.getReport() != null) {
-			if (msg.getReport().getMark() != null)
-				markForm.setMark(msg.getReport().getMark().toString());
-			else
-				markForm.setMark("");
-			markForm.setComment(msg.getReport().getComment());
-		}
-		
-		// each back to web page
-		request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
-		request.setAttribute(ForumConstants.ATTR_USER, user);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-		request.setAttribute(ForumConstants.PARAM_UPDATE_MODE, updateMode);
-		
-		return mapping.findForward("success");
-	}
-
-	/**
-	 * Update mark for a special user
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward updateMark(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		MarkForm markForm = (MarkForm) form;
-		Long messageId = new Long(WebUtil.readLongParam(request,
-				ForumConstants.MESSAGE_UID));
-		Long userUid = new Long(WebUtil.readLongParam(request,
-				ForumConstants.USER_UID));
-		Long sessionId = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID));
-		String updateMode = request.getParameter(ForumConstants.PARAM_UPDATE_MODE);
-		request.setAttribute(ForumConstants.PARAM_UPDATE_MODE, updateMode);
-		
-		String mark = markForm.getMark();
-        ActionMessages errors = new ActionMessages();
-        if (StringUtils.isBlank(mark)) {
-          ActionMessage error = new ActionMessage("error.valueReqd");
-          errors.add("report.mark", error);
-        }else if(!NumberUtils.isNumber(mark)){
-        	ActionMessage error = new ActionMessage("error.mark.needNumber");
-        	errors.add("report.mark", error);
-        }else {
-        	try{
-        		Float.parseFloat(mark);
-        	}catch(Exception e){
-              	ActionMessage error = new ActionMessage("error.mark.invalid.number");
-            	errors.add("report.mark", error);
-        	}
-        }
-        
-		forumService = getForumService();
-		// echo back to web page
-		ForumUser user = forumService.getUser(userUid);
-		Message msg = forumService.getMessage(messageId);
-		
-		request.setAttribute(ForumConstants.ATTR_USER, user);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-		if(!errors.isEmpty()){
-			// each back to web page
-			request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
-        	saveErrors(request, errors);
-        	return mapping.getInputForward();
-        }
-
-		//update message report
-		
-		forumService = getForumService();
-		ForumReport report = msg.getReport();
-		if (report == null) {
-			report = new ForumReport();
-			msg.setReport(report);
-		}
-		//only session has been released mark, the data of mark release will have value.
-		ForumToolSession toolSession = forumService.getSessionBySessionId(sessionId);
-		if(toolSession.isMarkReleased())
-			report.setDateMarksReleased(new Date());
-		
-		report.setMark(new Float(Float.parseFloat(mark)));
-		report.setComment(markForm.getComment());
-		forumService.updateTopic(msg);
-		
-		//echo back to topic list page: it depends which screen is come from: view special user mark, or view all user marks. 
-		if(StringUtils.equals(updateMode, "listAllMarks")){
-			List topicList = forumService.getAllTopicsFromSession(sessionId);
-			Map topicsByUser = getTopicsSortedByAuthor(topicList);
-			request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
-		}else{
-			List<MessageDTO> messageList = forumService.getMessagesByUserUid(userUid, sessionId);
-			Map<ForumUser,List<MessageDTO>> topicMap = new TreeMap(this.new ForumUserComparator());
-			topicMap.put(user,messageList);
-			request.setAttribute(ForumConstants.ATTR_REPORT, topicMap);
-		}
-
-		//listMark or listAllMark.
-		return mapping.findForward("success");
-
 	}
 
 	/**
@@ -740,7 +558,7 @@ public class MonitoringAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		Long msgUid = new Long(WebUtil.readLongParam(request,
-				ForumConstants.MESSAGE_UID));
+				ForumConstants.ATTR_TOPIC_ID));
 
 		forumService = getForumService();
 		Message topic = forumService.getMessage(msgUid);
@@ -771,6 +589,202 @@ public class MonitoringAction extends Action {
 		return null;
 	}
 
+	// ==========================================================================================
+	// View and update marks methods
+	// ==========================================================================================
+
+	/**
+	 * View all user marks for a special Session ID
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		//only one param for session scope marks
+		Long sessionID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		
+		//create sessionMap
+		SessionMap<String, Object> sessionMap = new SessionMap<String,Object>();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
+		sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_SESSION);
+		
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		
+		//get tool session scope topics
+		forumService = getForumService();
+		List topicList = forumService.getAllTopicsFromSession(sessionID);
+
+		Map topicsByUser = getTopicsSortedByAuthor(topicList);
+		request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
+		return mapping.findForward("success");
+	}
+	/**
+	 * View a special user's mark
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		Long userUid = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
+		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+
+		//create sessionMap
+		SessionMap<String, Object> sessionMap = new SessionMap<String,Object>();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
+		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_USER);
+		
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		//get this user's all topics
+		forumService = getForumService();
+		List<MessageDTO> messageList = forumService.getMessagesByUserUid(userUid, sessionId);
+		ForumUser user = forumService.getUser(userUid);
+
+		// each back to web page
+		Map<ForumUser,List<MessageDTO>> report = new TreeMap(this.new ForumUserComparator());
+		report.put(user,messageList);
+		request.setAttribute(ForumConstants.ATTR_REPORT, report);
+		
+		return mapping.findForward("success");
+	}
+
+
+	/**
+	 * Edit a special user's mark.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward editMark(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		MarkForm markForm = (MarkForm) form;
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(markForm.getSessionMapID());
+		String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
+		//view forum mode
+		if(StringUtils.isBlank(updateMode)){
+			sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_FORUM);
+			sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID,markForm.getTopicID());
+		}
+		
+		// get Message and User from database
+		forumService = getForumService();
+		Message msg = forumService.getMessage(markForm.getTopicID());
+		ForumUser user = msg.getCreatedBy();
+
+		// echo back to web page
+		if (msg.getReport() != null) {
+			if (msg.getReport().getMark() != null)
+				markForm.setMark(msg.getReport().getMark().toString());
+			else
+				markForm.setMark("");
+			markForm.setComment(msg.getReport().getComment());
+		}
+		
+		// each back to web page
+		request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
+		request.setAttribute(ForumConstants.ATTR_USER, user);
+		
+		return mapping.findForward("success");
+	}
+
+	/**
+	 * Update mark for a special user
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward updateMark(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		MarkForm markForm = (MarkForm) form;
+		
+		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
+		String mark = markForm.getMark();
+        ActionMessages errors = new ActionMessages();
+        if (StringUtils.isBlank(mark)) {
+          ActionMessage error = new ActionMessage("error.valueReqd");
+          errors.add("report.mark", error);
+        }else if(!NumberUtils.isNumber(mark)){
+        	ActionMessage error = new ActionMessage("error.mark.needNumber");
+        	errors.add("report.mark", error);
+        }else {
+        	try{
+        		Float.parseFloat(mark);
+        	}catch(Exception e){
+              	ActionMessage error = new ActionMessage("error.mark.invalid.number");
+            	errors.add("report.mark", error);
+        	}
+        }
+        
+		forumService = getForumService();
+		// echo back to web page
+		Message msg = forumService.getMessage(markForm.getTopicID());
+		ForumUser user = msg.getCreatedBy();
+		
+		request.setAttribute(ForumConstants.ATTR_USER, user);
+		if(!errors.isEmpty()){
+			// each back to web page
+			request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
+        	saveErrors(request, errors);
+        	return mapping.getInputForward();
+        }
+
+		//update message report
+		
+		forumService = getForumService();
+		ForumReport report = msg.getReport();
+		if (report == null) {
+			report = new ForumReport();
+			msg.setReport(report);
+		}
+		
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(markForm.getSessionMapID());
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
+		
+		//only session has been released mark, the data of mark release will have value.
+		ForumToolSession toolSession = forumService.getSessionBySessionId(sessionId);
+		if(toolSession.isMarkReleased())
+			report.setDateMarksReleased(new Date());
+		
+		report.setMark(new Float(Float.parseFloat(mark)));
+		report.setComment(markForm.getComment());
+		forumService.updateTopic(msg);
+		
+		//echo back to topic list page: it depends which screen is come from: view special user mark, or view all user marks. 
+		if(StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_SESSION)){
+			List topicList = forumService.getAllTopicsFromSession(sessionId);
+			Map topicsByUser = getTopicsSortedByAuthor(topicList);
+			request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
+			//listMark or listAllMark.
+			return mapping.findForward("success");
+		}else if(StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_USER)){
+			List<MessageDTO> messageList = forumService.getMessagesByUserUid(user.getUid(), sessionId);
+			Map<ForumUser,List<MessageDTO>> topicMap = new TreeMap(this.new ForumUserComparator());
+			topicMap.put(user,messageList);
+			request.setAttribute(ForumConstants.ATTR_REPORT, topicMap);
+			//listMark or listAllMark.
+			return mapping.findForward("success");
+		}else{  //mark from view forum
+			return mapping.findForward("viewTopic");
+		}
+
+	}
 
 	// ==========================================================================================
 	// Utility methods

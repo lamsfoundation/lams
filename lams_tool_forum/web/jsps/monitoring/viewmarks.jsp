@@ -38,7 +38,7 @@
 			<tr>
 				<td>
 					<c:set var="viewtopic">
-						<html:rewrite page="/monitoring/viewTopic.do?messageID=${topic.message.uid}&create=${topic.message.created.time}" />
+						<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}" />
 					</c:set>
 					<html:link href="javascript:launchPopup('${viewtopic}','viewtopic');">
 						<c:out value="${topic.message.subject}" />
@@ -101,10 +101,8 @@
 			<tr>
 				<td colspan="5">
 					<html:form action="/monitoring/editMark" method="post">
-						<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' />>
-						<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' />>
-						<input type="hidden" name="userID" value=<c:out value='${user.uid}' />>
-						<input type="hidden" name="updateMode" value="${updateMode}" />
+						<html:hidden property="sessionMapID" value="${sessionMapID}"/>
+						<html:hidden property="topicID" value="${topic.message.uid}"/>
 						<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
 					</html:form>
 				</td>

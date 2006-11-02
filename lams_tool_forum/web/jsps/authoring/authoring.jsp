@@ -10,8 +10,7 @@
 	<input type="hidden" name="mode" value="author">
 
 	<c:set var="formBean"
-		value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<div id="header">
 
 

@@ -98,6 +98,14 @@
 					<div class="right-buttons">
 						<!--  Hide/Unhide Button -->
 						<c:if test='${sessionMap.mode == "teacher"}'>
+							<c:set var="updateMark">
+								<html:rewrite
+									page="/monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum" />
+							</c:set>
+						
+							<html:link href="${updateMark}" styleClass="button">
+								<fmt:message key="lable.topic.title.mark" />
+							</html:link>
 							<!--  call the hide action -->
 							<c:choose>
 								<c:when test="${hidden}">

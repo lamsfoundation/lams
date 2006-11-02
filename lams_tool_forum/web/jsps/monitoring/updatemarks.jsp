@@ -1,10 +1,12 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
+
 <html:form action="/monitoring/updateMark" method="post">
-		<input type="hidden" name="toolSessionID" value="<c:out value='${toolSessionID}'/>" />
-		<input type="hidden" name="messageID" value="<c:out value='${topic.message.uid}'/>" />
-		<input type="hidden" name="userID" value="<c:out value='${user.uid}'/>" />
-		<input type="hidden" name="updateMode" value="${updateMode}" />
+	<c:set var="formBean"
+		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+	<html:hidden property="sessionMapID"/>
+	<html:hidden property="topicID"/>
 
 	<table cellpadding="0">
 		<tr>
@@ -20,7 +22,7 @@
 		<tr>
 			<td>
 				<c:set var="viewtopic">
-					<html:rewrite page="/monitoring/viewTopic.do?messageID=${topic.message.uid}&create=${topic.message.created.time}" />
+					<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}" />
 				</c:set>
 				<html:link href="javascript:launchPopup('${viewtopic}','viewtopic')">
 					<c:out value="${topic.message.subject}" />
@@ -74,14 +76,19 @@
 			<td colspan="2">
 				<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
 				&nbsp;&nbsp;
-				<c:if test="${updateMode == 'listMarks'}">
+				<c:if test="${sessionMap.updateMode == 'listMarks'}">
 					<c:set var="cancelUrl">
-						<c:url value="/monitoring/viewUserMark.do"/>?userID=${user.uid}&toolSessionID=${toolSessionID}
+						<c:url value="/monitoring/viewUserMark.do"/>?userID=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
 					</c:set>
 				</c:if>
-				<c:if test="${updateMode == 'listAllMarks'}">
+				<c:if test="${sessionMap.updateMode == 'listAllMarks'}">
 					<c:set var="cancelUrl">
-						<c:url value="/monitoring/viewAllMarks.do"/>?toolSessionID=${toolSessionID}
+						<c:url value="/monitoring/viewAllMarks.do"/>?toolSessionID=${sessionMap.toolSessionID}
+					</c:set>
+				</c:if>
+				<c:if test="${sessionMap.updateMode == 'viewForum'}">
+					<c:set var="cancelUrl">
+						<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}
 					</c:set>
 				</c:if>
 				<input type="button" onclick="location.href='${cancelUrl}';" class="button" value="<fmt:message key="button.cancel"/>">

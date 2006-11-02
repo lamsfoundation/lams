@@ -327,6 +327,7 @@
 			validate="false"
 			parameter="updateMark" >
 			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
+			<forward name="viewTopic" path="/learning/viewTopic.do" />
 		</action>
 		<action path="/monitoring/viewTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"

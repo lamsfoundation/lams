@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 /**
  * @struts.form name="markForm"
@@ -38,6 +37,10 @@ public class MarkForm  extends ActionForm{
 	
 	private String mark;
 	private String comment;
+	
+	private Long topicID;
+	private String sessionMapID;
+	
 	public String getComment() {
 		return comment;
 	}
@@ -49,5 +52,17 @@ public class MarkForm  extends ActionForm{
 	}
 	public void setMark(String mark) {
 		this.mark = mark;
+	}
+	public String getSessionMapID() {
+		return sessionMapID;
+	}
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
+	}
+	public Long getTopicID() {
+		return topicID;
+	}
+	public void setTopicID(Long topicID) {
+		this.topicID = topicID;
 	}
 }
