@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -71,10 +72,10 @@ public class WorkspaceAction extends LamsDispatchAction {
 	public static final String ROLE_DELIMITER = ",";
 	
 	private Integer getUserId(HttpServletRequest request) {
-		return new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-	/*	HttpSession ss = SessionManager.getSession();
+		// return new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		return user != null ? user.getUserID() : null; */
+		return user != null ? user.getUserID() : null; 
 	}
 
 	/** 
@@ -91,6 +92,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	 */
 	public static final Integer ORG_FOLDER_ID = new Integer(-2);
 
+	public static final Integer ROOT_ORG_FOLDER_ID = new Integer(1);
+	
 	/**
 	 * @return
 	 */
@@ -194,12 +197,27 @@ public class WorkspaceAction extends LamsDispatchAction {
 										   HttpServletResponse response)throws ServletException,IOException{
 		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
 		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		//Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Integer userID = getUserId(request);
 		String methodKey = "getFolderContents";
-		Hashtable packet = null;
-		
 		try {
+			return returnWDDXPacket(new FlashMessage(methodKey,getFolderContents(folderID, mode, userID)), response);
+		} catch (UserAccessDeniedException e) {
+			return returnWDDXPacket(FlashMessage.getUserNotAuthorized(methodKey, userID), response);
+		} catch (WorkspaceFolderException e) {
+			return returnWDDXPacket(new FlashMessage(methodKey, e.getMessage(), FlashMessage.ERROR), response);		
+		} catch (Exception e) {
+			log.error("getFolderContents: Exception occured. userID "+userID+" folderID "+folderID, e);
+			return returnWDDXPacket(FlashMessage.getExceptionOccured(methodKey, e.getMessage()), response);
+		}
+	}
+	
+	private Hashtable getFolderContents(Integer folderID, Integer mode, Integer userID) throws UserAccessDeniedException, WorkspaceFolderException, Exception {
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		
+		Hashtable packet = null;
+		String methodKey = "getFolderContents";
+		
 			if ( BOOTSTRAP_FOLDER_ID.equals(folderID )) {
 				MessageService msgService = workspaceManagementService.getMessageService();
 
@@ -222,6 +240,13 @@ public class WorkspaceAction extends LamsDispatchAction {
 			} else if ( ORG_FOLDER_ID.equals(folderID) ) {
 				// return back all the organisation folders that the user can access
 				Vector folders = workspaceManagementService.getAccessibleOrganisationWorkspaceFolders(userID);
+				
+				if(folders.size() == 1) {
+					FolderContentDTO folder = (FolderContentDTO) folders.firstElement();
+					if(folder.resourceID.equals(new Long(ROOT_ORG_FOLDER_ID)))
+						return getFolderContents(new Integer(ROOT_ORG_FOLDER_ID), mode, userID);
+				}
+					
 				packet = createFolderContentPacket(BOOTSTRAP_FOLDER_ID, ORG_FOLDER_ID, folders);
 				
 			} else {
@@ -229,23 +254,23 @@ public class WorkspaceAction extends LamsDispatchAction {
 				WorkspaceFolder folder = workspaceManagementService.getWorkspaceFolder(folderID);
 				if ( folder != null ) {
 					Vector items;
-						items = workspaceManagementService.getFolderContentsExcludeHome(userID,folder,mode);
-					WorkspaceFolder parentWorkspaceFolder = folder.getParentWorkspaceFolder();
-					packet = createFolderContentPacket(parentWorkspaceFolder!=null?parentWorkspaceFolder.getWorkspaceFolderId():null, 
+					items = workspaceManagementService.getFolderContentsExcludeHome(userID,folder,mode);
+					if(folder.getWorkspaceFolderId().equals(ROOT_ORG_FOLDER_ID)) {
+						packet = createFolderContentPacket(BOOTSTRAP_FOLDER_ID, ORG_FOLDER_ID, items);
+					} else {
+						WorkspaceFolder parentWorkspaceFolder = folder.getParentWorkspaceFolder();
+						
+						packet = createFolderContentPacket(parentWorkspaceFolder!=null?parentWorkspaceFolder.getWorkspaceFolderId():null, 
 							folder.getWorkspaceFolderId(), 
 							items);
+					}
+						
 				} else {
-					return returnWDDXPacket(FlashMessage.getNoSuchWorkspaceFolderContentExsists(methodKey,new Long(folderID.longValue())), response);		
+					throw new WorkspaceFolderException(FlashMessage.getNoSuchWorkspaceFolderContentExsists(methodKey,new Long(folderID.longValue())).getMessageValue().toString());
 				}
 			}
-		} catch (UserAccessDeniedException e) {
-			return returnWDDXPacket(FlashMessage.getUserNotAuthorized(methodKey, userID), response);
-		} catch (Exception e) {
-			log.error("getFolderContents: Exception occured. userID "+userID+" folderID "+folderID, e);
-			return returnWDDXPacket(FlashMessage.getExceptionOccured(methodKey, e.getMessage()), response);
-		}
 	
-		return returnWDDXPacket(new FlashMessage(methodKey,packet), response);		
+		return packet;
 	}
 
 	private Hashtable<String,Object> createFolderContentPacket(Integer parentWorkspaceFolderID, Integer workspaceFolderID, Vector contents){
