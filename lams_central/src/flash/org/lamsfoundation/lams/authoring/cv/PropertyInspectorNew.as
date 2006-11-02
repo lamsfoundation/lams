@@ -79,10 +79,12 @@ class PropertyInspectorNew extends MovieClip{
 	private var gateType_cmb:ComboBox;
 	private var startOffset_lbl:Label;
 	private var endOffset_lbl:Label;
+	private var days_lbl:Label;
 	private var hours_lbl:Label;
 	private var mins_lbl:Label;
 	private var hoursEnd_lbl:Label;
 	private var minsEnd_lbl:Label;
+	private var days_stp:NumericStepper;
 	private var hours_stp:NumericStepper;
 	private var mins_stp:NumericStepper;
 	private var endHours_stp:NumericStepper;
@@ -166,8 +168,10 @@ class PropertyInspectorNew extends MovieClip{
 		minAct_stp.addEventListener("focusOut",Delegate.create(this,updateOptionalData));
 		maxAct_stp.addEventListener("change",Delegate.create(this,updateOptionalData));
 		maxAct_stp.addEventListener("focusOut",Delegate.create(this,updateOptionalData));
+		days_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
 		hours_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
 		mins_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
+		days_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
 		hours_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
 		mins_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
 		endHours_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
@@ -195,6 +199,7 @@ class PropertyInspectorNew extends MovieClip{
 		//trace("PI_mc "+PI_mc)
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>"
 		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
+		days_lbl.text = Dictionary.getValue('pi_days');
 		hours_lbl.text = Dictionary.getValue('pi_hours');
 		mins_lbl.text = Dictionary.getValue('pi_mins');
 		hoursEnd_lbl.text = Dictionary.getValue('pi_hours');
@@ -272,10 +277,11 @@ class PropertyInspectorNew extends MovieClip{
 		//Gate Activities
 		//gateType_cmb.enabled = true
 		gateType_cmb.tabIndex = 402
-		hours_stp.tabIndex = 403
-		mins_stp.tabIndex = 404
-		endHours_stp.tabIndex = 405
-		endMins_stp.tabIndex = 406
+		days_stp.tabIndex = 403
+		hours_stp.tabIndex = 404
+		mins_stp.tabIndex = 405
+		endHours_stp.tabIndex = 406
+		endMins_stp.tabIndex = 407
 		
 		//Grouping Activities
 		//groupType_cmb.enabled = true
@@ -549,10 +555,12 @@ class PropertyInspectorNew extends MovieClip{
 	
 	private function showGateControls(v:Boolean){
 		trace('showGateControls....'+v);
+		days_lbl.visible = v;
 		hours_lbl.visible = v;
 		mins_lbl.visible = v;
 		hoursEnd_lbl.visible = v;
 		minsEnd_lbl.visible = v;
+		days_stp.visible = v;
 		hours_stp.visible = v;
 		mins_stp.visible = v;
 		//endHours_stp.visible = v;
@@ -806,6 +814,7 @@ class PropertyInspectorNew extends MovieClip{
 		//Debugger.log('_canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'checkEnableGateControls','PropertyInspector');
 		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE){
 			trace('enabling....');
+			days_stp.enabled = true;
 			hours_stp.enabled = true;
 			mins_stp.enabled = true;
 			endHours_stp.enabled = true;
@@ -815,6 +824,7 @@ class PropertyInspectorNew extends MovieClip{
 		/**/
 		else{
 			trace('disabling....');
+			days_stp.enabled = false;
 			hours_stp.enabled = false;
 			mins_stp.enabled = false;
 			endHours_stp.enabled = false;
@@ -935,6 +945,7 @@ class PropertyInspectorNew extends MovieClip{
 		gateType_lbl.setStyle('styleName',styleObj);
 		startOffset_lbl.setStyle('styleName',styleObj);
 		endOffset_lbl.setStyle('styleName',styleObj);
+		days_lbl.setStyle('styleName', styleObj);
 		hours_lbl.setStyle('styleName',styleObj);
 		mins_lbl.setStyle('styleName',styleObj);
 		hoursEnd_lbl.setStyle('styleName',styleObj);
@@ -948,6 +959,7 @@ class PropertyInspectorNew extends MovieClip{
 		desc_txt.setStyle('styleName',styleObj);
 		runOffline_chk.setStyle('styleName',styleObj);
 		defineLater_chk.setStyle('styleName',styleObj);
+		days_stp.setStyle('styleName', styleObj);
 		hours_stp.setStyle('styleName',styleObj);
 		mins_stp.setStyle('styleName',styleObj);
 		endHours_stp.setStyle('styleName',styleObj);
@@ -970,6 +982,7 @@ class PropertyInspectorNew extends MovieClip{
 		//defineLater_chk.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('numericstepper');
+		days_stp.setStyle('styleName',styleObj);
 		hours_stp.setStyle('styleName',styleObj);
 		mins_stp.setStyle('styleName',styleObj);
 		endHours_stp.setStyle('styleName',styleObj);
@@ -1056,7 +1069,7 @@ class PropertyInspectorNew extends MovieClip{
 	
 	private function onScheduleOffsetChange(evt:Object){
 		
-		var startOffsetMins:Number = (hours_stp.value * 60) + mins_stp.value;
+		var startOffsetMins:Number = (days_stp.value * 60 * 24) + (hours_stp.value * 60) + mins_stp.value;
 		_canvasModel.selectedItem.activity.gateStartTimeOffset = startOffsetMins;
 		var endOffsetMins:Number = (endHours_stp.value * 60) + endMins_stp.value;
 		_canvasModel.selectedItem.activity.gateEndTimeOffset = endOffsetMins;
