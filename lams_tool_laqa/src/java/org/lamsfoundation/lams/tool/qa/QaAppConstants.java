@@ -71,8 +71,8 @@ public interface QaAppConstants {
 	public static final String ERROR_LIST_LEARNER						="errorListLearner";
 	public static final String MAP_SEQUENTIAL_ANSWERS_KEY				="mapSequentialAnswersKey";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
-	public static final String DEFAULT_ONLINE_INST						="online instructions";
-	public static final String DEFAULT_OFFLINE_INST						="offline instructions";
+	public static final String DEFAULT_ONLINE_INST						="";
+	public static final String DEFAULT_OFFLINE_INST						="";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID";
 	public static final String EXPORT_USER_ID							="exportUserId";
 	public static final String DEFAULT_QA_TITLE							="Q&A";

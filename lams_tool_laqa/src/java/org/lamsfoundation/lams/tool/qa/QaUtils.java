@@ -138,14 +138,6 @@ public abstract class QaUtils implements QaAppConstants {
 		qaAuthoringForm.setOnlineInstructions(onlineInstructions);
 		qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
-		/*
-		String defineLaterInEditMode=request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
-		logger.debug("defineLaterInEditMode: " + defineLaterInEditMode);
-		qaAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
-		qaGeneralAuthoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
-		*/
-		
-
 		String reflect=request.getParameter(REFLECT);
 		logger.debug("reflect: " + reflect);
 		qaAuthoringForm.setReflect(reflect);

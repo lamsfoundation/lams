@@ -135,16 +135,16 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     {
     	QaContent qa = new QaContent();
     	qa.setQaContentId(new Long(TEST_NEW_CONTENT_ID+1));
-    	qa.setTitle("New - Put Title Here");
-    	qa.setInstructions("New - Put instructions here.");
+    	qa.setTitle("New Title");
+    	qa.setInstructions("New Instructions");
     	qa.setCreationDate(new Date(System.currentTimeMillis()));
     	qa.setCreatedBy(0);
         qa.setUsernameVisible(false);
         qa.setDefineLater(false);
         qa.setSynchInMonitor(false);
-        qa.setOnlineInstructions("New- online instructions");
-        qa.setOfflineInstructions("New- offline instructions");
-        qa.setReportTitle("New-Report title");
+        qa.setOnlineInstructions("");
+        qa.setOfflineInstructions("");
+        qa.setReportTitle("");
         qa.setQaQueContents(new TreeSet());
         qa.setQaSessions(new TreeSet());
         

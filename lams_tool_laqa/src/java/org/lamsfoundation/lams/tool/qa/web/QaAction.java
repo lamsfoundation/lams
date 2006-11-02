@@ -1044,14 +1044,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		
 		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("qaContent: " + qaContent);
-		/*
-		if (qaContent == null)
-		{
-			logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-			qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue());
-		}
-		logger.debug("final qaContent: " + qaContent);
-		*/
 		
 
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
@@ -1346,14 +1338,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("qaContent: " + qaContent);
 
-		/*
-		if (qaContent == null)
-		{
-			logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-			qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue());
-		}
-		logger.debug("final qaContent: " + qaContent);
-		*/
 	
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
 		logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
@@ -1495,14 +1479,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("qaContent: " + qaContent);
 		
-		/*
-		if (qaContent == null)
-		{
-			logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-			qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue());
-		}
-		logger.debug("final qaContent: " + qaContent);
-		*/
 	
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
 		logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
@@ -1634,15 +1610,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		
 		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("qaContent: " + qaContent);
-
-		/*
-		if (qaContent == null)
-		{
-			logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-			qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue());
-		}
-		logger.debug("final qaContent: " + qaContent);
-		*/
 		
 		
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
@@ -1774,14 +1741,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		
 		QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("qaContent: " + qaContent);
-		/*
-		if (qaContent == null)
-		{
-			logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-			qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue());
-		}
-		logger.debug("final qaContent: " + qaContent);
-		*/
 		
 
 		QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO(); 
