@@ -118,16 +118,11 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="createRootTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="updateTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="deleteTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="hideMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                
                 <prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="createUser">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="updateForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="deleteForumAttachment">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="deleteFromRepository">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="updateSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <!--  Tool Content Manager and Tool Session Manager calls -->
@@ -135,7 +130,6 @@
                 <prop key="removeToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="createToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="removeToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
