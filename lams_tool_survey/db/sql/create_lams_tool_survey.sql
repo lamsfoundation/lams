@@ -110,7 +110,7 @@ alter table tl_lasurv11_user add index FK633F2588D14146E5 (survey_uid), add cons
 INSERT INTO `tl_lasurv11_survey` (`uid`, `create_date`, `update_date`, `create_by`, `title`, 
   `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`,
  `content_in_use`, `define_later`, `content_id`,`show_questions_on_one_page`,`reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'Survey','0','0','Instruction','Online instruction','Offline instruction',0,0,${default_content_id},1,0);
+  (1,NULL,NULL,NULL,'Survey','0','1','Instructions',null,null,0,0,${default_content_id},1,0);
   
 INSERT INTO `tl_lasurv11_question` (`uid`, `sequence_id`, `description`, `create_by`, `create_date`, `question_type`, `append_text`, `optional`, `allow_multiple_answer`, `survey_uid`) VALUES 
   (1,1,'Sample Multiple choice - only one response allowed?',null,NOW(),1,0,0,0,1);

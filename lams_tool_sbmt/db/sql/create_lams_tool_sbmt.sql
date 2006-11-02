@@ -80,5 +80,6 @@ alter table tl_lasbmt11_submission_details add index FK1411A53CFFD5A38B (learner
 alter table tl_lasbmt11_submission_details add index FK1411A53C93C861A (session_id), add constraint FK1411A53C93C861A foreign key (session_id) references tl_lasbmt11_session (session_id);
 
 
-INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished,reflect_on_activity,limit_upload,limit_upload_number) values(${default_content_id},"Submit files","Upload your files below...",0,0,0,0,0,0,1);
+INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished,reflect_on_activity,limit_upload,limit_upload_number) 
+values(${default_content_id},"Submit Files","Instructions",0,0,0,0,0,0,1);
 SET FOREIGN_KEY_CHECKS=1;
