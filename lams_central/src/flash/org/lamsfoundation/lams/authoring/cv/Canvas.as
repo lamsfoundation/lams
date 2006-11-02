@@ -649,12 +649,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function removeActivity(activityUIID:Number){
 		Debugger.log('activityUIID:'+activityUIID,4,'removeActivity','Canvas');		
-		_ddm.removeActivity(activityUIID);
+	
 		
 		// remove transitions connected to this activity being removed
+			
 		_ddm.removeTransitionByConnection(activityUIID);
-		
-		canvasModel.setDirty();		
+		//canvasModel.setDirty();	
+		_ddm.removeActivity(activityUIID);
+		canvasModel.setDirty();	
 		//select the new thing
 		canvasModel.selectedItem = null;
 	}
