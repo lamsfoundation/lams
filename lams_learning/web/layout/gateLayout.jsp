@@ -27,7 +27,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+            "http://www.w3.org/TR/html4/loose.dtd">
 <html:html locale="true" xhtml="true">
 
 	<tiles:useAttribute name="pageTitle" ignore="false" />
