@@ -25,7 +25,7 @@
 
 <p>
 	<html:select property="resource.miniViewResourceNumber"
-		styleId="viewNumList">
+		styleId="viewNumList" style="width:50px">
 		<c:forEach begin="1" end="${fn:length(resourceList)}"
 			varStatus="status">
 			<c:choose>
