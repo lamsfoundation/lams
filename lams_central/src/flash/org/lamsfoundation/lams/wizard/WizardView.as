@@ -95,6 +95,8 @@ class WizardView extends AbstractView {
 	private var staff_lbl:Label;
 	private var learner_scp:MovieClip;		// learners container
 	private var learner_lbl:Label;
+	private var staff_selAll_cb:CheckBox;
+	private var learner_selAll_cb:CheckBox;
 	
 	// step 4 UI elements
 	private var schedule_cb:CheckBox;
@@ -147,7 +149,7 @@ class WizardView extends AbstractView {
 	private var _workspaceModel:WorkspaceModel;
 	private var _workspaceView:WorkspaceView;
 	private var _workspaceController:WorkspaceController;
-	
+
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -198,6 +200,7 @@ class WizardView extends AbstractView {
 	public function update (o:Observable,infoObj:Object):Void{
 		
        var wm:WizardModel = WizardModel(o);
+	   
 	   _wizardController = getController();
 
 	   switch (infoObj.updateType){
@@ -205,9 +208,15 @@ class WizardView extends AbstractView {
 				updateScreen(infoObj.data.lastStep, infoObj.data.currentStep);
                 break;
 			case 'USERS_LOADED' :
-				loadLearners(wm.organisation.getLearners());
-				loadStaff(wm.organisation.getMonitors());
+				loadLearners(wm.organisation.getLearners(), true);
+				loadStaff(wm.organisation.getMonitors(), true);
 				_wizardController.clearBusy();
+				break;
+			case 'STAFF_RELOAD' :
+				loadStaff(wm.organisation.getMonitors(), true);
+				break;
+			case 'LEARNER_RELOAD' :
+				loadLearners(wm.organisation.getLearners(), true);
 				break;
 			case 'SAVED_LC' :
 				conclusionStep(infoObj.data, wm);
@@ -236,7 +245,7 @@ class WizardView extends AbstractView {
 		trace('receiving view update event...');
 		var wm:WorkspaceModel = event.target;
 	   //set a permenent ref to the model for ease (sorry mvc guru)
-	   _workspaceModel = wm;
+		
 	   
 		switch (event.updateType){
 			case 'REFRESH_TREE' :
@@ -297,7 +306,9 @@ class WizardView extends AbstractView {
 		start_btn.addEventListener('click', Delegate.create(this, start));
 		schedule_btn.addEventListener('click', Delegate.create(this, scheduleNow));
 		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
-
+		staff_selAll_cb.addEventListener("click", Delegate.create(this, toogleStaffSelection));
+		learner_selAll_cb.addEventListener("click", Delegate.create(this, toogleLearnerSelection));
+		
 		//Set up the treeview
         setUpTreeview();
 		//itemSelected(location_treeview.selectedNode, WorkspaceModel(workspaceView.getModel()));
@@ -330,6 +341,10 @@ class WizardView extends AbstractView {
 		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
 		date_lbl.text = Dictionary.getValue('date_lbl');
 		time_lbl.text = Dictionary.getValue('time_lbl');
+		
+		// checkboxes
+		staff_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
+		learner_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
 		
 		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn, schedule_btn]);
 		positionButtons();
@@ -839,6 +854,8 @@ class WizardView extends AbstractView {
 		staff_scp.visible = false;
 		learner_lbl.visible = false;
 		learner_scp.visible = false;
+		staff_selAll_cb.visible = false;
+		learner_selAll_cb.visible = false;
 		
 		// hide step 4 (Startup)
 		date_lbl.visible = false;
@@ -951,6 +968,10 @@ class WizardView extends AbstractView {
 		staff_scp.visible = true;
 		learner_lbl.visible = true;
 		learner_scp.visible = true;
+		
+		staff_selAll_cb.visible = true;
+		learner_selAll_cb.visible = true;
+		
 	}
 	
 	private function clearStep2():Void{
@@ -960,6 +981,8 @@ class WizardView extends AbstractView {
 		staff_scp.visible = false;
 		learner_lbl.visible = false;
 		learner_scp.visible = false;
+		staff_selAll_cb.visible = false;
+		learner_selAll_cb.visible = false;
 	}
 	
 	private function validateStep2(wm:WizardModel):Boolean{
@@ -1270,11 +1293,10 @@ class WizardView extends AbstractView {
 	 * @param   users Users to load
 	 */
 	
-	public function loadLearners(users:Array):Void{
+	public function loadLearners(users:Array, _selected:Boolean):Void{
 		trace('loading Learners...');
 		_learnerList = WizardView.clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
-		var _selected:Boolean = true;
 		trace('list length: ' + users.length);
 		
 		for(var i=0; i<users.length; i++){
@@ -1293,6 +1315,8 @@ class WizardView extends AbstractView {
 			
 		}
 		
+		learner_selAll_cb.selected = _selected;
+		
 		learner_scp.redraw(true);
 	}
 	
@@ -1300,7 +1324,7 @@ class WizardView extends AbstractView {
 	* Load staff into scrollpane
 	* @param 	users Users to load
 	*/
-	public function loadStaff(users:Array):Void{
+	public function loadStaff(users:Array, _selected:Boolean):Void{
 		trace('loading Staff....');
 		trace('list length: ' + users.length);
 		_staffList = WizardView.clearScp(_staffList);
@@ -1315,11 +1339,15 @@ class WizardView extends AbstractView {
 			_staffList[i]._y = USER_OFFSET * i;
 			_staffList[i].data = user.getDTO();
 			var listItem:MovieClip = MovieClip(_staffList[i]);
-			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:_selected})
 			
 			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 			
 		}
+		
+		
+		staff_selAll_cb.selected = _selected;
+		
 		staff_scp.redraw(true);
 	}
 	
@@ -1482,6 +1510,21 @@ class WizardView extends AbstractView {
 		
 		confirmMsg_txt.visible = true;
 		
+	}
+	
+	private function toogleStaffSelection(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		var wm:WizardModel = WizardModel(getModel());
+		loadStaff(wm.organisation.getMonitors(), target.selected);
+	}
+	
+	private function toogleLearnerSelection(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		var wm:WizardModel = WizardModel(getModel());
+		
+		loadLearners(wm.organisation.getLearners(), target.selected);
 	}
 	
 	/**
