@@ -2,58 +2,53 @@
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-
 	</head>
 	<body>
-		<div class="content">
-		<!-- Basic Info Form-->
-		<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm">
+		<html:form action="/learning/saveOrUpdateItem" method="post"
+			styleId="resourceItemForm">
 			<html:hidden property="itemType" styleId="itemType" value="1" />
-			<html:hidden property="mode"/>
-			<html:hidden property="sessionMapID"/>
-			<table width="100%" border="0" align="left" cellpadding="0" cellspacing="0">
-				<tr>
-					<td  colspan="2">
-						<h2>
-							<fmt:message key="label.learning.new.url" />
-						</h2>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<%@ include file="/common/messages.jsp"%>
-					</td>
-				</tr>
-				<tr>
-					<td valign="top">
-						<fmt:message key="label.authoring.basic.resource.title.input" />
-						<BR>
-						<html:text property="title" size="40" tabindex="1" />
-						<BR>
-						<BR>
-						<fmt:message key="label.authoring.basic.resource.url.input" />
-						<BR>
-						<html:text property="url" size="40" tabindex="2" />
-						<BR>
-						<html:checkbox property="openUrlNewWindow" tabindex="3">
-							<fmt:message key="open.in.new.window" />
-						</html:checkbox>
+			<html:hidden property="mode" />
+			<html:hidden property="sessionMapID" />
 
-					</td>
-					<td valign="top">
-						<fmt:message key="label.learning.comment.or.instruction" />
-						<BR>
-						<html:textarea rows="5" cols="25" tabindex="4" property="description" />
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2" align="center" valign="bottom">
-						<a href="#" onclick="document.getElementById('resourceItemForm').submit()" class="button"> <fmt:message key="button.add" /> </a>
-						<br><br>
-					</td>
-				</tr>
-			</table>
+			<div class="field-name-alternative-color space-top">
+				<fmt:message key="label.learning.new.url" />
+			</div>
+			<%@ include file="/common/messages.jsp"%>
+
+			<div class="field-name space-top">
+				<fmt:message key="label.authoring.basic.resource.title.input" />
+			</div>
+
+			<html:text property="title" size="40" tabindex="1" />
+
+			<div class="field-name space-top">
+				<fmt:message key="label.authoring.basic.resource.url.input" />
+			</div>
+
+			<html:text property="url" size="40" tabindex="2" />
+
+
+			<html:checkbox property="openUrlNewWindow" tabindex="3"
+				styleId="openUrlNewWindow" styleClass="noBorder">
+			</html:checkbox>
+			<label for="openUrlNewWindow">
+				<fmt:message key="open.in.new.window" />
+			</label>
+
+
+			<div class="field-name space-top">
+				<fmt:message key="label.learning.comment.or.instruction" />
+			</div>
+
+			<html:textarea rows="5" cols="25" tabindex="4" styleClass="text-area"
+				property="description" />
+
+
+			<div class="space-bottom-top">
+				<a href="#"
+					onclick="document.getElementById('resourceItemForm').submit()"
+					class="button"> <fmt:message key="button.add" /> </a>
+			</div>
 		</html:form>
-		</div>
 	</body>
 </html>
