@@ -104,7 +104,7 @@
 									<!--  display a show link  -->
 									<c:set var="hidetopic">
 										<html:rewrite
-											page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&msgId=${msgDto.message.uid}&hideFlag=false" />
+											page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=false" />
 									</c:set>
 									<html:link href="${hidetopic}" styleClass="button">
 										<fmt:message key="label.show" />
@@ -135,18 +135,18 @@
 									<fmt:message key="label.edit" />
 								</html:link>
 							</c:if>
-						</c:if>
 					
-						<!--  Reply Button -->
-						<c:if
-							test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
-							<c:set var="replytopic">
-								<html:rewrite
-									page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
-							</c:set>
-							<html:link href="${replytopic}" styleClass="button">
-								<fmt:message key="label.reply" />
-							</html:link>
+							<!--  Reply Button -->
+							<c:if
+								test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
+								<c:set var="replytopic">
+									<html:rewrite
+										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
+								</c:set>
+								<html:link href="${replytopic}" styleClass="button">
+									<fmt:message key="label.reply" />
+								</html:link>
+							</c:if>
 						</c:if>
 					</div>
 				</td>
