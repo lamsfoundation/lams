@@ -422,7 +422,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		notebookUserDAO.saveOrUpdate(notebookUser);
 	}
 
-	public synchronized NotebookUser createNotebookUser(UserDTO user,
+	public NotebookUser createNotebookUser(UserDTO user,
 			NotebookSession notebookSession) {
 		NotebookUser notebookUser = new NotebookUser(user, notebookSession);
 		saveOrUpdateNotebookUser(notebookUser);

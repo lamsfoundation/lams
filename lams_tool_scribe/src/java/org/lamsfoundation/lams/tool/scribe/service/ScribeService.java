@@ -447,7 +447,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		scribeUserDAO.saveOrUpdate(scribeUser);
 	}
 
-	public synchronized ScribeUser createScribeUser(UserDTO user,
+	public ScribeUser createScribeUser(UserDTO user,
 			ScribeSession scribeSession) {
 		ScribeUser scribeUser = new ScribeUser(user, scribeSession);
 		saveOrUpdateScribeUser(scribeUser);
