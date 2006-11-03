@@ -30,7 +30,7 @@
 					</c:if>
 					<c:forEach var="lessonlink" items="${lesson.links}">
 						<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
-							<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="19" height="16" class="align-middle" /> 
+							<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="20" height="22" class="align-middle" /> 
 							<fmt:message key="${lessonlink.name}" /> 
 						</a>
 					</c:forEach>
@@ -43,7 +43,7 @@
 				<c:out value="${childOrg.name}" /> 
 				<c:forEach var="childlink" items="${childOrg.links}">
 					<a href="<c:out value='${childlink.url}'/>" class="sequence-action-link"> 
-						<img src="images/css/mycourses_addlesson.jpg" alt="add lesson" width="13" height="15" class="align-middle"> 
+						<img src="images/css/mycourses_addlesson.jpg" alt="add lesson" width="20" height="18" class="align-middle"> 
 						<fmt:message key="${childlink.name}" /> 
 					</a>
 				</c:forEach>
