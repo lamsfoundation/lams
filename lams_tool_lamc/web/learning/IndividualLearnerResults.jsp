@@ -115,13 +115,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						<div style="overflow: auto;">
 							<c:out value="${dto.question}" escapeXml="false" />
-
-							<c:if test="${dto.attemptCorrect == 'true'}">
-								<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
-							</c:if>
-							<c:if test="${dto.attemptCorrect != 'true'}">
-								<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
-							</c:if>
 						</div>									
 
 						[
@@ -135,6 +128,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:out value="${caText.value}" escapeXml="false" />
 						</c:forEach>
 
+							<c:if test="${dto.attemptCorrect == 'true'}">
+								<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
+							</c:if>
+							<c:if test="${dto.attemptCorrect != 'true'}">
+								<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
+							</c:if>
 
 					</p>
 
