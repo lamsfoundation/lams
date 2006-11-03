@@ -96,7 +96,7 @@ public class DisplayActivityAction extends ActivityAction {
 		setupProgressString(actionForm, request);
 	
 		if(log.isDebugEnabled())
-		    log.debug(forward.toString());
+		    log.debug(forward);
 		    
 		return 	forward;
 	}
