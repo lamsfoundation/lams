@@ -382,6 +382,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageDate_lbl._y = manageDate_lbl._y - 30
 		manageTime_lbl._y = manageTime_lbl._y - 30
 		start_date_lbl._y = start_date_lbl._y - 30
+		schedule_date_lbl._y = schedule_date_lbl._y - 30
 		scheduleDate_dt._y = scheduleDate_dt._y - 30
 		scheduleTime._y = scheduleTime._y - 30
 		viewLearners_btn._y = viewLearners_btn._y - 30
