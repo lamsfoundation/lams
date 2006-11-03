@@ -140,9 +140,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					</p>
 
-					<div style="overflow: auto;">
-						<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
-					</div>									
+						<c:if test="${(dto.feedback != null) && (dto.feedback != '')}">
+							<div style="overflow: auto;">
+								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
+							</div>		
+						</c:if>												
 
 				</div>
 			</c:forEach>
