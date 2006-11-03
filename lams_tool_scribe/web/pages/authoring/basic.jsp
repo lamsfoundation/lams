@@ -13,8 +13,8 @@
 			area.src=url;
 			area.style.display="block";
 		}
-		
 		document.getElementById("saveCancelButtons").style.visibility="hidden";
+		location.hash = "iframeArea";		
 	}
 	function hideMessage(){
 		var area=document.getElementById("iframeArea");
@@ -71,7 +71,7 @@
 </div>
 
 <p class="small-space-bottom">
-<a
+<a 
 	href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${formBean.sessionMapID}"/>');"
 	class="button-add-item"> <fmt:message
 		key="label.authoring.basic.heading.add" /> </a>

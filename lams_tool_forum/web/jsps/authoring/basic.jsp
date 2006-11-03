@@ -23,6 +23,8 @@
 		if (elem != null) {
 			elem.style.display="none";
 		}
+		
+		location.hash = "messageArea";
 	}
 	function hideMessage(){
 		var area=document.getElementById("messageArea");

@@ -20,6 +20,7 @@
 		if (elem != null) {
 			elem.style.display="none";
 		}
+		location.hash = "reourceInputArea";
 	}
 	function hideMessage(){
 		var area=document.getElementById("reourceInputArea");
