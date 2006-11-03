@@ -82,6 +82,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	//Labels
 	private var status_lbl:Label;
 	private var learner_lbl:Label;
+	private var learnerURL_lbl:Label;
+	private var learnerURL_txt:TextInput;
 	private var class_lbl:Label;
 	private var elapsed_lbl:Label;
 	private var manageClass_lbl:Label;
@@ -326,7 +328,7 @@ public function update (o:Observable,infoObj:Object):Void{
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
-		
+		Debugger.log('Lesson Launch set in sysadmin :'+_root.lessonLaunch, Debugger.CRITICAL,'Draw','org.lamsfoundation.lams.LessonTabView');
 		listCount = 0; 
 		this.onEnterFrame = setupLabels;
 		
@@ -340,7 +342,9 @@ public function update (o:Observable,infoObj:Object):Void{
 		startMsg_txt.visible = false;
 	
 		var seq:Sequence = mm.getSequence();
-	
+		if (_root.lessonLaunch == "false"){
+			rearrangeAll();			
+		}
 		populateStatusList(seq.state);
 		populateLessonDetails();
 		enableEditClass(seq.state);
@@ -365,6 +369,30 @@ public function update (o:Observable,infoObj:Object):Void{
 		dispatchEvent({type:'load',target:this});
 	}
 	
+	private function rearrangeAll():Void{
+		learnerURL_lbl.visible = false;
+		learnerURL_txt.visible = false;
+		class_lbl._y = class_lbl._y - 30
+		class_txt._y = class_txt._y - 30
+		lessonManager._y = lessonManager._y - 30
+		taskManager._y = taskManager._y - 30
+		manageClass_lbl._y = manageClass_lbl._y - 30
+		manageStatus_lbl._y = manageStatus_lbl._y - 30
+		manageStart_lbl._y = manageStart_lbl._y - 30
+		manageDate_lbl._y = manageDate_lbl._y - 30
+		manageTime_lbl._y = manageTime_lbl._y - 30
+		start_date_lbl._y = start_date_lbl._y - 30
+		scheduleDate_dt._y = scheduleDate_dt._y - 30
+		scheduleTime._y = scheduleTime._y - 30
+		viewLearners_btn._y = viewLearners_btn._y - 30
+		editClass_btn._y = editClass_btn._y - 30
+		changeStatus_cmb._y = changeStatus_cmb._y - 30
+		statusApply_btn._y = statusApply_btn._y - 30
+		schedule_btn._y = schedule_btn._y - 30
+		start_btn._y = start_btn._y - 30
+		reqTasks_scp._y = reqTasks_scp._y - 30
+		
+	}
 	/**
 	 * Populate the lesson details from HashTable Sequence in MOnitorModel
 	*/
@@ -377,6 +405,8 @@ public function update (o:Observable,infoObj:Object):Void{
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		trace("current logged in learners are: "+mm.allLearnersProgress.length)
+		learnerURL_txt.text = _root.serverURL+"launchlearner.do?lessonID="+_root.lessonID;
+
 		//numLearners_txt.text = mm.allLearnersProgress.length + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		class_txt.text = s.organisationName;
 	}
@@ -709,6 +739,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		//populate the synch type combo:
 		status_lbl.text = "<b>"+Dictionary.getValue('ls_status_lbl')+"</b>";
 		learner_lbl.text = "<b>"+Dictionary.getValue('ls_learners_lbl')+"</b>";
+		learnerURL_lbl.text = "<b>"+Dictionary.getValue('ls_learnerURL_lbl')+"</b>";
 		class_lbl.text = "<b>"+Dictionary.getValue('ls_class_lbl')+"</b>";
 		elapsed_lbl.text = "<b>"+Dictionary.getValue('ls_duration_lbl')+"</b>";
 		manageClass_lbl.text = "<b>"+Dictionary.getValue('ls_manage_class_lbl')+"</b>";
@@ -755,6 +786,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		var styleObj = _tm.getStyleObject('label');
 		status_lbl.setStyle('styleName',styleObj);
 		learner_lbl.setStyle('styleName',styleObj);
+		learnerURL_lbl.setStyle('styleName',styleObj);
 		class_lbl.setStyle('styleName',styleObj);
 		manageClass_lbl.setStyle('styleName',styleObj);
 		manageStatus_lbl.setStyle('styleName',styleObj);
