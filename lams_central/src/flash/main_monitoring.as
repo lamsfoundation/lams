@@ -1,6 +1,6 @@
 ﻿import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.common.util.StringUtils;
-
+import org.lamsfoundation.lams.common.util.Debugger;
 //Temp values to be removed / repplaced at deployment
 /**/
 if(StringUtils.isEmpty(serverURL)){
@@ -13,7 +13,12 @@ if(StringUtils.isEmpty(userID)){
 	_root.userID = 4;
 	Debugger.log('userID is not defined, using defualt:'+_root.userID ,Debugger.CRITICAL,'main','ROOT');			
 }
+Debugger.log('lesson launch is set as:'+_root.lessonLaunch ,Debugger.CRITICAL,'main','ROOT');
 
+if (StringUtils.isEmpty(lessonLaunch)){
+	_root.lessonLaunch = false;
+	Debugger.log('lesson launch is set as:'+_root.lessonLaunch ,Debugger.CRITICAL,'mainin if condition','ROOT');
+}
 if(StringUtils.isEmpty(mode)){
 	_root.mode = 1;
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
