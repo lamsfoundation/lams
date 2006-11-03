@@ -36,7 +36,7 @@ VALUES
 'Shared Resources',
 'Shared Resources',
 'sharedresources',
-'1.1',
+'20061102',
 NULL,
 NULL,
 0,

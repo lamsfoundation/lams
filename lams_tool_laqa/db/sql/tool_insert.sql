@@ -55,7 +55,7 @@ VALUES
 'Question and Answer',
 'Q/A Tool',
 'qa',
-'1.1',
+'20061102',
 NULL,
 NULL,
 0,

@@ -34,7 +34,7 @@ VALUES
 'Forum',
 'Forum / Message Boards',
 'forum',
-'1.1',
+'20061102',
 NULL,
 NULL,
 0,
