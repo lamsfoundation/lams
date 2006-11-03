@@ -156,9 +156,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="feedbackEntry"
 						items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
 						<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
-							<div style="overflow: auto;">									  							
-								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="false" />
-							</div>								
+							<c:if test="${(feedbackEntry.value != null) && (feedbackEntry.value != '')}">
+								<div style="overflow: auto;">									  							
+									<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="false" />
+								</div>								
+							</c:if>																			
 						</c:if>
 					</c:forEach>
 				</div>
