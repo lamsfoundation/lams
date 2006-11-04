@@ -40,21 +40,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</p>
 		
 		
-		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
-			<p>
-				<strong> <fmt:message key="label.withRetries" /> </strong>
-			</p>
-		
-		</c:if>
-		
-		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'false'}">
-		
-			<p>
-				<strong> <fmt:message key="label.withoutRetries" /> </strong>
-			</p>
-		
-		</c:if>
-		
 		<c:if
 			test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 		
