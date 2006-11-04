@@ -285,7 +285,9 @@ public interface IMcService
     
     public void removeFile(Long submissionId) throws McApplicationException;
     
-    public List retrieveMcUploadedFiles(McContent mc) throws McApplicationException;
+    public List retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
+    
+    public List getMarksForContent(McContent mcContent) throws McApplicationException;
     
 }
 

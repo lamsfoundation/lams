@@ -939,6 +939,19 @@ public class McServicePOJO implements
 	}
     
     
+    public List getMarksForContent(McContent mcContent) throws McApplicationException
+    {
+    	try
+        {
+    		return mcUsrAttemptDAO.getMarksForContent(mcContent);
+        }
+        catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting marks "
+                                                 + e.getMessage(),e);
+        }        
+    }
+    
     public List getMarks() throws McApplicationException
 	{
     	try

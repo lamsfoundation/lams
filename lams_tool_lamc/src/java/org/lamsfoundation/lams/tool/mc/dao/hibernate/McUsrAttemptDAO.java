@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -89,6 +90,38 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			
 			return list;
 	    }
+
+		public List getMarksForContent(McContent mcContent)
+	    {
+		    logger.debug("running getMarksForContent for mcContent:"  + mcContent);
+		    logger.debug("running getMarksForContent for mcContent uid :"  + mcContent.getUid());
+		    
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_MARK)
+				.list();
+
+			List userEntries= new ArrayList();
+			
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt:"  + attempt);
+		    	    logger.debug("attempt content uid:"  + attempt.getMcQueContent().getMcContent().getUid());
+		    	    
+		    	    if (attempt.getMcQueContent().getMcContent().getUid() == mcContent.getUid())
+		    	    {
+		    	        logger.debug("same content found:"  + mcContent);
+		    	        userEntries.add(attempt);
+		    	    }
+		    	}
+			}
+			
+			logger.debug("returning userEntries:"  + userEntries);
+			return userEntries;
+	    }
+
 		
 		
 		public List getHighestAttemptOrder(Long queUsrId)

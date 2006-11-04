@@ -260,9 +260,11 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return
      */
-    public static int getTopMark(HttpServletRequest request, IMcService mcService)
+    public static int getTopMark(HttpServletRequest request, IMcService mcService, McContent mcContent)
     {
-    	List listMarks=mcService.getMarks();
+        logger.debug("performing getTopMark on mcContent: " + mcContent);
+        List listMarks=mcService.getMarksForContent(mcContent);
+        logger.debug("listMarks: " + listMarks);
     	
     	Iterator itMarks=listMarks.iterator();
     	int highestMark=0;
@@ -284,9 +286,11 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return
      */
-    public static int getLowestMark(HttpServletRequest request, IMcService mcService)
+    public static int getLowestMark(HttpServletRequest request, IMcService mcService, McContent mcContent)
     {
-    	List listMarks=mcService.getMarks();
+        logger.debug("performing getLowestMark on mcContent: " + mcContent);
+        List listMarks=mcService.getMarksForContent(mcContent);
+        logger.debug("listMarks: " + listMarks);
     	
     	Iterator itMarks=listMarks.iterator();
     	int lowestMark=100;
@@ -312,9 +316,11 @@ public class LearningUtil implements McAppConstants {
      * @param request
      * @return
      */
-    public static int getAverageMark(HttpServletRequest request, IMcService mcService)
+    public static int getAverageMark(HttpServletRequest request, IMcService mcService, McContent mcContent)
     {
-    	List listMarks=mcService.getMarks();
+        logger.debug("performing getAverageMark on mcContent: " + mcContent);
+        List listMarks=mcService.getMarksForContent(mcContent);
+        logger.debug("listMarks: " + listMarks);       
     	
     	Iterator itMarks=listMarks.iterator();
     	int marksTotal=0;

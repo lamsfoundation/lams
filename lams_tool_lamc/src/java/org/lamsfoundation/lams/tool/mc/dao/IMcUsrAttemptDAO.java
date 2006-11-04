@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 
@@ -143,6 +144,8 @@ public interface IMcUsrAttemptDAO
 	public boolean getUserAttemptCorrectForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder);
 	
 	public List getMarks();
+	
+	public List getMarksForContent(McContent mcContent);
 }
 
 

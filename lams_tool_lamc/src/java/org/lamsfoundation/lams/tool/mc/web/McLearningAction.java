@@ -585,23 +585,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		String question=mcQueContent.getQuestion();
     		logger.debug("question: " + question);
     		
-    		/*
-    		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
-    		logger.debug("isTextMarkup: " + isTextMarkup);
-    		
-    		String newQuestionText=question;
-    		if (!isTextMarkup)
-    		{
-        		newQuestionText= LearningUtil.getWrappedText(question, false);
-        		logger.debug("wrapped newQuestionText: " + newQuestionText);    		    
-    		}
-    		logger.debug("post warp newQuestionText: " + newQuestionText);
-
-    		
-    		newQuestionText=McUtils.replaceNewLines(newQuestionText);
-    		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
-    		*/
-    		
     		
     		mcLearnerAnswersDTO.setQuestion(question);
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
@@ -616,23 +599,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		String feedback=mcQueContent.getFeedback();
     		if (feedback == null) feedback="";
     		logger.debug("feedback: " + feedback);
-    		
-    		/*
-    		boolean isFeedbackTextMarkup=LearningUtil.isTextMarkup(feedback);
-    		logger.debug("isFeedbackTextMarkup: " + isFeedbackTextMarkup);
-
-    		String newFeedbackText=feedback;
-    		if (!isFeedbackTextMarkup)
-    		{
-    		    newFeedbackText= LearningUtil.getWrappedText(feedback, false);
-        		logger.debug("wrapped newFeedbackText: " + newFeedbackText);    		    
-    		}
-    		logger.debug("post warp newFeedbackText: " + newFeedbackText);
-    		
-    		
-    		newFeedbackText=McUtils.replaceNewLines(newFeedbackText);
-    		logger.debug("newFeedbackText after procesing new lines: " + newFeedbackText);
-    		*/
     		
     		mcLearnerAnswersDTO.setFeedback(feedback);
     		
@@ -1002,6 +968,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    totalMarksPossible=LearningUtil.getTotalMarksPossible(mcContent);
 	    logger.debug("totalMarksPossible: " + totalMarksPossible);
 	    mcGeneralLearnerFlowDTO.setTotalMarksPossible(totalMarksPossible);
+	    
+	    
+		int topMark=LearningUtil.getTopMark(request, mcService, mcContent);
+		int lowestMark=LearningUtil.getLowestMark(request, mcService, mcContent);
+		int averageMark=LearningUtil.getAverageMark(request, mcService, mcContent);
+
+		mcGeneralLearnerFlowDTO.setTopMark(new Integer(topMark).toString());
+		mcGeneralLearnerFlowDTO.setLowestMark(new Integer(lowestMark).toString());
+		mcGeneralLearnerFlowDTO.setAverageMark(new Integer(averageMark).toString());
 
 		
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
@@ -1491,7 +1466,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 
 		
-		
         String userID = "";
 	    HttpSession ss = SessionManager.getSession();
 	    logger.debug("ss: " + ss);
@@ -1561,29 +1535,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		 	logger.debug("userOverPassMark: " + userOverPassMark);
     	}
 
-	    
-	    /*
-	    if (requestByStarter.equals("true"))
-	    {
-	        logger.debug("requestByStarter is true");
-	        
-	    	passMarkApplicable=(String)sessionMap.get(PASSMARK_APPLICABLE);
-	    	logger.debug("passMarkApplicable: " + passMarkApplicable);
-	    	
-	    	userOverPassMark=(String)sessionMap.get(USER_OVER_PASSMARK);
-	    	logger.debug("userOverPassMark: " + userOverPassMark);
-	    }
-	    else
-	    {
-	        logger.debug("requestByStarter is not true");
-			logger.debug("reading request parameters");
-			passMarkApplicable=request.getParameter("passMarkApplicable");
-		 	logger.debug("passMarkApplicable: " + passMarkApplicable);
-		 	
-		 	userOverPassMark=request.getParameter("userOverPassMark");
-		 	logger.debug("userOverPassMark: " + userOverPassMark);
-	    }
-	    */
 
     	mcGeneralLearnerFlowDTO.setPassMarkApplicable(passMarkApplicable);
     	mcLearningForm.setPassMarkApplicable(passMarkApplicable);
@@ -1713,9 +1664,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		
 		
-		int topMark=LearningUtil.getTopMark(request, mcService);
-		int lowestMark=LearningUtil.getLowestMark(request, mcService);
-		int averageMark=LearningUtil.getAverageMark(request, mcService);
+		int topMark=LearningUtil.getTopMark(request, mcService, mcContent);
+		int lowestMark=LearningUtil.getLowestMark(request, mcService, mcContent);
+		int averageMark=LearningUtil.getAverageMark(request, mcService, mcContent);
 		
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		logger.debug("topMark: " + topMark);
@@ -1771,8 +1722,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	sessionMap.put(USER_OVER_PASSMARK, userOverPassMark);
     	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-    	
-    	
 
 	    String totalMarksPossible=LearningUtil.getTotalMarksPossible(mcContent);
 	    logger.debug("totalMarksPossible: " + totalMarksPossible);
@@ -2028,8 +1977,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("fwd'ing to: " + NOTEBOOK);
         return (mapping.findForward(NOTEBOOK));
 	}
-    
-    
     
 }
     
