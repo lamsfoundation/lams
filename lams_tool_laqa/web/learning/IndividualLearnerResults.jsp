@@ -70,13 +70,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="totalQuestionCount" />
 
 
-			<p>
-				<strong><fmt:message key="label.learning.reportMessage" />
-				</strong>
-			</p>
-
-
-
 			<c:forEach var="questionEntry"
 				items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 
