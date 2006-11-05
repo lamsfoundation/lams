@@ -39,13 +39,13 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.0 RC1"
+!define VERSION "2.0 RC2"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
 # installer settings
-!define MUI_ICON "..\graphics\favicon.ico"
-!define MUI_UNICON "..\graphics\favicon.ico"
+!define MUI_ICON "..\graphics\lams2.ico"
+!define MUI_UNICON "..\graphics\lams2.ico"
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
