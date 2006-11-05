@@ -30,7 +30,7 @@
   
 Name "Start LAMS"
 OutFile "..\build\lams-start.exe"
-!define MUI_ICON "..\graphics\lams2.ico"
+!define MUI_ICON "..\graphics\favicon.ico"
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
 
