@@ -49,7 +49,7 @@
 				<include name="run.bat" />
 			</fileset>
 			<filterset>
-				<filter token="JAVA_HOME" value="${JDK_DIR}" />
+				<filter token="JAVA_HOME" value="${JDK_DIR_UNIX_SLASH}" />
 			</filterset>
 		</copy>
 		<copy overwrite="yes" todir="${INSTDIR}">
