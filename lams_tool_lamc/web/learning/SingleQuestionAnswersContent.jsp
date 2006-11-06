@@ -26,12 +26,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!--options content goes here-->
 				<table class="forms">
 					  <tr>
-					  	<th scope="col" valign=top colspan=2> 
-						  	 <fmt:message key="label.assessment"/> 
-					  	</td>
-					  </tr>
-					  
-					  <tr>
 					  	<td align=left valign=top colspan=2> 
 						  	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" /> 
 					  	</td>

@@ -28,11 +28,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <!--options content goes here-->
-
-
-		<h3>
-			<fmt:message key="label.assessment" />
-		</h3>
 		
 		<p>
 			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}"

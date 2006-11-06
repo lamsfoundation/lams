@@ -59,11 +59,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="learnerProgressUserId" />
 			<html:hidden property="questionListingMode" />
 
-			<h2>
-				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
-					<fmt:message key="label.assessment" />
-				</c:if>
-			</h2>
 
 			<h2>
 				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">

@@ -58,11 +58,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</h1>
 
 	
-				
-				  
-					  <h3><fmt:message key="label.assessment"/> 
-				  	</h3>
-				  	
 					
 		 			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
 						  <h3> <fmt:message key="label.withRetries.results.summary"/>	</h3> 
