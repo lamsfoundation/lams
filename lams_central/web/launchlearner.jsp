@@ -1,4 +1,5 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ page import="org.lamsfoundation.lams.lesson.Lesson" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -12,7 +13,6 @@
 </head>
 
 <body class="stripes">
-	
 	<div id="page">
 	
 	<div id="header-no-tabs">
@@ -20,11 +20,57 @@
 
 	<div id="content">
 		<h1><c:out value="${name}"/></h1>
-		<p><c:out value="${description}" escapeXml="false"/></h1>
-		<p>Status: <c:out value="${status}"/></p>
-		<p><a href='javascript:openLearner(<c:out value="${lessonID}"/>)'>Start Lesson</a></p>
+		<p><c:out value="${description}" escapeXml="false"/></p>
+		<p>
+		<!-- defined Lesson states -->
+		<c:set var="created"><%= Lesson.CREATED %></c:set>
+		<c:set var="notstarted"><%= Lesson.NOT_STARTED_STATE %></c:set>
+		<c:set var="started"><%= Lesson.STARTED_STATE %></c:set>
+		<c:set var="finished"><%= Lesson.FINISHED_STATE %></c:set>
+		<c:set var="suspended"><%= Lesson.SUSPENDED_STATE %></c:set>
+		<c:set var="archived"><%= Lesson.ARCHIVED_STATE %></c:set>
+		<c:set var="removed"><%= Lesson.REMOVED_STATE %></c:set>
+
+				<c:if test="${status == created || status == notstarted}">
+					<fmt:message key="label.msg.status">
+						<fmt:param>
+							<fmt:message key="msg.status.not.stated"/>
+						</fmt:param>
+					</fmt:message>
+					<c:set var="button" value="false"/>
+				</c:if>
+				<c:if test="${status == started}">
+					<c:set var="button" value="true"/>
+				</c:if>
+				<c:if test="${status == suspended}">
+					<fmt:message key="label.msg.status">
+						<fmt:param>
+							<fmt:message key="msg.status.disabled"/>
+						</fmt:param>
+					</fmt:message>
+					<c:set var="button" value="false"/>
+				</c:if>
+				<c:if test="${status == finished || status == archived}">
+					<fmt:message key="label.msg.status">
+						<fmt:param>
+							<fmt:message key="msg.status.finished"/>
+						</fmt:param>
+					</fmt:message>
+					<c:set var="button" value="true"/>
+				</c:if>
+				<c:if test="${status == removed}">
+					<fmt:message key="label.msg.status">
+						<fmt:param>
+							<fmt:message key="msg.status.removed"/>
+						</fmt:param>
+					</fmt:message>
+					<c:set var="button" value="false"/>
+				</c:if>
+		</p>
+		<c:if test="${button}">
+			<a href='javascript:openLearner(<c:out value="${lessonID}"/>)' class='button'><fmt:message key="label.open.lesson"/></a>
+		</c:if>
 	</div>
-	   
 	<div id="footer">
 	</div><!--closes footer-->
 		
