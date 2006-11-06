@@ -457,10 +457,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		
 	private ActionMessages validate(AuthoringForm sbmtForm, ActionMapping mapping, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
-		if (StringUtils.isBlank(sbmtForm.getTitle())) {
-			ActionMessage error = new ActionMessage("error.title.blank");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-		}
+//		if (StringUtils.isBlank(sbmtForm.getTitle())) {
+//			ActionMessage error = new ActionMessage("error.title.blank");
+//			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+//		}
 		//define it later mode(TEACHER) skip below validation.
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){

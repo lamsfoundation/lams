@@ -987,10 +987,10 @@ public class AuthoringAction extends Action {
 	
 	private ActionMessages validate(SurveyForm surveyForm, ActionMapping mapping, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
-		if (StringUtils.isBlank(surveyForm.getSurvey().getTitle())) {
-			ActionMessage error = new ActionMessage("error.title.empty");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-		}
+//		if (StringUtils.isBlank(surveyForm.getSurvey().getTitle())) {
+//			ActionMessage error = new ActionMessage("error.title.empty");
+//			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+//		}
 		//define it later mode(TEACHER) skip below validation.
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){

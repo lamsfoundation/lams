@@ -896,10 +896,10 @@ public class AuthoringAction extends Action {
 		ActionMessage ae;
 		try {
 			String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-			if (StringUtils.isBlank(form.getForum().getTitle())) {
-				ActionMessage error = new ActionMessage("error.title.empty");
-				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-			}
+//			if (StringUtils.isBlank(form.getForum().getTitle())) {
+//				ActionMessage error = new ActionMessage("error.title.empty");
+//				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+//			}
 			boolean allowNewTopic = form.getForum().isAllowNewTopic();
 //			define it later mode(TEACHER): need read out AllowNewTopic flag rather than get from HTML form
 			//becuase defineLater does not include this field
