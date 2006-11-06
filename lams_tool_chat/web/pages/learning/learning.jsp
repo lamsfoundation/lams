@@ -43,46 +43,45 @@
 	<p>
 		<c:out value="${chatDTO.instructions}" escapeXml="false" />
 	</p>
-	
+
 	<div id="chat_content">
-		<div id="chat_pane">
-			<form name="sendForm" action="" onSubmit="return sendMsg(this);">
-				<div>
+
+		<form name="sendForm" action="" onSubmit="return sendMsg(this);">
+			<div>
 
 
-					<div id="roster"></div>
-					<div id="iResp">
-						<fmt:message>message.loading</fmt:message>
-					</div>
+				<div id="roster"></div>
+				<div id="iResp">
+					<fmt:message>message.loading</fmt:message>
+				</div>
 
-					<br />
+				<br />
 
+				<c:if test="${MODE == 'teacher' }">
 					<div class="field-name">
 						<fmt:message>label.sendMessageTo</fmt:message>
 						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
 						</span><span id="sendToUser" style="display: none"></span>
 					</div>
+				</c:if>
 
-
-					
-						<textarea name="msg" onKeyPress="return checkEnter(event);"
-							id="msgArea" rows="2" cols="20"></textarea>
-						
-						
-						<div class="space-top">
+				<div>
+					<div id="send-button" align="right">
 						<input id="sendButton" class="button" type="submit"
 							value='<fmt:message>button.send</fmt:message>' />
-						</div>
-					
-					
-				</div>
-			</form>
+					</div>
 
-			
-			<c:if test="${MODE == 'learner' || MODE == 'author'}">
-				<%@ include file="parts/finishButton.jsp"%>
-			</c:if>
-		</div>
+
+					<div id="send-message-area">
+						<textarea id="msgArea" name="msg"
+							onKeyPress="return checkEnter(event);" rows="2" cols="2"></textarea>
+					</div>
+				</div>
+			</div>
+		</form>
+		<c:if test="${MODE == 'learner' || MODE == 'author'}">
+			<%@ include file="parts/finishButton.jsp"%>
+		</c:if>
 	</div>
 </div>
 

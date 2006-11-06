@@ -19,14 +19,10 @@
 	margin-left: 4px;
 }
 
-#chat_pane {
-	width: 98%;
-}
-
 #iResp {
 	height: 260px;
 	margin-right: 12px;
-	overflow: scroll;
+	overflow: auto;
 	border-width: 1px;
 	border-style: solid;
 	padding: 2px;
@@ -36,11 +32,22 @@
 	float: right;
 	width: 105px;
 	height: 260px;
-	overflow: hidden;
+	overflow: auto;
 	border-width: 1px;
 	border-style: solid;
 	font-weight: bold;
 	padding: 2px;
+}
+
+#send-button {
+	float: right;
+	width: 105px;
+	overflow: auto;
+}
+	
+#send-message-area {
+	margin-right: 12px;
+	overflow: auto;
 }
 
 .selected {

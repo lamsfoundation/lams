@@ -91,10 +91,12 @@ function UpdateRosterDisplay() {
 		sendToUserElem.appendChild(createElem("span", null, {color:getColour(user.nick)}, user.nick));
 		document.getElementById("sendToEveryone").style.display = "none";
 		document.getElementById("sendToUser").style.display = "";
-	} else {
-		document.getElementById("sendToUser").style.display = "none";
-		document.getElementById("sendToEveryone").style.display = "";
-	}
+	} 
+	
+	//else {
+	//	document.getElementById("sendToUser").style.display = "none";
+	//	document.getElementById("sendToEveryone").style.display = "";
+	//}
 }
 function Roster() {
 	this.users = [];
