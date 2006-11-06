@@ -15,7 +15,18 @@
 		${sessionMap.title}
 	</h1>
 	<div>
+		<div class="right-buttons">
+			<c:set var="backToForum">
+				<html:rewrite
+					page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
+			</c:set>
+			<html:button property="backToForum"
+				onclick="javascript:location.href='${backToForum}';"
+				styleClass="button">
+				<fmt:message key="label.back.to.forum" />
+			</html:button>
 
+		</div>
 		<h2>
 			<fmt:message key="title.message.view.topic" />
 		</h2>
