@@ -1,12 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
-<lams:html>
+<html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
 	<body class="stripes">
-		<br>
+
 		<div id="content">
 			<p>
 				${title}
