@@ -108,11 +108,11 @@ public class IndexAction extends Action {
 		
 		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
 		if (request.isUserInRole(Role.SYSADMIN)) {
-			List<Integer> roles = new ArrayList<Integer>();
 			List<Organisation> organisations = getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,state);
 			log.debug("we got "+organisations.size()+" organisations whose type is "+OrganisationType.COURSE_DESCRIPTION+" and whose state is "+state);
-			roles.add(Role.ROLE_SYSADMIN);
 			for (Organisation org:organisations) {
+				List<Integer> roles = new ArrayList<Integer>();
+				roles.add(Role.ROLE_SYSADMIN);
 				List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
 				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
 					roles.add(userOrganisationRole.getRole().getRoleId());
