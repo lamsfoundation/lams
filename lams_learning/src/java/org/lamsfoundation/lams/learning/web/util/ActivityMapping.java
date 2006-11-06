@@ -346,7 +346,7 @@ public class ActivityMapping implements Serializable
 
         if (activity.isToolActivity() || activity.isSystemToolActivity())
         {
-            return WebUtil.convertToFullURL(getLearnerToolURL(lesson, ((ToolActivity) activity), learner));
+            return WebUtil.convertToFullURL(getLearnerToolURL(lesson, ((Activity) activity), learner));
         } else {
         	// fall back to the strategy for complex activities
         	return getActivityURL(activity);
