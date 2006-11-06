@@ -66,19 +66,29 @@
 				</c:if>
 
 				<div>
-					<div id="send-button" align="right">
-						<input id="sendButton" class="button" type="submit"
-							value='<fmt:message>button.send</fmt:message>' />
-					</div>
+
+					<table cellpadding="0" cellspacing="0">
+						<tr>
+							<td>
+								<textarea id="msgArea" name="msg"
+									onKeyPress="return checkEnter(event);" rows="2" cols="2"></textarea>
+							</td>
+
+							<td valign="middle" width="105px">
+								<input id="sendButton" class="button" type="submit"
+									value='<fmt:message>button.send</fmt:message>' />
 
 
-					<div id="send-message-area">
-						<textarea id="msgArea" name="msg"
-							onKeyPress="return checkEnter(event);" rows="2" cols="2"></textarea>
-					</div>
+
+							</td>
+						</tr>
+
+					</table>
+
 				</div>
 			</div>
 		</form>
+
 		<c:if test="${MODE == 'learner' || MODE == 'author'}">
 			<%@ include file="parts/finishButton.jsp"%>
 		</c:if>

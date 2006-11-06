@@ -13,19 +13,15 @@
 }
 
 /* ==================== LEARNING PAGE STYLES ==================== */
-#chat_content {
-	width: 500 px;
-	/* compensate for content image border */
-	margin-left: 4px;
-}
+
 
 #iResp {
 	height: 260px;
 	margin-right: 12px;
 	overflow: auto;
-	border-width: 1px;
-	border-style: solid;
+	border: 1px solid #999;
 	padding: 2px;
+	padding-left:5px;
 }
 
 #roster {
@@ -33,8 +29,7 @@
 	width: 105px;
 	height: 260px;
 	overflow: auto;
-	border-width: 1px;
-	border-style: solid;
+	border: 1px solid #999;
 	font-weight: bold;
 	padding: 2px;
 }
@@ -63,7 +58,10 @@
 }
 
 #msgArea {
-	width: 98%;
+	width: 95%;
+	margin:0;
+	margin-right:20px;
+	border: 1px solid #999;
 }
 
 /* ================== MONITORING ================== */
