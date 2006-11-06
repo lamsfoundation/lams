@@ -176,13 +176,12 @@ table.forum td {
 /*layout of the table with form elements */
 
 table { 
-	 width:98%;
-	 margin-left:7px; 
+	 width:100%;
 	 text-align:left; 
 	 }
 
 td { 
-	padding:10px; 
+	
 	font-size:11px;
 	vertical-align:top;
 }
@@ -248,8 +247,6 @@ textarea {
 	padding-top: 20px;
 }
 
-
-
 .small-space-bottom {
 	margin-bottom: 20px;
 }
@@ -262,10 +259,9 @@ textarea {
 
 hr {border:0px;
 	border-top:1px solid #ccc; 
-	width: 630px;
 	height: 1px;
-	
-	}
+}
+
 .warning {
 	color: #cc0000;
 	padding:8px 10px 10px 40px;
