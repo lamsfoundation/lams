@@ -22,33 +22,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 -->
 <tiles-definitions>
 
-	<definition name=".portrait" path="/template.jsp">
-		<put name="titleKey" value="title.change.portrait.window"/>
-		<put name="content" value="portrait.jsp"/>	
+	<definition name=".portrait" path="/main.jsp">
+		<put name="profile" value="portrait.jsp"/>	
 	</definition>
 
-	<definition name=".profile" path="/template.jsp">
-		<put name="titleKey" value="title.profile.window"/>
-		<put name="content" value="profile.jsp"/>	
+	<definition name=".profile" path="/main.jsp">
+		<put name="profile" value="profile.jsp"/>	
 	</definition>
 	
-	<definition name=".editprofile" path="/template.jsp">
-		<put name="titleKey" value="title.edit.profile.window"/>
-		<put name="content" value="editprofile.jsp"/>	
+	<definition name=".editprofile" path="/main.jsp">
+		<put name="profile" value="editprofile.jsp"/>	
 	</definition>
 
-	<definition name=".passwordChange" path="/template.jsp">
-		<put name="titleKey" value="title.change.password.window"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="passwordChangeContent.jsp"/>	
-		<put name="footer" value="footer.jsp"/>	
+	<definition name=".passwordChange" path="/main.jsp">
+		<put name="profile" value="passwordChangeContent.jsp"/>	
 	</definition>
 	
-	<definition name=".passwordChangeOk" path="/template.jsp">
-		<put name="titleKey" value="title.password.changed.window"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="passwordChangeOkContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
+	<definition name=".passwordChangeOk" path="/main.jsp">
+		<put name="profile" value="passwordChangeOkContent.jsp" />	
 	</definition>
 
 	<definition name=".error" path="/template.jsp">

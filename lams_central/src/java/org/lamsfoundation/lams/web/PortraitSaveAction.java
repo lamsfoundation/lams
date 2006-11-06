@@ -56,7 +56,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 	              scope="request"
  * 				  validate="false"
  * 
- * @struts:action-forward name="profile" path="/profile.do?method=view"
+ * @struts:action-forward name="profile" path="/index.do?state=active&amp;tab=profile"
+ * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=portrait"
  */
 public class PortraitSaveAction extends Action {
 	
@@ -92,7 +93,7 @@ public class PortraitSaveAction extends Action {
 		if (!mediaType.equals("image")) {
 			errors.add("file",new ActionMessage("error.portrait.not.image"));
 			saveErrors(request, errors);
-			return mapping.getInputForward();
+			return mapping.findForward("errors");
 		}
 		
 		// resize picture into new buffer
@@ -103,7 +104,7 @@ public class PortraitSaveAction extends Action {
 		if (is==null) {
 			errors.add("file",new ActionMessage("error.general.1"));
 			saveErrors(request, errors);
-			return mapping.getInputForward();
+			return mapping.findForward("errors");
 		}
     	
 		// write to content repository

@@ -81,6 +81,7 @@ public class ProfileAction extends LamsDispatchAction {
 		request.setAttribute("fullName", fullName);
 		request.setAttribute("email", (email!=null ? email : ""));
 		request.setAttribute("portraitUuid", (requestor.getPortraitUuid()==null ? 0 : requestor.getPortraitUuid()));
+		request.setAttribute("tab", "profile");
 		return mapping.findForward("view");
 	}
 	
@@ -96,6 +97,7 @@ public class ProfileAction extends LamsDispatchAction {
 		SupportedLocale locale = requestor.getLocale();
 		userForm.set("localeId",locale.getLocaleId());
 		request.setAttribute("locales", locales);
+		request.setAttribute("tab", "profile");
 		return mapping.findForward("edit");
 	}
 	

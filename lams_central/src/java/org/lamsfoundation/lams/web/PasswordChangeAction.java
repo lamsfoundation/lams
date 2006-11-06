@@ -53,7 +53,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				validate="false"
  * 
  * @struts:action-forward name="okay" path=".passwordChangeOk"
- * @struts:action-forward name="cancelled" path="/profile.do?method=view"
+ * @struts:action-forward name="cancelled" path="/index.do?state=active&amp;tab=profile"
+ * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=password"
  */
 public class PasswordChangeAction extends Action {
 
@@ -144,12 +145,13 @@ public class PasswordChangeAction extends Action {
             {
             	passwordChangeForm.reset(mapping,request);
                 //return (new ActionForward(mapping.getInput()));
-            	return (mapping.getInputForward());
+            	return (mapping.findForward("errors"));
             }
             // If no input page, use error forwarding
             return (mapping.findForward("error.system"));
         }
         
+        request.setAttribute("tab", "password");
 		return mapping.findForward("okay");
 
     } 

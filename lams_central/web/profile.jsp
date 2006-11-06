@@ -21,6 +21,7 @@
 		}
 	</script>
 
+<p>&nbsp;</p>
 <h2><fmt:message key="index.myprofile" /></h2>
 
 <table border="0">
@@ -49,9 +50,9 @@
 	</tr>
 </table>
 
-<p><a href="profile.do?method=edit"><fmt:message key="title.profile.edit.screen" /></a><br />
-<a href="password.do"><fmt:message key="title.password.change.screen" /></a><br />
-<a href="portrait.do"><fmt:message key="title.portrait.change.screen" /></a><br />
+<p><a href="index.do?state=active&tab=editprofile"><fmt:message key="title.profile.edit.screen" /></a><br />
+<a href="index.do?state=active&tab=password"><fmt:message key="title.password.change.screen" /></a><br />
+<a href="index.do?state=active&tab=portrait"><fmt:message key="title.portrait.change.screen" /></a><br />
 </p>
 
 <h2><fmt:message key="title.archived.groups" /></h2>

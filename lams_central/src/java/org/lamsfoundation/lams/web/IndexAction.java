@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -65,7 +66,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/index" validate="false"
  * 
  * @struts.action-forward name="main" path="/main.jsp"
- * 
+ * @struts.action-forward name="profile" path="/profile.do?method=view"
+ * @struts.action-forward name="editprofile" path="/profile.do?method=edit"
+ * @struts.action-forward name="password" path="/password.do"
+ * @struts.action-forward name="portrait" path="/portrait.do"
  * @struts.action-forward name="content" path="/indexContent.jsp"
  */
 public class IndexAction extends Action {
@@ -78,27 +82,28 @@ public class IndexAction extends Action {
 	
 	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		String stateParam = WebUtil.readStrParam(request, "state");
 		state = (stateParam.equals("active")?OrganisationState.ACTIVE:OrganisationState.ARCHIVED);
+		
 		log.debug("User:"+request.getRemoteUser());
 		// only set header links if we are displaying 'active' organisations; i.e., on the index page
 		if(state.equals(OrganisationState.ACTIVE)){
-			List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
-			if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
-				log.debug("user is author");
-				headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
-			}
-			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
-				log.debug("user is a course admin or manager");
-				headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
-			}
-			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
-				log.debug("user is sysadmin or author admin");
-				headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
-			}
-			headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile()"));
-			log.debug("set headerLinks in request");
-			request.setAttribute("headerLinks", headerLinks);
+			setHeaderLinks(request);
+		}
+		
+		String tab = WebUtil.readStrParam(request, "tab", true);
+		if (StringUtils.equals(tab, "profile")) {
+			return mapping.findForward("profile");
+		} else if (StringUtils.equals(tab, "editprofile")) {
+			return mapping.findForward("editprofile");
+		} else if (StringUtils.equals(tab, "password")) {
+			return mapping.findForward("password");
+		} else if (StringUtils.equals(tab, "portrait")) {
+			return mapping.findForward("portrait");
+		} else if(StringUtils.equals(tab, "sysadmin") || StringUtils.equals(tab, "groupmgmt")) {
+			request.setAttribute("tab", tab);
+			return mapping.findForward("main");
 		}
 		
 		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
@@ -130,6 +135,28 @@ public class IndexAction extends Action {
 			return mapping.findForward("main");
 		else
 			return mapping.findForward("content");
+	}
+	
+	private void setHeaderLinks(HttpServletRequest request) {
+		List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
+		if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
+			log.debug("user is author");
+			headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
+		}
+		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
+			log.debug("user is a course admin or manager");
+			headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
+			//headerLinks.add(new IndexLinkBean("index.courseman", "index.do?state=active&tab=groupmgmt"));
+		}
+		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
+			log.debug("user is sysadmin or author admin");
+			headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
+			//headerLinks.add(new IndexLinkBean("index.sysadmin", "index.do?state=active&tab=sysadmin"));
+		}
+		//headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile()"));
+		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?state=active&tab=profile"));
+		log.debug("set headerLinks in request");
+		request.setAttribute("headerLinks", headerLinks);
 	}
 
 	@SuppressWarnings({"unchecked","static-access"})

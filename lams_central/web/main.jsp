@@ -6,6 +6,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-tiles" prefix="tiles" %>
 
 <%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
 <%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser());%>
@@ -36,9 +37,18 @@
 	<div id="header-my-courses">
 		<div id="nav-right">
 			<div class="nav-box-right">
-				<div class="tab-left-selected"></div>
-				<div class="tab-middle-selected"><a class="tab-middle-link-selected" style="border:0;" href="#"><fmt:message key="index.mycourses"/> </a></div>
-				<div class="tab-right-selected"></div>
+				<c:choose>
+					<c:when test="${empty tab}">
+						<div class="tab-left-selected"></div>
+						<div class="tab-middle-selected"><a class="tab-middle-link-selected" style="border:0;" href="index.do?state=active"><fmt:message key="index.mycourses"/> </a></div>
+						<div class="tab-right-selected"></div>
+					</c:when>
+					<c:otherwise>
+						<div class="tab-left"></div>
+						<div class="tab-middle"><a class="tab-middle-link" style="border:0;" href="index.do?state=active"><fmt:message key="index.mycourses"/> </a></div>
+						<div class="tab-right"></div>
+					</c:otherwise>
+				</c:choose>
 			</div>
 			<c:forEach var="headerlink" items="${headerLinks}">
 			<div class="nav-box-right">
@@ -47,6 +57,14 @@
 				<c:set var="tabMiddle" value="tab-middle"/>
 				<c:set var="tabRight" value="tab-right"/>	
 				<c:set var="highlight" value="false" />
+				<c:if test="${tab eq 'profile'}">
+					<c:if test="${headerlink.name eq 'index.myprofile'}">
+						<c:set var="tabLeft" value="tab-left-selected"/>
+						<c:set var="tabMiddle" value="tab-middle-selected"/>
+						<c:set var="tabRight" value="tab-right-selected"/>	
+						<c:set var="highlight" value="false" />
+					</c:if>
+				</c:if>
 				<c:if test="${headerlink.name eq 'index.author'}">
 					<c:set var="tabLeft" value="tab-left-highlight"/>
 					<c:set var="tabMiddle" value="tab-middle-highlight"/>
@@ -84,7 +102,12 @@
 									</a>
 								</div>
 							</div>
-							<c:import url="indexCommon.jsp" charEncoding="utf-8"/>						
+							<c:if test="${empty tab}">
+								<c:import url="indexCommon.jsp" charEncoding="utf-8"/>	
+							</c:if>
+							<c:if test="${tab eq 'profile'}">
+								<tiles:insert attribute="profile" />
+							</c:if>
 						</td>
 					</tr>
 				</tbody>

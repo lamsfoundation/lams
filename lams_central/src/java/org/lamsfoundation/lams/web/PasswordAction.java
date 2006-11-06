@@ -51,6 +51,7 @@ public class PasswordAction extends Action {
 	
 		PasswordChangeActionForm passwordChangeForm = (PasswordChangeActionForm)form;
 		passwordChangeForm.setLogin(request.getRemoteUser());
+		request.setAttribute("tab", "profile");
 		return mapping.findForward("passwordChange");
 	}
 }

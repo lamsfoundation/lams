@@ -57,7 +57,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 	              scope="request"
  * 				  validate="false"
  * 
- * @struts:action-forward name="profile" path="/profile.do?method=view"
+ * @struts:action-forward name="profile" path="/index.do?state=active&amp;tab=profile"
  */
 public class ProfileSaveAction extends Action {
 	
