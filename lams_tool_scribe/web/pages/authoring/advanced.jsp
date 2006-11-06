@@ -19,14 +19,14 @@
 </h2>
 
 <p>
-	<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1">
+	<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1" styleClass="noBorder">
 	</html:radio>
 	<label for="autoSelectScribe1">
 		<fmt:message key="advanced.firstLearner" />
 	</label>
 </p>
 <p>
-	<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2">
+	<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2" styleClass="noBorder">
 	</html:radio>
 	<label for="autoSelectScribe2">
 		<fmt:message key="advanced.selectInMonitor" />

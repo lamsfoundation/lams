@@ -60,53 +60,67 @@
 		<html:hidden property="dispatch" value="submitReport"></html:hidden>
 		<html:hidden property="toolSessionID"></html:hidden>
 		<html:hidden property="mode"></html:hidden>
-		
+
 		<div id="voteDisplay">
-			<%@include file="/pages/parts/voteDisplay.jsp" %>
+			<%@include file="/pages/parts/voteDisplay.jsp"%>
 		</div>
 
-		<div class="field-name">
+		<h2>
 			<fmt:message key="heading.report" />
-		</div>
+		</h2>
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
-			<p>
-				${reportDTO.headingDTO.headingText}
-			</p>
+			<div class="shading-bg">
+				<p>
+					${reportDTO.headingDTO.headingText}
+				</p>
 
-			<p>
-				<lams:out value="${reportDTO.entryText}" />
-			</p>
 
-			<c:if test="${not scribeUserDTO.finishedActivity}">
-				<html:textarea property="report(${reportDTO.uid})" rows="4"
-					cols="20" value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
-			</c:if>
+				<c:if test="${not empty reportDTO.entryText}">
+					<ul>
+						<li>
+							<p>
+								<lams:out value="${reportDTO.entryText}" />
+							</p>
+						</li>
+					</ul>
+				</c:if>
 
+				<c:if test="${not scribeUserDTO.finishedActivity}">
+					<html:textarea property="report(${reportDTO.uid})" rows="4"
+						cols="20" value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
+				</c:if>
+			</div>
 		</c:forEach>
 
 		<c:if test="${not scribeUserDTO.finishedActivity}">
-			<html:submit styleClass="button">
+			<html:submit styleClass="button small-space-bottom">
 				<fmt:message key="button.submitReport" />
 			</html:submit>
 		</c:if>
-				
-		<span id="agreeButton">
-			<c:if test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
+
+	</html:form>
+
+	<hr>
+
+	<div class="space-bottom-top">
+		<html:form action="learning">
+			<html:hidden property="dispatch" value="forceCompleteActivity" />
+			<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
+			<html:hidden property="mode" />
+
+			<div class="right-buttons">
+				<html:submit styleClass="button">
+					<fmt:message key="button.forceComplete" />
+				</html:submit>
+			</div>
+		</html:form>
+
+		<span id="agreeButton"> <c:if
+				test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
 				<a id="agreeButton" class="button" onclick="submitApproval();">
 					<fmt:message key="button.agree" /> </a>
-			</c:if>
-		</span>
-	</html:form>
-
-	<html:form action="learning">
-		<html:hidden property="dispatch" value="forceCompleteActivity"/>
-		<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}"/>
-		<html:hidden property="mode" />
-		<html:submit styleClass="button right-buttons">
-			<fmt:message key="button.forceComplete"/>
-		</html:submit>
-	</html:form>
-
-	<div class="space-bottom"></div>
-
+			</c:if> </span>
+	</div>
 </div>
+
+<div id="footer"></div>

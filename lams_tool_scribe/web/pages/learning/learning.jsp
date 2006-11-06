@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="tool">
-	<lams:WebAppURL/>
+	<lams:WebAppURL />
 </c:set>
 
 <script type="text/javascript">
@@ -13,7 +13,7 @@
 </script>
 
 <div id="content">
-	
+
 	<h1>
 		<c:out value="${scribeDTO.title}" escapeXml="false" />
 	</h1>
@@ -21,8 +21,8 @@
 	<p>
 		${scribeDTO.instructions}
 	</p>
-	
-	<%@include file="/pages/parts/voteDisplay.jsp" %>
+
+	<%@include file="/pages/parts/voteDisplay.jsp"%>
 
 	<div class="field-name">
 		<fmt:message key="heading.report" />
@@ -33,26 +33,36 @@
 		<html:hidden property="mode"></html:hidden>
 
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
-			<p>
-				${reportDTO.headingDTO.headingText}
-			</p>
 
-			<p>
-				<lams:out value="${reportDTO.entryText}" />
-			</p>
+			<div class="shading-bg">
+				<p>
+					${reportDTO.headingDTO.headingText}
+				</p>
+
+				<c:if test="${not empty reportDTO.entryText}">
+					<ul>
+						<li>
+							<p>
+								<lams:out value="${reportDTO.entryText}" />
+							</p>
+						</li>
+					</ul>
+				</c:if>
+			</div>
 
 		</c:forEach>
 
 		<p>
-			<c:if test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
+			<c:if
+				test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
 				<html:submit styleClass="button">
-					<fmt:message key="button.agree" />					
+					<fmt:message key="button.agree" />
 				</html:submit>
 			</c:if>
 		</p>
 
 	</html:form>
 
-	<div class="space-bottom"></div>
-
 </div>
+
+<div id="footer"></div>

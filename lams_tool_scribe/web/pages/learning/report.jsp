@@ -15,20 +15,28 @@
 	<div class="field-name">
 		<fmt:message key="heading.report" />
 	</div>
-		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
+	<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
+
+		<div class="shading-bg">
 			<p>
 				${reportDTO.headingDTO.headingText}
 			</p>
 
-			<p>
-				<lams:out value="${reportDTO.entryText}" />
-			</p>
+			<c:if test="${not empty reportDTO.entryText}">
+				<ul>
+					<li>
+						<p>
+							<lams:out value="${reportDTO.entryText}" />
+						</p>
+					</li>
+				</ul>
+			</c:if>
+		</div>
+	</c:forEach>
 
-		</c:forEach>
-
-		<c:if test="${MODE == 'learner' || MODE == 'author'}">
-			<%@ include file="parts/finishButton.jsp"%>
-		</c:if>
-		
-		<div class="space-bottom"></div>
+	<c:if test="${MODE == 'learner' || MODE == 'author'}">
+		<%@ include file="parts/finishButton.jsp"%>
+	</c:if>
 </div>
+
+<div id="footer"></div>
