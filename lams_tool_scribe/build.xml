@@ -422,7 +422,7 @@ Ant build file.
 			<arg value="True" />
 		</java>
 
-		<echo>Marking activity as invalid - set it to valid if debugging or use the combined chat/scribe activity </echo>
+		<echo>Marking activity as invalid - set it to valid if debugging or use the combined chat/scribe or forum/scribe activity. This is not an error.</echo>
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}" password="${db.password}" encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}" />
