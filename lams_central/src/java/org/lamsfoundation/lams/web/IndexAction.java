@@ -90,6 +90,7 @@ public class IndexAction extends Action {
 		// only set header links if we are displaying 'active' organisations; i.e., on the index page
 		if(state.equals(OrganisationState.ACTIVE)){
 			setHeaderLinks(request);
+			setAdminLinks(request);
 		}
 		
 		String tab = WebUtil.readStrParam(request, "tab", true);
@@ -101,9 +102,6 @@ public class IndexAction extends Action {
 			return mapping.findForward("password");
 		} else if (StringUtils.equals(tab, "portrait")) {
 			return mapping.findForward("portrait");
-		} else if(StringUtils.equals(tab, "sysadmin") || StringUtils.equals(tab, "groupmgmt")) {
-			request.setAttribute("tab", tab);
-			return mapping.findForward("main");
 		}
 		
 		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
@@ -143,20 +141,18 @@ public class IndexAction extends Action {
 			log.debug("user is author");
 			headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 		}
-		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)) {
-			log.debug("user is a course admin or manager");
-			headerLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
-			//headerLinks.add(new IndexLinkBean("index.courseman", "index.do?state=active&tab=groupmgmt"));
-		}
-		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
-			log.debug("user is sysadmin or author admin");
-			headerLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
-			//headerLinks.add(new IndexLinkBean("index.sysadmin", "index.do?state=active&tab=sysadmin"));
-		}
-		//headerLinks.add(new IndexLinkBean("index.myprofile", "javascript:openProfile()"));
 		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?state=active&tab=profile"));
 		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
+	}
+	
+	private void setAdminLinks(HttpServletRequest request) {
+		List<IndexLinkBean> adminLinks = new ArrayList<IndexLinkBean>();
+		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER))
+			adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
+		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN))
+			adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
+		request.setAttribute("adminLinks", adminLinks);
 	}
 
 	@SuppressWarnings({"unchecked","static-access"})

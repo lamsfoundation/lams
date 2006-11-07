@@ -95,6 +95,11 @@
 									<lams:user property="firstName" />
 								</div>
 								<div class="float-right">
+									<c:if test="${not empty adminLinks}">
+										<c:forEach var="adminlink" items="${adminLinks}">
+											<a title='<fmt:message key="${adminlink.name}"/>' href='<c:out value="${adminlink.url}"/>'><fmt:message key="${adminlink.name}"/></a> | 
+										</c:forEach>
+									</c:if>
 									<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:refresh()">
 										<fmt:message key="index.refresh" />
 									</a> | <a href="home.do?method=logout" onClick="closeAllChildren()">
