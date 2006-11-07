@@ -339,9 +339,9 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     	Vector listOfValidationErrors = new Vector();
     	if(isScheduledByTimeOffset()) {
     		if(getGateStartTimeOffset().equals(getGateEndTimeOffset()))
-    			listOfValidationErrors.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY), this.getActivityUIID()));
+    			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SCHEDULE_GATE_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY), this.getActivityUIID()));
     		else if(getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0)
-    			listOfValidationErrors.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY), this.getActivityUIID()));
+    			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SCHEDULE_GATE_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY), this.getActivityUIID()));
     		
     	}
     	return listOfValidationErrors;

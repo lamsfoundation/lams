@@ -143,8 +143,49 @@ public class LearningDesignService implements ILearningDesignService{
 		
 		validateActivityTransitionRules(learningDesign.getParentActivities(), learningDesign.getTransitions(), listOfValidationErrorDTOs);
 		validateGeneral(learningDesign.getActivities(), listOfValidationErrorDTOs);
-		
+		cleanupValidationErrors(listOfValidationErrorDTOs);
 		return listOfValidationErrorDTOs;
+		
+	}
+	
+	/**
+	 * Cleans up multiple and redundant error messages in the list.
+	 * @param errors	List of errors to cleanup.
+	 */
+	private void cleanupValidationErrors(Vector<ValidationErrorDTO> errors) {
+		ValidationErrorDTO currentError = null;
+		Iterator it = errors.iterator();
+		while(it.hasNext()) {
+			cleanupTransitionErrors(errors, it);
+		}
+	}
+	
+	private void cleanupTransitionErrors(Vector<ValidationErrorDTO> errors, Iterator topIt) {
+		ValidationErrorDTO nextError;
+		ValidationErrorDTO currentError = (ValidationErrorDTO) topIt.next();
+		Iterator it = errors.iterator();
+		
+		while(it.hasNext()) {
+			nextError = (ValidationErrorDTO) it.next();
+		
+			if(currentError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE) && 
+					(nextError.getCode().equals(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE) ||
+					 nextError.getCode().equals(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE)))
+				if(currentError.getUIID().equals(nextError.getUIID())) {
+					topIt.remove();
+					return;
+				}
+			else if(currentError.getCode().equals(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE)) 
+					if(nextError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE))
+						if(currentError.getUIID().equals(nextError.getUIID()))
+							it.remove();
+			else if(currentError.getCode().equals(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE))
+					if(nextError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE))
+						if(currentError.getUIID().equals(nextError.getUIID()))
+							it.remove();
+			
+		}			   
+			
 		
 	}
 	
@@ -182,7 +223,7 @@ public class LearningDesignService implements ILearningDesignService{
 		if (numOfTopLevelActivities > 0)
 		{
 			if (noInputTransition.size() == 0)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2_KEY)));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2_KEY)));
 			
 			if (noInputTransition.size() > 1)
 			{
@@ -191,12 +232,12 @@ public class LearningDesignService implements ILearningDesignService{
 				while (noInputTransitionIterator.hasNext())
 				{
 					Activity a = (Activity)noInputTransitionIterator.next();
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
 				}
 			}
 			
 			if (noOuputTransition.size() == 0)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE,messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
 			if (noOuputTransition.size() > 1)
 			{
 				//there is more than one activity with no output transitions
@@ -204,7 +245,7 @@ public class LearningDesignService implements ILearningDesignService{
 				while (noOutputTransitionIterator.hasNext())
 				{
 					Activity a = (Activity)noOutputTransitionIterator.next();
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));					
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));					
 				}
 			}
 		}
@@ -228,9 +269,9 @@ public class LearningDesignService implements ILearningDesignService{
 			Activity fromActivity = transition.getFromActivity();
 			Activity toActivity = transition.getToActivity();
 			if (fromActivity == null)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
 			else if (toActivity == null)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
 			
 		}
 		
@@ -254,13 +295,13 @@ public class LearningDesignService implements ILearningDesignService{
 		if(numOfActivities > 1)
 		{
 			if (inputTransition == null && outputTransition == null)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
 			
 		}
 		if (numOfActivities == 1)
 		{	
 			if (inputTransition != null || outputTransition != null)				
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
 			
 		}
 	
@@ -308,7 +349,7 @@ public class LearningDesignService implements ILearningDesignService{
 				Grouping grouping = activity.getGrouping();
 				if (grouping == null)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
 				}
 			}
 			else if(groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_NONE)
@@ -316,7 +357,7 @@ public class LearningDesignService implements ILearningDesignService{
 				Grouping grouping = activity.getGrouping();
 				if (grouping != null)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
 				}
 			}
 				
@@ -339,7 +380,7 @@ public class LearningDesignService implements ILearningDesignService{
 				int numOfChildActivities = childActivities.size();
 				if(numOfChildActivities == 0)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY), optionsActivity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY), optionsActivity.getActivityUIID()));
 				}
 				
 				
@@ -389,7 +430,7 @@ public class LearningDesignService implements ILearningDesignService{
 			}
 			
 			if (!validOrderId)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY), optionsActivity.getActivityUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY), optionsActivity.getActivityUIID()));
 			
 		}	
 	}
@@ -405,7 +446,7 @@ public class LearningDesignService implements ILearningDesignService{
 			{				
 				if (activity.getGrouping() == null)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.GROUPING_SELECTED_ERROR), activity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_SELECTED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_SELECTED_ERROR_KEY), activity.getActivityUIID()));
 				}
 			}
 		

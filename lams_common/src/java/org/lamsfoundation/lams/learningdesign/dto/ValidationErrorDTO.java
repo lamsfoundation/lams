@@ -30,22 +30,33 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 public class ValidationErrorDTO {
 	
 	/** Struts Message Resource related variables */
-	public static final String CONFIG_PARAM = "org.lamsfoundation.lams.applicationResources";
-	public static final String OTHER_ERROR_KEY = "validation.error.other";
-	public static final String TRANSITION_ERROR_KEY = "validation.error.transitionNoActivityBeforeOrAfter";
-	public static final String ACTIVITY_TRANSITION_ERROR_KEY= "validation.error.activityWithNoTransition";
-	public static final String INPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.inputTransitionType1";
-	public static final String INPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.inputTransitionType2";
-	public static final String OUTPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.outputTransitionType1";
-	public static final String OUTPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.outputTransitionType2";
-	public static final String GROUPING_REQUIRED_ERROR_KEY = "validation.error.GroupingRequired";
-	public static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "validation.error.GroupingNotRequired";
-	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected";
-	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity";
-	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId";
-	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1";
-	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";	
+	public static final String CONFIG_PARAM = "org.lamsfoundation.lams.applicationResources";								// Code:
+	public static final String OTHER_ERROR_KEY = "validation.error.other";													// O
+	public static final String TRANSITION_ERROR_KEY = "validation.error.transitionNoActivityBeforeOrAfter";					// T
+	public static final String ACTIVITY_TRANSITION_ERROR_KEY= "validation.error.activityWithNoTransition";					// AT
+	public static final String INPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.inputTransitionType1";					// IT
+	public static final String INPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.inputTransitionType2";  				
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.outputTransitionType1";				// OT
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.outputTransitionType2";				
+	public static final String GROUPING_REQUIRED_ERROR_KEY = "validation.error.GroupingRequired";							// GR
+	public static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "validation.error.GroupingNotRequired";					// GNR
+	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected";							// GS
+	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity";							// OA
+	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId";	// OAOI
+	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1";			// SG
+	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";			
 	
+	public static final String OTHER_ERROR_CODE = "O";
+	public static final String TRANSITION_ERROR_CODE = "T";
+	public static final String ACTIVITY_TRANSITION_ERROR_CODE = "AT";
+	public static final String INPUT_TRANSITION_ERROR_CODE = "IT";
+	public static final String OUTPUT_TRANSITION_ERROR_CODE = "OT1";
+	public static final String GROUPING_REQUIRED_ERROR_CODE = "GR";
+	public static final String GROUPING_NOT_REQUIRED_ERROR_CODE = "GNR";
+	public static final String GROUPING_SELECTED_ERROR_CODE = "GS";
+	public static final String OPTIONAL_ACTIVITY_ERROR_CODE = "OA";
+	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE = "OAOI";
+	public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
 	
 	
 	private static MessageResources resources = MessageResources.getMessageResources(CONFIG_PARAM);
@@ -129,18 +140,20 @@ public class ValidationErrorDTO {
 	
 	private Integer UIID;
 	private String message; //the validation message explaining what the problem is
+	private String code;	// unique code representing the validation error message
 	
-	
-	public ValidationErrorDTO(String message, Integer UIID)
+	public ValidationErrorDTO(String code, String message, Integer UIID)
 	{
+		this.code = code;
 		this.message =  message;
 		this.UIID = UIID;
 		
 		
 	}
 	
-	public ValidationErrorDTO(String message)
+	public ValidationErrorDTO(String code, String message)
 	{
+		this.code = code;
 		this.message = message;
 	}
 
@@ -153,7 +166,9 @@ public class ValidationErrorDTO {
 	{		
 	}
 	
-	
+	public String getCode() {
+		return code;
+	}
 	public String getMessage() {
 		return message;
 	}
