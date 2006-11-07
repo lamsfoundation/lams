@@ -58,6 +58,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				  validate="false"
  * 
  * @struts:action-forward name="profile" path="/index.do?state=active&amp;tab=profile"
+ * @struts:action-forward name="editprofile" path="/index.do?state=active&amp;tab=editprofile"
  */
 public class ProfileSaveAction extends Action {
 	
@@ -100,6 +101,11 @@ public class ProfileSaveAction extends Action {
 			if (!m.matches()) {
 				errors.add("email", new ActionMessage("error.valid.email.required"));
 			}
+		}
+		
+		if (!errors.isEmpty()) {
+			saveErrors(request, errors);
+			return (mapping.findForward("editprofile"));
 		}
 		
 		BeanUtils.copyProperties(requestor,userForm);
