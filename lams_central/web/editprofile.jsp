@@ -6,8 +6,6 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<h2><fmt:message key="title.profile.edit.screen"/></h2>
-
 <html:form action="/saveprofile.do" method="post">
 <html:hidden property="userId" />
 <html:hidden property="login" />
@@ -17,6 +15,9 @@
 	<p class="warning"><html:errors/></p>
 </logic:messagesPresent>
 <table>
+	<tr>
+		<td><h2><fmt:message key="title.profile.edit.screen"/></h2></td>
+	</tr>
     <tr>
 		<td align="right"><fmt:message key="label.username"/>:</td>
 		<td><bean:write name="UserForm" property="login" /></td>

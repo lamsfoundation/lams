@@ -21,10 +21,10 @@
 		}
 	</script>
 
-<p>&nbsp;</p>
-<h2><fmt:message key="index.myprofile" /></h2>
-
 <table border="0">
+	<tr>
+		<td><h2><fmt:message key="index.myprofile" /></h2></td>
+	</tr>
 	<tr>
 		<td align="right"><fmt:message key="label.name" />: 
 		</td>
