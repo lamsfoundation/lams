@@ -483,6 +483,14 @@ public class LearningDesignService implements ILearningDesignService{
 	private void internationaliseActivities(Collection activities) {		
 		Iterator iter = activities.iterator();
 		Locale locale = LocaleContextHolder.getLocale();
+		
+		if ( log.isDebugEnabled()) {
+			if ( locale != null )
+				log.debug("internationaliseActivities: Locale has lang/country "+locale.getLanguage()+","+locale.getCountry());
+			else 
+				log.debug("internationaliseActivities: Locale missing.");
+		}
+		
 		while (iter.hasNext()) {
 			LibraryActivityDTO activity = (LibraryActivityDTO) iter.next();
 			// update the activity fields

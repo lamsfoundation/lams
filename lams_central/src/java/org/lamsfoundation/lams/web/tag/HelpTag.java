@@ -100,7 +100,12 @@ public class HelpTag extends TagSupport {
 				    
 				    fullURL = helpURL + module + "#" + toolSignature + module + "-" + language + country;
 					
-				    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+					// TODO Added to debug Chinese problem. To be removed.
+					if ( log.isDebugEnabled() ) {
+						log.debug("In help tag, url is "+fullURL);
+					}
+
+					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 				   
 	        	} else if(page != null){
 	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + Configuration.get(ConfigurationKeys.HELP_URL) + page + "', 'help')\"/>");

@@ -35,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -53,6 +54,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @version $Revision$
  */
 public class LocaleFilter extends OncePerRequestFilter {
+	
+	private static Logger log = Logger.getLogger(LocaleFilter.class);
 	private String encoding;
 	
 	public static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
@@ -98,6 +101,12 @@ public class LocaleFilter extends OncePerRequestFilter {
 					// so we may end up with some confusing situations.
 					if(!StringUtils.isEmpty(lang)){
 						preferredLocale = new Locale(lang,country!=null?country:"");
+
+						// TODO Added to debug Chinese problem. To be removed.
+						if ( log.isDebugEnabled() ) {
+							log.debug("Locale set from user lang/country is "+lang+","+country);
+						}
+
 					}
 				}
 			}
@@ -107,7 +116,14 @@ public class LocaleFilter extends OncePerRequestFilter {
 			String defaults[] = LanguageUtil.getDefaultLangCountry();
         	preferredLocale = new Locale(defaults[0]!=null?defaults[0]:"",
         								 defaults[1]!=null?defaults[1]:"");
-		} 
+        	
+			// TODO Added to debug Chinese problem. To be removed.
+			if ( log.isDebugEnabled() ) {
+				log.debug("Locale set from server is "+defaults[0]+","+defaults[1]);
+			}
+
+		}
+
 		if(direction == null){
 			direction = LanguageUtil.getDefaultDirection();
 		}
