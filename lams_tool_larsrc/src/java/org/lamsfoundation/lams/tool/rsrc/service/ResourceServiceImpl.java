@@ -1070,19 +1070,13 @@ public class ResourceServiceImpl implements
 	    			item.setCreateBy(ruser);
 	    			item.setCreateByAuthor(true);
 	    			item.setHide(false);
-	
+
 	    			Vector instructions = (Vector) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
 	    			if ( instructions != null && instructions.size() > 0 ) {
 	    				item.setItemInstructions(new HashSet());
 	    				Iterator insIter = instructions.iterator();
 	    				while (insIter.hasNext()) {
-	    					Hashtable instructionEntry = (Hashtable) insIter.next();
-							String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-							Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-							ResourceItemInstruction instruction = new ResourceItemInstruction();
-							instruction.setDescription(instructionText);
-							instruction.setSequenceId(instructionOrder);
-							item.getItemInstructions().add(instruction);
+							item.getItemInstructions().add(createInstruction( (Hashtable) insIter.next() ));
 						}
 	    			}
 	
@@ -1128,6 +1122,27 @@ public class ResourceServiceImpl implements
 
     }
 
+    private ResourceItemInstruction createInstruction( Hashtable instructionEntry ) throws WDDXProcessorConversionException {
+
+		Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry, ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+		
+		// the description column in 1.0.2 was longer than 255 chars, so truncate.
+		String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
+		if ( instructionText != null && instructionText.length() > 255 ) {
+			if ( log.isDebugEnabled() ) {
+				log.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
+						+instructionText+"\'");
+			}
+			instructionText = instructionText.substring(0,255);
+		}
+
+		ResourceItemInstruction instruction = new ResourceItemInstruction();
+		instruction.setDescription(instructionText);
+		instruction.setSequenceId(instructionOrder);
+		
+		return instruction;
+    }
+    
     /** Set the description, throws away the title value as this is not supported in 2.0 */
     public void setReflectiveData(Long toolContentId, String title, String description) 
     		throws ToolException, DataMissingException {
