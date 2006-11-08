@@ -189,6 +189,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	</tr>
 
 
+					  <tr>
+					  	<td NOWRAP align=left valign=top colspan=2> 
+								&nbsp&nbsp
+					  	</td>
+					  </tr>
 
 
 						<tr> 
@@ -212,8 +217,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-
-
 					  <tr>
 					  	<td NOWRAP valign=top> 
 		                                <html:submit property="redoQuestionsOk" 
@@ -227,17 +230,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</td>					
 						<td NOWRAP valign=top align=right> 			
 	                                
-									<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-										<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
-											<fmt:message key="label.finished"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					
-									<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-										<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" styleClass="button">
-											<fmt:message key="label.continue"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
+								<html:submit property="learnerFinished"  onclick="javascript:submitMethod('learnerFinished');" styleClass="button">
+									<fmt:message key="label.finished"/>
+								</html:submit>	 				
 
 					  	 </td>
 					  </tr>

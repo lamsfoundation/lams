@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="reportViewOnly"/>		
 	<html:hidden property="userEntry"/>			
 		
-			<table cellpadding="0" class="alternative-color">
+			<table cellpadding="0">
 					  <tr>
 					  	<td NOWRAP align=left valign=top colspan=2> 
 						  	 <b>  <fmt:message key="label.learning.forceFinishMessage"/> </b> 
@@ -89,11 +89,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 			  		<c:forEach var="entry" items="${requestScope.mapGeneralCheckedOptionsContent}">
 						  <tr>
-						  	<td NOWRAP align=left valign=top colspan=2> 
+						  	<td NOWRAP align=center valign=top colspan=2> 
 								  <c:out value="${entry.value}" escapeXml="false" />						  																	
 						  	</td>
 						  </tr>
 					</c:forEach>
+
+					  <tr>
+					  	<td NOWRAP align=left valign=top colspan=2> 
+								&nbsp&nbsp
+					  	</td>
+					  </tr>
+
+
+						<tr> 
+						<td NOWRAP align=center  valign=top colspan=2> 
+								<table>
+									<tr> 
+					  	   		  		<td>
+											<b> <fmt:message key="label.notebook.entries"/> </b>						
+										 </td>
+									</tr>
+									
+									<tr> 
+					  	   		  		<td>
+											<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
+										 </td>
+									</tr>
+							</table>
+	
+						</td>
+						</tr>
+
+					
 				
 				
 		  	   		  <tr>
