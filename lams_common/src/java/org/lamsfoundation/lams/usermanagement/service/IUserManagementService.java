@@ -252,6 +252,16 @@ public interface IUserManagementService {
 	 * @return a list of UserOrganisations
 	 */
 	public List getUserOrganisationsForUserByTypeAndStatus(String login, Integer typeId, Integer stateId);
+
+	/**
+	 * 
+	 * @param login
+	 * @param typeId
+	 * @param stateId
+	 * @param parentOrgId
+	 * @return a list of UserOrganisations
+	 */
+	public List getUserOrganisationsForUserByTypeAndStatusAndParent(String login, Integer typeId, Integer stateId, Integer parentOrgId);
 	
 	/**
 	 * @param login

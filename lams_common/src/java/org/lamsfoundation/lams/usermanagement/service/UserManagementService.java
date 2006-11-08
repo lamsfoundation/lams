@@ -383,6 +383,15 @@ public class UserManagementService implements IUserManagementService {
 		properties.put("organisation.organisationState.organisationStateId",stateId);
 		return baseDAO.findByProperties(UserOrganisation.class,properties);
 	}
+	
+	public List getUserOrganisationsForUserByTypeAndStatusAndParent(String login, Integer typeId, Integer stateId, Integer parentOrgId) {
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("user.login",login);
+		properties.put("organisation.organisationType.organisationTypeId",typeId);
+		properties.put("organisation.organisationState.organisationStateId",stateId);
+		properties.put("organisation.parentOrganisation.organisationId",parentOrgId);
+		return baseDAO.findByProperties(UserOrganisation.class,properties);
+	}
 
 	public User getUserByLogin(String login) {
 		List results = baseDAO.findByProperty(User.class,"login",login);
