@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,11 +39,15 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.admin.web.dto.UserOrgRoleDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -120,6 +125,8 @@ public class UserAction extends LamsDispatchAction {
 			userForm.set("password", null);
 	        SupportedLocale locale = user.getLocale();
 			userForm.set("localeId", locale.getLocaleId());
+			// set user's organisations to display
+			request.setAttribute("userOrgRoles", getUserOrgRoles(user));
 		} else {  // create a user
 			try {
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
@@ -145,6 +152,45 @@ public class UserAction extends LamsDispatchAction {
 		request.setAttribute("locales",locales);
 
 		return mapping.findForward("user");
+	}
+	
+	// display user's organisations and roles in them
+	private List<UserOrgRoleDTO> getUserOrgRoles(User user) {
+		
+		List<UserOrgRoleDTO> uorDTOs = new ArrayList<UserOrgRoleDTO>();
+		List<UserOrganisation> uos = service.getUserOrganisationsForUserByTypeAndStatus(
+				user.getLogin(), 
+				OrganisationType.COURSE_TYPE, 
+				OrganisationState.ACTIVE);
+		for (UserOrganisation uo : uos) {
+			UserOrgRoleDTO uorDTO = new UserOrgRoleDTO();
+			List<String> roles = new ArrayList<String>();
+			for (Object uor : uo.getUserOrganisationRoles())
+				roles.add(((UserOrganisationRole)uor).getRole().getName());
+			Collections.sort(roles);
+			uorDTO.setOrgName(uo.getOrganisation().getName());
+			uorDTO.setRoles(roles);
+			List<UserOrgRoleDTO> childDTOs = new ArrayList<UserOrgRoleDTO>();
+			List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(
+					user.getLogin(), 
+					OrganisationType.CLASS_TYPE, 
+					OrganisationState.ACTIVE,
+					uo.getOrganisation().getOrganisationId());
+			for (UserOrganisation childuo : childuos) {
+				UserOrgRoleDTO childDTO = new UserOrgRoleDTO();
+				List<String> childroles = new ArrayList<String>();
+				for (Object uor : childuo.getUserOrganisationRoles())
+					childroles.add(((UserOrganisationRole)uor).getRole().getName());
+				Collections.sort(childroles);
+				childDTO.setOrgName(childuo.getOrganisation().getName());
+				childDTO.setRoles(childroles);
+				childDTOs.add(childDTO);
+			}
+			uorDTO.setChildDTOs(childDTOs);
+			uorDTOs.add(uorDTO);
+		}
+		
+		return uorDTOs;
 	}
 	
 	// determine whether to disable or delete user based on their lams data
