@@ -90,7 +90,7 @@
 						<td>
 							<div class="welcome">
 								<div class="float-left">
-									<img src="images/css/user.gif" alt="" width="14" height="13" /> 
+									<img src="images/css/user.jpg" alt="" width="20" height="22" /> 
 									<fmt:message key="index.welcome" /> 
 									<lams:user property="firstName" />
 								</div>
