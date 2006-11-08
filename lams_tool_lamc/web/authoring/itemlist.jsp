@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<c:set var="formBean"
 		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<table id="itemTable" class="alternative-color">
+	<table id="itemTable" class="alternative-color" cellspacing="0">
 		<c:set var="queIndex" scope="request" value="0" />
 
 		<tr>
@@ -109,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}"/>');">
 				</td>
 
-				<td width="10%">
+				<td width="10%" align="center">
 					<img src="<c:out value="${tool}"/>images/delete.gif" border="0"
 						title="<fmt:message key='label.tip.deleteQuestion'/>"
 						onclick="removeQuestion(${queIndex});">
