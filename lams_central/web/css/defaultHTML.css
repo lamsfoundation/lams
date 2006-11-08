@@ -481,6 +481,15 @@ input:hover.button {
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
 }
+
+input.disabled {
+	color: #999;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	font-size:11px;
+	}
+
 .box {
 	display: none;
 	min-height: 100px;
