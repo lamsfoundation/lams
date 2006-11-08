@@ -8,7 +8,7 @@
 			style="display:none" id="surveyListArea_Busy" />
 	</h2>
 
-	<table id="itemTable" class="alternative-color">
+	<table id="itemTable" class="alternative-color" cellspacing="0">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 		<c:forEach var="question" items="${sessionMap.questionList}"
