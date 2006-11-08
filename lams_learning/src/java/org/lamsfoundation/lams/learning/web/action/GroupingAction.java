@@ -38,14 +38,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -130,17 +132,22 @@ public class GroupingAction extends LamsDispatchAction
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-        validateLearnerProgress(learnerProgress);
-        
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+		if (!(activity instanceof GroupingActivity)) 
+		{
+		    log.error(className+": activity not GroupingActivity");
+			return mapping.findForward(ActivityMapping.ERROR);
+		}
+		
         boolean groupingDone = learnerService.performGrouping(learnerProgress.getLesson().getLessonId(),
-        								learnerProgress.getNextActivity().getActivityId(), 
+        								activity.getActivityId(), 
         								LearningWebUtil.getUserId(),forceGroup);
 
-        LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
+        LearningWebUtil.putActivityInRequest(request, activity, learnerService);
         
         DynaActionForm groupForm = (DynaActionForm)form;
         groupForm.set("previewLesson",learnerProgress.getLesson().isPreviewLesson());
-        groupForm.set("title", learnerProgress.getNextActivity().getTitle());
+        groupForm.set("title", activity.getTitle());
         
         if ( groupingDone ) {
         	request.setAttribute(FINISHED_BUTTON, Boolean.TRUE);
@@ -169,7 +176,7 @@ public class GroupingAction extends LamsDispatchAction
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
      
-        SortedSet groups = new TreeSet(new GroupComparator());
+        SortedSet<Group> groups = new TreeSet<Group>(new GroupComparator());
 
         Activity activity = LearningWebUtil.getActivityFromRequest(request,learnerService);
 
@@ -247,40 +254,12 @@ public class GroupingAction extends LamsDispatchAction
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
-
+        Lesson lesson = learnerService.getLessonByActivity(groupingActivity);
+        
         String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser().getUserId(),
-                                                                  groupingActivity);
+                                                                  groupingActivity, lesson.getLessonId());
 		response.sendRedirect(nextActivityUrl);
         return null;
     }
-    //---------------------------------------------------------------------
-    // Helper method
-    //---------------------------------------------------------------------
-    /**
-     * @param learnerProgress
-     */
-    private void validateLearnerProgress(LearnerProgress learnerProgress)
-    {
-        if(learnerProgress ==null)
-            throw new LearnerServiceException("Can't perform grouping without knowing" +
-            		" the learner progress.");
-        
-        if(!isNextActivityValid(learnerProgress))
-            throw new LearnerServiceException("Error in progress engine. Getting "
-                                              +learnerProgress.getNextActivity().toString()
-                                              +" where it should be grouping activity");
-    }
-
-
-    /**
-     * Validate the next activity within the learner progress. It should not
-     * be null and it should be the grouping activity.
-     * @param learnerProgress the learner progress for current learner.
-     * @return whether the next activity is valid.
-     */
-    private boolean isNextActivityValid(LearnerProgress learnerProgress)
-    {
-        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity().isGroupingActivity());
-    }
-
+ 
 }

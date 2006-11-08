@@ -400,25 +400,8 @@ public class LearnerService implements ICoreLearnerService
         ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);	
         // in the future, we might want to see if the entire tool session is completed at this point. 
        
-        LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), toolSession.getLesson().getLessonId());
-       
-        // Need to synchronise the next bit of code so that if the tool calls
-        // this twice in quick succession, with the same parameters, it won't update
-        // the database twice! This may happen if a tool has a double submission problem.
-        // I don't want to synchronise on (this), as this could cause too much of a bottleneck,
-        // but if its not synchronised, we get db errors if the same tool session is completed twice
-        // (invalid index). I can'tfind another object on which to synchronise - Hibernate does not give me the 
-        // same object for tool session or current progress and user is cached via login, not userid.
-        String returnURL = null;
-        //  bottleneck synchronized (this) {
-        	if (currentProgress.getCompletedActivities().contains(toolSession.getToolActivity())) {
-        		// return close window url
-        		returnURL = ActivityMapping.getCloseURL();
-        	} else {
-        		returnURL = completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
-        	}
-        //}
-        
+        String returnURL = completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity(), toolSession.getLesson().getLessonId());
+
         if ( log.isDebugEnabled() ) { 
         	log.debug("Moving onto next activity after tool session id "+toolSessionId+" learnerId "+learnerId+" url is "+returnURL);
         }
@@ -428,28 +411,48 @@ public class LearnerService implements ICoreLearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, java.lang.Long, java.lang.Long)
      */
-    public String completeActivity(Integer learnerId,Long activityId) {
+    public String completeActivity(Integer learnerId,Long activityId,Long lessonId) {
     	Activity activity = getActivity(activityId);
-    	return completeActivity(learnerId, activity);
+    	return completeActivity(learnerId, activity,lessonId);
     }
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
      */
-    public String completeActivity(Integer learnerId,Activity activity)
+    public String completeActivity(Integer learnerId,Activity activity,Long lessonId)
     {
-    	try 
-    	{
-	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId);
-	    	return activityMapping.getProgressURL(nextLearnerProgress);
-    	}
-        catch (UnsupportedEncodingException e)
-        {
-            log.error("error occurred in 'getProgressURL':"+e.getMessage());
-    		throw new LearnerServiceException(e.getMessage());
-        }
+        LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
+        
+        // Need to synchronise the next bit of code so that if the tool calls
+        // this twice in quick succession, with the same parameters, it won't update
+        // the database twice! This may happen if a tool has a double submission problem.
+        // I don't want to synchronise on (this), as this could cause too much of a bottleneck,
+        // but if its not synchronised, we get db errors if the same tool session is completed twice
+        // (invalid index). I can'tfind another object on which to synchronise - Hibernate does not give me the 
+        // same object for tool session or current progress and user is cached via login, not userid.
+        String returnURL = null;
+        //  bottleneck synchronized (this) {
+        	if (currentProgress.getCompletedActivities().contains(activity)) {
+        		// return close window url
+        		returnURL = ActivityMapping.getCloseURL();
+        		
+        	} else {
+        		
+		    	try 
+		    	{
+			    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId);
+			    	returnURL = activityMapping.getProgressURL(nextLearnerProgress);
+		    	}
+		        catch (UnsupportedEncodingException e)
+		        {
+		            log.error("error occurred in 'getProgressURL':"+e.getMessage());
+		    		throw new LearnerServiceException(e.getMessage());
+		        }
+        	}
+        //}
+       	return returnURL;
     }
     
     /**
@@ -495,26 +498,26 @@ public class LearnerService implements ICoreLearnerService
 	    	if ( groupingActivity != null && groupingActivity.getCreateGrouping()!=null && learner != null ) {
 	    		Grouping grouping = groupingActivity.getCreateGrouping();
 	    		
-	    		if ( grouping.isRandomGrouping() ) {
-	    			// normal and preview cases for random grouping 
-	    			lessonService.performGrouping(lessonId, groupingActivity, learner);
-	    			groupingDone = true;
-	    			
-	    		} else if ( forceGrouping ) {
-	    			// preview case for chosen grouping 
-	            	Lesson lesson = getLesson(lessonId);
-	            	if ( lesson.isPreviewLesson() ) {
-	            		ArrayList learnerList = new ArrayList();
-	            		learnerList.add(learner);
-	            		lessonService.performGrouping(groupingActivity, (String)null, learnerList);
-		    			groupingDone = true;
-	            	}
-	        	} 
+	    		// first check if the grouping already done for the user. If done, then skip the processing.
+    			groupingDone = grouping.doesLearnerExist(learner);
 
-	    		if ( ! groupingDone ) {
-	    			// normal case for chosen grouping
-	    			groupingDone = grouping.doesLearnerExist(learner);
-	    		}
+    			if ( ! groupingDone ) {
+    				if ( grouping.isRandomGrouping() ) {
+		    			// normal and preview cases for random grouping 
+		    			lessonService.performGrouping(lessonId, groupingActivity, learner);
+		    			groupingDone = true;
+		    			
+		    		} else if ( forceGrouping ) {
+		    			// preview case for chosen grouping 
+		            	Lesson lesson = getLesson(lessonId);
+		            	if ( lesson.isPreviewLesson() ) {
+		            		ArrayList<User> learnerList = new ArrayList<User>();
+		            		learnerList.add(learner);
+		            		lessonService.performGrouping(groupingActivity, (String)null, learnerList);
+			    			groupingDone = true;
+		            	}
+		        	} 
+    			}
 	    		
 	    	} else {
 	    		String error = "Grouping activity "+groupingActivity.getActivityId()+" learner "+learnerId+" does not exist. Cannot perform grouping.";

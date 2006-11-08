@@ -135,7 +135,7 @@ public class GateAction extends LamsDispatchAction
         // if we reuse our cached entries, hibernate may throw session errors (if the objects are CGLIB entities).
         if(gateOpen)
         {
-            String nextActivityUrl = learnerService.completeActivity(learner.getUserId(),activityId);
+            String nextActivityUrl = learnerService.completeActivity(learner.getUserId(),activityId,lesson.getLessonId());
             response.sendRedirect(nextActivityUrl);
             return null;
         }

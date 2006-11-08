@@ -135,9 +135,10 @@ public interface ICoreLearnerService extends ILearnerService
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
+     * @param lessonId lesson id
      * @return the url for next activity.
      */
-    public String completeActivity(Integer learnerId,Long activityId);
+    public String completeActivity(Integer learnerId,Long activityId,Long lessonId);
   
     /**
      * Complete the activity in the progress engine and delegate to the progress 
@@ -147,9 +148,10 @@ public interface ICoreLearnerService extends ILearnerService
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
+     * @param lessonId lesson id
      * @return the url for next activity.
      */
-    public String completeActivity(Integer learnerId,Activity activity);
+    public String completeActivity(Integer learnerId,Activity activity,Long lessonId);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All
