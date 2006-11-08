@@ -105,10 +105,10 @@ public class HelpTag extends TagSupport {
 						log.debug("In help tag, url is "+fullURL);
 					}
 
-					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 				   
 	        	} else if(page != null){
-	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.png\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + Configuration.get(ConfigurationKeys.HELP_URL) + page + "', 'help')\"/>");
+	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"18\" height=\"18\" onclick=\"window.open('" + Configuration.get(ConfigurationKeys.HELP_URL) + page + "', 'help')\"/>");
 	        	} else {
 	        		log.error("HelpTag unable to write out due to unspecified values.");
 	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\"20\" height=\"20\"/>");
