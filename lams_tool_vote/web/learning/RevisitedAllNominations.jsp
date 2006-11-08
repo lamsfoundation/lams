@@ -213,23 +213,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }"> 			
+
 					  <tr>
 					  	<td NOWRAP valign=top> 
-		                                <html:submit property="refreshVotes" 
-		                                             styleClass="button" 
-		                                             onclick="submitMethod('viewAllResults');">
-		                                    <fmt:message key="label.refresh"/>
-		                                </html:submit>
-		                                
-							<c:if test="${VoteLearningForm.lockOnFinish != 'true'}"> 				   										  
-										&nbsp&nbsp	
 		                                <html:submit property="redoQuestionsOk" 
 		                                             styleClass="button" 
 		                                             onclick="submitMethod('redoQuestionsOk');">
 		                                    <fmt:message key="label.retake"/>
 		                                </html:submit>
-							</c:if> 		          					
+
 		                                
 		                                
 						</td>					
@@ -249,8 +241,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					  	 </td>
 					  </tr>
-				</c:if> 							  
-		
+
 		</table>
 	
 </html:form>

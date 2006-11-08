@@ -78,8 +78,6 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private long createdBy;
     
-    private boolean voteChangable;
-    
     private boolean reflect;
     
     private boolean allowText;
@@ -110,7 +108,7 @@ public class VoteContent implements Serializable {
 
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, 
-            Date creationDate, Date updateDate, boolean voteChangable, boolean allowText,boolean reflect, String reflectionSubject,
+            Date creationDate, Date updateDate, boolean allowText,boolean reflect, String reflectionSubject,
             String maxNominationCount, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
             String onlineInstructions, Set voteQueContents, Set voteSessions, 
 			Set voteAttachments) {
@@ -122,7 +120,6 @@ public class VoteContent implements Serializable {
         this.runOffline = runOffline;
         this.creationDate = creationDate;
         this.updateDate = updateDate;
-        this.voteChangable=voteChangable;
         this.maxNominationCount=maxNominationCount;
         this.allowText=allowText;
         this.reflect=reflect;
@@ -172,7 +169,6 @@ public class VoteContent implements Serializable {
     				 vote.isRunOffline(),
     				 vote.getCreationDate(),
     				 vote.getUpdateDate(),
-    				 vote.isVoteChangable(),
     				 vote.isAllowText(),
     				 vote.isReflect(),
     				 vote.getReflectionSubject(),
@@ -430,18 +426,6 @@ public class VoteContent implements Serializable {
         this.voteContentId = voteContentId;
     }
     
-    /**
-     * @return Returns the voteChangable.
-     */
-    public boolean isVoteChangable() {
-        return voteChangable;
-    }
-    /**
-     * @param voteChangable The voteChangable to set.
-     */
-    public void setVoteChangable(boolean voteChangable) {
-        this.voteChangable = voteChangable;
-    }
 
     /**
      * @return Returns the allowText.

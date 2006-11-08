@@ -64,7 +64,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="previewOnly"/>	
 	<html:hidden property="maxNominationCount"/>		
 	<html:hidden property="allowTextEntry"/>	
-	<html:hidden property="voteChangable"/>	
 	<html:hidden property="lockOnFinish"/>	
 	<html:hidden property="reportViewOnly"/>		
 	<html:hidden property="userEntry"/>			
