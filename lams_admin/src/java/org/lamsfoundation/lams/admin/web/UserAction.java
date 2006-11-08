@@ -171,7 +171,8 @@ public class UserAction extends LamsDispatchAction {
 			uorDTO.setOrgName(uo.getOrganisation().getName());
 			uorDTO.setRoles(roles);
 			List<UserOrgRoleDTO> childDTOs = new ArrayList<UserOrgRoleDTO>();
-			List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(
+/* JunDir - please fix!
+ * 			List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(
 					user.getLogin(), 
 					OrganisationType.CLASS_TYPE, 
 					OrganisationState.ACTIVE,
@@ -188,7 +189,7 @@ public class UserAction extends LamsDispatchAction {
 			}
 			uorDTO.setChildDTOs(childDTOs);
 			uorDTOs.add(uorDTO);
-		}
+*/		}
 		
 		return uorDTOs;
 	}
