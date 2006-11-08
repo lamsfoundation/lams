@@ -54,7 +54,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String maxNominationCount;
 	protected String allowTextEntry;
 	protected String lockOnFinish;
-	protected String voteChangable;
 	protected String activityRunOffline;
 	protected String activityRetries;
 	protected String activityTitle;
@@ -540,18 +539,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setActivityRunOffline(String activityRunOffline) {
         this.activityRunOffline = activityRunOffline;
     }
-    /**
-     * @return Returns the voteChangable.
-     */
-    public String getVoteChangable() {
-        return voteChangable;
-    }
-    /**
-     * @param voteChangable The voteChangable to set.
-     */
-    public void setVoteChangable(String voteChangable) {
-        this.voteChangable = voteChangable;
-    }
+
     /**
      * @return Returns the lockOnFinish.
      */

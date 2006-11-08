@@ -717,9 +717,6 @@ public class AuthoringUtil implements VoteAppConstants {
         logger.debug("richTextTitle: " + richTextTitle);
         logger.debug("richTextInstructions: " + richTextInstructions);
         
-        String voteChangable = request.getParameter("voteChangable");
-        logger.debug("voteChangable: " + voteChangable);
-
         String lockOnFinish = request.getParameter("lockOnFinish");
         logger.debug("lockOnFinish: " + lockOnFinish);
 
@@ -742,7 +739,7 @@ public class AuthoringUtil implements VoteAppConstants {
 		logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
 
         boolean setCommonContent=true; 
-        if ((lockOnFinish == null) || (voteChangable == null))
+        if (lockOnFinish == null) 
         {
         	setCommonContent=false;
         }
@@ -751,15 +748,11 @@ public class AuthoringUtil implements VoteAppConstants {
         String activeModule=voteAuthoringForm.getActiveModule();
         logger.debug("activeModule: " + activeModule);
 
-        boolean voteChangableBoolean=false;
         boolean lockedOnFinishBoolean=false;
         boolean allowTextBoolean=false;
         boolean reflectBoolean=false;
         
             
-        if ((voteChangable != null) && (voteChangable.equalsIgnoreCase("1")))
-            voteChangableBoolean=true;
-        
         if ((lockOnFinish != null) && (lockOnFinish.equalsIgnoreCase("1")))
             lockedOnFinishBoolean=true;
         
@@ -822,7 +815,6 @@ public class AuthoringUtil implements VoteAppConstants {
      	if (activeModule.equals(AUTHORING))
 		{
         	logger.debug("setting other content values...");
-         	voteContent.setVoteChangable(voteChangableBoolean);
          	voteContent.setLockOnFinish(lockedOnFinishBoolean);
          	voteContent.setAllowText(allowTextBoolean);
          	voteContent.setReflect(reflectBoolean);
@@ -1342,7 +1334,6 @@ public class AuthoringUtil implements VoteAppConstants {
     {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
         
-        boolean isVoteChangable=false;
         boolean isLockOnFinish=false;
         boolean isAllowTextEntry=false;
         boolean isReflect=false;
@@ -1353,9 +1344,6 @@ public class AuthoringUtil implements VoteAppConstants {
         logger.debug("richTextTitle: " + richTextTitle);
         logger.debug("richTextInstructions: " + richTextInstructions);
         
-        
-        String voteChangable = request.getParameter("voteChangable");
-        logger.debug("voteChangable: " + voteChangable);
 
         String lockOnFinish = request.getParameter("lockOnFinish");
         logger.debug("lockOnFinish: " + lockOnFinish);
@@ -1382,7 +1370,7 @@ public class AuthoringUtil implements VoteAppConstants {
         
         
         boolean setCommonContent=true; 
-        if ((voteChangable == null) || (lockOnFinish == null) || 
+        if ( (lockOnFinish == null) || 
              (allowTextEntry == null) || (reflect == null) ||
              (reflectionSubject == null) || (maxNomcount == null))
             
@@ -1391,13 +1379,10 @@ public class AuthoringUtil implements VoteAppConstants {
         }
         logger.debug("setCommonContent: " + setCommonContent);
 		
-        boolean voteChangableBoolean=false;
         boolean lockOnFinishBoolean=false;
         boolean allowTextEntryBoolean=false;
         boolean reflectBoolean=false;
 
-    	if ((voteChangable != null) && (voteChangable.equalsIgnoreCase("1")))
-    	    voteChangableBoolean=true;            
         
         if ((lockOnFinish != null) && (lockOnFinish.equalsIgnoreCase("1")))
             lockOnFinishBoolean=true;            
@@ -1409,7 +1394,6 @@ public class AuthoringUtil implements VoteAppConstants {
             reflectBoolean=true;
             
             
-        logger.debug("voteChangableBoolean: " + voteChangableBoolean);
         logger.debug("lockOnFinishBoolean: " + lockOnFinishBoolean);
         logger.debug("allowTextEntryBoolean: " + allowTextEntryBoolean);
         logger.debug("reflectBoolean: " + reflectBoolean);
@@ -1461,7 +1445,6 @@ public class AuthoringUtil implements VoteAppConstants {
      	if (activeModule.equals(AUTHORING))
 		{
         	logger.debug("setting other content values...");
-         	voteContent.setVoteChangable(voteChangableBoolean); 
          	voteContent.setLockOnFinish(lockOnFinishBoolean);
          	voteContent.setAllowText(allowTextEntryBoolean);
          	voteContent.setReflect(reflectBoolean);

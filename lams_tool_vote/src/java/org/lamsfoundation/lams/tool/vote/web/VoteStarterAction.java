@@ -182,7 +182,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		voteAction.repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 	
 
-		
 		logger.debug("getting voteService now: servlet is: " + getServlet());
 		IVoteService voteService=null;
 		if (getServlet() != null)
@@ -317,6 +316,8 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	            retrieveContent(request, voteService, voteAuthoringForm, voteGeneralAuthoringDTO, mapOptionsContent, 
 	                    new Long(defaultContentIdStr).longValue(), sessionMap);
 	            
+	    	    voteAuthoringForm.setLockOnFinish("1");
+	    	    voteGeneralAuthoringDTO.setLockOnFinish("1");
 			}
 			else
 			{

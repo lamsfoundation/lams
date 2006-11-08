@@ -67,8 +67,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
 	
     protected String lockOnFinish;
 	
-    protected String voteChangable;
-    
     protected String notebookEntriesVisible;
     
     protected String reflection;
@@ -253,18 +251,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
     }
-    /**
-     * @return Returns the voteChangable.
-     */
-    public String getVoteChangable() {
-        return voteChangable;
-    }
-    /**
-     * @param voteChangable The voteChangable to set.
-     */
-    public void setVoteChangable(String voteChangable) {
-        this.voteChangable = voteChangable;
-    }
     
     /**
      * @return Returns the toolContentID.
@@ -353,7 +339,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
 			.append("maxNominationCount: ", maxNominationCount)
 			.append("allowTextEntry: ", allowTextEntry)
 			.append("lockOnFinish: ", lockOnFinish)
-			.append("voteChangable: ", voteChangable)
 			.append("toolContentID: ", toolContentID)
 			.append("toolContentUID: ", toolContentUID)
 			.append("totalQuestionCount: ", totalQuestionCount)

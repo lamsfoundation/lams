@@ -756,11 +756,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         voteAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
         voteGeneralAuthoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
         
-        String voteChangable=request.getParameter(VOTE_CHANGABLE);
-        logger.debug("voteChangable: " + voteChangable);
-        voteAuthoringForm.setVoteChangable(voteChangable);
-        voteGeneralAuthoringDTO.setVoteChangable(voteChangable);
-        
         String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
         logger.debug("lockOnFinish: " + lockOnFinish);
         voteAuthoringForm.setLockOnFinish(lockOnFinish);

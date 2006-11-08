@@ -1025,10 +1025,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("allowTextEntry: " + allowTextEntry);
     	voteLearningForm.setAllowTextEntry(allowTextEntry);
     	
-    	String voteChangable=request.getParameter(VOTE_CHANGABLE);
-    	logger.debug("voteChangable: " + voteChangable);
-    	voteLearningForm.setVoteChangable(voteChangable);
-
     	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
     	logger.debug("lockOnFinish: " + lockOnFinish);
     	voteLearningForm.setLockOnFinish(lockOnFinish);

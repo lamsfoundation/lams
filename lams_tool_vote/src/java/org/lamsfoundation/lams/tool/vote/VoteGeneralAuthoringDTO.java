@@ -62,7 +62,6 @@ public class VoteGeneralAuthoringDTO implements Comparable
 	protected String offlineInstructions;
 	
 	protected String allowText;
-	protected String voteChangable;
 	protected String lockOnFinish;
 	protected String maxNominationCount;
 	
@@ -414,18 +413,7 @@ public class VoteGeneralAuthoringDTO implements Comparable
     public void setLockOnFinish(String lockOnFinish) {
         this.lockOnFinish = lockOnFinish;
     }
-    /**
-     * @return Returns the voteChangable.
-     */
-    public String getVoteChangable() {
-        return voteChangable;
-    }
-    /**
-     * @param voteChangable The voteChangable to set.
-     */
-    public void setVoteChangable(String voteChangable) {
-        this.voteChangable = voteChangable;
-    }
+
     /**
      * @return Returns the mapOptionsContent.
      */
@@ -544,7 +532,6 @@ public class VoteGeneralAuthoringDTO implements Comparable
             .append("reflect: ", reflect)            
             .append("isDefineLater: ", isDefineLater)
             .append("allowText: ", allowText)
-            .append("voteChangable: ", voteChangable)
             .append("lockOnFinish: ", lockOnFinish)
             .append("maxNominationCount: ", maxNominationCount)
             .append("activityTitle: ", activityTitle)

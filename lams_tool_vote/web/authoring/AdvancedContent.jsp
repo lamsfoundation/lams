@@ -28,14 +28,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<p class="small-space-top">
-	<html:checkbox property="voteChangable" value="1" styleClass="noBorder" styleId="voteChangable">
-	</html:checkbox>
-	<label for="voteChangable">
-		<fmt:message key="label.vote.changable" />
-	</label>
-</p>
-
 <p>
 	<html:checkbox property="lockOnFinish" value="1" styleClass="noBorder" styleId="lockOnFinish">
 	</html:checkbox>

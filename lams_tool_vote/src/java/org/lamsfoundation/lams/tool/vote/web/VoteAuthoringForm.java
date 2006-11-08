@@ -47,7 +47,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
 	
-	protected String voteChangable;
 	protected String lockOnFinish;
 	protected String allowText;
 	
@@ -189,7 +188,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.richTextOfflineInstructions=null;
 		this.richTextOnlineInstructions=null;
 	
-		this.voteChangable=null;
 		this.reflect=null;
 		this.lockOnFinish=null;
 		this.allowText=null;
@@ -207,7 +205,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	public void resetRadioBoxes()
 	{
-	    this.voteChangable		 ="0";
 		this.lockOnFinish		 ="0";
 		this.allowText			 ="0";
 		this.reflect			 ="0";
@@ -721,18 +718,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
         this.optIndex = optIndex;
     }
     
-    /**
-     * @return Returns the voteChangable.
-     */
-    public String getVoteChangable() {
-        return voteChangable;
-    }
-    /**
-     * @param voteChangable The voteChangable to set.
-     */
-    public void setVoteChangable(String voteChangable) {
-        this.voteChangable = voteChangable;
-    }
     
     /**
      * @return Returns the lockOnFinish.
@@ -900,7 +885,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
             .append("isDefineLater: ", isDefineLater)
             .append("toolContentID: ", toolContentID)
             .append("allowText: ", allowText)
-            .append("voteChangable: ", voteChangable)
             .append("lockOnFinish: ", lockOnFinish)
             .append("reflect: ", reflect)
             .append("defaultContentId: ", defaultContentId)

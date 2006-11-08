@@ -187,6 +187,13 @@
 		    path="/learning/ViewAnswers.jsp"
 		    redirect="false"
 	  	/>
+	  	
+	  	<forward
+		    name="revisitedAllNominations"
+		    path="/learning/RevisitedAllNominations.jsp"
+		    redirect="false"
+	  	/>
+
 
 	  	<forward
 		    name="redoQuestions"

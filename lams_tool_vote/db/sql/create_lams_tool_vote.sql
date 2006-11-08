@@ -8,7 +8,6 @@ CREATE TABLE tl_lavote11_content (
      , maxNominationCount VARCHAR(20) NOT NULL DEFAULT '1'
      , allowText TINYINT(1) NOT NULL DEFAULT 0
      , reflect TINYINT(1) NOT NULL DEFAULT 0
-     , voteChangable TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0
      , run_offline TINYINT(1) NOT NULL DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0

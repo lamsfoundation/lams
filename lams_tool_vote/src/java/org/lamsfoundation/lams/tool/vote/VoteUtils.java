@@ -212,7 +212,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    
 	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?"1":"0");
 	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?"1":"0");
-	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?"1":"0");
+	    
 	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?"1":"0");
 	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
 	    
@@ -221,7 +221,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    
 
 	    voteGeneralAuthoringDTO.setAllowText(defaultVoteContent.isAllowText()?"1":"0");
-	    voteGeneralAuthoringDTO.setVoteChangable(defaultVoteContent.isVoteChangable()?"1":"0");
 	    voteGeneralAuthoringDTO.setLockOnFinish(defaultVoteContent.isLockOnFinish()?"1":"0");
 	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
 	    
@@ -584,11 +583,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     	voteAuthoringForm.setActiveModule(activeModule);
     	voteGeneralAuthoringDTO.setActiveModule(activeModule);
     	
-		String voteChangable=request.getParameter("voteChangable");
-    	logger.debug("voteChangable: " + voteChangable);
-		voteAuthoringForm.setVoteChangable(voteChangable);
-		voteGeneralAuthoringDTO.setVoteChangable(voteChangable);
-		
 		String lockOnFinish=request.getParameter("lockOnFinish");
 		logger.debug("lockOnFinish: " + lockOnFinish);
 		voteAuthoringForm.setLockOnFinish(lockOnFinish);

@@ -2202,22 +2202,22 @@ public class VoteServicePOJO implements
     {
     	Date now = new Date();
     	VoteContent toolContentObj = new VoteContent();
-    	toolContentObj.setContentInUse(Boolean.FALSE);
+    	toolContentObj.setContentInUse(Boolean.FALSE.booleanValue());
     	toolContentObj.setCreatedBy(user.getUserID().longValue());
     	toolContentObj.setCreationDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE);
+    	toolContentObj.setDefineLater(Boolean.FALSE.booleanValue());
     	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
     	toolContentObj.setReflectionSubject(null);
-    	toolContentObj.setReflect(Boolean.FALSE);
-    	toolContentObj.setRunOffline(Boolean.FALSE);
+    	toolContentObj.setReflect(Boolean.FALSE.booleanValue());
+    	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	
     	toolContentObj.setContent(null);
     	toolContentObj.setUpdateDate(now);
     	toolContentObj.setVoteContentId(toolContentId);
-    	toolContentObj.setVoteChangable(Boolean.FALSE);
+    	toolContentObj.setLockOnFinish(Boolean.FALSE.booleanValue());
     	
 		try {
 			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);
@@ -2268,7 +2268,7 @@ public class VoteServicePOJO implements
 	       			+" as the tool content does not exist.");
     	}
     	
-    	toolContentObj.setReflect(Boolean.TRUE);
+    	toolContentObj.setReflect(Boolean.TRUE.booleanValue());
     	toolContentObj.setReflectionSubject(description);
     }
     

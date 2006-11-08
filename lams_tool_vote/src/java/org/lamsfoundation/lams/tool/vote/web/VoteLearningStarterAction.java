@@ -548,6 +548,14 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
          		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
          		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
          		
+        	    if ((isContentLockOnFinish.equals(new Boolean(false).toString()) && (isResponseFinalised == true)))
+        	    {
+            	    logger.debug("isContentLockOnFinish is false, enable redo of votes : ");
+        	    	logger.debug("fwd'ing to: " + REVISITED_ALL_NOMINATIONS);
+        	    	return (mapping.findForward(REVISITED_ALL_NOMINATIONS));
+        	    }
+
+         		
          		logger.debug("fwd'ing to: " + ALL_NOMINATIONS);
         		return (mapping.findForward(ALL_NOMINATIONS));
         	}
@@ -606,7 +614,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	    logger.debug("advanced properties maxNominationCount: " + voteContent.getMaxNominationCount());
 	    logger.debug("advanced properties isAllowText(): " + new Boolean(voteContent.isAllowText()).toString());
-	    logger.debug("advanced properties isVoteChangable(): " + new Boolean(voteContent.isVoteChangable()).toString());
 	    logger.debug("advanced properties isRunOffline(): " + new Boolean(voteContent.isRunOffline()).toString());
 	    logger.debug("advanced properties isLockOnFinish(): " + new Boolean(voteContent.isLockOnFinish()).toString());
 	    
@@ -618,7 +625,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    voteLearningForm.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	    logger.debug("allow text entry is: " + voteLearningForm.getAllowTextEntry());
 	    voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
-	    voteLearningForm.setVoteChangable(new Boolean(voteContent.isVoteChangable()).toString());
 	    
 	    voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	    voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
@@ -626,7 +632,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    voteGeneralLearnerFlowDTO.setMaxNominationCount(voteContent.getMaxNominationCount());
 	    voteGeneralLearnerFlowDTO.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	    voteGeneralLearnerFlowDTO.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
-	    voteGeneralLearnerFlowDTO.setVoteChangable(new Boolean(voteContent.isVoteChangable()).toString());
 	    voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	    voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 	}

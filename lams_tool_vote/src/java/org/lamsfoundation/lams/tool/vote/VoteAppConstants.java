@@ -65,7 +65,6 @@ public interface VoteAppConstants {
     public static final String MAX_NOMINATION_COUNT						="maxNominationCount";
     public static final String ALLOW_TEXT								="allowText";
     public static final String ALLOW_TEXT_ENTRY							="allowTextEntry";
-    public static final String VOTE_CHANGABLE							="voteChangable";
     public static final String LOCK_ON_FINISH							="lockOnFinish";
     public static final String REPORT_VIEW_ONLY							="reportViewOnly";
     public static final String USER_ENTRY								="userEntry";
@@ -80,6 +79,7 @@ public interface VoteAppConstants {
 	public static final String VOTE_STATS_DTO							="voteStatsDTO";
 	public static final String LIST_ALL_GROUPS_DTO						="listAllGroupsDTO";
 	public static final String CURRENT_SESSION_NAME						="currentSessionName";
+	public static final String REVISITED_ALL_NOMINATIONS				="revisitedAllNominations";
 	
 	public static final String ATTACHMENT_LIST_KEY 						= "attachmentListKey";
 	public static final String DELETED_ATTACHMENT_LIST_KEY				= "deletedAttachmentListKey";

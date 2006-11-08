@@ -29,8 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</h2>
 
 	<c:set var="formBean"
-		value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<table id="itemTable" class="alternative-color">
 		<c:set var="queIndex" scope="request" value="0" />
 
@@ -88,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<td width="10%" align="right">
 					<img src="<c:out value="${tool}"/>images/edit.gif" border="0"
 						title="<fmt:message key='label.tip.editNomination'/>"
-						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&voteChangable=${voteGeneralAuthoringDTO.voteChangable}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');">
+						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');">
 				</td>
 
 				<td width="10%" align="right">

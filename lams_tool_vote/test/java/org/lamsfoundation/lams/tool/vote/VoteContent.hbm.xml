@@ -70,14 +70,6 @@
     />
 
    <property
-        name="voteChangable"
-        type="boolean"
-        access="property"
-        column="voteChangable"
-        length="1"        
-   />
-
-   <property
         name="reflect"
         type="boolean"
         access="property"
