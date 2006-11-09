@@ -15,7 +15,7 @@
 				<fmt:message key="page.title.monitoring.view.reflection"/>
 			</h1>
 			<p>${userDTO.firstName} ${userDTO.lastName}</p>
-			<table class="alternative-color">
+			<table class="alternative-color" cellspacing="0">
 				<tr>
 					<th class="first">
 						<lams:out value="${userDTO.reflectInstrctions}"/>

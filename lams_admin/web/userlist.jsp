@@ -29,7 +29,7 @@
 		<input type="button" value='<fmt:message key="admin.edit" /> <bean:write name="UserManageForm" property="orgName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${UserManageForm.orgId}"/>' />
 	</logic:notEqual>
 </p>
-<table class="alternative-color" width=100%>
+<table class="alternative-color" width=100% cellspacing="0" >
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.name"/></th>

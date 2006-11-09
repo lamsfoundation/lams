@@ -75,7 +75,7 @@
 			</fmt:message>
 		</p>
 
-		<table class="alternative-color">
+		<table class="alternative-color" cellspacing="0">
 			<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL" varStatus="loop">
 				<tr onclick="selectActivity(<c:out value="${activityURL.activityId}" />)">
 					<td >

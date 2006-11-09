@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<h1><c:out value="${title}"/></h1>
 
-		<table class="alternative-color">
+		<table class="alternative-color" cellspacing="0">
 			<tr>
 				<th width="25%" class="first">
 					<fmt:message key="label.view.groups.title"/>

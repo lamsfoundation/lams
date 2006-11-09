@@ -21,7 +21,7 @@
 				<%--  display question header  --%>
 				<c:if test="${status.first}">
 					<h2><fmt:message key="label.question"/></h2>
-					<table  class="alternative-color">
+					<table  class="alternative-color" cellspacing="0">
 					<tr>
 						<%-- <td><fmt:message key="label.question"/></td>--%>
 						<th colspan="2" class="first"><c:out value="${question.description}" escapeXml="false"/></th>
@@ -56,7 +56,7 @@
 				<c:if test="${status.first}">
 					<h2><fmt:message key="label.answer"/></h2>
 					<div align="center">
-						<table class="alternative-color">
+						<table class="alternative-color" cellspacing="0">
 							<tr>
 								<th class="first"><fmt:message key="label.learner"/></th>
 								<c:forEach var="option" items="${question.options}" varStatus="optStatus">

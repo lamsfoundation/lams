@@ -5,7 +5,7 @@
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.list.disabled.users"/></h2>
 <p>&nbsp;</p>
-<table class="alternative-color" width=100%>
+<table class="alternative-color" width=100% cellspacing="0">
 <tr>
 	<th></th>
 	<th><fmt:message key="admin.user.login"/></th>

@@ -29,7 +29,7 @@ function toggleCheckboxes(roleIndex, object){
 <html-el:form action="/userorgrolesave.do" method="post">
 <html-el:hidden property="orgId" />
 
-<table class="alternative-color" width=100%>
+<table class="alternative-color" width=100% cellspacing="0">
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
 	<logic:iterate id="role" name="roles" indexId="roleIndex">

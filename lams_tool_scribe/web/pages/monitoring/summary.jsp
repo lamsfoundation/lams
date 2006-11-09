@@ -89,7 +89,7 @@
 		<div class="field-name">
 			<fmt:message key="heading.reflections" />
 		</div>
-		<table class="alternative-color">
+		<table class="alternative-color" cellspacing="0">
 			<tr>
 				<th class="first">
 					<fmt:message>heading.learner</fmt:message>

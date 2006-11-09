@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		value="<%=request
 									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
-	<table id="itemTable" class="alternative-color">
+	<table id="itemTable" class="alternative-color" cellspacing="0">
 		<c:set var="queIndex" scope="request" value="0" />
 
 		<c:forEach items="${listQuestionContentDTO}" var="currentDTO"

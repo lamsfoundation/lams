@@ -13,7 +13,7 @@
 </p>
 
 <p>
-<table class="alternative-color">
+<table class="alternative-color" cellspacing="0">
 <logic:iterate name="activeTools" id="dto">
 	<tr>
 		<td>

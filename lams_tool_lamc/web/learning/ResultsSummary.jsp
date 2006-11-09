@@ -79,7 +79,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="label.learnersFinished.simple" />
 			</p>
 
-			<table class="alternative-color" cellspacing="1">
+			<table class="alternative-color" cellspacing="0">
 				<tr>
 					<td width="30%">
 						<strong> <fmt:message key="label.topMark" /> </strong>

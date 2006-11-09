@@ -8,7 +8,7 @@
 	</h2>
 	<br/>
 	
-	<table class="alternative-color" width=100%>
+	<table class="alternative-color" width=100% cellspacing="0">
 			<tr>
 				<th colspan="2"><fmt:message key="admin.register.heading.title"/></th>
 			</tr>

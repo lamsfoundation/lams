@@ -2,7 +2,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<table  class="alternative-color">
+<table  class="alternative-color" cellspacing="0">
 	<tr>
 		<th class="first">
 			<fmt:message key="label.session.name"/>

@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<h2><fmt:message key="mynotes.view.all.button"/></h2>
 		<p>&nbsp;</p>
-		<table class="alternative-color">
+		<table class="alternative-color" cellspacing="0">
 					
 			<c:forEach var="entry" items="${journals}" varStatus="status">
 				
@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					<c:set var="userToCheck" value="${entry.user.userId}"/>
 					<h2><c:out value="${entry.user.fullName}" escapeXml="false"/></h2>
-					<table class="alternative-color">
+					<table class="alternative-color" cellspacing="0">
 						<tr>
 							<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label"/></th>
 							<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label"/></th>

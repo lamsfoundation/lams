@@ -14,7 +14,7 @@
 				<fmt:message key="title.chart.report"/>
 			</h1>
 
-			<table class="alternative-color">
+			<table class="alternative-color" cellspacing="0">
 				<tr>
 					<%-- <th class="first"><fmt:message key="label.question"/></th> --%>
 					<th colspan="2" class="first"><c:out value="${question.description}" escapeXml="false"/></th>

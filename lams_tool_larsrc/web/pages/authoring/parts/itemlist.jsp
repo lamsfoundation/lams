@@ -13,7 +13,7 @@
 			style="display:none" id="resourceListArea_Busy" />
 	</h2>
 
-	<table class="alternative-color" id="itemTable">
+	<table class="alternative-color" id="itemTable" cellspacing="0">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 		<c:forEach var="resource" items="${sessionMap.resourceList}"

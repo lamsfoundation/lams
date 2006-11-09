@@ -9,7 +9,7 @@
 	</h2>
 	<lams:help page="<%= Configuration.CONFIGURATION_HELP_PAGE %>"/>
 	<br/>
-	<table class="alternative-color" width=100%>
+	<table class="alternative-color" width=100% cellspacing="0">
 		<tr>
 			<th><fmt:message key="admin.config.key"/></th>
 			<th><fmt:message key="admin.config.value"/></th>

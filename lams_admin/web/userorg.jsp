@@ -28,7 +28,7 @@ function toggleCheckboxes(){
 <p>&nbsp;</p>
 
 <div align="center"><html-el:errors/></div>
-<table class="alternative-color" width=100%>
+<table class="alternative-color" width=100% cellspacing="0">
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.title"/></th>

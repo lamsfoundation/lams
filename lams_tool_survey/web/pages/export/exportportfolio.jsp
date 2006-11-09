@@ -25,7 +25,7 @@
 					<h1><fmt:message key="label.authoring.basic.survey.list.title"/></h1>
 					<c:forEach var="qe" items="${questionList}" varStatus="qeStatus">
 						<c:set var="qe" value="${qe.key}"/>
-							<table  class="alternative-color">
+							<table  class="alternative-color" cellspacing="0">
 								<tr>
 									<%-- <td><fmt:message key="label.question"/></td>--%>
 									<th colspan="2" class="first"><fmt:message key="label.question"/> ${qeStatus.count} : <c:out value="${qe.description}" escapeXml="false"/></th>
@@ -58,7 +58,7 @@
 					<c:set var="answers" value="${entry.value}"/>
 					<%-- only display session name once for each session group--%>
 					<%-- Display question header --%>
-					<table class="alternative-color">
+					<table class="alternative-color" cellspacing="0">
 						<tr>
 							<th class="first" width="150px"><fmt:message key="label.question"/> ${questionStatus.count}</th>
 							<c:forEach var="option" items="${question.options}" varStatus="optStatus">
