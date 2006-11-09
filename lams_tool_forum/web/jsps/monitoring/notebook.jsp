@@ -2,7 +2,7 @@
 
 <p>${userDTO.fullName}</p>
 
-<table class="alternative-color">
+<table class="alternative-color" cellspacing="0">
 	<tr>
 		<th class="first">
 			<lams:out value="${userDTO.reflectInstrctions}"/>
