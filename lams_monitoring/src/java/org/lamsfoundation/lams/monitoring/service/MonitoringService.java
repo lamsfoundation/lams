@@ -791,11 +791,31 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private void revertLessonState(Lesson requestedLesson) {
     	
     	Integer currentStatus = requestedLesson.getLessonStateId();
-    	requestedLesson.setLessonStateId(requestedLesson.getPreviousLessonStateId());
-    	requestedLesson.setPreviousLessonStateId(currentStatus);
+    	if(requestedLesson.getPreviousLessonStateId() != null) {
+    		if(requestedLesson.getPreviousLessonStateId().equals(Lesson.NOT_STARTED_STATE) && requestedLesson.getScheduleStartDate().before(new Date()))
+    			requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+    		else
+    			requestedLesson.setLessonStateId(requestedLesson.getPreviousLessonStateId());
+    		requestedLesson.setPreviousLessonStateId(null);
+    	} else {
+    		if(requestedLesson.getStartDateTime() != null && requestedLesson.getScheduleStartDate() != null)
+    			requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+    		else if(requestedLesson.getScheduleStartDate() != null)
+    			if(requestedLesson.getScheduleStartDate().after(new Date()))
+    				requestedLesson.setLessonStateId(Lesson.NOT_STARTED_STATE);
+    			else
+        			requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+    		else if(requestedLesson.getStartDateTime() != null)
+    			requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+    		else
+    			requestedLesson.setLessonStateId(Lesson.CREATED);
+    		
+    		requestedLesson.setPreviousLessonStateId(currentStatus);
+    	}
     	lessonDAO.updateLesson(requestedLesson);
     }
-/**
+    
+    /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#removeLesson(long)
      */
     public void removeLesson(long lessonId, Integer userId) {
