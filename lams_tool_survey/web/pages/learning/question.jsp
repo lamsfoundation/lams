@@ -34,7 +34,8 @@
 					${option.description}
 				</c:when>
 				<c:when test="${question.type == 2}">
-					<input type="checkbox" name="optionChoice${question.uid}"
+					<input type="checkbox" class="noBorder"
+					 name="optionChoice${question.uid}"
 						value="${option.uid}" ${checked}/>
 					${option.description}
 				</c:when>
