@@ -140,6 +140,10 @@ public class LD102Importer implements ApplicationContextAware{
 	 * to use for each tool, based on the library activities in the database. 
 	 * Key is tool id, value is ToolActivity. */
 	private Map<Long, ToolActivity> libraryActivityForTool;
+	/** complex library activity used for the image and activityCategoryID
+	 * to use for each tool, based on the complex (parallel) library activities in the database. 
+	 * Key is activity id, value is ComplexActivity. */
+	private Map<Long, ComplexActivity> complexLibraryActivityForTool;
 	/** Map of the 1.0.2 tool signature (key) to the tool which now supports it (value) */
 	private Map<String, Tool> toolImportSupport;
 
@@ -892,13 +896,76 @@ public class LD102Importer implements ApplicationContextAware{
 					toolsErrorMsgs.add(message);
 				}
 				
+				
 				subActivity.setOrderId(orderId);
 			}
 		}
-
+		setupParallelActivityIcon(activity);
+		return activity;
+	}
+	
+	/**
+	 * Find and set the matching ParallelActivity icon.
+	 * 
+	 * @param activity given ParallelActivity to find a matching icon for.
+	 * @return ParallelActivity to add
+	 */
+	private ParallelActivity setupParallelActivityIcon(ParallelActivity activity) {
+		Set<Activity> subActivities = activity.getActivities();
+		if(subActivities.size() != 2)
+			return activity;
+		else
+			activity.setLibraryActivityUiImage(findParallelActivityIcon(subActivities));
+		
+		
 		return activity;
 	}
 
+	/**
+	 * Find the relevant icon by matching up the children of a give ParallelActivity to a system installed ParallelActivity.
+	 * 
+	 * @param	subActivities	Set of children activities for a ParallelActivity
+	 * @return 	ParallelActivity icon url
+	 */
+	private String findParallelActivityIcon(Set subActivities) {
+		
+		Iterator it = complexLibraryActivityForTool.values().iterator();
+		
+		while(it.hasNext()) {
+			Activity activity = (Activity)it.next();
+			if(activity.isParallelActivity()) {
+				
+				ParallelActivity parallelActivity = (ParallelActivity) activity;
+				Set toolActivities =  parallelActivity.getAllToolActivities();
+				
+				Object[] toolActivitiesArray = toolActivities.toArray();
+				Object[] subActivitiesArray = subActivities.toArray();
+				
+				if(compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[0], (ToolActivity)subActivitiesArray[0]) && 
+				   compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[1], (ToolActivity)subActivitiesArray[1]))
+					return parallelActivity.getLibraryActivityUiImage();
+				else if(compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[0], (ToolActivity)subActivitiesArray[1]) && 
+						   compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[1], (ToolActivity)subActivitiesArray[0]))
+					return parallelActivity.getLibraryActivityUiImage();
+			}
+		}
+		
+		return null;
+		
+	}
+	
+	/**
+	 * Compare two ToolActivity by their relevent matching Tool
+	 * @param toolActivity
+	 * @param toolActivityToCompare
+	 * @return true if equal, otherwise false
+	 * 
+	 */
+	private boolean compareToolActivitiesbyTool(ToolActivity toolActivity, ToolActivity toolActivityToCompare) {
+		if(toolActivity.getTool().equals(toolActivityToCompare.getTool())) return true;
+		else return false;
+	}
+	
 	private GroupingActivity setupGroupingActivity(Hashtable taskDetails, Integer contentId, Integer taskUIID, Integer parentActivityId) throws WDDXProcessorConversionException {
 		
 		RandomGrouping grouping = (RandomGrouping) Grouping.getGroupingInstance(Grouping.RANDOM_GROUPING_TYPE);
@@ -1308,19 +1375,22 @@ public class LD102Importer implements ApplicationContextAware{
 	private Map<Long, ToolActivity> getLibraryActivityForTool() {
 		
 		HashMap<Long, ToolActivity> activityMap = new HashMap<Long, ToolActivity>();
+		HashMap<Long, ComplexActivity> complexMap = new HashMap<Long, ComplexActivity>();
+		
 		Iterator iterator = learningLibraryDAO.getAllLearningLibraries().iterator();
 		while(iterator.hasNext()){
 			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();		
 			List templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
 			Iterator actIterator = templateActivities.iterator();
 			while ( actIterator.hasNext() ) {
-				getLibraryActivityFromActivity((Activity)actIterator.next(), activityMap);
+				getLibraryActivityFromActivity((Activity)actIterator.next(), activityMap, complexMap);
 			}
 		}
+		complexLibraryActivityForTool = complexMap;
 		return activityMap;
 	}
-
-	private void getLibraryActivityFromActivity( Activity activity, HashMap<Long, ToolActivity> activityMap ) {
+	
+	private void getLibraryActivityFromActivity( Activity activity, HashMap<Long, ToolActivity> activityMap, HashMap<Long, ComplexActivity> complexMap ) {
 		if ( activity.isToolActivity() ) {
 			ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId(), ToolActivity.class);
 			Tool tool = toolActivity.getTool();
@@ -1330,8 +1400,11 @@ public class LD102Importer implements ApplicationContextAware{
 		} else if ( activity.isComplexActivity() ) {
 			ComplexActivity complex = (ComplexActivity) activity;
 			Iterator actIterator = complex.getActivities().iterator();
+			if ( ! complexMap.containsKey(complex.getActivityId())) {
+				complexMap.put(complex.getActivityId(), complex);
+			}
 			while ( actIterator.hasNext() ) {
-				getLibraryActivityFromActivity((Activity)actIterator.next(), activityMap);
+				getLibraryActivityFromActivity((Activity)actIterator.next(), activityMap, complexMap);
 			}
 		}
 	}
