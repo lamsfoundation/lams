@@ -463,8 +463,6 @@ public class LD102Importer implements ApplicationContextAware{
 		for ( Hashtable optionTable : optionalActivitiesToDo) {
 			setupOptionalActivity(optionTable);
 		}
-		ldInProgress.setFirstActivity(ldInProgress.calculateFirstActivity());
-		ldInProgress.setMaxID(maxId);
 		
 		// all activities are set up so now we can do the transitions
 		// some .las files have more transitions than activities - a bug in 1.0.2
@@ -478,6 +476,9 @@ public class LD102Importer implements ApplicationContextAware{
 		// are the groupings are set up as the activities are processed.
 		assignGroupings();
 
+		ldInProgress.setFirstActivity(ldInProgress.calculateFirstActivity());
+		ldInProgress.setMaxID(maxId);
+		
 		baseDAO.update(ldInProgress);
 
 	}
