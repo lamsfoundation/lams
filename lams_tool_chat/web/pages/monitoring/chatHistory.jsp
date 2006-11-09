@@ -61,11 +61,11 @@ function closeEditPane() {
 						<c:choose>
 							<c:when test="${message.hidden}">
 								<input id="cb${message.uid}" name="messageHidden"
-									type="checkbox" checked="checked" />
+									type="checkbox" checked="checked" class="noBorder"/>
 							</c:when>
 							<c:otherwise>
 								<input id="cb${message.uid}" name="messageHidden"
-									type="checkbox" />
+									type="checkbox" class="noBorder"/>
 							</c:otherwise>
 						</c:choose>
 
