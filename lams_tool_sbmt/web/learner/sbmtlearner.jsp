@@ -6,7 +6,8 @@
 
 <html:html>
 <head>
-	<title><fmt:message key="tool.display.name" /></title>
+	<title><fmt:message key="tool.display.name" />
+	</title>
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
 
@@ -77,82 +78,81 @@
 
 			<c:otherwise>
 				<c:forEach var="file" items="${learner.filesUploaded}">
-					
+
 					<div class="shading-bg">
-					<table>
-						<tr>
-							<!--First Row displaying the name of the File -->
-							<td class="field-name">
-								<fmt:message key="label.learner.fileName" />
-							</td>
-							<td>
-								<c:out value="${file.filePath}" />
+						<table>
+							<tr>
+								<!--First Row displaying the name of the File -->
+								<td class="field-name">
+									<fmt:message key="label.learner.fileName" />
+								</td>
+								<td>
+									<c:out value="${file.filePath}" />
 
-								<c:if test="${file.currentLearner}">
-									<c:set var="downloadURL">
-										<c:url
-											value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
-									</c:set>
-									<a href="${downloadURL}"><fmt:message key="label.download" />
-									</a>
-								</c:if>
-							</td>
-						</tr>
+									<c:if test="${file.currentLearner}">
+										<c:set var="downloadURL">
+											<c:url
+												value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+										</c:set>
+										<a href="${downloadURL}"><fmt:message key="label.download" /></a>
+									</c:if>
+								</td>
+							</tr>
 
-						<tr>
-							<!--Second Row displaying the description of the File -->
-							<td class="field-name">
-								<fmt:message key="label.learner.fileDescription" />
-							</td>
-							<td>
-								<lams:out value="${file.fileDescription}" />
-							</td>
-						</tr>
+							<tr>
+								<!--Second Row displaying the description of the File -->
+								<td class="field-name">
+									<fmt:message key="label.learner.fileDescription" />
+								</td>
+								<td>
+									<lams:out value="${file.fileDescription}" />
+								</td>
+							</tr>
 
-						<tr>
-							<!--Third row displaying the date of submission of the File -->
-							<td class="field-name">
-								<fmt:message key="label.learner.time" />
-							</td>
-							<td>
-								<lams:Date value="${file.dateOfSubmission}" />
-							</td>
-						</tr>
+							<tr>
+								<!--Third row displaying the date of submission of the File -->
+								<td class="field-name">
+									<fmt:message key="label.learner.time" />
+								</td>
+								<td>
+									<lams:Date value="${file.dateOfSubmission}" />
+								</td>
+							</tr>
 
-						<tr>
-							<!--Fourth row displaying the comments -->
-							<td class="field-name">
-								<fmt:message key="label.learner.comments" />
-							</td>
-							<td>
-								<c:choose>
-									<c:when test="${empty file.comments}">
-										<fmt:message key="label.learner.notAvailable" />
-									</c:when>
-									<c:otherwise>
-										<c:out value="${file.comments}" escapeXml="false" />
-									</c:otherwise>
-								</c:choose>
-							</td>
-						</tr>
+							<tr>
+								<!--Fourth row displaying the comments -->
+								<td class="field-name">
+									<fmt:message key="label.learner.comments" />
+								</td>
+								<td>
+									<c:choose>
+										<c:when test="${empty file.comments}">
+											<fmt:message key="label.learner.notAvailable" />
+										</c:when>
+										<c:otherwise>
+											<c:out value="${file.comments}" escapeXml="false" />
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
 
-						<tr>
-							<!--Fifth row displaying the marks-->
-							<td class="field-name">
-								<fmt:message key="label.learner.marks" />
-							</td>
-							<td>
-								<c:choose>
-									<c:when test="${empty file.comments}">
-										<fmt:message key="label.learner.notAvailable" />
-									</c:when>
-									<c:otherwise>
-										<c:out value="${file.marks}" escapeXml="false" />
-									</c:otherwise>
-								</c:choose>
-							</td>
-						</tr>
-					</table>
+							<tr>
+								<!--Fifth row displaying the marks-->
+								<td class="field-name">
+									<fmt:message key="label.learner.marks" />
+								</td>
+								<td>
+									<c:choose>
+										<c:when test="${empty file.comments}">
+											<fmt:message key="label.learner.notAvailable" />
+										</c:when>
+										<c:otherwise>
+											<c:out value="${file.marks}" escapeXml="false" />
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+						</table>
 					</div>
 				</c:forEach>
 
@@ -162,7 +162,7 @@
 
 
 		<div class="last-item"></div>
-		
+
 		<c:if test="${sessionMap.mode != 'teacher'}">
 			<html:form action="/learner?method=uploadFile" method="post"
 				enctype="multipart/form-data">
@@ -185,8 +185,8 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.learner.fileDescription" />
 				</div>
-				<html:textarea rows="5" cols="40" tabindex="2" styleClass="text-area"
-					property="description"
+				<html:textarea rows="5" cols="40" tabindex="2"
+					styleClass="text-area" property="description"
 					disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
 
 				<div class="small-space-top">
