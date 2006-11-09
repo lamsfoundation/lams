@@ -20,98 +20,91 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
-	<!--options content goes here-->
-				<table class="forms">
-					  <tr>
-					  	<td align=left valign=top colspan=2> 
-						  	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" /> 
-					  	</td>
-					  </tr>
-					  
+<!--options content goes here-->
 
-			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}"> 		
-					  <tr>
-					  	<td align=left valign=top colspan=2> 
-						  	 <b>  <fmt:message key="label.learner.message"/> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}"/> )  </b>
-						  	 
-					  	</td>
-					  </tr>
+<p>
+	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}"
+		escapeXml="false" />
+</p>
+
+<c:if
+	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
+
+	<strong> <fmt:message key="label.learner.message" /> ( <c:out
+			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) </strong>>
+	</c:if>
+
+<html:hidden property="nextQuestionSelected" />
+<html:hidden property="questionIndex"
+	value="${mcGeneralLearnerFlowDTO.questionIndex}" />
+
+
+
+<c:forEach var="dto" varStatus="status"
+	items="${requestScope.listQuestionCandidateAnswersDto}">
+	<c:if
+		test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
+		<div class="shading-bg">
+			<div style="overflow: auto;">
+				<c:out value="${dto.question}" escapeXml="false" />
+				[
+				<strong> <fmt:message key="label.mark" /> </strong>
+				<c:out value="${dto.mark}" />
+				]
+			</div>
+		</div>
+		<c:forEach var="ca" varStatus="status"
+			items="${dto.candidateAnswerUids}">
+			<div class="indent">
+				<input type="checkbox" name="checkedCa" class="noBorder"
+					value="${dto.questionUid}-${ca.value}">
+
+				<c:forEach var="caText" varStatus="status"
+					items="${dto.candidateAnswers}">
+					<c:if test="${ca.key == caText.key}">
+						<c:out value="${caText.value}" escapeXml="false" />
 					</c:if>
+				</c:forEach>
+			</div>
+		</c:forEach>
 
-				  <tr>						 
-					  	<td align=left valign=top colspan=2> 
-						<table align=left>
-						
-								<html:hidden property="nextQuestionSelected"/>						
-								<html:hidden property="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}"/>						
-								<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
-									<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}"> 										
-									  <tr>
-									  	<td align=left valign=top> 
-											<div style="overflow: auto;">									  	
-										  		<c:out value="${dto.question}" escapeXml="false"/> &nbsp[ <b> <fmt:message key="label.mark"/> </b>
-										  		<c:out value="${dto.mark}"/> ]
-											</div>																			  		
-									  	</td>
-									  </tr>
-									
-									  <tr>
-									  	<td align=left valign=top> 
-											<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
-												<input type="checkbox" name="checkedCa" value="${dto.questionUid}-${ca.value}"> 
-													
-													<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
-														<c:if test="${ca.key == caText.key}"> 		
-																<c:out value="${caText.value}" escapeXml="false"/><BR>
-														</c:if>															
-													</c:forEach>
-											</c:forEach>
-									  	</td>
-									  </tr>
-									</c:if>																								  
-								</c:forEach>								
-						</table>
-						</td>
-					</tr>
+	</c:if>
+
+</c:forEach>
 
 
-			  	   	<tr> 
-				 		<td colspan=2 valign=top> 
-				 		&nbsp
-				 		</td>
-			  	   </tr>
-			  	   
-			  	<html:hidden property="donePreview"/>						   
-		  		<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 			
-	  	   		  <tr>
-				  	<td colspan=2 valign=top> 
-						  <img src="<c:out value="${tool}"/>images/green_arrow_down_right.gif" align=left onclick="javascript:submitNextQuestionSelected();"> 							
-				  	 </td>
-				  </tr>
-				</c:if> 								  
 
-		 		<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}"> 		
-	  	   		  <tr>
-				  	<td colspan=2 valign=top> 
-				  			<html:submit property="continueOptionsCombined" styleClass="button">
-								<fmt:message key="button.continue"/>
-							</html:submit>	 				 		  					
-				  	 </td>
-				  </tr>
-				</c:if> 								  
-				
-		 		<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}"> 		
-	  	   		  <tr>
-				  	<td colspan=2 valign=top> 
-				  			<html:submit property="continueOptionsCombined" styleClass="button">
-								<fmt:message key="button.continue"/>
-							</html:submit>	 				 		  					
-				  	 </td>
-				  </tr>
-				</c:if> 								  
-		</table>
-	<!--options content ends here-->
+<html:hidden property="donePreview" />
 
+<div class="space-bottom-top">
+
+
+	<c:if
+		test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
+		<img src="<c:out value="${tool}"/>images/green_arrow_down_right.gif"
+			align=left onclick="javascript:submitNextQuestionSelected();">
+	</c:if>
+
+
+	<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
+		<html:submit property="continueOptionsCombined" styleClass="button">
+			<fmt:message key="button.continue" />
+		</html:submit>
+	</c:if>
+
+
+	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
+		<html:submit property="continueOptionsCombined" styleClass="button">
+			<fmt:message key="button.continue" />
+		</html:submit>
+	</c:if>
+
+</div>
+<!--options content ends here-->

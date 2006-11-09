@@ -35,129 +35,123 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 </head>
 
 <body class="stripes">
-	
-<div id="content">
-	<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-		<html:hidden property="toolContentID"/>						
-		<html:hidden property="toolSessionID"/>								
-		<html:hidden property="httpSessionID"/>										
-		<html:hidden property="userID"/>										
-		<html:hidden property="userOverPassMark"/>						
-		<html:hidden property="passMarkApplicable"/>										
-		<html:hidden property="learnerProgress"/>										
-		<html:hidden property="learnerProgressUserId"/>										
-		<html:hidden property="questionListingMode"/>												
-	
-		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
-		</h1>
 
-	
-					
-		 			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 		
-						  <h3> <fmt:message key="label.withRetries.results.summary"/>	</h3> 
-					</c:if> 			
-				
-					
-					
-					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
-					   
-						  <h3><fmt:message key="label.withoutRetries.results.summary"/> </h3>
-					   
-					</c:if> 			
+	<div id="content">
+		<html:form action="/learning?method=displayMc&validate=false"
+			method="POST" target="_self">
+			<html:hidden property="toolContentID" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="httpSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="userOverPassMark" />
+			<html:hidden property="passMarkApplicable" />
+			<html:hidden property="learnerProgress" />
+			<html:hidden property="learnerProgressUserId" />
+			<html:hidden property="questionListingMode" />
 
+			<h1>
+				<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"
+					escapeXml="false" />
+			</h1>
 
+			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
+				<h3>
+					<fmt:message key="label.withRetries.results.summary" />
+				</h3>
+			</c:if>
+
+			<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
+
+				<h3>
+					<fmt:message key="label.withoutRetries.results.summary" />
+				</h3>
+
+			</c:if>
+
+			<p>
+				<c:out value="${mcGeneralLearnerFlowDTO.countSessionComplete}" />
+				<fmt:message key="label.learnersFinished.simple" />
+			</p>
+
+			<table class="alternative-color" cellspacing="1">
+				<tr>
+					<td width="30%">
+						<strong> <fmt:message key="label.topMark" /> </strong>
+					</td>
+					<td>
+						<c:out value="${mcGeneralLearnerFlowDTO.topMark}" />
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<strong><fmt:message key="label.avMark" /> </strong>
+					</td>
+					<td>
+						<c:out value="${mcGeneralLearnerFlowDTO.averageMark}" />
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<strong> <fmt:message key="label.loMark" /> </strong>
+					</td>
+					<td>
+						<c:out value="${mcGeneralLearnerFlowDTO.lowestMark}" />
+					</td>
+				</tr>
+			</table>
+
+			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
+
+				<html:submit property="redoQuestions" styleClass="button">
+					<fmt:message key="label.redo.questions" />
+				</html:submit>
+
+				<div class="space-bottom-top" align="right">
+					<c:if
+						test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+						<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+							<html:submit property="learnerFinished" styleClass="button">
+								<fmt:message key="label.finished" />
+							</html:submit>
+						</c:if>
+
+						<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+							<html:submit property="forwardtoReflection" styleClass="button">
+								<fmt:message key="label.continue" />
+							</html:submit>
+						</c:if>
+					</c:if>
+				</div>
+
+			</c:if>
+
+			<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
+
+				<div class="space-bottom-top" align="right">
+					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+						<html:submit property="learnerFinished" styleClass="button">
+							<fmt:message key="label.finished" />
+						</html:submit>
+					</c:if>
+
+					<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+						<html:submit property="forwardtoReflection" styleClass="button">
+							<fmt:message key="label.continue" />
+						</html:submit>
+					</c:if>
+				</div>
+			</c:if>
 			
-				 		<p>
-					  	  <c:out value="${mcGeneralLearnerFlowDTO.countSessionComplete}"/> 
-					  	  <fmt:message key="label.learnersFinished.simple"/> 
-					  	</p>
-				 
-					
-					
-					<table class="alternative-color" cellspacing="1">
-					  <tr>
-					  	<td width="30%"> 
-						  	  <strong> <fmt:message key="label.topMark"/> </strong>
-						 </td> 
-						 <td>	
-							  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
-					  	</td>
-					  </tr>	
-
-					  <tr>
-					  	<td> 
-						  	 <strong><fmt:message key="label.avMark"/> </strong>
-					  	</td>
-					  	<td>
-							  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
-					  	</td>
-					  </tr>	
-
-					  <tr>
-					  	<td> 
-							   <strong> <fmt:message key="label.loMark"/>  </strong>
-					  	</td>
-					  	<td>
-							  	<c:out value="${mcGeneralLearnerFlowDTO.lowestMark}"/>
-					  	</td>
-					  </tr>	
-				</table>
-
-			 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}"> 					  	   
-		  	   		 
-					  			<html:submit property="redoQuestions" styleClass="button">
-									<fmt:message key="label.redo.questions"/>
-								</html:submit>	 		
-					  			  	 
-       	  						<div class="space-bottom-top" align="right">  		    
-									<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
-										<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-											<html:submit property="learnerFinished"  styleClass="button">
-												<fmt:message key="label.finished"/>
-											</html:submit>	 				
-									  	</c:if> 				    					
-						
-										<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-											<html:submit property="forwardtoReflection" styleClass="button">
-												<fmt:message key="label.continue"/>
-											</html:submit>	 				
-									  	</c:if> 				    					
-							  	   </c:if>	
-						  	   </div>						   						  	   
-					  	
-					</c:if> 				
-				
-				
-
-				<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}"> 							  
-	  	   		  
-	  						<div class="right-buttons">	  	   		    
-									<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}"> 						  			  		
-										<html:submit property="learnerFinished"  styleClass="button">
-											<fmt:message key="label.finished"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					
-									<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}"> 						  			  		
-										<html:submit property="forwardtoReflection" styleClass="button">
-											<fmt:message key="label.continue"/>
-										</html:submit>	 				
-								  	</c:if> 				    					
-					  	   </div>						   
-				  	
-				</c:if> 																		
-			
-</html:form>
-</div>
-
-
-
+		</html:form>
+	</div>
 </body>
 </html:html>
 
@@ -169,5 +163,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-	
-	
+
+

@@ -28,69 +28,73 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <!--options content goes here-->
-		
-		<p>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}"
-				escapeXml="false" />
-		</p>
-		
-		
-		<c:if
-			test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
-		
-			<p>
-				 <fmt:message key="label.learner.message" /> ( <c:out
-						value="${mcGeneralLearnerFlowDTO.passMark}" /> )  
-			</p>
-		
-		
+
+<p>
+	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}"
+		escapeXml="false" />
+</p>
+
+
+<c:if
+	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
+
+	<p>
+		<fmt:message key="label.learner.message" />
+		(
+		<c:out value="${mcGeneralLearnerFlowDTO.passMark}" />
+		)
+	</p>
+
+
+</c:if>
+
+
+
+<c:forEach var="dto" varStatus="status"
+	items="${requestScope.listQuestionCandidateAnswersDto}">
+
+	<div class="shading-bg">
+		<div style="overflow: auto;">
+			<c:out value="${dto.question}" escapeXml="false" />
+			[
+			<strong><fmt:message key="label.mark" />
+			</strong>
+			<c:out value="${dto.mark}" />
+			]
+		</div>
+	</div>
+
+
+	<c:forEach var="ca" varStatus="status"
+		items="${dto.candidateAnswerUids}">
+
+		<div class="indent">
+			<input type="checkbox" name="checkedCa" class="noBorder"
+				value="${dto.questionUid}-${ca.value}">
+
+			<c:forEach var="caText" varStatus="status"
+				items="${dto.candidateAnswers}">
+
+
+
+				<c:if test="${ca.key == caText.key}">
+					<c:out value="${caText.value}" escapeXml="false" />
+		</div>
+
+
 		</c:if>
-		
-		
-		
-		<c:forEach var="dto" varStatus="status"
-			items="${requestScope.listQuestionCandidateAnswersDto}">
-		
-			<div class="shading-bg">
-				<div style="overflow: auto;">
-				<c:out value="${dto.question}" escapeXml="false" />
-				 [
-				<strong><fmt:message key="label.mark" /></strong>
-				<c:out value="${dto.mark}" />
-				]
-				</div>									
-			</div>
-			
-			
-			<c:forEach var="ca" varStatus="status"
-				items="${dto.candidateAnswerUids}">
-			
-				<div class="indent"><input type="checkbox" name="checkedCa" class="noBorder"
-					value="${dto.questionUid}-${ca.value}">
-		
-				<c:forEach var="caText" varStatus="status"
-					items="${dto.candidateAnswers}">
-					
-					
-					
-					<c:if test="${ca.key == caText.key}">
-						<c:out value="${caText.value}" escapeXml="false" />
-						</div>
-						
-					
-					</c:if>
-				</c:forEach>
-			</c:forEach>
-		
-		</c:forEach>
+	</c:forEach>
+</c:forEach>
+
+</c:forEach>
 
 
 <html:hidden property="donePreview" />
 
 <div class="space-bottom-top" align="right">
-<html:submit property="continueOptionsCombined" styleClass="button">
-	<fmt:message key="button.continue" />
-</html:submit>
+	<html:submit property="continueOptionsCombined" styleClass="button">
+		<fmt:message key="button.continue" />
+	</html:submit>
 </div>
 
 <!--options content ends here-->
