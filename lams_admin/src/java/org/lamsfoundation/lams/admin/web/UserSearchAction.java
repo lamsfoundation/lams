@@ -90,6 +90,7 @@ public class UserSearchAction extends Action {
 		String login = ((String)userSearchForm.get("sLogin")).trim();
 		String firstName = ((String)userSearchForm.get("sFirstName")).trim();
 		String lastName = ((String)userSearchForm.get("sLastName")).trim();
+		Boolean showAll = (Boolean)userSearchForm.get("showAll");
 		
 		log.debug("got userId: '"+userId+"'");
 		log.debug("got login: '"+login+"'");
@@ -97,19 +98,23 @@ public class UserSearchAction extends Action {
 		log.debug("got lastName: '"+lastName+"'");
 		
 		List userList = new ArrayList();
-		if(userId.length()==0) {
-			Map<String, String> stringProperties = new HashMap<String,String>();
-			if(login.length()>0) stringProperties.put("login","%"+login+"%");
-			if(firstName.length()>0) stringProperties.put("firstName","%"+firstName+"%");
-			if(lastName.length()>0) stringProperties.put("lastName","%"+lastName+"%");
-			if(!stringProperties.isEmpty()) userList = service.searchByStringProperties(User.class,stringProperties);
-		}else{
-			Map<String, Object> objectProperties = new HashMap<String,Object>();
-			objectProperties.put("userId",userId);
-			if(login.length()>0) objectProperties.put("login",login);
-			if(firstName.length()>0) objectProperties.put("firstName",firstName);
-			if(lastName.length()>0) objectProperties.put("lastName",lastName);
-			if(!objectProperties.isEmpty()) userList = service.findByProperties(User.class,objectProperties);
+		if (showAll) {
+			userList = service.findAll(User.class);
+		} else {
+			if(userId.length()==0) {
+				Map<String, String> stringProperties = new HashMap<String,String>();
+				if(login.length()>0) stringProperties.put("login","%"+login+"%");
+				if(firstName.length()>0) stringProperties.put("firstName","%"+firstName+"%");
+				if(lastName.length()>0) stringProperties.put("lastName","%"+lastName+"%");
+				if(!stringProperties.isEmpty()) userList = service.searchByStringProperties(User.class,stringProperties);
+			}else{
+				Map<String, Object> objectProperties = new HashMap<String,Object>();
+				objectProperties.put("userId",userId);
+				if(login.length()>0) objectProperties.put("login",login);
+				if(firstName.length()>0) objectProperties.put("firstName",firstName);
+				if(lastName.length()>0) objectProperties.put("lastName",lastName);
+				if(!objectProperties.isEmpty()) userList = service.findByProperties(User.class,objectProperties);
+			}
 		}
 		
 		if(userList.isEmpty() && (Boolean)userSearchForm.get("searched")){
@@ -120,6 +125,7 @@ public class UserSearchAction extends Action {
 		
 		userList = removeDisabledUsers(userList);
 		
+		userSearchForm.set("showAll", false);
 		userSearchForm.set("searched", true);
 		request.setAttribute("userList",userList);
 		return mapping.findForward("usersearchlist");

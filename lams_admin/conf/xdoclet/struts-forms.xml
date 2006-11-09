@@ -55,6 +55,7 @@
     <form-property name="sFirstName" type="java.lang.String" />
     <form-property name="sLastName" type="java.lang.String" />
     <form-property name="searched" type="java.lang.Boolean" initial="false" />
+    <form-property name="showAll" type="java.lang.Boolean" initial="false" />
 </form-bean>
 
 <form-bean name="LoginMaintainForm" type="org.apache.struts.action.DynaActionForm">
