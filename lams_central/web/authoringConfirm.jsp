@@ -29,7 +29,7 @@
 		<h1>
 			<fmt:message key="authoring.msg.save.success" />
 		</h1>
-		<p>
+		<div class="space-top">
 			<html:button onclick="javascript:location.href='${param.reEditUrl}'"
 				property="reedit" styleClass="button">
 				<fmt:message key="label.authoring.re.edit" />
@@ -38,7 +38,7 @@
 				styleClass="button">
 				<fmt:message key="label.authoring.close" />
 			</html:button>
-		</p>
+		</div>
 
 	</div>
 
