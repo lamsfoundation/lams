@@ -6,34 +6,25 @@
 	</h1>
 
 	<c:if test="${mode == 'learner' || mode == 'author'}">
+	
 		<html:form action="/learning" method="post">
-
+			<html:hidden property="dispatch" value="finishActivity" />
+			<html:hidden property="toolSessionID" />
 
 			<p>
 				${notebookDTO.instructions}
 			</p>
 
 			<c:set var="lrnForm"
-				value="<%=request
-											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				
 			<c:choose>
 				<c:when test="${contentEditable}">
 					<c:choose>
 						<c:when test="${notebookDTO.allowRichEditor}">
-							<c:set var="language">
-								<lams:user property="localeLanguage" />
-							</c:set>
-							<fck:editor id="entryText" basePath="/lams/fckeditor/"
-								imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-								linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-								flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-								imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-								linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-								flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-								toolbarSet="Default-Learner" defaultLanguage="${language}"
-								autoDetectLanguage="false">
-												${lrnForm.entryText}
-										</fck:editor>
+							<lams:FCKEditor id="entryText" value="${lrnForm.entryText}"
+								toolbarSet="Default-Learner">
+							</lams:FCKEditor>
 						</c:when>
 
 						<c:otherwise>
@@ -44,25 +35,15 @@
 				</c:when>
 
 				<c:otherwise>
-								${lrnForm.entryText}
-							</c:otherwise>
+					${lrnForm.entryText}
+				</c:otherwise>
 			</c:choose>
 
-
 			<div align="right" class="space-bottom-top">
-			
-			<html:hidden property="dispatch" value="finishActivity" />
-			<html:hidden property="toolSessionID" />
-			<html:submit styleClass="button">
-				<fmt:message>button.finish</fmt:message>
-			</html:submit>
-
-		</html:form>
+				<html:submit styleClass="button">
+					<fmt:message>button.finish</fmt:message>
+				</html:submit>
 			</div>
-	
+		</html:form>
 	</c:if>
-
-
-
 </div>
-
