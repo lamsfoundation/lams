@@ -327,6 +327,14 @@ public class LD102Importer implements ApplicationContextAware{
 			return false;
 	}
 
+	/** 1.0.x WDDX sent just &amp; in packets. 2.0 Sends &amp;amp; for an ampersand,
+	 * so it needs to be converted, or we end up with misinterpreted strings. 
+	 * @param packet
+	 * @return
+	 */
+	private String convertAmpersands(String packet) {
+		return packet.replaceAll("&amp;", "&amp;amp;");
+	}
 	
 	public Long storeLDDataWDDX(String ldWddxPacket, User importer, WorkspaceFolder folder, List<String> toolsErrorMsgs) throws ImportToolContentException
 	{
@@ -367,6 +375,8 @@ public class LD102Importer implements ApplicationContextAware{
 				throw new ImportToolContentException("Invalid packet format - failed decryption. See log for details.", e);
 			}
 		}
+		
+		ldWddxPacket = convertAmpersands(ldWddxPacket);
 		
 		Hashtable ldHashTable = null;
 
