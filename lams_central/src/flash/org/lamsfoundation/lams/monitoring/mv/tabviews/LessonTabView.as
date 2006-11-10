@@ -67,6 +67,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var _tip:ToolTip;
 	private var mm:MonitorModel;
 	
+	private var isLessonLaunchChecked:Boolean
 	//TabView clips
 	private var reqTasks_depth:Number = 4000;
 	private var listCount:Number = 0; 
@@ -151,7 +152,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public function init(m:Observable,c:Controller){
 		trace("called Lesson Tab Init")
 		super (m, c);
-		
+		isLessonLaunchChecked = true;
 		btnLabel = Dictionary.getValue('td_goContribute_btn');
 		
 		MovieClipUtils.doLater(Proxy.create(this,setupTab));
@@ -342,8 +343,9 @@ public function update (o:Observable,infoObj:Object):Void{
 		startMsg_txt.visible = false;
 	
 		var seq:Sequence = mm.getSequence();
-		if (_root.lessonLaunch == "false"){
-			rearrangeAll();			
+		if (_root.lessonLaunch == "false" && isLessonLaunchChecked){
+			rearrangeAll();		
+			isLessonLaunchChecked = false;
 		}
 		populateStatusList(seq.state);
 		populateLessonDetails();
