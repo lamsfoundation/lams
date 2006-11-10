@@ -29,7 +29,7 @@
 		<p>
 			<c:choose>
 				<c:when test="${question.type == 1}">
-					<input type="radio" name="optionChoice${question.uid}"
+					<input type="radio" name="optionChoice${question.uid}" class="noBorder"
 						value="${option.uid}" ${checked} />
 					${option.description}
 				</c:when>
