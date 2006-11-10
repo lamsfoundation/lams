@@ -1,4 +1,5 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ page language="java" pageEncoding="UTF-8"
+	contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
@@ -6,42 +7,34 @@
 	<lams:LAMSURL />
 </c:set>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf8">
 		<title><fmt:message key="404.title" /></title>
-		<!-- ********************  CSS ********************** -->
+
 		<lams:css />
 	</head>
 
 	<body class="stripes">
 
-			<!--main box 'page'-->
+		<div id="content">
 
 			<h1>
 				<fmt:message key="404.title" />
 			</h1>
-			
-			<!--closes header-->
 
-			<div id="content">
-				<%-- Error Messages --%>
-				<p class="warning">
-					<fmt:message key="404.message" />
-				</p>
-				<!--
-				<div class="right-buttons">
-					<a href="javascript:;" onclick="closeWin();" class="button"> <fmt:message
-							key="button.close" /> </a>
-				</div>
-				-->
-			</div>
-			<!--closes content-->
+			<p class="space-bottom">
+				<fmt:message key="404.message" />
+			</p>
 
-			<div id="footer"></div>
-			<!--closes footer-->
+		</div>
+		<!--closes content-->
+
+		<div id="footer"></div>
+		<!--closes footer-->
 
 	</body>
 </html>
