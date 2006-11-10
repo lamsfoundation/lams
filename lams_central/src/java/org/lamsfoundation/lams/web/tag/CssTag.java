@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -34,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 /**
  * Output the required css based in the user's details. Will output one or more
@@ -58,6 +61,7 @@ public class CssTag extends TagSupport {
 	
 	private static final String LEARNER_STYLE = "learner"; // expandable
 	private static final String TABBED_STYLE = "tabbed"; // fixed width
+	private static final String RTL_DIR = "rtl";	// right-to-left direction
 	/**
 	 * 
 	 */
@@ -66,15 +70,24 @@ public class CssTag extends TagSupport {
 	}
 	
 	public int doStartTag() throws JspException {
+		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
 		
 		String customStylesheetLink = null;
+		
+		boolean rtl = false;
+		String pageDirection = (String) session.getAttribute(LocaleFilter.DIRECTION);  // RTL or LTR (default)
+		
 		String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
-		serverURL = ( serverURL != null ? serverURL.trim() : null);
+	    serverURL = ( serverURL != null ? serverURL.trim() : null);
 
+		
 		try {
 
         	JspWriter writer = pageContext.getOut();
 			if ( serverURL != null ) {
+				if(pageDirection.toLowerCase().equals(RTL_DIR))
+					rtl = true;
+				
 				List themeList = CSSThemeUtil.getAllUserThemes();
 				
 				Iterator i = themeList.iterator();
@@ -83,11 +96,11 @@ public class CssTag extends TagSupport {
 				{
 					String theme = (String)i.next();
 					if ( theme != null) {
-						theme = appendStyle(theme);
+						theme = appendStyle(theme, rtl);
 						if (localLinkPath != null)
 							customStylesheetLink = generateLocalLink(theme);
 						else	
-							customStylesheetLink = generateLink(theme,serverURL);
+							customStylesheetLink = generateLink(theme, serverURL);
 					}
 					
 		    	   	if ( customStylesheetLink != null ) {
@@ -122,10 +135,12 @@ public class CssTag extends TagSupport {
 		}
 	}
 
-	private String appendStyle(String stylesheetName) {
+	private String appendStyle(String stylesheetName, boolean rtl) {
 		String ssName = stylesheetName;
 		if ( ssName != null && ( getStyle() == null || getStyle().equals(LEARNER_STYLE)) ) {
-				ssName = ssName + "_" + "learner";
+			ssName = (!rtl)?ssName + "_" + "learner":ssName + "_" + RTL_DIR +"_"+ "learner";
+		} else {
+			ssName = (!rtl)?ssName:ssName + "_" + RTL_DIR;
 		}
 		return ssName;
 	}
