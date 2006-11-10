@@ -268,10 +268,8 @@ Layout of main content section
 ********************************************** */
 #content { /*box around the main content area */
 	width: 707px;
-	background: url('../images/css/body_bg.jpg') repeat-y;
-	padding-bottom:40px;
-	padding-left:15px;
-	padding-right:15px;
+	background: url('../images/css/body_bg.jpg') repeat-y top right;
+	padding: 0px 15px 40px 15px;
 	font-size: 11px;
 	margin-top: -5px
 	
@@ -438,16 +436,16 @@ a:hover.button-add-item {
 	margin-bottom:20px;
 	width:100%;
 	background:#fff url('../images/css/mycourses_greentab.jpg') no-repeat top; 
-	margin-left:0px;
+	margin-right:0px;
 
 }
 
 .course-bg h2 {
 	font-size:13px;
 	color:#47bc23;
-	padding-left:0px;
+	padding-right:0px;
 	margin-top:12px;
-	margin-left:0px;
+	margin-right:0px;
 }
 
 .course-bg h4 {
@@ -457,7 +455,7 @@ a:hover.button-add-item {
 }
 
 .course-buttons {
-	margin-right:0px;
+	margin-left:0px;
 }
 
 
@@ -615,8 +613,8 @@ table.chosengrouping td select {
 
 table { 
 	 width:94%;
-	 margin-left:7px; 
-	 text-align:left; 
+	 margin-right:7px; 
+	 text-align:right; 
 	 }
 
 td { 
@@ -888,9 +886,9 @@ Floating button containers
 
 ********************************************** */
 
-.left-buttons {float:left; padding-left:20px;}
+.left-buttons {float:right; padding-right:20px;}
 
-.right-buttons {float:right; padding-right:20px; padding-top:5px;}
+.right-buttons {float:left; padding-left:20px; padding-top:5px;}
 
 
 
@@ -903,11 +901,11 @@ My Courses Pages
 /* welcome user box */
 
 
-.welcome {margin-bottom:35px; margin-top:0px; background-color:#33FFFF; margin-left:20px;margin-right:20px;}
+.welcome {margin-bottom:35px; margin-top:0px; background-color:#33FFFF; margin-right:20px;margin-left:10px;}
 
-.float-left {float:left;}
+.float-left {float:right;}
 
-.float-right {float:right;}
+.float-right {float:left;}
 
 
 
@@ -921,7 +919,7 @@ My Courses Pages
 #page-mycourses { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat 10px -7px;
+	background: url('../images/css/lams_logo.gif') no-repeat top right; /*  10px -7px */
 
 }
 
@@ -951,16 +949,16 @@ My Courses Pages
 .nav-box-right {
 	height: 31px;
 	width: auto;
-	margin-right: 2px;
+	margin-left: 3px; /* was 2 */
 	margin-top: 16px;
-	float: right;
+	float: left;
 	text-align: center;}
 
 #nav-right { /* layout of box that contains the main navigation */
 	margin-top:30px;
 	width: auto;
 	height: 40px;
-	margin-right: 1px;
+	margin-left: 1px;
 }
 
 #nav-right a {
@@ -982,49 +980,49 @@ My Courses Pages
 
 /* my courses grey buttons in the green bar */
 
-.mycourses-right-buttons {float:right; padding-right:20px;  margin-top:11px; height:24px; font-size:11px}
+.mycourses-right-buttons {float:left; padding-left:20px;  margin-top:11px; height:24px; font-size:11px}
 
 #content a.add-lesson-button {
-	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	background: url('../images/css/add_lesson.rtl.jpg') no-repeat 0px 0px;
 	color: #666;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 6px 12px;
 	text-decoration: none;
-	border-right:1px solid #d2d2d2;
+	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
 	margin-top:6px;
 	margin-left:5px;
 }
 
 #content a:hover.add-lesson-button {
-	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	background: url('../images/css/add_lesson.rtl.jpg') no-repeat 0px 0px;
 	color: #47bc23;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 6px 12px;
 	text-decoration: none;
 	margin-top:0px;
 	margin-left:5px;
-	border-right:1px solid #d2d2d2;
+	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
 }
 
 #content a.manage-group-button {
-	background: url('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	background: url('../images/css/manage_groups.rtl.jpg') no-repeat 0px 0px;
 	color: #666;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 6px 12px;
 	text-decoration: none;
-	border-right:1px solid #d2d2d2;
+	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
 	margin-top:6px;
-	margin-left:10px;
+	margin-right:10px;
 }
 
 #content a:hover.manage-group-button {
-	background: url('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	background: url('../images/css/manage_groups.rtl.jpg') no-repeat 0px 0px;
 	color: #47bc23;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 6px 12px;
 	text-decoration: none;
 	margin-top:0px;
-	margin-left:10px;
-	border-right:1px solid #d2d2d2;
+	margin-right:10px;
+	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
 }
 
@@ -1035,7 +1033,7 @@ My Courses Pages
 	margin-bottom:20px;
 	width:100%;
 	background:#fff url('../images/css/mycourses_greentab.jpg') no-repeat top; 
-	margin-left:0px;
+	margin-right:0px;
 
 }
 
@@ -1060,7 +1058,7 @@ My Courses Pages
 /************ The sequence name box **********/
 .sequence-name {
 	margin-top:5px;
-	margin-left:30px;
+	margin-right:30px;
 	
 }
 
@@ -1089,7 +1087,7 @@ My Courses Pages
 	text-decoration: none;
 	border:0px;
 	font-variant:small-caps;
-	margin-left:20px;	
+	margin-right:20px;	
 }
 
 #content a:hover.sequence-action-link {
@@ -1097,7 +1095,7 @@ My Courses Pages
 	text-decoration: none;
 	border-bottom:0px;
 	font-variant:small-caps;
-	margin-left:20px;
+	margin-right:20px;
 	}
 
 
@@ -1105,14 +1103,14 @@ My Courses Pages
 
 .group-name {
 margin-top:5px;
-margin-left:80px;
+margin-right:80px;
 }
 
 .group-name p {
 padding-top:0px;
 margin-bottom:0px;
-padding-left:0px;
-margin-left:0px;
+padding-right:0px;
+margin-right:0px;
 }
 
 .group-name strong {
@@ -1126,4 +1124,4 @@ padding-right:0px;
 border:0px;
 }
 
-.help {text-align:right; margin-right:35px;}
+.help {text-align:left; margin-left:35px;}
