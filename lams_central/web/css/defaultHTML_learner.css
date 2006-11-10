@@ -118,6 +118,7 @@ table.alternative-color th {
 }
 
 table.alternative-color td {
+	padding:5px;
 	padding-left: 20px;
 	font-size: 11px;
 	border-bottom: 1px solid #efefef;
@@ -125,6 +126,12 @@ table.alternative-color td {
 	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 0px
 }
 
+
+
+table.alternative-color td.first, table.alternative-color th.first {
+	border-left: none;
+	padding-left: 20px;
+}
 
 /*layout of the forum tables with the colored table heading cell */
 table.forum { 
@@ -138,11 +145,12 @@ table.forum {
 
 table.forum th { 
 	background: url('../images/css/green_bg_forum.jpg') repeat-x #f0f5df; 
-	height:20px; 
-	padding-top:5px; 
+	height:26px; 
+	padding-top:1px; 
 	color:#47bc23; 
 	padding-left:15px; 
 	border-left:1px solid #cacdd1;  
+	border-top:1px solid #cacdd1;  
 	font-size:12px; 
 	vertical-align:middle;
 }
@@ -158,8 +166,8 @@ table.forum td.posted-by {
 	color:#666;
 }
 
-
 table.forum td {
+	padding:10px;
 	padding-left:20px; 
 	font-size:11px; 
 	vertical-align:top; 
@@ -431,6 +439,8 @@ input:hover.button {
 .text-area {width:99%}
 
 .shading-bg {padding:5px; padding-left:10px;  padding-top:10px; margin-top:10px; margin-bottom:10px; width:99%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px}
+
+.shading-bg td {padding:5px;}
 
 .last-item {border-top:1px solid #ccc; height:20px;}
 

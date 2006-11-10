@@ -23,12 +23,14 @@ a {
 	color: #47bc23;
 	text-decoration: none;
 	border-bottom: 1px dotted #47bc23;
+	text-decoration: none;
 }
 
 a:hover {
 	color: #47bc23;
 	text-decoration: none;
 	border-bottom: 1px solid #47bc23;
+	text-decoration: none;
 }
 
 body.stripes {
@@ -115,7 +117,7 @@ li { list-style-type:circle;}
 #page { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat right 10px;
+	background: url('../images/css/lams_logo.gif') no-repeat 585px 10px;
 }
 
 #header { /*layout of the header */
@@ -685,6 +687,7 @@ textarea {
 .space-bottom-top {
 	padding-bottom: 20px;
 	padding-top: 20px;
+	padding-right:20px; /* Testing spacing IE */
 }
 
 .small-space-bottom {
@@ -772,10 +775,6 @@ padding-left:40px;
 margin-top:15px;
 }
 
-#login-left-col a {
-	color:#47bc23;
-	text-decoration: underline;		
-}n
 
 #login-left-col h1 {
 margin:0px; 
@@ -803,8 +802,8 @@ margin-left:4px;
 
 #login-left-col li {
 padding:10px 0px 15px 0px; 
-border-bottom:
-1px dotted #ccc;
+border-bottom:1px dotted #ccc;
+list-style-type:none;
 }
 
 #login-right-col {
@@ -1120,10 +1119,10 @@ color: #666;
 }
 
 /*aligns the image in the middle of the line - gives padding */
-.align-middle{
+.align-middle {
 vertical-align:middle;
 padding-right:0px;
 border:0px;
 }
 
-.help {text-align:right; margin-right:35px;}
+.help {text-align:right; margin-right:35px; cursor: pointer;}
