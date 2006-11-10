@@ -35,9 +35,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
+	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
-	
+
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
@@ -48,98 +48,63 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 
 <body class="stripes">
+	<div id="content">
 
+		<h1>
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
+				escapeXml="false" />
+		</h1>
 
+		<html:form action="/learning?validate=false"
+			enctype="multipart/form-data" method="POST" target="_self">
+			<html:hidden property="dispatch" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="revisitingUser" />
+			<html:hidden property="previewOnly" />
+			<html:hidden property="maxNominationCount" />
+			<html:hidden property="allowTextEntry" />
+			<html:hidden property="lockOnFinish" />
+			<html:hidden property="reportViewOnly" />
+			<html:hidden property="userEntry" />
 
-<div id="content">
-<h1>
-	<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
-</h1>
+			<p>
+				<strong><fmt:message
+						key="label.learning.forceFinishMessage" /> </strong>
+			</p>
 
-<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
-	<html:hidden property="dispatch"/>
-	<html:hidden property="toolSessionID"/>
-	<html:hidden property="userID"/>	
-	<html:hidden property="revisitingUser"/>			
-	<html:hidden property="previewOnly"/>	
-	<html:hidden property="maxNominationCount"/>		
-	<html:hidden property="allowTextEntry"/>	
-	<html:hidden property="lockOnFinish"/>	
-	<html:hidden property="reportViewOnly"/>		
-	<html:hidden property="userEntry"/>			
-		
-			<table cellpadding="0">
-					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
-						  	 <b>  <fmt:message key="label.learning.forceFinishMessage"/> </b> 
-					  	</td>
-					  </tr>
-				
-					<tr>
-						<td NOWRAP valign=top colspan=2> 
-							&nbsp
-						</td> 
-					</tr>
-				
-				  <tr>
-				  	<td NOWRAP align=left valign=top colspan=2> 
-					  	 <b>  <fmt:message key="label.learning.reportMessage"/> </b> 
-				  	</td>
-				  </tr>
-				
-			  		<c:forEach var="entry" items="${requestScope.mapGeneralCheckedOptionsContent}">
-						  <tr>
-						  	<td NOWRAP align=center valign=top colspan=2> 
-								  <c:out value="${entry.value}" escapeXml="false" />						  																	
-						  	</td>
-						  </tr>
-					</c:forEach>
+			<p>
+				<strong> <fmt:message key="label.learning.reportMessage" />
+				</strong>
+			</p>
 
-					  <tr>
-					  	<td NOWRAP align=left valign=top colspan=2> 
-								&nbsp&nbsp
-					  	</td>
-					  </tr>
+			<c:forEach var="entry"
+				items="${requestScope.mapGeneralCheckedOptionsContent}">
+				<div>
+				<c:out value="${entry.value}" escapeXml="false" />
+				</div>
+			</c:forEach>
 
+			<h2>
+				<fmt:message key="label.notebook.entries" />
+			</h2>
 
-						<tr> 
-						<td NOWRAP align=center  valign=top colspan=2> 
-								<table>
-									<tr> 
-					  	   		  		<td>
-											<b> <fmt:message key="label.notebook.entries"/> </b>						
-										 </td>
-									</tr>
-									
-									<tr> 
-					  	   		  		<td>
-											<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>				  	   		  		
-										 </td>
-									</tr>
-							</table>
-	
-						</td>
-						</tr>
+			<p>
+				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+					escapeXml="false" />
+			</p>
 
-					
-				
-				
-		  	   		  <tr>
-					  	<td NOWRAP colspan=2 valign=top align=right> 
-                                <html:submit property="learnerFinished" 
-                                             styleClass="button" 
-                                             onclick="submitMethod('learnerFinished');">
-                                    <fmt:message key="label.finished"/>
-                                </html:submit>
-					  	 </td>
-					  </tr>
-					
-				</table>
-</html:form>
+			<div align="right">
+				<html:submit property="learnerFinished" styleClass="button"
+					onclick="submitMethod('learnerFinished');">
+					<fmt:message key="label.finished" />
+				</html:submit>
+			</div>
 
-</div>
+		</html:form>
 
-<div id="footer"></div>
+	</div>
+
+	<div id="footer"></div>
 </body>
 </html:html>
-

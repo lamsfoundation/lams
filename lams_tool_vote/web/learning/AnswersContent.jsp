@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set scope="request"  var="lams">
+<c:set scope="request" var="lams">
 	<lams:LAMSURL />
 </c:set>
 <c:set scope="request" var="tool">
@@ -35,8 +35,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<lams:css/>
-	<title><fmt:message key="activity.title" /></title>
+	<lams:css />
+	<title><fmt:message key="activity.title" />
+	</title>
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -86,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		alert(msg);
 	}
 	</script>
-	
+
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
@@ -98,92 +99,89 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <body class="stripes">
 
+	<div id="content">
+		<h1>
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
+				escapeXml="false" />
+		</h1>
 
+		<html:form onsubmit="return validate();"
+			action="/learning?validate=false&dispatch=continueOptionsCombined"
+			method="POST" target="_self">
+			<html:hidden property="dispatch" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="revisitingUser" />
+			<html:hidden property="previewOnly" />
+			<html:hidden property="maxNominationCount" />
+			<html:hidden property="allowTextEntry" />
+			<html:hidden property="lockOnFinish" />
+			<html:hidden property="reportViewOnly" />
 
-<div id="content">
+			<c:if
+				test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}">
+				<div class="warning">
+					<fmt:message key="label.learning.forceOfflineMessage" />
+				</div>
+			</c:if>
 
-<h1>
-	<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
-</h1>
-	<html:form  onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
-	<html:hidden property="dispatch"/>
-	<html:hidden property="toolSessionID"/>
-	<html:hidden property="userID"/>	
-	<html:hidden property="revisitingUser"/>		
-	<html:hidden property="previewOnly"/>		
-	<html:hidden property="maxNominationCount"/>		
-	<html:hidden property="allowTextEntry"/>		
-	<html:hidden property="lockOnFinish"/>	
-	<html:hidden property="reportViewOnly"/>			
-	
-	
-			<table cellpadding="0">
-					<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}"> 			
-						<tr> <td class="error">
-							<fmt:message key="label.learning.forceOfflineMessage"/>
-						</td></tr>
-					</c:if> 		
-					
-					<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}"> 			
-						<tr> <td class="error">
-							<fmt:message key="error.maxNominationCount.reached"/> 
-								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}"/>	
-							<fmt:message key="label.nominations"/>
-						</td></tr>
-					</c:if> 		
-					
-	
-					<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}"> 			
-						  <tr>
-						  	<td  NOWRAP align=left valign=top colspan=2> 
-								  <c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />						  																
-						  	</td>
-						  </tr>
-	
+			<c:if
+				test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}">
+				<div class="warning">
+					<fmt:message key="error.maxNominationCount.reached" />
+					<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
+					<fmt:message key="label.nominations" />
+				</div>
+			</c:if>
 
-							  <tr>						 
-								<td NOWRAP align=left>
-								<table align=left>
-										<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
-											<input type="checkbox" name="checkedVotes" value="${subEntry.key}" onClick="updateCount(this);"><c:out value="${subEntry.value}" escapeXml="false"/><BR>
-										</c:forEach>
-								</table>
-								</td>
-							</tr>
-							  
-							<c:if test="${VoteLearningForm.allowTextEntry == 'true'}"> 			
-									<tr> 
-										<td NOWRAP align=left valign=top colspan=2> 
-											<table align=left> 
-												<tr> <td>
-								      			 <b>
-											 		<fmt:message key="label.other"/>: 
-										      		</b> 
-										 			<html:text property="userEntry" size="30" maxlength="100"/>
-											 	</td> </tr>
-											</table>									 			
-								 		</td>
-								  	</tr>
-							</c:if> 									  	
-				  	   
-				  	<html:hidden property="donePreview"/>						   
-		  	   		
-		  	   		  <tr>
-					  	<td NOWRAP valign=top colspan=2> 
-		                            <html:submit property="continueOptionsCombined" 
-		                                         styleClass="button">
-										<fmt:message key="label.submit.vote"/>
-		                            </html:submit>
-					  	 </td>
-					  </tr>
-					
-					</c:if> 		
+			<c:if
+				test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}">
+
+				<p>
+					<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}"
+						escapeXml="false" />
+				</p>
+
+				<table class="shading-bg">
+
+					<c:forEach var="subEntry" varStatus="status"
+						items="${requestScope.mapQuestionContentLearner}">
+
+						<tr>
+							<td width="50px">
+
+								<input type="checkbox" name="checkedVotes" class="noBorder"
+									value="${subEntry.key}" onClick="updateCount(this);">
+
+							</td>
+
+							<td>
+
+								<c:out value="${subEntry.value}" escapeXml="false" />
+
+							</td>
+					</c:forEach>
 				</table>
-	</html:form>
-</div>
 
-<div id="footer"></div>
+				<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
+					<strong> <fmt:message key="label.other" />: </strong>
+					<html:text property="userEntry" size="30" maxlength="100" />
+				</c:if>
+
+				<html:hidden property="donePreview" />
+
+				<div class="space-top">
+					<html:submit property="continueOptionsCombined" styleClass="button">
+						<fmt:message key="label.submit.vote" />
+					</html:submit>
+				</div>
+				
+			</c:if>
+
+		</html:form>
+	</div>
+
+	<div id="footer"></div>
 
 </body>
 </html:html>
-
