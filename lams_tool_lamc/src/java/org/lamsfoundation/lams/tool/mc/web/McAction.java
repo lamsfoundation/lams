@@ -521,10 +521,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		boolean validateSingleCorrectCandidate=authoringUtil.validateSingleCorrectCandidate(caList);
 	    logger.debug("validateSingleCorrectCandidate: " + validateSingleCorrectCandidate);
 	    
-	    /*
+
 		boolean validateOnlyOneCorrectCandidate=authoringUtil.validateOnlyOneCorrectCandidate(caList);
 	    logger.debug("validateOnlyOneCorrectCandidate: " + validateOnlyOneCorrectCandidate);
-	    */
+
 	    
 	    
         ActionMessages errors = new ActionMessages();
@@ -541,14 +541,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             ActionMessage error = new ActionMessage("candidates.none.correct");
 			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
         }
-        
-        /*
+
         if (!validateOnlyOneCorrectCandidate)
         {
             ActionMessage error = new ActionMessage("candidates.duplicate.correct");
 			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
         }
-        */
         
         
         logger.debug("errors: " + errors);
@@ -955,10 +953,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		boolean validateSingleCorrectCandidate=authoringUtil.validateSingleCorrectCandidate(caList);
 	    logger.debug("validateSingleCorrectCandidate: " + validateSingleCorrectCandidate);
 	    
-	    /*
+
 		boolean validateOnlyOneCorrectCandidate=authoringUtil.validateOnlyOneCorrectCandidate(caList);
 	    logger.debug("validateOnlyOneCorrectCandidate: " + validateOnlyOneCorrectCandidate);
-	    */
+
 
 	    
         ActionMessages errors = new ActionMessages();
@@ -977,13 +975,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
         }
         
-        /*
         if (!validateOnlyOneCorrectCandidate)
         {
             ActionMessage error = new ActionMessage("candidates.duplicate.correct");
 			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
         }
-        */
         
         logger.debug("errors: " + errors);
 
@@ -1444,21 +1440,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
         
-        /*
-	    String newQuestion=request.getParameter("newQuestion");
-	    logger.debug("newQuestion: " + newQuestion);
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    logger.debug("feedback: " + feedback);
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-		logger.debug("mark: " + mark);
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-		*/
-        
-
         logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
     	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 

@@ -74,7 +74,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				{
 					var msg = "<fmt:message key="candidates.duplicate.correct"/>";
 					alert(msg);
+					return false;
 				}
+				return true;
 			}
 			
 		</script>		
@@ -169,10 +171,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table>
 							<tr>
 							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="validateDuplicateCorrectAnswers(); getElementById('newQuestionForm').submit();" class="button-add-item">
-									<fmt:message key="label.save.question" />
-								</a>
-							</td> 
+								<a href="#" onclick="if (validateDuplicateCorrectAnswers()) { getElementById('newQuestionForm').submit(); }"				
+									class="button-add-item"> <fmt:message key="label.save.question" />
+								</a>							
 	
 							<td>
 								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">

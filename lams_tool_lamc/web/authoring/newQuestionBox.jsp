@@ -75,7 +75,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				{
 					var msg = "<fmt:message key="candidates.duplicate.correct"/>";
 					alert(msg);
+					return false;
 				}
+				return true;
 			}
 			
 		</script>
@@ -138,7 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:textarea property="feedback" rows="3" cols="70"></html:textarea>
 
 			<div class="space-bottom-top">
-				<a href="#" onclick="validateDuplicateCorrectAnswers(); getElementById('newQuestionForm').submit();"
+				<a href="#" onclick="if (validateDuplicateCorrectAnswers()) { getElementById('newQuestionForm').submit(); }"				
 					class="button-add-item"> <fmt:message key="label.save.question" />
 				</a>
 
