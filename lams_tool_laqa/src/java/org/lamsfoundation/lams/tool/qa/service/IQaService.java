@@ -153,6 +153,8 @@ public interface IQaService
 	
 	public QaUsrResp getAttemptByUID(Long uid) throws QaApplicationException;
 	
+	public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
+	
     public void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
 
     public void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException;

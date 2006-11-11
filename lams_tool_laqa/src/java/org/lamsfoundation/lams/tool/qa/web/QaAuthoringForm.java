@@ -75,6 +75,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String endLearningMessage;
 	protected String usernameVisible;
 	protected String questionsSequenced;
+	protected String lockWhenFinished;
 	protected String reflect;
 	protected String reflectionSubject;
 	
@@ -142,6 +143,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		this.reportTitle=null;
 		this.monitoringReportTitle=null;
 		this.questionsSequenced=null;
+		this.lockWhenFinished=null;
 		this.reflect=null;
 		
     	
@@ -159,6 +161,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		this.synchInMonitor		=OPTION_OFF;
 		this.usernameVisible	=OPTION_OFF;
 		this.questionsSequenced	=OPTION_OFF;
+		this.lockWhenFinished  	=OPTION_OFF;
 		this.reflect			=OPTION_OFF;
 	}
 
@@ -179,6 +182,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
             .append("usernameVisible: ", usernameVisible)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
+            .append("lockWhenFinished: ", lockWhenFinished)
             .append("reflect: ", reflect)
             .append("defineLaterInEditMode: ", defineLaterInEditMode)
             .toString();
@@ -743,5 +747,17 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
         this.editQuestionBoxRequest = editQuestionBoxRequest;
+    }
+    /**
+     * @return Returns the lockWhenFinished.
+     */
+    public String getLockWhenFinished() {
+        return lockWhenFinished;
+    }
+    /**
+     * @param lockWhenFinished The lockWhenFinished to set.
+     */
+    public void setLockWhenFinished(String lockWhenFinished) {
+        this.lockWhenFinished = lockWhenFinished;
     }
 }

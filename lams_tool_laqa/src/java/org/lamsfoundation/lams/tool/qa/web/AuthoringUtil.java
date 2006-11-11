@@ -438,10 +438,6 @@ public class AuthoringUtil implements QaAppConstants {
     {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
         
-        boolean isQuestionsSequenced=false;
-        boolean isSynchInMonitor=false;
-        boolean isUsernameVisible=false;
-
         String richTextTitle = request.getParameter(TITLE);
         String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
@@ -450,10 +446,17 @@ public class AuthoringUtil implements QaAppConstants {
 
 		String synchInMonitor=request.getParameter(SYNC_IN_MONITOR);
 		logger.debug("synchInMonitor: " + synchInMonitor);
+		
 		String usernameVisible=request.getParameter(USERNAME_VISIBLE);
 		logger.debug("usernameVisible: " + usernameVisible);
+		
 		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
 		logger.debug("questionsSequenced: " + questionsSequenced);
+		
+		String lockWhenFinished=request.getParameter("lockWhenFinished");
+		logger.debug("lockWhenFinished: " + lockWhenFinished);
+		
+		
 		String richTextOfflineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
 		String richTextOnlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
 		String reflect=request.getParameter(REFLECT);
@@ -467,7 +470,7 @@ public class AuthoringUtil implements QaAppConstants {
         
         
         boolean setCommonContent=true; 
-        if ((questionsSequenced == null) || (synchInMonitor == null) || 
+        if ((questionsSequenced == null) || (synchInMonitor == null) || (lockWhenFinished == null) || 
              (usernameVisible == null) || (reflect == null))
         {
         	setCommonContent=false;
@@ -476,6 +479,7 @@ public class AuthoringUtil implements QaAppConstants {
 		
         boolean questionsSequencedBoolean=false;
         boolean synchInMonitorBoolean=false;
+        boolean lockWhenFinishedBoolean=false;
         boolean usernameVisibleBoolean=false;
         boolean reflectBoolean=false;
 
@@ -484,6 +488,9 @@ public class AuthoringUtil implements QaAppConstants {
         
         if ((synchInMonitor != null) && (synchInMonitor.equalsIgnoreCase("1")))
             synchInMonitorBoolean=true;            
+        
+        if ((lockWhenFinished != null) && (lockWhenFinished.equalsIgnoreCase("1")))
+            lockWhenFinishedBoolean=true;
         
         if ((usernameVisible != null) && (usernameVisible.equalsIgnoreCase("1")))
             usernameVisibleBoolean=true;            
@@ -494,6 +501,7 @@ public class AuthoringUtil implements QaAppConstants {
             
         logger.debug("questionsSequencedBoolean: " + questionsSequencedBoolean);
         logger.debug("synchInMonitorBoolean: " + synchInMonitorBoolean);
+        logger.debug("lockWhenFinishedBoolean: " + lockWhenFinishedBoolean);
         logger.debug("usernameVisibleBoolean: " + usernameVisibleBoolean);
         logger.debug("reflectBoolean: " + reflectBoolean);
         
@@ -544,12 +552,11 @@ public class AuthoringUtil implements QaAppConstants {
      	if (activeModule.equals(AUTHORING))
 		{
         	logger.debug("setting other content values...");
-         	qaContent.setQuestionsSequenced(isQuestionsSequenced); 
-         	qaContent.setSynchInMonitor(isSynchInMonitor);
          	qaContent.setOnlineInstructions(richTextOnlineInstructions);
          	qaContent.setOfflineInstructions(richTextOfflineInstructions);
          	qaContent.setUsernameVisible(usernameVisibleBoolean);
          	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
+         	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
          	qaContent.setSynchInMonitor(synchInMonitorBoolean);	
          	qaContent.setReflect(reflectBoolean);
          	qaContent.setReflectionSubject(reflectionSubject);

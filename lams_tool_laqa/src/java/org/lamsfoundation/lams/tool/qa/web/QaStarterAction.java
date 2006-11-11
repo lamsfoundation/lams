@@ -328,7 +328,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
             qaContent=retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, 
                     new Long(defaultContentIdStr).longValue(), true, qaService, qaGeneralAuthoringDTO, sessionMap);
             
-            logger.debug("post retrive content :" + sessionMap); 
+            logger.debug("post retrive content :" + sessionMap);
+            qaAuthoringForm.setLockWhenFinished("1");
 		}
         else
         {
@@ -419,6 +420,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?"1":"0");
 	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?"1":"0");	    
 	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?"1":"0");
+	    qaAuthoringForm.setLockWhenFinished(qaContent.isLockWhenFinished()?"1":"0");
+	    
 	    qaGeneralAuthoringDTO.setReflect(qaContent.isReflect()?"1":"0");
 	    
 	    logger.debug("QaContent isReflect: " + qaContent.isReflect());

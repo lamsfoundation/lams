@@ -129,6 +129,17 @@
         length="1"
     />
     
+
+    <property
+        name="lockWhenFinished"
+        type="boolean"
+        access="property"        
+        column="lockWhenFinished"
+        length="1"
+    />
+    
+
+    
     <property
         name="contentLocked"
         type="boolean"

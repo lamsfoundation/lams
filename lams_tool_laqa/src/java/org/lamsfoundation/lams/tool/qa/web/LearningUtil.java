@@ -205,9 +205,31 @@ public class LearningUtil implements QaAppConstants{
     	boolean isResponseFinalized=qaQueUsr.isResponseFinalized();
     	logger.debug("isResponseFinalized: " + isResponseFinalized);
     	
-    	if (!isResponseFinalized)
+    	boolean lockWhenFinished=qaContent.isLockWhenFinished(); 
+	    logger.debug("lockWhenFinished: " + lockWhenFinished);
+	    
+	    boolean enableAttemptEntry=false;
+	    boolean userAttemptExist=false;
+	    
+        if (!isResponseFinalized)
+        {
+            logger.debug("type 1 attempt entry");
+            enableAttemptEntry=true;
+        }
+        
+        if (isResponseFinalized && (!lockWhenFinished))
+	    {
+            logger.debug("type 2 attempt entry");
+	        logger.debug("second visit and lockWhenFinished is false, enable attempt entry");
+	        userAttemptExist=true;
+	        enableAttemptEntry=true;
+	    }
+	    logger.debug("final enableAttemptEntry: " + enableAttemptEntry);
+	    logger.debug("final userAttemptExist: " + userAttemptExist);
+	    
+    	if (enableAttemptEntry)
     	{
-    	  	logger.debug("isResponseFinalized is false, so creating the responses: ");
+    	  	logger.debug("enableAttemptEntry is true, so creating the responses: ");
             while (contentIterator.hasNext())
         	{
         		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
@@ -216,7 +238,9 @@ public class LearningUtil implements QaAppConstants{
         		    logger.debug("qaQueContent uid:" + qaQueContent.getUid());
         		    
             		String question=qaQueContent.getQuestion();
+            		logger.debug("question:" + question);
             		String displayOrder=new Long(qaQueContent.getDisplayOrder()).toString();
+            		logger.debug("displayOrder:" + displayOrder);
             		String answer=(String)mapAnswers.get(displayOrder);
             		
                     logger.debug("iterationg question-answers: displayOrder: " + displayOrder + 
@@ -227,12 +251,12 @@ public class LearningUtil implements QaAppConstants{
                     List attempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
                     logger.debug("attempts:" + attempts);
                     
-                    if ((attempts != null) && (attempts.size() > 0))
+                    
+                    if (userAttemptExist)
                     {
-                        logger.debug("this user already responsed to q/a in this session:");
-                    }
-                    else
-                    {
+                        logger.debug("since userAttemptExist is true remove them:");
+                        qaService.removeAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
+                        
                         logger.debug("creating response.");
                     	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
         						new Date(System.currentTimeMillis()),
@@ -247,6 +271,33 @@ public class LearningUtil implements QaAppConstants{
         					qaService.createQaUsrResp(qaUsrResp);
         					logger.debug("created qaUsrResp in the db");	
         				}
+
+        				logger.debug("recreated user attempts since the content is not locked when finished");
+                    }
+                    else
+                    {
+                        logger.debug("first time attempt entry or content is locked");
+                        if ((attempts != null) && (attempts.size() > 0))
+                        {
+                            logger.debug("this user already responsed to q/a in this session:");
+                        }
+                        else
+                        {
+                            logger.debug("creating response.");
+                        	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
+            						new Date(System.currentTimeMillis()),
+            						timezoneId,
+            						qaQueContent,
+            						qaQueUsr,
+            						true); 
+
+            				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
+            				if (qaUsrResp != null)
+            				{
+            					qaService.createQaUsrResp(qaUsrResp);
+            					logger.debug("created qaUsrResp in the db");	
+            				}
+                        }
                     }
         		}
             }

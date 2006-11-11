@@ -1,4 +1,3 @@
-
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -55,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:link>
 							&nbsp
 							<html:link
-								page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
+								page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
 								paramId="uuid" paramName="attachment" paramProperty="uuid"
 								onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 								target="_self">

@@ -49,6 +49,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</label>
 </p>
 
+<p>
+	<html:checkbox property="lockWhenFinished" value="1" styleId="lockWhenFinished"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="lockWhenFinished">
+		<fmt:message key="label.lockWhenFinished" />
+	</label>
+</p>
+
 
 
 

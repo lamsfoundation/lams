@@ -448,6 +448,22 @@ public class QaServicePOJO
         }
     }
     
+    
+    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) throws QaApplicationException
+    {
+        try
+        {
+        	qaUsrRespDAO.removeAttemptsForUserAndQuestionContent(queUsrId, qaQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is removing attempts by queUsrId and qaQueContentId: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+    
+    
     public void updateUserResponse(QaUsrResp resp) throws QaApplicationException
     {
         try
@@ -2086,8 +2102,6 @@ public class QaServicePOJO
      */
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
-       
-        
     	Date now = new Date();
     	QaContent toolContentObj = new QaContent();
     	toolContentObj.setContentLocked(Boolean.FALSE.booleanValue() );
@@ -2097,7 +2111,7 @@ public class QaServicePOJO
     	toolContentObj.setInstructions(null);
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
- 	    toolContentObj.setReflect(Boolean.FALSE);
+ 	    toolContentObj.setReflect(Boolean.FALSE.booleanValue());
     	toolContentObj.setReflectionSubject(null);
     	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
@@ -2108,6 +2122,7 @@ public class QaServicePOJO
     	toolContentObj.setReportTitle(null);
     	toolContentObj.setMonitoringReportTitle(null);
     	toolContentObj.setSynchInMonitor(false); // doesn't appear to be used in LAMS 2.0
+    	toolContentObj.setLockWhenFinished(Boolean.TRUE.booleanValue()); // doesn't appear to be used in LAMS 2.0
     	
     	Boolean bool;
 		try {
@@ -2148,7 +2163,7 @@ public class QaServicePOJO
 	       			+" as the tool content does not exist.");
     	}
     	
-    	qaContent.setReflect(Boolean.TRUE);
+    	qaContent.setReflect(Boolean.TRUE.booleanValue());
     	qaContent.setReflectionSubject(description);
     }
     

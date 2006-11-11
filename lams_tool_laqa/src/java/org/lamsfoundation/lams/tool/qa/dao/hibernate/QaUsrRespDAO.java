@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
@@ -111,6 +112,29 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
         
 		return list;
     }
+    
+    
+    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId)
+    {
+        HibernateTemplate templ = this.getHibernateTemplate();
+        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
+		.setLong("queUsrId", queUsrId.longValue())
+		.setLong("qaQueContentId", qaQueContentId.longValue())
+		.list();
+        
+        
+		if(list != null && list.size() > 0){
+			Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    	    QaUsrResp qaUsrResp=(QaUsrResp)listIterator.next();
+				this.getSession().setFlushMode(FlushMode.AUTO);
+	    		templ.delete(qaUsrResp);
+	    		templ.flush();
+	    	}
+		}
+    }
+    
     
     public void removeUserResponseByQaQueId(Long qaQueId)
     {

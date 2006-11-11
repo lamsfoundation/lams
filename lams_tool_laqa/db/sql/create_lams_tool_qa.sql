@@ -20,6 +20,7 @@
 --
 -- $Id$
 
+
 CREATE TABLE tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , qa_content_id BIGINT(20) NOT NULL
@@ -38,6 +39,7 @@ CREATE TABLE tl_laqa11_content (
      , online_instructions TEXT
      , content_inUse TINYINT(1) DEFAULT 0
      , reflectionSubject TEXT
+     , lockWhenFinished TINYINT(1) NOT NULL DEFAULT 1
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
@@ -112,12 +114,7 @@ CREATE TABLE tl_laqa11_uploadedfile (
 )TYPE=InnoDB;
 
 -- data for content table
-INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date)  VALUES (${default_content_id}, 'Q&A', 'Instructions', NOW());
+INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date, lockWhenFinished)  VALUES (${default_content_id}, 'Q&A', 'Instructions', NOW() , 1);
 
 -- data for content questions table
 INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
-
-
-
-
-

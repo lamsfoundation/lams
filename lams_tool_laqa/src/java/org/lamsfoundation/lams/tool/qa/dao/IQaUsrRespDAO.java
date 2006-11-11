@@ -50,6 +50,8 @@ public interface IQaUsrRespDAO
 	public QaUsrResp retrieveQaUsrResp(long responseId);
 	
 	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
+	
+	public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
 }
 
 
