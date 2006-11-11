@@ -14,7 +14,7 @@ CREATE TABLE tl_lavote11_content (
      , offline_instructions TEXT
      , online_instructions TEXT
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
-     , lock_on_finish TINYINT(1) NOT NULL DEFAULT 0
+     , lock_on_finish TINYINT(1) NOT NULL DEFAULT 1
      , retries TINYINT(1) NOT NULL DEFAULT 0
      , reflectionSubject TEXT
      , PRIMARY KEY (uid)
@@ -91,7 +91,7 @@ CREATE TABLE tl_lavote11_uploadedfile (
 )TYPE=InnoDB;
 
 
-INSERT INTO tl_lavote11_content(uid, content_id , title , instructions , creation_date , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries) VALUES (1, ${default_content_id} ,'Voting','Instructions', NOW(), 1,0, 0, '','', 0, 0);
+INSERT INTO tl_lavote11_content(uid, content_id , title , instructions , creation_date , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries, lock_on_finish) VALUES (1, ${default_content_id} ,'Voting','Instructions', NOW(), 1,0, 0, '','', 0, 0, 1);
 
 INSERT INTO tl_lavote11_nomination_content  (uid,nomination, display_order, vote_content_id) VALUES (1, 'Sample Nomination 1', 1, 1);
 INSERT INTO tl_lavote11_nomination_content  (uid,nomination, display_order, vote_content_id) VALUES (2, 'Sample Nomination 2', 2, 1);
