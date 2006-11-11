@@ -122,11 +122,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
 					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
-						<html:button property="refreshAnswers" styleClass="button"
-							onclick="submitMethod('refreshAllResults');">
-							<fmt:message key="label.refresh" />
-						</html:button>
-
 						<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
 							<html:button property="redoQuestions" styleClass="button"
 								onclick="submitMethod('redoQuestions');">
@@ -134,26 +129,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:button>
 						</c:if>						
 
-
 						<div class="space-bottom-top" align="right">
-							<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 								<html:button property="endLearning"
 									onclick="javascript:submitMethod('endLearning');"
 									styleClass="button">
 									<fmt:message key="button.endLearning" />
 								</html:button>
-							</c:if>
-
-							<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-								<html:button property="forwardtoReflection"
-									onclick="javascript:submitMethod('forwardtoReflection');"
-									styleClass="button">
-									<fmt:message key="label.continue" />
-								</html:button>
-							</c:if>
 						</div>
 					</c:if>
 				</c:if>
+				
+				<c:if
+					test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true' }">
+					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
+
+
+						<div class="space-bottom-top" align="right">
+								<html:button property="endLearning"
+									onclick="javascript:submitMethod('endLearning');"
+									styleClass="button">
+									<fmt:message key="button.endLearning" />
+								</html:button>
+						</div>
+					</c:if>
+				</c:if>
+
+				
 			</html:form>
 		</c:if>
 
@@ -218,15 +219,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</p>
 				</c:if>
 
+				
 				<c:if
 					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
 					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
-						<html:button property="refreshAnswers" styleClass="button"
-							onclick="submitMethod('refreshAllResults');">
-							<fmt:message key="label.refresh" />
-						</html:button>
+						<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
+							<html:button property="redoQuestions" styleClass="button"
+								onclick="submitMethod('redoQuestions');">
+								<fmt:message key="label.redo" />
+							</html:button>
+						</c:if>						
 
+						<div class="space-bottom-top" align="right">
+								<html:button property="endLearning"
+									onclick="javascript:submitMethod('endLearning');"
+									styleClass="button">
+									<fmt:message key="button.endLearning" />
+								</html:button>
+						</div>
+					</c:if>
+				</c:if>
+				
+				<c:if
+					test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true' }">
+					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
 						<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
 							<html:button property="redoQuestions" styleClass="button"
@@ -237,24 +254,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 						<div class="space-bottom-top" align="right">
-							<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 								<html:button property="endLearning"
 									onclick="javascript:submitMethod('endLearning');"
 									styleClass="button">
 									<fmt:message key="button.endLearning" />
 								</html:button>
-							</c:if>
-
-							<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-								<html:button property="forwardtoReflection"
-									onclick="javascript:submitMethod('forwardtoReflection');"
-									styleClass="button">
-									<fmt:message key="label.continue" />
-								</html:button>
-							</c:if>
 						</div>
 					</c:if>
 				</c:if>
+				
+				
 			</html:form>
 		</c:if>
 	</div>
