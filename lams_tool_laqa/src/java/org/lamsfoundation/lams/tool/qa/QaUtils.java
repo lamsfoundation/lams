@@ -70,14 +70,6 @@ public abstract class QaUtils implements QaAppConstants {
 		
 	    qaGeneralAuthoringDTO.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
 	    qaGeneralAuthoringDTO.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
-		
-         /* set the status of radio boxes */
-	    /*
-	    qaGeneralAuthoringDTO.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
-	    qaGeneralAuthoringDTO.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
-	    qaGeneralAuthoringDTO.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
-	    qaGeneralAuthoringDTO.setReflect(defaultQaContent.isReflect()?ON:OFF);
-	    */
 	}
     
     
@@ -127,6 +119,13 @@ public abstract class QaUtils implements QaAppConstants {
 		logger.debug("questionsSequenced: " + questionsSequenced);
 		qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
 		qaGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
+		
+
+		String lockWhenFinished=request.getParameter("lockWhenFinished");
+		logger.debug("lockWhenFinished: " + lockWhenFinished);
+		qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
+		qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
+		
 		
 		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
 		logger.debug("offlineInstructions: " + offlineInstructions);

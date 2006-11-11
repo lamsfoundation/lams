@@ -243,7 +243,8 @@ public interface QaAppConstants {
     public static final String REQUEST_LEARNING_REPORT					="requestLearningReport";
     public static final String REQUEST_LEARNING_REPORT_PROGRESS			="requestLearningReportProgress";
     public static final String REQUEST_PREVIEW							="requestPreview";
-    public static final String REQUEST_LEARNING_REPORT_VIEWONLY			="requestLearningReportViewOnly";    
+    public static final String REQUEST_LEARNING_REPORT_VIEWONLY			="requestLearningReportViewOnly";
+    public static final String REVISITED_LEARNER_REP					="revisitedLearnerRep";
     
             
     /*

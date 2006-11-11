@@ -103,6 +103,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String initialScreen;
     
+    protected String lockWhenFinished;
+    
     
     /**
      * @return Returns the currentMonitoredToolSession.
@@ -237,6 +239,7 @@ public class GeneralLearnerFlowDTO implements Comparable
             .append("totalQuestionCount : ", totalQuestionCount)
             .append("activityInstructions: ", activityInstructions)
             .append("teacherViewOnly: ", teacherViewOnly)
+            .append("lockWhenFinished: ", lockWhenFinished)
             .append("activityTitle: ", activityTitle)
             .append("countSessionComplete: ", countSessionComplete)
             .append("toolSessionID: ", toolSessionID)
@@ -552,5 +555,18 @@ public class GeneralLearnerFlowDTO implements Comparable
      */
     public void setInitialScreen(String initialScreen) {
         this.initialScreen = initialScreen;
+    }
+
+    /**
+     * @return Returns the lockWhenFinished.
+     */
+    public String getLockWhenFinished() {
+        return lockWhenFinished;
+    }
+    /**
+     * @param lockWhenFinished The lockWhenFinished to set.
+     */
+    public void setLockWhenFinished(String lockWhenFinished) {
+        this.lockWhenFinished = lockWhenFinished;
     }
 }

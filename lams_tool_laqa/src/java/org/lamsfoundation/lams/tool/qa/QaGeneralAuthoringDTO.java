@@ -57,6 +57,7 @@ public class QaGeneralAuthoringDTO implements Comparable
     protected String reflect;
     protected String synchInMonitor;
     protected String questionsSequenced;
+    protected String lockWhenFinished;
     protected String editActivityEditMode;
     protected String reflectionSubject;
     
@@ -100,6 +101,7 @@ public class QaGeneralAuthoringDTO implements Comparable
             .append("usernameVisible: ", usernameVisible)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
+            .append("lockWhenFinished: ", lockWhenFinished)
             .append("editActivityEditMode: ", editActivityEditMode)
             .append("reflectionSubject: ", reflectionSubject)
             .append("requestedModule: ", requestedModule)
@@ -512,5 +514,17 @@ public class QaGeneralAuthoringDTO implements Comparable
      */
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
+    }
+    /**
+     * @return Returns the lockWhenFinished.
+     */
+    public String getLockWhenFinished() {
+        return lockWhenFinished;
+    }
+    /**
+     * @param lockWhenFinished The lockWhenFinished to set.
+     */
+    public void setLockWhenFinished(String lockWhenFinished) {
+        this.lockWhenFinished = lockWhenFinished;
     }
 }

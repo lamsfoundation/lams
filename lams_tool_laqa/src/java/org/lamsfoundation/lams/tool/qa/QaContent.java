@@ -99,6 +99,8 @@ public class QaContent implements Serializable {
     
     private boolean questionsSequenced;
     
+    private boolean lockWhenFinished;
+    
     /** nullable persistent field */
     private boolean usernameVisible;
     
@@ -141,6 +143,7 @@ public class QaContent implements Serializable {
 					 boolean 	questionsSequenced,
 	                 boolean 	usernameVisible,
 	                 boolean 	synchInMonitor,
+	                 boolean 	lockWhenFinished,
 	                 boolean 	contentLocked,
 	                 boolean 	reflect,
 	                 String 	reflectionSubject,
@@ -164,6 +167,7 @@ public class QaContent implements Serializable {
         this.questionsSequenced	 = questionsSequenced;
         this.usernameVisible 	 = usernameVisible;
         this.synchInMonitor 	 = synchInMonitor;
+        this.lockWhenFinished 	 = lockWhenFinished;
         this.contentLocked		 = contentLocked;
         this.reflect		 	 = reflect;
         this.reflectionSubject	 =reflectionSubject;
@@ -201,6 +205,7 @@ public class QaContent implements Serializable {
 					 qa.isQuestionsSequenced(),
                      qa.isUsernameVisible(),
                      qa.isSynchInMonitor(),
+                     qa.isLockWhenFinished(),
 					 qa.isContentLocked(),
 					 qa.isReflect(),
 					 qa.getReflectionSubject(),
@@ -589,5 +594,17 @@ public class QaContent implements Serializable {
      */
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
+    }
+    /**
+     * @return Returns the lockWhenFinished.
+     */
+    public boolean isLockWhenFinished() {
+        return lockWhenFinished;
+    }
+    /**
+     * @param lockWhenFinished The lockWhenFinished to set.
+     */
+    public void setLockWhenFinished(boolean lockWhenFinished) {
+        this.lockWhenFinished = lockWhenFinished;
     }
 }
