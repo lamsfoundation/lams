@@ -328,7 +328,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
-	    
+	    generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
 	    
 	    /*
 	     * Is the tool activity been checked as Define Later in the property inspector?

@@ -54,6 +54,7 @@ public class QaGeneralAuthoringDTO implements Comparable
     protected String onlineInstructions;
     protected String offlineInstructions;
     protected String usernameVisible;
+    protected String showOtherAnswers;
     protected String reflect;
     protected String synchInMonitor;
     protected String questionsSequenced;
@@ -99,6 +100,7 @@ public class QaGeneralAuthoringDTO implements Comparable
             .append("onlineInstructions: ", onlineInstructions)
             .append("offlineInstructions: ", offlineInstructions)
             .append("usernameVisible: ", usernameVisible)
+            .append("showOtherAnswers: ", showOtherAnswers)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
             .append("lockWhenFinished: ", lockWhenFinished)
@@ -526,5 +528,17 @@ public class QaGeneralAuthoringDTO implements Comparable
      */
     public void setLockWhenFinished(String lockWhenFinished) {
         this.lockWhenFinished = lockWhenFinished;
+    }
+    /**
+     * @return Returns the showOtherAnswers.
+     */
+    public String getShowOtherAnswers() {
+        return showOtherAnswers;
+    }
+    /**
+     * @param showOtherAnswers The showOtherAnswers to set.
+     */
+    public void setShowOtherAnswers(String showOtherAnswers) {
+        this.showOtherAnswers = showOtherAnswers;
     }
 }

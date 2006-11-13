@@ -74,6 +74,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String monitoringReportTitle;
 	protected String endLearningMessage;
 	protected String usernameVisible;
+	protected String showOtherAnswers;
 	protected String questionsSequenced;
 	protected String lockWhenFinished;
 	protected String reflect;
@@ -180,6 +181,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
             .append("onlineInstructions: ", onlineInstructions)
             .append("offlineInstructions: ", offlineInstructions)
             .append("usernameVisible: ", usernameVisible)
+            .append("showOtherAnswers: ", showOtherAnswers)
             .append("synchInMonitor: ", synchInMonitor)
             .append("questionsSequenced: ", questionsSequenced)
             .append("lockWhenFinished: ", lockWhenFinished)
@@ -759,5 +761,17 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setLockWhenFinished(String lockWhenFinished) {
         this.lockWhenFinished = lockWhenFinished;
+    }
+    /**
+     * @return Returns the showOtherAnswers.
+     */
+    public String getShowOtherAnswers() {
+        return showOtherAnswers;
+    }
+    /**
+     * @param showOtherAnswers The showOtherAnswers to set.
+     */
+    public void setShowOtherAnswers(String showOtherAnswers) {
+        this.showOtherAnswers = showOtherAnswers;
     }
 }

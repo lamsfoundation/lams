@@ -1,26 +1,3 @@
--- Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
--- =============================================================
--- License Information: http://lamsfoundation.org/licensing/lams/2.0/
---
--- This program is free software; you can redistribute it and/or modify
--- it under the terms of the GNU General Public License version 2.0 as
--- published by the Free Software Foundation.
---
--- This program is distributed in the hope that it will be useful,
--- but WITHOUT ANY WARRANTY; without even the implied warranty of
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--- GNU General Public License for more details.
---
--- You should have received a copy of the GNU General Public License
--- along with this program; if not, write to the Free Software
--- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301-- USA
---
--- http://www.gnu.org/licenses/gpl.txt
--- ****************************************************************
---
--- $Id$
-
-
 CREATE TABLE tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , qa_content_id BIGINT(20) NOT NULL
@@ -40,6 +17,7 @@ CREATE TABLE tl_laqa11_content (
      , content_inUse TINYINT(1) DEFAULT 0
      , reflectionSubject TEXT
      , lockWhenFinished TINYINT(1) NOT NULL DEFAULT 1
+     , showOtherAnswers TINYINT(1) NOT NULL DEFAULT 1
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
@@ -112,6 +90,7 @@ CREATE TABLE tl_laqa11_uploadedfile (
      , CONSTRAINT FK_tl_laqa11_uploadedfile_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
 )TYPE=InnoDB;
+
 
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date, lockWhenFinished)  VALUES (${default_content_id}, 'Q&A', 'Instructions', NOW() , 1);

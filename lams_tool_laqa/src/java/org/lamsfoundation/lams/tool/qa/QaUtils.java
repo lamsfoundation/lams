@@ -115,6 +115,13 @@ public abstract class QaUtils implements QaAppConstants {
 		qaAuthoringForm.setUsernameVisible(usernameVisible);
 		qaGeneralAuthoringDTO.setUsernameVisible(usernameVisible);
 		
+
+		String showOtherAnswers=request.getParameter("showOtherAnswers");
+		logger.debug("showOtherAnswers: " + showOtherAnswers);
+		qaAuthoringForm.setShowOtherAnswers(showOtherAnswers);
+		qaGeneralAuthoringDTO.setShowOtherAnswers(showOtherAnswers);
+		
+		
 		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
 		logger.debug("questionsSequenced: " + questionsSequenced);
 		qaAuthoringForm.setQuestionsSequenced(questionsSequenced);

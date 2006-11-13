@@ -81,6 +81,8 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String userNameVisible;
     
+    protected String showOtherAnswers;
+    
 	protected String requestLearningReport;
 
 	protected String requestLearningReportProgress;
@@ -568,5 +570,17 @@ public class GeneralLearnerFlowDTO implements Comparable
      */
     public void setLockWhenFinished(String lockWhenFinished) {
         this.lockWhenFinished = lockWhenFinished;
+    }
+    /**
+     * @return Returns the showOtherAnswers.
+     */
+    public String getShowOtherAnswers() {
+        return showOtherAnswers;
+    }
+    /**
+     * @param showOtherAnswers The showOtherAnswers to set.
+     */
+    public void setShowOtherAnswers(String showOtherAnswers) {
+        this.showOtherAnswers = showOtherAnswers;
     }
 }

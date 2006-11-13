@@ -101,6 +101,8 @@ public class QaContent implements Serializable {
     
     private boolean lockWhenFinished;
     
+    private boolean showOtherAnswers;
+    
     /** nullable persistent field */
     private boolean usernameVisible;
     
@@ -145,6 +147,7 @@ public class QaContent implements Serializable {
 	                 boolean 	synchInMonitor,
 	                 boolean 	lockWhenFinished,
 	                 boolean 	contentLocked,
+	                 boolean	showOtherAnswers,
 	                 boolean 	reflect,
 	                 String 	reflectionSubject,
 	                 Date		creationDate,
@@ -169,6 +172,7 @@ public class QaContent implements Serializable {
         this.synchInMonitor 	 = synchInMonitor;
         this.lockWhenFinished 	 = lockWhenFinished;
         this.contentLocked		 = contentLocked;
+        this.showOtherAnswers	 = showOtherAnswers;
         this.reflect		 	 = reflect;
         this.reflectionSubject	 =reflectionSubject;
         this.creationDate 		 = creationDate;
@@ -207,6 +211,7 @@ public class QaContent implements Serializable {
                      qa.isSynchInMonitor(),
                      qa.isLockWhenFinished(),
 					 qa.isContentLocked(),
+					 qa.isShowOtherAnswers(),
 					 qa.isReflect(),
 					 qa.getReflectionSubject(),
                      qa.getCreationDate(),
@@ -214,7 +219,7 @@ public class QaContent implements Serializable {
 					 new TreeSet(),
 					 new TreeSet(),
                      new TreeSet());
-    	logger.debug(logger + " " + "QaContent" +  " " + "before doing deepCopyQaQueContent");
+
     	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
     	logger.debug(logger + " " + "QaContent" +  " " + "after doing deepCopyQaQueContent");
 
@@ -607,4 +612,18 @@ public class QaContent implements Serializable {
     public void setLockWhenFinished(boolean lockWhenFinished) {
         this.lockWhenFinished = lockWhenFinished;
     }
+    
+    /**
+     * @return Returns the showOtherAnswers.
+     */
+    public boolean isShowOtherAnswers() {
+        return showOtherAnswers;
+    }
+    /**
+     * @param showOtherAnswers The showOtherAnswers to set.
+     */
+    public void setShowOtherAnswers(boolean showOtherAnswers) {
+        this.showOtherAnswers = showOtherAnswers;
+    }
+    
 }

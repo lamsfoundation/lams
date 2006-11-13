@@ -21,13 +21,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 
 <p class="small-space-top">
-	<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible"
+	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers" onclick="updateUsernameVisible(this);"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="showOtherAnswers">
+		<fmt:message key="label.learner.answers" />
+	</label>
+
+	<br>	
+	&nbsp&nbsp<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible"
 		styleClass="noBorder">
 	</html:checkbox>
 	<label for="usernameVisible">
-		<fmt:message key="radiobox.usernameVisible" />
+		<fmt:message key="label.show.names" />
 	</label>
 </p>
+
 
 <p>
 	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">

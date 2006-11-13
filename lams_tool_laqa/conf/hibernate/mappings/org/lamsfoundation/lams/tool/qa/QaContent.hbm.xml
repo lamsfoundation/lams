@@ -148,7 +148,14 @@
         length="1"
     />
     
-    
+    <property
+        name="showOtherAnswers"
+        type="boolean"
+        access="property"        
+        column="showOtherAnswers"
+        length="1"
+    />
+
     
     <property
         name="offlineInstructions"

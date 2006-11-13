@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:link>
 							&nbsp
 							<html:link
-								page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
+								page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&showOtherAnswers=${qaGeneralAuthoringDTO.showOtherAnswers}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
 								paramId="uuid" paramName="attachment" paramProperty="uuid"
 								onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 								target="_self">
@@ -119,7 +119,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:link>
 							&nbsp&nbsp
 							<html:link
-								page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
+								page="/authoring.do?dispatch=deleteFile&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&showOtherAnswers=${qaGeneralAuthoringDTO.showOtherAnswers}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}&reflect=${qaGeneralAuthoringDTO.reflect}&reflectionSubject=${qaGeneralAuthoringDTO.reflectionSubject}"
 								paramId="uuid" paramName="attachment" paramProperty="uuid"
 								onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 								target="_self">

@@ -273,6 +273,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    logger.debug("lockWhenFinished: " + lockWhenFinished);
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 
+	    boolean showOtherAnswers=qaContent.isShowOtherAnswers();  
+	    logger.debug("showOtherAnswers: " + showOtherAnswers);
+	    generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(showOtherAnswers).toString());
+	    
+	    generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
+	    
 	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
     	
     	qaLearningForm.resetAll();
@@ -373,6 +379,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    
 	    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
+	    generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
 
 
 	    /*

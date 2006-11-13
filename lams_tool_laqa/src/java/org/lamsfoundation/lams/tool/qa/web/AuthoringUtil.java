@@ -450,6 +450,9 @@ public class AuthoringUtil implements QaAppConstants {
 		String usernameVisible=request.getParameter(USERNAME_VISIBLE);
 		logger.debug("usernameVisible: " + usernameVisible);
 		
+		String showOtherAnswers=request.getParameter("showOtherAnswers");
+		logger.debug("showOtherAnswers: " + showOtherAnswers);
+		
 		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
 		logger.debug("questionsSequenced: " + questionsSequenced);
 		
@@ -471,7 +474,7 @@ public class AuthoringUtil implements QaAppConstants {
         
         boolean setCommonContent=true; 
         if ((questionsSequenced == null) || (synchInMonitor == null) || (lockWhenFinished == null) || 
-             (usernameVisible == null) || (reflect == null))
+             (usernameVisible == null) || (reflect == null) || (showOtherAnswers == null))
         {
         	setCommonContent=false;
         }
@@ -481,6 +484,7 @@ public class AuthoringUtil implements QaAppConstants {
         boolean synchInMonitorBoolean=false;
         boolean lockWhenFinishedBoolean=false;
         boolean usernameVisibleBoolean=false;
+        boolean showOtherAnswersBoolean=false;
         boolean reflectBoolean=false;
 
     	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
@@ -495,6 +499,10 @@ public class AuthoringUtil implements QaAppConstants {
         if ((usernameVisible != null) && (usernameVisible.equalsIgnoreCase("1")))
             usernameVisibleBoolean=true;            
 
+        if ((showOtherAnswers != null) && (showOtherAnswers.equalsIgnoreCase("1")))
+            showOtherAnswersBoolean=true;            
+
+        
         if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
             reflectBoolean=true;
             
@@ -503,6 +511,7 @@ public class AuthoringUtil implements QaAppConstants {
         logger.debug("synchInMonitorBoolean: " + synchInMonitorBoolean);
         logger.debug("lockWhenFinishedBoolean: " + lockWhenFinishedBoolean);
         logger.debug("usernameVisibleBoolean: " + usernameVisibleBoolean);
+        logger.debug("showOtherAnswersBoolean: " + showOtherAnswersBoolean);
         logger.debug("reflectBoolean: " + reflectBoolean);
         
         long userId=0;
@@ -555,6 +564,7 @@ public class AuthoringUtil implements QaAppConstants {
          	qaContent.setOnlineInstructions(richTextOnlineInstructions);
          	qaContent.setOfflineInstructions(richTextOfflineInstructions);
          	qaContent.setUsernameVisible(usernameVisibleBoolean);
+         	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
          	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
          	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
          	qaContent.setSynchInMonitor(synchInMonitorBoolean);	

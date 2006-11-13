@@ -124,7 +124,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			</div>
 
-			<c:if test="${generalLearnerFlowDTO.lockWhenFinished == 'true'}">
+			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
 				<p>
 					<fmt:message key="label.responses.locked" />
 				</p>
@@ -139,12 +139,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
+			<c:if test="${generalLearnerFlowDTO.showOtherAnswers == 'true'}">
 				<html:button property="viewAllResults"
 					onclick="submitMethod('viewAllResults');" styleClass="button">
 					<fmt:message key="label.allResponses" />
 				</html:button>
-			</div>
+			</c:if>				
 
+			<c:if test="${generalLearnerFlowDTO.showOtherAnswers != 'true'}">
+				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
+					<html:button property="endLearning"
+						onclick="javascript:submitMethod('endLearning');"
+						styleClass="button">
+						<fmt:message key="button.endLearning" />
+					</html:button>
+				</c:if>
+
+				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
+					<html:button property="forwardtoReflection"
+						onclick="javascript:submitMethod('forwardtoReflection');"
+						styleClass="button">
+						<fmt:message key="label.continue" />
+					</html:button>
+				</c:if>
+			</c:if>				
+			
+			
+			</div>
 
 		</html:form>
 	</div>

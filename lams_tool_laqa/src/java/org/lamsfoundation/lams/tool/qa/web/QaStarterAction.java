@@ -418,6 +418,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		QaUtils.populateAuthoringDTO(request, qaContent, qaGeneralAuthoringDTO);
 		
 	    qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible()?"1":"0");
+	    qaAuthoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers()?"1":"0");
 	    qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor()?"1":"0");	    
 	    qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced()?"1":"0");
 	    qaAuthoringForm.setLockWhenFinished(qaContent.isLockWhenFinished()?"1":"0");

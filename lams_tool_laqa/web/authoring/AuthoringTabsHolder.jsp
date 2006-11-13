@@ -95,6 +95,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	document.QaAuthoringForm.dispatch.value=method;
         	document.QaAuthoringForm.submit();
         }
+        
+
+		function updateUsernameVisible(clickedObj){
+			if(clickedObj.checked){
+				document.QaAuthoringForm.usernameVisible.checked=true;
+			}else{
+				document.QaAuthoringForm.usernameVisible.checked=false;			
+			}
+		}
+
 	</script>
 </head>
 
