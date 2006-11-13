@@ -1245,13 +1245,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
         ActionMessages errors = new ActionMessages();
         
         
-        if (caList.size() == 0)
-        {
-            ActionMessage error = new ActionMessage("candidates.none.provided");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-        
-        
         if (!validateSingleCorrectCandidate)
         {
             ActionMessage error = new ActionMessage("candidates.none.correct");
@@ -1653,12 +1646,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    
 	    
         ActionMessages errors = new ActionMessages();
-        
-        if (caList.size() == 0)
-        {
-            ActionMessage error = new ActionMessage("candidates.none.provided");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
         
         
         if (!validateSingleCorrectCandidate)
@@ -2656,6 +2643,25 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("totalMarks: " + totalMarks);
 
 		AuthoringUtil authoringUtil = new AuthoringUtil();
+
+		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
+		logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
+
+		ActionMessages errors = new ActionMessages();
+		
+        if (!validateCandidateAnswersNotBlank)
+        {
+            ActionMessage error = new ActionMessage("candidates.blank");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+        }
+        
+
+	 	if(!errors.isEmpty()){
+			saveErrors(request, errors);
+	        logger.debug("errors saved: " + errors);
+		}
+
+		
 	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
 	    logger.debug("repopulated caList: " + caList);
 
@@ -2663,44 +2669,46 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
 	    logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 	  
-	    
-	    List candidates =new LinkedList();
-	    List listCandidates =new LinkedList();
-        String editableQuestion="";
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
+	    if (errors.isEmpty())
 	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	        
-	        logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
-	        String question=mcQuestionContentDTO.getQuestion();
-	        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-	        
-	        if ((displayOrder != null) && (!displayOrder.equals("")))
-    		{
-	            if (displayOrder.equals(questionIndex))
-	            {
-	                logger.debug("displayOrder equals questionIndex :" + questionIndex);
-	                editableQuestion=mcQuestionContentDTO.getQuestion();
-	                
-	                candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-	                logger.debug("candidates found :" + candidates);
-	                logger.debug("but we are using the repopulated caList here: " + caList);
-	                
-	                listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
-	                logger.debug("swapped candidates :" + listCandidates);
-	                
-	                mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-	                
-	                break;
-	            }
-	            
-    		}
+		    List candidates =new LinkedList();
+		    List listCandidates =new LinkedList();
+	        String editableQuestion="";
+		    Iterator listIterator=listQuestionContentDTO.iterator();
+		    while (listIterator.hasNext())
+		    {
+		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
+		        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
+		        
+		        logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
+		        String question=mcQuestionContentDTO.getQuestion();
+		        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
+		        
+		        if ((displayOrder != null) && (!displayOrder.equals("")))
+	    		{
+		            if (displayOrder.equals(questionIndex))
+		            {
+		                logger.debug("displayOrder equals questionIndex :" + questionIndex);
+		                editableQuestion=mcQuestionContentDTO.getQuestion();
+		                
+		                candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
+		                logger.debug("candidates found :" + candidates);
+		                logger.debug("but we are using the repopulated caList here: " + caList);
+		                
+		                listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
+		                logger.debug("swapped candidates :" + listCandidates);
+		                
+		                mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+		                
+		                break;
+		            }
+		            
+	    		}
+		    }
+		    logger.debug("candidates found :" + candidates);
+		    logger.debug("swapped candidates is :" + listCandidates);
 	    }
 
-	    logger.debug("candidates found :" + candidates);
-	    logger.debug("swapped candidates is :" + listCandidates);
 	    logger.debug("listQuestionContentDTO after swapped candidates :" + listQuestionContentDTO);
 
 	    
@@ -2858,6 +2866,25 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 		AuthoringUtil authoringUtil = new AuthoringUtil();
+
+		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
+		logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
+
+		ActionMessages errors = new ActionMessages();
+		
+        if (!validateCandidateAnswersNotBlank)
+        {
+            ActionMessage error = new ActionMessage("candidates.blank");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+        }
+        
+
+	 	if(!errors.isEmpty()){
+			saveErrors(request, errors);
+	        logger.debug("errors saved: " + errors);
+		}
+
+		
 	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
 	    logger.debug("repopulated caList: " + caList);
 
@@ -2866,47 +2893,50 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	    
-	    
-	    List candidates =new LinkedList();
-	    List listCandidates =new LinkedList();
-        String editableQuestion="";
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
+	    if (errors.isEmpty())
 	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	        
-	        logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
-	        String question=mcQuestionContentDTO.getQuestion();
-	        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-	        
-	        if ((displayOrder != null) && (!displayOrder.equals("")))
-    		{
-	            if (displayOrder.equals(questionIndex))
-	            {
-	                logger.debug("displayOrder equals questionIndex :" + questionIndex);
-	                editableQuestion=mcQuestionContentDTO.getQuestion();
-	                
-	                candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-	                logger.debug("candidates found :" + candidates);
-	                
-	                logger.debug("using repopulated caList:" + caList);
-	                
-	                listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
-	                logger.debug("swapped candidates :" + listCandidates);
-	                
-	                
-	                mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-	                mcQuestionContentDTO.setCaCount(new Integer(listCandidates.size()).toString());
-	                
-	                break;
-	            }
-	            
-    		}
+		    List candidates =new LinkedList();
+		    List listCandidates =new LinkedList();
+	        String editableQuestion="";
+		    Iterator listIterator=listQuestionContentDTO.iterator();
+		    while (listIterator.hasNext())
+		    {
+		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
+		        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
+		        
+		        logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
+		        String question=mcQuestionContentDTO.getQuestion();
+		        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
+		        
+		        if ((displayOrder != null) && (!displayOrder.equals("")))
+	    		{
+		            if (displayOrder.equals(questionIndex))
+		            {
+		                logger.debug("displayOrder equals questionIndex :" + questionIndex);
+		                editableQuestion=mcQuestionContentDTO.getQuestion();
+		                
+		                candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
+		                logger.debug("candidates found :" + candidates);
+		                
+		                logger.debug("using repopulated caList:" + caList);
+		                
+		                listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
+		                logger.debug("swapped candidates :" + listCandidates);
+		                
+		                
+		                mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+		                mcQuestionContentDTO.setCaCount(new Integer(listCandidates.size()).toString());
+		                
+		                break;
+		            }
+		            
+	    		}
+		    }
+		    logger.debug("candidates found :" + candidates);
+		    logger.debug("swapped candidates is :" + listCandidates);
 	    }
+	    
 
-	    logger.debug("candidates found :" + candidates);
-	    logger.debug("swapped candidates is :" + listCandidates);
 	    logger.debug("listQuestionContentDTO after swapped candidates :" + listQuestionContentDTO);
 
 	    
@@ -3485,6 +3515,24 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 		AuthoringUtil authoringUtil = new AuthoringUtil();
+
+		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
+		logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
+
+		ActionMessages errors = new ActionMessages();
+		
+        if (!validateCandidateAnswersNotBlank)
+        {
+            ActionMessage error = new ActionMessage("candidates.blank");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+        }
+        
+
+	 	if(!errors.isEmpty()){
+			saveErrors(request, errors);
+	        logger.debug("errors saved: " + errors);
+		}
+
 	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
 	    logger.debug("repopulated caList: " + caList);
 
@@ -3498,26 +3546,28 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
 		logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 		
-		
-	    List candidates =new LinkedList();
-	    List listCandidates =new LinkedList();
-	    
-	    Iterator listIterator=listAddableQuestionContentDTO.iterator();
-	    /*there is only 1 question dto*/
-	    while (listIterator.hasNext())
-	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	        
-            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-            logger.debug("candidates found :" + candidates);
-            logger.debug("but we are using the repopulated caList here: " + caList);
-            
-            listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
-            logger.debug("swapped candidates :" + listCandidates);
-            
-            mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-	    }
+		if (errors.isEmpty())
+		{
+		    List candidates =new LinkedList();
+		    List listCandidates =new LinkedList();
+		    
+		    Iterator listIterator=listAddableQuestionContentDTO.iterator();
+		    /*there is only 1 question dto*/
+		    while (listIterator.hasNext())
+		    {
+		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
+		        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
+		        
+	            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
+	            logger.debug("candidates found :" + candidates);
+	            logger.debug("but we are using the repopulated caList here: " + caList);
+	            
+	            listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
+	            logger.debug("swapped candidates :" + listCandidates);
+	            
+	            mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+		    }
+		}
 
 	    logger.debug("listAddableQuestionContentDTO after swapping (up) candidates: " + listAddableQuestionContentDTO);
 		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
@@ -3659,6 +3709,24 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("totalMarks: " + totalMarks);
 
 		AuthoringUtil authoringUtil = new AuthoringUtil();
+
+		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
+		logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
+
+		ActionMessages errors = new ActionMessages();
+		
+        if (!validateCandidateAnswersNotBlank)
+        {
+            ActionMessage error = new ActionMessage("candidates.blank");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+        }
+        
+
+	 	if(!errors.isEmpty()){
+			saveErrors(request, errors);
+	        logger.debug("errors saved: " + errors);
+		}
+
 	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
 	    logger.debug("repopulated caList: " + caList);
 
@@ -3672,25 +3740,29 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	    
-	    List candidates =new LinkedList();
-	    List listCandidates =new LinkedList();
-	    
-	    Iterator listIterator=listAddableQuestionContentDTO.iterator();
-	    /*there is only 1 question dto*/
-	    while (listIterator.hasNext())
-	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	        
-            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-            logger.debug("candidates found :" + candidates);
-            logger.debug("but we are using the repopulated caList here: " + caList);
-            
-            listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
-            logger.debug("swapped candidates :" + listCandidates);
-            
-            mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-	    }
+		if (errors.isEmpty())
+		{
+		    List candidates =new LinkedList();
+		    List listCandidates =new LinkedList();
+		    
+		    Iterator listIterator=listAddableQuestionContentDTO.iterator();
+		    /*there is only 1 question dto*/
+		    while (listIterator.hasNext())
+		    {
+		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
+		        logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
+		        
+	            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
+	            logger.debug("candidates found :" + candidates);
+	            logger.debug("but we are using the repopulated caList here: " + caList);
+	            
+	            listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
+	            logger.debug("swapped candidates :" + listCandidates);
+	            
+	            mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+		    }
+		}
+		
 
 	    logger.debug("listAddableQuestionContentDTO after moving down candidates: ");
 		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);

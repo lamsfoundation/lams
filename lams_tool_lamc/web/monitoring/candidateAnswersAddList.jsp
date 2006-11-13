@@ -43,6 +43,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:set var="listCandidateAnswersDTO" scope="request" value="${currentDTO.listCandidateAnswersDTO}"/>	
 	
 		    <c:set var="caIndex" scope="request" value="0"/>
+
+			<tr>
+					<td width="4%" align="right">
+					</td>
+		
+					<td align="left">
+					</td>
+		
+					<td width="16%" align="center">
+						<fmt:message key="label.isCorrect" />
+					</td>
+		
+					<td width="12%" align="left">
+					</td>
+		
+					<td width="10%" align="left">
+					</td>
+			</tr>
 		    
 		   <c:forEach items="${listCandidateAnswersDTO}" var="currentCandidateDTO" varStatus="status">
 		   	<c:set var="caIndex" scope="request" value="${caIndex +1}"/>
@@ -56,23 +74,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<input type="text" name="ca${caIndex}"  value="${currentCandidateDTO.candidateAnswer}" size="50">
 				</td>		
 				
-				<td width="16%" align="left">				
+				<td width="16%" align="center">
 
+						<c:forEach var="correctEntry"
+							items="${mcGeneralAuthoringDTO.correctMap}">
+							<c:set var="SELECTED_ANSWER" scope="request" value="" />
+							<c:set var="ISCORRECT" scope="request" value="Incorrect" />
+							
+							<c:if
+								test="${correctEntry.value == currentCandidateDTO.correct}">
+								<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
+								<c:set var="ISCORRECT" scope="request" value="Correct" />
+							</c:if>
 
-					<select name="correct${caIndex}" id="select${caIndex}">
-						<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
-							<c:set var="SELECTED_ANSWER" scope="request" value=""/>
-							<c:if test="${correctEntry.value == currentCandidateDTO.correct}"> 			
-										<c:set var="SELECTED_ANSWER" scope="request" value="SELECTED"/>
-							</c:if>						
-	
-							<option value="<c:out value="${correctEntry.value}"/>"  <c:out value="${SELECTED_ANSWER}"/>> <c:out value="${correctEntry.value}"/>  </option>																				
-								
-						</c:forEach>		  	
-					</select>
+							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" <c:out value="${SELECTED_ANSWER}"/> >  
+
+						</c:forEach>
+				</td>		
 				
-				</td>
-		
 				<td width="22%" align="left">
 			 		<c:if test="${caCount != 1}"> 		
 			 		
@@ -103,10 +122,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</td>
 				
 				<td width="10%" align="left">				
-						<a title="<fmt:message key='label.tip.removeCandidate'/>" href="javascript:;" onclick="removeAddedCandidate(${caIndex});">
+						<a title="<fmt:message key='label.tip.removeCandidate'/>" href="javascript:;" 
+						onclick="if (validateMinumumCandidateCount()) { removeAddedCandidate(${caIndex}); } ">
 			                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
 						</a> 				
-				</td>						
+				</td>	
+				
 		
 			</tr>
 			</c:forEach>	

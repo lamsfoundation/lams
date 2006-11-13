@@ -324,24 +324,6 @@ public class AuthoringUtil implements McAppConstants {
     		String feedback=mcQueContent.getFeedback();
     		logger.debug("feedback:" + feedback);
     		
-    		/*
-    		boolean isFeedbackTextMarkup=LearningUtil.isTextMarkup(feedback);
-    		logger.debug("isFeedbackTextMarkup: " + isFeedbackTextMarkup);
-
-    		String newFeedbackText=feedback;
-    		if (!isFeedbackTextMarkup)
-    		{
-    		    newFeedbackText= LearningUtil.getWrappedText(feedback, false);
-        		logger.debug("wrapped newFeedbackText: " + newFeedbackText);    		    
-    		}
-    		logger.debug("post warp newFeedbackText: " + newFeedbackText);
-    		
-    		
-    		newFeedbackText=McUtils.replaceNewLines(newFeedbackText);
-    		logger.debug("newFeedbackText after procesing new lines: " + newFeedbackText);
-    		*/
-
-    		
     		map.put(mapIndex.toString(),feedback);
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
@@ -350,7 +332,6 @@ public class AuthoringUtil implements McAppConstants {
     	return map;
     }
 
-    
     
     
     /**
@@ -580,7 +561,6 @@ public class AuthoringUtil implements McAppConstants {
 	    }
 
 	    
-	    
         logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
         return listFinalQuestionContentDTO;
     }
@@ -635,7 +615,6 @@ public class AuthoringUtil implements McAppConstants {
             logger.debug("mainNode/replacedNode is null");
             return listCandidates;
         }
-        
         
 
         List listFinalCandidateDTO=new LinkedList();
@@ -932,7 +911,6 @@ public class AuthoringUtil implements McAppConstants {
 		            mcQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
 		            mcQuestionContentDTO.setFeedback(feedback);
 		            mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-		            //mcQuestionContentDTO.setCaCount(caList);
 
 		            logger.debug("caList size:" + mcQuestionContentDTO.getListCandidateAnswersDTO().size());
 				    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO().size()).toString());
@@ -1675,10 +1653,6 @@ public class AuthoringUtil implements McAppConstants {
         logger.debug("initialScreen: " + initialScreen);
         
     	Map map= new TreeMap(new McComparator());
-    	
-        //if (initialScreen)
-        //   return map;
-        
         
         String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
         logger.debug("totalMark: " + totalMark);
@@ -1733,26 +1707,6 @@ public class AuthoringUtil implements McAppConstants {
     	return map;
     }
 
-    /**
-     * Map buildPassMarkMap()
-     * 
-     * @return
-     */
-    /*
-    protected Map buildPassMarkMap()
-    {
-    	Map map= new TreeMap(new McComparator());
-    	
-        map.put(new Integer(1).toString(), " ");
-        
-    	for (int i=2; i <= 11 ; i++)
-		{
-    	    map.put(new Integer(i).toString(), new Integer(i-1).toString());
-		}
-    	logger.debug("return passmarks Map: " + map);
-    	return map;
-    }
-    */
 
     /**
      * Map buildCorrectMap()
@@ -1762,7 +1716,6 @@ public class AuthoringUtil implements McAppConstants {
     protected Map buildCorrectMap()
     {
     	Map map= new TreeMap(new McComparator());
-	    map.put(new Integer(1).toString(), "Incorrect");
 	    map.put(new Integer(2).toString(), "Correct");
     	logger.debug("return marks Map: " + map);
     	return map;
@@ -1780,6 +1733,24 @@ public class AuthoringUtil implements McAppConstants {
     {
         logger.debug("doing repopulateCandidateAnswersBox, addBlankCa: " + addBlankCa);
         
+        String correct= request.getParameter("correct");
+        logger.debug("correct: " + correct);
+        
+        
+        /* check this logic again*/
+        int intCorrect=0;
+        if (correct == null)
+        {
+            logger.debug("correct is null: ");
+        }
+        else
+        {
+            intCorrect= new Integer(correct).intValue();            
+        }
+        
+
+        logger.debug("intCorrect: " + intCorrect);
+        
         List listFinalCandidatesDTO=new LinkedList();
         
         for (int i=0; i< MAX_OPTION_COUNT; i++)
@@ -1787,16 +1758,20 @@ public class AuthoringUtil implements McAppConstants {
             String candidate= request.getParameter("ca" + i);
             logger.debug("candidate: " + candidate);
             
-            String correct= request.getParameter("correct" + i);
-            logger.debug("correct: " + correct);
-
+            String isCorrect="Incorrect";
+            logger.debug("i versus intCorrect: " + i + " versus " + intCorrect);
+           
+            if (i == intCorrect)
+            {
+                isCorrect="Correct";
+            }
+            logger.debug("isCorrect: " + isCorrect);
             
-            //if ((candidate != null) && (candidate.length() > 0))
             if (candidate != null)            
             {
                 McCandidateAnswersDTO mcCandidateAnswersDTO= new McCandidateAnswersDTO();
                 mcCandidateAnswersDTO.setCandidateAnswer(candidate);
-                mcCandidateAnswersDTO.setCorrect(correct);
+                mcCandidateAnswersDTO.setCorrect(isCorrect);
                 listFinalCandidatesDTO.add(mcCandidateAnswersDTO);
             }
         }
@@ -1812,7 +1787,43 @@ public class AuthoringUtil implements McAppConstants {
         logger.debug("returning listFinalCandidatesDTO: " + listFinalCandidatesDTO);
         return listFinalCandidatesDTO;
     }
+
+
     
+    protected boolean validateCandidateAnswersNotBlank(HttpServletRequest request)
+    {
+        
+        for (int i=0; i< MAX_OPTION_COUNT; i++)
+        {
+            String candidate= request.getParameter("ca" + i);
+            logger.debug("candidate: " + candidate);
+            
+            if ((candidate != null) && (candidate.length() == 0))
+            {
+                logger.debug("there is at least 1 blank candidate");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    
+    
+    
+    protected List repopulateCandidateAnswersRadioBox(HttpServletRequest request, boolean addBlankCa)
+    {
+        logger.debug("doing repopulateCandidateAnswersRadioBox, addBlankCa: " + addBlankCa);
+        
+        String correct= request.getParameter("correct");
+        logger.debug("correct: " + correct);
+        
+        List listFinalCandidatesDTO=new LinkedList();
+
+        logger.debug("returning listFinalCandidatesDTO: " + listFinalCandidatesDTO);
+        return listFinalCandidatesDTO;
+    }
+
     
     /**
      * boolean validateSingleCorrectCandidate(List caList)
@@ -1919,23 +1930,6 @@ public class AuthoringUtil implements McAppConstants {
     			
         		String question=mcQueContent.getQuestion();
         		logger.debug("question: " + question);
-        		
-        		/*
-        		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
-        		logger.debug("isTextMarkup: " + isTextMarkup);
-        		
-        		String newQuestionText=question;
-        		if (!isTextMarkup)
-        		{
-            		newQuestionText= LearningUtil.getWrappedText(question, true);
-            		logger.debug("wrapped newQuestionText: " + newQuestionText);    		    
-        		}
-        		logger.debug("post warp newQuestionText: " + newQuestionText);
-
-        		
-        		newQuestionText=McUtils.replaceNewLines(newQuestionText);
-        		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
-        		*/
     			
     			
     			mcQuestionContentDTO.setQuestion(question);

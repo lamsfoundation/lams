@@ -249,6 +249,7 @@ public interface McAppConstants {
     public static final String OPTION_OFF								="false";
     public static final String ACTIVITY_TITLE 							= "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS					= "activityInstructions";
+    public static final String CORRECT									= "Correct";
 
         
     /*

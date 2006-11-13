@@ -80,6 +80,85 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}
 				return true;
 			}
+
+			function validateSingleCorrectAnswer() 
+			{
+				var singleCorrectEntry = 0;
+				var radioCorrect=document.McMonitoringForm.correct;
+
+				if ((radioCorrect == 'null') || (radioCorrect == 'undefined'))
+				{
+					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
+					alert(msg);
+					return false;				
+				}
+
+				var radioGroupSize=radioCorrect.length;
+				
+				if ((radioGroupSize == 'undefined') || (radioGroupSize < 2))				
+				{
+					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
+					alert(msg);
+					return false;				
+				}
+				
+				
+				for(i = 0; i < 51; i++)
+				{
+					if (radioCorrect[i] != null)
+					{
+						if ((typeof(radioCorrect[i]) != 'undefined') && (typeof(radioCorrect[i]) != null))
+						{
+							if (radioCorrect[i].checked) 
+							{
+								singleCorrectEntry =1;
+							}
+						}
+					}
+				}
+				
+				if (singleCorrectEntry == 0)
+				{
+					var msg = "<fmt:message key="candidates.none.correct"/>";
+					var msgSetFirst = "<fmt:message key="candidates.setFirst"/>";
+					alert(msg);
+
+					if ((radioCorrect[0] != 'undefined') && (radioCorrect[0] != null))
+					{
+						radioCorrect[0].checked=true;					
+						alert(msgSetFirst);						
+					}
+
+					return false;
+				}
+				return true;
+			}
+
+
+			function validateMinumumCandidateCount() 
+			{
+				var radioCorrect=document.McMonitoringForm.correct;
+
+				if ((radioCorrect == 'undefined') || (radioCorrect == null))
+				{
+					var msg = "<fmt:message key="candidates.unremovable.groupSize"/>";
+					alert(msg);
+					return false;				
+				}
+
+				
+				var radioGroupSize=radioCorrect.length;
+				
+				if ((radioGroupSize == 'undefined') || (radioGroupSize <= 2))				
+				{
+					var msg = "<fmt:message key="candidates.unremovable.groupSize"/>";
+					alert(msg);
+					return false;				
+				}
+				
+				return true;
+			}
+			
 			
 		</script>		
 	</head>
@@ -173,7 +252,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<table>
 							<tr>
 							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="if (validateDuplicateCorrectAnswers()) { getElementById('newQuestionForm').submit(); }"
+								<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"
 									class="button-add-item"> <fmt:message key="label.save.question" />
 								</a>
 							</td> 
