@@ -89,7 +89,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 			</ul>
 
-			<div class="space-top">
+			<div class="space-bottom-top">
 				<html:submit property="redoQuestions" styleClass="button"
 					onclick="submitMethod('redoQuestions');">
 					<fmt:message key="label.retake" />

@@ -202,7 +202,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					escapeXml="false" />
 			</p>
 
-			<div class="small-space-top">
+			<div class="space-bottom-top">
 				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
 					<html:submit property="refreshVotes" styleClass="button"
 						onclick="submitMethod('viewAllResults');">

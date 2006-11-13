@@ -170,7 +170,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<html:hidden property="donePreview" />
 
-				<div class="space-top">
+				<div class="space-bottom-top">
 					<html:submit property="continueOptionsCombined" styleClass="button">
 						<fmt:message key="label.submit.vote" />
 					</html:submit>

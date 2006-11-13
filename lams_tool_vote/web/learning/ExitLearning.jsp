@@ -94,7 +94,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					escapeXml="false" />
 			</p>
 
-			<div align="right">
+			<div align="right" class="space-bottom-top">
 				<html:submit property="learnerFinished" styleClass="button"
 					onclick="submitMethod('learnerFinished');">
 					<fmt:message key="label.finished" />

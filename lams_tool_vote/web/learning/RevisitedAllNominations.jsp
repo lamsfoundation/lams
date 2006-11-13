@@ -199,7 +199,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						escapeXml="false" />
 				</p>
 
-				<div class="small-space-top">
+				<div class="space-bottom-top">
 
 					<html:submit property="redoQuestionsOk" styleClass="button"
 						onclick="submitMethod('redoQuestionsOk');">
