@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -1189,7 +1190,10 @@ public class LD102Importer implements ApplicationContextAware{
 			processCommonActivityFields(optionObj, xCoOrd, yCoOrd, optionsActivity);
 			
 			// work out the child activities and move them from the main activity set to the optional activity.
+			// 1.0.2 appears to layout the activities the based on the x/y co-ordinates rather than the order
+			// in the optional activity. So we need to sort by y co-ord before assigning the order id.
 			Vector subActivityUIIDs = (Vector) optionObj.get(WDDXTAGS102.OPTACT_ACTIVITIES);
+			TreeMap<Integer, Activity> sortedMap = new  TreeMap<Integer, Activity>();
 			int orderId = 1;
 			if ( subActivityUIIDs != null ) {
 				Iterator subActIter =  subActivityUIIDs.iterator();
@@ -1200,16 +1204,20 @@ public class LD102Importer implements ApplicationContextAware{
 						String message = "Activity inside optional activity "+optionsActivity.getTitle()+" cannot be matched to a known activity. The child activity will be missing from the optional activity but it may appear in the design elsewhere. Child activity UI ID "+id;
 						log.warn(message);
 						toolsErrorMsgs.add(message);
-					} else { 
-						childActivity.setParentActivity(optionsActivity);
-						childActivity.setParentUIID(optionsActivity.getActivityUIID());
-						childActivity.setOrderId(new Integer(orderId++));
-						// order id must be set before adding to activity set, 
-						// or the order will be wrong (it's a sorted set!)
-						optionsActivity.getActivities().add(childActivity);
+					} else {
+						sortedMap.put(childActivity.getYcoord(), childActivity);
 					}
 				}
 			}
+			for ( Activity childActivity:sortedMap.values() ) {
+				childActivity.setParentActivity(optionsActivity);
+				childActivity.setParentUIID(optionsActivity.getActivityUIID());
+				childActivity.setOrderId(new Integer(orderId++));
+				// order id must be set before adding to activity set, 
+				// or the order will be wrong (it's a sorted set!)
+				optionsActivity.getActivities().add(childActivity);
+			}
+			
 			optionsActivity.setLearningDesign(ldInProgress);
 			baseDAO.insert(optionsActivity);
 			
