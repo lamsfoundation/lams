@@ -1485,6 +1485,9 @@ public class QaServicePOJO
 		 try {
 				exportContentService.registerFileClassForImport(QaUploadedFile.class.getName(),"uuid",null,"fileName","fileProperty",null,null);
 				
+				//register version filter class
+				exportContentService.registerImportVersionFilterClass(QaImportContentVersionFilter.class);
+
 				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,qaToolContentHandler,fromVersion,toVersion);
 				if(!(toolPOJO instanceof QaContent))
 					throw new ImportToolContentException("Import QA tool content failed. Deserialized object is " + toolPOJO);
@@ -2104,25 +2107,25 @@ public class QaServicePOJO
     {
     	Date now = new Date();
     	QaContent toolContentObj = new QaContent();
-    	toolContentObj.setContentLocked(Boolean.FALSE.booleanValue() );
+    	toolContentObj.setContentLocked(false);
     	toolContentObj.setCreatedBy(user.getUserID().longValue());
     	toolContentObj.setCreationDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE.booleanValue());
+    	toolContentObj.setDefineLater(false);
     	toolContentObj.setInstructions(null);
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
- 	    toolContentObj.setReflect(Boolean.FALSE.booleanValue());
+ 	    toolContentObj.setReflect(false);
     	toolContentObj.setReflectionSubject(null);
-    	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
+    	toolContentObj.setRunOffline(false);
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	toolContentObj.setQaContentId(toolContentId);
     	toolContentObj.setUpdateDate(now);
-    	toolContentObj.setQuestionsSequenced(Boolean.FALSE.booleanValue()); // there is only 1 question
+    	toolContentObj.setQuestionsSequenced(false); // there is only 1 question
     	toolContentObj.setContent(null);
     	toolContentObj.setReportTitle(null);
     	toolContentObj.setMonitoringReportTitle(null);
     	toolContentObj.setSynchInMonitor(false); // doesn't appear to be used in LAMS 2.0
-    	toolContentObj.setLockWhenFinished(Boolean.TRUE.booleanValue()); // doesn't appear to be used in LAMS 2.0
+    	toolContentObj.setLockWhenFinished(true); 
     	
     	Boolean bool;
 		try {
@@ -2163,7 +2166,7 @@ public class QaServicePOJO
 	       			+" as the tool content does not exist.");
     	}
     	
-    	qaContent.setReflect(Boolean.TRUE.booleanValue());
+    	qaContent.setReflect(true);
     	qaContent.setReflectionSubject(description);
     }
     
