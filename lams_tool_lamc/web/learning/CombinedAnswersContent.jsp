@@ -69,7 +69,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		items="${dto.candidateAnswerUids}">
 
 		<div class="indent">
-			<input type="checkbox" name="checkedCa" class="noBorder"
+			<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder"
 				value="${dto.questionUid}-${ca.value}">
 
 			<c:forEach var="caText" varStatus="status"
@@ -80,11 +80,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${ca.key == caText.key}">
 					<c:out value="${caText.value}" escapeXml="false" />
 		</div>
-
-
-		</c:if>
+				</c:if>
+			</c:forEach>
 	</c:forEach>
-</c:forEach>
 
 </c:forEach>
 

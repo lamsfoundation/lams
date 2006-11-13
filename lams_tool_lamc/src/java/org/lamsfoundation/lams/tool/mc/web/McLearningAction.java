@@ -768,22 +768,20 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	    else
 	    {
-		 	String[] checkedCa=mcLearningForm.getCheckedCa();
-
-		 	if (checkedCa != null)
-		    {
-			 	mcLearningForm.resetCa(mapping, request);
-
-			 	logger.debug("checkedCa: " + checkedCa);
-			 	logger.debug("checkedCa length: " + checkedCa.length );
-			 	
-			 	for (int i=0; i < checkedCa.length ; i++)
-			 	{
-			 	  String currentCa=checkedCa[i];
-			 	  logger.debug("currentCa: " + currentCa);
-			 	  learnerInput.add(currentCa);
-			 	}
-		    }
+		 	
+		 	for (int i=0 ; i < 51 ; i++)
+		 	{
+		 	   String currentCheckedCa= request.getParameter("checkedCa" + i);    
+		 	   logger.debug("currentCheckedCa : " + currentCheckedCa);
+		 	   
+		 	   if (currentCheckedCa != null)
+		 	   {
+				 	logger.debug("currentCheckedCa: " + currentCheckedCa);
+				 	learnerInput.add(currentCheckedCa);
+		 	   }
+		 	}
+		 	
+		 	mcLearningForm.resetCa(mapping, request);
 	    }
 	    
 	    logger.debug("final learnerInput: " + learnerInput);
