@@ -63,7 +63,7 @@
 				<%@ include file="/jsps/authoring/parts/msgattachment.jsp"%>
 			</div>
 
-			<div style="padding-bottom:20px;">
+			<div style="padding-bottom:30px;">
 				<a href="#" onclick="getElementById('topicFormId').submit();"
 					class="button-add-item"> <fmt:message key="button.add" /> </a>
 					

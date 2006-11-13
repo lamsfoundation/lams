@@ -48,7 +48,7 @@
 				<html:file tabindex="3" property="attachmentFile" />
 			</div>
 
-			<div style="padding-bottom:20px;">
+			<div style="padding-bottom:30px;">
 				<a href="#" onclick="getElementById('topicFormId').submit();"
 					class="button-add-item"> <fmt:message key="button.add" /> </a>
 
