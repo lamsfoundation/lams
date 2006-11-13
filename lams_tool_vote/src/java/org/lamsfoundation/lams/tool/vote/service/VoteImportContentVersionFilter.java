@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.vote.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 
 /**
  * Import filter class for different versions of Q&A content.
@@ -33,7 +34,9 @@ public class VoteImportContentVersionFilter extends ToolContentVersionFilter{
 	 * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish
 	 * field.
 	 */
+	
 	public void up20061102To20061113(){
 		// Change name to suit the version you give the tool.
+		this.removeField(VoteContent.class, "voteChangable");
 	}
 }
