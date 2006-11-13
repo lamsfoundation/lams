@@ -2125,7 +2125,8 @@ public class QaServicePOJO
     	toolContentObj.setReportTitle(null);
     	toolContentObj.setMonitoringReportTitle(null);
     	toolContentObj.setSynchInMonitor(false); // doesn't appear to be used in LAMS 2.0
-    	toolContentObj.setLockWhenFinished(true); 
+    	toolContentObj.setLockWhenFinished(true);
+    	toolContentObj.setShowOtherAnswers(true);
     	
     	Boolean bool;
 		try {
