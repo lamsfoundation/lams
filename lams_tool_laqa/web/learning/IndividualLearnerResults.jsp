@@ -124,9 +124,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			</div>
 
-			<p>
-				<fmt:message key="label.responses.locked" />
-			</p>
+			<c:if test="${generalLearnerFlowDTO.lockWhenFinished == 'true'}">
+				<p>
+					<fmt:message key="label.responses.locked" />
+				</p>
+			</c:if>
+
 
 			<div class="space-bottom-top small-space-top">
 				<html:button property="redoQuestions" styleClass="button"

@@ -268,7 +268,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
 		
-    	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+		
+		boolean lockWhenFinished=qaContent.isLockWhenFinished(); 
+	    logger.debug("lockWhenFinished: " + lockWhenFinished);
+	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+
+	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
     	
     	qaLearningForm.resetAll();
 		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_RESULTS);
