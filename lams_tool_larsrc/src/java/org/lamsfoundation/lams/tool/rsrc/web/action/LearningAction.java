@@ -542,8 +542,8 @@ public class LearningAction extends Action {
 		}
 //		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 //				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-			if(StringUtils.isBlank(itemForm.getDescription()))
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
+//			if(StringUtils.isBlank(itemForm.getDescription()))
+//				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
 //		}
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
