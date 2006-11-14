@@ -151,6 +151,9 @@ public class LD102Importer implements ApplicationContextAware{
 	/** The value to be past back and forth with the 1.0.x authoring tool to indicate a null value for a numeric id */
 	private static final Integer NUMERIC_NULL_VALUE_INTEGER = new Integer(-1);
 	
+	/** Offset of the optional activity box from its internal activities  */
+	private static final Integer OPT_ACTIVITY_102_MARGIN = 20;
+
 	private static final String LD_OBJECT_TYPE = "LearningDesign";
 	private static final String ABSTRACT_TASK_OBJECT_TYPE = "task";
 	private static final String MULTI_TASK_OBJECT_TYPE = "Multitask";
@@ -1183,18 +1186,20 @@ public class LD102Importer implements ApplicationContextAware{
 			optionsActivity.setOptionsInstructions(null); // not supported in 1.0.2. 
 			optionsActivity.setDescription((String) optionObj.get(WDDXTAGS102.DESCRIPTION));
 			optionsActivity.setTitle((String) optionObj.get(WDDXTAGS102.TITLE));
-		
+
 			Integer xCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_X);
 			Integer yCoOrd = WDDXProcessor.convertToInteger(optionObj,WDDXTAGS102.ACT_Y);
-
 			processCommonActivityFields(optionObj, xCoOrd, yCoOrd, optionsActivity);
 			
 			// work out the child activities and move them from the main activity set to the optional activity.
 			// 1.0.2 appears to layout the activities the based on the x/y co-ordinates rather than the order
 			// in the optional activity. So we need to sort by y co-ord before assigning the order id.
+			// But 1.0.2 supports columns of activities in the (e.g. the wetlands design) so we can't just
+			// take the y co-ord as it - need make need to offset it if the y co-ord is already used.
 			Vector subActivityUIIDs = (Vector) optionObj.get(WDDXTAGS102.OPTACT_ACTIVITIES);
 			TreeMap<Integer, Activity> sortedMap = new  TreeMap<Integer, Activity>();
 			int orderId = 1;
+			int childy = 1;
 			if ( subActivityUIIDs != null ) {
 				Iterator subActIter =  subActivityUIIDs.iterator();
 				while ( subActIter.hasNext() ) {
@@ -1205,11 +1210,20 @@ public class LD102Importer implements ApplicationContextAware{
 						log.warn(message);
 						toolsErrorMsgs.add(message);
 					} else {
-						sortedMap.put(childActivity.getYcoord(), childActivity);
+						if ( childActivity.getYcoord() != null ) {
+							childy = childActivity.getYcoord().intValue();
+						}
+						while ( sortedMap.containsKey(childy) ) {
+							childy++;
+						}
+						sortedMap.put(childy, childActivity);
 					}
 				}
 			}
+			Activity firstChild = null;
 			for ( Activity childActivity:sortedMap.values() ) {
+				if ( firstChild == null ) 
+					firstChild = childActivity;
 				childActivity.setParentActivity(optionsActivity);
 				childActivity.setParentUIID(optionsActivity.getActivityUIID());
 				childActivity.setOrderId(new Integer(orderId++));
@@ -1218,6 +1232,16 @@ public class LD102Importer implements ApplicationContextAware{
 				optionsActivity.getActivities().add(childActivity);
 			}
 			
+			// Finally, the  y-coord on optional activity itself seems to be out - appears too low down on the canvas. 
+			// So set the y-coord based on an offset of the first child activity.
+			if ( firstChild != null &&  firstChild.getYcoord() != null ) {
+				Integer overrideY = firstChild.getYcoord();
+				if ( overrideY > OPT_ACTIVITY_102_MARGIN ) {
+					overrideY = overrideY - OPT_ACTIVITY_102_MARGIN;
+				}
+				optionsActivity.setYcoord(overrideY);
+			}
+
 			optionsActivity.setLearningDesign(ldInProgress);
 			baseDAO.insert(optionsActivity);
 			
