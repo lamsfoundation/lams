@@ -152,6 +152,15 @@
         length="1"        
    />
     
+
+   <property
+        name="showMarks"
+        type="boolean"
+        access="property"
+        column="showMarks"
+        length="1"        
+   />
+
     
     <property
         name="passMark"

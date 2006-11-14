@@ -2539,6 +2539,7 @@ public class McServicePOJO implements
     	toolContentObj.setUpdateDate(now);
     	toolContentObj.setMcContentId(toolContentId);
     	toolContentObj.setQuestionsSequenced(false);
+    	toolContentObj.setShowMarks(false);
     	// I can't find a use for setShowReport anywhere
     	toolContentObj.setShowReport(false);
     	

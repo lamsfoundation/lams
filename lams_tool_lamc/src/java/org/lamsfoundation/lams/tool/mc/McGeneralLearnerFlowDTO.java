@@ -86,6 +86,8 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String learnerProgressUserId;
     
+    protected String showMarks;
+    
     protected Map mapQueAttempts;
 	
     protected Map mapQueCorrectAttempts;
@@ -596,5 +598,17 @@ public class McGeneralLearnerFlowDTO implements Comparable
      */
     public void setTotalMarksPossible(String totalMarksPossible) {
         this.totalMarksPossible = totalMarksPossible;
+    }
+    /**
+     * @return Returns the showMarks.
+     */
+    public String getShowMarks() {
+        return showMarks;
+    }
+    /**
+     * @param showMarks The showMarks to set.
+     */
+    public void setShowMarks(String showMarks) {
+        this.showMarks = showMarks;
     }
 }

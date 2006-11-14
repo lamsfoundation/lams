@@ -46,6 +46,8 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	protected String activeModule;
 	protected String editOptionsMode;
 	
+	protected String showMarks;
+	
 	protected String fileItem;
 	protected String uuid;
 	
@@ -167,6 +169,8 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 		this.submitOfflineFile=null;
 		this.submitOnlineFile=null;
 		this.offlineFile=null;
+		
+		this.showMarks=null;
 
     	this.dispatch=null;
 
@@ -997,5 +1001,17 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      */
     public void setCurrentField(String currentField) {
         this.currentField = currentField;
+    }
+    /**
+     * @return Returns the showMarks.
+     */
+    public String getShowMarks() {
+        return showMarks;
+    }
+    /**
+     * @param showMarks The showMarks to set.
+     */
+    public void setShowMarks(String showMarks) {
+        this.showMarks = showMarks;
     }
 }

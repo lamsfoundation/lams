@@ -170,9 +170,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:submit property="redoQuestions" styleClass="button">
 							<fmt:message key="label.redo.questions" />
 						</html:submit>
-						<html:submit property="viewSummary" styleClass="button">
-							<fmt:message key="label.view.summary" />
-						</html:submit>
+						
+						<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">						
+							<html:submit property="viewSummary" styleClass="button">
+								<fmt:message key="label.view.summary" />
+							</html:submit>
+						</c:if>						
 
 						<div class="right-buttons">
 							<c:if
@@ -195,10 +198,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
-
-						<html:submit property="viewSummary" styleClass="button">
-							<fmt:message key="label.view.summary" />
-						</html:submit>
+						<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">						
+							<html:submit property="viewSummary" styleClass="button">
+								<fmt:message key="label.view.summary" />
+							</html:submit>
+						</c:if>						
 
 						<div class="right-buttons">
 							<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">

@@ -95,6 +95,8 @@ public class McContent implements Serializable {
     
     private boolean showReport;
     
+    private boolean showMarks;
+    
     /** nullable persistent field */
     private Integer passMark;
 
@@ -112,7 +114,7 @@ public class McContent implements Serializable {
     /** full constructor */
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
     		Date updateDate, boolean questionsSequenced,  long createdBy, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
-			Integer passMark, boolean showReport, boolean retries, boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, 
+			Integer passMark, boolean showReport, boolean showMarks, boolean retries, boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
         
         logger.debug("copying properties");
@@ -134,6 +136,7 @@ public class McContent implements Serializable {
         this.reflect=reflect;
         this.passMark = passMark;
         this.showReport = showReport;
+        this.showMarks = showMarks;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
         this.mcAttachments = mcAttachments;
@@ -181,6 +184,7 @@ public class McContent implements Serializable {
 					 mc.getOnlineInstructions(),
 					 mc.getPassMark(),
 					 mc.isShowReport(),
+					 mc.isShowMarks(),
 					 mc.isRetries(),
 					 mc.isReflect(),
 					 mc.getReflectionSubject(),
@@ -459,4 +463,28 @@ public class McContent implements Serializable {
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
     }    
+    /**
+     * @return Returns the logger.
+     */
+    public static Logger getLogger() {
+        return logger;
+    }
+    /**
+     * @param logger The logger to set.
+     */
+    public static void setLogger(Logger logger) {
+        McContent.logger = logger;
+    }
+    /**
+     * @return Returns the showMarks.
+     */
+    public boolean isShowMarks() {
+        return showMarks;
+    }
+    /**
+     * @param showMarks The showMarks to set.
+     */
+    public void setShowMarks(boolean showMarks) {
+        this.showMarks = showMarks;
+    }
 }

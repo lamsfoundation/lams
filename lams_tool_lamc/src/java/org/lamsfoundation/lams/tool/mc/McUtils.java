@@ -654,6 +654,12 @@ public abstract class McUtils implements McAppConstants {
 		mcAuthoringForm.setQuestionsSequenced(questionsSequenced);
 		mcGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
 
+		String showMarks=request.getParameter("showMarks");
+		logger.debug("showMarks: " + questionsSequenced);
+		mcAuthoringForm.setShowMarks(showMarks);
+		mcGeneralAuthoringDTO.setShowMarks(showMarks);
+		
+		
 		String retries=request.getParameter("retries");
 		logger.debug("retries: " + retries);
 		mcAuthoringForm.setRetries(retries);

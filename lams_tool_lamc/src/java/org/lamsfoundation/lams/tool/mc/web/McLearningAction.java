@@ -976,6 +976,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		mcGeneralLearnerFlowDTO.setLowestMark(new Integer(lowestMark).toString());
 		mcGeneralLearnerFlowDTO.setAverageMark(new Integer(averageMark).toString());
 
+		boolean showMarks=mcContent.isShowMarks();
+		logger.debug("showMarks: " + showMarks);
+		mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(showMarks).toString());
 		
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
@@ -1550,9 +1553,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    logger.debug("totalMarksPossible: " + totalMarksPossible);
 	    mcGeneralLearnerFlowDTO.setTotalMarksPossible(totalMarksPossible);
 
-		
+		boolean showMarks=mcContent.isShowMarks();
+		logger.debug("showMarks: " + showMarks);
+		mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(showMarks).toString());
+	    
 		logger.debug("mcGeneralLearnerFlowDTO for jsp: " +  mcGeneralLearnerFlowDTO);
-		
 		
 		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));    	

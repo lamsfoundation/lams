@@ -66,6 +66,7 @@ public class AuthoringUtil implements McAppConstants {
 	protected static void setRadioboxes(McContent mcContent, McAuthoringForm mcAuthoringForm)
 	{
 		mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
+		mcAuthoringForm.setShowMarks(mcContent.isShowMarks()?"1":"0");
 		mcAuthoringForm.setRetries(mcContent.isRetries()?"1":"0");
 		mcAuthoringForm.setSln(mcContent.isShowReport()?"1":"0");
 		mcAuthoringForm.setReflect(mcContent.isReflect()?"1":"0");
@@ -1368,10 +1369,6 @@ public class AuthoringUtil implements McAppConstants {
         logger.debug("doing saveOrUpdateMcContent, mapCandidatesList: " + mapCandidatesList);
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
         
-        boolean isQuestionsSequenced=false;
-        boolean isSynchInMonitor=false;
-        boolean isUsernameVisible=false;
-
         String richTextTitle = request.getParameter(TITLE);
         String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
@@ -1383,6 +1380,10 @@ public class AuthoringUtil implements McAppConstants {
 		
 		String questionsSequenced=request.getParameter("questionsSequenced");
 		logger.debug("questionsSequenced: " + questionsSequenced);
+		
+		String showMarks=request.getParameter("showMarks");
+		logger.debug("showMarks: " + showMarks);
+		
 
 		String retries=request.getParameter("retries");
 		logger.debug("retries: " + retries);
@@ -1403,20 +1404,24 @@ public class AuthoringUtil implements McAppConstants {
         
         boolean setCommonContent=true; 
         if ((sln == null) || (questionsSequenced == null) || 
-             (retries == null) || (reflect == null))
+             (retries == null) || (reflect == null) || (showMarks == null))
         {
         	setCommonContent=false;
         }
         logger.debug("setCommonContent: " + setCommonContent);
 		
         boolean questionsSequencedBoolean=false;
+        boolean showMarksBoolean=false;
         boolean slnBoolean=false;
         boolean retriesBoolean=false;
         boolean reflectBoolean=false;
 
     	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
             questionsSequencedBoolean=true;            
-        
+
+    	if ((showMarks != null) && (showMarks.equalsIgnoreCase("1")))
+    	    showMarksBoolean=true;            
+    	
         if ((sln != null) && (sln.equalsIgnoreCase("1")))
             slnBoolean=true;            
         
@@ -1494,6 +1499,7 @@ public class AuthoringUtil implements McAppConstants {
          	mcContent.setOnlineInstructions(richTextOnlineInstructions);
          	mcContent.setOfflineInstructions(richTextOfflineInstructions);
          	mcContent.setQuestionsSequenced(questionsSequencedBoolean);
+         	mcContent.setShowMarks(showMarksBoolean);
          	mcContent.setRetries(retriesBoolean);
          	mcContent.setShowReport(slnBoolean);	
          	mcContent.setReflect(reflectBoolean);

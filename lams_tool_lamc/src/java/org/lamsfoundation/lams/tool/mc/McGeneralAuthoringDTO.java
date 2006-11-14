@@ -59,6 +59,7 @@ public class McGeneralAuthoringDTO implements Comparable
     protected String questionsSequenced;
     protected String editActivityEditMode;
     protected String reflectionSubject;
+    protected String showMarks;
     
     protected String monitoredContentInUse;
 
@@ -624,4 +625,17 @@ public class McGeneralAuthoringDTO implements Comparable
     public void setTotalMarks(String totalMarks) {
         this.totalMarks = totalMarks;
     }
+    /**
+     * @return Returns the showMarks.
+     */
+    public String getShowMarks() {
+        return showMarks;
+    }
+    /**
+     * @param showMarks The showMarks to set.
+     */
+    public void setShowMarks(String showMarks) {
+        this.showMarks = showMarks;
+    }
+
 }

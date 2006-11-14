@@ -142,29 +142,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:forEach>
 
-			<h4>
-				<fmt:message key="label.group.results" />
-			</h4>
-			
-			<table class="alternative-color" cellspacing="0">
-			  <tr>
-			  	<td width="30%"> 
-				  	  <strong> <fmt:message key="label.topMark"/> </strong>
-				 </td> 
-				 <td>	
-					  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
-			  	</td>
-			  </tr>	
-
-			  <tr>
-			  	<td> 
-				  	 <strong><fmt:message key="label.avMark"/> </strong>
-			  	</td>
-			  	<td>
-					  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
-			  	</td>
-			  </tr>	
-			</table>
+			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
+				<h4>
+					<fmt:message key="label.group.results" />
+				</h4>
+				
+				<table class="alternative-color" cellspacing="0">
+				  <tr>
+				  	<td width="30%"> 
+					  	  <strong> <fmt:message key="label.topMark"/> </strong>
+					 </td> 
+					 <td>	
+						  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
+				  	</td>
+				  </tr>	
+	
+				  <tr>
+				  	<td> 
+					  	 <strong><fmt:message key="label.avMark"/> </strong>
+				  	</td>
+				  	<td>
+						  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
+				  	</td>
+				  </tr>	
+				</table>
+			</c:if>				
 			
 
 
@@ -174,9 +176,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<fmt:message key="label.redo.questions" />
 				</html:submit>
 
-				<html:submit property="viewSummary" styleClass="button">
-					<fmt:message key="label.view.summary" />
-				</html:submit>
+				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
+					<html:submit property="viewSummary" styleClass="button">
+						<fmt:message key="label.view.summary" />
+					</html:submit>
+				</c:if>				
 
 				<div class="space-bottom-top" align="right">
 					<c:if
@@ -199,9 +203,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
 
-				<html:submit property="viewSummary" styleClass="button">
-					<fmt:message key="label.view.summary" />
-				</html:submit>
+				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
+					<html:submit property="viewSummary" styleClass="button">
+						<fmt:message key="label.view.summary" />
+					</html:submit>
+				</c:if>								
 
 				<div class="space-bottom-top" align="right">
 					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">

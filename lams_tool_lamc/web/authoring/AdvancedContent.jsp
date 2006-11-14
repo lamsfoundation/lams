@@ -29,6 +29,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</label>
 </p>
 
+
+<p class="small-space-top">
+	<html:checkbox property="showMarks" value="1" styleId="showMarks"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="showMarks">
+		<fmt:message key="label.showMarks" />
+	</label>
+</p>
+
+
+
 <p>
 	<html:checkbox property="retries" value="1" styleId="retries"
 		onclick="javascript:updatePass(this); submitMethod('updateMarksList');" styleClass="noBorder">

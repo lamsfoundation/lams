@@ -446,6 +446,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		mcAuthoringForm.setSln(mcContent.isShowReport()?"1":"0");
 		mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
+		mcAuthoringForm.setShowMarks(mcContent.isShowMarks()?"1":"0");
+		
 		mcAuthoringForm.setRetries(mcContent.isRetries()?"1":"0");
 	    mcAuthoringForm.setReflect(mcContent.isReflect()?"1":"0");
 	    mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());		
