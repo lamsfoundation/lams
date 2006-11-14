@@ -193,14 +193,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:out value="${VoteLearningForm.userEntry}" />
 			</div>
 
-			<h2>
-				<fmt:message key="label.notebook.entries" />
-			</h2>
 
-			<p>
-				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					escapeXml="false" />
-			</p>
+				<c:if
+					test="${voteGeneralLearnerFlowDTO.notebookEntry != null && voteGeneralLearnerFlowDTO.notebookEntry != ''}">
+	
+				<h2>
+					<fmt:message key="label.notebook.entries" />
+				</h2>
+	
+				<p>
+					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+						escapeXml="false" />
+				</p>
+			</c:if>							
 
 			<div class="space-bottom-top">
 				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
