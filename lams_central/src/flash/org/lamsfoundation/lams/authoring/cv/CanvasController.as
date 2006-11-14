@@ -292,6 +292,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			Debugger.log("Transition drop target:"+transitionTarget_mc, Debugger.GEN,'activityReleaseOutside','CanvasController');
 			
 			var transitionTarget = createValidTransitionTarget(transitionTarget_mc);
+			
 			if(transitionTarget instanceof LFError){
 				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
@@ -307,7 +308,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					LFMessage.showMessageAlert(td);
 				}
 			}
-			
+			_canvasModel.getCanvas().stopTransitionTool();
 		
 			
 	   }else{
