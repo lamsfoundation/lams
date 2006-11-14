@@ -225,14 +225,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 			</c:if>
 
-			<h2>
-				<fmt:message key="label.notebook.entries" />
-			</h2>
+			<c:if
+				test="${mcGeneralLearnerFlowDTO.notebookEntry != null && mcGeneralLearnerFlowDTO.notebookEntry != ''}">
 
-			<p>
-				<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}"
-					escapeXml="false" />
-			</p>
+				<h2>
+					<fmt:message key="label.notebook.entries" />
+				</h2>
+	
+				<p>
+					<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}"
+						escapeXml="false" />
+				</p>
+			</c:if>			
 
 			<html:hidden property="doneLearnerProgress" />
 
