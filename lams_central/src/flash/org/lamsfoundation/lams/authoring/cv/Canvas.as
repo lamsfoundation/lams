@@ -897,7 +897,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			default :
 				Debugger.log('No tool active. Setting Default.', Debugger.GEN,'stopActiveTool','Canvas');
 				Cursor.showCursor(ApplicationParent.C_DEFAULT);
-				canvasModel.activeTool = null;
+				canvasModel.activeTool = "none";
 
 		}
 	}
@@ -911,7 +911,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function stopGateTool(){
 		Debugger.log('Stopping gate tool',Debugger.GEN,'stopGateTool','Canvas');
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
-		canvasModel.activeTool = null;
+		canvasModel.activeTool = "none";
 	}
 	
 	
@@ -924,7 +924,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function stopOptionalActivity(){
 		Debugger.log('Stopping Optioanl Activity',Debugger.GEN,'stopOptionalActivity','Canvas');
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
-		canvasModel.activeTool = null;
+		canvasModel.activeTool = "none";
 	}
 	public function startGroupTool(){
 		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
@@ -935,7 +935,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function stopGroupTool(){
 		Debugger.log('Stopping group tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
-		canvasModel.activeTool = null;
+		canvasModel.activeTool = "none";
 	}
 	
 	
@@ -1025,7 +1025,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function doImportLaunch():Void{
 		var serverUrl = Config.getInstance().serverUrl;
-		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import', 298, 712, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import', 298, 800, true, true, false, false, false);
 	}
 	
 	/**
