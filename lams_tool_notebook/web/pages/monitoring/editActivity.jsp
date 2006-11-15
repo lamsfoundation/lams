@@ -23,7 +23,7 @@
 	</tbody>
 </table>
 
-<p align="right">
+<p class="align-right">
 	<c:choose>
 		<c:when test="${not dto.contentInUse}">
 			<c:url value="/authoring.do" var="authoringUrl">
