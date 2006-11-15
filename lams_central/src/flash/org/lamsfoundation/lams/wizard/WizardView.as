@@ -1,25 +1,4 @@
-﻿/***************************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
- * =============================================================
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
- * USA
- * 
- * http://www.gnu.org/licenses/gpl.txt
- * ************************************************************************
- */
+﻿
 import mx.controls.*
 import mx.utils.*
 import mx.managers.*
@@ -53,9 +32,9 @@ class WizardView extends AbstractView {
 	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
 	public static var SUMMERY_X:Number = 11;
-	public static var SUMMERY_Y:Number = 150;
+	public static var SUMMERY_Y:Number = 140;
 	public static var SUMMERY_W:Number = 500;
-	public static var SUMMERY_H:Number = 22;
+	public static var SUMMERY_H:Number = 20;
 	public static var SUMMERY_OFFSET:Number = 2;
 	
 	// submission modes
@@ -100,6 +79,7 @@ class WizardView extends AbstractView {
 	
 	// step 4 UI elements
 	private var schedule_cb:CheckBox;
+	private var learner_expp_cb:CheckBox;
 	private var start_btn:Button;
 	private var schedule_btn:Button;
 	private var schedule_time:MovieClip;
@@ -298,15 +278,16 @@ class WizardView extends AbstractView {
 		WorkspaceModel(workspaceView.getModel()).addEventListener('viewUpdate',this);
 		var controller = getController();
 		this.addEventListener('okClicked',Delegate.create(controller,controller.okClicked));
-		next_btn.addEventListener('click',Delegate.create(this, next));
-		prev_btn.addEventListener('click',Delegate.create(this, prev));
-		finish_btn.addEventListener('click',Delegate.create(this, finish));
-		cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-		close_btn.addEventListener('click', Delegate.create(this, close));
-		start_btn.addEventListener('click', Delegate.create(this, start));
+		next_btn.addEventListener('click',Delegate.create(this, gonext));
+		prev_btn.addEventListener('click',Delegate.create(this, goprev));
+		finish_btn.addEventListener('click',Delegate.create(this, gofinish));
+		cancel_btn.addEventListener('click',Delegate.create(this, gocancel));
+		close_btn.addEventListener('click', Delegate.create(this, goclose));
+		start_btn.addEventListener('click', Delegate.create(this, gostart));
 		schedule_btn.addEventListener('click', Delegate.create(this, scheduleNow));
 		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
 		staff_selAll_cb.addEventListener("click", Delegate.create(this, toogleStaffSelection));
+		learner_expp_cb.addEventListener("click", Delegate.create(this, toogleExpPortfolio));
 		learner_selAll_cb.addEventListener("click", Delegate.create(this, toogleLearnerSelection));
 		
 		//Set up the treeview
@@ -345,7 +326,7 @@ class WizardView extends AbstractView {
 		// checkboxes
 		staff_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
 		learner_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
-		
+		learner_expp_cb.label = Dictionary.getValue('wizard_learner_expp_cb_lbl');
 		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn, schedule_btn]);
 		positionButtons();
 	}
@@ -425,6 +406,7 @@ class WizardView extends AbstractView {
 		summery_lbl.setStyle('styleName',styleObj);
 		staff_lbl.setStyle('styleName',styleObj);
 		schedule_cb.setStyle('styleName', styleObj);
+		learner_expp_cb.setStyle('styleName', styleObj);
 		date_lbl.setStyle('styleName', styleObj);
 		time_lbl.setStyle('styleName', styleObj);
 		
@@ -667,12 +649,12 @@ class WizardView extends AbstractView {
 	}
 
 	// BUTTON EVENT HANDLER methods
-
+	
 	/**
     * Called by the NEXT button
 	*
 	*/
-    private function next(evt:Object){
+    private function gonext(evt:Object){
         trace('NEXT CLICKED');
 		_global.breakpoint();
 		var wm:WizardModel = WizardModel(getModel());
@@ -682,14 +664,14 @@ class WizardView extends AbstractView {
 		}
     }
 	
-	private function prev(evt:Object){
+	private function goprev(evt:Object){
 		trace('PREV CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
 		wm.stepID--;
 		trace('new step ID: ' + wm.stepID);
 	}
 	
-	private function finish(evt:Object){
+	private function gofinish(evt:Object){
 		trace('FINISH CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
 		if(validateStep(wm)){
@@ -699,7 +681,7 @@ class WizardView extends AbstractView {
 		}
 	}
 	
-	private function start(evt:Object){
+	private function gostart(evt:Object){
 		trace('START CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
 		if(validateStep(wm)){
@@ -709,6 +691,17 @@ class WizardView extends AbstractView {
 		}
 	}
 	
+	private function gocancel(evt:Object){
+		// close window
+		trace('CANCEL CLICKED');
+		getURL('javascript:window.close()');
+	}
+	
+	private function goclose(evt:Object){
+		trace('CLOSE WINDOW');
+		getURL('javascript:closeWizard()');
+	}
+
 	private function scheduleNow(evt:Object){
 		trace('SCHEDULE CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
@@ -732,17 +725,6 @@ class WizardView extends AbstractView {
 			disableButtons();
 			_wizardController.initializeLesson(resultDTO);
 		}
-	}
-	
-	private function cancel(evt:Object){
-		// close window
-		trace('CANCEL CLICKED');
-		getURL('javascript:window.close()');
-	}
-	
-	private function close(evt:Object){
-		trace('CLOSE WINDOW');
-		getURL('javascript:closeWizard()');
 	}
 	
 	private function scheduleChange(evt:Object){
@@ -811,7 +793,7 @@ class WizardView extends AbstractView {
 	
 	// VALIDATE STEPS
 	
-	private function validateStep(wm:WizardModel):Boolean{
+	public function validateStep(wm:WizardModel):Boolean{
 		switch(wm.stepID){
 			case 1:
 				return validateStep1(wm);
@@ -865,6 +847,7 @@ class WizardView extends AbstractView {
 		schedule_btn.visible = false;
 		summery_scp.visible = false;
 		summery_lbl.visible = false;
+		learner_expp_cb.visible = false;
 		schedule_cb.visible = false;
 		schedule_time._visible = false;
 		scheduleDate_dt.visible = false;
@@ -878,7 +861,7 @@ class WizardView extends AbstractView {
 	}
 	
 	
-	private function validateStep1(wm:WizardModel):Boolean{
+	public function validateStep1(wm:WizardModel):Boolean{
 		var snode = location_treeview.selectedNode;
 		if (snode.attributes.data.resourceType==wm.RT_FOLDER){
 			// set result DTO - folder selected cannot continue
@@ -903,54 +886,6 @@ class WizardView extends AbstractView {
 		}
 	}
 	
-	/**
-	private function showStep2():Void{
-		trace('showing step 2');
-		
-		setTitle(Dictionary.getValue('wizardTitle_2_lbl'));
-		setDescription(Dictionary.getValue('wizardDesc_2_lbl'));
-		// enable prev button after Step 1
-		prev_btn.enabled = true;
-		
-		// display Step 2
-		title_lbl.visible = true;
-		resourceTitle_txi.visible = true;
-		desc_lbl.visible = true;
-		resourceDesc_txa.visible = true;
-		
-		// check for NULL value
-		if(resourceDesc_txa.text == STRING_NULL){
-			resourceDesc_txa.text = "";
-		}
-		
-	}
-	
-	
-	private function clearStep2():Void{
-		// display Step 2
-		title_lbl.visible = false;
-		resourceTitle_txi.visible = false;
-		desc_lbl.visible = false;
-		resourceDesc_txa.visible = false;
-	}
-	
-	
-	private function validateStep2(wm:WizardModel):Boolean{
-		var valid:Boolean = true;
-		if(resourceTitle_txi.text == ""){
-			trace('title is empty must contain value');
-			valid = false;
-		} 
-		
-		if(valid){
-			if(resourceTitle_txi.text != ""){resultDTO.resourceTitle = resourceTitle_txi.text;}
-			resultDTO.resourceDescription = resourceDesc_txa.text;
-		} else {
-			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg2'), null, null);
-		}
-		return valid;
-	}
-	*/
 	private function showStep2():Void{
 		trace('showing step 2');
 		setTitle(Dictionary.getValue('wizardTitle_3_lbl'));
@@ -986,7 +921,7 @@ class WizardView extends AbstractView {
 		learner_selAll_cb.visible = false;
 	}
 	
-	private function validateStep2(wm:WizardModel):Boolean{
+	public function validateStep2(wm:WizardModel):Boolean{
 		_global.breakpoint();
 		
 		var valid:Boolean = true;
@@ -1078,6 +1013,8 @@ class WizardView extends AbstractView {
 		
 		summery_lbl.visible = true;
 		schedule_cb.visible = true;
+		learner_expp_cb.visible = true;
+		learner_expp_cb.selected = true;
 		//start_btn.visible = true;
 		
 		if(schedule_cb.selected){
@@ -1128,7 +1065,7 @@ class WizardView extends AbstractView {
 		summery_lbl = this['wizardSummery_lbl_design'];
 		
 		// course label
-		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_course', this.getNextHighestDepth(), {_x:summery_lbl._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET + SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_course_lbl') + ' ' + resultDTO.courseName}));
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_course', this.getNextHighestDepth(), {_x:summery_lbl._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_course_lbl') + ' ' + resultDTO.courseName}));
 		summery_lbl = this['wizardSummery_lbl_course'];
 		
 		// class label
@@ -1136,11 +1073,11 @@ class WizardView extends AbstractView {
 		summery_lbl = this['wizardSummery_lbl_class'];
 		
 		// staff label
-		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_staff', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_staff_lbl') + ' ' + String(resultDTO.selectedStaff.length) + '/' + staffList.length}));
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_staff', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_staff_lbl') + ' ' + String(resultDTO.selectedStaff.length) + '/' + staffList.length}));
 		summery_lbl = this['wizardSummery_lbl_staff'];
 		
 		// learners label
-		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + String(resultDTO.selectedLearners.length) + '/' + learnerList.length}));
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + String(resultDTO.selectedLearners.length) + '/' + learnerList.length}));
 
 	}
 	
@@ -1176,6 +1113,7 @@ class WizardView extends AbstractView {
 		} 
 		
 		if(valid){
+			
 			if(resourceTitle_txi.text != ""){resultDTO.resourceTitle = resourceTitle_txi.text;}
 			resultDTO.resourceDescription = resourceDesc_txa.text;
 		} else {
@@ -1518,6 +1456,13 @@ class WizardView extends AbstractView {
 		var target:CheckBox = CheckBox(evt.target);
 		var wm:WizardModel = WizardModel(getModel());
 		loadStaff(wm.organisation.getMonitors(), target.selected);
+	}
+	
+	private function toogleExpPortfolio(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		//var wm:WizardModel = WizardModel(getModel());
+		resultDTO.learnerExpPortfolio = target.selected;
 	}
 	
 	private function toogleLearnerSelection(evt:Object) {

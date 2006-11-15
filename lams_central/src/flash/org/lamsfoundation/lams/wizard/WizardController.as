@@ -33,6 +33,8 @@ import mx.utils.*
 class WizardController extends AbstractController {
 	private var _wizardModel:WizardModel;
 	private var _wizardController:WizardController;
+	private var _wizardView:WizardView;
+	private var _resultDTO:Object;
 	private var _isBusy:Boolean;
 	/**
 	* Constructor
@@ -43,6 +45,7 @@ class WizardController extends AbstractController {
 		super (wm);
 		_wizardModel = WizardModel(model);
 		_wizardController = this;
+		_wizardView = getView()
 		_isBusy = false;
 	}
 	
@@ -52,9 +55,10 @@ class WizardController extends AbstractController {
 	public function click(evt):Void{
 		trace(evt.target);
 		var tgt:String = new String(evt.target);
-		
-		// button click event handler - next, prev, finish, cancel
+				// button click event handler - next, prev, finish, cancel
 	}
+	
+	
 	
 	/**
     * Workspace dialog OK button clicked handler
