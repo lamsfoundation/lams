@@ -1096,6 +1096,7 @@ class WizardView extends AbstractView {
 		time_lbl.visible = false;
 		summery_lbl.visible = false;
 		schedule_cb.visible = false;
+		learner_expp_cb.visible = false;
 		start_btn.visible = false;
 		schedule_btn.visible = false;
 		schedule_time._visible = false;
