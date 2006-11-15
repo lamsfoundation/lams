@@ -524,6 +524,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
         		logger.debug("userAttempts: "+ userAttempts);
         		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
+        		
+         		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+        	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
+        	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+
         	    
         	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
         	    logger.debug("isContentLockOnFinish: " + isContentLockOnFinish);
@@ -539,10 +544,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
         		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
         		voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(true).toString());
          		logger.debug("preparing chart data for readonly mode");
-         		
-         		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
-        	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-        	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
 
          		
          		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
