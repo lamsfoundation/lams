@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.sbmt.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
@@ -72,6 +73,17 @@ public class ReflectAction extends Action{
 		
 		refForm.setUserID(user.getUserID());
 		refForm.setSessionMapID(sessionMapID);
+		
+		// get the existing reflection entry
+		ISubmitFilesService submitFilesService = getService();
+		
+		SessionMap map = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		Long toolSessionID = (Long)map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, SbmtConstants.TOOL_SIGNATURE, user.getUserID());
+		
+		if (entry != null) {
+			refForm.setEntryText(entry.getEntry());		
+		}
 		
 		return mapping.findForward(SbmtConstants.SUCCESS);
 	}

@@ -46,24 +46,24 @@ public class ReflectionForm extends ValidatorForm {
 	private String sessionMapID;
 	private String entryText;
 
-    /**
-     * MessageForm validation method from STRUCT interface.
-     * 
-     */
-    public ActionErrors validate(ActionMapping mapping,
-                                 javax.servlet.http.HttpServletRequest request) {
-        ActionErrors errors = new ActionErrors(); 
-        try{
-            if (StringUtils.isBlank(entryText)) {
-               ActionMessage error = new ActionMessage("error.reflection.emtpy");
-               errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-            }
-            
-        } catch (Exception e) {
-            logger.error(e);
-        }
-        return errors;
-    }
+//    /**
+//     * MessageForm validation method from STRUCT interface.
+//     * 
+//     */
+//    public ActionErrors validate(ActionMapping mapping,
+//                                 javax.servlet.http.HttpServletRequest request) {
+//        ActionErrors errors = new ActionErrors(); 
+//        try{
+//            if (StringUtils.isBlank(entryText)) {
+//               ActionMessage error = new ActionMessage("error.reflection.emtpy");
+//               errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+//            }
+//            
+//        } catch (Exception e) {
+//            logger.error(e);
+//        }
+//        return errors;
+//    }
 
 	public String getEntryText() {
 		return entryText;

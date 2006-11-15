@@ -43,6 +43,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -143,7 +145,7 @@ public class LearnerAction extends DispatchAction {
 		sessionMap.put(SbmtConstants.ATTR_INSTRUCTION,content.getInstruction());
 		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD,content.isLimitUpload());
 		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER,content.getLimitUploadNumber());
-
+		sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
 		
 		setLearnerDTO(request, sessionMap, learner, filesUploaded);
 		
@@ -350,6 +352,17 @@ public class LearnerAction extends DispatchAction {
 			}
 			int limitUploadLeft = limit -  filesUploaded.size();
 			dto.setLimitUploadLeft(limitUploadLeft);
+		}
+		
+		// retreive notebook reflection entry.
+		ISubmitFilesService submitFilesService = getService();
+		
+		NotebookEntry notebookEntry = submitFilesService.getEntry((Long)sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID), 
+				CoreNotebookConstants.NOTEBOOK_TOOL, 
+				SbmtConstants.TOOL_SIGNATURE, currUser.getUserID());
+		
+		if ( notebookEntry != null) {
+			dto.setReflect(notebookEntry.getEntry());
 		}
 		
 		request.setAttribute("learner",dto);

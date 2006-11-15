@@ -24,7 +24,7 @@
 		<action path="/learning/submitReflection"
 			type="org.lamsfoundation.lams.tool.sbmt.web.ReflectAction"
 			name="reflectionForm" 
-			validate="true" 
+			validate="false" 
 			input="/learner/notebook.jsp"
 			parameter="submitReflection" 
 			scope="request">
