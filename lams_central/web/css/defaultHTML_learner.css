@@ -446,3 +446,12 @@ input:hover.button {
 .indent {margin-left:20px;}
 
 .middle {vertical-align:middle;}
+
+.help {text-align:left; margin-left:35px; cursor: pointer;}
+
+.align-right{
+text-align:right;
+}
+.align-left{
+text-align:left;
+}

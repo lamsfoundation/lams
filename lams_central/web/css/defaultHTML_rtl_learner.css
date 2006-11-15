@@ -77,7 +77,7 @@ p.instructions {
 	margin-bottom:0;
 	margin-top:0;
 	background: url('../images/css/blue_arrow_right.gif') no-repeat 0 0px;
-	padding-left: 30px;
+	padding-right: 30px;
 	padding-bottom: 10px;
 	font-size:13px;
 }
@@ -91,8 +91,8 @@ p {
 b.error {color:#cc0000;} 
 
 ul {
-	margin-left: 25px;
-	margin-right: 30px;
+	margin-right: 25px;
+	margin-left: 30px;
 }
 
 li { list-style-type:square;}
@@ -100,25 +100,26 @@ li { list-style-type:square;}
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
  	 width:100%; 
-	 margin-left:0px; 
+	 margin-right:0px; 
 	 padding-top:0px; 
 	 margin-bottom:15px; 
 	 margin-top:10px;
-	 text-align:left;
+	 text-align:right;
 }
 
 table.alternative-color th {
 	background: url('../images/css/green_bg.jpg') repeat-x;
 	height: 30px;
 	color: #47bc23;
-	padding-left: 15px;
-	border-left: 1px solid #cacdd1;
-	border-right: 1px solid #fff;
+	padding-right: 15px;
+	border-right: 1px solid #cacdd1;
+	border-left: 1px solid #fff;
 	font-size: 12px;
 }
 
 table.alternative-color td {
-	padding-left: 20px;
+	padding:5px;
+	padding-right: 20px;
 	font-size: 11px;
 	border-bottom: 1px solid #efefef;
 	vertical-align: top; 
@@ -126,23 +127,29 @@ table.alternative-color td {
 }
 
 
+
+table.alternative-color td.first, table.alternative-color th.first {
+	border-right: none;
+	padding-right: 20px;
+}
+
 /*layout of the forum tables with the colored table heading cell */
 table.forum { 
 	width:100%;
-	margin-left:0px; 
+	margin-right:0px; 
 	padding-top:5px; 
 	margin-bottom:10px;
 	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 49px; 
-	text-align:left; 
+	text-align:right; 
 	border-bottom:1px solid #efefef;}
 
 table.forum th { 
 	background: url('../images/css/green_bg_forum.jpg') repeat-x #f0f5df; 
-	height:20px; 
-	padding-top:5px; 
+	height:26px; 
+	padding-top:1px; 
 	color:#47bc23; 
-	padding-left:15px; 
-	border-left:1px solid #cacdd1;  
+	padding-right:15px; 
+	border-right:1px solid #cacdd1;  
 	font-size:12px; 
 	vertical-align:middle;
 }
@@ -150,17 +157,17 @@ table.forum th {
 table.forum td.posted-by {
 	background: url('../images/css/forum_postedby_bg.jpg') repeat-x; 
 	height:20px; 
-	padding-left:15px; 
+	padding-right:15px; 
 	padding-top:0px; 
 	font-size:10px;
 	vertical-align:top; 
-	border-left:1px solid #cacdd1; 
+	border-right:1px solid #cacdd1; 
 	color:#666;
 }
 
-
 table.forum td {
-	padding-left:20px; 
+	padding:10px;
+	padding-right:20px; 
 	font-size:11px; 
 	vertical-align:top; 
 }
@@ -177,7 +184,7 @@ table.forum td {
 
 table { 
 	 width:100%;
-	 text-align:left; 
+	 text-align:right; 
 	 }
 
 td { 
@@ -204,14 +211,14 @@ td p.button{
 .field-name{
 	color: #0087e5;
 	font-weight: bold;
-	text-align: left;
+	text-align: right;
 	padding-bottom:10px;
 }
 
 .field-name-alternative-color {
 	color: #47bc23;
 	font-weight: bold;
-	text-align: left;
+	text-align: right;
 }
 
 input {
@@ -230,11 +237,11 @@ textarea {
 
 /*misc styles*/
 .space-right {
-	margin-right: 10px;
+	margin-left: 10px;
 }
 
 .space-left {
-	margin-left: 10px;
+	margin-right: 10px;
 }
 
 .space-bottom {
@@ -264,13 +271,13 @@ hr {border:0px;
 
 .warning {
 	color: #cc0000;
-	padding:8px 10px 10px 40px;
+	padding:8px 40px 10px 10px;
 	margin-top: 25px;
-	margin-left: auto;
 	margin-right: auto;
-	text-align: left;
+	margin-left: auto;
+	text-align: right;
 	font-weight: normal;
-	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
+	background: url('../images/css/warning.gif') no-repeat #ffeae0 top right; /** TODO: fix bg image pos **/
 	width: 70%;
 	border: 1px solid #E82A28;
 }
@@ -304,9 +311,9 @@ Buttons
 
 ********************************************** */
 
-.left-buttons {float:left;}
+.left-buttons {float:right;}
 
-.right-buttons {float:right;}
+.right-buttons {float:left;}
 
 /*layout of a general button*/
 #content a.button {
@@ -361,50 +368,50 @@ a:hover.button {
 
 /*layout of adding a topic button */
 a.button-add-item {
-	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_off.gif') no-repeat right -20px;
 	color: #333;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:25px 25px 25px 15px;
     text-decoration: none;
 }
 
 a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_over.gif') no-repeat right -20px;
 	color: #349018;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:25px 25px 25px 15px;
     text-decoration: none;
 }
 
 
 /*layout of adding a topic button */
 #content a.button-add-item {
-	background: url('../images/css/btn_add_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_off.gif') no-repeat right -20px;
 	color: #333;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:25px 25px 25px 15px;
 }
 
 #content a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_add_over.gif') no-repeat right -20px;
 	color: #349018;
 	border: 0px none;
-	padding:25px 15px 25px 25px;
+	padding:25px 25px 25px 15px;
 }
 
 /*layout of html editor button */
 #content a.button-html-editor {
-	background: url('../images/css/btn_htmled_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_htmled_off.gif') no-repeat right -20px;
 	color: #666;
 	border: 0px none;
-	padding:25px 15px 25px 28px;
+	padding:25px 28px 25px 15px;
 }
 
 #content a:hover.button-html-editor {
-	background: url('../images/css/btn_htmled_off.gif') no-repeat 0px 20px;
+	background: url('../images/css/btn_htmled_off.gif') no-repeat right -20px;
 	color: #333;
 	border: 0px none;
-	padding:25px 15px 25px 28px;
+	padding:25px 28px 25px 15px;
 }
 
 /* Hovering submit button */
@@ -430,10 +437,21 @@ input:hover.button {
 
 .text-area {width:99%}
 
-.shading-bg {padding:5px; padding-left:10px;  padding-top:10px; margin-top:10px; margin-bottom:10px; width:99%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px}
+.shading-bg {padding:5px; padding-right:10px;  padding-top:10px; margin-top:10px; margin-bottom:10px; width:99%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px -1px}
+
+.shading-bg td {padding:5px;}
 
 .last-item {border-top:1px solid #ccc; height:20px;}
 
-.indent {margin-left:20px;}
+.indent {margin-right:20px;}
 
 .middle {vertical-align:middle;}
+
+.help {text-align:left; margin-left:35px; cursor: pointer;}
+
+.align-right{
+text-align:left;
+}
+.align-left{
+text-align:right;
+}

@@ -205,7 +205,7 @@ Tab navigation styles
 .tab-right-selected { /* defines right side of selected tab */
 	height: 31px;
 	width: 8px;
-	background: url('../images/css/selected_right.jpg') no-repeat top right;;
+	background: url('../images/css/selected_right.jpg') no-repeat top right;
 	float: left
 }
 
@@ -231,7 +231,7 @@ Tab navigation styles
 .tab-right { /* defines right side of selected tab */
 	height: 31px;
 	width: 8px;
-	background: url('../images/css/button_right.jpg') no-repeat top right;;
+	background: url('../images/css/button_right.jpg') no-repeat top right;
 	float: left
 }
 
@@ -258,7 +258,7 @@ Tab navigation styles
  .tab-right-highlight { /* defines right side of selected tab */ 	 
          height: 31px; 	 
          width: 8px; 	 
-         background: url('../images/css/button_highlight_right.jpg') no-repeat top right;; 	 
+         background: url('../images/css/button_highlight_right.jpg') no-repeat top right; 
          float: left 	 
  }
 
@@ -1128,9 +1128,9 @@ border:0px;
 .help {text-align:right; margin-right:35px; cursor: pointer;}
 
 /************ My Profile custom **********/
-td.align-right{
+.align-right{
 text-align:right;
 }
-td.align-left{
+.align-left{
 text-align:left;
 }

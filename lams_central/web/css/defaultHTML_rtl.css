@@ -115,7 +115,7 @@ li { list-style-type:circle;}
 #page { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat 585px 10px;
+	background: url('../images/css/lams_logo.gif') no-repeat -10px 10px;
 }
 
 #header { /*layout of the header */
@@ -141,7 +141,7 @@ Layout of  tab navigation section
 	margin-top: 15px;
 	width: auto;
 	height: 40px;
-	margin-left: 4px;
+	margin-right: 3px;
 	
 }
 
@@ -176,8 +176,9 @@ Tab navigation styles
 .nav-box { /* layout of containers that surround the tab navigation */
 	height: 31px;
 	width: auto;
-	margin-right: 2px;
-	float: left;
+	margin-left: 2px;
+	
+	float: right;
 	text-align: center;
 }
 
@@ -642,7 +643,7 @@ td .button{
 .field-name{
 	color: #0087e5;
 	font-weight: bold;
-	text-align: left;
+	text-align: right;
 	padding-bottom:10px;
 }
 
@@ -650,7 +651,7 @@ td .button{
 	color: #47bc23;
 	font-weight: bold;
 	padding-bottom:10px;
-	text-align: left;
+	text-align: right;
 }
 
 input {
@@ -979,7 +980,7 @@ My Courses Pages
 .mycourses-right-buttons {float:left; padding-left:20px;  margin-top:11px; height:24px; font-size:11px}
 
 #content a.add-lesson-button {
-	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right; /* 0px 0px; */
+	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #666;
 	padding: 5px 12px 6px 30px;
 	text-decoration: none;
@@ -990,7 +991,7 @@ My Courses Pages
 }
 
 #content a:hover.add-lesson-button {
-	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right; /* 0px 0px; */
+	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #47bc23;
 	padding: 5px 12px 6px 30px;
 	text-decoration: none;
@@ -1001,7 +1002,7 @@ My Courses Pages
 }
 
 #content a.manage-group-button {
-	background: url('../images/css/manage_groups.rtl.jpg') no-repeat 0px 0px;
+	background: url('../images/css/manage_groups.rtl.jpg') no-repeat top right;
 	color: #666;
 	padding: 5px 30px 6px 12px;
 	text-decoration: none;
@@ -1012,7 +1013,7 @@ My Courses Pages
 }
 
 #content a:hover.manage-group-button {
-	background: url('../images/css/manage_groups.rtl.jpg') no-repeat 0px 0px;
+	background: url('../images/css/manage_groups.rtl.jpg') no-repeat top right;
 	color: #47bc23;
 	padding: 5px 30px 6px 12px;
 	text-decoration: none;
@@ -1036,15 +1037,15 @@ My Courses Pages
 .course-bg h2 {
 	font-size:13px;
 	color:#47bc23;
-	padding-left:0px;
+	padding-right:0px;
 	margin-top:12px;
-	margin-left:0px;
+	margin-right:0px;
 }
 
 .course-bg h4 {
 	font-size:12px;
 	color:#47bc23;
-	padding-left:0px
+	padding-right:0px
 }
 
 .course-buttons {
@@ -1120,12 +1121,12 @@ padding-right:0px;
 border:0px;
 }
 
-.help {text-align:right; margin-left:35px; cursor: pointer;}
+.help {text-align:left; margin-left:35px; cursor: pointer;}
 
 /************ My Profile custom **********/
-td.align-right{
+.align-right{
 text-align:left;
 }
-td.align-left{
+.align-left{
 text-align:right;
 }

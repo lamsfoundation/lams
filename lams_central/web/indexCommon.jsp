@@ -71,5 +71,5 @@
 </div>
 </c:forEach>
 <c:if test="${empty orgBeans}">
-	<p align="left"><fmt:message key="msg.groups.empty" /></p>
+	<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
 </c:if>
