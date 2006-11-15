@@ -920,7 +920,7 @@ My Courses Pages
 #page-mycourses { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat 10px -7px;
+	background: url('../images/css/lams_logo.gif') no-repeat left -7px;
 
 }
 
@@ -1126,3 +1126,11 @@ border:0px;
 }
 
 .help {text-align:right; margin-right:35px; cursor: pointer;}
+
+/************ My Profile custom **********/
+td.align-right{
+text-align:right;
+}
+td.align-left{
+text-align:left;
+}

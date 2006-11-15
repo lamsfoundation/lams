@@ -50,7 +50,7 @@ h1 {
 	color:#0087e5; 
 	font-size:15px; 
 	margin-bottom:0px; 
-	margin-left:10px; 
+	margin-right:10px; 
 	padding-top:5px; }
 
 
@@ -64,21 +64,21 @@ h1.no-tabs-below {
 
 h2 {color:#47bc23; 
 	font-size:12px; 
-	margin-left:10px; 
+	margin-right:10px; 
 	margin-bottom:10px; 
 	margin-top:10px; }
 	
 h2.no-space-left {
-	margin-left:0px;
+	margin-right:0px;
 }
 
 h2.spacer-left{
-	margin-left:25px;
+	margin-right:25px;
 }
 
 h3 {color:#47bc23; 
 	font-size:12px; 
-	margin-left:10px; 
+	margin-right:10px; 
 	margin-bottom:10px; 
 	margin-top:10px; }
 	
@@ -91,23 +91,23 @@ p.instructions {
 	color: #0087e5;
 	margin-bottom: 0px;
 	margin-top: 0px;;
-	margin-left: 30px;
+	margin-right: 30px;
 	font-weight: bold;
-	background: url('../images/css/blue_arrow_right.gif') no-repeat 0 0px;
-	padding-left: 30px;
+	background: url('../images/css/blue_arrow_right.gif') no-repeat top right;
+	padding-right: 30px;
 	padding-bottom: 10px;
 	font-size: 12px
 }
 
 p {
-	margin-left: 25px;
-	margin-right: 30px;
+	margin-right: 25px;
+	margin-left: 30px;
 	margin-bottom: 18px;
 }
 
 ul {
-	margin-left: 25px;
-	margin-right: 30px;
+	margin-right: 25px;
+	margin-left: 30px;
 }
 
 li { list-style-type:circle;}
@@ -115,7 +115,7 @@ li { list-style-type:circle;}
 #page { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat right 10px;
+	background: url('../images/css/lams_logo.gif') no-repeat 585px 10px;
 }
 
 #header { /*layout of the header */
@@ -683,6 +683,7 @@ textarea {
 .space-bottom-top {
 	padding-bottom: 20px;
 	padding-top: 20px;
+	padding-right:20px; /* Testing spacing IE */
 }
 
 .small-space-bottom {
@@ -770,11 +771,6 @@ padding-right:40px;
 margin-top:15px;
 }
 
-#login-left-col a {
-	color:#47bc23;
-	text-decoration: underline;		
-}
-
 #login-left-col h1 {
 margin:0px; 
 padding:0px;
@@ -801,8 +797,8 @@ margin-right:4px;
 
 #login-left-col li {
 padding:10px 0px 15px 0px; 
-border-bottom:
-1px dotted #ccc;
+border-bottom:1px dotted #ccc;
+list-style-type:none;
 }
 
 #login-right-col {
@@ -919,7 +915,7 @@ My Courses Pages
 #page-mycourses { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat top right; /*  10px -7px */
+	background: url('../images/css/lams_logo.gif') no-repeat right -7px;
 
 }
 
@@ -983,23 +979,23 @@ My Courses Pages
 .mycourses-right-buttons {float:left; padding-left:20px;  margin-top:11px; height:24px; font-size:11px}
 
 #content a.add-lesson-button {
-	background: url('../images/css/add_lesson.rtl.jpg') no-repeat 0px 0px;
+	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right; /* 0px 0px; */
 	color: #666;
-	padding: 5px 30px 6px 12px;
+	padding: 5px 12px 6px 30px;
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
 	margin-top:6px;
-	margin-left:5px;
+	margin-right:5px;
 }
 
 #content a:hover.add-lesson-button {
-	background: url('../images/css/add_lesson.rtl.jpg') no-repeat 0px 0px;
+	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right; /* 0px 0px; */
 	color: #47bc23;
-	padding: 5px 30px 6px 12px;
+	padding: 5px 12px 6px 30px;
 	text-decoration: none;
 	margin-top:0px;
-	margin-left:5px;
+	margin-right:5px;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
 }
@@ -1124,4 +1120,12 @@ padding-right:0px;
 border:0px;
 }
 
-.help {text-align:left; margin-left:35px;}
+.help {text-align:right; margin-left:35px; cursor: pointer;}
+
+/************ My Profile custom **********/
+td.align-right{
+text-align:left;
+}
+td.align-left{
+text-align:right;
+}

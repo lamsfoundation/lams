@@ -14,7 +14,7 @@
 			</logic:messagesPresent>
 			<table>
 				<tr>
-					<td align="right"><fmt:message key="label.portrait.current" />:</td>
+					<td class="align-right"><fmt:message key="label.portrait.current" />:</td>
 					<td>
 						<logic:notEqual name="PortraitActionForm" property="portraitUuid" value="0">
 							<img src="/lams/download/?uuid=<bean:write name="PortraitActionForm" property="portraitUuid" />&preferDownload=false" />
@@ -25,11 +25,11 @@
 					</td>
 				</tr>
 				<tr>
-					<td align="right"><fmt:message key="label.portrait.upload" />:</td>
+					<td class="align-right"><fmt:message key="label.portrait.upload" />:</td>
 					<td><html:file property="file" /></td>
 				</tr>
 				<tr>
-					<td colspan="2" align="right">
+					<td colspan="2" class="align-right">
 						<html:submit><fmt:message key="button.save"/></html:submit> &nbsp; 	
 						<html:cancel><fmt:message key="button.cancel"/></html:cancel>
 					</td>

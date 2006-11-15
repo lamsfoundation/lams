@@ -26,19 +26,19 @@
 		<td><h2><fmt:message key="index.myprofile" /></h2></td>
 	</tr>
 	<tr>
-		<td align="right"><fmt:message key="label.name" />: 
+		<td class="align-right"><fmt:message key="label.name" />: 
 		</td>
 		<td><bean:write name="fullName" />
 		</td>
 	</tr>
 	<tr>
-		<td align="right"><fmt:message key="label.email" />: 
+		<td class="align-right"><fmt:message key="label.email" />: 
 		</td>
 		<td><bean:write name="email" />
 		</td>
 	</tr>
 	<tr>
-		<td align="right"><fmt:message key="label.portrait.current" />:
+		<td class="align-right"><fmt:message key="label.portrait.current" />:
 		</td>
 		<td><logic:notEqual name="portraitUuid" value="0">
 				<img src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />

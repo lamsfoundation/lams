@@ -17,42 +17,42 @@
 				</html:messages>
 				</p>
 			</logic:messagesPresent>
-			<table>
+			<table class="body">
 				<tr>
-					<td class="body" align="right">
+					<td class="align-right">
 						<fmt:message key="label.username"/>:
 					</td>
-					<td class="body" align="left">
+					<td class="align-left">
 						<html:hidden name="<%=PasswordChangeActionForm.formName%>" property="login"/>
 						<bean:write name="<%=PasswordChangeActionForm.formName%>" property="login"/>
 					</td>
 				</tr>
 				<tr>
-					<td class="body" align="right">
+					<td class="align-right">
 						<fmt:message key="label.password.old.password"/>:
 					</td>
-					<td class="body" align="left">
+					<td class="align-left">
 						<html:password name="<%=PasswordChangeActionForm.formName%>" property="oldPassword" size="50" maxlength="50"/>
 					</td>
 				</tr>
 				<tr>
-					<td class="body" align="right">
+					<td class="align-right">
 						<fmt:message key="label.password.new.password"/>:
 					</td>
-					<td class="body" align="left">
+					<td class="align-left">
 						<html:password name="<%=PasswordChangeActionForm.formName%>" property="password" size="50" maxlength="50"/>
 					</td>
 				</tr>
 				<tr>
-					<td class="body" align="right">
+					<td class="align-right">
 						<fmt:message key="label.password.confirm.new.password"/>:
 					</td>
-					<td class="body" align="left">
+					<td class="align-left">
 						<html:password name="<%=PasswordChangeActionForm.formName%>" property="passwordConfirm" size="50" maxlength="50"/>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2" align="right">
+					<td colspan="2" class="align-right">
 						<html:submit><fmt:message key="button.save"/></html:submit> &nbsp; 	
 						<html:cancel><fmt:message key="button.cancel"/></html:cancel>
 					</td>
