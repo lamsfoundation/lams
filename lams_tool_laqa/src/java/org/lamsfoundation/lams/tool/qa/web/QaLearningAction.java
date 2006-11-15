@@ -644,6 +644,42 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    logger.debug("lockWhenFinished: " + lockWhenFinished);
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	    
+	    
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO */
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	logger.debug("retrieving toolUser: " + toolUser);
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
+
+    	String userName=toolUser.getLogin(); 
+    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+    	logger.debug("retrieving toolUser fullname: " + fullName);
+    	
+    	Long userId=new Long(toolUser.getUserID().longValue());
+    	logger.debug("userId: " + userId);
+    	
+    	QaQueUsr qaQueUsr=qaService.getQaUserBySession(userId, qaSession.getUid());
+    	logger.debug("qaQueUsr: " + qaQueUsr);
+    	logger.debug("qaQueUsr uid : " + qaQueUsr.getUid());
+    	
+	    generalLearnerFlowDTO.setUserUid(qaQueUsr.getUid().toString());
+	    
+    	int sessionUserCount=0;
+    	if (qaSession.getQaQueUsers() != null)
+    	{
+    	    sessionUserCount=qaSession.getQaQueUsers().size();    
+    	}
+	    
+	    if (sessionUserCount > 1)
+	    {
+	        logger.debug("there are multiple user responses");
+	        generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
+	    }
+	    
+	    boolean usernameVisible=qaContent.isUsernameVisible();
+	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
+	    
 	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	    logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    
@@ -746,6 +782,44 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		boolean lockWhenFinished=qaContent.isLockWhenFinished(); 
 	    logger.debug("lockWhenFinished: " + lockWhenFinished);
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	    
+
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO */
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	logger.debug("retrieving toolUser: " + toolUser);
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
+
+    	String userName=toolUser.getLogin(); 
+    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+    	logger.debug("retrieving toolUser fullname: " + fullName);
+    	
+    	Long userId=new Long(toolUser.getUserID().longValue());
+    	logger.debug("userId: " + userId);
+    	
+    	QaQueUsr qaQueUsr=qaService.getQaUserBySession(userId, qaSession.getUid());
+    	logger.debug("qaQueUsr: " + qaQueUsr);
+    	logger.debug("qaQueUsr uid : " + qaQueUsr.getUid());
+    	
+	    generalLearnerFlowDTO.setUserUid(qaQueUsr.getUid().toString());
+
+    	int sessionUserCount=0;
+    	if (qaSession.getQaQueUsers() != null)
+    	{
+    	    sessionUserCount=qaSession.getQaQueUsers().size();    
+    	}
+	    
+	    if (sessionUserCount > 1)
+	    {
+	        logger.debug("there are multiple user responses");
+	        generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
+	    }
+	    
+	    boolean usernameVisible=qaContent.isUsernameVisible();
+	    logger.debug("usernameVisible: " + usernameVisible);
+	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
+
 	    
 	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	    logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);

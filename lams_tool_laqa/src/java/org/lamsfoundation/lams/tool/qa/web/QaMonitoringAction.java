@@ -1676,7 +1676,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
 			GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean setEditResponse, String currentMonitoredToolSession)
 	{
-        
         logger.debug("starting refreshSummaryData: setEditResponse + " + setEditResponse);
         logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
@@ -1786,6 +1785,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	        logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	        logger.debug("placing LIST_MONITORED_ANSWERS_CONTAINER_DTO within generalLearnerFlowDTO");
 		    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
+		    
 		    
 		    if (isLearnerRequest)
 		    {
@@ -4237,5 +4237,5 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         
         return reflectionsContainerDTO;
     }
-	
+    
 }

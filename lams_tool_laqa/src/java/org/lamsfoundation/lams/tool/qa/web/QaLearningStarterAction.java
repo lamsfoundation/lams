@@ -408,6 +408,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	generalLearnerFlowDTO.setRemainingQuestionCount(generalLearnerFlowDTO.getTotalQuestionCount().toString());
     	generalLearnerFlowDTO.setInitialScreen(new Boolean(true).toString());
     	
+    	
     	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
     	/* Is the request for a preview by the author?
     	Preview The tool must be able to show the specified content as if it was running in a lesson. 
@@ -424,6 +425,22 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	{
     		logger.debug("Author requests for a preview of the content.");
     	}
+    	
+    	
+    	int sessionUserCount=0;
+    	if (qaSession.getQaQueUsers() != null)
+    	{
+    	    sessionUserCount=qaSession.getQaQueUsers().size();    
+    	}
+	    
+	    if (sessionUserCount > 1)
+	    {
+	        logger.debug("there are multiple user responses");
+	        generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
+	    }
+
+    	
+    	
     	
     	/* by now, we know that the mode is either teacher or learner
     	 * check if the mode is teacher and request is for Learner Progress
@@ -447,6 +464,19 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	        generalLearnerFlowDTO, false, toolSessionID);
     		
 	    	logger.debug("presenting teacher's report");
+	    	
+	    	
+    	    HttpSession ss = SessionManager.getSession();
+    	    /* get back login user DTO */
+    	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        	Long userId=new Long(toolUser.getUserID().longValue());
+        	
+        	QaQueUsr qaQueUsrLocal=qaService.getQaUserBySession(userId, qaSession.getUid());
+        	logger.debug("qaQueUsrLocal: " + qaQueUsrLocal);
+        	logger.debug("qaQueUsrLocal uid : " + qaQueUsrLocal.getUid());
+        	
+    	    generalLearnerFlowDTO.setUserUid(qaQueUsrLocal.getUid().toString());
+	    	
 	    	logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
     		
     		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		    		
@@ -533,6 +563,17 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    			    mapAnswers=(Map)sessionMap.get(MAP_ALL_RESULTS_KEY);
 		    		    	logger.debug("mapAnswers: " + mapAnswers);
 		    		    	
+		    	    	    HttpSession ss = SessionManager.getSession();
+		    	    	    /* get back login user DTO */
+		    	    	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		    	        	Long userId=new Long(toolUser.getUserID().longValue());
+		    	        	
+		    	        	QaQueUsr qaQueUsrLocal=qaService.getQaUserBySession(userId, qaSession.getUid());
+		    	        	logger.debug("qaQueUsrLocal: " + qaQueUsrLocal);
+		    	        	logger.debug("qaQueUsrLocal uid : " + qaQueUsrLocal.getUid());
+		    	        	
+		    	    	    generalLearnerFlowDTO.setUserUid(qaQueUsrLocal.getUid().toString());
+
 		    		    	
 		    	    	    if (isLearnerFinished)
 		    	    	    {
@@ -554,7 +595,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			    	    		logger.debug("before fwd, GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
 		    	    	    }
 
-		    		    	
+
+		    	    	    
 		    	    		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_REPORT);
 		    	    		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 		    			}

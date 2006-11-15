@@ -92,22 +92,70 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:set var="userData" scope="request" value="${sData.value}" />
 								<c:set var="responseUid" scope="request" value="${userData.uid}" />
 
-								<c:if test="${currentQuestionId == userData.questionUid}">
-									<p>
-										<span class="field-name"> <c:out
-												value="${userData.userName}" /> </span> -
-										<lams:Date value="${userData.attemptTime}" />
-									</p>
-									<p>
-										<c:out value="${userData.responsePresentable}"
-											escapeXml="false" />
-
-									</p>
-								</c:if>
+								<c:if test="${generalLearnerFlowDTO.userUid == userData.queUsrId}">
+		
+										<c:if test="${currentQuestionId == userData.questionUid}">
+											<p>
+												<span class="field-name"> <c:out
+														value="${userData.userName}" /> </span> -
+												<lams:Date value="${userData.attemptTime}" />
+											</p>
+											<p>
+												<c:out value="${userData.responsePresentable}"
+													escapeXml="false" />
+		
+											</p>
+										</c:if>
+								</c:if>								
 							</c:forEach>
 						</c:forEach>
 					</div>
 				</c:forEach>
+				
+				
+				<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
+					<h2>
+						<fmt:message key="label.other.answers" />
+					</h2>
+					
+	
+					<c:forEach var="currentDto"
+								items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+								<c:set var="currentQuestionId" scope="request"
+									value="${currentDto.questionUid}" />
+			
+								<div class="shading-bg">
+			
+									<c:forEach var="questionAttemptData"
+										items="${currentDto.questionAttempts}">
+										<c:forEach var="sData" items="${questionAttemptData.value}">
+											<c:set var="userData" scope="request" value="${sData.value}" />
+											<c:set var="responseUid" scope="request" value="${userData.uid}" />
+		
+										<c:if test="${generalLearnerFlowDTO.userUid != userData.queUsrId}">	
+											<c:if test="${currentQuestionId == userData.questionUid}">
+												<p>
+													<span class="field-name"> <c:out
+															value="${userData.userName}" /> </span>
+															
+													<c:if test="${generalLearnerFlowDTO.userNameVisible == 'true'}">																			
+																 -
+														<lams:Date value="${userData.attemptTime}" />
+													</c:if>																						
+												</p>
+												<p>
+													<c:out value="${userData.responsePresentable}"
+														escapeXml="false" />
+													<hr size=1> 												
+												</p>
+											</c:if>
+										</c:if>									
+										</c:forEach>
+									</c:forEach>
+								</div>
+					</c:forEach>
+
+				</c:if>				
 
 				<c:if
 					test="${generalLearnerFlowDTO.notebookEntry != null && generalLearnerFlowDTO.notebookEntry != ''}">
@@ -192,21 +240,69 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:set var="userData" scope="request" value="${sData.value}" />
 								<c:set var="responseUid" scope="request" value="${userData.uid}" />
 
-								<c:if test="${currentQuestionId == userData.questionUid}">
-									<p>
-										<span class="field-name"><c:out
-												value="${userData.userName}" /> </span> -
-										<lams:Date value="${userData.attemptTime}" />
-									</p>
-									<p>
-										<c:out value="${userData.responsePresentable}"
-											escapeXml="false" />
-									</p>
-								</c:if>
+								<c:if test="${generalLearnerFlowDTO.userUid == userData.queUsrId}">
+		
+										<c:if test="${currentQuestionId == userData.questionUid}">
+											<p>
+												<span class="field-name"> <c:out
+														value="${userData.userName}" /> </span> -
+												<lams:Date value="${userData.attemptTime}" />
+											</p>
+											<p>
+												<c:out value="${userData.responsePresentable}"
+													escapeXml="false" />
+		
+											</p>
+										</c:if>
+								</c:if>								
 							</c:forEach>
 						</c:forEach>
 					</div>
 				</c:forEach>
+				
+				
+				<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
+					<h2>
+						<fmt:message key="label.other.answers" />
+					</h2>
+					
+	
+					<c:forEach var="currentDto"
+								items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+								<c:set var="currentQuestionId" scope="request"
+									value="${currentDto.questionUid}" />
+			
+								<div class="shading-bg">
+			
+									<c:forEach var="questionAttemptData"
+										items="${currentDto.questionAttempts}">
+										<c:forEach var="sData" items="${questionAttemptData.value}">
+											<c:set var="userData" scope="request" value="${sData.value}" />
+											<c:set var="responseUid" scope="request" value="${userData.uid}" />
+		
+										<c:if test="${generalLearnerFlowDTO.userUid != userData.queUsrId}">	
+											<c:if test="${currentQuestionId == userData.questionUid}">
+												<p>
+													<span class="field-name"> <c:out
+															value="${userData.userName}" /> </span>
+															
+													<c:if test="${generalLearnerFlowDTO.userNameVisible == 'true'}">																			
+																 -
+														<lams:Date value="${userData.attemptTime}" />
+													</c:if>																						
+												</p>
+												<p>
+													<c:out value="${userData.responsePresentable}"
+														escapeXml="false" />
+													<hr size=1> 												
+												</p>
+											</c:if>
+										</c:if>									
+										</c:forEach>
+									</c:forEach>
+								</div>
+					</c:forEach>
+				</c:if>				
 
 				<c:if
 					test="${generalLearnerFlowDTO.notebookEntry != null && generalLearnerFlowDTO.notebookEntry != ''}">

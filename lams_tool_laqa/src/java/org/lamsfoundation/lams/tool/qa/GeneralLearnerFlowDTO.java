@@ -107,7 +107,25 @@ public class GeneralLearnerFlowDTO implements Comparable
     
     protected String lockWhenFinished;
     
+    protected String userUid;
     
+    protected String existMultipleUserResponses;
+    
+    protected String usernameVisible;
+    
+    
+    /**
+     * @return Returns the usernameVisible.
+     */
+    public String getUsernameVisible() {
+        return usernameVisible;
+    }
+    /**
+     * @param usernameVisible The usernameVisible to set.
+     */
+    public void setUsernameVisible(String usernameVisible) {
+        this.usernameVisible = usernameVisible;
+    }
     /**
      * @return Returns the currentMonitoredToolSession.
      */
@@ -583,4 +601,28 @@ public class GeneralLearnerFlowDTO implements Comparable
     public void setShowOtherAnswers(String showOtherAnswers) {
         this.showOtherAnswers = showOtherAnswers;
     }
-}
+    /**
+     * @return Returns the userUid.
+     */
+    public String getUserUid() {
+        return userUid;
+    }
+    /**
+     * @param userUid The userUid to set.
+     */
+    public void setUserUid(String userUid) {
+        this.userUid = userUid;
+    }
+    /**
+     * @return Returns the existMultipleUserResponses.
+     */
+    public String getExistMultipleUserResponses() {
+        return existMultipleUserResponses;
+    }
+    /**
+     * @param existMultipleUserResponses The existMultipleUserResponses to set.
+     */
+    public void setExistMultipleUserResponses(String existMultipleUserResponses) {
+        this.existMultipleUserResponses = existMultipleUserResponses;
+    }
+ }
