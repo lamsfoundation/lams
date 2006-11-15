@@ -24,6 +24,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter{
 	
 	public void up20061015To20061113(){
 		// Change name to suit the version you give the tool.
-	    this.removeField(McContent.class, "showMarks");
+
+	    this.addField(McContent.class, "showMarks",new Boolean(false)); 	    
 	}
 }

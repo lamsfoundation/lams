@@ -36,7 +36,7 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter{
 	 */
 	public void up20061102To20061113(){
 		// Change name to suit the version you give the tool.
-		this.addField(QaContent.class, "lockWhenFinished", true);
-		this.addField(QaContent.class, "showOtherAnswers", true);
+		this.addField(QaContent.class, "lockWhenFinished", new Boolean(true));
+		this.addField(QaContent.class, "showOtherAnswers", new Boolean(true));
 	}
 }
