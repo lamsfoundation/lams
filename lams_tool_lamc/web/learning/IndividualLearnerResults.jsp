@@ -176,12 +176,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<fmt:message key="label.redo.questions" />
 				</html:submit>
 
-				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
-					<html:submit property="viewSummary" styleClass="button">
-						<fmt:message key="label.view.summary" />
-					</html:submit>
-				</c:if>				
-
 				<div class="space-bottom-top" align="right">
 					<c:if
 						test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
@@ -202,12 +196,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:if>
 
 			<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
-
-				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
-					<html:submit property="viewSummary" styleClass="button">
-						<fmt:message key="label.view.summary" />
-					</html:submit>
-				</c:if>								
 
 				<div class="space-bottom-top" align="right">
 					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
