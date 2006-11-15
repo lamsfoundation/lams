@@ -10,7 +10,7 @@ function toggleCheckboxes(){
 
 <html-el:form action="/userorgsave.do" method="post">
 <html-el:hidden property="orgId" />
-<h2 align="left">
+<h2 class="align-left">
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
     <logic:notEmpty name="pOrgId">
         : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
@@ -58,7 +58,7 @@ function toggleCheckboxes(){
 </logic:iterate>
 
 <tr>
-	<td colspan=5 align="right">
+	<td colspan=5 class="align-right">
 		<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
 		<html-el:reset><fmt:message key="admin.reset"/></html-el:reset>
 		<html-el:cancel><fmt:message key="admin.cancel"/></html-el:cancel>

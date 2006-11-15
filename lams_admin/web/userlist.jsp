@@ -1,7 +1,7 @@
 <%@ include file="/taglibs.jsp"%>
 
 <form>
-<h2 align="left">
+<h2 class="align-left">
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
 	<logic:equal name="orgType" value="1">
 		: <fmt:message key="admin.global.roles.manage" />
@@ -20,7 +20,7 @@
 
 <p>&nbsp;</p>
 
-<p align="right">
+<p class="align-right">
 	<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
 		<input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:equal>

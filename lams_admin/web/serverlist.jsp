@@ -1,7 +1,7 @@
 <%@ include file="/taglibs.jsp"%>
 
 <h2><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> : <fmt:message key="sysadmin.maintain.external.servers" /></h2>
-<p align="right"><input type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" /></p>
+<p class="align-right"><input type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" /></p>
 <table class=alternative-color width=100%>
 	<tr>
 		<th><fmt:message key="sysadmin.serverid" /></th>

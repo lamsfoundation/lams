@@ -3,7 +3,7 @@
 
 <html:form action="/config" method="post">
 	<html:hidden property="method" value="save"/>
-	<h2 align="left">
+	<h2 class="align-left">
 		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :  
 		<fmt:message key="sysadmin.config.settings.edit" />
 	</h2>

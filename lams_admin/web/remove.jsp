@@ -40,7 +40,7 @@
 		<c:param name="userId" value="${userId}" />
 		<c:param name="orgId" value="${orgId}" />
 	</c:url>
-<div style="float:right">
+<div class="float-right">
 <input type="button" value="Delete" onClick="javascript:document.location='<c:out value="${deleteaction}"/>'" />
 <input type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
 </div>
