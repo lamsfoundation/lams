@@ -56,11 +56,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div class="shading-bg">
 		<div style="overflow: auto;">
 			<c:out value="${dto.question}" escapeXml="false" />
-			[
-			<strong><fmt:message key="label.mark" />
-			</strong>
-			<c:out value="${dto.mark}" />
-			]
+
+			<c:if test="${dto.mark != '1'}">			
+				[
+				<strong><fmt:message key="label.mark" />
+				</strong>
+				<c:out value="${dto.mark}" />
+				]
+			</c:if>							
 		</div>
 	</div>
 
