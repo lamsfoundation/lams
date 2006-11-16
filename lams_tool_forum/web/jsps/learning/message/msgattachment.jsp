@@ -3,7 +3,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 <input type="hidden" name="hasAttachment" value="${topic.hasAttachment}"/>
 <c:if test="${topic.hasAttachment}">
-<table border="0" style="align:left;width:400px">
+<table border="0" class="align-left" style="width:400px">
 	<c:forEach var="file" items="${topic.message.attachments}">
 		<tr><td>
 		<c:set var="downloadURL">

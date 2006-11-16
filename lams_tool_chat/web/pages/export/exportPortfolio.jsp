@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html>
+<lams:html>
 	<head>
 		<title><c:out value="${chatDTO.title}" escapeXml="false" /></title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -82,4 +82,4 @@
 			<!--closes footer-->
 
 	</body>
-</html>
+</lams:html>

@@ -95,7 +95,7 @@ ul {
 	margin-left: 30px;
 }
 
-li { list-style-type:square;}
+li { list-style-type:circle;}
 
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
@@ -302,6 +302,11 @@ Page layout
 #footer {
 	clear:inherit; 
 	height:20px;}
+
+
+.float-left {float:right;}
+
+.float-right {float:left;}
 
 
 /*

@@ -113,8 +113,7 @@
 		<tr>
 			<td colspan="3">
 				<div>
-					<html:form action="/monitoring" method="get" target="_blank"
-						style="float:left; margin-right: 4px">
+					<html:form action="/monitoring" method="get" target="_blank">
 						<div>
 							<html:hidden property="dispatch" value="openChatHistory" />
 							<html:hidden property="toolSessionID"

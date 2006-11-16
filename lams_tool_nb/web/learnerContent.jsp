@@ -10,7 +10,7 @@
 	</p>
 
 	<c:if test="${!NbLearnerForm.readOnly}">
-		<div align="right" class="space-bottom-top"><html:form
+		<div class="space-bottom-top align-right"><html:form
 			action="/learner" target="_self">
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />

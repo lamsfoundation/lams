@@ -1,10 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
 	"http://www.w3.org/TR/html4/strict.dtd">
-<html>
+
 <%@ page language="java" isErrorPage="true" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+<lams:html>
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -66,4 +67,4 @@ document.getElementById("errorForm").submit();
 
 </script>
 </body>
-</html>
+</lams:html>

@@ -19,15 +19,16 @@
 		<c:forEach items="${topicList}" var="topic">
 			<tr>
 				<td>
+					<c:if test="${topic.hasAttachment}">
+						<img src="<html:rewrite page="/images/paperclip.gif"/>" class="space-right float-right">
+					</c:if>
+					
 					<c:set var="viewtopic">
 						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}" />
 					</c:set>
 					<html:link href="${viewtopic}">
 						<c:out value="${topic.message.subject}" />
 					</html:link>
-					<c:if test="${topic.hasAttachment}">
-						<img src="<html:rewrite page="/images/paperclip.gif"/>">
-					</c:if>
 				</td>
 				<td>
 					<c:set var="author" value="${topic.author}"/>

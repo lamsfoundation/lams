@@ -40,7 +40,7 @@
 
 
 
-			<div style="float:right">
+			<div class="right-buttons">
 				<c:if test='${sessionMap.mode != "teacher"}'>
 					<c:choose>
 						<c:when

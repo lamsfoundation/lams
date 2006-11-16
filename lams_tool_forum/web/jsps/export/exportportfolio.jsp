@@ -8,7 +8,7 @@
 <c:set var="mode" value="${sessionMap.mode}"/>
 <c:set var="title" value="${sessionMap.title}"/>
 
-<html:html locale="true">
+<lams:html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -126,4 +126,4 @@
 
 
 </body>
-</html:html>
+</lams:html>

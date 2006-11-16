@@ -31,7 +31,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td align="right">
+			<td class="align-right">
 				<c:forEach var="file" items="${topic.message.attachments}">
 					<c:set var="downloadURL">
 						<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />

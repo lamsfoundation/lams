@@ -14,7 +14,7 @@
 
 <html:form action="/learning" method="post">
 	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
-	<div align="right" class="space-bottom-top">
+	<div class="space-bottom-top align-right">
 		<c:choose>
 			<c:when
 				test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">

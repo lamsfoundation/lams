@@ -39,12 +39,10 @@
 				</c:otherwise>
 			</c:choose>
 
-			<div class="space-bottom-top">
-				<p class="align-right">
+			<div class="space-bottom-top align-right">
 					<html:submit styleClass="button">
 						<fmt:message>button.finish</fmt:message>
 					</html:submit>
-				</p>
 			</div>
 		</html:form>
 	</c:if>

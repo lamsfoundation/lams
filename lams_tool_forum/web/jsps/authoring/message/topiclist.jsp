@@ -15,7 +15,7 @@
 				<td>
 					
 					<c:if test="${topic.hasAttachment}">
-						<img src="<html:rewrite page="/images/paperclip.gif" />" align="right" class="space-right" >
+						<img src="<html:rewrite page="/images/paperclip.gif" />" class="space-right float-right">
 					</c:if>
 					
 					<c:set var="viewtopic">

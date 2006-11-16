@@ -48,20 +48,24 @@
 			<c:if test="${not empty msgDto.message.attachments}">
 				<tr>
 					<td>
+						<ul>
 						<c:if
 							test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 							<c:forEach var="file" items="${msgDto.message.attachments}">
+								<li>
 								<c:set var="downloadURL">
 									<html:rewrite
 										page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 								</c:set>
 								<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 									<c:out value="${file.fileName}" /> </a>
+								</li>
 							</c:forEach>
 						</c:if>
 						<c:if test='${hidden}'>
 							<fmt:message key="topic.message.attachment.hidden" />
 						</c:if>
+						<ul>
 					</td>
 				</tr>
 			</c:if>

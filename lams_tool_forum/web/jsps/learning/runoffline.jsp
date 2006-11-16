@@ -11,7 +11,7 @@
 		<fmt:message key="run.offline.message" />
 	</p>
 
-	<div align="right" class="space-bottom-top">
+	<div class="space-bottom-top align-right">
 		<c:set var="continue">
 			<html:rewrite
 				page="/learning/newReflection.do?sessionMapID=${sessionMapID}" />

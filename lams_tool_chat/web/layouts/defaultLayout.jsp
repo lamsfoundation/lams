@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html>
+<lams:html>
 	<tiles:insert attribute="header" />
 	<body class="stripes">
 
@@ -18,4 +18,4 @@
 			<div id="footer"></div>
 
 	</body>
-</html>
+</lams:html>

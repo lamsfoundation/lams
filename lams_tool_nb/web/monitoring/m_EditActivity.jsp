@@ -34,7 +34,7 @@
 </table>
 
 <c:if test='${formBean.contentEditable == "true"}'>
-	<p align="right">
+	<p class="align-right">
 		<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">
 			<fmt:message key="button.edit" />
 		</html:link>
