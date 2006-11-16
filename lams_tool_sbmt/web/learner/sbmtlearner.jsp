@@ -179,7 +179,7 @@
 						</em>
 					</c:when>
 					<c:otherwise>
-						<p> <c:out escapeXml="true" value="${learner.reflect}" />  </p>				
+						<p> <lams:out escapeXml="true" value="${learner.reflect}" />  </p>				
 					</c:otherwise>
 				</c:choose>
 				
