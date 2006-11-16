@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
@@ -61,12 +60,13 @@ public interface IMonitoringService
      * 
      * @param lessonName the name of the lesson
      * @param lessonDescription the description of the lesson.
+     * @param learnerExportAvailable should the export portfolio option be made available to the learner?
      * @param learningDesignId the selected learning design
      * @param organisationId the copied sequence will be put in the default runtime sequence folder for this org, if such a folder exists.
      * @param userId the user who want to create this lesson.
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,Integer organisationId,Integer userID);
+    public Lesson initializeLesson(String lessonName, String lessonDescription,Boolean learnerExportAvailable,long learningDesignId,Integer organisationId,Integer userID);
     /**
      * Create new lesson according to the learning design specified by the 
      * user, but for a preview session rather than a normal learning session.
@@ -145,6 +145,19 @@ public interface IMonitoringService
      * @param endDate teh lesson end date and time.
      */
     public void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    
+    /** 
+     * Set whether or not the export portfolio button is available in learner. Sets it to FALSE if 
+     * learnerExportAvailable is null. Checks that the user is a staff member of this lesson before 
+     * updating.
+     * 
+     * @param lessonId
+     * @param userId 
+     * @param learnerExportAvailable
+     * @return new value for learnerExportAvailable. Normally will be same as input parameter, will only
+     * be different if the value cannot be updated for some reason.
+     */
+    public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable);
     
     /**
      * Force Complete works on an individual user. The teacher may complete it up to a particular activity, 

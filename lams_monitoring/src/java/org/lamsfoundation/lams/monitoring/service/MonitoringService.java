@@ -25,46 +25,43 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.text.DateFormat;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
-import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.NullGroup;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
-import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -75,7 +72,6 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -83,13 +79,13 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -126,6 +122,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(MonitoringService.class);
    	private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
+   	private static final String AUDIT_LEARNER_PORTFOLIO_SET = "audit.learner.portfolio.set";
+   	private static final String AUDIT_LESSON_CREATED_KEY = "audit.lesson.created";
 
     private ILessonDAO lessonDAO;    
     private ILessonClassDAO lessonClassDAO;        
@@ -142,7 +140,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private Scheduler scheduler;
     private ApplicationContext applicationContext;
     private MessageService messageService;
-    private ILearningDesignService learningDesignService;
+    private AuditService auditService;
     
     
     /** Message keys */
@@ -268,13 +266,18 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         this.scheduler = scheduler;
     }
     
-    public void setLearningDesignService(ILearningDesignService learningDesignService) {
-		this.learningDesignService = learningDesignService;
+    public void setAuditService(AuditService auditService) {
+		this.auditService = auditService;
 	}
 
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
+
+    private void auditAction(String messageKey, Object[] args) {	
+		String message = messageService.getMessage(messageKey, args);
+		auditService.log("Monitoring", message);
+	}
 
 	/** Checks whether the user is a staff member for the lesson or the creator of the lesson. 
      * If not, throws a UserAccessDeniedException exception */
@@ -303,6 +306,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public Lesson initializeLesson(String lessonName,
                                String lessonDescription,
+                               Boolean learnerExportAvailable,
                                long learningDesignId,
                                Integer organisationId,
                                Integer userID) 
@@ -335,7 +339,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
  
     	User user = (userID != null ? (User)baseDAO.find(User.class,userID) : null);
-        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, runSeqFolder, LearningDesign.COPY_TYPE_LESSON);
+        return initializeLesson(lessonName, lessonDescription, learnerExportAvailable, 
+        		originalLearningDesign, user, runSeqFolder, LearningDesign.COPY_TYPE_LESSON);
         
     }
     
@@ -355,11 +360,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
     	User user = (userID != null ? (User)baseDAO.find(User.class,userID) : null);
 
-        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null, LearningDesign.COPY_TYPE_PREVIEW);
+        return initializeLesson(lessonName, lessonDescription, Boolean.TRUE, originalLearningDesign, user, null, LearningDesign.COPY_TYPE_PREVIEW);
     }
 
     public Lesson initializeLesson(String lessonName,
             String lessonDescription,
+            Boolean learnerExportAvailable,
             LearningDesign originalLearningDesign,
             User user,
             WorkspaceFolder workspaceFolder,
@@ -410,8 +416,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		
         authoringService.saveLearningDesign(copiedLearningDesign);
         
-        return createNewLesson(lessonName,lessonDescription,user,copiedLearningDesign);
-
+        Lesson lesson = createNewLesson(lessonName,lessonDescription,user,learnerExportAvailable,copiedLearningDesign);
+        auditAction(AUDIT_LESSON_CREATED_KEY, new Object[] {lessonName, copiedLearningDesign.getTitle(), learnerExportAvailable});
+        return lesson;
     }
     
     /**
@@ -826,8 +833,21 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         checkOwnerOrStaffMember(userId, requestedLesson, "remove lesson");
         setLessonState(requestedLesson,Lesson.REMOVED_STATE);
     }
-
     /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setLearnerPortfolioAvailable(long, java.lang.Integer, boolean)
+     */
+	public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable) {
+    	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+    	if ( requestedLesson == null ) {
+    		throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to set learner portfolio available to "+learnerExportAvailable);
+    	}
+        checkOwnerOrStaffMember(userId, requestedLesson, "set learner portfolio available");
+		requestedLesson.setLearnerExportAvailable(learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE);
+        auditAction(AUDIT_LEARNER_PORTFOLIO_SET, new Object[]{requestedLesson.getLessonName(), requestedLesson.getLearnerExportAvailable()});
+		lessonDAO.updateLesson(requestedLesson);
+		return requestedLesson.getLearnerExportAvailable();
+	}
+   /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
     public GateActivity openGate(Long gateId)
@@ -1409,15 +1429,19 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @param lessonName the name of the lesson
      * @param lessonDescription the description of the lesson.
      * @param user user the user who want to create this lesson.
+     * @param learnerExportAvailable should the export portfolio option be made available to the learner?
      * @param copiedLearningDesign the copied learning design
      * @return the lesson object without class.
      * 
      */
-    private Lesson createNewLesson(String lessonName, String lessonDescription, User user, LearningDesign copiedLearningDesign)
+    private Lesson createNewLesson(String lessonName, String lessonDescription, User user, 
+    		Boolean learnerExportAvailable,
+    		LearningDesign copiedLearningDesign)
     {
         Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName,
                                                               lessonDescription,
                                                               user,
+                                                              learnerExportAvailable,
                                                               copiedLearningDesign);
         lessonDAO.saveLesson(newLesson);
         return newLesson;

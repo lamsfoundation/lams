@@ -173,7 +173,8 @@ public class MonitoringAction extends LamsDispatchAction
     		if ( desc == null ) desc = "description";
     		Integer organisationId = WebUtil.readIntParam(request,"organisationID",true);
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,organisationId,getUserId());
+    		Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId());
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
@@ -849,4 +850,32 @@ public class MonitoringAction extends LamsDispatchAction
 		return auditService;
 	}
     
+	/**
+     * Set whether or not the export portfolio button is available in learner. Expects parameters lessonID
+     * and learnerExportPortfolio.
+     */
+    public ActionForward learnerExportPortfolioAvailable(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        FlashMessage flashMessage = null;
+    	try {
+      		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	Integer userID = getUserId();
+	    	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request,"learnerExportPortfolio",false); 
+    		monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
+    		
+    		flashMessage = new FlashMessage("learnerExportPortfolioAvailable",Boolean.TRUE);
+       	} catch (Exception e) {
+			flashMessage = handleException(e, "renameLesson", monitoringService);
+		}
+       	String wddxPacket = flashMessage.serializeMessage();
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
 }
