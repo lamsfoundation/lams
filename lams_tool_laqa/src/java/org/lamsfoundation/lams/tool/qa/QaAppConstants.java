@@ -75,8 +75,6 @@ public interface QaAppConstants {
 	public static final String DEFAULT_OFFLINE_INST						="";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID";
 	public static final String EXPORT_USER_ID							="exportUserId";
-	public static final String DEFAULT_QA_TITLE							="Q&A";
-	public static final String DEFAULT_QA_INSTRUCTIONS					="Instructions";
 	public static final String NOTEBOOK									="notebook";
 	public static final String ENTRY_TEXT								="entryText";
 	public static final String REFLECTIONS_CONTAINER_DTO				="reflectionsContainerDTO";

@@ -4675,25 +4675,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("starting prepareEditActivityScreenData: " + mcContent);
 	    McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
 		
-	    if (mcContent.getTitle() == null)
-		{
-			mcGeneralAuthoringDTO.setActivityTitle(DEFAULT_MC_TITLE);
-		}
-		else
-		{
-			mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
-		}
-
-		
-		if (mcContent.getInstructions() == null)
-		{
-		    mcGeneralAuthoringDTO.setActivityInstructions(DEFAULT_MC_INSTRUCTIONS);
-		}
-		else
-		{
-			mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
-		}
-		
+		mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
+		mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
 		
 		logger.debug("final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);

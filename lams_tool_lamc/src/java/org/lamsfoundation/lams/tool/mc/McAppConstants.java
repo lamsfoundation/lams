@@ -69,8 +69,6 @@ public interface McAppConstants {
 	public static final String ONLINE_INSTRUCTIONS_KEY					= "onlineInstructionsKey";
 	public static final String OFFLINE_INSTRUCTIONS_KEY					= "offlineInstructionsKey";
 	public static final String MAP_QUESTION_CONTENT_KEY					= "mapQuestionContentKey";
-	public static final String DEFAULT_MC_TITLE							="MCQ";
-	public static final String DEFAULT_MC_INSTRUCTIONS					="Instructions";
 	public static final String LOAD_VIEW_ONLY							="loadViewOnly";
 	public static final String MC_GENERAL_AUTHORING_DTO					="mcGeneralAuthoringDTO";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";

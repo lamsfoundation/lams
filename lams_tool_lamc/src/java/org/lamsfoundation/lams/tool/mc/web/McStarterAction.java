@@ -469,28 +469,11 @@ public class McStarterAction extends Action implements McAppConstants {
 
 	    mcGeneralAuthoringDTO.setIsDefineLater(new Boolean(mcContent.isDefineLater()).toString());
 	    
-		if (mcContent.getTitle() == null)
-		{
-			mcGeneralAuthoringDTO.setActivityTitle(DEFAULT_MC_TITLE);
-			mcAuthoringForm.setTitle(DEFAULT_MC_TITLE);
-		}
-		else
-		{
-			mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
-			mcAuthoringForm.setTitle(mcContent.getTitle());
-		}
+		mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
+		mcAuthoringForm.setTitle(mcContent.getTitle());
 
-		
-		if (mcContent.getInstructions() == null)
-		{
-		    mcGeneralAuthoringDTO.setActivityInstructions(DEFAULT_MC_INSTRUCTIONS);
-		    mcAuthoringForm.setInstructions(DEFAULT_MC_INSTRUCTIONS);
-		}
-		else
-		{
-			mcGeneralAuthoringDTO.setActivityInstructions( mcContent.getInstructions());
-			mcAuthoringForm.setInstructions(mcContent.getInstructions());
-		}
+		mcGeneralAuthoringDTO.setActivityInstructions( mcContent.getInstructions());
+		mcAuthoringForm.setInstructions(mcContent.getInstructions());
 		
 		sessionMap.put(ACTIVITY_TITLE_KEY, mcGeneralAuthoringDTO.getActivityTitle());
 	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, mcGeneralAuthoringDTO.getActivityInstructions());

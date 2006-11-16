@@ -441,28 +441,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	    qaGeneralAuthoringDTO.setIsDefineLater(new Boolean(qaContent.isDefineLater()).toString());
 	    
-		if (qaContent.getTitle() == null)
-		{
-			qaGeneralAuthoringDTO.setActivityTitle(DEFAULT_QA_TITLE);
-			qaAuthoringForm.setTitle(DEFAULT_QA_TITLE);
-		}
-		else
-		{
-			qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
-			qaAuthoringForm.setTitle(qaContent.getTitle());
-		}
+		qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+		qaAuthoringForm.setTitle(qaContent.getTitle());
 
-		
-		if (qaContent.getInstructions() == null)
-		{
-		    qaGeneralAuthoringDTO.setActivityInstructions(DEFAULT_QA_INSTRUCTIONS);
-		    qaAuthoringForm.setInstructions(DEFAULT_QA_INSTRUCTIONS);
-		}
-		else
-		{
-			qaGeneralAuthoringDTO.setActivityInstructions( qaContent.getInstructions());
-			qaAuthoringForm.setInstructions(qaContent.getInstructions());
-		}
+		qaGeneralAuthoringDTO.setActivityInstructions( qaContent.getInstructions());
+		qaAuthoringForm.setInstructions(qaContent.getInstructions());
 		
 		sessionMap.put(ACTIVITY_TITLE_KEY, qaGeneralAuthoringDTO.getActivityTitle());
 	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaGeneralAuthoringDTO.getActivityInstructions());

@@ -2477,25 +2477,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		logger.debug("starting prepareEditActivityScreenData: " + qaContent);
 	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO= new QaGeneralAuthoringDTO();
 		
-	    if (qaContent.getTitle() == null)
-		{
-			qaGeneralAuthoringDTO.setActivityTitle(DEFAULT_QA_TITLE);
-		}
-		else
-		{
-			qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
-		}
-
-		
-		if (qaContent.getInstructions() == null)
-		{
-		    qaGeneralAuthoringDTO.setActivityInstructions(DEFAULT_QA_INSTRUCTIONS);
-		}
-		else
-		{
-			qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
-		}
-		
+		qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+		qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
 	
 		logger.debug("final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 		request.setAttribute(QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
