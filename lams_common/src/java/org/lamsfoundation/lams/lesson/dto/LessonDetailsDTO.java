@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.lesson.dto;
 
 import java.util.Date;
-import java.text.DateFormat;
 import java.util.Set;
 
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -56,6 +55,7 @@ public class LessonDetailsDTO {
 	private Long learningDesignID;
 	private Integer numberPossibleLearners;
 	private Integer numberStartedLearners;
+	private Boolean learnerExportAvailable;
 	
 	/** Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners */
 	public LessonDetailsDTO(Lesson lesson){
@@ -111,6 +111,8 @@ public class LessonDetailsDTO {
 		Set allLearners = lesson.getAllLearners();
 		this.numberPossibleLearners = new Integer(allLearners !=null ? allLearners.size() : 0);
 		this.numberStartedLearners = new Integer(0);
+	
+		this.learnerExportAvailable = lesson.getLearnerExportAvailable();
 	}	
 	public Date getScheduleEndDate() {
 		return scheduleEndDate;
@@ -227,5 +229,8 @@ public class LessonDetailsDTO {
 	}
 	public Integer getNumberPossibleLearners() {
 		return numberPossibleLearners;
+	}
+	public Boolean getLearnerExportAvailable() {
+		return learnerExportAvailable;
 	}
 }

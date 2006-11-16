@@ -41,6 +41,10 @@
 		<property name="previousLessonStateId" type="java.lang.Integer"
 			column="previous_state_id" length="3">
 		</property>
+		<property name="learnerExportAvailable" type="java.lang.Boolean"
+        	column="learner_exportport_avail" length="1">
+    </property>
+		
 		<!-- Associations -->
 		
 		<!-- bi-directional many-to-one association to User -->

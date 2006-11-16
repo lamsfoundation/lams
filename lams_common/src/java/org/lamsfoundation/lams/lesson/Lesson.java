@@ -117,6 +117,9 @@ public class Lesson implements Serializable {
     /** persistent field */
     private Set learnerProgresses;
 
+    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    private Boolean learnerExportAvailable;
+    
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -129,10 +132,12 @@ public class Lesson implements Serializable {
      * organization and class information.
      * Cain constructor pattern implementation.
      */
-    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
+    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, 
+    		Integer previousLessonStateId, Boolean learnerExportAvailable, 
     		LearningDesign learningDesign,Set learnerProgresses) 
     {
-        this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,learningDesign,null,null,learnerProgresses);
+        this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
+        		learnerExportAvailable,learningDesign,null,null,learnerProgresses);
     }     
     
     /** 
@@ -141,15 +146,17 @@ public class Lesson implements Serializable {
      * Chain construtor pattern implementation. 
      */
     public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId, 
-    		LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    		Boolean learnerExportAvailable, LearningDesign learningDesign, LessonClass lessonClass, 
+    		Organisation organisation, Set learnerProgresses) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learningDesign,lessonClass,organisation,learnerProgresses);
+        		learnerExportAvailable, learningDesign,lessonClass,organisation,learnerProgresses);
     }    
     
     /** full constructor */
     public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, 
-    		Integer lessonStateId, Integer previousLessonStateId, LearningDesign learningDesign, LessonClass lessonClass, 
+    		Integer lessonStateId, Integer previousLessonStateId, Boolean learnerExportAvailable, 
+    		LearningDesign learningDesign, LessonClass lessonClass, 
     		Organisation organisation, Set learnerProgresses) 
     {
         this.lessonId = lessonId;
@@ -161,6 +168,7 @@ public class Lesson implements Serializable {
         this.user = user;
         this.lessonStateId = lessonStateId;
         this.previousLessonStateId = previousLessonStateId;
+        this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
         this.learningDesign = learningDesign;
         this.lessonClass = lessonClass;
         this.organisation = organisation;
@@ -172,6 +180,7 @@ public class Lesson implements Serializable {
      * It is designed for monitor side to create a lesson by teacher.
      * 
      * @param user the teacher who created this lesson
+     * @pram learnerExportAvailable should the export portfolio option be made available to the learner?
      * @param organisation the organisation associated with this lesson.
      * @param ld the learning design associated with this lesson.
      * @param newLessonClass the lesson class that will run this lesson.
@@ -181,6 +190,7 @@ public class Lesson implements Serializable {
                                          String lessonDescription,
                                          User user, 
                                          Organisation organisation, 
+                                         Boolean learnerExportAvailable,
                                          LearningDesign ld, 
                                          LessonClass newLessonClass)
     {
@@ -191,6 +201,7 @@ public class Lesson implements Serializable {
                           user,
                           Lesson.CREATED,
                           null,
+                          learnerExportAvailable, 
                           ld,
                           newLessonClass,//lesson class
                           organisation,
@@ -203,12 +214,14 @@ public class Lesson implements Serializable {
      * and lesson class data later.
      * 
      * @param user the user who want to create a lesson.
+     * @param learnerExportAvailable should the export portfolio option be made available to the learner?
      * @param ld the learning design that this lesson is based on.
      * @return the lesson created.
      */
     public static Lesson createNewLessonWithoutClass(String lessonName,
                                                      String lessonDescription,
                                                      User user,
+                                                     Boolean learnerExportAvailable,
                                                      LearningDesign ld)
     {
         return new Lesson(lessonName,
@@ -217,6 +230,7 @@ public class Lesson implements Serializable {
                           user,
                           Lesson.CREATED,
                           null,
+                          learnerExportAvailable,
                           ld,
                           new HashSet());
     }
@@ -373,6 +387,18 @@ public class Lesson implements Serializable {
     }
 
     /** 
+     * @hibernate.property type="java.lang.Boolean"  column="learner_exportport_avail"
+     *            	       length="1"
+     */
+ 	public Boolean getLearnerExportAvailable() {
+		return learnerExportAvailable;
+	}
+
+	public void setLearnerExportAvailable(Boolean learnerExportAvailable) {
+		this.learnerExportAvailable = learnerExportAvailable;
+	}
+
+	/** 
      * @hibernate.many-to-one not-null="true" cascade="none"
      * @hibernate.column name="learning_design_id"        
      */
@@ -422,6 +448,7 @@ public class Lesson implements Serializable {
     public void setLearnerProgresses(Set learnerProgresses) {
         this.learnerProgresses = learnerProgresses;
     }
+
 
     public String toString() {
         return new ToStringBuilder(this)
@@ -488,4 +515,5 @@ public class Lesson implements Serializable {
     		( stateId.equals(STARTED_STATE) || stateId.equals(FINISHED_STATE) 
     			|| stateId.equals(ARCHIVED_STATE) || stateId.equals(REMOVED_STATE) ) ) ;
     }
+
 }

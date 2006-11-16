@@ -2491,7 +2491,7 @@
 </table>
 <table alias="" name="lams_lesson" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="-85" y="371"/>
+<table-figure-bounds height="-1" width="-1" x="-87" y="329"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="lesson_id" remarks="">
 <column-description></column-description>
@@ -2625,6 +2625,19 @@
 <variant type-name-pattern="INT UNSIGNED"/>
 <variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="1" mandatory="false" name="learner_exportport_avail" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
 </column-list>
@@ -3457,7 +3470,7 @@ It will be used for the IMS LD import/export.</column-description>
 </table>
 <table alias="" name="lams_lesson_state" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="-64" y="256"/>
+<table-figure-bounds height="-1" width="-1" x="-67" y="240"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="3" decimal-digits="0" default-value="" mandatory="true" name="lesson_state_id" remarks="">
 <column-description></column-description>
