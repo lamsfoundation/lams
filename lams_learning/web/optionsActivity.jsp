@@ -78,7 +78,7 @@
 		<table class="alternative-color" cellspacing="0">
 			<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL" varStatus="loop">
 				<tr onclick="selectActivity(<c:out value="${activityURL.activityId}" />)">
-					<td >
+					<td width="2%">
 						<c:choose>
 							<c:when test="${activityURL.complete}">
 								<%--html:img page="/images/tick.gif" /--%>
@@ -92,7 +92,6 @@
 					<td >
 						<c:out value="${activityURL.title}"/>
 					</td>
-					<td ><c:out value="${activityURL.description}"/></td>
 				</tr>
 			</c:forEach> 
 		</table>
