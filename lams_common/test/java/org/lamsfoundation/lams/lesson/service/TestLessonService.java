@@ -79,7 +79,7 @@ public class TestLessonService extends AbstractLamsTestCase {
 		User test1 = userManagementService.getUserByLogin(TEST1_USER_LOGIN);
 
 		// this lesson isn't valid as it doesn't have a learning design
-	      Lesson newLesson = Lesson.createNewLessonWithoutClass("test lesson", "test lesson", mmm, null);
+	      Lesson newLesson = Lesson.createNewLessonWithoutClass("test lesson", "test lesson", mmm, true, null);
 	      lessonDAO.saveLesson(newLesson);
 	      
 	      Organisation organisation = (Organisation) baseDAO.find(Organisation.class, TEST_ORG_ID);

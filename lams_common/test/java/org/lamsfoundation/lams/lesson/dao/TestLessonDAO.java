@@ -119,6 +119,7 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         Lesson lessonWithoutName = Lesson.createNewLessonWithoutClass(null,
                                                                       null,
                                                                       testUser,
+                                                                      true,
                                                                       testLearningDesign);
         
         try

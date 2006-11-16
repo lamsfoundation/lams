@@ -240,6 +240,7 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
                                 testUser,
                                 Lesson.CREATED,
                                 null,
+                                true,
                                 testLearningDesign,
                                 testLessonClass,//lesson class
                                 testOrg,
