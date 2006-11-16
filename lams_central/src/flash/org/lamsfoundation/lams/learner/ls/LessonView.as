@@ -156,6 +156,7 @@ class LessonView extends AbstractView {
 			case 'LESSON' :
 				trace('setting lesson name');
 				setLessonName(lm.name);
+				Application.getInstance().getHeader().showExportButton(lm.learnerExportAvailable);
 				break;
 			case 'DESIGNMODEL' :
 				trace('updating design model for lesson..');

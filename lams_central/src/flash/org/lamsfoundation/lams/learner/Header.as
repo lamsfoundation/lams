@@ -120,6 +120,8 @@ class Header extends MovieClip {
 		export_btn.onRollOver = Proxy.create(this,this['showToolTip'], export_btn, "ln_export_tooltip");
 		export_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
+		export_btn._visible = false;
+		export_lbl._visible = false;
 		this.onEnterFrame = setLabels;
 		
 	}
@@ -160,6 +162,12 @@ class Header extends MovieClip {
 		
 		dispatchEvent({type:'load',target:this});
         
+	}
+	
+	public function showExportButton(v:Boolean) {
+		Debugger.log("Show/Hide Export Button: " + v, Debugger.GEN, "showExportButton", "Header");
+		export_btn._visible = v;
+		export_lbl._visible = v;
 	}
 	
 	public function setLessonName(lessonName:String){

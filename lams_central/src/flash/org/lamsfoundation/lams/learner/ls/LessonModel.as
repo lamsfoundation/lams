@@ -60,6 +60,7 @@ class LessonModel extends Observable {
 	private var _lessonDescription:String;
 	private var _lessonStateID:Number;
 	private var _learningDesignID:Number;
+	private var _learnerExportAvailable:Boolean;
 	
 	/* the learningDesignModel gets set when you join a lesson */
 	private var _learningDesignModel:DesignDataModel;
@@ -91,6 +92,7 @@ class LessonModel extends Observable {
 		_lessonDescription = dto.lessonDescription;
 		_lessonStateID = dto.lessonStateID;
 		_learningDesignID = dto.learningDesignID;
+		_learnerExportAvailable = dto.learnerExportAvailable;
 		
 		
 		setChanged();
@@ -245,6 +247,14 @@ class LessonModel extends Observable {
 		infoObj = {};
 		infoObj.updateType = "DESIGNMODEL";
 		notifyObservers(infoObj);
+	}
+	
+	public function set learnerExportAvailable(b:Boolean) {
+		_learnerExportAvailable = b;
+	}
+	
+	public function get learnerExportAvailable():Boolean {
+		return _learnerExportAvailable;
 	}
 	
 	public function getLearningDesignModel():DesignDataModel{
