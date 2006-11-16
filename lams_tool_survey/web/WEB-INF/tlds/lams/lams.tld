@@ -60,6 +60,14 @@
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
+      <attribute>
+         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>escapeXml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
 
    </tag>
    <tag>

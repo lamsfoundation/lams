@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 /**
  * JSP tag. It converts text from \n or \r\n to &lt;BR&gt; before rendering.
@@ -21,6 +22,8 @@ public class MultiLinesOutputTag extends SimpleTagSupport{
 	
 	private String value;
 	
+	private boolean escapeXml;
+	
 	@Override
 	public void doTag() throws JspException, IOException {
 		if(StringUtils.isEmpty(value))
@@ -30,7 +33,17 @@ public class MultiLinesOutputTag extends SimpleTagSupport{
 //		if(os.toLowerCase().indexOf("win") != -1)
 //			value = value.replaceAll("\r\n","<BR>");
 //		else
+		
+		if (escapeXml) {
+			String[] lines = value.split("\n");
+			value = new String();
+			for(String line: lines) {
+				value += StringEscapeUtils.escapeXml(line) + "<br>";
+			}			
+		} else {
 			value = value.replaceAll("\n","<BR>");
+		}
+
 		getJspContext().getOut().write(value.toString());
 	}
 
@@ -45,5 +58,16 @@ public class MultiLinesOutputTag extends SimpleTagSupport{
 	public void setValue(String value) {
 		this.value = value;
 	}
-
+	
+	/**
+	 * @jsp.attribute required="false" rtexprvalue="true" description="escape xml characters?
+	 * 
+	 */
+	public boolean getEscapeXml() {
+	    return this.escapeXml;
+	}
+	
+	public void setEscapeXml(boolean escapeXml) {
+	    this.escapeXml = escapeXml;
+	}
 }
