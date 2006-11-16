@@ -95,6 +95,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var start_date_lbl:Label;
 	private var schedule_date_lbl:Label;
 	private var btnLabel:String;
+	private var learner_expp_cb:CheckBox;
 	
 	//Text Items
     private var LSTitle_txt:TextField;
@@ -260,6 +261,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
 		start_btn.addEventListener("click", _monitorController);
 		statusApply_btn.addEventListener("click", Proxy.create(this, changeStatus));
+		learner_expp_cb.addEventListener("click", Delegate.create(this, toogleExpPortfolio));
 		this.addEventListener("apply", Proxy.create(_monitorController, _monitorController.changeStatus));
 		
 		editClass_btn.onRollOver = Proxy.create(this,this['showToolTip'], editClass_btn, "ls_manage_editclass_btn_tooltip");
@@ -412,6 +414,7 @@ public function update (o:Observable,infoObj:Object):Void{
 
 		//numLearners_txt.text = mm.allLearnersProgress.length + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		class_txt.text = s.organisationName;
+		learner_expp_cb.selected = s.learnerExportAvailable;
 	}
 	
 	private function populateStatusList(stateID:Number):Void{
@@ -750,6 +753,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageStart_lbl.text = "<b>"+Dictionary.getValue('ls_manage_start_lbl')+"</b>";
 		manageDate_lbl.text = Dictionary.getValue('ls_manage_date_lbl');
 		manageTime_lbl.text = Dictionary.getValue('ls_manage_time_lbl');
+		learner_expp_cb.label = Dictionary.getValue('ls_manage_learnerExpp_lbl');
 		//Button
 		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
 		editClass_btn.label = Dictionary.getValue('ls_manage_editclass_btn');
@@ -779,6 +783,32 @@ public function update (o:Observable,infoObj:Object):Void{
 			
 	}
 	
+	
+	private function toogleExpPortfolio(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		//var wm:WizardModel = WizardModel(getModel());
+		//resultDTO.learnerExpPortfolio = target.selected;
+		var callback:Function = Proxy.create(this,confirmOutput);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=learnerExportPortfolioAvailable&lessonID='+_root.lessonID+'&learnerExportPortfolio='+target.selected, callback, false);
+	}
+	
+	
+	public function confirmOutput(r):Void{
+		if(r instanceof LFError) {
+				r.showErrorAlert();
+		} else {
+			if (learner_expp_cb.selected){
+				var msg:String = Dictionary.getValue('ls_confirm_expp_enabled') ;
+				LFMessage.showMessageAlert(msg);
+
+			}else {
+				var msg:String = Dictionary.getValue('ls_confirm_expp_disabled') ;
+				LFMessage.showMessageAlert(msg);
+			}
+			
+		}
+	}
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and apply them
 	 * directly to the instance
@@ -794,6 +824,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.setStyle('styleName',styleObj);
 		manageStatus_lbl.setStyle('styleName',styleObj);
 		manageStart_lbl.setStyle('styleName',styleObj);
+		learner_expp_cb.setStyle('styleName',styleObj);
 		
 		schedule_date_lbl.setStyle('styleName', styleObj);
 		sessionStatus_txt.setStyle('styleName', styleObj);
