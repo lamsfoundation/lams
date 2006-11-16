@@ -83,6 +83,8 @@ class Sequence {
 	
 	private var _active:Boolean;
 	
+	private var _learnerExportAvailable:Boolean;
+	
 	
 	/**
 	* Constructor.
@@ -138,6 +140,8 @@ class Sequence {
 		
 		_licenseID = dto.licenseID;
 		_licenseText = dto.licenseText;
+		
+		_learnerExportAvailable = dto.learnerExportAvailable;
 	}
 	
 	
@@ -456,6 +460,14 @@ class Sequence {
 	
 	public function get licenseText():String{
 		return _licenseText;
+	}
+	
+	public function set learnerExportAvailable(b:Boolean) {
+		_learnerExportAvailable = b;
+	}
+	
+	public function get learnerExportAvailable():Boolean {
+		return _learnerExportAvailable;
 	}
 	
 	function get className():String{
