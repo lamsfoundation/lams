@@ -396,6 +396,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		schedule_btn._y = schedule_btn._y - 30
 		start_btn._y = start_btn._y - 30
 		reqTasks_scp._y = reqTasks_scp._y - 30
+		learner_expp_cb._y = learner_expp_cb._y - 30
 		
 	}
 	/**
