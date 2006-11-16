@@ -1015,6 +1015,7 @@ class WizardView extends AbstractView {
 		schedule_cb.visible = true;
 		learner_expp_cb.visible = true;
 		learner_expp_cb.selected = true;
+		
 		//start_btn.visible = true;
 		
 		if(schedule_cb.selected){
@@ -1114,7 +1115,6 @@ class WizardView extends AbstractView {
 		} 
 		
 		if(valid){
-			
 			if(resourceTitle_txi.text != ""){resultDTO.resourceTitle = resourceTitle_txi.text;}
 			resultDTO.resourceDescription = resourceDesc_txa.text;
 		} else {
@@ -1127,6 +1127,9 @@ class WizardView extends AbstractView {
 		}else {
 			
 		}
+		
+		resultDTO.learnerExpPortfolio = learner_expp_cb.selected;
+		
 		return valid;
 	}
 	
