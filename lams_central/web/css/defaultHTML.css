@@ -112,7 +112,14 @@ ul {
 	margin-right: 30px;
 }
 
-li { list-style-type:circle;}
+li {
+	list-style-type: circle;
+	padding-bottom: 5px;
+}
+
+li.no-list-type  {
+	list-style-type: none;
+}
 
 #page { /*whole layout of page*/
 	margin: 25px auto;
@@ -1128,9 +1135,28 @@ border:0px;
 .help {text-align:right; margin-right:35px; cursor: pointer;}
 
 /************ My Profile custom **********/
-.align-right{
-text-align:right;
+.align-right {
+	text-align: right;
 }
-.align-left{
-text-align:left;
+
+.align-left {
+	text-align: left;
 }
+
+.shading-bg {
+	padding: 5px;
+	padding-left: 10px;
+	padding-top: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 98%;
+	border-top: 1px solid #ccc;
+	background: url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px
+}
+
+.img-border {
+	padding: 2px;
+	border: 1px solid #efefef;
+}
+
+.userpage-td {border-left:1px solid #ccc;}
