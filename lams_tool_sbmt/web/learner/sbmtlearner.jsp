@@ -174,9 +174,11 @@
 				
 				<c:choose>
 					<c:when test="${empty learner.reflect}">
-						<em>
-							<fmt:message key="no.reflection.available" />
-						</em>
+						<p>
+							<em>
+								<fmt:message key="message.no.reflection.available" />
+							</em>
+						</p>
 					</c:when>
 					<c:otherwise>
 						<p> <lams:out escapeXml="true" value="${learner.reflect}" />  </p>				
