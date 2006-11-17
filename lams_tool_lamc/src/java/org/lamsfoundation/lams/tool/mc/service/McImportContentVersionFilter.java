@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.tool.mc.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
@@ -25,6 +26,8 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter{
 	public void up20061015To20061113(){
 		// Change name to suit the version you give the tool.
 
-	    this.addField(McContent.class, "showMarks",new Boolean(false)); 	    
+	    this.addField(McContent.class, "showMarks",new Boolean(false));
+	    this.addField(McContent.class, "randomize",new Boolean(false));
+	    this.addField(McOptsContent.class, "displayOrder, ",new Boolean(false));
 	}
 }

@@ -2523,16 +2523,16 @@ public class McServicePOJO implements
     {
     	Date now = new Date();
     	McContent toolContentObj = new McContent();
-    	toolContentObj.setContentInUse(Boolean.FALSE.booleanValue());
+    	toolContentObj.setContentInUse(false);
     	toolContentObj.setCreatedBy(user.getUserID().longValue());
     	toolContentObj.setCreationDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE.booleanValue());
+    	toolContentObj.setDefineLater(false);
     	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
- 	    toolContentObj.setReflect(Boolean.FALSE);
+ 	    toolContentObj.setReflect(false);
     	toolContentObj.setReflectionSubject(null);
-    	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
+    	toolContentObj.setRunOffline(false);
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	
     	toolContentObj.setContent(null);
@@ -2540,6 +2540,7 @@ public class McServicePOJO implements
     	toolContentObj.setMcContentId(toolContentId);
     	toolContentObj.setQuestionsSequenced(false);
     	toolContentObj.setShowMarks(false);
+    	toolContentObj.setRandomize(false);
     	// I can't find a use for setShowReport anywhere
     	toolContentObj.setShowReport(false);
     	
@@ -2589,7 +2590,7 @@ public class McServicePOJO implements
 		question.setQuestion(WebUtil.convertNewlines((String)questionMap.get(CONTENT_Q_QUESTION)));
 		
 		// In 1.0.2 all questions are implicitly assumed to be 1 and be of equal weight
-		question.setMark( 1 );
+		question.setMark(new Integer(1));
 		
 		String correctAnswer = (String)questionMap.get(CONTENT_Q_ANSWER);
 
@@ -2629,7 +2630,7 @@ public class McServicePOJO implements
 	       			+" as the tool content does not exist.");
     	}
     	
-    	toolContentObj.setReflect(Boolean.TRUE);
+    	toolContentObj.setReflect(true);
     	toolContentObj.setReflectionSubject(description);
     }
    

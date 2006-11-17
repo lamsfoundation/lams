@@ -160,6 +160,15 @@
         column="showMarks"
         length="1"        
    />
+   
+   <property
+        name="randomize"
+        type="boolean"
+        access="property"
+        column="randomize"
+        length="1"        
+   />
+
 
     
     <property

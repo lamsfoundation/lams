@@ -486,7 +486,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("dettingcommon content: ");
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		
-		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+		boolean randomize=mcContent.isRandomize();
+		logger.debug("randomize: " + randomize);
+		
+		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
+		
 		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
 		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
 		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));

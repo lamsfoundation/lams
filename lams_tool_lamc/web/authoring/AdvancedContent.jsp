@@ -40,6 +40,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </p>
 
 
+<p class="small-space-top">
+	<html:checkbox property="randomize" value="1" styleId="randomize"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="randomize">
+		<fmt:message key="label.randomize" />
+	</label>
+</p>
+
+
+
 
 <p>
 	<html:checkbox property="retries" value="1" styleId="retries"

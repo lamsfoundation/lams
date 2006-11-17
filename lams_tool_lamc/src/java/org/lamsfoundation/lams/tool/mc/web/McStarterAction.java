@@ -446,6 +446,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		mcAuthoringForm.setSln(mcContent.isShowReport()?"1":"0");
 		mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
+		mcAuthoringForm.setRandomize(mcContent.isRandomize()?"1":"0");
 		mcAuthoringForm.setShowMarks(mcContent.isShowMarks()?"1":"0");
 		
 		mcAuthoringForm.setRetries(mcContent.isRetries()?"1":"0");
@@ -454,6 +455,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		mcGeneralAuthoringDTO.setSln(mcContent.isShowReport()?"1":"0");
 		mcGeneralAuthoringDTO.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
+		mcGeneralAuthoringDTO.setRandomize(mcContent.isRandomize()?"1":"0");
 		mcGeneralAuthoringDTO.setRetries(mcContent.isRetries()?"1":"0");
 	    mcGeneralAuthoringDTO.setReflect(mcContent.isReflect()?"1":"0");
 	    mcGeneralAuthoringDTO.setReflectionSubject(mcContent.getReflectionSubject());

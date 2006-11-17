@@ -18,6 +18,7 @@ CREATE TABLE tl_lamc11_content (
      , show_report TINYINT(1) NOT NULL DEFAULT 0
      , reflectionSubject TEXT
      , showMarks TINYINT(1) NOT NULL DEFAULT 0
+     , randomize TINYINT(1) NOT NULL DEFAULT 0
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
@@ -40,6 +41,7 @@ CREATE TABLE tl_lamc11_options_content (
      , correct_option TINYINT(1) NOT NULL DEFAULT 0
      , mc_que_content_id BIGINT(20) NOT NULL
      , mc_que_option_text VARCHAR(250)
+     , displayOrder INT(5)
      , PRIMARY KEY (uid)
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_options_content_1 FOREIGN KEY (mc_que_content_id)
@@ -110,11 +112,12 @@ CREATE TABLE tl_lamc11_uploadedfile (
                   REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
+
 INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced , created_by , run_offline , define_later,  offline_instructions, online_instructions, content_in_use, retries, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ', 'Instructions', NOW(), 0, 0, 1, 0, 0, '','', 0, 0, 0, 0);
 
 INSERT INTO tl_lamc11_que_content  (uid,question, mark, display_order,  mc_content_id) VALUES (1, 'A Sample question?', 1,1,1);
 	
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1,'Candidate Answer 1');
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 1,'Candidate Answer 2');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1, 1,'Candidate Answer 1');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 2, 1,'Candidate Answer 2');
 
 

@@ -66,6 +66,7 @@ public class AuthoringUtil implements McAppConstants {
 	protected static void setRadioboxes(McContent mcContent, McAuthoringForm mcAuthoringForm)
 	{
 		mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
+		mcAuthoringForm.setRandomize(mcContent.isRandomize ()?"1":"0");
 		mcAuthoringForm.setShowMarks(mcContent.isShowMarks()?"1":"0");
 		mcAuthoringForm.setRetries(mcContent.isRetries()?"1":"0");
 		mcAuthoringForm.setSln(mcContent.isShowReport()?"1":"0");
@@ -1380,6 +1381,9 @@ public class AuthoringUtil implements McAppConstants {
 		
 		String questionsSequenced=request.getParameter("questionsSequenced");
 		logger.debug("questionsSequenced: " + questionsSequenced);
+
+		String randomize=request.getParameter("randomize");
+		logger.debug("randomize: " + randomize);
 		
 		String showMarks=request.getParameter("showMarks");
 		logger.debug("showMarks: " + showMarks);
@@ -1404,21 +1408,25 @@ public class AuthoringUtil implements McAppConstants {
         
         boolean setCommonContent=true; 
         if ((sln == null) || (questionsSequenced == null) || 
-             (retries == null) || (reflect == null) || (showMarks == null))
+             (retries == null) || (reflect == null) || (showMarks == null)  || (randomize == null))
         {
         	setCommonContent=false;
         }
         logger.debug("setCommonContent: " + setCommonContent);
 		
         boolean questionsSequencedBoolean=false;
+        boolean randomizeBoolean=false;
         boolean showMarksBoolean=false;
         boolean slnBoolean=false;
         boolean retriesBoolean=false;
         boolean reflectBoolean=false;
 
     	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
-            questionsSequencedBoolean=true;            
-
+            questionsSequencedBoolean=true;
+    	
+    	if ((randomize != null) && (randomize.equalsIgnoreCase("1")))
+    	    randomizeBoolean=true;            
+    	
     	if ((showMarks != null) && (showMarks.equalsIgnoreCase("1")))
     	    showMarksBoolean=true;            
     	
@@ -1499,6 +1507,7 @@ public class AuthoringUtil implements McAppConstants {
          	mcContent.setOnlineInstructions(richTextOnlineInstructions);
          	mcContent.setOfflineInstructions(richTextOfflineInstructions);
          	mcContent.setQuestionsSequenced(questionsSequencedBoolean);
+         	mcContent.setRandomize(randomizeBoolean);
          	mcContent.setShowMarks(showMarksBoolean);
          	mcContent.setRetries(retriesBoolean);
          	mcContent.setShowReport(slnBoolean);	
@@ -2009,6 +2018,7 @@ public class AuthoringUtil implements McAppConstants {
        logger.debug("doing persistCandidates:" + caList);
        logger.debug("mcQueContent:" + mcQueContent);
 
+       int displayOrder = 0;
        Iterator itCaList=  caList.iterator();
        while (itCaList.hasNext())
        {
@@ -2024,7 +2034,12 @@ public class AuthoringUtil implements McAppConstants {
 	    	else
 	    	    correctOption= false;
 	    	    
-	    	McOptsContent mcOptsContent = new McOptsContent(correctOption, candidateAnswer, mcQueContent, new TreeSet());
+	    	
+	    	++ displayOrder; 
+	    	logger.debug("displayOrder:" + displayOrder);
+	    	
+	    	//McOptsContent mcOptsContent = new McOptsContent(correctOption, candidateAnswer, mcQueContent, new TreeSet());
+	    	McOptsContent mcOptsContent = new McOptsContent(new Integer(displayOrder), correctOption, candidateAnswer, mcQueContent, new TreeSet());
 			logger.debug("mcOptsContent: " + mcOptsContent);
 			
 			mcService.saveMcOptionsContent(mcOptsContent);

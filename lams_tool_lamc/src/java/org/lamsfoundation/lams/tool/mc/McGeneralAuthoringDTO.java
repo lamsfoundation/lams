@@ -57,6 +57,7 @@ public class McGeneralAuthoringDTO implements Comparable
     protected String reflect;
     protected String synchInMonitor;
     protected String questionsSequenced;
+    protected String randomize;
     protected String editActivityEditMode;
     protected String reflectionSubject;
     protected String showMarks;
@@ -638,4 +639,16 @@ public class McGeneralAuthoringDTO implements Comparable
         this.showMarks = showMarks;
     }
 
+    /**
+     * @return Returns the randomize.
+     */
+    public String getRandomize() {
+        return randomize;
+    }
+    /**
+     * @param randomize The randomize to set.
+     */
+    public void setRandomize(String randomize) {
+        this.randomize = randomize;
+    }
 }

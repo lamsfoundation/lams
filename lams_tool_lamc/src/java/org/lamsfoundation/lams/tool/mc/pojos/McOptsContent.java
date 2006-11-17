@@ -52,6 +52,8 @@ public class McOptsContent implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String mcQueOptionText;
+    
+    private Integer displayOrder;
 
     /** non persistent field */
     private Long mcQueContentId;
@@ -78,12 +80,20 @@ public class McOptsContent implements Serializable, Comparable {
         this.mcQueContent = mcQueContent;
         this.mcUsrAttempts=mcUsrAttempts;
     }
+    public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, Set mcUsrAttempts) {
+        this.displayOrder = displayOrder;        
+    	this.correctOption = correctOption;
+        this.mcQueOptionText = mcQueOptionText;
+        this.mcQueContent = mcQueContent;
+        this.mcUsrAttempts=mcUsrAttempts;
+    }
     
     public static McOptsContent newInstance(McOptsContent mcOptsContent,
 											McQueContent newMcQueContent)
 											
 	{
-    	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.isCorrectOption(),
+    	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getDisplayOrder(),
+    	        										  mcOptsContent.isCorrectOption(),
 							    						  mcOptsContent.getMcQueOptionText(),
 							    						  newMcQueContent,
 														  new TreeSet());
@@ -185,5 +195,29 @@ public class McOptsContent implements Serializable, Comparable {
         	return 1;
 		else
 			return (int) (mcQueOptionId.longValue() - optContent.mcQueOptionId.longValue());
+    }
+    /**
+     * @return Returns the logger.
+     */
+    public static Logger getLogger() {
+        return logger;
+    }
+    /**
+     * @param logger The logger to set.
+     */
+    public static void setLogger(Logger logger) {
+        McOptsContent.logger = logger;
+    }
+    /**
+     * @return Returns the displayOrder.
+     */
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+    /**
+     * @param displayOrder The displayOrder to set.
+     */
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
     }
 }

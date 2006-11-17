@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -37,6 +38,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McRandomizedListsDTO;
 import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -733,6 +735,83 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+    public static McRandomizedListsDTO randomizeList(List listCandidateAnswers, List listCandidateAnswerUids)
+    {
+        logger.debug("starting randomizeList: " + listCandidateAnswers);
+        logger.debug("using listCandidateAnswerUids: " + listCandidateAnswerUids);
+        
+        McRandomizedListsDTO mcRandomizedListsDTO= new McRandomizedListsDTO();
+        
+        int caCount=listCandidateAnswers.size();
+        logger.debug("caCount: " + caCount);
+
+        Random generator = new Random();
+                
+        boolean listNotComplete=true;
+        int randomInt=0;
+                
+        List randomList= new LinkedList();
+        List randomUidList= new LinkedList();
+        while (listNotComplete)
+        {
+            randomInt = generator.nextInt(caCount);
+            logger.debug("randomInt: " + randomInt);
+            
+            String ca=(String)listCandidateAnswers.get(randomInt);
+            logger.debug("ca: " + ca);
+            
+            String caUid=(String)listCandidateAnswerUids.get(randomInt);
+            
+        
+            if (!isEntryStored(ca, randomList))
+            {
+                logger.debug("adding ca, since it is a new candidate, ca: " + ca);
+                randomList.add(ca);
+                randomUidList.add(caUid);
+                
+                logger.debug("randomList size: " + randomList.size());
+                if (randomList.size() == listCandidateAnswers.size())
+                {
+                    logger.debug("the list is populated completely, randomList: " + randomList);
+                    listNotComplete =false;        
+                }
+            }
+        }
+        
+        listCandidateAnswerUids=randomUidList;
+        logger.debug("modified listCandidateAnswerUids as: " + listCandidateAnswerUids);
+        
+        mcRandomizedListsDTO.setListCandidateAnswers(randomList);
+        mcRandomizedListsDTO.setListCandidateAnswerUids(listCandidateAnswerUids);
+        
+        logger.debug("returning mcRandomizedListsDTO: " + mcRandomizedListsDTO);
+        return mcRandomizedListsDTO;
+    }
+    
+    
+    public static boolean  isEntryStored(String ca, List randomList)
+    {
+        logger.debug("isEntryStored, randomList: " + randomList);
+        logger.debug("isEntryStored, ca: " + ca);
+        
+        Iterator randomListIterator=randomList.iterator();
+        
+        while (randomListIterator.hasNext())
+        {
+            String caStored=(String)randomListIterator.next();
+            logger.debug("caStored: " + caStored);
+            
+            if (caStored.equals(ca))
+            {
+                logger.debug("this ca already is stored: " + ca);
+                return true;
+            }
+        }
+        
+       return false;
+    }
+    
+    
     /**
      * List buildQuestionAndCandidateAnswersDTO(HttpServletRequest request, McContent mcContent, IMcService mcService)
      * 
@@ -741,14 +820,18 @@ public class LearningUtil implements McAppConstants {
      * @param mcService
      * @return
      */
-    public static List buildQuestionAndCandidateAnswersDTO(HttpServletRequest request, McContent mcContent, IMcService mcService)
+    public static List buildQuestionAndCandidateAnswersDTO(HttpServletRequest request, McContent mcContent, boolean randomize, 
+            IMcService mcService)
     {
-        logger.debug("starting buildQuestionAndCandidateAnswersDTO");
+        logger.debug("starting buildQuestionAndCandidateAnswersDTO, randomize: " + randomize);
+        
     	List questionAndCandidateAnswersList= new LinkedList();
     	logger.debug("mcContent uid : " + mcContent.getUid());
     	
     	List listQuestionEntries=mcService.getAllQuestionEntries(mcContent.getUid());
     	logger.debug("listQuestionEntries : " + listQuestionEntries);
+    	
+    	
     	
         Iterator listQuestionEntriesIterator=listQuestionEntries.iterator();
     	while (listQuestionEntriesIterator.hasNext())
@@ -760,13 +843,33 @@ public class LearningUtil implements McAppConstants {
     		logger.debug("mcQueContent uid: " + mcQueContent.getUid());
     		
     		List listCandidateAnswers=mcService.findMcOptionNamesByQueId(mcQueContent.getUid());
+    		logger.debug("pre randomize check, listCandidateAnswers: " + listCandidateAnswers);
+    		
+    		List listCandidateAnswerUids=mcService.findMcOptionUidsByQueId(mcQueContent.getUid());
+    		logger.debug("listCandidateAnswerUids: " + listCandidateAnswerUids);
+
+    		
+    		if (randomize)
+    		{
+    		    logger.debug("since randomize is on randomizing the list");
+    		    //listCandidateAnswers=randomizeList(listCandidateAnswers, listCandidateAnswerUids);
+    		    McRandomizedListsDTO mcRandomizedListsDTO=randomizeList(listCandidateAnswers, listCandidateAnswerUids);
+    		    logger.debug("mcRandomizedListsDTO: " + mcRandomizedListsDTO);
+    		    
+    		    listCandidateAnswers=mcRandomizedListsDTO.getListCandidateAnswers();
+    		    listCandidateAnswerUids=mcRandomizedListsDTO.getListCandidateAnswerUids();
+    		}
+    		
+    		
+    		logger.debug("post randomize check, listCandidateAnswers: " + listCandidateAnswers);
+    		logger.debug("post randomize check, listCandidateAnswerUids: " + listCandidateAnswerUids);
+    		    
+
     		logger.debug("listCandidateAnswers: " + listCandidateAnswers);
     		Map mapCandidateAnswers=convertToStringMap(listCandidateAnswers);
     		logger.debug("mapCandidateAnswers: " + mapCandidateAnswers);
 
     		
-    		List listCandidateAnswerUids=mcService.findMcOptionUidsByQueId(mcQueContent.getUid());
-    		logger.debug("listCandidateAnswerUids: " + listCandidateAnswerUids);
     		Map mapCandidateAnswerUids=convertToStringMap(listCandidateAnswerUids);
     		logger.debug("mapCandidateAnswerUids: " + mapCandidateAnswerUids);
     		
@@ -774,23 +877,6 @@ public class LearningUtil implements McAppConstants {
     		String question=mcQueContent.getQuestion();
     		logger.debug("question: " + question);
     		
-    		/*
-    		boolean isTextMarkup=LearningUtil.isTextMarkup(question);
-    		logger.debug("isTextMarkup: " + isTextMarkup);
-    		
-    		String newQuestionText=question;
-    		if (!isTextMarkup)
-    		{
-        		newQuestionText= LearningUtil.getWrappedText(question, false);
-        		logger.debug("wrapped newQuestionText: " + newQuestionText);    		    
-    		}
-    		logger.debug("post warp newQuestionText: " + newQuestionText);
-
-    		
-    		newQuestionText=McUtils.replaceNewLines(newQuestionText);
-    		logger.debug("newQuestionText after procesing new lines: " + newQuestionText);
-    		*/
-
     		mcLearnerAnswersDTO.setQuestion(question);
     		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());

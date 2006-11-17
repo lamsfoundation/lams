@@ -1074,7 +1074,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
     	
-    	List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+    	boolean randomize=mcContent.isRandomize();
+		logger.debug("randomize: " + randomize);
+		
+    	List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
 		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
 		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
 		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
@@ -1150,7 +1153,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
     	
-    	List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+    	boolean randomize=mcContent.isRandomize();
+		logger.debug("randomize: " + randomize);
+		
+    	
+    	List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
 		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
 		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
 		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
@@ -1792,8 +1799,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
     	
+    	boolean randomize=mcContent.isRandomize();
+		logger.debug("randomize: " + randomize);
+		
     	    	
-		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, mcService);
+		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize,mcService);
 		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
 		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
 		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));

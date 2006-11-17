@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:link>
 							&nbsp;
 							<html:link
-								page="/authoring.do?dispatch=deleteFile&amp;httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&amp;toolContentID=${mcGeneralAuthoringDTO.toolContentID}&amp;contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&amp;activeModule=${mcGeneralAuthoringDTO.activeModule}&amp;defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&amp;sln=${mcGeneralAuthoringDTO.sln}&amp;showMarks=${mcGeneralAuthoringDTO.showMarks}&amp&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&amp;retries=${mcGeneralAuthoringDTO.retries}&amp;reflect=${mcGeneralAuthoringDTO.reflect}&amp;reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&amp;passmark=${mcGeneralAuthoringDTO.passMarkValue}"
+								page="/authoring.do?dispatch=deleteFile&amp;httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&amp;toolContentID=${mcGeneralAuthoringDTO.toolContentID}&amp;contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&amp;activeModule=${mcGeneralAuthoringDTO.activeModule}&amp;defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&amp;sln=${mcGeneralAuthoringDTO.sln}&amp;showMarks=${mcGeneralAuthoringDTO.showMarks}&amp;randomize=${mcGeneralAuthoringDTO.randomize}&amp;questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&amp;retries=${mcGeneralAuthoringDTO.retries}&amp;reflect=${mcGeneralAuthoringDTO.reflect}&amp;reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&amp;passmark=${mcGeneralAuthoringDTO.passMarkValue}"
 								paramId="uuid" paramName="attachment" paramProperty="uuid"
 								onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 								target="_self">
@@ -125,7 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:link>
 							&nbsp;
 							<html:link
-								page="/authoring.do?dispatch=deleteFile&amp;httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&amp;toolContentID=${mcGeneralAuthoringDTO.toolContentID}&amp;contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&amp;activeModule=${mcGeneralAuthoringDTO.activeModule}&amp;defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&amp;sln=${mcGeneralAuthoringDTO.sln}&amp;questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&amp;showMarks=${mcGeneralAuthoringDTO.showMarks}&amp;retries=${mcGeneralAuthoringDTO.retries}&amp;reflect=${mcGeneralAuthoringDTO.reflect}&amp;reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&amp;passmark=${mcGeneralAuthoringDTO.passMarkValue}"
+								page="/authoring.do?dispatch=deleteFile&amp;httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&amp;toolContentID=${mcGeneralAuthoringDTO.toolContentID}&amp;contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&amp;activeModule=${mcGeneralAuthoringDTO.activeModule}&amp;defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&amp;sln=${mcGeneralAuthoringDTO.sln}&amp;randomize=${mcGeneralAuthoringDTO.randomize}&amp;questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&amp;showMarks=${mcGeneralAuthoringDTO.showMarks}&amp;retries=${mcGeneralAuthoringDTO.retries}&amp;reflect=${mcGeneralAuthoringDTO.reflect}&amp;reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&amp;passmark=${mcGeneralAuthoringDTO.passMarkValue}"
 								paramId="uuid" paramName="attachment" paramProperty="uuid"
 								onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 								target="_self">
