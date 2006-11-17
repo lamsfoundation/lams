@@ -43,9 +43,9 @@ class WizardController extends AbstractController {
 	*/
 	public function WizardController (wm:Observable) {
 		super (wm);
-		_wizardModel = WizardModel(model);
+		_wizardModel = WizardModel(getModel());
 		_wizardController = this;
-		_wizardView = getView()
+		_wizardView = WizardView(getView());
 		_isBusy = false;
 	}
 	
@@ -53,12 +53,76 @@ class WizardController extends AbstractController {
 	
 
 	public function click(evt):Void{
-		trace(evt.target);
+		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.CRITICAL,'click','WizardController');
 		var tgt:String = new String(evt.target);
-				// button click event handler - next, prev, finish, cancel
+		// button click event handler - next, prev, finish, cancel
+		
+		if(tgt.indexOf("next_btn") != -1){
+			gonext();
+		
+		}else if(tgt.indexOf("prev_btn") != -1){
+			goprev();
+		}else if(tgt.indexOf("finish_btn") != -1){
+			gofinish();
+		}else if(tgt.indexOf("start_btn") != -1){
+			gostart();
+		}else if(tgt.indexOf("close_btn") != -1){
+			goclose();
+		}else if(tgt.indexOf("cancel_btn") != -1){
+			gocancel();
+		}
+		
 	}
 	
+	private function gonext(evt:Object){
+       Debugger.log('I am in goNext:',Debugger.CRITICAL,'click','gonext');
+		_global.breakpoint();
+		var wizView:WizardView = getView();
+		if(wizView.validateStep(_wizardModel)){
+			_wizardModel.stepID++;
+			trace('new step ID: ' + _wizardModel.stepID);
+		}
+    }
 	
+	private function gocancel(evt:Object){
+		// close window
+		trace('CANCEL CLICKED');
+		getURL('javascript:window.close()');
+	}
+	
+	private function goclose(evt:Object){
+		trace('CLOSE WINDOW');
+		getURL('javascript:closeWizard()');
+	}
+	
+	private function goprev(evt:Object){
+		trace('PREV CLICKED');
+		//var wm:WizardModel = WizardModel(getModel());
+		_wizardModel.stepID--;
+		trace('new step ID: ' +_wizardModel.stepID);
+	}
+	
+	private function gofinish(evt:Object){
+		trace('FINISH CLICKED');
+		//var wm:WizardModel = WizardModel(getModel());
+		var wizView:WizardView = getView();
+		if(wizView.validateStep(_wizardModel)){
+			wizView.resultDTO.mode = WizardView.FINISH_MODE;
+			wizView.disableButtons();
+			initializeLesson(wizView.resultDTO);
+		}
+	}
+	
+	private function gostart(evt:Object){
+		trace('START CLICKED');
+		//var wm:WizardModel = WizardModel(getModel());
+		var wizView:WizardView = getView();
+		if(wizView.validateStep(_wizardModel)){
+			wizView.resultDTO.mode = WizardView.START_MODE;
+			wizView.disableButtons();
+			initializeLesson(wizView.resultDTO);
+		}
+	}
 	
 	/**
     * Workspace dialog OK button clicked handler
