@@ -278,12 +278,12 @@ class WizardView extends AbstractView {
 		WorkspaceModel(workspaceView.getModel()).addEventListener('viewUpdate',this);
 		var controller = getController();
 		this.addEventListener('okClicked',Delegate.create(controller,controller.okClicked));
-		next_btn.addEventListener('click',Delegate.create(this, gonext));
-		prev_btn.addEventListener('click',Delegate.create(this, goprev));
-		finish_btn.addEventListener('click',Delegate.create(this, gofinish));
-		cancel_btn.addEventListener('click',Delegate.create(this, gocancel));
-		close_btn.addEventListener('click', Delegate.create(this, goclose));
-		start_btn.addEventListener('click', Delegate.create(this, gostart));
+		next_btn.addEventListener("click",controller);
+		prev_btn.addEventListener("click",controller);
+		finish_btn.addEventListener("click",controller);
+		cancel_btn.addEventListener("click",controller);
+		close_btn.addEventListener("click",controller);
+		start_btn.addEventListener("click",controller);
 		schedule_btn.addEventListener('click', Delegate.create(this, scheduleNow));
 		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
 		staff_selAll_cb.addEventListener("click", Delegate.create(this, toogleStaffSelection));
@@ -650,58 +650,6 @@ class WizardView extends AbstractView {
 
 	// BUTTON EVENT HANDLER methods
 	
-	/**
-    * Called by the NEXT button
-	*
-	*/
-    private function gonext(evt:Object){
-        trace('NEXT CLICKED');
-		_global.breakpoint();
-		var wm:WizardModel = WizardModel(getModel());
-		if(validateStep(wm)){
-			wm.stepID++;
-			trace('new step ID: ' + wm.stepID);
-		}
-    }
-	
-	private function goprev(evt:Object){
-		trace('PREV CLICKED');
-		var wm:WizardModel = WizardModel(getModel());
-		wm.stepID--;
-		trace('new step ID: ' + wm.stepID);
-	}
-	
-	private function gofinish(evt:Object){
-		trace('FINISH CLICKED');
-		var wm:WizardModel = WizardModel(getModel());
-		if(validateStep(wm)){
-			resultDTO.mode = FINISH_MODE;
-			disableButtons();
-			_wizardController.initializeLesson(resultDTO);
-		}
-	}
-	
-	private function gostart(evt:Object){
-		trace('START CLICKED');
-		var wm:WizardModel = WizardModel(getModel());
-		if(validateStep(wm)){
-			resultDTO.mode = START_MODE;
-			disableButtons();
-			_wizardController.initializeLesson(resultDTO);
-		}
-	}
-	
-	private function gocancel(evt:Object){
-		// close window
-		trace('CANCEL CLICKED');
-		getURL('javascript:window.close()');
-	}
-	
-	private function goclose(evt:Object){
-		trace('CLOSE WINDOW');
-		getURL('javascript:closeWizard()');
-	}
-
 	private function scheduleNow(evt:Object){
 		trace('SCHEDULE CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
