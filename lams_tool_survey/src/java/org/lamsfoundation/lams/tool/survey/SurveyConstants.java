@@ -73,6 +73,7 @@ public class SurveyConstants {
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 	public static final String ATTR_REFLECT_LIST = "reflectList";
+	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
@@ -106,6 +107,7 @@ public class SurveyConstants {
 	public static final String ATTR_QUESTION_UID = "questionUid";
 	public static final String ATTR_SUMMARY_LIST = "summaryList";
 	public static final String ATTR_SURVEY = "survey";
+	public static final String ATTR_USER_FINISHED = "userFinished";
 	
 	//POSITION
 	public static int POSITION_INSIDE = 0;

@@ -203,7 +203,7 @@
 		<action path="/learning/submitReflection"
 			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
 			name="reflectionForm" 
-			validate="true" 
+			validate="false" 
 			input="/pages/learning/notebook.jsp"
 			parameter="submitReflection" 
 			scope="request">

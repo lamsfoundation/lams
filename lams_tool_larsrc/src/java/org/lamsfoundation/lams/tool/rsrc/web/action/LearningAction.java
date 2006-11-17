@@ -48,6 +48,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -177,16 +178,27 @@ public class LearningAction extends Action {
 			}
 		}
 		
+		// get notebook entry
+		String entryText = new String();
+		NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+				ResourceConstants.TOOL_SIGNATURE, resourceUser.getUserId().intValue());
+		
+		if (notebookEntry != null) {
+			entryText = notebookEntry.getEntry();
+		}
+		
 		//basic information
 		sessionMap.put(ResourceConstants.ATTR_TITLE,resource.getTitle());
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE_INSTRUCTION,resource.getInstructions());
 		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK,lock);
+		sessionMap.put(ResourceConstants.ATTR_USER_FINISHED, resourceUser.isSessionFinished());
 		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		sessionMap.put(AttributeNames.ATTR_MODE,mode);
 		//reflection information
 		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON,resource.isReflectOnActivity());
 		sessionMap.put(ResourceConstants.ATTR_REFLECTION_INSTRUCTION,resource.getReflectInstructions());
+		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ENTRY, entryText);
 		sessionMap.put(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
 		
 		//add define later support
@@ -392,6 +404,17 @@ public class LearningAction extends Action {
 		
 		refForm.setUserID(user.getUserID());
 		refForm.setSessionMapID(sessionMapID);
+		
+//		 get the existing reflection entry
+		IResourceService submitFilesService = getResourceService();
+		
+		SessionMap map = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		Long toolSessionID = (Long)map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, ResourceConstants.TOOL_SIGNATURE, user.getUserID());
+		
+		if (entry != null) {
+			refForm.setEntryText(entry.getEntry());		
+		}
 		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}

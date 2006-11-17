@@ -211,12 +211,35 @@
 			</c:choose>
 			<%-- end mode != teacher --%>
 		</c:if>
+		
+		
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+			<div class="small-space-top">
+				<h2>${sessionMap.reflectInstructions}</h2>
+			
+				<c:choose>
+					<c:when test="${empty sessionMap.reflectEntry}">
+						<em>
+							<fmt:message key="no.reflection.available" />
+						</em>
+					</c:when>
+					<c:otherwise>
+						<p> <lams:out escapeXml="true" value="${sessionMap.reflectEntry}" />  </p>				
+					</c:otherwise>
+				</c:choose>
+				
+				<html:button property="FinishButton"
+					onclick="return continueReflect()" styleClass="button">
+					<fmt:message key="label.edit" />
+				</html:button>											
+			</div>
+		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top" align="right">
 				<c:choose>
 					<c:when
-						test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
+						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton"
 							onclick="return continueReflect()" styleClass="button">
 							<fmt:message key="label.continue" />

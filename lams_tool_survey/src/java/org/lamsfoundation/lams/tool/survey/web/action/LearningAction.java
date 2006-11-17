@@ -47,6 +47,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
@@ -150,17 +151,28 @@ public class LearningAction extends Action {
 		//check whehter finish lock is on/off
 		boolean lock = survey.getLockWhenFinished() && surveyUser.isSessionFinished();
 		
+		// get notebook entry
+		String entryText = new String();
+		NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+				SurveyConstants.TOOL_SIGNATURE, surveyUser.getUserId().intValue());
+		
+		if (notebookEntry != null) {
+			entryText = notebookEntry.getEntry();
+		}
+		
 		//basic information
 		sessionMap.put(SurveyConstants.ATTR_TITLE,survey.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_SURVEY_INSTRUCTION,survey.getInstructions());
 		sessionMap.put(SurveyConstants.ATTR_FINISH_LOCK,lock);
 		sessionMap.put(SurveyConstants.ATTR_SHOW_ON_ONE_PAGE,survey.isShowOnePage());
+		sessionMap.put(SurveyConstants.ATTR_USER_FINISHED, surveyUser.isSessionFinished());
 		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		sessionMap.put(AttributeNames.ATTR_MODE,mode);
 		//reflection information
 		sessionMap.put(SurveyConstants.ATTR_REFLECTION_ON,survey.isReflectOnActivity());
 		sessionMap.put(SurveyConstants.ATTR_REFLECTION_INSTRUCTION,survey.getReflectInstructions());
+		sessionMap.put(SurveyConstants.ATTR_REFLECTION_ENTRY, entryText);
 		
 		//add define later support
 		if(survey.isDefineLater()){
@@ -388,6 +400,17 @@ public class LearningAction extends Action {
 		
 		refForm.setUserID(user.getUserID());
 		refForm.setSessionMapID(sessionMapID);
+		
+		// get the existing reflection entry
+		ISurveyService submitFilesService = getSurveyService();
+		
+		SessionMap map = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		Long toolSessionID = (Long)map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, SurveyConstants.TOOL_SIGNATURE, user.getUserID());
+		
+		if (entry != null) {
+			refForm.setEntryText(entry.getEntry());		
+		}
 		
 		return mapping.findForward(SurveyConstants.SUCCESS);
 	}
