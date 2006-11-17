@@ -150,7 +150,9 @@ public class IndexAction extends Action {
 		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?state=active&tab=profile"));
 		
 		if(Configuration.getAsBoolean(ConfigurationKeys.LAMS_COMMUNITY_ENABLE))
-			headerLinks.add(new IndexLinkBean("index.community", "index.do?state=active&tab=community"));
+			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER) || 
+				request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN) || request.isUserInRole(Role.MONITOR))
+				headerLinks.add(new IndexLinkBean("index.community", "index.do?state=active&tab=community"));
 		
 		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
