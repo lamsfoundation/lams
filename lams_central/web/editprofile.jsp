@@ -14,9 +14,16 @@
 <logic:messagesPresent> 
 	<p class="warning"><html:errors/></p>
 </logic:messagesPresent>
+
+<div style="clear:both;"></div>
+
+<h2 class="small-space-top"><fmt:message key="title.profile.edit.screen"/></h2>
+
+<div class="shading-bg">
+
 <table>
 	<tr>
-		<td><h2><fmt:message key="title.profile.edit.screen"/></h2></td>
+		<td></td>
 	</tr>
     <tr>
 		<td class="align-right"><fmt:message key="label.username"/>:</td>
@@ -94,12 +101,14 @@
 			</html:select>
 		</td>
 	</tr>
-	<tr>
-		<td colspan=2 class="align-right">
-			<html:submit><fmt:message key="button.save"/></html:submit>
-			<html:reset><fmt:message key="button.reset"/></html:reset>
-			<html:cancel><fmt:message key="button.cancel"/></html:cancel>
-		</td>
-	</tr>
-</table>
+	</table>
+			<div class="space-top" align="center">
+			<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>
+			<html:reset styleClass="button"><fmt:message key="button.reset"/></html:reset>
+			<html:cancel styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
+			</div>
+
+
+</div>
+
 </html:form>
