@@ -13,7 +13,7 @@
 			pageContext.setAttribute("tabs", tabs);
 
 			%>
-<html:html locale="true">
+<lams:html>
 <head>
 	<title><fmt:message key="label.author.title" /></title>
 
@@ -150,4 +150,4 @@
 	changeViewNum(${formBean.resource.miniViewResourceNumber});
 </script>
 </body>
-</html:html>
+</lams:html>

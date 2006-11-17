@@ -2,7 +2,7 @@
 		"http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<html:html locale="true">
+<lams:html>
 <head>
 	<lams:headItems />
 <head>
@@ -15,4 +15,4 @@
 		<B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B>
 	</div>
 </body>
-</html:html>
+</lams:html>

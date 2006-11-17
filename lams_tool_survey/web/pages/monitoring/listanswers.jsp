@@ -5,7 +5,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
-<html>
+<lams:html>
 <head>
 	    <%@ include file="/common/header.jsp" %>
 </head>
@@ -110,4 +110,4 @@
 		</div>
 	</div>
 </body>
-</html>
+</lams:html>

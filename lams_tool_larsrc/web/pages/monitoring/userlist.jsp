@@ -3,7 +3,7 @@
 
 
 <%@ include file="/common/taglibs.jsp"%>
-<html>
+<lams:html>
 <head>
 	    <%@ include file="/common/header.jsp" %>
 </head>
@@ -42,7 +42,7 @@
 			</tr>
 		</c:forEach>
 		<tr>
-			<td colspan="3" align="right">
+			<td colspan="3" class="align-right">
 				<a href="javaqscript:;" onclick="window.close()" class="button">Close</a>
 			</td>
 		</tr>
@@ -51,4 +51,4 @@
 		<div id="footer"></div>
 		</div>
 </body>
-</html>
+</lams:html>

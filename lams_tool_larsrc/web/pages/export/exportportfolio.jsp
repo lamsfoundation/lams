@@ -7,7 +7,7 @@
 <c:set var="mode" value="${sessionMap.mode}"/>
 <c:set var="title" value="${sessionMap.title}"/>
 
-<html:html locale="true">
+<lams:html>
 <head>
 	<title><fmt:message key="export.title" /></title>
 	<c:set var="lams">
@@ -147,4 +147,4 @@
 	</div><!--closes footer-->
 
 </body>
-</html:html>
+</lams:html>

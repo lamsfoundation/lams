@@ -4,7 +4,7 @@
 <%@include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<html:html>
+<lams:html>
 <head>
 <title><fmt:message key="tool.display.name" /></title>
 <html:base />
@@ -213,4 +213,4 @@
 </c:if></div>
 <div id="footer"></div>
 </body>
-</html:html>
+</lams:html>

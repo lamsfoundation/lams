@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
-<html>
+<lams:html>
 <head>
 	<title><fmt:message key="activity.title" /></title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -35,4 +35,4 @@
 		<div id="footer"></div>
 		</div>
 </body>
-</html>
+</lams:html>

@@ -11,7 +11,6 @@
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
-	<link href="${tool}includes/css/scribe.css" rel="stylesheet" type="text/css">
 
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>

@@ -18,7 +18,7 @@
 		<html:textarea cols="60" rows="8" property="entryText"
 			styleClass="text-area"></html:textarea>
 
-		<div align="right" class="space-bottom-top">
+		<div class="space-bottom-top align-right">
 			<html:submit styleClass="button">
 				<fmt:message>button.finish</fmt:message>
 			</html:submit>

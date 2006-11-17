@@ -4,7 +4,7 @@
 
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
 
-<html:html>
+<lams:html>
 <head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:headItems />
@@ -117,4 +117,4 @@
 		<div id="footer"></div>
 	</div>
 </body>
-</html:html>
+</lams:html>

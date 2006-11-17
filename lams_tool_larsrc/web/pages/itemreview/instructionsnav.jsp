@@ -22,7 +22,7 @@
 	</c:otherwise>
 </c:choose>
 
-<html>
+<lams:html>
 	<head>
 		<title>${instructions.title}</title>
 
@@ -112,4 +112,4 @@
 
 		</div>
 	</body>
-</html>
+</lams:html>

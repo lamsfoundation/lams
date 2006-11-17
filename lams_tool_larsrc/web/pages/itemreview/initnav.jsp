@@ -9,7 +9,7 @@ request using this page as target
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<lams:html>
 	<head>
 	</head>
 	<body class="stripes" bgcolor="#9DC5EC" border="1" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
@@ -21,4 +21,4 @@ request using this page as target
 			<c:param name="sessionMapID" value="${param.sessionMapID}"/>
 		</c:redirect>
 	</body>
-</html>
+</lams:html>

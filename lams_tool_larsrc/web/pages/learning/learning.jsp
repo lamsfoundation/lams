@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<html:html locale="true">
+<lams:html>
 <head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
@@ -238,7 +238,7 @@
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top" align="right">
+			<div class="space-bottom-top align-right">
 				<c:choose>
 					<c:when
 						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
@@ -265,5 +265,4 @@
 	<!--closes footer-->
 
 </body>
-</html:html>
-
+</lams:html>

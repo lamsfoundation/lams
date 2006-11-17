@@ -4,7 +4,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
-<html>
+<lams:html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
@@ -22,4 +22,4 @@
 			</c:if>
 		</div>
 	</body>
-</html>
+</lams:html>

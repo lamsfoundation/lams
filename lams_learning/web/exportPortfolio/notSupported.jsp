@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
-<html:html locale="true" xhtml="true">
+<lams:html xhtml="true">
 
 <c:set var="pageTitle">
 	<fmt:message key="${title.export.portfolio}">
@@ -58,4 +58,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="footer"></div>
 	</body>
 	
-</html:html>
+</lams:html>

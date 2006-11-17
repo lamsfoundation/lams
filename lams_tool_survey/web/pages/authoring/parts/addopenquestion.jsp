@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html>
+<lams:html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
@@ -64,4 +64,4 @@
 		</div>
 
 	</body>
-</html>
+</lams:html>

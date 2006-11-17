@@ -2,7 +2,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
-<html:html locale="true">
+<lams:html>
 <head>
 	<title><fmt:message key="page.title.monitoring.view.reflection" /></title>
 	<%@ include file="/common/header.jsp"%>
@@ -49,4 +49,4 @@
 		<!--closes footer-->
 
 </body>
-</html:html>
+</lams:html>

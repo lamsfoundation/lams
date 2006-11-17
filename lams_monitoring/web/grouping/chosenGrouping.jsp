@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html:html locale = "true">
+<lams:html>
     <head>
        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
        <html:base/>
@@ -478,4 +478,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 
 </body>
-</html:html>
+</lams:html>

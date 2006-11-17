@@ -12,7 +12,7 @@
 			pageContext.setAttribute("tabs", tabs);
 
 			%>
-<html:html locale="true">
+<lams:html>
 <head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
@@ -74,4 +74,4 @@
 		<div id="footer"></div>
 	</div>
 </body>
-</html:html>
+</lams:html>

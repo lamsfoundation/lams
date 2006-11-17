@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-<html:html locale="true" xhtml="true">
+<lams:html xhtml="true">
 
 	<tiles:useAttribute name="title" ignore="false" />
 
@@ -66,4 +66,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	</c:choose>
 
-</html:html>
+</lams:html>

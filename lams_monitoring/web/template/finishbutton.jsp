@@ -19,5 +19,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<p align="right"><a href="javascript:window.close();" class="button"><fmt:message key="button.finished"/></a></p>
+<p class="align-right"><a href="javascript:window.close();" class="button"><fmt:message key="button.finished"/></a></p>
 

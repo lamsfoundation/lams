@@ -3,9 +3,9 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html>
+<lams:html>
 	<tiles:insert attribute="header" />
 	<body>
 		<tiles:insert attribute="body" />
 	</body>
-</html>
+</lams:html>

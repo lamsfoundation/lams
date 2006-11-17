@@ -2,7 +2,7 @@
 		"http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<html>
+<lams:html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
@@ -73,4 +73,4 @@
 		</div>
 
 	</body>
-</html>
+</lams:html>

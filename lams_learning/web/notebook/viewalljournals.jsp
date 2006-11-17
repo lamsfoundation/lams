@@ -59,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 				
 				<tr>
-					<td align="left" width="28%">
+					<td class="align-left" width="28%">
 						<c:set var="viewnote">
 							<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=" /><c:out value="${entry.uid}"/>
 						</c:set> 

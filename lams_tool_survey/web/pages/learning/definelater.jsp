@@ -3,7 +3,7 @@
 
 <%@include file="/common/taglibs.jsp"%>
 
-<html:html locale="true">
+<lams:html>
 <head>
 	<%@ include file="/common/header.jsp"%>
 	<meta http-equiv="refresh" content="60">
@@ -20,4 +20,4 @@
 	</div>
 	<!--closes footer-->
 </body>
-</html:html>
+</lams:html>

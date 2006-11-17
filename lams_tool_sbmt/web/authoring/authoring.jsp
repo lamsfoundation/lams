@@ -10,7 +10,7 @@
 </c:set>
 
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
-<html:html>
+<lams:html>
 <head>
 	
 	<lams:headItems />
@@ -99,4 +99,4 @@
 	</div>
 	<!--closes page-->
 </body>
-</html:html>
+</lams:html>

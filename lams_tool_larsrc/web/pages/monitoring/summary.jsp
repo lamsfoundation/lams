@@ -46,7 +46,7 @@
 			<c:if test="${item.itemUid == -1}">
 				<tr>
 					<td colspan="5">
-						<div align="left">
+						<div class="align-left">
 							<b> <fmt:message key="message.monitoring.summary.no.resource.for.group" /> </b>
 						</div>
 					</td>

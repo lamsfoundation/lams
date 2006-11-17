@@ -4,7 +4,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
-<html>
+<lams:html>
 <head>
 	    <%@ include file="/common/header.jsp" %>
 </head>
@@ -50,4 +50,4 @@
 		<div id="learner"></div>
 		</div>
 </body>
-</html>
+</lams:html>

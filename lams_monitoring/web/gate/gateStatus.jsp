@@ -19,7 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 <c:if test="${not GateForm.map.localFiles}">
-	<p align="right">
+	<p class="align-right">
 			<c:if test="${not GateForm.map.gate.gateOpen}">
 				<img height="43" src="../images/synch_active.gif" width="37"><br><span class="bodyBold"><fmt:message key="label.gate.closed"/></span>
 			</c:if>
@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:if>
 
 <c:if test="${GateForm.map.localFiles}">
-	<p align="left">
+	<p class="align-left">
 		<c:if test="${not GateForm.map.gate.gateOpen}">
 				<span class="bodyBold"><fmt:message key="label.gate.closed"/></span>
 			</c:if>

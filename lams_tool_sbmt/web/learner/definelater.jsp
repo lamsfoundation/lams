@@ -3,7 +3,7 @@
 
 <%@include file="/common/taglibs.jsp"%>
 
-<html:html>
+<lams:html>
 <head>
 	<%@ include file="/common/header.jsp"%>
 </head>
@@ -17,6 +17,6 @@
 	</div>
 	<div id="footer"></div>
 </body>
-</html:html>
+</lams:html>
 
 

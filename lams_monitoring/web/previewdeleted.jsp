@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-<html:html locale="true" xhtml="true">
+<lams:html xhtml="true">
 
 	<head>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -42,4 +42,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
  </fmt:message></p>
  
 </body>
-</html:html>
+</lams:html>

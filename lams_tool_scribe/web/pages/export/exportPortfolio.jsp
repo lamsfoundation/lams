@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html>
+<lams:html>
 	<head>
 		<title><c:out value="${scribeDTO.title}" escapeXml="false" />
 		</title>
@@ -98,4 +98,4 @@
 		<!--closes footer-->
 
 	</body>
-</html>
+</lams:html>

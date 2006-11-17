@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<html:html locale="true">
+<lams:html>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <head>
 	<title><fmt:message key="label.learning.title" /></title>
@@ -90,7 +90,7 @@
 				</c:if>
 			</div>
 		</c:forEach>
-		
+
 		<c:if test="${not sessionMap.finishedLock}">
 			 <html:button
 				property="RetakeButton" onclick="return retakeSurvey(-1)"
@@ -98,7 +98,7 @@
 				<fmt:message key="label.retake.survey" />
 			</html:button> 
 		</c:if>
-		
+
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>${sessionMap.reflectInstructions}</h2>
@@ -122,7 +122,7 @@
 				</html:button>											
 			</div>
 		</c:if>
-		
+
 		<table>
 			<tr>
 				<td>
@@ -151,6 +151,6 @@
 	<!--closes footer-->
 
 </body>
-</html:html>
+</lams:html>
 
 

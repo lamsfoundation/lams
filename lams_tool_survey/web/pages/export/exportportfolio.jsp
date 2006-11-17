@@ -7,7 +7,7 @@
 <c:set var="tool"><lams:WebAppURL/></c:set>
 <c:set var="sessionMapID" value="${param.sessionMapID}"/>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<html>
+<lams:html>
 <head>
 	    <%@ include file="/common/header.jsp" %>
 </head>
@@ -111,4 +111,4 @@
 		<div id="footer"></div>
 		</div>
 </body>
-</html>
+</lams:html>

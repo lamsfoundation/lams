@@ -43,7 +43,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<lams:html>
   <head>
     <title><fmt:message key='export.portfolio.window.title'/></title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -162,4 +162,4 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 		</div><!--closes footer-->
 
   </body>
-</html>
+</lams:html>

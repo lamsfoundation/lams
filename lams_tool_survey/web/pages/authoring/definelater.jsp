@@ -10,7 +10,7 @@
 			pageContext.setAttribute("tabs", tabs);
 
 			%>
-<html:html locale="true">
+<lams:html>
 <head>
 	<title><fmt:message key="label.author.title" /></title>
 
@@ -82,4 +82,4 @@
 <div id="footer"></div>
 </div>
 </body>
-</html:html>
+</lams:html>

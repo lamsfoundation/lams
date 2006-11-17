@@ -3,7 +3,7 @@
 
 <%@include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<html:html locale="true">
+<lams:html>
 <head>
 	<%@ include file="/common/header.jsp"%>
 
@@ -56,7 +56,8 @@
 			</div>
 		</c:if>
 
-		<div align="right" class="space-bottom-top">
+
+		<div class="space-bottom-top align-right">
 			<c:choose>
 				<c:when
 					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
@@ -76,4 +77,4 @@
 	</div>
 	<!--closes footer-->
 </body>
-</html:html>
+</lams:html>

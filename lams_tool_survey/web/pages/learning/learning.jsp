@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<html:html locale="true">
+<lams:html>
 <head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
@@ -122,4 +122,4 @@
 		<!--closes footer-->
 	</html:form>
 </body>
-</html:html>
+</lams:html>
