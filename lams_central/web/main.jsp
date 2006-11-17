@@ -65,6 +65,14 @@
 						<c:set var="highlight" value="false" />
 					</c:if>
 				</c:if>
+				<c:if test="${tab eq 'community'}">
+					<c:if test="${headerlink.name eq 'index.community'}">
+						<c:set var="tabLeft" value="tab-left-selected"/>
+						<c:set var="tabMiddle" value="tab-middle-selected"/>
+						<c:set var="tabRight" value="tab-right-selected"/>	
+						<c:set var="highlight" value="false" />
+					</c:if>
+				</c:if>
 				<c:if test="${headerlink.name eq 'index.author'}">
 					<c:set var="tabLeft" value="tab-left-highlight"/>
 					<c:set var="tabMiddle" value="tab-middle-highlight"/>
@@ -112,6 +120,9 @@
 							</c:if>
 							<c:if test="${tab eq 'profile'}">
 								<tiles:insert attribute="profile" />
+							</c:if>
+							<c:if test="${tab eq 'community'}">
+								<tiles:insert attribute="community" />
 							</c:if>
 						</td>
 					</tr>

@@ -129,4 +129,6 @@ public class ConfigurationKeys {
 	public static String DEFAULT_HTML_THEME = "DefaultHTMLTheme";
 	
 	public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
+	
+	public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
 }

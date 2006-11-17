@@ -46,6 +46,8 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -66,6 +68,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/index" validate="false"
  * 
  * @struts.action-forward name="main" path="/main.jsp"
+ * @struts.action-forward name="community" path=".community"
  * @struts.action-forward name="profile" path="/profile.do?method=view"
  * @struts.action-forward name="editprofile" path="/profile.do?method=edit"
  * @struts.action-forward name="password" path="/password.do"
@@ -102,6 +105,9 @@ public class IndexAction extends Action {
 			return mapping.findForward("password");
 		} else if (StringUtils.equals(tab, "portrait")) {
 			return mapping.findForward("portrait");
+		} else if (StringUtils.equals(tab, "community")) {
+			request.setAttribute("tab", tab);
+			return mapping.findForward("community");
 		}
 		
 		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
@@ -142,6 +148,10 @@ public class IndexAction extends Action {
 			headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 		}
 		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?state=active&tab=profile"));
+		
+		if(Configuration.getAsBoolean(ConfigurationKeys.LAMS_COMMUNITY_ENABLE))
+			headerLinks.add(new IndexLinkBean("index.community", "index.do?state=active&tab=community"));
+		
 		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
 	}

@@ -28,4 +28,5 @@ insert into lams_configuration (config_key, config_value) values ('XmppAdmin','a
 insert into lams_configuration (config_key, config_value) values ('XmppPassword','wildfire');
 insert into lams_configuration (config_key, config_value) values ('DefaultFlashTheme','default');
 insert into lams_configuration (config_key, config_value) values ('DefaultHTMLTheme','defaultHTML');
-insert into lams_configuration (config_key, config_value) values ('AllowDirectLessonLaunch','false');
+insert into lams_configuration (config_key, config_value) values ('AllowDirectLessonLaunch','false'); 
+insert into lams_configuration (config_key, config_value) values ('LAMS_Community_enable','false');

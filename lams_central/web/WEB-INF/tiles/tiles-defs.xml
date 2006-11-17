@@ -30,6 +30,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="profile" value="profile.jsp"/>	
 	</definition>
 	
+	<definition name=".community" path="/main.jsp">
+		<put name="community" value="community.jsp"/>	
+	</definition>
+	
 	<definition name=".editprofile" path="/main.jsp">
 		<put name="profile" value="editprofile.jsp"/>	
 	</definition>

@@ -86,7 +86,12 @@
       />
       <forward
         name="cancelled"
-        path="/profile.do?method=view"
+        path="/index.do?state=active&amp;tab=profile"
+        redirect="false"
+      />
+      <forward
+        name="errors"
+        path="/index.do?state=active&amp;tab=password"
         redirect="false"
       />
     </action>
@@ -154,6 +159,31 @@
         redirect="false"
       />
       <forward
+        name="community"
+        path=".community"
+        redirect="false"
+      />
+      <forward
+        name="profile"
+        path="/profile.do?method=view"
+        redirect="false"
+      />
+      <forward
+        name="editprofile"
+        path="/profile.do?method=edit"
+        redirect="false"
+      />
+      <forward
+        name="password"
+        path="/password.do"
+        redirect="false"
+      />
+      <forward
+        name="portrait"
+        path="/portrait.do"
+        redirect="false"
+      />
+      <forward
         name="content"
         path="/indexContent.jsp"
         redirect="false"
@@ -170,7 +200,12 @@
     >
       <forward
         name="profile"
-        path="/profile.do?method=view"
+        path="/index.do?state=active&amp;tab=profile"
+        redirect="false"
+      />
+      <forward
+        name="editprofile"
+        path="/index.do?state=active&amp;tab=editprofile"
         redirect="false"
       />
     </action>
@@ -199,7 +234,12 @@
     >
       <forward
         name="profile"
-        path="/profile.do?method=view"
+        path="/index.do?state=active&amp;tab=profile"
+        redirect="false"
+      />
+      <forward
+        name="errors"
+        path="/index.do?state=active&amp;tab=portrait"
         redirect="false"
       />
     </action>
