@@ -31,11 +31,36 @@
 		<p>
 			<fmt:message key="run.offline.message" />
 		</p>
-
+		
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+			<div class="small-space-top">
+				<h2>${sessionMap.reflectInstructions}</h2>
+				
+				<c:choose>
+					<c:when test="${empty learner.reflect}">
+						<p>
+							<em>
+								<fmt:message key="message.no.reflection.available" />
+							</em>
+						</p>
+					</c:when>
+					<c:otherwise>
+						<p> <lams:out escapeXml="true" value="${learner.reflect}" />  </p>				
+					</c:otherwise>
+				</c:choose>
+				
+				<html:button property="notebookButton"
+					onclick="javascript:notebook();" styleClass="button">
+					<fmt:message key="label.edit" />					
+				</html:button>				
+								
+			</div>
+		</c:if>
+		
 		<div align="right" class="space-bottom-top">
 			<c:choose>
 				<c:when
-					test="${sessionMap.reflectOn and (not sessionMap.finishLock)}">
+					test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
 					<html:button property="continueButton"
 						onclick="javascript:notebook();" styleClass="button">
 						<fmt:message key="label.continue" />
