@@ -22,9 +22,7 @@
 <div class="shading-bg">
 
 <table>
-	<tr>
-		<td></td>
-	</tr>
+	
     <tr>
 		<td class="align-right"><fmt:message key="label.username"/>:</td>
 		<td><bean:write name="UserForm" property="login" /></td>
@@ -102,6 +100,9 @@
 		</td>
 	</tr>
 	</table>
+			</div>
+			
+			
 			<div class="space-top" align="center">
 			<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>
 			<html:reset styleClass="button"><fmt:message key="button.reset"/></html:reset>
@@ -109,6 +110,6 @@
 			</div>
 
 
-</div>
+
 
 </html:form>

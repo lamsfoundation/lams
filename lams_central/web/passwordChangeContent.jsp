@@ -6,17 +6,27 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <html:form action="/passwordChanged" method="post">
-<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
-	<tr> 
-		<td valign="top">
-			<H2><fmt:message key="title.password.change.screen"/></H2>
+
+
+<div style="clear:both"></div>
+
+
+<h2 class="small-space-top"><fmt:message key="title.password.change.screen"/></h2>
+
+	
+			
+<div class="shading-bg">
+
+
 			<logic:messagesPresent message="true"> 
 				<p class="warning">
 				<html:messages message="true" id="errMsg" >
-					<bean:write name="errMsg"/><BR>
+					<bean:write name="errMsg"/><br>
 				</html:messages>
 				</p>
 			</logic:messagesPresent>
+			
+		
 			<table class="body">
 				<tr>
 					<td class="align-right">
@@ -52,14 +62,14 @@
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2" class="align-right">
-						<html:submit><fmt:message key="button.save"/></html:submit> &nbsp; 	
-						<html:cancel><fmt:message key="button.cancel"/></html:cancel>
+					<td>&nbsp;</td>
+				
+					<td>
+						<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>  	
+						<html:cancel  styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
 					</td>
 				</tr>
 			</table>
-		</td>
-	</tr>
-</table>
+
 </html:form>
 			

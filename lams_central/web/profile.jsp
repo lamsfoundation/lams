@@ -47,11 +47,11 @@
 
 			<li class="no-list-type"><a
 				href="index.do?state=active&tab=password"><fmt:message
-				key="title.password.change.screen" /> </a></li>
+				key="title.password.change.screen" /></a></li>
 
 			<li class="no-list-type"><a
 				href="index.do?state=active&tab=portrait"><fmt:message
-				key="title.portrait.change.screen" /> </a></li>
+				key="title.portrait.change.screen" /></a></li>
 		</ul>
 
 		</td>
@@ -65,15 +65,12 @@
 		<td class="align-right" valign="top"><span class="field-name"><fmt:message
 			key="label.portrait.current" />:</span></td>
 		<td valign="top"><logic:notEqual name="portraitUuid" value="0">
-			<img
+			<img class="img-border"
 				src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />
 		</logic:notEqual> <logic:equal name="portraitUuid" value="0">
 			<c:set var="lams">
 				<lams:LAMSURL />
 			</c:set>
-
-
-
 				<em><fmt:message key="msg.portrait.none" /></em>
 			<div class="small-space-top">
 			<img src="${lams}/images/default_user.gif" alt="User Portrait"
