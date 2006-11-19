@@ -219,7 +219,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div class="space-bottom-top">
 				<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"				
-					class="button-add-item"> <fmt:message key="label.save.question" />
+					class="button-add-item"> <fmt:message key="label.add.new.question" />
 				</a>
 
 				<a href="#" onclick="javascript:window.parent.hideMessage()"

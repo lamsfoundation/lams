@@ -107,14 +107,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<a
 			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}"/>');"
 			class="button-add-item"> <fmt:message
-				key="label.add.new.question" /> </a>
+				key="label.save.question" /> </a>
 	</c:if>
 	<c:if
 		test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
 		<a
 			href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}"/>');"
 			class="button-add-item"> <fmt:message
-				key="label.add.new.question" /> </a>
+				key="label.save.question" /> </a>
 
 	</c:if>
 </p>
