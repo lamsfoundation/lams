@@ -723,6 +723,10 @@ public class MonitoringUtil implements VoteAppConstants{
 	        {
 	            double completedPercent=(completedSessionUserCount*100) / potentialUserCount;
 	            logger.debug("completed percent: " + completedPercent);
+	            
+	            if (completedPercent > 100)
+	                completedPercent = 100;
+	            
 	            voteAllSessionsDTO.setCompletedSessionUserPercent(new Double(completedPercent).toString());
 	        }
 	        else
@@ -937,6 +941,10 @@ public class MonitoringUtil implements VoteAppConstants{
 		        {
 		            double completedPercent=(completedSessionUserCount*100) / potentialUserCount;
 		            logger.debug("completed percent: " + completedPercent);
+		            
+		            if (completedPercent > 100)
+		                completedPercent = 100;
+		            
 		            voteMonitoringForm.setCompletedSessionUserPercent(new Double(completedPercent).toString());
 				    if (voteGeneralMonitoringDTO != null)
 				    {
