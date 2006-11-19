@@ -552,10 +552,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      * @param mcContent
      * @return
      */
-    protected List buildSelectedQuestionAndCandidateAnswersDTO(List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, 
+    protected List buildSelectedQuestionAndCandidateAnswersDTO(List allQuestionUidsList, 
+            List learnerInput, McTempDataHolderDTO mcTempDataHolderDTO, 
             IMcService mcService, McContent mcContent)
     {
-        logger.debug("starting buildSelectedQuestionAndCandidateAnswersDTO: " + learnerInput);
+        logger.debug("starting buildSelectedQuestionAndCandidateAnswersDTO using allQuestionUidsList: " + allQuestionUidsList);
+        logger.debug("buildSelectedQuestionAndCandidateAnswersDTO: " + learnerInput);
         logger.debug("mcContent: " + mcContent);
         
         logger.debug("learnerInput: " + learnerInput);
@@ -571,101 +573,165 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         List questionAndCandidateAnswersList= new LinkedList();
         
         int totalUserMarks= 0;
-        Iterator setQuestionUidsIterator=questionUids.iterator();
-        while (setQuestionUidsIterator.hasNext())
+
+        
+        if (questionUids.size() == 0)
+        {
+            logger.debug("there are no selected answers for any questions: " + questionUids);
+        }
+        
+        Iterator allQuestionUidsListIterator=allQuestionUidsList.iterator();
+        while (allQuestionUidsListIterator.hasNext())
     	{
-            McLearnerAnswersDTO mcLearnerAnswersDTO= new McLearnerAnswersDTO();
-            String questionUid=(String)setQuestionUidsIterator.next();
-            logger.debug("questionUid: " + questionUid);
+            logger.debug("started testing all uids");
 
-            McQueContent mcQueContent=mcService.findMcQuestionContentByUid(new Long(questionUid));
-    		logger.debug("mcQueContent: " + mcQueContent);
-    		
-    		logger.debug("mcQueContent text: " + mcQueContent.getQuestion());
-    		String question=mcQueContent.getQuestion();
-    		logger.debug("question: " + question);
-    		
-    		
-    		mcLearnerAnswersDTO.setQuestion(question);
-    		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
-    		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
-    		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
-    		
-    		int currentMark= mcQueContent.getMark().intValue();
-    		logger.debug("currentMark: " + currentMark);
-    		totalMarksPossible+=currentMark;
-    		
-    		
-    		String feedback=mcQueContent.getFeedback();
-    		if (feedback == null) feedback="";
-    		logger.debug("feedback: " + feedback);
-    		
-    		mcLearnerAnswersDTO.setFeedback(feedback);
-    		
-    		Map caMap= new TreeMap(new McStringComparator());
-    		Map caIdsMap= new TreeMap(new McStringComparator());
-    		Long mapIndex=new Long(1);
-    		
-            Iterator listLearnerInputIterator=learnerInput.iterator();
-        	while (listLearnerInputIterator.hasNext())
-        	{
-        		String input=(String)listLearnerInputIterator.next();
-        		logger.debug("input: " + input);
-        		int pos=input.indexOf("-");
-        		logger.debug("pos: " + pos);
-        		String localQuestionUid=input.substring(0,pos);
-        		logger.debug("localQuestionUid: " + localQuestionUid);
+            String currentQuestionUid=(String)allQuestionUidsListIterator.next();
+            logger.debug("currentQuestionUid: " + currentQuestionUid);
+
+            
+            boolean selectedQuestionFound=false;
+            Iterator setQuestionUidsIterator=questionUids.iterator();            
+            while (setQuestionUidsIterator.hasNext())            
+            {
+                String questionUid=(String)setQuestionUidsIterator.next();
+                logger.debug("questionUid: " + questionUid);
+
+                McQueContent mcQueContent=mcService.findMcQuestionContentByUid(new Long(questionUid));
+        		logger.debug("mcQueContent: " + mcQueContent);
         		
-        		if (questionUid.equals(localQuestionUid))
+        		logger.debug("mcQueContent text: " + mcQueContent.getQuestion());
+        		String question=mcQueContent.getQuestion();
+        		logger.debug("question: " + question);
+        		logger.debug("question uid: " + mcQueContent.getUid());
+        		 
+        		logger.debug("testing for comparison currentQuestionUid and  mcQueContent.getUid(): " + 
+        		        currentQuestionUid + " and " + mcQueContent.getUid());        		
+        		
+        		if (currentQuestionUid.equals(mcQueContent.getUid().toString()))
         		{
-        		    logger.debug("equal uids found : " + localQuestionUid);
-            		String caUid=input.substring(pos+1);
-            		logger.debug("caUid: " + caUid);
-            		McOptsContent mcOptsContent= mcService.findMcOptionsContentByUid(new Long(caUid));
-            		logger.debug("mcOptsContent: " + mcOptsContent);
-            		logger.debug("mcOptsContent text: " + mcOptsContent.getMcQueOptionText());
-            		caMap.put(mapIndex.toString(), mcOptsContent.getMcQueOptionText());
-            		caIdsMap.put(mapIndex.toString(), mcOptsContent.getUid().toString() );
-            		mapIndex=new Long(mapIndex.longValue()+1);
-        		}
-        	}
-        	logger.debug("current caMap: " + caMap);
-        	logger.debug("current caIdsMap: " + caIdsMap);
-        	mcLearnerAnswersDTO.setCandidateAnswers(caMap);
-        	
-        	Long mcQueContentUid= mcQueContent.getUid(); 
-        	logger.debug("mcQueContentUid: " + mcQueContentUid);
-        	
-            List correctOptions=(List) mcService.getPersistedSelectedOptions(mcQueContentUid);
-            logger.debug("correctOptions: " +  correctOptions);
-            Map mapCorrectOptionUids=LearningUtil.buildMapCorrectOptionUids(correctOptions);
-            logger.debug("mapCorrectOptionUids: " +  mapCorrectOptionUids);
-        	
-            boolean isEqual=LearningUtil.compareMapItems(mapCorrectOptionUids, caIdsMap);
-            logger.debug("isEqual: " +  isEqual);
-            boolean isEqualCross=LearningUtil.compareMapsItemsCross(mapCorrectOptionUids, caIdsMap);
-            logger.debug("isEqualCross: " +  isEqualCross);
-            boolean compareResult= isEqual && isEqualCross; 
-            logger.debug("compareResult: " +  compareResult);
+        		    selectedQuestionFound=true;
+        		    McLearnerAnswersDTO mcLearnerAnswersDTO= new McLearnerAnswersDTO();
 
-            mcLearnerAnswersDTO.setAttemptCorrect(new Boolean(compareResult).toString());
-            if (compareResult)
-            {
-            	mcLearnerAnswersDTO.setFeedbackCorrect(mcQueContent.getFeedback());
-            	++mark;
+        		    logger.debug("this is a selected question with uid: " + mcQueContent.getUid());
+            		mcLearnerAnswersDTO.setQuestion(question);
+            		mcLearnerAnswersDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
+            		mcLearnerAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
+            		mcLearnerAnswersDTO.setMark(mcQueContent.getMark().toString());
+            		
+            		int currentMark= mcQueContent.getMark().intValue();
+            		logger.debug("currentMark: " + currentMark);
+            		totalMarksPossible+=currentMark;
+            		
+            		
+            		String feedback=mcQueContent.getFeedback();
+            		if (feedback == null) feedback="";
+            		logger.debug("feedback: " + feedback);
+            		
+            		mcLearnerAnswersDTO.setFeedback(feedback);
+            		
+            		Map caMap= new TreeMap(new McStringComparator());
+            		Map caIdsMap= new TreeMap(new McStringComparator());
+            		Long mapIndex=new Long(1);
+            		
+                    Iterator listLearnerInputIterator=learnerInput.iterator();
+                	while (listLearnerInputIterator.hasNext())
+                	{
+                		String input=(String)listLearnerInputIterator.next();
+                		logger.debug("input: " + input);
+                		int pos=input.indexOf("-");
+                		logger.debug("pos: " + pos);
+                		String localQuestionUid=input.substring(0,pos);
+                		logger.debug("localQuestionUid: " + localQuestionUid);
+                		
+                		if (questionUid.equals(localQuestionUid))
+                		{
+                		    logger.debug("equal uids found : " + localQuestionUid);
+                    		String caUid=input.substring(pos+1);
+                    		logger.debug("caUid: " + caUid);
+                    		McOptsContent mcOptsContent= mcService.findMcOptionsContentByUid(new Long(caUid));
+                    		logger.debug("mcOptsContent: " + mcOptsContent);
+                    		logger.debug("mcOptsContent text: " + mcOptsContent.getMcQueOptionText());
+                    		caMap.put(mapIndex.toString(), mcOptsContent.getMcQueOptionText());
+                    		caIdsMap.put(mapIndex.toString(), mcOptsContent.getUid().toString() );
+                    		mapIndex=new Long(mapIndex.longValue()+1);
+                		}
+                	}
+                	logger.debug("current caMap: " + caMap);
+                	logger.debug("current caIdsMap: " + caIdsMap);
+                	mcLearnerAnswersDTO.setCandidateAnswers(caMap);
+                	
+                	Long mcQueContentUid= mcQueContent.getUid(); 
+                	logger.debug("mcQueContentUid: " + mcQueContentUid);
+                	
+                    List correctOptions=(List) mcService.getPersistedSelectedOptions(mcQueContentUid);
+                    logger.debug("correctOptions: " +  correctOptions);
+                    Map mapCorrectOptionUids=LearningUtil.buildMapCorrectOptionUids(correctOptions);
+                    logger.debug("mapCorrectOptionUids: " +  mapCorrectOptionUids);
+                	
+                    boolean isEqual=LearningUtil.compareMapItems(mapCorrectOptionUids, caIdsMap);
+                    logger.debug("isEqual: " +  isEqual);
+                    boolean isEqualCross=LearningUtil.compareMapsItemsCross(mapCorrectOptionUids, caIdsMap);
+                    logger.debug("isEqualCross: " +  isEqualCross);
+                    boolean compareResult= isEqual && isEqualCross; 
+                    logger.debug("compareResult: " +  compareResult);
 
-            	totalUserMarks+=currentMark;	
-            	userMarks=userMarks + currentMark;;
-            }
-            else
+                    mcLearnerAnswersDTO.setAttemptCorrect(new Boolean(compareResult).toString());
+                    if (compareResult)
+                    {
+                    	mcLearnerAnswersDTO.setFeedbackCorrect(mcQueContent.getFeedback());
+                    	++mark;
+
+                    	totalUserMarks+=currentMark;	
+                    	userMarks=userMarks + currentMark;;
+                    }
+                    else
+                    {
+                        mcLearnerAnswersDTO.setFeedbackIncorrect(mcQueContent.getFeedback());
+                    }
+                	logger.debug("assesment complete");
+                	logger.debug("mark:: " + mark);
+                	logger.debug("totalUserMarks: " + totalUserMarks);
+                	
+                	logger.debug("current mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+                	questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
+        		    
+        		}//end if
+            } //end while
+            
+            if (!selectedQuestionFound)
             {
-                mcLearnerAnswersDTO.setFeedbackIncorrect(mcQueContent.getFeedback());
+                logger.debug("this is a not selected question, its uid: " + currentQuestionUid);
+                
+                McQueContent mcQueContentOrig=mcService.findMcQuestionContentByUid(new Long(currentQuestionUid));
+        		logger.debug("mcQueContentOrig: " + mcQueContentOrig);
+    		    McLearnerAnswersDTO mcLearnerAnswersDTO= new McLearnerAnswersDTO();
+
+        		mcLearnerAnswersDTO.setQuestion(mcQueContentOrig.getQuestion());
+        		mcLearnerAnswersDTO.setDisplayOrder(mcQueContentOrig.getDisplayOrder().toString());
+        		mcLearnerAnswersDTO.setQuestionUid(mcQueContentOrig.getUid().toString());
+        		mcLearnerAnswersDTO.setMark(mcQueContentOrig.getMark().toString());
+        		
+        		int currentMark= mcQueContentOrig.getMark().intValue();
+        		logger.debug("currentMark: " + currentMark);
+        		totalMarksPossible+=currentMark;
+        		
+        		
+        		String feedback=mcQueContentOrig.getFeedback();
+        		if (feedback == null) feedback="";
+        		logger.debug("feedback: " + feedback);
+        		
+        		mcLearnerAnswersDTO.setFeedback(feedback);     
+        		
+        		Map caMap= new TreeMap(new McStringComparator());
+        		mcLearnerAnswersDTO.setCandidateAnswers(caMap);            		
+        		
+                mcLearnerAnswersDTO.setAttemptCorrect(new Boolean(false).toString());
+                mcLearnerAnswersDTO.setFeedbackIncorrect(mcQueContentOrig.getFeedback());
+                
+            	logger.debug("current mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+            	questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
             }
-        	logger.debug("assesment complete");
-        	logger.debug("mark:: " + mark);
-        	logger.debug("totalUserMarks: " + totalUserMarks);
-        	
-        	questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
+            
     	}
         logger.debug("final questionAndCandidateAnswersList: " + questionAndCandidateAnswersList);
         logger.debug("final mark: " + mark);
@@ -801,9 +867,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
 
+    	
+    	List allQuestionUidsList = getAllQuestionUids(mcContent);
+    	logger.debug("allQuestionUidsList: " + allQuestionUidsList);
+    	
 	 	McTempDataHolderDTO mcTempDataHolderDTO= new McTempDataHolderDTO();
 
-	 	List selectedQuestionAndCandidateAnswersDTO=buildSelectedQuestionAndCandidateAnswersDTO(learnerInput,mcTempDataHolderDTO 
+	 	List selectedQuestionAndCandidateAnswersDTO=buildSelectedQuestionAndCandidateAnswersDTO(allQuestionUidsList, learnerInput,mcTempDataHolderDTO 
 	 	        , mcService, mcContent);
 	 	logger.debug("selectedQuestionAndCandidateAnswersDTO: " + selectedQuestionAndCandidateAnswersDTO);
 	 	request.setAttribute(LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO, selectedQuestionAndCandidateAnswersDTO);
@@ -1990,6 +2060,26 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("fwd'ing to: " + NOTEBOOK);
         return (mapping.findForward(NOTEBOOK));
 	}
+    
+    
+    public List getAllQuestionUids(McContent mcContent)
+    {
+        logger.debug("getAllQuestionsUids: " + mcContent);
+        
+        Iterator listIterator=mcContent.getMcQueContents().iterator();
+        
+        List uidList= new LinkedList();
+        while (listIterator.hasNext())
+        {
+            McQueContent mcQueContent = (McQueContent)listIterator.next();
+            logger.debug("mcQueContent: " + mcQueContent);
+            logger.debug("mcQueContent uid: " + mcQueContent.getUid());
+            uidList.add(mcQueContent.getUid().toString());
+        }
+        logger.debug("uidList: " + uidList);
+        
+        return uidList;
+    }
     
 }
     
