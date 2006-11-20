@@ -72,6 +72,8 @@ j_security_login_page
 			    <h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
 			  	<!--Test if the browsers flash player meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
+			  		<!--
+			  			var incompat = false;
 						var minimumFlashVersion = 7;
 						var flashVersion = getFlashVersion();
 						if(flashVersion < minimumFlashVersion) {
@@ -80,18 +82,22 @@ j_security_login_page
 							document.write('<br><a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
 						}
 						
-						// check browser compatability
-						if(ie6 || ie7) {
-							// compatable - do nothing.
+						if(op) {
+							// incompatable browser - show warning message
+							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
+							document.write('<br></div>');
+						} else if(ie6 || ie7) {
+							// compatable - do nothing
 						} else if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) {
 							// compatable - do nothing.
-							document.write('<div class=\"warning\">' + moz_brow + ' ' + moz_brow_nu);
-							document.write('<br></div>');
 						} else {
 							// incompatable browser - show warning message
 							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
 							document.write('<br></div>');
 						}
+						
+						
+					//-->
 				</script>
 			  	<c:set var="url"><lams:LAMSURL/>www/news.html</c:set>
 		  		<c:import url="${url}" charEncoding="utf-8" />
