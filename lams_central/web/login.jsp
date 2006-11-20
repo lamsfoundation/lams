@@ -36,7 +36,7 @@ j_security_login_page
 		function getFlashVersion() { return null; };
 		//-->
 	</script>
-	<script language="javascript" type="text/javascript" src="includes/javascript/browser_detect.js"/>
+	<script language="javascript" type="text/javascript" src="includes/javascript/browser_detect.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script>
 		function submitForm(){
@@ -85,6 +85,8 @@ j_security_login_page
 							// compatable - do nothing.
 						} else if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) {
 							// compatable - do nothing.
+							document.write('<div class=\"warning\">' + moz_brow + ' ' + moz_brow_nu);
+							document.write('<br></div>');
 						} else {
 							// incompatable browser - show warning message
 							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
