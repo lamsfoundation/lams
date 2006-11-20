@@ -54,4 +54,4 @@
 			</div>
 		</html:form>
 	</body>
-</html>
+</lams:html>
