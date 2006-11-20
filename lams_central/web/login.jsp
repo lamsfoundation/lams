@@ -32,10 +32,11 @@ j_security_login_page
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<script language="javascript" type="text/javascript" src="includes/javascript/flash_detect.js">
-	<!--
-	function getFlashVersion() { return null; };
-	//-->
+ 		<!--
+		function getFlashVersion() { return null; };
+		//-->
 	</script>
+	<script language="javascript" type="text/javascript" src="includes/javascript/browser_detect.js"/>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script>
 		function submitForm(){
@@ -71,13 +72,24 @@ j_security_login_page
 			    <h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" width="186" height="90" /></h1>
 			  	<!--Test if the browsers flash player meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
-					var minimumFlashVersion = 7;
-					var flashVersion = getFlashVersion();
-					if(flashVersion < minimumFlashVersion) {
-						// show error message
-						document.write('<div class=\"warning\"><fmt:message key="flash.min.error"/>');
-						document.write('<br><a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
-					}
+						var minimumFlashVersion = 7;
+						var flashVersion = getFlashVersion();
+						if(flashVersion < minimumFlashVersion) {
+							// show error message
+							document.write('<div class=\"warning\"><fmt:message key="flash.min.error"/>');
+							document.write('<br><a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
+						}
+						
+						// check browser compatability
+						if(ie6 || ie7) {
+							// compatable - do nothing.
+						} else if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) {
+							// compatable - do nothing.
+						} else {
+							// incompatable browser - show warning message
+							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
+							document.write('<br></div>');
+						}
 				</script>
 			  	<c:set var="url"><lams:LAMSURL/>www/news.html</c:set>
 		  		<c:import url="${url}" charEncoding="utf-8" />
