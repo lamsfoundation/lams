@@ -17,7 +17,7 @@ insert into lams_configuration (config_key, config_value) values ('AuthoringActi
 insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.RC2.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.RC2.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.RC2.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.RC2.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
 insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2006-01-02');
