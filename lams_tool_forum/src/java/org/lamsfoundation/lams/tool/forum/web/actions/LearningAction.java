@@ -44,6 +44,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -201,9 +202,19 @@ public class LearningAction extends Action {
 		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
 		int allowNumber = forum.getLimitedChar();
 		
+		// get notebook entry
+		String entryText = new String();
+		NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+				ForumConstants.TOOL_SIGNATURE, forumUser.getUserId().intValue());
+		
+		if (notebookEntry != null) {
+			entryText = notebookEntry.getEntry();
+		}
+		
 		sessionMap.put(ForumConstants.FORUM_ID, forumId);
 		sessionMap.put(AttributeNames.ATTR_MODE, mode);
 		sessionMap.put(ForumConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
+		sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD,forum.isAllowUpload());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_NEW_TOPICS,forum.isAllowNewTopic());
@@ -211,6 +222,7 @@ public class LearningAction extends Action {
 		sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
 		sessionMap.put(ForumConstants.ATTR_REFLECTION_ON,forum.isReflectOnActivity());
 		sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION,forum.getReflectInstructions());
+		sessionMap.put(ForumConstants.ATTR_REFLECTION_ENTRY, entryText);
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
@@ -341,6 +353,17 @@ public class LearningAction extends Action {
 		
 		refForm.setUserID(user.getUserID());
 		refForm.setSessionMapID(sessionMapID);
+		
+		// get the existing reflection entry
+		IForumService submitFilesService = getForumManager();
+		
+		SessionMap map = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		Long toolSessionID = (Long)map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, ForumConstants.TOOL_SIGNATURE, user.getUserID());
+		
+		if (entry != null) {
+			refForm.setEntryText(entry.getEntry());
+		}
 		
 		return mapping.findForward("success");
 	}

@@ -79,6 +79,8 @@ public interface ForumConstants {
 
 	public static final String ATTR_FINISHED_LOCK = "finishedLock";
 	
+	public static final String ATTR_USER_FINISHED = "userFinished";
+	
 	// used in monitoring 
 	public static final String TITLE = "title";
 	public static final String INSTRUCTIONS = "instructions";
@@ -107,6 +109,7 @@ public interface ForumConstants {
 	public static final String ATTR_TOPIC_ID = "topicID";
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
 	
 	public static final String MARK_UPDATE_FROM_SESSION = "listAllMarks";
 	public static final String MARK_UPDATE_FROM_USER = "listMarks";
