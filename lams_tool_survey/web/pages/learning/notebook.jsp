@@ -27,7 +27,7 @@
 			
 			<%@ include file="/common/messages.jsp"%>
 
-			<lams:STRUTS-textarea cols="60" rows="8" property="entryText"
+			<html:textarea cols="60" rows="8" property="entryText"
 				styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
