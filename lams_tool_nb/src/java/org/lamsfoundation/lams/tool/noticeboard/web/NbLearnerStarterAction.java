@@ -35,6 +35,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -144,8 +146,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         if ( isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER) ) {
             return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
 	    }
-
-	    request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
 	    
 	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
 
@@ -180,6 +180,19 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         
         learnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
         
+        NotebookEntry notebookEntry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
+        if (notebookEntry != null) {
+        	request.setAttribute("reflectEntry", notebookEntry.getEntry());
+        }
+        request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
+	    request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
+	    
+	    Boolean userFinished = false;
+	    if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED)) {
+	    	userFinished = true;	    	
+	    }
+        request.setAttribute("userFinished", userFinished);
+	    
 	    /*
          * Checks to see if the runOffline flag is set.
          * If the particular flag is set, control is forwarded to jsp page

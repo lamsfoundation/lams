@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -87,6 +88,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		Map map = new HashMap();
 		map.put(NoticeboardConstants.BUTTON_FINISH, "finish");
 		map.put(NoticeboardConstants.BUTTON_CONTINUE, "reflect");
+		map.put(NoticeboardConstants.BUTTON_EDIT, "reflect");
 		return map;
 	}
     
@@ -193,6 +195,12 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
     	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
     	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
     	request.setAttribute("title", nbContent.getTitle());
+    	
+        // get the existing reflection entry
+    	NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE, getUserID(request).intValue());
+        if (entry != null) {
+        	request.setAttribute("reflectEntry", entry.getEntry());
+        }
 	  
     	return mapping.findForward(NoticeboardConstants.REFLECT_ON_ACTIVITY);
     }
