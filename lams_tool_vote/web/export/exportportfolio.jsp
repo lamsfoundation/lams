@@ -26,6 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:html locale="true">
 	<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <fmt:message key="label.export"/> </title>
 		<lams:css localLinkPath="../"/>
 	</head>

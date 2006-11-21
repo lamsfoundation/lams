@@ -9,6 +9,7 @@
 
 <lams:html>
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title><fmt:message key="export.title" /></title>
 	<c:set var="lams">
 		<lams:LAMSURL />

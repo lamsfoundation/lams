@@ -11,6 +11,7 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">    
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css localLinkPath="../"/>
 </head>

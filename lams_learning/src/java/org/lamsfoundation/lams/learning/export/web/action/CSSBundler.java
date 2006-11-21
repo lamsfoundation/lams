@@ -46,10 +46,12 @@ import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 public class CSSBundler {
 
 	private static Logger log = Logger.getLogger(CSSBundler.class);
+	private static final String RTL_DIR = "rtl";	// right-to-left direction
 
 	Map<String,File> filesToCopy = null;
 	List<String> directoriesRequired = null;
@@ -57,6 +59,7 @@ public class CSSBundler {
 	Cookie[] cookies  = null;
 	String outputDirectory  = null;
 	String centralPath  = null;
+	boolean rtl = false;
 
 	/**
  	 * @param centralPath the directory path to the lams-central.war. Assumes that it is an expanded war.
@@ -74,6 +77,12 @@ public class CSSBundler {
 		} else {
 			centralPath = centralPath + File.separator + "lams-central.war";
 		}
+				
+		String pageDirection = (String) request.getSession().getAttribute(LocaleFilter.DIRECTION);  // RTL or LTR (default)
+		if(pageDirection != null)
+			if(pageDirection.toLowerCase().equals(RTL_DIR))
+				this.rtl = true;
+
 	}
 	
 	/** Bundle the stylesheets.
@@ -111,7 +120,7 @@ public class CSSBundler {
 		String cssDirectory = outputDirectory+File.separator+"css";
 		File cssDirectoryFile = new File(cssDirectory);
 		cssDirectoryFile.mkdirs();
-
+		
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 
 		List themeList = CSSThemeUtil.getAllUserThemes();
@@ -122,11 +131,11 @@ public class CSSBundler {
 		{
 			String theme = (String)i.next();
 			
-			String url = basePath + "/lams/css/" + theme + ".css";
-			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, theme + ".css", cookies); //cookies aren't really needed here.
+			String url = (!rtl)? basePath + "/lams/css/" + theme + ".css" : basePath + "/lams/css/" + theme + "_" + RTL_DIR + ".css";
+			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? theme + ".css" :  theme + "_" + RTL_DIR + ".css", cookies); //cookies aren't really needed here.
 
-			url = basePath + "/lams/css/" + theme + "_learner.css";
-			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, theme + "_learner.css", cookies); //cookies aren't really needed here.
+			url = (!rtl)? basePath + "/lams/css/" + theme + "_learner.css" : basePath + "/lams/css/" + theme + "_" + RTL_DIR + "_learner.css" ;
+			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? theme + "_learner.css" : theme + "_" + RTL_DIR + "_learner.css", cookies); //cookies aren't really needed here.
 }
 		
 		// include the special IE stylesheet
@@ -169,10 +178,10 @@ public class CSSBundler {
 		{
 			String theme = (String)i.next();
 
-			String themeFilename = theme + ".css";
+			String themeFilename = (!rtl) ? theme + ".css" : theme + "_" + RTL_DIR + ".css";
 			addThemeFile(cssDirectory, themeFilename);
 
-			themeFilename = theme + "_learner.css";
+			themeFilename = theme + "_" + RTL_DIR + "_learner.css";
 			addThemeFile(cssDirectory, themeFilename);
 		}
 		
