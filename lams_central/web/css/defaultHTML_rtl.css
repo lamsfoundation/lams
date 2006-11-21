@@ -93,7 +93,7 @@ p.instructions {
 	margin-top: 0px;;
 	margin-right: 30px;
 	font-weight: bold;
-	background: url('../images/css/blue_arrow_right.gif') no-repeat top right;
+	background: url('../images/css/blue_arrow_left.gif') no-repeat top right;
 	padding-right: 30px;
 	padding-bottom: 10px;
 	font-size: 12px
@@ -982,7 +982,7 @@ My Courses Pages
 #content a.add-lesson-button {
 	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #666;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 6px 12px;
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
@@ -993,7 +993,7 @@ My Courses Pages
 #content a:hover.add-lesson-button {
 	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #47bc23;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 6px 12px;
 	text-decoration: none;
 	margin-top:0px;
 	margin-right:5px;

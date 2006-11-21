@@ -86,8 +86,9 @@ public class CssTag extends TagSupport {
 
         	JspWriter writer = pageContext.getOut();
 			if ( serverURL != null ) {
-				if(pageDirection.toLowerCase().equals(RTL_DIR))
-					rtl = true;
+				if(pageDirection != null)
+					if(pageDirection.toLowerCase().equals(RTL_DIR))
+						rtl = true;
 				
 				List themeList = CSSThemeUtil.getAllUserThemes();
 				
