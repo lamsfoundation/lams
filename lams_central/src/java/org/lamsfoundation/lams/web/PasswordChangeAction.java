@@ -52,7 +52,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				input=".passwordChange"
  * 				validate="false"
  * 
- * @struts:action-forward name="okay" path=".passwordChangeOk"
+ * @struts:action-forward name="okay" path="/index.do?state=active&amp;tab=passwordChanged"
  * @struts:action-forward name="cancelled" path="/index.do?state=active&amp;tab=profile"
  * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=password"
  */

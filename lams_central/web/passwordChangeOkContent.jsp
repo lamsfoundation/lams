@@ -6,7 +6,7 @@
 			<p class=body><fmt:message key="msg.password.changed"/></p>
 			<p class=body>	
 				<input type="submit" class="button" value="Ok"
-					onClick="javascript:document.location='profile.do?method=view';" />
+					onClick="javascript:document.location='index.do?state=active&tab=profile';" />
 			</p>
 		</td>
 	</tr>

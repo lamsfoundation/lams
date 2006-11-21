@@ -72,6 +72,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name="profile" path="/profile.do?method=view"
  * @struts.action-forward name="editprofile" path="/profile.do?method=edit"
  * @struts.action-forward name="password" path="/password.do"
+ * @struts.action-forward name="passwordChanged" path=".passwordChangeOk"
  * @struts.action-forward name="portrait" path="/portrait.do"
  * @struts.action-forward name="content" path="/indexContent.jsp"
  */
@@ -103,6 +104,9 @@ public class IndexAction extends Action {
 			return mapping.findForward("editprofile");
 		} else if (StringUtils.equals(tab, "password")) {
 			return mapping.findForward("password");
+		} else if (StringUtils.equals(tab, "passwordChanged")) {
+			request.setAttribute("tab", "profile");
+			return mapping.findForward("passwordChanged");
 		} else if (StringUtils.equals(tab, "portrait")) {
 			return mapping.findForward("portrait");
 		} else if (StringUtils.equals(tab, "community")) {
