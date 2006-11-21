@@ -39,6 +39,7 @@ import org.xml.sax.SAXParseException;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethodParameter;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.util.XmlFileLoader;
+import org.lamsfoundation.lams.util.AuthEntityResolver;
 
 /**
  * <p>
@@ -70,7 +71,7 @@ public class AuthenticationMethodConfigurer {
 		throws IOException,SAXException,SAXParseException,ParserConfigurationException{
 		
 		if(authConfigureDoc==null){
-			authConfigureDoc = XmlFileLoader.getDocumentFromFilePath(configFilePath);
+			authConfigureDoc = XmlFileLoader.getDocumentFromFilePath(configFilePath, new AuthEntityResolver());
 		}
 	}
 	

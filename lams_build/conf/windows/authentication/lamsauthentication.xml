@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "file:///@confdir@/lamsauthentication.dtd">
+<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "http://lamsfoundation.org/dtd/lamsauthentication.dtd">
 
 <Authentication>
 

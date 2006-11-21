@@ -37,6 +37,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.EntityResolver;
 
 
 /**
@@ -74,9 +75,22 @@ public class XmlFileLoader {
 		
 		InputStream is = null;
 		is = url.openStream();
-		return getDocument(is);
+		return getDocument(is, null);
 	}
 
+	/** Get the xml file from the File Path and parse it into a Document object.
+	 *
+	 * @param filePath the file path from which the xml doc is to be obtained.
+	 * @return Document
+	 */
+	public static Document getDocumentFromFilePath(String filePath, EntityResolver resolver) 
+		throws IOException,SAXException,SAXParseException,ParserConfigurationException {
+		
+		InputStream is = null;
+		is = new FileInputStream(new File(filePath));
+		return getDocument(is, resolver);
+	}
+	
 	/** Get the xml file from the File Path and parse it into a Document object.
 	 *
 	 * @param filePath the file path from which the xml doc is to be obtained.
@@ -87,7 +101,7 @@ public class XmlFileLoader {
 		
 		InputStream is = null;
 		is = new FileInputStream(new File(filePath));
-		return getDocument(is);
+		return getDocument(is, null);
 	}
 	
 	/** Parses the xml document in is to create a DOM Document. DTD validation
@@ -96,12 +110,12 @@ public class XmlFileLoader {
 	 * @param is the InputStream containing the xml descriptor to parse
 	 * @return Document
 	 */
-	private static Document getDocument(InputStream is)
+	private static Document getDocument(InputStream is, EntityResolver resolver)
 		throws IOException,SAXException,SAXParseException,ParserConfigurationException {
 		
 		try{
 			InputSource is2 = new InputSource(is);
-			return getDocument(is2);
+			return getDocument(is2, resolver);
 		}
 		finally{
 			is.close();
@@ -114,7 +128,7 @@ public class XmlFileLoader {
 	 * @param is the InputSource containing the xml descriptor to parse
 	 * @return Document
 	 */
-	private static Document getDocument(InputSource is)
+	private static Document getDocument(InputSource is, EntityResolver resolver)
 			throws IOException,SAXException,SAXParseException,ParserConfigurationException {
 			
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
@@ -122,8 +136,9 @@ public class XmlFileLoader {
 			// Enable DTD validation based on our validating flag
 			docBuilderFactory.setValidating(validating);
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			if(resolver != null) docBuilder.setEntityResolver(resolver);
 			return docBuilder.parse(is);
 	}
-
+	
 }
 
