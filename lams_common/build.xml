@@ -165,7 +165,7 @@ Ant build file.
 	</target>
 
 	<target name="copy-dtd" description="copy required dtd files.">
-		<delete>
+		<delete failonerror="false">
 			<fileset dir="${src.lams.resources}"/>
 		</delete>
 		<mkdir dir="${src.lams.resources}"/>
