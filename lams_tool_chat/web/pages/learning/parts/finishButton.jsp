@@ -1,16 +1,34 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if
-	test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
-	<div class="space-top">
-		<h4>
-			${chatDTO.reflectInstructions}
-		</h4>
-		<p>
-			${chatUserDTO.notebookEntry}
-		</p>
-	</div>
-</c:if>
+<html:form action="/learning" method="post">
+	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
+	<html:hidden property="dispatch" value="openNotebook" />
+	
+	<c:if
+		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
+		<div class="space-top">
+			<h2>
+				${chatDTO.reflectInstructions}
+			</h2>
+			
+			<p>
+				<c:choose>
+					<c:when test="${not empty chatUserDTO.notebookEntry}">
+						<lams:out value="${chatUserDTO.notebookEntry}" escapeXml="true" />
+					</c:when>
+					
+					<c:otherwise>
+						<em><fmt:message key="message.no.reflection.available" /></em>  
+					</c:otherwise>
+				</c:choose>		
+			</p>
+			
+			<html:submit styleClass="button">
+				<fmt:message key="button.edit" />
+			</html:submit>
+		</div>
+	</c:if>
+</html:form>
 
 <html:form action="/learning" method="post">
 	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
@@ -23,7 +41,6 @@
 				<html:submit styleClass="button">
 					<fmt:message key="button.continue" />
 				</html:submit>
-
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />

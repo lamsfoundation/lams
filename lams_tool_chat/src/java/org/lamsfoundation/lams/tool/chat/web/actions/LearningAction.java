@@ -222,6 +222,17 @@ public class LearningAction extends LamsDispatchAction {
 		ChatDTO chatDTO = new ChatDTO(chatUser.getChatSession().getChat());
 
 		request.setAttribute("chatDTO", chatDTO);
+		
+		NotebookEntry notebookEntry = chatService.getEntry(
+				chatUser.getChatSession().getSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				ChatConstants.TOOL_SIGNATURE,
+				chatUser.getUserId().intValue());
+		
+		if (notebookEntry != null) {
+			lrnForm.setEntryText(notebookEntry.getEntry());
+		}
+		
 		return mapping.findForward("notebook");
 	}
 
