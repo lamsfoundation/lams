@@ -53,20 +53,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 			<tr>
-					<td width="4%" align="right">
+					<td width="4%" class="align-right">
 					</td>
 		
-					<td align="left">
+					<td class="align-left">
 					</td>
 		
 					<td width="16%" align="center">
 						<fmt:message key="label.isCorrect" />
 					</td>
 		
-					<td width="12%" align="left">
+					<td width="12%" class="align-left">
 					</td>
 		
-					<td width="10%" align="left">
+					<td width="10%" class="align-left">
 					</td>
 			</tr>
 
@@ -75,11 +75,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		   	<c:set var="caIndex" scope="request" value="${caIndex +1}"/>
 		   	
 			<tr>
-				<td width="4%" align="right">
+				<td width="4%" class="align-right">
 					<c:out value="${caIndex}" /> 
 				</td>		
 			
-				<td align="left">
+				<td class="align-left">
 					<input type="text" name="ca${caIndex}"  value="${currentCandidateDTO.candidateAnswer}" size="50">
 				</td>		
 				
@@ -101,7 +101,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:forEach>
 				</td>
 						
-				<td width="22%" align="left">
+				<td width="22%" class="align-left">
 			 		<c:if test="${caCount != 1}"> 		
 			 		
 				 		<c:if test="${caIndex == 1}"> 		
@@ -130,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if> 			
 				</td>
 				
-				<td width="10%" align="left">				
+				<td width="10%" class="align-left">				
 						<a title="<fmt:message key='label.tip.removeCandidate'/>" href="javascript:;" 
 						onclick="  if (validateMinumumCandidateCount()) { removeCandidate(${queIndex}, ${caIndex});	} ">
 			                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">

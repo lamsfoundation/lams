@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-	<html:html locale="true">
+	<lams:html>
 	<head>
 	<title> <fmt:message key="label.exportPortfolio"/> </title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -70,17 +70,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td>&nbsp;</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
+								<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
 									<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp; (<fmt:message key="label.mark"/> 
 									<c:out value="${currentDto.mark}"/>)
 								 </td>
 							</tr>	
 							<tr>					
-								<td NOWRAP valign=top align=left>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
-									<table align=left>
+								<td NOWRAP valign=top class="align-left">  <b> <fmt:message key="label.mc.options.col"/>  </b> 
+									<table class="align-left">
 										<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 											<tr>			
-												<td NOWRAP valign=top align=left>
+												<td NOWRAP valign=top class="align-left">
 													<c:out value="${answersData.candidateAnswer}" escapeXml="false"/> 
 													
 													<c:if test="${answersData.correct == 'true'}"> 		
@@ -96,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:forEach>		  	
 		
 			  	 		<tr>
-			  	 			<td NOWRAP valign=top align=left> <b> 
+			  	 			<td NOWRAP valign=top class="align-left"> <b> 
 			  	 				<fmt:message key="label.passingMark"/> </b> <c:out value="${passMark}"/>  
 			  	 			</td>
 			  	 		</tr>
@@ -117,17 +117,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		
 					  	 		<tr>
-									 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.user"/> </b> </td>  
+									 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.user"/> </b> </td>  
 						  	 		<c:set var="queIndex" scope="request" value="0"/>
 									<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 									<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-										<td NOWRAP valign=top align=left> <b>  <fmt:message key="label.question.only"/> 
+										<td NOWRAP valign=top class="align-left"> <b>  <fmt:message key="label.question.only"/> 
 											<c:out value="${queIndex}"/></b>
 											 &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/>)
 										</td>
 									</c:forEach>		  	
 									 
-									 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.total"/>  </b> </td>  
+									 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.total"/>  </b> </td>  
 						  	 		</tr>						 
 		
 											<c:forEach var="markData" items="${mapUserMarksDto}">						
@@ -136,17 +136,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 												<c:if test="${currentUserSessionId == currentSessionId}"> 	
 													<tr>									  	 		
-									  	 				<td NOWRAP valign=top align=left> 
+									  	 				<td NOWRAP valign=top class="align-left"> 
 																<c:out value="${data.userName}"/> 
 														</td>	
 					
 														<c:forEach var="mark" items="${data.marks}">
-															<td NOWRAP valign=top align=left> 
+															<td NOWRAP valign=top class="align-left"> 
 																	<c:out value="${mark}"/> 								
 															</td>
 														</c:forEach>		  										
 					
-														<td NOWRAP valign=top align=left> 
+														<td NOWRAP valign=top class="align-left"> 
 																	<c:out value="${data.totalMark}"/> 																
 														</td>							
 													</tr>													
@@ -176,17 +176,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	 			<td> &nbsp;</td>
 					  	 		</tr>
 								<tr>			
-									<td NOWRAP valign=top align=left><b>  <fmt:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
+									<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
 										<c:out value="${currentDto.question}"  escapeXml="false"/> &nbsp; (<fmt:message key="label.mark"/> 
 										<c:out value="${currentDto.mark}"/>)
 									 </td>
 								</tr>	
 								<tr>					
-									<td NOWRAP valign=top align=left>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
-										<table align=left>
+									<td NOWRAP valign=top class="align-left">  <b> <fmt:message key="label.mc.options.col"/>  </b> 
+										<table class="align-left">
 											<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
 												<tr>			
-													<td NOWRAP valign=top align=left>
+													<td NOWRAP valign=top class="align-left">
 														<c:out value="${answersData.candidateAnswer}"  escapeXml="false"/> 
 														
 														<c:if test="${answersData.correct == 'true'}"> 		
@@ -200,13 +200,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</tr>			
 										
 								<tr>
-									<td  NOWRAP align=left valign=top> 											
-									<table align=left>
+									<td  NOWRAP class="align-left" valign=top> 											
+									<table class="align-left">
 										<c:forEach var="attemptEntry" items="${mapQueAttempts}">
 											<c:if test="${mainQueIndex == attemptEntry.key}"> 		
 									  		  	 		<c:set var="aIndex" scope="request" value="1"/>
 										  		  	 		<tr>
-																<td NOWRAP align=left valign=top> 
+																<td NOWRAP class="align-left" valign=top> 
 																			<b> <fmt:message key="label.yourAnswers"/>  </b>
 																</td>
 																<td align=right valign=top>
@@ -223,11 +223,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<c:if test="${distinctAttemptEntry.key == i}"> 	
 																	<tr>
 																		<c:set var="aIndex" scope="request" value="${aIndex +1}"/>
-				 														<td align=left valign=top colspan=2> 																					
-					 														<table align=left>
+				 														<td class="align-left" valign=top colspan=2> 																					
+					 														<table class="align-left">
 							 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
 																					<tr>
-																						<td NOWRAP align=left valign=top>
+																						<td NOWRAP class="align-left" valign=top>
 									 															<c:out value="${singleAttemptEntry.value}"  escapeXml="false"/> 
 								 														</td>
 																					</tr>	
@@ -249,14 +249,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</c:forEach>
 		
 				  	 		<tr>
-				  	 			<td NOWRAP valign=top align=left> <b> 
+				  	 			<td NOWRAP valign=top class="align-left"> <b> 
 				  	 				<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
 				  	 			</td>
 				  	 		</tr>
 		
 		
 				  	 		<tr>
-				  	 			<td NOWRAP valign=top align=left> <b> 
+				  	 			<td NOWRAP valign=top class="align-left"> <b> 
 				  	 				<fmt:message key="label.studentMark"/>: </b> <c:out value="${learnerMark}"/> 
 				  	 			</td>
 				  	 		</tr>
@@ -267,14 +267,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table  class="forms">
 				
 						<tr>			
-							<td valign=top align=left>
+							<td valign=top class="align-left">
 								&nbsp
 							</td>
 						</tr>
 				
 					<tr>			
-							<td valign=top align=left>
-								<table align=left>
+							<td valign=top class="align-left">
+								<table class="align-left">
 								
 										<tr>			
 											<td colspan=3 valign=top align=center>
@@ -290,15 +290,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 							  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
 										<tr>			
-											<td valign=top align=left>
+											<td valign=top class="align-left">
 												<b> <fmt:message key="label.user"/>:</b>
 											 </td>
 										
-											<td valign=top align=left>
+											<td valign=top class="align-left">
 												 <c:out value="${userName}" escapeXml="false"/> 
 											 </td>
 
-											<td valign=top align=left>
+											<td valign=top class="align-left">
 												 <c:out value="${entry}" escapeXml="false"/> 
 											 </td>
 										</tr>	

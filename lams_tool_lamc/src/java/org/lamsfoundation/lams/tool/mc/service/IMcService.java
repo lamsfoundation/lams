@@ -280,6 +280,7 @@ public interface IMcService
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
 	
+	public void updateEntry(NotebookEntry notebookEntry);
 	
     public void persistFile(McContent content, McUploadedFile file) throws McApplicationException;
     

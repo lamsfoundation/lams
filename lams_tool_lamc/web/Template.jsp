@@ -20,7 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
-<html:html locale = "true">
+<lams:html>
     <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
       <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
 	        <!-- header -->
@@ -35,4 +35,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	        <!-- end of footer -->
       </table>
     </body>
-</html:html>
+</lams:html>

@@ -36,18 +36,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}"/>	
 
 	<tr>
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 			<strong> 	<fmt:message key="label.question" />: </strong>
 		</td>
 
-		<td width="60%" align="left">
+		<td width="60%" class="align-left">
 			<div style="overflow: auto;">						
 				<c:out value="${question}" escapeXml="false"/> 
 			</div>														
 		</td>		
 
 
-			<td width="10%" align="right">
+			<td width="10%" class="align-right">
 		 		<c:if test="${totalQuestionCount != 1}"> 		
 		 		
 			 		<c:if test="${queIndex == 1}"> 		
@@ -78,13 +78,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 				<a title="<fmt:message key='label.tip.editQuestion'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}"/>');">
 	                    <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 				</a> 
 		</td>
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 				<a title="<fmt:message key='label.tip.deleteQuestion'/>" href="javascript:;" onclick="removeMonitoringQuestion(${queIndex});">
 	                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
 				</a> 				

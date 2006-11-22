@@ -2692,6 +2692,11 @@ public class McServicePOJO implements
 		}
 	}
 
+	
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
+
     
     /**
      * @return Returns the coreNotebookService.

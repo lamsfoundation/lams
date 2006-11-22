@@ -92,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <html:hidden property="donePreview" />
 
-<div class="space-bottom-top" align="right">
+<div class="space-bottom-top align-right">
 	<html:submit property="continueOptionsCombined" styleClass="button">
 		<fmt:message key="button.continue" />
 	</html:submit>

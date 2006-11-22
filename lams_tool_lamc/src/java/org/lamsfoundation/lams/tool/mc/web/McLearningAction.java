@@ -2029,8 +2029,20 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    logger.debug("userID:" + userID);
 	    logger.debug("reflectionEntry:" + reflectionEntry);
 	    
-		mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-				MY_SIGNATURE, new Integer(userID), reflectionEntry);
+	    logger.debug("attempt getting notebookEntry: ");
+		NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+		if (notebookEntry != null) {
+			notebookEntry.setEntry(reflectionEntry);
+			mcService.updateEntry(notebookEntry);
+		} else {
+			mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+					MY_SIGNATURE, new Integer(userID), reflectionEntry);
+		}
 	    
 	    return endLearning(mapping, form, request, response);
 	}
@@ -2072,8 +2084,36 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    reflectionSubject=McUtils.replaceNewLines(reflectionSubject);
 	    mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
         
+	    String userID = "";
+	    HttpSession ss = SessionManager.getSession();
+	    logger.debug("ss: " + ss);
+	    
+	    if (ss != null)
+	    {
+		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		    if ((user != null) && (user.getUserID() != null))
+		    {
+		    	userID = user.getUserID().toString();
+			    logger.debug("retrieved userId: " + userID);
+		    }
+	    }
+	    
+	    logger.debug("attempt getting notebookEntry: ");
+		NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+		if (notebookEntry != null) {
+		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+		    mcLearningForm.setEntryText(notebookEntryPresentable);
+		    
+		}
+
         request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 		logger.debug("final mcGeneralLearnerFlowDTO: " + mcGeneralLearnerFlowDTO);
+		
 		
 		logger.debug("fwd'ing to: " + NOTEBOOK);
         return (mapping.findForward(NOTEBOOK));

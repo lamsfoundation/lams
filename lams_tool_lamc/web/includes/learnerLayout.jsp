@@ -9,7 +9,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<html>
+<lams:html>
 	<head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/learnerheader.jsp"%>
@@ -28,4 +28,4 @@
 	<body  class="stripes">
 		<tiles:insert attribute="body" />
 	</body>
-</html>
+</lams:html>

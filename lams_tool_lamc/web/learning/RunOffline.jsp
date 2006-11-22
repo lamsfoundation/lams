@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</p>
 
 
-			<div align="right" class="space-bottom-top">
+			<div class="space-bottom-top align-right">
 
 				<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 					<html:submit property="learnerFinished" styleClass="button">
@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</html:form>
 	<div id="footer"></div>
 </body>
-</html:html>
+</lams:html>
 
 
 

@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -214,25 +214,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 			</c:if>
 
-			<c:if
-				test="${mcGeneralLearnerFlowDTO.notebookEntry != null && mcGeneralLearnerFlowDTO.notebookEntry != ''}">
-
-				<h2>
-					<fmt:message key="label.notebook.entries" />
-				</h2>
+			<h2>
+				<fmt:message key="label.notebook.entries" />
+			</h2>
 	
-				<p>
-					<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}"
-						escapeXml="false" />
-				</p>
-			</c:if>			
-
+			<p>
+				<c:choose>
+					<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
+						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true" />
+					</c:when>
+					<c:otherwise>
+						<em><fmt:message key="message.no.reflection.available" /></em>  
+					</c:otherwise>
+				</c:choose>
+			</p>
+			
+			<html:submit property="forwardtoReflection" styleClass="button">
+				<fmt:message key="label.edit" />
+			</html:submit>
+							
 			<html:hidden property="doneLearnerProgress" />
 
 		</html:form>
+
 	</div>
 </body>
-</html:html>
+</lams:html>
 
 
 

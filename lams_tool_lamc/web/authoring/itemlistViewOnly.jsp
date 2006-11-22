@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" /></h2>
 
 <c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-<table id="itemTable" style="align:left;width:650px" >
+<table id="itemTable" class="align-left" style="width:650px" >
     <c:set var="queIndex" scope="request" value="0"/>
     
     
@@ -37,25 +37,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}"/>	
 
 	<tr>
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 				<strong> <fmt:message key="label.question" />: </strong>
 		</td>
 
-		<td width="60%" align="left">
+		<td width="60%" class="align-left">
 			<div style="overflow: auto;">				
 				<c:out value="${question}" escapeXml="false"/> 
 			</div>											
 		</td>		
 
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 		</td>
        	
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 
 		</td>
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 
 		</td>
 	</tr>

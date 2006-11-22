@@ -35,16 +35,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 			  	 		<tr>
-							 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.user"/> </b> </td>  
+							 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.user"/> </b> </td>  
 				  	 		<c:set var="queIndex" scope="request" value="0"/>
 							<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 							<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-								<td NOWRAP valign=top align=left> <b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
+								<td NOWRAP valign=top class="align-left"> <b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
 									 &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
 								</td>
 							</c:forEach>		  	
 							 
-							 <td NOWRAP valign=top align=left> <b> <fmt:message key="label.total"/>  </b> </td>  
+							 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.total"/>  </b> </td>  
 			  	 		</tr>						 
 
 									<c:forEach var="markData" items="${mapUserMarksDto}">						
@@ -54,17 +54,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<c:if test="${currentMonitoredToolSession == 'All'}"> 			
 										<c:if test="${currentUserSessionId == currentSessionId}"> 	
 											<tr>									  	 		
-							  	 				<td NOWRAP valign=top align=left> 
+							  	 				<td NOWRAP valign=top class="align-left"> 
 														<c:out value="${data.userName}"/> 
 												</td>	
 			
 												<c:forEach var="mark" items="${data.marks}">
-													<td NOWRAP valign=top align=left> 
+													<td NOWRAP valign=top class="align-left"> 
 															<c:out value="${mark}"/> 								
 													</td>
 												</c:forEach>		  										
 			
-												<td NOWRAP valign=top align=left> 
+												<td NOWRAP valign=top class="align-left"> 
 															<c:out value="${data.totalMark}"/> 																
 												</td>							
 											</tr>													
@@ -80,17 +80,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<c:if test="${currentMonitoredToolSession == currentUserSessionId}"> 										
 											<c:if test="${currentUserSessionId == currentSessionId}"> 									
 											<tr>			
-												<td NOWRAP valign=top align=left> 
+												<td NOWRAP valign=top class="align-left"> 
 														<c:out value="${data.userName}"/> 
 												</td>	
 			
 												<c:forEach var="mark" items="${data.marks}">
-													<td NOWRAP valign=top align=left> 
+													<td NOWRAP valign=top class="align-left"> 
 															<c:out value="${mark}"/> 								
 													</td>
 												</c:forEach>		  										
 			
-												<td NOWRAP valign=top align=left> 
+												<td NOWRAP valign=top class="align-left"> 
 															<c:out value="${data.totalMark}"/> 																
 												</td>							
 											</tr>														

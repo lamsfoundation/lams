@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		pageContext.setAttribute("tabs", tabs);
 	%>
 
-	<html:html locale="true">
+	<lams:html>
 	<head>
 
 	<title> <fmt:message key="label.monitoring"/> </title>
@@ -175,4 +175,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 	
 </body>
-</html:html>
+</lams:html>

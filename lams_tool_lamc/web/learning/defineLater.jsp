@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<lams:headItems />
@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="footer-learner"></div>
 </div>
 </body>
-</html:html>
+</lams:html>
 
 
 
