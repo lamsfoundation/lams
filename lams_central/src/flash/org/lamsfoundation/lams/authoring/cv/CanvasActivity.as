@@ -115,11 +115,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	public function init(initObj):Void{
-		clickTarget_mc.onRollOver = Proxy.create (this, localOnRollOver);
-		clickTarget_mc.onRollOut = Proxy.create (this, localOnRollOut);
-		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
-		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
-		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		//clickTarget_mc.onRollOver = Proxy.create (this, localOnRollOver);
+		//clickTarget_mc.onRollOut = Proxy.create (this, localOnRollOut);
+		//clickTarget_mc.onPress = Proxy.create (this, localOnPress);
+		//clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
+		//clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
 		if(initObj){
 			_module = initObj._module;
@@ -371,7 +371,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 
 	
-	private function localOnRollOver():Void{
+	private function onRollOver():Void{
 		if (_module == "monitoring"){
 			_ccm.showCustomCM(_ccm.loadMenu("activity", "monitoring"))
 		}else {
@@ -379,7 +379,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 	}
 	
-	private function localOnRollOut():Void{
+	private function onRollOut():Void{
 		if (_module == "monitoring"){
 			_ccm.showCustomCM(_ccm.loadMenu("canvas", "monitoring"))
 		}else {
@@ -387,7 +387,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 	}	
 	
-	private function localOnPress():Void{
+	private function onPress():Void{
 		
 			
 			// check double-click
@@ -401,7 +401,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 						Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.GEN,'onPress','CanvasActivity For Monitoring');
 						_monitorController.activityDoubleClick(this, "MonitorTabView");
 					}else {
-						Debugger.log('DoubleClicking: '+this,Debugger.GEN,'onPress','CanvasActivity');
+						Debugger.log('DoubleClicking: '+this,Debugger.CRITICAL,'onPress','CanvasActivity');
 						_canvasController.activityDoubleClick(this);
 					}
 				}
@@ -452,7 +452,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	}
 	
-	private function localOnRelease():Void{
+	private function onRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
 				trace("Activity ID is: "+this.activity.activityUIID)	
@@ -465,7 +465,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 	}
 	
-	private function localOnReleaseOutside():Void{
+	private function onReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
 		if (_module == "monitoring"){
 			_monitorController.activityReleaseOutside(this);
