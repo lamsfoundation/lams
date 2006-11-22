@@ -83,7 +83,7 @@ public class XmlFileLoader {
 	 * @param filePath the file path from which the xml doc is to be obtained.
 	 * @return Document
 	 */
-	public static Document getDocumentFromFilePath(String filePath, EntityResolver resolver) 
+	public static Document getDocumentFromFilePathUsingResolver(String filePath, EntityResolver resolver) 
 		throws IOException,SAXException,SAXParseException,ParserConfigurationException {
 		
 		InputStream is = null;

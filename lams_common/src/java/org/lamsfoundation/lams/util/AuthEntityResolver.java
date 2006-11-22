@@ -39,7 +39,7 @@ public class AuthEntityResolver implements EntityResolver{
 	public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
 		if ( publicId.equals( "-//LAMS//DTD LAMS//EN" ) ) {
 			InputStream in = getClass().getResourceAsStream(
-		                "org/lamsfoundation/lams/resources/lamsauthentication.dtd"
+		                "/org/lamsfoundation/lams/resources/lamsauthentication.dtd"
 			);
 			return new InputSource(in);
 		}

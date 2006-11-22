@@ -71,7 +71,7 @@ public class AuthenticationMethodConfigurer {
 		throws IOException,SAXException,SAXParseException,ParserConfigurationException{
 		
 		if(authConfigureDoc==null){
-			authConfigureDoc = XmlFileLoader.getDocumentFromFilePath(configFilePath, new AuthEntityResolver());
+			authConfigureDoc = XmlFileLoader.getDocumentFromFilePathUsingResolver(configFilePath, new AuthEntityResolver());
 		}
 	}
 	
