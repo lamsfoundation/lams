@@ -363,7 +363,11 @@ class PropertyInspectorNew extends MovieClip{
 			// its a Canvas activity then
 			Debugger.log('Its a canvas activity',4,'updateItemProperties','PropertyInspector');
 			var ca = CanvasActivity(cm.selectedItem);
-			var a:Activity = ca.activity;			
+			var a:Activity = ca.activity;	
+			var cao = CanvasOptionalActivity(cm.selectedItem);
+			var cap = CanvasParallelActivity(cm.selectedItem);
+			var caco:ComplexActivity = ComplexActivity(cao.activity);
+			var cacp:ComplexActivity = ComplexActivity(cap.activity);
 			if(a.isGateActivity()){
 				//its a gate
 				delimitLine._visible = true;
@@ -402,6 +406,45 @@ class PropertyInspectorNew extends MovieClip{
 				desc_txt.text = StringUtils.cleanNull(a.description);
 				//PI_sp.refreshPane();
 			
+			}else if(a.isOptionalActivity()){
+				//its a grouping activity
+				delimitLine._visible = true;
+				
+				showGeneralControls(true);
+				showGroupingControls(false);
+				//showRelevantGroupOptions();
+				showToolActivityControls(false);
+				showGateControls(false);
+				showGeneralInfo(false);
+				showAppliedGroupingControls(false);
+				showOptionalControls(true);
+				//showGeneralProperties(cca)
+				populateGroupingProperties(GroupingActivity(caco));
+				showAppliedGroupingProperties(caco);
+				showOptionalActivityProperties(caco);
+				//show the title
+				title_txt.text = StringUtils.cleanNull(a.title);
+				desc_txt.text = StringUtils.cleanNull(a.description);
+				//PI_sp.refreshPane();
+			}else if(a.isParallelActivity()){
+				//its a grouping activity
+				delimitLine._visible = true;
+				//its an parallel activity
+				showOptionalControls(false);
+				showGeneralControls(true);
+				showGeneralInfo(false);
+				showGroupingControls(false);
+				//showRelevantGroupOptions();
+				showToolActivityControls(false);
+				showGateControls(false);
+				showAppliedGroupingControls(true);
+				//showGeneralProperties(cca)
+				populateGroupingProperties(GroupingActivity(cacp));
+				showAppliedGroupingProperties(cacp);
+				showParallelActivityProperties(cacp);
+				//show the title
+				title_txt.text = StringUtils.cleanNull(a.title);
+				desc_txt.text = StringUtils.cleanNull(a.description);
 			}else{
 				//its a tool activity
 				delimitLine._visible = true;	
