@@ -282,7 +282,6 @@
 		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
 			<fileset dir="${conf.auth}/">
 				<include name="*.xml" />
-				<include name="*.dtd" />
 			</fileset>
 	        <filterset>
 	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
