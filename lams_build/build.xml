@@ -59,6 +59,11 @@
 	<!-- build sub-projects -->
 	<target name="build-subprojects"
 		description="builds sub porjects">
+		<copy overwrite="yes" todir="${shareddtd}">
+			<fileset dir="${conf.auth}">
+				<include name="**/*.dtd"/>
+			</fileset>
+		</copy>
 		<ant antfile="../${lams_common}/build.xml" target="build-jar"
 			inheritAll="false" />
 		<ant antfile="../${lams_contentrepository}/build.xml"
@@ -311,11 +316,6 @@
 			</fileset>
 		</copy>
 
-		<copy overwrite="yes" todir="${shareddtd}">
-			<fileset dir="${conf.auth}">
-				<include name="**/*.dtd"/>
-			</fileset>
-		</copy>
 		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
 		<ant antfile="../${lams_common}/build.xml" target="copy-lams-valve-jar" inheritAll="false"/>
 		<echo message="Please copy jboss-cache.jar and jgroups.jar from server/all/lib to server/default/lib"
