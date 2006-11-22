@@ -37,10 +37,16 @@
 	</c:set>
 
 	<div>
+		
+		<c:set var="buttonClass" value="button" />
+		<c:if test="${sessionMap.finishedLock}">
+			<c:set var="buttonClass" value="disabled" />
+		</c:if>
+	
 		<c:if	test='${sessionMap.mode != "teacher" && sessionMap.allowNewTopics}'>
 			<html:button property="newtopic"
 				onclick="javascript:location.href='${newtopic}';"
-				disabled="${sessionMap.finishedLock}" styleClass="button">
+				disabled="${sessionMap.finishedLock}" styleClass="${buttonClass}">
 				<fmt:message key="label.newtopic" />
 			</html:button>
 		</c:if>
