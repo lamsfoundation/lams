@@ -66,6 +66,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 		</h1>
 		
+		<%@ include file="/common/messages.jsp"%>
+		
 		<c:choose> 
 		  <c:when test="${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
 				<jsp:include page="/learning/SingleQuestionAnswersContent.jsp" /> 

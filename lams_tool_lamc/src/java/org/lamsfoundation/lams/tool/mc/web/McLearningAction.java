@@ -851,7 +851,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	    
 	    logger.debug("final learnerInput: " + learnerInput);
-	 	
+	    
 
 	 	String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	 	logger.debug("toolSessionID: " + toolSessionID);
@@ -867,6 +867,24 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
 
+        if (learnerInput.size() == 0)
+        {
+            logger.debug("there are no selected answers for any questions: " + learnerInput);
+            ActionMessages errors = new ActionMessages();
+            
+            ActionMessage error = new ActionMessage("answers.submitted.none");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			logger.debug("errors: " + errors);
+			saveErrors(request, errors);
+	        logger.debug("errors saved: " + errors);
+
+	        McLearningStarterAction mcLearningStarterAction= new McLearningStarterAction();
+	        mcLearningStarterAction.commonContentSetup(request, mcContent, mcService, mcLearningForm, toolSessionID);
+	        
+	        logger.debug("returning to LOAD_LEARNER: " + LOAD_LEARNER);
+	      	return (mapping.findForward(LOAD_LEARNER));
+        }
+    	
     	
     	List allQuestionUidsList = getAllQuestionUids(mcContent);
     	logger.debug("allQuestionUidsList: " + allQuestionUidsList);
