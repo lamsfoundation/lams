@@ -29,51 +29,55 @@
 	
 }
 
-.mycourses-right-buttons {float:left; height:24px; padding-top:5px; margin-top:4px;}
+
+.mycourses-right-buttons {float:left; height:24px;}
 
 #content a.add-lesson-button {
 	background: url ('../images/css/add_lesson.rtl.jpg') no-repeat 0px 0px;
 	color: #666;
 	border: 0px none;
-	padding: 5px 30px 6px 12px;
+	padding: 3px 30px 5px 12px;
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
 	margin-right:5px;
+	display:block;
 }
 
 #content a:hover.add-lesson-button {
 	background: url ('../images/css/add_lesson.rtl.jpg') no-repeat 0px 0px;
 	color: #47bc23;
 	border: 0px none;
-	padding: 5px 30px 6px 12px;
+	padding: 3px 30px 5px 12px;
 	text-decoration: none;
-	margin-top:0px;
-	margin-right:5px;
 	border-left:1px solid #d2d2d2;
+	margin-right:5px;
+	display:block;
 }
 
 #content a.manage-group-button {
 	background: url ('../images/css/manage_groups.rtl.jpg') no-repeat 0px 0px;
 	color: #666;
 	border: 0px none;
-	padding: 5px 30px 6px 12px;
+	padding: 3px 30px 5px 12px;
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
-	margin-top:6px;
-	margin-right:10px;
+	margin-right:5px;
+	display:block;
 }
 
 #content a:hover.manage-group-button {
 	background: url ('../images/css/manage_groups.rtl.jpg') no-repeat 0px 0px;
 	color: #47bc23;
 	border: 0px none;
-	padding: 5px 30px 6px 12px;
+	padding: 3px 30px 5px 12px;
 	text-decoration: none;
-	margin-top:0px;
-	margin-right:10px;
 	border-left:1px solid #d2d2d2;
-	}
+	margin-right:5px;
+	display:block;
+}
 	
+
+
 #content {
 	padding-bottom:0px
 	}

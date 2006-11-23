@@ -59,7 +59,7 @@ h1.no-tabs-below {
 	color:#0087e5; 
 	font-size:16px; 
 	margin-bottom:0px; 
-	margin-left:10px; 
+	margin-right:10px; 
 	padding-top:25px; }
 
 h2 {color:#47bc23; 
@@ -358,19 +358,21 @@ a:hover.button-add-item {
 
 /*layout of adding a topic button */
 #content a.button-add-item {
-	background: url('../images/css/btn_add_off.gif') no-repeat 0px 0px;
+	background: url('../images/css/btn_add_off.rtl.gif') no-repeat right top;
 	color: #333;
 	border: 0px none;
-	padding:5px 15px 6px 25px;
+	padding:5px 25px 6px 30px;
 	font-size:11px;
-}
+	
+	}
 
 #content a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.gif') no-repeat 0px 0px;
+	background: url('../images/css/btn_add_over.rtl.gif')no-repeat right top;
 	color: #349018;
 	border: 0px none;
-	padding:5px 15px 6px 25px;
+	padding:5px 25px 6px 30px;
 	font-size:11px;
+
 }
 
 /************ The sequence name box **********/
@@ -977,51 +979,51 @@ My Courses Pages
 
 /* my courses grey buttons in the green bar */
 
-.mycourses-right-buttons {float:left; padding-left:20px;  margin-top:11px; height:24px; font-size:11px}
+.mycourses-right-buttons {float:left; padding-left:15px;  margin-top:6px; height:24px; font-size:11px;}
 
 #content a.add-lesson-button {
 	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #666;
-	padding: 5px 30px 6px 12px;
+	padding: 5px 30px 3px 12px;
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
-	margin-top:6px;
-	margin-right:5px;
+    display:block
 }
+
 
 #content a:hover.add-lesson-button {
 	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #47bc23;
-	padding: 5px 30px 6px 12px;
+	padding: 5px 30px 3px 12px;
 	text-decoration: none;
-	margin-top:0px;
-	margin-right:5px;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
+    display:block;
 }
+
 
 #content a.manage-group-button {
 	background: url('../images/css/manage_groups.rtl.jpg') no-repeat top right;
 	color: #666;
-	padding: 5px 30px 6px 12px;
+	padding: 5px 30px 3px 12px;
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
-	margin-top:6px;
-	margin-right:10px;
+    display:block;
 }
+
 
 #content a:hover.manage-group-button {
 	background: url('../images/css/manage_groups.rtl.jpg') no-repeat top right;
 	color: #47bc23;
-	padding: 5px 30px 6px 12px;
+	padding: 5px 30px 3px 12px;
 	text-decoration: none;
-	margin-top:0px;
-	margin-right:10px;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
+    display:block;
 }
+
 
 /* my courses individual course boxes */
 
@@ -1130,3 +1132,22 @@ text-align:left;
 .align-left{
 text-align:right;
 }
+
+
+.shading-bg {
+	padding: 5px;
+	padding-right: 10px;
+	padding-top: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 98%;
+	border-top: 1px solid #ccc;
+	background: url('../images/css/greyfade_bg.jpg') repeat-x 3px -1px
+}
+
+.img-border {
+	padding: 2px;
+	border: 1px solid #dcdcdc;
+}
+
+.userpage-td {border-right:1px solid #ccc;}

@@ -9,13 +9,13 @@
 			<div class="left-buttons">
 				<h2><c:out value="${orgBean.name}" /></h2>
 			</div>
-			<div class="mycourses-right-buttons">
-				<c:forEach var="link" items="${orgBean.links}">
-				<a class="<c:out value='${link.style}'/>" href="<c:out value='${link.url}'/>"> 
-					<fmt:message key="${link.name}" /> 
-				</a>
-				</c:forEach>
-			</div>
+			<c:forEach var="link" items="${orgBean.links}">
+				<div class="mycourses-right-buttons">
+					<a class="<c:out value='${link.style}'/>" href="<c:out value='${link.url}'/>"> 
+						<fmt:message key="${link.name}" /> 
+					</a>
+				</div>	
+			</c:forEach>
 		</div>
 		<c:forEach var="lesson" items="${orgBean.lessons}">
 			<div class="sequence-name">
