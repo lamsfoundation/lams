@@ -352,5 +352,11 @@ public interface IUserManagementService {
 	 */
 	public boolean hasRoleInOrganisation(User user,  Integer roleId, Organisation organisation);
 	
-
+	/**
+	 * Given a user and a group, removes user from subgroups.
+	 * @param user
+	 * @param org
+	 */
+	public void deleteChildUserOrganisations(User user, Organisation org);
+	
 }

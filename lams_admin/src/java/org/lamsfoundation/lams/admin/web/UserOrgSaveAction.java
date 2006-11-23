@@ -110,6 +110,8 @@ public class UserOrgSaveAction extends Action{
 				userUos.remove(uo);
 				user.setUserOrganisations(userUos);
 				log.debug("removed userId="+userId+" from orgId="+orgId);
+				// remove from subgroups
+				service.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
 			}
 		}
 		// add UserOrganisations that are in form data

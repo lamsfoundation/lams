@@ -734,4 +734,27 @@ public class UserManagementService implements IUserManagementService {
 		else
 			return false;
 	}
+	
+	public void deleteChildUserOrganisations(User user, Organisation org) {
+		if (!org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE))
+			return;
+		Set childOrgs = org.getChildOrganisations();
+		Iterator iter = childOrgs.iterator();
+		while (iter.hasNext()) {
+			Organisation childOrg = (Organisation)iter.next();
+			Set childOrgUos = childOrg.getUserOrganisations();
+			UserOrganisation uo = getUserOrganisation(user.getUserId(), childOrg.getOrganisationId());
+			if (uo != null) {
+				// remove user's membership of this subgroup
+				childOrgUos.remove(uo);
+				childOrg.setUserOrganisations(childOrgUos);
+				save(childOrg);
+				// remove User's link to this subgroup
+				Set userUos = user.getUserOrganisations();
+				userUos.remove(uo);
+				user.setUserOrganisations(userUos);
+				log.debug("removed userId="+user.getUserId()+" from orgId="+childOrg.getOrganisationId());
+			}
+		}
+	}
 }

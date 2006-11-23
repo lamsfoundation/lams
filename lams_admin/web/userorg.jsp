@@ -27,6 +27,10 @@ function toggleCheckboxes(){
 
 <p>&nbsp;</p>
 
+<logic:equal name="orgType" value="2">
+	<p><fmt:message key="msg.remove.from.subgroups"/></p>
+</logic:equal>
+
 <div align="center"><html-el:errors/></div>
 <table class="alternative-color" width=100% cellspacing="0">
 <tr>
