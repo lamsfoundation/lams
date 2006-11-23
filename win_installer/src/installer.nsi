@@ -401,15 +401,23 @@ Function PostMySQLConfig
     !insertmacro MUI_INSTALLOPTIONS_READ $DB_USER "mysql.ini" "Field 9" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $DB_PASS "mysql.ini" "Field 10" "State"
     
+    
+    
+    
     # check mysql version is 5.0.x
     nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
     Pop $0
     Pop $1
+    ${If} $1 == "" ; if mySQL install directory field is empty, do not continue
+       MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
+       Abort
+    ${EndIf}
     ${StrStr} $0 $1 "5.0"
     ${If} $0 == "" ; if not 5.0.x, check 5.1.x
         ${StrStr} $0 $1 "5.1"
         ${If} $0 == ""
             MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$\r$\n$1"
+            Abort
         ${EndIf}
     ${EndIf}
     
