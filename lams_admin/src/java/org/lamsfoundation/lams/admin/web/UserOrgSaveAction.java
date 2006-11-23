@@ -142,7 +142,9 @@ public class UserOrgSaveAction extends Action{
 			log.debug("no new users to add to orgId="+orgId);
 			return mapping.findForward("userlist");
 		}else{
-			request.setAttribute("roles",service.filterRoles(rolelist,false, organisation.getOrganisationType()));
+			request.setAttribute("roles",service.filterRoles(rolelist,
+					request.isUserInRole(Role.SYSADMIN),
+					organisation.getOrganisationType()));
 			request.setAttribute("newUserOrganisations",newUserOrganisations);
 			request.setAttribute("orgId",orgId);
 			return mapping.findForward("userorgrole");
