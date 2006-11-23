@@ -73,17 +73,15 @@ public class LearningAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(LearningAction.class);
 
-	private static final boolean MODE_OPTIONAL = false;
-
 	private IChatService chatService;
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
-		// TODO need to catch exceptions and handle errors.
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
-				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
+		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE,
+				false);
+		checkMode(mode);
 
 		Long toolSessionID = WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -113,7 +111,7 @@ public class LearningAction extends LamsDispatchAction {
 			return mapping.findForward("defineLater");
 		}
 
-		request.setAttribute("MODE", mode.toString());
+		request.setAttribute("MODE", mode);
 
 		// Create the room if it doesnt exist
 		if (chatSession.getJabberRoom() == null) {
@@ -127,7 +125,7 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("XMPPDOMAIN", Configuration
 				.get(ConfigurationKeys.XMPP_DOMAIN));
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
-		
+
 		ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
 		if (chatUser.isFinishedActivity()) {
 			// get the notebook entry.
@@ -139,21 +137,21 @@ public class LearningAction extends LamsDispatchAction {
 				chatUserDTO.notebookEntry = notebookEntry.getEntry();
 			}
 		}
-		request.setAttribute("chatUserDTO", chatUserDTO);		
-		
+		request.setAttribute("chatUserDTO", chatUserDTO);
+
 		// Ensure that the content is use flag is set.
 		if (!chat.isContentInUse()) {
 			chat.setContentInUse(new Boolean(true));
 			chatService.saveOrUpdateChat(chat);
 		}
-		
+
 		// check runOffline
 		if (chat.isRunOffline()) {
 			return mapping.findForward("runOffline");
 		}
-		
+
 		return mapping.findForward("learning");
-		
+
 	}
 
 	private ChatUser getCurrentUser(Long toolSessionId) {
@@ -222,17 +220,16 @@ public class LearningAction extends LamsDispatchAction {
 		ChatDTO chatDTO = new ChatDTO(chatUser.getChatSession().getChat());
 
 		request.setAttribute("chatDTO", chatDTO);
-		
-		NotebookEntry notebookEntry = chatService.getEntry(
-				chatUser.getChatSession().getSessionId(),
+
+		NotebookEntry notebookEntry = chatService.getEntry(chatUser
+				.getChatSession().getSessionId(),
 				CoreNotebookConstants.NOTEBOOK_TOOL,
-				ChatConstants.TOOL_SIGNATURE,
-				chatUser.getUserId().intValue());
-		
+				ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
+
 		if (notebookEntry != null) {
 			lrnForm.setEntryText(notebookEntry.getEntry());
 		}
-		
+
 		return mapping.findForward("notebook");
 	}
 
@@ -254,4 +251,14 @@ public class LearningAction extends LamsDispatchAction {
 		return finishActivity(mapping, form, request, response);
 	}
 
+	private void checkMode(String mode) {
+		if (!mode.equals("moderator")
+				&& !mode.equals(ToolAccessMode.AUTHOR.toString())
+				&& !mode.equals(ToolAccessMode.LEARNER.toString())
+				&& !mode.equals(ToolAccessMode.TEACHER.toString())) {
+			String errorMsg = "[" + mode + "] is not a legal mode";
+			log.error(errorMsg);
+			throw new IllegalArgumentException(errorMsg);
+		}
+	}
 }

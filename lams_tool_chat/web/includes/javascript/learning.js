@@ -19,7 +19,7 @@ function htmlEnc(str) {
 	str = str.replace(/</g, "&lt;");
 	str = str.replace(/>/g, "&gt;");
 	str = str.replace(/\"/g, "&quot;");
-	str = str.replace(/\n/g, "<br />");
+	str = str.replace(/\n/g, "<br>");
 	return str;
 }
 function createElem(name, attrs, style, text) {
@@ -84,7 +84,7 @@ function UpdateRosterDisplay() {
 	}
 	
 	// change the name on the 'Send To' label
-	if (MODE == "teacher" && !(this.currentIndex === null)) {
+	if (MODE == "moderator" && !(this.currentIndex === null)) {
 		var user = this.users[this.currentIndex];
 		var sendToUserElem = document.getElementById("sendToUser");
 		sendToUserElem.innerHTML = "";
@@ -110,7 +110,7 @@ function Roster() {
 }
 var roster = new Roster();
 function selectUser(userDiv) {
-	if (MODE == "teacher") {
+	if (MODE == "moderator") {
 		var newIndex = userDiv.id.substring(userDiv.id.indexOf("-") + 1, userDiv.id.length);
 		if (roster.currentIndex == newIndex) {
 			roster.currentIndex = null;
@@ -139,7 +139,7 @@ function sendMsg(aForm) {
 		return false;  // do not send empty messages.
 	}
 	var aMsg = new JSJaCMessage();
-	if (MODE == "teacher" && !(roster.currentIndex === null)) {
+	if (MODE == "moderator" && !(roster.currentIndex === null)) {
 		var toNick = roster.users[roster.currentIndex].nick;
 		aMsg.setTo(CONFERENCEROOM + "/" + toNick);
 		aMsg.setType("chat");
@@ -163,7 +163,7 @@ function sendMsg(aForm) {
 }
 /* ******* Event Handlers ******* */
 function handleEvent(aJSJaCPacket) {
-	document.getElementById("iResp").innerHTML += "IN (raw):<br/>" + htmlEnc(aJSJaCPacket.xml()) + "<hr/>";
+	document.getElementById("iResp").innerHTML += "IN (raw):<br>" + htmlEnc(aJSJaCPacket.xml()) + "<hr>";
 }
 function handleMessage(aJSJaCPacket) {
 	var nick = aJSJaCPacket.getFrom().substring(aJSJaCPacket.getFrom().indexOf("/") + 1);
@@ -221,15 +221,12 @@ function handlePresence(presence) {
 	roster.updateDisplay();
 }
 function handleConnected() {
-	if (MODE == "learner") {
-		if (LEARNER_FINISHED == "true") {
-			//document.getElementById("notebookEntry_pane").style.display = "";
-			if (LOCK_ON_FINISHED == "true") {
-    			// disable sending messages.
-				document.getElementById("msgArea").disabled = "disabled";
-				document.getElementById("sendButton").disabled = "disabled";
-			}
-		}
+	if (MODE == "teacher" || (LEARNER_FINISHED == "true" && LOCK_ON_FINISHED == "true")) {
+		// disable sending messages.
+		document.getElementById("msgArea").disabled = "disabled";
+		var sendButton = document.getElementById("sendButton");
+		sendButton.disabled = "disabled";
+		sendButton.className = "disabled";
 	}
 	
 	// clear the response window.
@@ -251,7 +248,8 @@ function handleConnected() {
 function handleError(e) {
 	document.getElementById("msgArea").disabled = "disabled";
 	document.getElementById("sendButton").disabled = "disabled";
-	document.getElementById("iResp").innerHTML = "Couldn't connect. Please try again...<br />" + htmlEnc("Code: " + e.getAttribute("code") + "\nType: " + e.getAttribute("type") + "\nCondition: " + e.firstChild.nodeName);
+	document.getElementById("sendButton").className = "disabled";
+	document.getElementById("iResp").innerHTML = "Couldn't connect. Please try again...<br>" + htmlEnc("Code: " + e.getAttribute("code") + "\nType: " + e.getAttribute("type") + "\nCondition: " + e.firstChild.nodeName);
 	document.getElementById("roster").innerHTML = "";
 }
 /* ******* Init ******* */

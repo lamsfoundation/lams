@@ -128,7 +128,7 @@
 						<div>
 							<html:hidden property="toolSessionID"
 								value="${session.sessionID}" />
-							<html:hidden property="mode" value="teacher" />
+							<html:hidden property="mode" value="moderator" />
 							<html:submit styleClass="button">
 								<fmt:message>summary.openChat</fmt:message>
 							</html:submit>
@@ -138,5 +138,5 @@
 			</td>
 		</tr>
 	</table>
-	<hr />
+	<hr>
 </c:forEach>
