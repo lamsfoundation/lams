@@ -401,9 +401,7 @@ Function PostMySQLConfig
     !insertmacro MUI_INSTALLOPTIONS_READ $DB_USER "mysql.ini" "Field 9" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $DB_PASS "mysql.ini" "Field 10" "State"
     
-    
-    
-    
+
     # check mysql version is 5.0.x
     nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
     Pop $0
@@ -851,6 +849,9 @@ FunctionEnd
 
 Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
+    ;!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
+    ;!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_UP "uninstall.ini" "Field 3" "State"
+    ;!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 4" "State"
 FunctionEnd
 
 
