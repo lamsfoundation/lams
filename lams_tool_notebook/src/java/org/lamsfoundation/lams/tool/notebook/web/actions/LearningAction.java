@@ -129,8 +129,14 @@ public class LearningAction extends LamsDispatchAction {
 		if (notebook.isRunOffline()) {
 			return mapping.findForward("runOffline");
 		}
-
-		NotebookUser notebookUser = getCurrentUser(toolSessionID);
+		
+		NotebookUser notebookUser;
+		if (mode.equals(ToolAccessMode.TEACHER)) {
+			Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
+			notebookUser = notebookService.getUserByUserIdAndSessionId(userID, toolSessionID);
+		} else {
+			notebookUser = getCurrentUser(toolSessionID);
+		}
 		
 		// get any existing notebook entry
 		NotebookEntry nbEntry = notebookService.getEntry(notebookUser
@@ -140,7 +146,7 @@ public class LearningAction extends LamsDispatchAction {
 		}
 		
 		// set readOnly flag.
-		if (notebook.isLockOnFinished() && notebookUser.isFinishedActivity()) {
+		if (mode.equals(ToolAccessMode.TEACHER) || (notebook.isLockOnFinished() && notebookUser.isFinishedActivity())) {
 			request.setAttribute("contentEditable", false);
 		} else {
 			request.setAttribute("contentEditable", true);
