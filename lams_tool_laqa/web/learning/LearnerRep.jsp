@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -352,7 +352,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 	<div id="footer"></div>
 </body>
-</html:html>
+</lams:html>
 
 
 

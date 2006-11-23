@@ -213,25 +213,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				</c:if>
 			</c:if>
-
-			<h2>
-				<fmt:message key="label.notebook.entries" />
-			</h2>
-	
-			<p>
-				<c:choose>
-					<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true"/>
-					</c:when>
-					<c:otherwise>
-						<em><fmt:message key="message.no.reflection.available" /></em>  
-					</c:otherwise>
-				</c:choose>
-			</p>
-			
-			<html:submit property="forwardtoReflection" styleClass="button">
-				<fmt:message key="label.edit" />
-			</html:submit>
+			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
+				<h2>
+					<fmt:message key="label.notebook.entries" />
+				</h2>
+		
+				<p>
+					<c:choose>
+						<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
+							<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true"/>
+						</c:when>
+						<c:otherwise>
+							<em><fmt:message key="message.no.reflection.available" /></em>  
+						</c:otherwise>
+					</c:choose>
+				</p>
+				
+				<html:submit property="forwardtoReflection" styleClass="button">
+					<fmt:message key="label.edit" />
+				</html:submit>
+			</c:if>
 							
 			<html:hidden property="doneLearnerProgress" />
 

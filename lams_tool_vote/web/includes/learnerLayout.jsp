@@ -9,7 +9,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<html>
+<lams:html>
 	<head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
@@ -31,4 +31,4 @@
 		</div>
 		<div id="footer"></div>
 </body>
-</html>
+</lams:html>

@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<table class="forms">
 						
 								<tr>			
-									<td colspan=2 valign=top align=left>
+									<td colspan=2 valign=top class="align-left">
 										<b>  <fmt:message key="label.reflection"/>  </b> 
 									 </td>
 								</tr>	
@@ -36,11 +36,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	 		<c:set var="sessionId" scope="request" value="${currentDto.sessionId}"/>
 					  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 								<tr>			
-									<td valign=top align=left>
+									<td valign=top class="align-left">
 										 <c:out value="${userName}" escapeXml="false"/> 
 									 </td>
 	
-									<td valign=top align=left>
+									<td valign=top class="align-left">
 										<c:url value="monitoring.do" var="openNotebook">
 											<c:param name="dispatch" value="openNotebook" />
 											<c:param name="uid" value="${reflectionUid}" />

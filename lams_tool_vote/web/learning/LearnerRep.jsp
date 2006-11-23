@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -78,8 +78,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table>
 					<tr>
-						<td NOWRAP valign=top align=left>
-			 			<table align=left>
+						<td NOWRAP valign=top class="align-left">
+			 			<table class="align-left">
 			 			
 						<c:forEach var="currentDto" items="${voteGeneralLearnerFlowDTO.listMonitoredAnswersContainerDto}">
 				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
@@ -87,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td> &nbsp</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b>  <fmt:message key="label.nomination"/>: </b>
+								<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.nomination"/>: </b>
 									<c:out value="${currentDto.question}" escapeXml="false"/>
 								 </td>
 							</tr>	
@@ -135,7 +135,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  	 			<td> &nbsp&nbsp</td>
 				  	 		</tr>
 							<tr>			
-								<td NOWRAP valign=top align=left><b>  <fmt:message key="label.nomination"/>: </b>
+								<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.nomination"/>: </b>
 									<c:out value="${currentDto.question}" escapeXml="false"/>
 								 </td>
 							</tr>	
@@ -172,7 +172,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="footer"></div>
 
 </body>
-</html:html>
+</lams:html>
 
 
 

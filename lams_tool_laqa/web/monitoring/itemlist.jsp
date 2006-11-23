@@ -36,16 +36,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}"/>	
 
 	<tr>
-		<td width="10%" align="right" class="field-name">
+		<td width="10%" class="field-name align-right">
 			<fmt:message key="label.question" />:
 		</td>
 
-		<td width="60%" align="left">
+		<td width="60%" class="align-left">
 			<c:out value="${question}" escapeXml="false"/> 
 		</td>		
 
 
-			<td width="10%" align="right">
+			<td width="10%" class="align-right">
 		 		<c:if test="${totalQuestionCount != 1}"> 		
 		 		
 			 		<c:if test="${queIndex == 1}"> 		
@@ -76,13 +76,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 				<a title="<fmt:message key='label.tip.editQuestion'/>" href="javascript:;" onclick="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}"/>');">
 	                    <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 				</a> 
 		</td>
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 				<a title="<fmt:message key='label.tip.deleteQuestion'/>" href="javascript:;" onclick="removeMonitoringQuestion(${queIndex});">
 	                    <img src="<c:out value="${tool}"/>images/delete.gif" border="0">
 				</a> 				

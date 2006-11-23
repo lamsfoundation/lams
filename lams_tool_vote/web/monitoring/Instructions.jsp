@@ -39,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 								<tr>
 									<td>
-										<table width="70%" align="left">
+										<table width="70%" class="align-left">
 
        									<c:forEach var="attachment" items="${voteGeneralMonitoringDTO.attachmentList}">
 											<c:if test="${attachment.fileOnline == true }"> 			
@@ -94,7 +94,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
 								<tr>
 									<td>
-										<table width="70%" align="left">
+										<table width="70%" class="align-left">
 
        									<c:forEach var="attachment" items="${voteGeneralMonitoringDTO.attachmentList}">
 											<c:if test="${attachment.fileOnline == false}"> 			

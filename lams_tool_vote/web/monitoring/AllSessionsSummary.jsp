@@ -129,7 +129,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr> <td NOWRAP colspan=2> 									
 						  	 		<c:set var="currentSessionId" scope="request" value="${currentDto.sessionId}"/>
 						  	 		
- 							 			<table align=left>
+ 							 			<table class="align-left">
 						  					<tr>
 										 		<td NOWRAP> <b>  <fmt:message key="label.total.students"/> </b> </td>
 										 		<td>  <c:out value="${currentDto.sessionUserCount}"/> </td>
@@ -160,12 +160,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 											<tr>
-												<td NOWRAP colspan=2 valign=top align=left>
+												<td NOWRAP colspan=2 valign=top class="align-left">
 												<table align=center>
 													<c:if test="${statsTabActive != 'true'}"> 							
 														<tr> 
 															<td> </td>
-															<td NOWRAP valign=top align=left >
+															<td NOWRAP valign=top class="align-left" >
 																<c:set scope="request" var="viewURL">
 																	<html:rewrite page="/chartGenerator?type=pie&currentSessionId=${currentSessionId}"/>
 																</c:set>
@@ -176,7 +176,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														</tr>
 														<tr> 
 															<td> </td>
-															<td NOWRAP valign=top align=left >
+															<td NOWRAP valign=top class="align-left" >
 																<c:set scope="request" var="viewURL">
 																	<html:rewrite page="/chartGenerator?type=bar&currentSessionId=${currentSessionId}"/>
 																</c:set>
@@ -195,13 +195,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:forEach var="currentNomination" items="${currentDto.mapStandardNominationsHTMLedContent}">
 										  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 										  	 		 <tr>
-							  	 						<td NOWRAP valign=top align=left>
+							  	 						<td NOWRAP valign=top class="align-left">
 															<c:out value="${currentNomination.value}" escapeXml="false"/>
 														 </td>
 						
 
 
-														<td NOWRAP valign=top align=left>				  	 		
+														<td NOWRAP valign=top class="align-left">				  	 		
 												  	 		<c:forEach var="currentUserCount" items="${currentDto.mapStandardUserCount}">
 													  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 												  				<c:if test="${currentNominationKey == currentUserKey}"> 				
@@ -275,17 +275,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							
 								<tr>
 							 		<td NOWRAP colspan=2>
-						 			<table align=left>
+						 			<table class="align-left">
 												<tr>
 											 		<th NOWRAP colspan=3>  <fmt:message key="label.openVotes"/>  </th>
 												</tr>
 	
 												<tr> 
-													 <td NOWRAP valign=top align=left> <b>  <fmt:message key="label.vote"/>  </b> </td>  														 
-													 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.attemptTime"/> </b></td>
+													 <td NOWRAP valign=top class="align-left"> <b>  <fmt:message key="label.vote"/>  </b> </td>  														 
+													 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.user"/>  </b> </td>  
+							  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
 							 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
-								  						 <td NOWRAP valign=top align=left> <b>   <fmt:message key="label.visible"/>  </b></td>								  						 
+								  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.visible"/>  </b></td>								  						 
 													 </c:if> 																					  						 
 									  			</tr>				 
 											
@@ -295,18 +295,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
 														<tr> 
-																<td NOWRAP valign=top align=left> 
+																<td NOWRAP valign=top class="align-left"> 
 																	<c:out value="${dtoEntry.question}" escapeXml="false"/> 
 																	<c:if test="${userData.visible != 'true' }"> 			
 												                                 <i><fmt:message key="label.hidden"/> </i> 
 																	</c:if> 								
 																</td>
 																 
-																 <td NOWRAP valign=top align=left>    <c:out value="${userData.userName}"/>   </td>  
-																 <td NOWRAP valign=top align=left>    <lams:Date value="${userData.attemptTime}"/>  </td>
+																 <td NOWRAP valign=top class="align-left">    <c:out value="${userData.userName}"/>   </td>  
+																 <td NOWRAP valign=top class="align-left">    <lams:Date value="${userData.attemptTime}"/>  </td>
 																 
 										 						<c:if test="${statsTabActive != 'true'}"> 							
-																	 <td NOWRAP valign=top align=left>
+																	 <td NOWRAP valign=top class="align-left">
 												 						<c:if test="${userData.visible == 'true' }"> 			
 													                                <html:submit property="hideOpenVote" 
 													                                             styleClass="linkbutton" 

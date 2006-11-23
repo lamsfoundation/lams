@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -157,7 +157,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</table>
 
 			<div>
-				<div style="float:right">
+				<div class="float-right">
 
 					<c:set scope="request" var="viewURL">
 						<html:rewrite page="/chartGenerator?type=pie" />
@@ -207,7 +207,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-			<div align="right" class="space-bottom-top">
+			<div class="space-bottom-top align-right">
 				<html:submit property="learnerFinished" styleClass="button"
 					onclick="submitMethod('learnerFinished');">
 					<fmt:message key="label.finished" />
@@ -220,4 +220,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="footer"></div>
 </body>
-</html:html>
+</lams:html>

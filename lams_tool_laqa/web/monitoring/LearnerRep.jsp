@@ -23,7 +23,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:html locale="true">
+<lams:html>
 <head>
 	<title> <fmt:message key="activity.title"/> </title>
 
@@ -90,8 +90,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<jsp:include page="/monitoring/SummaryContent.jsp" />
 
 				<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
-			       	<table class="forms" align=right> 	  
-							<tr> <td align=right> 
+			       	<table class="forms align-right"> 	  
+							<tr> <td class="align-right"> 
 								 <fmt:message key="label.learning.forceFinish"/> &nbsp&nbsp
 
 								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
@@ -103,8 +103,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if> 			
 
 				<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-			       	<table class="forms" align=right> 	  
-							<tr> <td align=right> 
+			       	<table class="forms align-right" > 	  
+							<tr> <td class="align-right"> 
 								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
 									<fmt:message key="button.endLearning"/>
 								</html:submit>	 				 		  					
@@ -137,7 +137,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:if> 				    
 
 </body>
-</html:html>
+</lams:html>
 
 
 

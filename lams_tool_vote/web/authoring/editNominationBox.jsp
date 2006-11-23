@@ -22,7 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<html>
+<lams:html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
@@ -67,4 +67,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 	</body>
-</html>
+</lams:html>

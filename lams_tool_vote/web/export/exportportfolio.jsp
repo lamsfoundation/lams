@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-	<html:html locale="true">
+	<lams:html>
 	<head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <fmt:message key="label.export"/> </title>
@@ -68,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		</html:form>
 </body>
-</html:html>
+</lams:html>
 
 
 

@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			  	 		
 						<tr>			
-							<td valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
+							<td valign=top class="align-left"><b>  <fmt:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -61,14 +61,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																 <td  valign=top>  <c:out value="${userData.userName}"/>   </td>  
 																 <td  valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 																 
-																  <td align=right valign=top width="150"> 
+																  <td class="align-right" valign=top width="150"> 
 																	<b> <fmt:message key="label.edit"/> </b>
 																	<a title="<fmt:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','editGroupResponse');">
 								                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 																	</a> 
 																  </td>
 	
-			   													 <td align=right valign=top> 				 
+			   													 <td class="align-right" valign=top> 				 
 																	<c:if test="${userData.visible == 'true' }"> 			
 													                            <html:submit property="hideResponse" 
 													                                         styleClass="linkbutton" 
@@ -108,7 +108,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																		 <td valign=top>  <c:out value="${userData.userName}"/>   </td>  
 																		 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 															
-																		  <td align=right valign=top width="150">  
+																		  <td class="align-right" valign=top width="150">  
 																		  	<b> <fmt:message key="label.save"/> </b>
 		
 																			<a title="<fmt:message key='label.tooltip.tick'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','updateGroupResponse');">
@@ -117,7 +117,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																		  </td>	  	 																	
 															
 		
-					   													 <td align=right valign=top> 				 
+					   													 <td class="align-right" valign=top> 				 
 																			<c:if test="${userData.visible == 'true' }"> 			
 															                            <html:submit property="hideResponse" 
 															                                         styleClass="linkbutton" 
@@ -154,14 +154,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	 <td valign=top>  <c:out value="${userData.userName}"/>   </td>  
 																	 <td valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
 	
-																	  <td align=right valign=top width="150"> 
+																	  <td class="align-right" valign=top width="150"> 
 																		 <b> <fmt:message key="label.edit"/> </b>
 																		<a title="<fmt:message key='label.tooltip.edit'/>" href="javascript:;" onclick="javascript:submitEditGroupResponse('<c:out value="${sessionId}"/>','<c:out value="${userData.uid}"/>','editGroupResponse');">
 									                                                <img src="<c:out value="${tool}"/>images/edit.gif" border="0">
 																		</a> 
 																	  </td>	  	 
 	
-				   													 <td align=right valign=top> 				 
+				   													 <td class="align-right" valign=top> 				 
 																		<c:if test="${userData.visible == 'true' }"> 			
 														                            <html:submit property="hideResponse" 
 														                                         styleClass="linkbutton" 

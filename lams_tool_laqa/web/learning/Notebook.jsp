@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<html:html>
+<lams:html>
 <head>
 	<html:base />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:textarea cols="60" rows="8" property="entryText"
 				styleClass="text-area"></html:textarea>
 
-			<div align="right" class="space-bottom-top">
+			<div class="space-bottom-top align-right">
 				<html:button property="submitReflection"
 					onclick="javascript:submitMethod('submitReflection');"
 					styleClass="button">
@@ -91,7 +91,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="footer"></div>
 
 </body>
-</html:html>
+</lams:html>
 
 
 

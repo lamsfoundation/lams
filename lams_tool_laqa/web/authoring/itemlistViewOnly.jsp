@@ -37,23 +37,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}"/>	
 
 	<tr>
-		<td width="10%" align="right" class="field-name">
+		<td width="10%" class="field-name align-right">
 			<fmt:message key="label.question" />:
 		</td>
 
-		<td width="60%" align="left">
+		<td width="60%" class="align-left">
 			<c:out value="${question}" escapeXml="false"/> 
 		</td>		
 
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 		</td>
        	
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 		</td>
 
-		<td width="10%" align="right">
+		<td width="10%" class="align-right">
 		</td>
 	</tr>
 </c:forEach>

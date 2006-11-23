@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				value="${currentDTO.displayOrder}" />
 
 			<tr>
-				<td width="10%" align="right" class="field-name">
+				<td width="10%" class="field-name align-right">
 					<fmt:message key="label.nomination" />
 				</td>
 
@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-				<td width="10%" align="right">
+				<td width="10%" class="align-right">
 					<c:if test="${totalNominationCount != 1}">
 
 						<c:if test="${queIndex == 1}">
@@ -84,13 +84,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if>
 				</td>
 
-				<td width="10%" align="right">
+				<td width="10%" class="align-right">
 					<img src="<c:out value="${tool}"/>images/edit.gif" border="0"
 						title="<fmt:message key='label.tip.editNomination'/>"
 						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');">
 				</td>
 
-				<td width="10%" align="right">
+				<td width="10%" class="align-right">
 					<img src="<c:out value="${tool}"/>images/delete.gif" border="0"
 						title="<fmt:message key='label.tip.deleteNomination'/>"
 						onclick="removeNomination(${queIndex});">

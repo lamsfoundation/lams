@@ -206,7 +206,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<tr>
 					<td>
-						<html:submit onclick="javascript:submitMethod('newCandidateBox');" style="float:right;width:150px"  styleClass="button-add-item">
+						<html:submit onclick="javascript:submitMethod('newCandidateBox');" style="width:150px"  styleClass="button-add-item float-right">
 			            	<fmt:message key="label.add.candidates" />
 						</html:submit>	 				 		  											
 					</td>

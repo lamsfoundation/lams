@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-	<html:html locale="true">
+	<lams:html>
 	<head>
 	<title> <fmt:message key="label.learnersVoted"/> </title>
 
@@ -55,4 +55,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 <div id="footer"></div>
 </body>
-</html:html>
+</lams:html>

@@ -4,7 +4,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 
-<html>
+<lams:html>
 	<head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
@@ -29,4 +29,4 @@
 			</div>
 		</div>
 	</body>
-</html>
+</lams:html>

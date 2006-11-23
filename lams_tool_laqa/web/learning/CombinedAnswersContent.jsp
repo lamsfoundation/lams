@@ -63,7 +63,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </c:forEach>
  
- 	<div align="right" class="space-bottom-top">
+ 	<div class="space-bottom-top align-right">
 	
 		<html:button property="btnCombined"
 			onclick="javascript:submitMethod('submitAnswersContent');"

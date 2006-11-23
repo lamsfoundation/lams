@@ -23,10 +23,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-	<html:html locale="true">
+	<lams:html>
 	<head>
-	<title> <fmt:message key="label.exportPortfolio"/> </title>
-	<lams:css localLinkPath="../"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title> <fmt:message key="label.exportPortfolio"/> </title>
+		<lams:css localLinkPath="../"/>
 	</head>
 	<body class="stripes">
 
@@ -64,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b>  <fmt:message key="label.question"/> : </b> 
+							<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -97,14 +98,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>		  	
 
 						<tr>			
-							<td valign=top align=left>
+							<td valign=top class="align-left">
 								&nbsp
 							</td>
 						</tr>
 
 					
 						<tr>			
-							<td valign=top align=left>
+							<td valign=top class="align-left">
 								<table align=center>
 								
 										<tr>			
@@ -121,15 +122,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 							  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
 										<tr>			
-											<td valign=top align=left>
+											<td valign=top class="align-left">
 												  <b>  <fmt:message key="label.user"/>:  </b>
 											 </td>
 
-											<td valign=top align=left>
+											<td valign=top class="align-left">
 	 												  <c:out value="${userName}" escapeXml="false"/> 
 											 </td>
 
-											<td valign=top align=left>
+											<td valign=top class="align-left">
 												 <c:out value="${entry}" escapeXml="false"/> 
 											 </td>
 										</tr>	
@@ -152,7 +153,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</html:form>
 
 	</body>
-</html:html>
+</lams:html>
 
 
 

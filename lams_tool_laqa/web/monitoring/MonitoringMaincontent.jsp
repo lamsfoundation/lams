@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 	%>
 
-	<html:html locale="true">
+	<lams:html>
 	<head>
 	<title><fmt:message key="activity.title" /></title>
 
@@ -172,4 +172,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 	
 </body>
-</html:html>
+</lams:html>
