@@ -221,7 +221,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<p>
 				<c:choose>
 					<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true" />
+						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true"/>
 					</c:when>
 					<c:otherwise>
 						<em><fmt:message key="message.no.reflection.available" /></em>  

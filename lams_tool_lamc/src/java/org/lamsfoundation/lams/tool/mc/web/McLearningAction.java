@@ -1584,7 +1584,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("notebookEntry: " + notebookEntry);
 		
 		if (notebookEntry != null) {
-		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+		    String notebookEntryPresentable = notebookEntry.getEntry();
 		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 		}
 
@@ -2106,7 +2106,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("notebookEntry: " + notebookEntry);
 		
 		if (notebookEntry != null) {
-		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
+		    String notebookEntryPresentable= notebookEntry.getEntry();
 		    mcLearningForm.setEntryText(notebookEntryPresentable);
 		    
 		}

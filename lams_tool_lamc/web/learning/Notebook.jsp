@@ -66,8 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:textarea cols="60" rows="8" property="entryText"
 				styleClass="text-area">
 				<c:if test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-					<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}"
-					escapeXml="true" />
+					<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}"/>
 				</c:if>
 			</html:textarea>
 
