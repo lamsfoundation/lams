@@ -72,7 +72,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                scope="request"
  *                validate="false"
  *
- * @struts:action-forward name="organisation" path=".organisation"                
+ * @struts:action-forward name="organisation" path="/organisation.do?method=edit"                
  * @struts:action-forward name="orglist" path="/orgmanage.do"
  * @struts:action-forward name="userlist" path="/usermanage.do"
  */
@@ -135,7 +135,13 @@ public class OrgSaveAction extends Action {
 			return mapping.findForward("orglist");
 		}else{
 			saveErrors(request,errors);
-			return mapping.findForward("organisation");
+			ActionForward forward = mapping.findForward("organisation");
+			if(orgId!=0) {
+				return forward;
+			}else{
+				forward.setPath(forward.getPath()+"&orgId="+orgId);
+				return forward;
+			}
 		}
 	}
 	
