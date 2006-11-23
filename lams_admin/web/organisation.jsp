@@ -106,5 +106,5 @@
 			<html-el:cancel><fmt:message key="admin.cancel"/></html-el:cancel>
 		</td>
 	</tr>
-<table>
+</table>
 </html-el:form>
