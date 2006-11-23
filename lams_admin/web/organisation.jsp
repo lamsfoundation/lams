@@ -88,6 +88,18 @@
 	</tr>
 	</logic:equal>
 	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td><logic:equal name="OrganisationForm" property="typeId" value="2"><fmt:message key="msg.group.organisation_id"/></logic:equal>
+			<logic:equal name="OrganisationForm" property="typeId" value="3"><fmt:message key="msg.subgroup.organisation_id"/></logic:equal>
+			<bean:write name="OrganisationForm" property="orgId" />.
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
 		<td colspan=2 class="align-right">
 			<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
 			<html-el:reset><fmt:message key="admin.reset"/></html-el:reset>
