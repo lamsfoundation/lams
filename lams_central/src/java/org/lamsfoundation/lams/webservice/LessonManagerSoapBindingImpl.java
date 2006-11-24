@@ -71,7 +71,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
 					countryIsoCode, langIsoCode);
 			// 1. init lesson
-			Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap
+			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
 					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId());
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
@@ -93,7 +93,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
 					countryIsoCode, langIsoCode);
 			// 1. init lesson
-			Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap
+			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
 					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId());
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
