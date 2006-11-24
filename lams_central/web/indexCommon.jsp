@@ -40,7 +40,7 @@
 		<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
 		<div class="group-name">
 			<p>
-				<c:out value="${childOrg.name}" /> 
+				<c:out value="${childOrg.name}" />
 				<c:forEach var="childlink" items="${childOrg.links}">
 					<a href="<c:out value='${childlink.url}'/>" class="sequence-action-link"> 
 						<img src="images/css/mycourses_addlesson.jpg" alt="add lesson" width="20" height="18" class="align-middle"> 
@@ -60,7 +60,7 @@
 					</c:if>
 					<c:forEach var="childlessonlink" items="${childLesson.links}">
 					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
-						<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="19" height="16" border="0" class="align-middle"> 
+						<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="20" height="22" border="0" class="align-middle"> 
 						<fmt:message key="${childlessonlink.name}" /> 
 					</a>
 					</c:forEach>

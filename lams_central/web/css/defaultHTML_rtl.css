@@ -338,7 +338,7 @@ a:hover.button {
 
 /*layout of adding a topic button */
 a.button-add-item {
-	background: url('../images/css/btn_add_off.gif') no-repeat 0px 0px;
+	background: url('../images/css/btn_add_off.rtl.gif') no-repeat right top;
 	color: #333;
 	border: 0px none;
 	padding:5px 15px 6px 25px;
@@ -347,7 +347,7 @@ a.button-add-item {
 }
 
 a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.gif') no-repeat 0px 0px;
+	background: url('../images/css/btn_add_over.rtl.gif') no-repeat right top;
 	color: #349018;
 	border: 0px none;
 	padding:5px 15px 6px 25px;
@@ -367,7 +367,7 @@ a:hover.button-add-item {
 	}
 
 #content a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.rtl.gif')no-repeat right top;
+	background: url('../images/css/btn_add_over.rtl.gif') no-repeat right top;
 	color: #349018;
 	border: 0px none;
 	padding:5px 25px 6px 30px;
@@ -378,7 +378,7 @@ a:hover.button-add-item {
 /************ The sequence name box **********/
 .sequence-name {
 	margin-top:5px;
-	margin-left:30px;
+	margin-right:30px;
 	
 }
 
@@ -421,7 +421,7 @@ a:hover.button-add-item {
 	text-decoration: none;
 	border:0px;
 	font-variant:small-caps;
-	margin-left:20px;	
+	margin-right:20px;	
 }
 
 #content a:hover.sequence-action-link {
@@ -429,7 +429,7 @@ a:hover.button-add-item {
 	text-decoration: none;
 	border-bottom:0px;
 	font-variant:small-caps;
-	margin-left:20px;
+	margin-right:20px;
 	}
 
 /* my courses individual course boxes */
@@ -842,22 +842,26 @@ font-size:1.2em;
 }
 #login-right-col p.login-button{
 margin-top:0px; 
-margin-left:50px; 
+margin-left:50px;
 text-align:left;
 }
 #login-right-col a.button {
 background:url('../images/css/btn_off.gif') repeat-x 0px 0px; 
 color:#333; 
 border:0px none; 
-padding:5px 20px 6px 20px;
-text-decoration:none; }
+padding:5px 20px 10px 20px;
+text-decoration:none;
+float: left;
+}
 
 #login-right-col a:hover.button {
 background:url('../images/css/btn_over.gif') repeat-x 0px 0px; 
 color:#349018; 
 border:0px none; 
 padding:5px 20px 6px 20px;
-text-decoration:none;}
+text-decoration:none;
+float: left;
+}
 
 #login-page #footer { /*layout of the footer - the bottom of the box */
 	width: 707px;
@@ -1102,7 +1106,7 @@ My Courses Pages
 
 .group-name {
 margin-top:5px;
-margin-right:80px;
+margin-right:60px;
 }
 
 .group-name p {
