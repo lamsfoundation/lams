@@ -87,6 +87,7 @@
 		</td>
 	</tr>
 	</logic:equal>
+	<logic:notEmpty name="OrganisationForm" property="orgId">
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
@@ -99,6 +100,7 @@
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
+	</logic:notEmpty>
 	<tr>
 		<td colspan=2 class="align-right">
 			<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
