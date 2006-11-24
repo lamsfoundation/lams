@@ -123,6 +123,12 @@ public class HtmlTag extends TagSupport {
 	    }
 	
 	    if ( direction!=null ) {
+            this.pageContext.setAttribute(
+            		LocaleFilter.DIRECTION,
+                    direction,
+                    PageContext.PAGE_SCOPE);
+
+	    	
 	    	sb.append(" dir=\"");
 	    	sb.append(direction);
 	    	sb.append("\"");

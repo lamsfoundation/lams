@@ -41,10 +41,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>
 	</head>
 
-	<frameset rows="*" cols="160,*">
-		<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if>" name="controlFrame" scrolling="NO">
-		<frame src="content.do" name="contentFrame" scrolling="YES">
-	</frameset>
+	<c:choose>
+		<c:when test="${page_direction == 'RTL'}">
+			<frameset rows="*" cols="*,160">
+				<frame src="content.do" name="contentFrame" scrolling="YES">
+				<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if>" name="controlFrame" scrolling="NO">
+			</frameset>	
+		</c:when>
+		<c:otherwise>
+			<frameset rows="*" cols="160,*">
+				<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if>" name="controlFrame" scrolling="NO">
+				<frame src="content.do" name="contentFrame" scrolling="YES">
+			</frameset>
+		</c:otherwise>
+	</c:choose>
 	
 	<noframes>
 		<body>
