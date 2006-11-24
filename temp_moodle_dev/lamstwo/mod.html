@@ -1,0 +1,478 @@
+<!-- This page defines the form to create or edit an instance of this module -->
+<!-- It is used from /course/mod.php.  The whole instance is available as $form. -->
+<?php
+
+include_once($CFG->dirroot.'/mod/lamstwo/constants.php');
+require_once($CFG->dirroot.'/mod/lamstwo/lib.php');
+
+if (!isset($form->name)) {
+    $form->name = '';
+}
+if (!isset($form->sequence_id)) {
+    $form->sequence_id = '';
+}
+if (!isset($form->introduction)) {
+    $form->introduction = '';
+}
+if (!isset($form->lesson_id)) {
+    $form->lesson_id = '';
+}
+
+if (!isset($form->create_sequence_url)) {
+    $datetime =    date("F d,Y g:i a");
+    $plaintext = trim($datetime).trim($USER->username).trim($LAMS2CONSTANTS->author_method).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
+    $hash = sha1(strtolower($plaintext));
+    $form->create_sequence_url = $CFG->lamstwo_serverurl.$LAMS2CONSTANTS->login_request.
+        '?'.$LAMS2CONSTANTS->param_uid.'='.$USER->username.
+        '&'.$LAMS2CONSTANTS->param_method.'='.$LAMS2CONSTANTS->author_method.
+        '&'.$LAMS2CONSTANTS->param_timestamp.'='.urlencode($datetime).
+        '&'.$LAMS2CONSTANTS->param_serverid.'='.$CFG->lamstwo_serverid.
+        '&'.$LAMS2CONSTANTS->param_hash.'='.$hash.
+        '&'.$LAMS2CONSTANTS->param_courseid.'='.$form->course.
+		'&'.$LAMS2CONSTANTS->param_country.'='.trim($USER->country).
+		'&'.$LAMS2CONSTANTS->param_lang.'='.substr(trim($USER->lang),0,2);
+}
+?>
+
+<link type="text/css" rel="stylesheet" href="../mod/lamstwo/calendar.css">
+
+<form name="form" method="post" action="mod.php">
+<!-- The following line for Moodle 1.5 prints the visibility setting form element -->
+<!-- <?php print_visible_setting($form); ?> -->
+<!-- and if your module uses groups you would also have -->
+<!-- ?php print_groupmode_setting($form); ? -->
+
+<?php
+	if ($_GET['update']){
+		echo '<div id="step1" align="center" style="display:none">';
+	}else{
+		echo '<div id="step1" align="center">';
+	}
+?>
+<table cellpadding="5">
+	<tr>	
+		<td align="left">
+			<b><?php  print_string("sequence","lamstwo") ?></b><br />
+			<p><?php print_string("sequenceExplanation","lamstwo") ?></p>
+		</td>
+	</tr>	
+	<tr>
+	<td align="center">
+		<table width="60%" align="center">
+			<tr>
+				<td align="left"> 
+					<script type="text/javascript" src="../mod/lamstwo/tree.js"></script>
+					<script type="text/javascript" src="../mod/lamstwo/tree_tpl.js"></script>
+					<script language="javascript">
+						<!--
+							<?php $lds = lamstwo_get_sequences($USER->username,$form->course,$USER->country,$USER->lang);
+								if (strpos($lds, '[') === 0){
+									echo "var TREE_ITEMS = $lds; new tree (TREE_ITEMS, TREE_TPL);";
+								}else{
+									echo "document.write(";
+									echo "<p>$lds</p>);";
+								}
+							?>
+						//->
+					</script>
+				</td>
+			</tr>
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td align="center">
+		<input type="button" id="create" name="create" value="<?php print_string("createSequence","lamstwo") ?>" onClick="openAuthor(<?php echo "'".$form->create_sequence_url."'";?>,'author','location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable',0)" />
+		<input type="button" id="refresh" name="refresh" value="<?php print_string("refreshSequenceList","lamstwo")?>" onclick="javascript:refreshSequences()" />
+		<input type="submit" id="cancel" name=cancel value="<?php  print_string("cancel") ?>" />
+		<input type="button" id="next" name="next" value="<?php print_string("next", "lamstwo") ?>" onClick="javascript:nextStep()"/>
+	</td>
+</tr>
+</table>
+</div>
+
+<?php
+	if ($_GET['update']){
+		echo '<div id="step2" align="center">';
+	}else{
+		echo '<div id="step2" align="center" style="display:none">';
+	}
+?>
+<table cellpadding="5">
+<tr>
+	<td align="left">
+		<b><?php if($_GET['update']) print_string("update","lamstwo"); else print_string("confirm", "lamstwo") ?></b><br />
+		<p><?php if($_GET['update']) print_string("updateExplanation","lamstwo"); else print_string("confirmExplanation", "lamstwo") ?></p>
+	</td>
+</tr>	
+<tr>
+	<td>
+		<div>
+			<table align="center">
+				<tr>
+					<td align="left">
+						<b><?php  print_string("name") ?>:</b><br /><input type="text" id="name" name="name" value="<?php p($form->name) ?>" size="50">
+					</td>
+				</tr>
+				<tr>
+					<td align="left">
+						<br />
+						<b><?php print_string("introduction", "lamstwo") ?>:</b>
+						<font size="1">
+						<?php
+							if ($usehtmleditor) {
+							    helpbutton("richtext", get_string("helprichtext"), "moodle", true, true);
+							} else {
+							    helpbutton("text", get_string("helptext"), "moodle", true, true);
+							    echo '<br />';
+							    emoticonhelpbutton("form", "introduction");
+							    echo '<br />';
+							}
+						?>
+						<br />				
+						</font>
+						<?php
+							print_textarea($usehtmleditor, 20, 50, 680, 200, "introduction", $form->introduction);
+						?>
+					</td>
+				</tr>
+				<tr>
+					<td align="left"><br /><b><?php print_string("sequence","lamstwo") ?>:</b><span id="seqname"></span></td>
+				</tr>
+				<tr>
+					<td align="left" with="100%">
+						<br />
+						<table with="100%">
+							<tr>
+								<td align="left">
+									<input type="checkbox" id="scheduled" name="scheduled" onClick="javascript:switchSubmitButton()" disabled="<?php echo $_GET['update']!=null ?>" />
+								</td>
+								<td colspan="3" align="left">
+									<b><?php print_string("schedule", "lamstwo") ?></b>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td align="left">
+									<?php print_string("date", "lamstwo") ?>
+								</td>
+								<td colspan="2" align="left">
+									<select id="selYear1" name="selYear1" onchange="javascript:changeDate1()" style="vertical-align:middle">
+										<option value="2006">2006</option>
+										<option value="2007">2007</option>
+										<option value="2008">2008</option>
+									</select>
+									<select id="selMonth1" name="selMonth1" onchange="javascript:changeDate1()" style="vertical-align:middle">
+										<option value="Jan"><?php print_string("Jan","lamstwo")?></option>
+										<option value="Feb"><?php print_string("Feb","lamstwo")?></option>
+										<option value="Mar"><?php print_string("Mar","lamstwo")?></option>
+										<option value="Apr"><?php print_string("Apr","lamstwo")?></option>
+										<option value="May"><?php print_string("May","lamstwo")?></option>
+										<option value="Jun"><?php print_string("Jun","lamstwo")?></option>
+										<option value="Jul"><?php print_string("Jul","lamstwo")?></option>
+										<option value="Aug"><?php print_string("Aug","lamstwo")?></option>
+										<option value="Sep"><?php print_string("Sep","lamstwo")?></option>
+										<option value="Oct"><?php print_string("Oct","lamstwo")?></option>
+										<option value="Nov"><?php print_string("Nov","lamstwo")?></option>
+										<option value="Dec"><?php print_string("Dec","lamstwo")?></option>
+									</select>
+									<select name="selDay1" id="selDay1" onchange="javascript:changeDate1()" style="vertical-align:middle">
+										<option value="1">1</option><option value="2">2</option><option value="3">3</option>
+										<option value="4">4</option><option value="5">5</option><option value="6">6</option>
+										<option value="7">7</option><option value="8">8</option><option value="9">9</option>
+										<option value="10">10</option><option value="11">11</option><option value="12">12</option>
+										<option value="13">13</option><option value="14">14</option><option value="15">15</option>
+										<option value="16">16</option><option value="17">17</option><option value="18">18</option>
+										<option value="19">19</option><option value="20">20</option><option value="21">21</option>
+										<option value="22">22</option><option value="23">23</option><option value="24">24</option>
+										<option value="25">25</option><option value="26">26</option><option value="27">27</option>
+										<option value="28">28</option><option value="29">29</option><option value="30">30</option>
+										<option value="31">31</option>
+									</select>
+									<a href="javascript:void(null)" onclick="javascript:showCalendar1()"><img id="dateLink1" src="../mod/lamstwo/pdate.gif" border="0" style="vertical-align:middle;margin:5px"/></a>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td align="left">
+									<?php print_string("time", "lamstwo") ?>
+								</td>
+								<td align="left">
+									<select id="hour" name="hour">
+										<option value="1">1</option><option value="2">2</option><option value="3">3</option>
+										<option value="4">4</option><option value="5">5</option><option value="6">6</option>
+										<option value="7">7</option><option value="8">2</option><option value="9">9</option>
+										<option value="10" selected="true">10</option><option value="11">11</option><option value="12">12</option>
+									</select>:
+									<select id="minute" name="minute">
+										<option value="00" selected="true">00</option><option value="01">01</option><option value="02">02</option>
+										<option value="03">03</option><option value="04">04</option><option value="05">05</option>
+										<option value="06">06</option><option value="07">07</option><option value="08">08</option>
+										<option value="09">09</option><option value="10">10</option><option value="11">11</option>
+										<option value="12">12</option><option value="13">13</option><option value="14">14</option>
+										<option value="15">15</option><option value="16">16</option><option value="17">17</option>
+										<option value="18">18</option><option value="19">19</option><option value="20">20</option>
+										<option value="21">21</option><option value="22">22</option><option value="23">23</option>
+										<option value="24">24</option><option value="25">25</option><option value="26">26</option>
+										<option value="27">27</option><option value="28">28</option><option value="29">29</option>
+										<option value="30">30</option><option value="31">31</option><option value="32">32</option>
+										<option value="33">33</option><option value="34">34</option><option value="35">35</option>
+										<option value="36">36</option><option value="37">37</option><option value="38">38</option>
+										<option value="39">39</option><option value="40">40</option><option value="41">41</option>
+										<option value="42">42</option><option value="43">43</option><option value="44">44</option>
+										<option value="45">45</option><option value="46">46</option><option value="47">47</option>
+										<option value="48">48</option><option value="49">49</option><option value="50">50</option>
+										<option value="51">51</option><option value="52">52</option><option value="53">53</option>
+										<option value="54">54</option><option value="55">55</option><option value="56">56</option>
+										<option value="57">57</option><option value="58">58</option><option value="59">59</option>
+									</select>
+									<select id="ap" name="ap">
+										<option value="AM" selected="true"><?php print_string("am", "lamstwo") ?></option>
+										<option value="PM"><?php print_string("pm", "lamstwo") ?></option>
+									</select>
+								</td>
+								<td align="right">
+									<input type="submit" id="save1" name="save" value="<?php print_string("startlater", "lamstwo") ?>" onClick="javascript:return validate2()" disabled="true"/>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</td>
+</tr>
+<tr>
+	<td align="center">
+		<input type="submit" id="cancel" name=cancel value="<?php  print_string("cancel") ?>">
+		<input type="button" id="prev" name="prev" value="<?php print_string("prev", "lamstwo") ?>" onClick="javascript:prevStep()" disabled="<?php echo $_GET['update']!=null ?>" />
+		<input type="submit" id="save2" name="save" value="<?php if($_GET['update']) print_string("savechanges");else print_string("startnow", "lamstwo") ?>" onClick="javascript:return validate()" />
+	</td>
+</tr>
+</table>
+</div>
+<div id="container1" style="position:absolute;display:none"></div>
+
+<input type="hidden" id="lesson_id" name="lesson_id" value="<?php p($form->lesson_id) ?>"/>
+<input type="hidden" name="create_sequence_url" id="create_sequence_url"/>
+<input type="hidden" id="sequence_id" name="sequence_id" value="<?php p($form->sequence_id) ?>"/>
+<input type="hidden" id="start_date" name="start_date"/>
+
+<!-- These hidden variables are always the same -->
+<input type="hidden" name=course        value="<?php  p($form->course) ?>" />
+<input type="hidden" name="sesskey"     value="<?php  p($form->sesskey) ?>" />
+<input type="hidden" name=coursemodule  value="<?php  p($form->coursemodule) ?>" />
+<input type="hidden" name=section       value="<?php  p($form->section) ?>" />
+<input type="hidden" name=module        value="<?php  p($form->module) ?>" />
+<input type="hidden" name=modulename    value="<?php  p($form->modulename) ?>" />
+<input type="hidden" name=instance      value="<?php  p($form->instance) ?>" />
+<input type="hidden" name=mode          value="<?php  p($form->mode) ?>" />
+
+</form>
+<script language="javascript" type="text/javascript">
+<!--
+	
+	var authorWin = null;
+	
+	function trim(str){
+		return str.replace(/^\s+|\s+$/, '');
+	}
+
+	function switchSubmitButton(){
+		if(document.getElementById("scheduled").checked){
+			document.getElementById("save1").disabled = false;
+			document.getElementById("save2").disabled = true;
+		}else{
+			document.getElementById("save1").disabled = true;
+			document.getElementById("save2").disabled = false;
+		}
+	}
+	function nextStep(){
+	    sequenceObj = document.getElementById("sequence_id");
+	    if(sequenceObj.value == ""){
+	        alert('<?php print_string("sequenceNotSelected","lamstwo") ?>');
+	        return false;
+	    }
+	    document.getElementById("step1").style.display="none";
+	    document.getElementById("step2").style.display="block";
+	}
+	
+	function openAuthor(url,name,options,fullscreen) {
+		if(authorWin && !authorWin.closed){
+			authorWin.focus();
+		}else{
+			authorWin = window.open(url,name,options);
+			if (fullscreen) {
+				authorWin.moveTo(0,0);
+				authorWin.resizeTo(screen.availWidth,screen.availHeight);
+			}
+			authorWin.focus();
+		}
+		return false;
+	}
+	
+	function prevStep(){
+			document.getElementById("step1").style.display="block";
+			document.getElementById("step2").style.display="none";
+	}
+	
+	function validate(){
+	    if(trim(document.getElementById("name").value).length==0){
+	        alert('<?php print_string("nameNotSpecified", "lamstwo") ?>');
+	        return false;
+	    }
+	    return true;
+	}
+	
+	function validate2(){
+		var d = new Date();
+		d.setFullYear(document.getElementById("selYear1").value,document.getElementById("selMonth1").selectedIndex,document.getElementById("selDay1").selectedIndex+1);
+		var h = document.getElementById("hour").selectedIndex+1;
+		if(document.getElementById("ap").selectedIndex == 0){
+			if(h==12){
+				h = 0;
+			}
+		}else{
+			if(h!=12){
+				h = h + 12;
+			}
+		}
+		d.setHours(h);
+		d.setMinutes(document.getElementById("minute").selectedIndex);
+		var now = new Date();
+		now.setMinutes(now.getMinutes()+1);
+		if(d<=now){
+			alert('<?php print_string("noPast","lamstwo") ?>');
+			return false;
+		}else{
+			document.getElementById("start_date").value = formatDate(d,"dd/M/yyyy h:mm a");
+		}
+		return validate();
+	}
+	
+	function refreshSequences(){
+		document.location.reload();
+	}
+	
+	function selectSequence(obj){
+		document.getElementById("sequence_id").value = obj;
+	}
+	var MONTH_NAMES=new Array('January','February','March','April','May','June','July','August','September','October','November','December','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+	var DAY_NAMES=new Array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+	function LZ(x) {return(x<0||x>9?"":"0")+x}
+	function formatDate(date,format) {
+		format=format+"";
+		var result="";
+		var i_format=0;
+		var c="";
+		var token="";
+		var y=date.getYear()+"";
+		var M=date.getMonth()+1;
+		var d=date.getDate();
+		var E=date.getDay();
+		var H=date.getHours();
+		var m=date.getMinutes();
+		var s=date.getSeconds();
+		var yyyy,yy,MMM,MM,dd,hh,h,mm,ss,ampm,HH,H,KK,K,kk,k;
+		// Convert real date parts into formatted versions
+		var value=new Object();
+		if (y.length < 4) {y=""+(y-0+1900);}
+		value["y"]=""+y;
+		value["yyyy"]=y;
+		value["yy"]=y.substring(2,4);
+		value["M"]=M;
+		value["MM"]=LZ(M);
+		value["MMM"]=MONTH_NAMES[M-1];
+		value["NNN"]=MONTH_NAMES[M+11];
+		value["d"]=d;
+		value["dd"]=LZ(d);
+		value["E"]=DAY_NAMES[E+7];
+		value["EE"]=DAY_NAMES[E];
+		value["H"]=H;
+		value["HH"]=LZ(H);
+		if (H==0){value["h"]=12;}
+		else if (H>12){value["h"]=H-12;}
+		else {value["h"]=H;}
+		value["hh"]=LZ(value["h"]);
+		if (H>11){value["K"]=H-12;} else {value["K"]=H;}
+		value["k"]=H+1;
+		value["KK"]=LZ(value["K"]);
+		value["kk"]=LZ(value["k"]);
+		if (H > 11) { value["a"]="PM"; }
+		else { value["a"]="AM"; }
+		value["m"]=m;
+		value["mm"]=LZ(m);
+		value["s"]=s;
+		value["ss"]=LZ(s);
+		while (i_format < format.length) {
+			c=format.charAt(i_format);
+			token="";
+			while ((format.charAt(i_format)==c) && (i_format < format.length)) {
+				token += format.charAt(i_format++);
+			}
+			if (value[token] != null) { result=result + value[token]; }
+			else { result=result + token; }
+		}
+		return result;
+	}
+	
+//-->
+</script>
+
+<script type="text/javascript" src="../mod/lamstwo/yahoo.js"></script>
+<script type="text/javascript" src="../mod/lamstwo/event.js" ></script>
+<script type="text/javascript" src="../mod/lamstwo/dom.js" ></script>
+<script type="text/javascript" src="../mod/lamstwo/calendar.js"></script>
+	
+<script language="javascript">
+	YAHOO.namespace("lams.calendar");
+
+	function init() {
+		this.today = new Date();
+		var thisMonth = this.today.getMonth();
+		var thisDay = this.today.getDate();
+		var thisYear = this.today.getFullYear();
+		this.container1 = document.getElementById('container1');
+		this.link1 = document.getElementById('dateLink1');
+		this.selYear1 = document.getElementById('selYear1');
+		this.selMonth1 = document.getElementById('selMonth1');
+		this.selDay1 = document.getElementById('selDay1');
+		this.selYear1.selectedIndex = thisYear-2006;
+		this.selMonth1.selectedIndex = thisMonth;
+		this.selDay1.selectedIndex = thisDay-1;
+		
+		YAHOO.lams.calendar.cal = new YAHOO.widget.Calendar2up("YAHOO.lams.calendar.cal","container1");
+		YAHOO.lams.calendar.cal.title = "<?php print_string("scheduleSequence", "lamstwo") ?>";
+		YAHOO.lams.calendar.cal.setChildFunction("onSelect",setDate);
+		YAHOO.lams.calendar.cal.render();
+	}
+
+	function setDate() {
+		var date1 = YAHOO.lams.calendar.cal.getSelectedDates()[0];
+		selYear1.selectedIndex = date1.getYear()+1900-2006;
+		selMonth1.selectedIndex = date1.getMonth();
+		selDay1.selectedIndex = date1.getDate()-1;
+		YAHOO.lams.calendar.cal.hide();
+	}
+	
+	function changeDate1() {
+		var month = this.selMonth1.selectedIndex;
+		var day = this.selDay1.selectedIndex + 1;
+		var year = this.selYear1.options[this.selYear1.selectedIndex].value;
+
+		YAHOO.lams.calendar.cal.select((month+1) + "/" + day + "/" + year);
+		YAHOO.lams.calendar.cal.setMonth(month);
+		YAHOO.lams.calendar.cal.setYear(year);
+		YAHOO.lams.calendar.cal.render();
+	}
+	
+	function showCalendar1() {
+		var pos = YAHOO.util.Dom.getXY(link1);
+		YAHOO.lams.calendar.cal.outerContainer.style.display='block';
+		YAHOO.util.Dom.setXY(YAHOO.lams.calendar.cal.outerContainer, [pos[0],pos[1]+link1.offsetHeight+1]);
+	}
+
+
+	YAHOO.util.Event.addListener(window, "load", init);
+	
+</script>
