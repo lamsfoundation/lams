@@ -128,42 +128,67 @@
 			</table>
 			</td>
 
-			<c:if test="${not empty userOrgRoles}">
-				<td>
-					<table class="alternative-color" cellspacing="0">
-						<tr>
-							<th><fmt:message key="label.member.of"/>:</th>
-							<th><fmt:message key="label.with.roles"/>:</th>
-						</tr>
-						<c:forEach var="userOrgRole" items="${userOrgRoles}">
+			<td>
+				<table>
+				
+				<c:if test="${not empty globalRoles}">
+					<tr><td>
+						<table class="alternative-color" cellspacing="0">
 							<tr>
-								<td><c:out value="${userOrgRole.orgName}"/></td>
+								<th><fmt:message key="label.global.roles"/>:</th>
+							</tr>
+							<tr>
 								<td>
 									<small>
-									<c:forEach var="role" items="${userOrgRole.roles}">
+									<c:forEach var="role" items="${globalRoles.roles}">
 										<fmt:message>role.<lams:role role="${role}" /></fmt:message>&nbsp;
 									</c:forEach>
 									</small>
 								</td>
 							</tr>
-							<c:if test="${not empty userOrgRole.childDTOs}">
-								<c:forEach var="child" items="${userOrgRole.childDTOs}">
-									<tr>
-										<td>-- <c:out value="${child.orgName}"/></td>
-										<td>
-											<small>
-											<c:forEach var="role" items="${child.roles}">
-												<fmt:message>role.<lams:role role="${role}" /></fmt:message>&nbsp;
-											</c:forEach>
-											</small>
-										</td>
-									</tr>
-								</c:forEach>
-							</c:if>
-						</c:forEach>
-					</table>
-				</td>
-			</c:if>
+						</table>
+					</td></tr>
+				</c:if>
+
+				<c:if test="${not empty userOrgRoles}">
+					<tr><td>
+						<table class="alternative-color" cellspacing="0">
+							<tr>
+								<th><fmt:message key="label.member.of"/>:</th>
+								<th><fmt:message key="label.with.roles"/>:</th>
+							</tr>
+							<c:forEach var="userOrgRole" items="${userOrgRoles}">
+								<tr>
+									<td><c:out value="${userOrgRole.orgName}"/></td>
+									<td>
+										<small>
+										<c:forEach var="role" items="${userOrgRole.roles}">
+											<fmt:message>role.<lams:role role="${role}" /></fmt:message>&nbsp;
+										</c:forEach>
+										</small>
+									</td>
+								</tr>
+								<c:if test="${not empty userOrgRole.childDTOs}">
+									<c:forEach var="child" items="${userOrgRole.childDTOs}">
+										<tr>
+											<td>-- <c:out value="${child.orgName}"/></td>
+											<td>
+												<small>
+												<c:forEach var="role" items="${child.roles}">
+													<fmt:message>role.<lams:role role="${role}" /></fmt:message>&nbsp;
+												</c:forEach>
+												</small>
+											</td>
+										</tr>
+									</c:forEach>
+								</c:if>
+							</c:forEach>
+						</table>
+					</td></tr>
+				</c:if>
+				
+				</table>
+			</td>
 	</tr>
 
 </table>

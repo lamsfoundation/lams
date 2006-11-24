@@ -127,6 +127,7 @@ public class UserAction extends LamsDispatchAction {
 			userForm.set("localeId", locale.getLocaleId());
 			// set user's organisations to display
 			request.setAttribute("userOrgRoles", getUserOrgRoles(user));
+			request.setAttribute("globalRoles", getGlobalRoles(user));
 		} else {  // create a user
 			try {
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
@@ -152,6 +153,20 @@ public class UserAction extends LamsDispatchAction {
 		request.setAttribute("locales",locales);
 
 		return mapping.findForward("user");
+	}
+	
+	// display user's global roles, if any
+	private UserOrgRoleDTO getGlobalRoles(User user) {
+		UserOrganisation uo = service.getUserOrganisation(user.getUserId(),
+				service.getRootOrganisation().getOrganisationId());
+		UserOrgRoleDTO uorDTO = new UserOrgRoleDTO();
+		List<String> roles = new ArrayList<String>();
+		for (Object uor : uo.getUserOrganisationRoles())
+			roles.add(((UserOrganisationRole)uor).getRole().getName());
+		Collections.sort(roles);
+		uorDTO.setOrgName(uo.getOrganisation().getName());
+		uorDTO.setRoles(roles);
+		return uorDTO;
 	}
 	
 	// display user's organisations and roles in them
