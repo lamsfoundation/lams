@@ -159,6 +159,7 @@ public class UserAction extends LamsDispatchAction {
 	private UserOrgRoleDTO getGlobalRoles(User user) {
 		UserOrganisation uo = service.getUserOrganisation(user.getUserId(),
 				service.getRootOrganisation().getOrganisationId());
+		if (uo==null) return null;
 		UserOrgRoleDTO uorDTO = new UserOrgRoleDTO();
 		List<String> roles = new ArrayList<String>();
 		for (Object uor : uo.getUserOrganisationRoles())
