@@ -188,7 +188,8 @@ Var LAMS_PASS
 Var WILDFIRE_DOMAIN
 Var WILDFIRE_USER
 Var WILDFIRE_PASS
-VAR WINTEMP
+Var WINTEMP
+Var RETAIN_DIR
 
 
 # installer sections
@@ -864,20 +865,6 @@ Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 4" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 3" "State"
-
-    # lines in below block to be removed-------------------------
-    strcpy $WINTEMP "C:\WINDOWS\Temp"
-    ${if} $UNINSTALL_DB == 0
-        MessageBox MB_OK|MB_ICONEXCLAMATION "DB to be retained!"
-    ${endif}
-    ${if} $UNINSTALL_RP == 0
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Repository to be retained! $\n $INSTDIR\repository $\n $WINTEMP\lams\ $\n $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war $\n $WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
-    ${endif}
-    ${if} $UNINSTALL_CF == 0
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Configurations to be retained!"
-    ${endif}
-    #-----------------------------------------------------------
-
 FunctionEnd
 
 
@@ -951,6 +938,7 @@ Section "Uninstall"
 
 
     strcpy $WINTEMP "C:\WINDOWS\Temp"
+    strcpy $RETAIN_DIR "C:\lams_RetainedFiles"
     ;create a directory in temp to store retained folders until they can be put into permanent storage
     ;NOTE that $TEMP cannot be used here as it does not point to C:\WINDOWS\TEMP
     CreateDirectory "$WINTEMP\lams"
@@ -962,54 +950,59 @@ Section "Uninstall"
         CopyFiles "$INSTDIR\repository" "$WINTEMP\Lams\"
         CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
         CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+        DetailPrint 'Saving repository and uploaded files to: $RETAIN_DIR'
     ${EndIf}
     ${If} $UNINSTALL_CF == 0
         ;KEEP some configuration files
         CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
-        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy"
-        
+        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar"
         CopyFiles "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
-        CopyFiles "$INSTDIR\server\default\deploy\jbossweb-tomcat55.sar\server.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar"
+        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\"
+        DetailPrint 'Saving configuration files files to: $RETAIN_DIR'
     ${EndIf}
     
     ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
     RMDir /r $INSTDIR
 
     ; RESTORE Retained folders to their original localtion
-    CreateDirectory $INSTDIR
-    CopyFiles "$WINTEMP\LAMS" "$INSTDIR\..\"
+    CreateDirectory "$RETAIN_DIR"
+    CopyFiles "$WINTEMP\LAMS" "$RETAIN_DIR\"
+    RMDir /r "$RETAIN_DIR\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\jbossweb-tomcat55.sar"
+    Delete "$RETAIN_DIR\lams\jboss-4.0.2\server\default\deploy\server.xml"
     
-
     ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
     
-    
-    ${If} $UNINSTALL_DB == 1
-        ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
-        ReadRegStr $1 HKLM "${REG_HEAD}" "db_name"
-        ReadRegStr $2 HKLM "${REG_HEAD}" "db_user"
-        ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
-        StrLen $9 $3
-        StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
-        DetailPrint $4
-        ${If} $9 != 0
-            StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
-        ${EndIf}
+    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
+    ReadRegStr $1 HKLM "${REG_HEAD}" "db_name"
+    ReadRegStr $2 HKLM "${REG_HEAD}" "db_user"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
+    ${If} $UNINSTALL_DB == 0
+        ; DUMP the database file into the retained install directory  
+        Strcpy $4 "$0\bin\mysqldump -r $RETAIN_DIR\lamsDump.sql -u $2 -p$3"
         nsExec::ExecToStack $4
-        Pop $0
-        Pop $1
-        ${If} $0 == 1
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
-            DetailPrint "Failed to remove LAMS database."
-        ${EndIf}
-    ${Else} 
-        ;::::::::::::TODO  
-        ;mysqldump target file
+        DetailPrint 'Dumping database to: $RETAIN_DIR'
+    ${EndIf}
+    StrLen $9 $3
+    StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
+    DetailPrint $4
+    ${If} $9 != 0
+        StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
+    ${EndIf}
+    nsExec::ExecToStack $4
+    Pop $0
+    Pop $1
+    ${If} $0 == 1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
+        DetailPrint "Failed to remove LAMS database."
     ${EndIf}
     
+        
+    
+    
     ; batch file doesn't want to work when called with ExecToStack
-    ;nsExec::ExecToStack '$INSTDIR\jboss-4.0.2\bin\UninstallLAMS-NT.bat'
+    ; nsExec::ExecToStack '$INSTDIR\jboss-4.0.2\bin\UninstallLAMS-NT.bat'
     nsExec::ExecToStack 'sc delete LAMSv2'
     Pop $0
     Pop $1
