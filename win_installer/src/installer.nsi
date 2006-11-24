@@ -419,6 +419,14 @@ Function PostMySQLConfig
         ${EndIf}
     ${EndIf}
     
+    # Checking if the given database name already exists in the mysql database list
+    ifFileExists "$MYSQL_DIRdata\$DB_NAME\*.*" databaseNameExists continue
+    databaseNameExists:
+        MessageBox MB_OK|MB_ICONSTOP 'A database named "$DB_NAME" already exists, please try another name.$\n$MYSQL_DIRdata\$DB_NAME'
+        Abort    
+    continue:
+        
+    
     # check root password, server status
     StrLen $0 $MYSQL_ROOT_PASS
     ${If} $0 == 0
@@ -440,6 +448,8 @@ Function PostMySQLConfig
         MessageBox MB_OK|MB_ICONEXCLAMATION "MySQL does not appear to be running - please make sure it is running before continuing."
         Abort
     ${EndIf}
+    
+    
 FunctionEnd
 
 
@@ -806,6 +816,8 @@ FunctionEnd
 # Uninstaller
 #
 Var UNINSTALL_DB
+Var UNINSTALL_RP
+Var UNINSTALL_CF
 
 Function un.onInit
     ;!insertmacro MUI_LANGDLL_DISPLAY
@@ -849,9 +861,8 @@ FunctionEnd
 
 Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
-    ;!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
-    ;!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_UP "uninstall.ini" "Field 3" "State"
-    ;!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 4" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 3" "State"
 FunctionEnd
 
 
@@ -922,9 +933,33 @@ FunctionEnd
 
 
 Section "Uninstall"
+
+
+    ;create a directory in temp to store retained folders until they can be put into permanent storage
+    CreateDirectory "$TEMP\Lams"
+    
+    ;Now copy files that are to be retained to the temp folder
+    ${If} $UNINSTALL_RP == 0
+        ; TODO copy repository and jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war to TEMP
+        CopyFiles "$INSTDIR\repository" "$TEMP\Lams\"
+        CreateDirectory "$TEMP\Lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$TEMP\Lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+    ${EndIf}
+    ${If} $UNINSTALL_CF == 0
+        ;KEEP some configuration files
+        ; TODO copy the config files to TEMP - MAINTAIN foleder system.
+        ;C:\lams\jboss-4.0.2\server\default\conf\log4j.xml
+        ;C:\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml
+    ${EndIf}
+    
+    ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
     RMDir /r $INSTDIR
+    ; TODO restore retained files and folders stored in temp to install directory
+    
+    ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
+    
     
     ${If} $UNINSTALL_DB == 1
         ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
@@ -944,6 +979,9 @@ Section "Uninstall"
             MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
             DetailPrint "Failed to remove LAMS database."
         ${EndIf}
+    ${Else} 
+        ;::::::::::::TODO  
+        ;mysqldump target file
     ${EndIf}
     
     ; batch file doesn't want to work when called with ExecToStack
