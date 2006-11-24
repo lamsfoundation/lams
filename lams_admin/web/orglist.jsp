@@ -13,8 +13,8 @@
 			<c:param name="parentId" value="${OrgManageForm.parentId}" />
 		</c:url>
 		<p align="right">
-			<input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
-			<input type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+			<input class="button" type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+			<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 		</p>
 	</logic:equal>
 </logic:equal>
@@ -31,9 +31,9 @@
 		<c:param name="parentId" value="${OrgManageForm.parentId}" />
 	</c:url>
 	<p align="right">
-		<input type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
-		<input type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-		<input type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 	</p>
 </logic:equal>
 <table class=alternative-color width=100%>

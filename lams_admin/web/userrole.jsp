@@ -45,9 +45,9 @@
 	</tr>
 	<tr>
 		<td colspan=2 class="align-right">
-			<html-el:submit><fmt:message key="admin.save"/></html-el:submit>
-			<html-el:reset><fmt:message key="admin.reset"/></html-el:reset>
-			<html-el:cancel><fmt:message key="admin.cancel"/></html-el:cancel>
+			<html-el:submit styleClass="button"><fmt:message key="admin.save"/></html-el:submit>
+			<html-el:reset styleClass="button"><fmt:message key="admin.reset"/></html-el:reset>
+			<html-el:cancel styleClass="button"><fmt:message key="admin.cancel"/></html-el:cancel>
 		</td>
 	</tr>
 </table>

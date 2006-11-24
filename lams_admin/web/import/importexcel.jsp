@@ -20,8 +20,8 @@
 		<td><html:file property="file" /></td>
 	</tr>
 	<tr>
-		<td colspan="2"><html:submit><fmt:message key="admin.save"/></html:submit> &nbsp; 	
-						<html:cancel><fmt:message key="admin.cancel"/></html:cancel></td>
+		<td colspan="2"><html:submit styleClass="button"><fmt:message key="admin.save"/></html:submit> &nbsp; 	
+						<html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel></td>
 	</tr>
 </table>
 

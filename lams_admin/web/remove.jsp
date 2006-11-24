@@ -26,8 +26,8 @@
 		<c:param name="orgId" value="${orgId}" />
 	</c:url>
 <div style="float:right">
-<input type="button" value="Disable" onClick="javascript:document.location='<c:out value="${disableaction}"/>'" />
-<input type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
+<input class="button" type="button" value="Disable" onClick="javascript:document.location='<c:out value="${disableaction}"/>'" />
+<input class="button" type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
 </div>
 </logic:equal>
 
@@ -41,8 +41,10 @@
 		<c:param name="orgId" value="${orgId}" />
 	</c:url>
 <div class="float-right">
-<input type="button" value="Delete" onClick="javascript:document.location='<c:out value="${deleteaction}"/>'" />
-<input type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
+<input class="button" type="button" value="Delete" onClick="javascript:document.location='<c:out value="${deleteaction}"/>'" />
+<input class="button" type="button" value="Cancel" onClick="javascript:document.location='<c:out value="${cancel}"/>'" />
 </div>
 </logic:equal>
 </form>
+
+<div id="footer"/>

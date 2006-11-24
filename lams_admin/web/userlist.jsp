@@ -22,11 +22,11 @@
 
 <p class="align-right">
 	<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
-		<input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:equal>
-	<input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+	<input class="button" type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	<logic:notEqual name="UserManageForm" property="orgId" value="1">
-		<input type="button" value='<fmt:message key="admin.edit" /> <bean:write name="UserManageForm" property="orgName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${UserManageForm.orgId}"/>' />
+		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="UserManageForm" property="orgName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${UserManageForm.orgId}"/>' />
 	</logic:notEqual>
 </p>
 <table class="alternative-color" width=100% cellspacing="0" >

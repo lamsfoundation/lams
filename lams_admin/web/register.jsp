@@ -494,9 +494,9 @@
 	</table>
 	
 	<p align="center">
-		<input type="submit" value="<fmt:message key="admin.register" />"/>
-		<input type="reset"  value="<fmt:message key="admin.reset" />"/>
-		<input type="button" value="<fmt:message key="admin.cancel" />" onClick="javascript:history.back(-1)"/>
+		<input class="button" type="submit" value="<fmt:message key="admin.register" />"/>
+		<input class="button" type="reset"  value="<fmt:message key="admin.reset" />"/>
+		<input class="button" type="button" value="<fmt:message key="admin.cancel" />" onClick="javascript:history.back(-1)"/>
 	</p>
 </form>
 

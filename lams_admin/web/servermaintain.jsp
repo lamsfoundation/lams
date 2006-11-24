@@ -57,9 +57,9 @@
 	</tr>
 </table>
 <div align="center">
-	<html:submit><fmt:message key="admin.save" /></html:submit>
-	<html:reset><fmt:message key="admin.reset" /></html:reset>
-	<html:cancel><fmt:message key="admin.cancel" /></html:cancel>
+	<html:submit styleClass="button"><fmt:message key="admin.save" /></html:submit>
+	<html:reset styleClass="button"><fmt:message key="admin.reset" /></html:reset>
+	<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
 </div>
 </html:form>
 <script type="text/javascript" language="javascript">

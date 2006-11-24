@@ -61,8 +61,8 @@
 <tr>
 	<td colspan=5 class="align-right">
 		<html:checkbox property="showAll"><fmt:message key="label.show.all.users"/></html:checkbox>&nbsp;
-		<html-el:submit><fmt:message key="admin.search"/></html-el:submit>
-		<input type="button" value='<fmt:message key="admin.reset"/>' onclick="resetFields();" />
+		<html-el:submit styleClass="button"><fmt:message key="admin.search"/></html-el:submit>
+		<input class="button" type="button" value='<fmt:message key="admin.reset"/>' onclick="resetFields();" />
 	</td>
 </tr>
 </table>
