@@ -188,6 +188,7 @@ Var LAMS_PASS
 Var WILDFIRE_DOMAIN
 Var WILDFIRE_USER
 Var WILDFIRE_PASS
+VAR WINTEMP
 
 
 # installer sections
@@ -860,9 +861,23 @@ Function un.PreUninstall
 FunctionEnd
 
 Function un.PostUninstall
-    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 4" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 3" "State"
+
+    # lines in below block to be removed-------------------------
+    strcpy $WINTEMP "C:\WINDOWS\Temp"
+    ${if} $UNINSTALL_DB == 0
+        MessageBox MB_OK|MB_ICONEXCLAMATION "DB to be retained!"
+    ${endif}
+    ${if} $UNINSTALL_RP == 0
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Repository to be retained! $\n $INSTDIR\repository $\n $WINTEMP\lams\ $\n $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war $\n $WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+    ${endif}
+    ${if} $UNINSTALL_CF == 0
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Configurations to be retained!"
+    ${endif}
+    #-----------------------------------------------------------
+
 FunctionEnd
 
 
@@ -935,27 +950,36 @@ FunctionEnd
 Section "Uninstall"
 
 
+    strcpy $WINTEMP "C:\WINDOWS\Temp"
     ;create a directory in temp to store retained folders until they can be put into permanent storage
-    CreateDirectory "$TEMP\Lams"
+    ;NOTE that $TEMP cannot be used here as it does not point to C:\WINDOWS\TEMP
+    CreateDirectory "$WINTEMP\lams"
     
     ;Now copy files that are to be retained to the temp folder
     ${If} $UNINSTALL_RP == 0
-        ; TODO copy repository and jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war to TEMP
-        CopyFiles "$INSTDIR\repository" "$TEMP\Lams\"
-        CreateDirectory "$TEMP\Lams\jboss-4.0.2\server\default\deploy\lams.ear\"
-        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$TEMP\Lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+        ; KEEP repository and uploaded files
+        ; Copy repository and jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war to TEMP
+        CopyFiles "$INSTDIR\repository" "$WINTEMP\Lams\"
+        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
     ${EndIf}
     ${If} $UNINSTALL_CF == 0
         ;KEEP some configuration files
-        ; TODO copy the config files to TEMP - MAINTAIN foleder system.
-        ;C:\lams\jboss-4.0.2\server\default\conf\log4j.xml
-        ;C:\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml
+        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
+        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy"
+        
+        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
+        CopyFiles "$INSTDIR\server\default\deploy\jbossweb-tomcat55.sar\server.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar"
     ${EndIf}
     
     ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
     RMDir /r $INSTDIR
-    ; TODO restore retained files and folders stored in temp to install directory
+
+    ; RESTORE Retained folders to their original localtion
+    CreateDirectory $INSTDIR
+    CopyFiles "$WINTEMP\LAMS" "$INSTDIR\..\"
     
+
     ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
