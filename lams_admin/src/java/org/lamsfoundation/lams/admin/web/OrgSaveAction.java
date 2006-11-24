@@ -135,13 +135,7 @@ public class OrgSaveAction extends Action {
 			return mapping.findForward("orglist");
 		}else{
 			saveErrors(request,errors);
-			ActionForward forward = mapping.findForward("organisation");
-			if(orgId!=0) {
-				return forward;
-			}else{
-				forward.setPath(forward.getPath()+"&orgId="+orgId);
-				return forward;
-			}
+			return mapping.findForward("organisation");
 		}
 	}
 	

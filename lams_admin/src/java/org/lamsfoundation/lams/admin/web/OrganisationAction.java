@@ -91,6 +91,7 @@ public class OrganisationAction extends LamsDispatchAction {
 			return mapping.findForward("error");
 		} else {
 			// creating new organisation
+			orgForm.set("orgId", null);
 			Integer parentId = WebUtil.readIntParam(request,"parentId",true);
 			if (parentId!=null) {
 				Organisation parentOrg = (Organisation)service.findById(Organisation.class,parentId);
