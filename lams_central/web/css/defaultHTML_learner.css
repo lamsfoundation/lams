@@ -34,8 +34,6 @@ a:hover {
 	border-bottom: 1px solid #47bc23;
 }
 
-strong {color:#333;}
-
 .row {
 	voice-family: "\"}\""; /* hide the following rules from IE5 */
 	voice-family: inherit;
