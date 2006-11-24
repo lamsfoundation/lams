@@ -53,6 +53,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<activities>
 							<!-- ================================== lams activities ================================== -->
 							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool"/>
+							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="group"/>
+							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="gate"/>
 							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex"/>
 							<!-- ================================== lams Tansitions ================================== -->
 							<xsl:apply-templates select="*/transitions"/>
@@ -82,12 +84,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!-- ================================== lams activities ================================== -->
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool">
-		<xsl:if test="not((activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8))">
+		<xsl:if test="(activityTypeID = 1)">
 			<xsl:call-template name="tool"/>
 		</xsl:if>
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool"/>
 	</xsl:template>
-	
+	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="group">
+		<xsl:if test="(activityTypeID = 2)">
+			<xsl:call-template name="group"/>
+		</xsl:if>
+		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="group"/>
+	</xsl:template>
+	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="gate">
+		<xsl:if test="(activityTypeID = 3) or (activityTypeID = 4) or (activityTypeID = 5)">
+			<xsl:call-template name="gate"/>
+		</xsl:if>
+		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="gate"/>
+	</xsl:template>
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex">
 		<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8)">
 			<xsl:call-template name="complex"/>
@@ -102,6 +115,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<xsl:value-of select="activityTitle"/>
 			</title>
 			<environment-ref xsl:use-attribute-sets="toolEnvRef"/>
+			<complete-activity>
+				<user-choice/>
+			</complete-activity>
+			<lams:lams-tool-activity>
+				<xsl:for-each select="node() | @*">
+					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				</xsl:for-each>
+			</lams:lams-tool-activity>
+		</learning-activity>
+	</xsl:template>
+	<!-- ================================== lams Grouping activities ================================== -->
+	<xsl:template name="group">
+		<learning-activity xsl:use-attribute-sets="groupIdentifier">
+			<title>
+				<xsl:value-of select="activityTitle"/>
+			</title>
+			<environment-ref xsl:use-attribute-sets="groupEnvRef"/>
+			<complete-activity>
+				<user-choice/>
+			</complete-activity>
+			<lams:lams-tool-activity>
+				<xsl:for-each select="node() | @*">
+					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				</xsl:for-each>
+			</lams:lams-tool-activity>
+		</learning-activity>
+	</xsl:template>
+	<!-- ================================== lams Gate activities ================================== -->
+	<xsl:template name="gate">
+		<learning-activity xsl:use-attribute-sets="gateIdentifier">
+			<title>
+				<xsl:value-of select="activityTitle"/>
+			</title>
+			<environment-ref xsl:use-attribute-sets="gateEnvRef"/>
 			<complete-activity>
 				<user-choice/>
 			</complete-activity>
@@ -132,7 +179,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</lams:lams-complex-activity>
 		</activity-structure>
 	</xsl:template>
-	<!-- ================================== lams Tansitions ================================== -->
+	<!-- ================================== lams Transitions ================================== -->
 	<xsl:template match="transitions">
 		<activity-structure identifier="A-sequence" structure-type="sequence">
 			<title>LAMS Learning design sequence</title>
@@ -159,27 +206,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</environments>
 	</xsl:template>
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="env">
-			<xsl:if test="not((activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8))">
-		<environment xsl:use-attribute-sets="toolEnvIdentifier">
-			<title>
-				<xsl:value-of select="activityTitle"/>
-			</title>
-			<service  xsl:use-attribute-sets="serviceAttr">
-				<tool_interface xmlns="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0">
-					<tool_id>
-						<identifier type="URN">URN:LAMS:<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></identifier>
-					</tool_id>
-					<tool_version><xsl:value-of select="toolVersion"/></tool_version>
-					<tool_contents>
-						<xsl:variable name="filename">
-							<xsl:value-of select="toolContentID"/>.xml
-						</xsl:variable>
-						<xsl:copy-of select="document($filename)"/>
-					</tool_contents>
-				</tool_interface>
-			</service>
-		</environment>
-			</xsl:if>
+		<xsl:if test="(activityTypeID = 2)">
+			<environment xsl:use-attribute-sets="groupEnvIdentifier"></environment>
+		</xsl:if>
+		<xsl:if test="(activityTypeID = 3) or (activityTypeID = 4) or (activityTypeID = 5)">
+			<environment xsl:use-attribute-sets="gateEnvIdentifier"></environment>
+		</xsl:if>
+		<xsl:if test="(activityTypeID = 1)">
+			<environment xsl:use-attribute-sets="toolEnvIdentifier">
+				<title>
+					<xsl:value-of select="activityTitle"/>
+				</title>
+				<service  xsl:use-attribute-sets="serviceAttr">
+					<tool_interface xmlns="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0">
+						<tool_id>
+							<identifier type="URN">URN:LAMS:<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></identifier>
+						</tool_id>
+						<tool_version><xsl:value-of select="toolVersion"/></tool_version>
+						<tool_contents>
+							<xsl:variable name="filename">
+								<xsl:value-of select="toolContentID"/>.xml
+							</xsl:variable>
+							<xsl:copy-of select="document($filename)"/>
+						</tool_contents>
+					</tool_interface>
+				</service>
+			</environment>
+		</xsl:if>
 	</xsl:template>
 	<!-- ================================== some attributes ================================== -->	
 	<xsl:attribute-set name="ldIdentifier">
@@ -192,6 +245,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<xsl:attribute-set name="toolRef">
 		<xsl:attribute name="ref">A-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="groupIdentifier">
+		<xsl:attribute name="identifier">A-group-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="groupRef">
+		<xsl:attribute name="ref">A-group-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="gateIdentifier">
+		<xsl:attribute name="identifier">A-gate-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="gateRef">
+		<xsl:attribute name="ref">A-gate-<xsl:value-of select="activityID"/></xsl:attribute>
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="complexAttr">
@@ -208,6 +277,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</xsl:attribute-set>	
 	<xsl:attribute-set name="toolEnvRef">
 		<xsl:attribute name="ref">E-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="groupEnvIdentifier">
+		<xsl:attribute name="identifier">E-group-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>	
+	<xsl:attribute-set name="groupEnvRef">
+		<xsl:attribute name="ref">E-group-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="gateEnvIdentifier">
+		<xsl:attribute name="identifier">E-gate-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>	
+	<xsl:attribute-set name="gateEnvRef">
+		<xsl:attribute name="ref">E-gate-<xsl:value-of select="activityID"/></xsl:attribute>
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="serviceAttr">

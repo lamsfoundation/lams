@@ -163,7 +163,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String FILTER_METHOD_MIDDLE = "To";
 	
 	//IMS format some tag name
-	private static final String IMS_TAG_RESOURCES="resources";
+	private static final String IMS_FILE_NAME_EXT = "_imsld";
+	private static final String IMS_TAG_RESOURCES = "resources";
 	private static final String IMS_TAG_RESOURCE = "resource";
 	private static final String IMS_ATTR_IDENTIFIER = "identifier";
 	private static final String IMS_TAG_FILE = "file";
@@ -176,6 +177,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		//this is not IMS standard tag, temporarily use to gather all tools node list
 	private static final String IMS_TAG_TRANSITIONS = "transitions";
 
+	// this is not IMS standard tag, temp use to ref grouping/gate activities 
+	private static final String IMS_TAG_GROUPING = "group";
+	private static final String IMS_TAG_GATE = "gate";
+	
 	//temporarily file for IMS XSLT file
 	private static final String XSLT_PARAM_RESOURCE_FILE = "resourcesFile";
 	private static final String IMS_RESOURCES_FILE_NAME = "resources.xml";
@@ -399,6 +404,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			//get learning desing and serialize it to XML file.
 			ILearningDesignService service =  getLearningDesignService();
 			LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId);
+			ldDto.setTitle(ldDto.getTitle().concat(IMS_FILE_NAME_EXT));
 			XStream designXml = new XStream();
 			designXml.toXML(ldDto,ldFile);
 			ldFile.close();
@@ -548,7 +554,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		for (AuthoringActivityDTO actDto : sortedActList) {
 			log.debug("Export IMS: Put actitivies " + actDto.getActivityTitle() + "[" +actDto.getToolContentID()+"] into Transition <learning-activity-ref> tag.");
 			Element ref = new Element(IMS_TAG_LEARING_ACTIIVTY_REF);
-			Attribute att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
+			Attribute att = null;
+			
+			//
+			if(actDto.getActivityTypeID().equals(Activity.GROUPING_ACTIVITY_TYPE))
+				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GROUPING + "-" + actDto.getActivityID());
+			else if(actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
+													  || actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE))
+				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GATE + "-" + actDto.getActivityID());
+			else 
+				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
+			
 			ref.setAttribute(att);
 			transChildren.add(ref);
 		}
