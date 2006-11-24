@@ -938,7 +938,7 @@ Section "Uninstall"
 
 
     strcpy $WINTEMP "C:\WINDOWS\Temp"
-    strcpy $RETAIN_DIR "C:\lams_RetainedFiles"
+    strcpy $RETAIN_DIR $INSTDIR
     ;create a directory in temp to store retained folders until they can be put into permanent storage
     ;NOTE that $TEMP cannot be used here as it does not point to C:\WINDOWS\TEMP
     CreateDirectory "$WINTEMP\lams"
@@ -947,7 +947,8 @@ Section "Uninstall"
     ${If} $UNINSTALL_RP == 0
         ; KEEP repository and uploaded files
         ; Copy repository and jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war to TEMP
-        CopyFiles "$INSTDIR\repository" "$WINTEMP\Lams\"
+        ReadRegStr $6 HKLM "${REG_HEAD}" "dir_repository"
+        CopyFiles "$6" "$WINTEMP\Lams\"
         CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
         CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
         DetailPrint 'Saving repository and uploaded files to: $RETAIN_DIR'
@@ -963,13 +964,14 @@ Section "Uninstall"
     
     ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
     RMDir /r $INSTDIR
+    
 
     ; RESTORE Retained folders to their original localtion
     CreateDirectory "$RETAIN_DIR"
-    CopyFiles "$WINTEMP\LAMS" "$RETAIN_DIR\"
-    RMDir /r "$RETAIN_DIR\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\jbossweb-tomcat55.sar"
-    Delete "$RETAIN_DIR\lams\jboss-4.0.2\server\default\deploy\server.xml"
-    
+    CopyFiles "$WINTEMP\LAMS" "$RETAIN_DIR\..\"
+    RMDir /r "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\jbossweb-tomcat55.sar"
+    Delete "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\server.xml"
+    RMDir /r "$WINTEMP\Lams"
     ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
@@ -980,8 +982,11 @@ Section "Uninstall"
     ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
     ${If} $UNINSTALL_DB == 0
         ; DUMP the database file into the retained install directory  
-        Strcpy $4 "$0\bin\mysqldump -r $RETAIN_DIR\lamsDump.sql -u $2 -p$3"
+        Strcpy $4 "$0\bin\mysqldump -r $RETAIN_DIR\lamsDump.sql $1 -u $2 -p$3"
         nsExec::ExecToStack $4
+        Pop $8
+        Pop $9
+        MessageBox MB_OK|MB_ICONEXCLAMATION "$8 $\n  $9"
         DetailPrint 'Dumping database to: $RETAIN_DIR'
     ${EndIf}
     StrLen $9 $3
