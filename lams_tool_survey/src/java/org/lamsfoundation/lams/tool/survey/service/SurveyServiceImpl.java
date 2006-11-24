@@ -294,6 +294,13 @@ public class SurveyServiceImpl implements
 		}
 	}
 	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
+	
 	public SurveyUser getUser(Long uid){
 		return (SurveyUser) surveyUserDao.getObject(SurveyUser.class, uid);
 	}

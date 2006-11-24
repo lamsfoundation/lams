@@ -1206,4 +1206,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 			return list.get(0);
 		}
 	}
+	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
 }

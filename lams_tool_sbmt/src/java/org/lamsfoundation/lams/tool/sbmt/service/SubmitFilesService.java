@@ -141,6 +141,11 @@ public class SubmitFilesService implements ToolContentManager,
 			return list.get(0);
 		}
 	}	
+	
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
+	
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -971,6 +976,4 @@ public class SubmitFilesService implements ToolContentManager,
 	public void setUserManagementService(IUserManagementService userManagementService) {
 		this.userManagementService = userManagementService;
 	}
-	
-
 }

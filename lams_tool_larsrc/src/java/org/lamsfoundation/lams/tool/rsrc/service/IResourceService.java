@@ -230,6 +230,11 @@ public interface IResourceService
 	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
 	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry);
+	
+	/**
 	 * Get Reflect DTO list grouped by sessionID.
 	 * @param contentId
 	 * @return

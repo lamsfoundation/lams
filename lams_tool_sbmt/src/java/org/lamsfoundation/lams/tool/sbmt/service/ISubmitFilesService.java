@@ -195,7 +195,12 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
+	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry);
+	
 	/**
 	 * Delete instruction file by UID
 	 * @param uid

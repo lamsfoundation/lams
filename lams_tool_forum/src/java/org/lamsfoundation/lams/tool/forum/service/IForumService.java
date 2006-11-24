@@ -317,4 +317,9 @@ public interface IForumService {
 	 * @return
 	 */
 	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry);
 }

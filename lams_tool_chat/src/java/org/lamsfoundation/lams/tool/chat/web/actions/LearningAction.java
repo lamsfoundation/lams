@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.chat.web.actions;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -242,11 +243,26 @@ public class LearningAction extends LamsDispatchAction {
 		LearningForm lrnForm = (LearningForm) form;
 
 		ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
+		Long toolSessionID = chatUser.getChatSession().getSessionId();
+		Integer userID = chatUser.getUserId().intValue();
 
-		chatService.createNotebookEntry(chatUser.getChatSession()
-				.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-				ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue(),
-				lrnForm.getEntryText());
+		// check for existing notebook entry
+		NotebookEntry entry = chatService.getEntry(toolSessionID,
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				ChatConstants.TOOL_SIGNATURE, userID);
+
+		if (entry == null) {
+			// create new entry
+			chatService.createNotebookEntry(toolSessionID,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					ChatConstants.TOOL_SIGNATURE, userID, lrnForm
+							.getEntryText());
+		} else {
+			// update existing entry
+			entry.setEntry(lrnForm.getEntryText());
+			entry.setLastModified(new Date());
+			chatService.updateEntry(entry);
+		}
 
 		return finishActivity(mapping, form, request, response);
 	}

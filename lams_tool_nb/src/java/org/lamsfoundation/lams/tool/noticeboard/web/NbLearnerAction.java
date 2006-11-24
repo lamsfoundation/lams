@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -145,9 +146,25 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  // Create the notebook entry if reflection is set.
 		  NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
 		  if (nbContent.getReflectOnActivity()) {
-			  nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, 
-					  NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), learnerForm.getReflectionText());
-		  }
+				// check for existing notebook entry
+				NotebookEntry entry = nbService.getEntry(toolSessionID,
+						CoreNotebookConstants.NOTEBOOK_TOOL,
+						NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
+
+				if (entry == null) {
+					// create new entry
+					nbService.createNotebookEntry(toolSessionID,
+							CoreNotebookConstants.NOTEBOOK_TOOL,
+							NoticeboardConstants.TOOL_SIGNATURE, userID
+									.intValue(), learnerForm
+									.getReflectionText());
+				} else {
+					// update existing entry
+					entry.setEntry(learnerForm.getReflectionText());
+					entry.setLastModified(new Date());
+					nbService.updateEntry(entry);
+				}
+			}
 		  
 		  String nextActivityUrl;
 			try

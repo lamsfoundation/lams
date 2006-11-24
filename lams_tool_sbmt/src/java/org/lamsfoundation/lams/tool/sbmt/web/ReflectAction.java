@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookService;
 import org.lamsfoundation.lams.tool.sbmt.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
@@ -107,15 +109,27 @@ public class ReflectAction extends Action{
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
 		ISubmitFilesService submitFilesService = getService();
-		submitFilesService.createNotebookEntry(sessionId, 
-				CoreNotebookConstants.NOTEBOOK_TOOL,
-				SbmtConstants.TOOL_SIGNATURE, 
-				userId,
-				refForm.getEntryText());
+		
+		
+		// check for existing notebook entry
+		NotebookEntry entry = submitFilesService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, SbmtConstants.TOOL_SIGNATURE, userId);
+		
+		if (entry == null) {
+			// create new entry
+			submitFilesService.createNotebookEntry(sessionId, 
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					SbmtConstants.TOOL_SIGNATURE, 
+					userId,
+					refForm.getEntryText());			
+		} else {
+			// update existing entry
+			entry.setEntry(refForm.getEntryText());
+			entry.setLastModified(new Date());
+			submitFilesService.updateEntry(entry);
+		}		
 
 		return mapping.findForward(SbmtConstants.SUCCESS);
 	}
-
 	
 	//**********************************************************************************************
 	//		Private mehtods

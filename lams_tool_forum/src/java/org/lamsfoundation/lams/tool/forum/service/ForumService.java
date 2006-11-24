@@ -602,6 +602,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			return list.get(0);
 		}
 	}
+	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
     //***************************************************************************************************************
     // ToolContentManager and ToolSessionManager methods
     //***************************************************************************************************************

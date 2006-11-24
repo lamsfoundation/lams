@@ -1090,6 +1090,13 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		}
 	}
 	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
+	
 	/* ===============Methods implemented from ToolContentImport102Manager =============== */
 	
 

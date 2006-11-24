@@ -432,11 +432,24 @@ public class LearningAction extends Action {
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
 		ISurveyService service = getSurveyService();
-		service.createNotebookEntry(sessionId, 
+
+		// check for existing notebook entry
+		NotebookEntry entry = service.getEntry(sessionId,
 				CoreNotebookConstants.NOTEBOOK_TOOL,
-				SurveyConstants.TOOL_SIGNATURE, 
-				userId,
-				refForm.getEntryText());
+				SurveyConstants.TOOL_SIGNATURE, userId);
+
+		if (entry == null) {
+			// create new entry
+			service.createNotebookEntry(sessionId,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					SurveyConstants.TOOL_SIGNATURE, userId, refForm
+							.getEntryText());
+		} else {
+			// update existing entry
+			entry.setEntry(refForm.getEntryText());
+			entry.setLastModified(new Date());
+			service.updateEntry(entry);
+		}
 
 		return finish(mapping, form, request, response);
 	}

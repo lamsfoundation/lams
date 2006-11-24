@@ -257,4 +257,6 @@ public interface IChatService {
 
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID);
+	
+	public void updateEntry(NotebookEntry notebookEntry);
 }

@@ -322,11 +322,23 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
-		forumService.createNotebookEntry(sessionId, 
+		// check for existing notebook entry
+		NotebookEntry entry = forumService.getEntry(sessionId,
 				CoreNotebookConstants.NOTEBOOK_TOOL,
-				ForumConstants.TOOL_SIGNATURE, 
-				userId,
-				refForm.getEntryText());
+				ForumConstants.TOOL_SIGNATURE, userId);
+
+		if (entry == null) {
+			// create new entry
+			forumService.createNotebookEntry(sessionId,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					ForumConstants.TOOL_SIGNATURE, userId, refForm
+							.getEntryText());
+		} else {
+			// update existing entry
+			entry.setEntry(refForm.getEntryText());
+			entry.setLastModified(new Date());
+			forumService.updateEntry(entry);
+		}
 
 		return finish(mapping, form, request, response);
 	}

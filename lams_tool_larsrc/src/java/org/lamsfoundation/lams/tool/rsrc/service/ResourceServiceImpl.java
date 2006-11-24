@@ -616,6 +616,13 @@ public class ResourceServiceImpl implements
 		}
 	}
 	
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
+	
 	public ResourceUser getUser(Long uid){
 		return (ResourceUser) resourceUserDao.getObject(ResourceUser.class, uid);
 	}
