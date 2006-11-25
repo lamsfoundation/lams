@@ -43,8 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content">
 
 		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 		</h1>
 
 		<html:form action="/learning?method=displayMc&validate=false"

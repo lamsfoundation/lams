@@ -43,8 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"	escapeXml="false" />
 		</h1>
 
 		<html:form action="/learning?method=displayMc&validate=false"
@@ -127,8 +126,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<c:forEach var="singleAttemptEntry"
 															items="${distinctAttemptEntry.value}">
 															<li>
-																<c:out value="${singleAttemptEntry.value}"
-																	escapeXml="false" />
+																<c:out value="${singleAttemptEntry.value}" escapeXml="false" />
 															</li>
 														</c:forEach>
 													</ul>
@@ -221,7 +219,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<p>
 					<c:choose>
 						<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-							<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true"/>
+							<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true"/>
 						</c:when>
 						<c:otherwise>
 							<em><fmt:message key="message.no.reflection.available" /></em>  

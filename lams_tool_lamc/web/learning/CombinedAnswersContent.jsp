@@ -30,8 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!--options content goes here-->
 
 <p>
-	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}"
-		escapeXml="false" />
+	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 </p>
 
 
