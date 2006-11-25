@@ -834,7 +834,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	    else
 	    {
-		 	
+		 	//assuming there can not be more than 50 candidates
 		 	for (int i=0 ; i < 51 ; i++)
 		 	{
 		 	   String currentCheckedCa= request.getParameter("checkedCa" + i);    
@@ -867,7 +867,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
     	logger.debug("mcContent: " + mcContent);
 
-        if (learnerInput.size() == 0)
+    	List allQuestionUidsList = getAllQuestionUids(mcContent);
+    	logger.debug("allQuestionUidsList: " + allQuestionUidsList);
+
+
+    	boolean allQuestionsChecked=allQuestionsChecked(learnerInput, allQuestionUidsList);
+    	logger.debug("allQuestionsChecked: " + allQuestionsChecked);
+    	
+    	if (!allQuestionsChecked)
         {
             logger.debug("there are no selected answers for any questions: " + learnerInput);
             ActionMessages errors = new ActionMessages();
@@ -886,8 +893,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         }
     	
     	
-    	List allQuestionUidsList = getAllQuestionUids(mcContent);
-    	logger.debug("allQuestionUidsList: " + allQuestionUidsList);
     	
 	 	McTempDataHolderDTO mcTempDataHolderDTO= new McTempDataHolderDTO();
 
@@ -1074,6 +1079,52 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		return (mapping.findForward(INDIVIDUAL_REPORT));
     }
     
+    
+    
+    public boolean allQuestionsChecked(List learnerInput, List allQuestionUidsList)
+    {
+    	logger.debug("starting allQuestionsChecked learnerInput: " +  learnerInput);
+    	logger.debug("using  allQuestionUidsList: " +  allQuestionUidsList);
+    	
+    	boolean questionSelected=false;
+    	Iterator allQuestionUidsListIterator=allQuestionUidsList.iterator();
+    	while (allQuestionUidsListIterator.hasNext())
+    	{
+    	    String uid=(String)allQuestionUidsListIterator.next(); 
+    	    logger.debug("using uid: " +  uid);
+    	    
+    	    questionSelected=false;
+        	Iterator learnerInputIterator=learnerInput.iterator();
+        	while (learnerInputIterator.hasNext())
+        	{
+        	    String learnerInputLine=(String)learnerInputIterator.next(); 
+        	    logger.debug("using learnerInputLine: " +  learnerInputLine);
+        	    
+        	    int sepIndex=learnerInputLine.indexOf("-");
+        	    logger.debug("having sepIndex: " +  sepIndex);
+        	    
+        	    String selectedUid=learnerInputLine.substring(0, sepIndex);
+        	    logger.debug("selectedUid: " +  selectedUid);
+        	    
+        	    if (uid.equals(selectedUid))
+        	    {
+            	    logger.debug("equal uids found: " +  selectedUid);
+        	        questionSelected=true;
+        	        break;
+        	    }
+        	        
+        	}
+    	    logger.debug("iterated loop questionSelected: " +  questionSelected);
+
+    	    if (questionSelected == false)
+    	    {
+    	        logger.debug("this question is not selected at all, question uid :" +  uid);
+    	        return false;
+    	    }
+    	}
+    	
+    	return true;
+    }
 
     /**
      * 
