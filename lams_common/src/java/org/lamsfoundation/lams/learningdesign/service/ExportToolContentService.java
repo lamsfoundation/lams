@@ -432,7 +432,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					contentManager.exportToolContent(activity.getToolContentID(),contentDir);
 				}catch (Exception e) {
 					String msg = activity.getToolDisplayName() + " export tool content failed:" + e.toString();
-					log.error(msg);
+					log.error(msg,e);
 					//Try to delete tool.xml. This makes export_failed and tool.xml does not exist simultaneously.
 					String toolPath = FileUtil.getFullPath(contentDir,activity.getToolContentID().toString());
 					String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FILE_NAME);
@@ -468,7 +468,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 				
 			} catch (Exception e) {
-				log.error("Exception:" + e.toString());
+				log.error(e);
 				throw new ExportToolContentException(e);
 			}
 			
@@ -479,13 +479,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			//create zip file and return zip full file name
 			return ZipFileUtil.createZipFile(targetZipFileName, contentDir,rootDir);
 		} catch (FileUtilException e) {
-			log.error("FileUtilExcpetion:" + e.toString());
+			log.error("FileUtilException:",e);
 			throw new ExportToolContentException(e);
 		} catch (ZipFileUtilException e) {
-			log.error("ZipFileUtilException:" + e.toString());
+			log.error("ZipFileUtilException:",e);
 			throw new ExportToolContentException(e);
 		} catch (IOException e) {
-			log.error("IOException:" + e.toString());
+			log.error("IOException:",e);
 			throw new ExportToolContentException(e);
 		}
 	}
@@ -1219,9 +1219,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			toolFile.flush();
 			toolFile.close();
 		} catch (FileUtilException e) {
-			log.warn("Export error file write error:" + e.toString());
+			log.warn("Export error file write error:",e);
 		} catch (IOException e) {
-			log.warn("Export error file write error:" + e.toString());
+			log.warn("Export error file write error:",e);
 		}
 	}	
 	private ILearningDesignService getLearningDesignService(){
