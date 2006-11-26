@@ -2184,4 +2184,9 @@ public class QaServicePOJO
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
         this.coreNotebookService = coreNotebookService;
     }
+    
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
+
 }

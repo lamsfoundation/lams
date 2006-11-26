@@ -302,6 +302,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		
 		if (notebookEntry != null) {
 		    String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+		    //String notebookEntryPresentable=notebookEntry.getEntry();
+		    logger.debug("notebookEntryPresentable: " + notebookEntryPresentable);
 		    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 		}
 		
@@ -573,7 +575,26 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    	        	logger.debug("qaQueUsrLocal uid : " + qaQueUsrLocal.getUid());
 		    	        	
 		    	    	    generalLearnerFlowDTO.setUserUid(qaQueUsrLocal.getUid().toString());
+		    	    	    String noteBookEntry=generalLearnerFlowDTO.getNotebookEntry();
+		    	    	    logger.debug("noteBookEntry : " + noteBookEntry);
+		    	    	    qaLearningForm.setEntryText(noteBookEntry);
 
+		    	    	    
+		    	    		logger.debug("attempt getting notebookEntry: ");
+		    	    		NotebookEntry notebookEntryLocal = qaService.getEntry(new Long(toolSessionID),
+		    	    				CoreNotebookConstants.NOTEBOOK_TOOL,
+		    	    				MY_SIGNATURE, new Integer(userID));
+		    	    		
+		    	            logger.debug("notebookEntryLocal: " + notebookEntryLocal);
+		    	    		
+		    	    		if (notebookEntryLocal != null) {
+		    	    		    String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntryLocal.getEntry());
+		    	    		    logger.debug("notebookEntryPresentable: " + notebookEntryPresentable);
+		    	    		    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+		    	    		    qaLearningForm.setEntryText(notebookEntryPresentable);
+		    	    		}
+		    	    	    
+		    	    	    
 		    		    	
 		    	    	    if (isLearnerFinished)
 		    	    	    {

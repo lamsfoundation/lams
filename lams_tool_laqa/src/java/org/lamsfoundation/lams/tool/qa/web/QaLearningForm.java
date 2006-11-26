@@ -44,6 +44,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String endLearning;
 	protected String refreshAnswers;
 	protected String submitReflection;
+	protected String updateReflection;
 	protected String forwardtoReflection;
 	
 	protected String totalQuestionCount;
@@ -454,4 +455,17 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
     public void setViewAll(String viewAll) {
         this.viewAll = viewAll;
     }
+    /**
+     * @return Returns the updateReflection.
+     */
+    public String getUpdateReflection() {
+        return updateReflection;
+    }
+    /**
+     * @param updateReflection The updateReflection to set.
+     */
+    public void setUpdateReflection(String updateReflection) {
+        this.updateReflection = updateReflection;
+    }
+    
 }

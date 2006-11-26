@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		styleClass="noBorder">
 	</html:checkbox>
 	<label for="showOtherAnswers">
-		<fmt:message key="label.learner.answers" />
+		<fmt:message key="label.learner.answer" />
 	</label>
 
 	<br>	

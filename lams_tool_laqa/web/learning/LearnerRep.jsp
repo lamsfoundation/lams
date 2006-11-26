@@ -152,14 +152,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 				</c:if>				
 
-				<c:if
-					test="${generalLearnerFlowDTO.notebookEntry != null && generalLearnerFlowDTO.notebookEntry != ''}">
-					<h2>
-						<fmt:message key="label.notebook.entries" />
-					</h2>
-					<c:out value="${generalLearnerFlowDTO.notebookEntry}"
-						escapeXml="false" />
-				</c:if>
+						
 
 				<c:if
 					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
@@ -299,16 +292,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				</c:if>				
 
-				<c:if
-					test="${generalLearnerFlowDTO.notebookEntry != null && generalLearnerFlowDTO.notebookEntry != ''}">
-					<h2>
-						<fmt:message key="label.notebook.entries" />
-					</h2>
-					<p>
-						<c:out value="${generalLearnerFlowDTO.notebookEntry}"
-							escapeXml="false" />
-					</p>
-				</c:if>
+					
 
 				<c:if
 					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">

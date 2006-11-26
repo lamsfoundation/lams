@@ -274,5 +274,8 @@ public interface IQaService
     /** Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer,
      * so the log entry must be made by the web layer. */
     public IAuditService getAuditService();
+    
+	public void updateEntry(NotebookEntry notebookEntry);
+
 }
 
