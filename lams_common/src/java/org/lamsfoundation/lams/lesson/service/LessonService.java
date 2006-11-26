@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.lesson.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -71,6 +72,7 @@ public class LessonService implements ILessonService
 	private ILessonClassDAO lessonClassDAO;        
 	private IGroupingDAO groupingDAO;
 	private MessageService messageService;
+	private IBaseDAO baseDAO;
 
     /* ******* Spring injection methods ***************************************/
 	public void setLessonDAO(ILessonDAO lessonDAO) {
@@ -89,6 +91,12 @@ public class LessonService implements ILessonService
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
 	}
+
+	public void setBaseDAO(
+			IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
+	}
+    
 
 
 	/* *********** Service methods ***********************************************/
@@ -311,10 +319,10 @@ public class LessonService implements ILessonService
     
     /** 
      * Add a learner to the lesson class. Checks for duplicates.
-     * @param user new learner 
+     * @param userId new learner id
      * @return true if added user, returns false if the user already a learner and hence not added.
      */ 
-    public boolean addLearner(Long lessonId, User user) throws LessonServiceException {
+    public boolean addLearner(Long lessonId, Integer userId) throws LessonServiceException {
 		Lesson lesson = lessonDAO.getLesson(lessonId);
 		if ( lesson == null ) {
 			throw new LessonServiceException("Lesson "+lessonId+" does not exist. Unable to add learner to lesson.");
@@ -332,10 +340,7 @@ public class LessonService implements ILessonService
 		if ( learnersGroup != null )
 			lessonDAO.initialize(learnersGroup);
 
-		// hack - if coming from moodle and person is accessing lams
-		// for the first time since it starts, the user object isn't full initialised.
-		lessonDAO.initialize(user); 
-		
+		User user = (User) baseDAO.find(User.class,userId);
 		boolean ret = lessonClass.addLearner(user);
 		if ( ret ) {
 			lessonClassDAO.updateLessonClass(lessonClass);
@@ -345,10 +350,10 @@ public class LessonService implements ILessonService
 
     /** 
      * Add a new staff member to the lesson class. Checks for duplicates.
-     * @param user new learner 
+     * @param userId new learner id
      * @return true if added user, returns false if the user already a staff member and hence not added.
      */ 
-    public boolean addStaffMember(Long lessonId, User user) {
+    public boolean addStaffMember(Long lessonId, Integer userId) {
 		Lesson lesson = lessonDAO.getLesson(lessonId);
 		if ( lesson == null ) {
 			throw new LessonServiceException("Lesson "+lessonId+" does not exist. Unable to add staff member to lesson.");
@@ -361,11 +366,7 @@ public class LessonService implements ILessonService
 		}
 		
 		lessonDAO.initialize(lessonClass.getStaffGroup());
-
-		// hack - if coming from moodle and person is accessing lams
-		// for the first time since it starts, the user object isn't full initialised.
-		lessonDAO.initialize(user); 
-		
+		User user = (User) baseDAO.find(User.class,userId);		
 
 		boolean ret = lessonClass.addStaffMember(user);
 		if ( ret ) {
@@ -373,5 +374,5 @@ public class LessonService implements ILessonService
 		}
 		return ret;
     }
-    
+
 }

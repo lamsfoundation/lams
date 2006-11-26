@@ -24,7 +24,6 @@
 
 package org.lamsfoundation.lams.lesson.service;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -143,16 +142,16 @@ public interface ILessonService {
     
     /** 
      * Add a learner to the lesson class. Checks for duplicates.
-     * @paran user new learner 
+     * @paran userId new learner id
      * @return true if added user, returns false if the user already a learner and hence not added.
      */ 
-    public boolean addLearner(Long lessonId, User user);
+    public boolean addLearner(Long lessonId, Integer userId);
 
     /** 
      * Add a new staff member to the lesson class. Checks for duplicates.
-     * @paran user new learner 
+     * @paran userId new learner id
      * @return true if added user, returns false if the user already a staff member and hence not added.
      */ 
-    public boolean addStaffMember(Long lessonId, User user);
+    public boolean addStaffMember(Long lessonId, Integer userId);
  	
 }

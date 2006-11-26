@@ -118,8 +118,8 @@ public class RegisterServiceSoapBindingImpl implements Register {
 			Iterator iter2 = org.getLessons().iterator();
 			while (iter2.hasNext()) {
 				Lesson lesson = (Lesson) iter2.next();
-				lessonService.addLearner(lesson.getLessonId(), user);
-				lessonService.addStaffMember(lesson.getLessonId(), user);
+				lessonService.addLearner(lesson.getLessonId(), user.getUserId());
+				lessonService.addStaffMember(lesson.getLessonId(), user.getUserId());
 				log.debug("Added " + user.getLogin() + " to " + lesson.getLessonName());
 			}
 		}

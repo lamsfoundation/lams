@@ -23,18 +23,22 @@ package org.lamsfoundation.lams.integration.util;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang, Anthony Xiao
  */
 public class LoginRequestDispatcher {
+
+	private static Logger log = Logger.getLogger(LoginRequestDispatcher.class);
 
 	public static final String PARAM_USER_ID = "uid";
 
@@ -123,9 +127,16 @@ public class LoginRequestDispatcher {
 		String extUsername = request.getParameter(PARAM_USER_ID);
 		ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
 		ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, extUsername);
+		User user = userMap.getUser();
+		if ( user == null ) {
+			String error = "Unable to add user to lesson class as user is missing from the user map";
+			log.error(error);
+			throw new UserInfoFetchException(error);
+		}
+		
 		if(METHOD_LEARNER.equals(method))
-			lessonService.addLearner(Long.parseLong(lessonId), userMap.getUser());
+			lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
 		else if(METHOD_MONITOR.equals(method))
-			lessonService.addStaffMember(Long.parseLong(lessonId), userMap.getUser());
+			lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
 	}
 }
