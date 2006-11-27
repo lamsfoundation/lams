@@ -169,7 +169,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<xsl:for-each select="/*/*/*">
 				<xsl:sort select="orderID" order="ascending"/>
 				<xsl:if test="parentActivityID = $myid">
-					<learning-activity-ref  xsl:use-attribute-sets="toolRef"/>
+					<xsl:if test="(activityTypeID = 1)">
+						<learning-activity-ref  xsl:use-attribute-sets="toolRef"/>
+					</xsl:if>
+					<xsl:if test="(activityTypeID = 2)">
+						<learning-activity-ref  xsl:use-attribute-sets="groupRef"/>
+					</xsl:if>
+					<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8)">
+						<learning-activity-ref  xsl:use-attribute-sets="complexRef"/>
+					</xsl:if>
 				</xsl:if>
 			</xsl:for-each>
 			<lams:lams-complex-activity>
@@ -271,6 +279,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>
 		</xsl:attribute>
 	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="complexRef">
+		<xsl:attribute name="ref">S-<xsl:if test="activityTypeID=6">PARALLEL</xsl:if><xsl:if test="activityTypeID=7">OPTIONS</xsl:if><xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>-<xsl:value-of select="activityID"/></xsl:attribute>
+	</xsl:attribute-set>
+	
 	
 	<xsl:attribute-set name="toolEnvIdentifier">
 		<xsl:attribute name="identifier">E-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>

@@ -173,6 +173,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	private static final String IMS_PREFIX_RESOURCE_IDENTIFIER = "R-";
 	private static final String IMS_PREFIX_ACTIVITY_REF = "A-";
+	private static final String IMS_PREFIX_COMPLEX_REF = "S-";
 
 		//this is not IMS standard tag, temporarily use to gather all tools node list
 	private static final String IMS_TAG_TRANSITIONS = "transitions";
@@ -180,6 +181,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// this is not IMS standard tag, temp use to ref grouping/gate activities 
 	private static final String IMS_TAG_GROUPING = "group";
 	private static final String IMS_TAG_GATE = "gate";
+	
+	private static final String IMS_TAG_OPTIONAL = "OPTIONS";
+	private static final String IMS_TAG_PARALLEL = "PARALLEL";
+	private static final String IMS_TAG_SEQUENCE = "SEQUENCE";
 	
 	//temporarily file for IMS XSLT file
 	private static final String XSLT_PARAM_RESOURCE_FILE = "resourcesFile";
@@ -548,10 +553,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			AuthoringActivityDTO activityDTO = iter.next();
 			if(activityDTO.getParentActivityID() != null)
 				iter.remove();
-			if(activityDTO.getActivityTypeID() == Activity.SEQUENCE_ACTIVITY_TYPE
-				|| activityDTO.getActivityTypeID() == Activity.PARALLEL_ACTIVITY_TYPE
-				|| activityDTO.getActivityTypeID() == Activity.OPTIONS_ACTIVITY_TYPE)
-				iter.remove();
 		}
 		
 		for (AuthoringActivityDTO actDto : sortedActList) {
@@ -565,7 +566,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			else if(actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 													  || actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE))
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GATE + "-" + actDto.getActivityID());
-			else 
+			else if(actDto.getActivityTypeID() == Activity.SEQUENCE_ACTIVITY_TYPE
+					|| actDto.getActivityTypeID() == Activity.PARALLEL_ACTIVITY_TYPE
+					|| actDto.getActivityTypeID() == Activity.OPTIONS_ACTIVITY_TYPE) {
+				
+				if(actDto.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE))
+					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_OPTIONAL + "-" + actDto.getActivityID());
+				else if(actDto.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE))
+					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_PARALLEL + "-" + actDto.getActivityID());
+				else if(actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE))
+					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_SEQUENCE + "-" + actDto.getActivityID());
+				
+			} else 
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
 			
 			ref.setAttribute(att);
