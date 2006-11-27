@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -284,7 +285,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 	    
 		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+		String reflectionSubject=VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 	    
 	    voteLearningForm.resetCommands();
     	
@@ -443,7 +445,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
 
 		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+		String reflectionSubject=VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 	    
 		voteLearningForm.resetCommands();
 
@@ -539,7 +542,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("attempting to leave/complete session with toolSessionID:" + toolSessionID + " and userID:"+userID);
 		
 		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+		String reflectionSubject=VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+		voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 	    
 		logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
  		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
@@ -988,6 +992,27 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    reflectionSubject=VoteUtils.replaceNewLines(reflectionSubject);
 	    
 	    voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	    
+	    String userID=request.getParameter("userID");
+	 	logger.debug("userID: " + userID);	 	
+	 	voteLearningForm.setUserID(userID);
+	    
+		logger.debug("attempt getting notebookEntry: ");
+		NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID));
+		
+        logger.debug("notebookEntry: " + notebookEntry);
+		
+		if (notebookEntry != null) {
+		    String notebookEntryPresentable=notebookEntry.getEntry();
+		    logger.debug("notebookEntryPresentable: " + notebookEntryPresentable);
+		    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+		    voteLearningForm.setEntryText(notebookEntryPresentable);
+		}
+        
+	    
+	    
 	    request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 	    
 		logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);

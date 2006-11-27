@@ -303,7 +303,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	logger.debug("is tool reflective: " + voteContent.isReflect());
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 	logger.debug("reflection subject: " + voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
+	String reflectionSubject=VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	
+	logger.debug("is vote lockOnFinish: " + voteContent.isLockOnFinish());
+	 
 	
 	logger.debug("attempt getting notebookEntry: ");
 	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),

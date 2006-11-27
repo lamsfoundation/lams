@@ -190,20 +190,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 
 
-				<c:if
-					test="${voteGeneralLearnerFlowDTO.notebookEntry != null && voteGeneralLearnerFlowDTO.notebookEntry != ''}">
+				<h2>
+						<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
+				</h2>
 
-					<h2>
-						<fmt:message key="label.notebook.entries" />
-					</h2>
-	
-					<p>
-						<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-							escapeXml="false" />
-					</p>
-				</c:if>				
+				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+					escapeXml="false" />
+			
 
-
+				<br>
+						<html:button property="forwardtoReflection" styleClass="button"
+							onclick="submitMethod('forwardtoReflection');"> 
+							<fmt:message key="label.edit" />
+						</html:button>
 
 
 
