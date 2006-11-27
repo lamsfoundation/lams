@@ -45,6 +45,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				document.McLearningForm.nextQuestionSelected.value = 1;
 				document.McLearningForm.submit();
 			}
+			
+			function verifyCandidateSelected()
+			{
+				var candidateSelected = false;
+				
+				for (counter = 0; counter < document.McLearningForm.checkedCa.length; counter++)
+				{
+					if (document.McLearningForm.checkedCa[counter].checked)
+						candidateSelected = true; 
+				}
+				
+				if (!candidateSelected)
+				{
+					var msg = "<fmt:message key="answers.submitted.current.none"/>";
+					alert(msg);
+					return (false);
+				}
+				return (true);
+			}
+			
 		</script>
 </head>
 

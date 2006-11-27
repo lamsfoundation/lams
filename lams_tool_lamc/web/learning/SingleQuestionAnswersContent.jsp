@@ -91,19 +91,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if
 		test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
 		<img src="<c:out value="${tool}"/>images/green_arrow_down_right.gif"
-			align=left onclick="javascript:submitNextQuestionSelected();">
+			align=left onclick="javascript:if (verifyCandidateSelected()){ submitNextQuestionSelected();}">
 	</c:if>
 
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
-		<html:submit property="continueOptionsCombined" styleClass="button">
+		<html:submit property="continueOptionsCombined" onclick="javascript:verifyCandidateSelected()" styleClass="button">
 			<fmt:message key="button.continue" />
 		</html:submit>
 	</c:if>
 
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-		<html:submit property="continueOptionsCombined" styleClass="button">
+		<html:submit property="continueOptionsCombined" onclick="javascript:verifyCandidateSelected()" styleClass="button">
 			<fmt:message key="button.continue" />
 		</html:submit>
 	</c:if>
