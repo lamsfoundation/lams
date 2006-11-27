@@ -83,7 +83,7 @@
 		</div>
 	</c:if>
 	
-	<div align="right">
+	<div align="right" class="space-bottom-top">
 		<c:if test='${sessionMap.mode != "teacher"}'>
 			<c:choose>
 				<c:when
