@@ -73,7 +73,6 @@ j_security_login_page
 			  	<!--Test if the browsers flash player meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
 			  		<!--
-			  			var ivBrow = false;
 						var minimumFlashVersion = 7;
 						var flashVersion = getFlashVersion();
 						if(flashVersion < minimumFlashVersion) {
@@ -82,16 +81,19 @@ j_security_login_page
 							document.write('<br><a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
 						}
 						
-						if(op) ivBrow = true;	// Opera
-						else if(saf) ivBrow = true;		// Safari
-						else if(ie6 || ie7) ivBrow = false;	// IE6 IE7
-						else if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) ivBrow = false;	// Firefox 1.5+
-						else ivBrow = true;
 						
-						if(ivBrow) {
+						if(isBrowerNotCompatable()) {
 							// incompatable browser - show warning message
 							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
 							document.write('<br></div>');
+						}
+						
+						function isBrowserNotCompatable() {
+							if(op) return true;	// Opera
+							else if(saf) return true;		// Safari
+							else if(ie6 || ie7) return false;	// IE6 IE7
+							else if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) return false;	// Firefox 1.5+
+							else return true;
 						}
 						
 					//-->
