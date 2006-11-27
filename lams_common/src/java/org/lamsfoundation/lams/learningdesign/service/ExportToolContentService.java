@@ -404,7 +404,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			//get learning desing and serialize it to XML file.
 			ILearningDesignService service =  getLearningDesignService();
 			LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId);
-			ldDto.setTitle(ldDto.getTitle().concat(IMS_FILE_NAME_EXT));
+			
+			if(format == PACKAGE_FORMAT_IMS)
+				ldDto.setTitle(ldDto.getTitle().concat(IMS_FILE_NAME_EXT));
+			
 			XStream designXml = new XStream();
 			designXml.toXML(ldDto,ldFile);
 			ldFile.close();
