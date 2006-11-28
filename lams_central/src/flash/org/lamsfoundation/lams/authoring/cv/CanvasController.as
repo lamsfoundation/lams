@@ -39,6 +39,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private var _canvasModel:CanvasModel;
 	private var _canvasView:CanvasView;
 	private var _pi:PropertyInspectorNew;
+	private var app:Application;
 	private var _isBusy:Boolean;
 	
 	/**
@@ -52,6 +53,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_canvasModel = CanvasModel(getModel());
 		_canvasView = CanvasView(getView());
 		_pi = new PropertyInspectorNew();
+		app = Application.getInstance();
 		_isBusy = false;
 	}
    
@@ -109,7 +111,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
 	    if (_canvasModel.isTransitionToolActive()){
 			_canvasModel.getCanvas().stopTransitionTool();
-			_canvasModel.getCanvas().view.removeTempTrans();	
+			//_canvasModel.getCanvas().view.removeTempTrans();	
+			app.controlKeyPressed = "";
 		}
 	    _canvasModel.getCanvas().stopActiveTool();
 		//_canvasModel.selectedItem = ca;
@@ -119,6 +122,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
+			 _canvasModel.isDragging = false;
 			if (ca.activity.parentUIID != null){
 				trace ("testing Optional child on Canvas "+ca.activity.activityUIID)
 				for (var i=0; i<optionalOnCanvas.length; i++){
@@ -316,7 +320,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.resetTransitionTool();
 			_canvasModel.getCanvas().stopActiveTool();
 			_canvasModel.getCanvas().stopTransitionTool();
-		
+			app.controlKeyPressed = ""
 			
 	   }else{
 			if(_canvasModel.isDragging){

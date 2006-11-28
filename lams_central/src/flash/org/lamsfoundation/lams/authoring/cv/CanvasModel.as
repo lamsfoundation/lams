@@ -87,7 +87,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 				
 	
-		_activeTool = null;
+		_activeTool = "none";
 		_autoSaveWait = false;
 		_transitionActivities = new Array();
 		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
@@ -213,7 +213,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function stopTransitionTool():Void{
 		Debugger.log('Stopping transition tool',Debugger.GEN,'stopTransitionTool','CanvasModel');
 		resetTransitionTool();
-		_activeTool = null;
+		_activeTool = "none";
 		//broadcastViewUpdate("STOP_TRANSITION_TOOL");
 	}
 	
@@ -611,11 +611,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			var success:Object = _cv.ddm.addTransition(t);
 			//flag the model as dirty and trigger a refresh
-			
+			_cv.stopTransitionTool();
 			setDirty();
 			
-			setSelectedItem(_transitionsDisplayed.get(t.transitionUIID));
-			_cv.stopTransitionTool();
+			//setSelectedItem(_transitionsDisplayed.get(t.transitionUIID));
+			
 			
 		}
 		return true;
