@@ -405,15 +405,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 						_canvasController.activityDoubleClick(this);
 					}
 				}
-				/*
-				if(workspaceRef.inspecting){
-			// click to zoom in / zoom out
-			if(workspaceRef.zooming == "in"){
-				closeZoomedActivity(this._parent);	
-			}else if(workspaceRef.zooming == "out"){
-				zoomActivity(this._parent, true);
-			}
-				*/
+				app.controlKeyPressed = "";
 				
 			}else{
 				
@@ -428,24 +420,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 					_canvasController.activityClick(this);
 				}				
 				
-				/*
-				if (userDrawingTransition){
-					debug('user drawing transition');
-					userDrawTransition(this,true);
-				}else if (userDrawingBox){
-					workspaceBkg.onPress();
-				}else{
-					doMove = false;
-					//move all the acts with the box
-					//Mouse.addListener(moveOpActBoxListner);
-					this.onEnterFrame = updateOpActPositions;
-					
-					draggedOptionalActivity = optActId;
-					workspaceRef.selectActivity(this);
-					this.startDrag(false);
-					this.pickup();
-				}
-				*/
 			}
 			
 			_dcStartTime = now;
