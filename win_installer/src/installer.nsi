@@ -405,7 +405,7 @@ Function DirectoryLeave
     instdirExists:
         ; CHECK if there are files retained from a previous uninstall
         ; THEN after installation, overwrite retained files and free files from temp folder temp folder 
-        
+        strcpy $6 ""
         
         IfFileExists "$INSTDIR\repository" repositoryExists noRepository 
         repositoryExists:         
@@ -427,13 +427,22 @@ Function DirectoryLeave
         
         MessageBox MB_YESNO|MB_ICONQUESTION "Installer has detected some files retained from a previous install, do you wish to use them? $\n$\n$6" \
                     IDYES retainFiles \
-                IDNO newInstDir
+                    IDNO newInstDir
         retainFiles:
-        Strcpy $WINTEMP "C:\WINDOWS\Temp"
-        Strcpy $RETAIN_FILES "1"
-        CopyFiles $INSTDIR $WINTEMP
-        #MessageBox MB_OK|MB_ICONEXCLAMATION "$RETAIN_FILES \n $RETAIN_REP $\n $RETAIN_CONF $\n $RETAIN_DB"
+            Strcpy $WINTEMP "C:\WINDOWS\Temp"
+            Strcpy $RETAIN_FILES "1"
+            CopyFiles $INSTDIR $WINTEMP
+            #MessageBox MB_OK|MB_ICONEXCLAMATION "$RETAIN_FILES \n $RETAIN_REP $\n $RETAIN_CONF $\n $RETAIN_DB"
     newInstDir:
+        # Remove retained  files and begin installation
+        ##################test this again
+        /*
+        Strcpy $RETAIN_FILES "0"
+        Strcpy $RETAIN_CONF "0"
+        Strcpy $RETAIN_DB "0"
+        Strcpy $RETAIN_REP "0"
+        RMdir /r $INSTDIR
+        CreateDirectory $INSTDIR*/
 FunctionEnd
 
 
@@ -834,7 +843,7 @@ FunctionEnd
 Function OverWriteRetainedFiles
     ${if} $RETAIN_REP == "1"
         #copy repository and uploaded files to install directory
-        MessageBox MB_OK|MB_ICONSTOP "repository files to be retained"
+        #MessageBox MB_OK|MB_ICONSTOP "repository files to be retained"
         CopyFiles "$WINTEMP\lams\repository" "$INSTDIR\" 
         DetailPrint "$INSTDIR\repository"
         CopyFiles "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
@@ -842,7 +851,7 @@ Function OverWriteRetainedFiles
     ${endif}
     ${if} $RETAIN_CONF == "1"
         #copy configuration files to be kept
-        MessageBox MB_OK|MB_ICONSTOP "CONF files to be retained"
+        #MessageBox MB_OK|MB_ICONSTOP "CONF files to be retained"
         CopyFiles "$WINTEMP\lams\jboss-4.0.2\server\default\conf\log4j.xml" "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml"
         CopyFiles "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar" "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml"
     ${endif}
@@ -876,6 +885,7 @@ Function RemoveTempFiles
     Delete "$TEMP\update_lams_configuration.sql"
     Delete "$TEMP\login-config.xml"
     Delete "$INSTDIR\update_lams_configuration.sql"
+    RMDIR /r "$WINTEMP\lams"
 FunctionEnd
 
 Function .onInstFailed
