@@ -689,6 +689,10 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	public function get controlKeyPressed():String{
         return _controlKeyPressed;
     }
+	
+	public function set controlKeyPressed(key:String){
+        _controlKeyPressed = key;
+    }
     /**
     * returns the the workspace instance
     */
