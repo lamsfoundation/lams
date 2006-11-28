@@ -997,7 +997,7 @@ My Courses Pages
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
-	margin-top:6px;
+	
 	margin-left:5px;
 }
 
@@ -1006,7 +1006,7 @@ My Courses Pages
 	color: #47bc23;
 	padding: 5px 12px 6px 30px;
 	text-decoration: none;
-	margin-top:0px;
+	
 	margin-left:5px;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
@@ -1019,8 +1019,6 @@ My Courses Pages
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
-	margin-top:6px;
-	margin-left:10px;
 }
 
 #content a:hover.manage-group-button {
@@ -1028,8 +1026,7 @@ My Courses Pages
 	color: #47bc23;
 	padding: 5px 12px 6px 30px;
 	text-decoration: none;
-	margin-top:0px;
-	margin-left:10px;
+	
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
 }
