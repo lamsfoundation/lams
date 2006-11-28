@@ -955,12 +955,17 @@ public class LD102Importer implements ApplicationContextAware{
 				Object[] toolActivitiesArray = toolActivities.toArray();
 				Object[] subActivitiesArray = subActivities.toArray();
 				
-				if(compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[0], (ToolActivity)subActivitiesArray[0]) && 
-				   compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[1], (ToolActivity)subActivitiesArray[1]))
-					return parallelActivity.getLibraryActivityUiImage();
-				else if(compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[0], (ToolActivity)subActivitiesArray[1]) && 
-						   compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[1], (ToolActivity)subActivitiesArray[0]))
-					return parallelActivity.getLibraryActivityUiImage();
+				// make sure the tool activities are sensible - don't want to crash import
+				// due to some bad data in the database e.g. a parallel activity that is missing a tool due
+				// to a bad build.
+				if ( toolActivitiesArray.length == 2 ) { 
+					if(compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[0], (ToolActivity)subActivitiesArray[0]) && 
+					   compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[1], (ToolActivity)subActivitiesArray[1]))
+						return parallelActivity.getLibraryActivityUiImage();
+					else if(compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[0], (ToolActivity)subActivitiesArray[1]) && 
+							   compareToolActivitiesbyTool((ToolActivity)toolActivitiesArray[1], (ToolActivity)subActivitiesArray[0]))
+						return parallelActivity.getLibraryActivityUiImage();
+				}
 			}
 		}
 		
@@ -1268,7 +1273,12 @@ public class LD102Importer implements ApplicationContextAware{
 		    Transition transition = new Transition();
 		    GateActivity gate = null; // only needed for synchronise
 		    Transition gateTransition = null; 
-		    transition.setTransitionUIID(WDDXProcessor.convertToInteger("Transition ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID)));
+		    
+		    // we've seen a design (TV_Debate_NZ) that had 0.0 in the id field. This can't be allowed
+		    // as LAMS 2.0 will fail when someone tries to save the design. So assign it a sensible UIID
+		    Integer transitionUIID = WDDXProcessor.convertToInteger("Transition ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID));
+		    transition.setTransitionUIID(transitionUIID != null && transitionUIID > 0 ? transitionUIID : ++maxId);
+		    
 		    transition.setCreateDateTime(createDate);			
 
 		    // if there is a completion type then we need to set up a gate and add an extra transition.
@@ -1277,7 +1287,7 @@ public class LD102Importer implements ApplicationContextAware{
 			    gate = setupGateActivity(completion);
 			    
 			    gateTransition = new Transition();
-		    	gateTransition.setTransitionUIID(maxId++);
+		    	gateTransition.setTransitionUIID(++maxId);
 		    	gate.setTransitionFrom(gateTransition);
 		    	gateTransition.setFromActivity(gate);
 		    	gateTransition.setFromUIID(gate.getActivityUIID());
@@ -1367,7 +1377,7 @@ public class LD102Importer implements ApplicationContextAware{
 			gate.setActivityTypeId(activityType.intValue());
 			gate.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 			gate.setSystemTool(systemTool);
-			gate.setActivityUIID(maxId++);
+			gate.setActivityUIID(++maxId);
 			gate.setTitle(title!=null?title:"Gate");
 			gate.setGateOpen(false);
 			gate.setWaitingLearners(null);
