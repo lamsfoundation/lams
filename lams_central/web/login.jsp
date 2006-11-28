@@ -32,7 +32,7 @@ j_security_login_page
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<script language="javascript" type="text/javascript" src="includes/javascript/flash_detect.js">
- 		<!--
+		<!--
 		function getFlashVersion() { return null; };
 		//-->
 	</script>
@@ -82,7 +82,7 @@ j_security_login_page
 						}
 						
 						
-						if(isBrowerNotCompatable()) {
+						if(isBrowserNotCompatable()) {
 							// incompatable browser - show warning message
 							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
 							document.write('<br></div>');
@@ -92,7 +92,9 @@ j_security_login_page
 							if(op) return true;	// Opera
 							else if(saf) return true;		// Safari
 							else if(ie6 || ie7) return false;	// IE6 IE7
-							else if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) return false;	// Firefox 1.5+
+							else if(ie5xwin || ie5 || ie4 || ie5mac || ie5x) return true;
+							else if(moz) 
+								if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) return false;	// Firefox 1.5+
 							else return true;
 						}
 						
