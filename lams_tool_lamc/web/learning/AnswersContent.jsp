@@ -58,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				if (!candidateSelected)
 				{
-					var msg = "<fmt:message key="answers.submitted.current.none"/>";
+					var msg = "<fmt:message key="answers.submitted.none"/>";
 					alert(msg);
 					return (false);
 				}
