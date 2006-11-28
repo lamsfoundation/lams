@@ -37,6 +37,10 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author jliew
@@ -54,17 +58,17 @@ public class DisabledUserManageAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		if (!request.isUserInRole(Role.SYSADMIN)) {
-			request.setAttribute("errorName","UserAction");
+		IUserManagementService service = AdminServiceProxy.getService(getServlet().getServletContext());
+		
+		if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+			request.setAttribute("errorName","DisabledUserManageAction");
 			request.setAttribute("errorMessage",AdminServiceProxy
 					.getMessageService(getServlet().getServletContext())
 					.getMessage("error.need.sysadmin"));
 			return mapping.findForward("error");
 		}
 		
-		List users = AdminServiceProxy
-			.getService(getServlet().getServletContext())
-			.findByProperty(User.class, "disabledFlag", true);
+		List users = service.findByProperty(User.class, "disabledFlag", true);
 		log.debug("got "+users.size()+" disabled users");
 		request.setAttribute("users", users);
 		

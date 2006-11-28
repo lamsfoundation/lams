@@ -44,8 +44,6 @@ import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
@@ -74,17 +72,17 @@ public class UserSearchAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		if(!request.isUserInRole(Role.SYSADMIN)){
-			log.debug("user not in role sysadmin");
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		DynaActionForm userSearchForm = (DynaActionForm)form;
+		
+		if(!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())){
+			log.debug("user not sysadmin or global group admin");
 			ActionMessages errors = new ActionMessages();
 			errors.add("authorisation",new ActionMessage("error.authorisation"));
 			saveErrors(request,errors);
 			request.setAttribute("isSysadmin",false);
 			return mapping.findForward("usersearchlist");
 		}
-
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		DynaActionForm userSearchForm = (DynaActionForm)form;
 		
 		String userId = ((String)userSearchForm.get("sUserId")).trim();
 		String login = ((String)userSearchForm.get("sLogin")).trim();

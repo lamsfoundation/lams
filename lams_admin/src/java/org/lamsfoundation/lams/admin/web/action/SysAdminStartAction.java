@@ -35,6 +35,10 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author jliew
@@ -44,10 +48,14 @@ import org.lamsfoundation.lams.usermanagement.Role;
  */
 public class SysAdminStartAction extends Action {
 	
+	private static IUserManagementService service;
+	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+		
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
 		
 		ArrayList<LinkBean> links = new ArrayList<LinkBean>();
 		if (request.isUserInRole(Role.SYSADMIN)) {
@@ -71,6 +79,13 @@ public class SysAdminStartAction extends Action {
 			links.add(linkBean);
 		} else if (request.isUserInRole(Role.AUTHOR_ADMIN)) {
 			LinkBean linkBean = new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content");
+			links.add(linkBean);
+		} else if (service.isUserGlobalGroupAdmin()) {
+			LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
+			links.add(linkBean);
+			linkBean = new LinkBean("importexcel.do", "admin.user.import");
+			links.add(linkBean);
+			linkBean = new LinkBean("disabledmanage.do", "admin.list.disabled.users");
 			links.add(linkBean);
 		} else {
 			request.setAttribute("errorName", "SysAdminStartAction");

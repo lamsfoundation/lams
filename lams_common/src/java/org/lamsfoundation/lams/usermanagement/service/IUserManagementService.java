@@ -359,4 +359,9 @@ public interface IUserManagementService {
 	 */
 	public void deleteChildUserOrganisations(User user, Organisation org);
 	
+	/**
+	 * Return true if user is a global group admin.
+	 * @return
+	 */
+	public boolean isUserGlobalGroupAdmin();
 }

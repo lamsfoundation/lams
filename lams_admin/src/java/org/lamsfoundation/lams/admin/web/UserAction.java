@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -77,17 +78,25 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 public class UserAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(UserAction.class);
-	private static IUserManagementService service;
-	private static MessageService messageService;
+	private IUserManagementService service;
+	private MessageService messageService;
 	private static List<SupportedLocale> locales;
+	
+	private void initServices() {
+		if (service==null) {
+			service = AdminServiceProxy.getService(getServlet().getServletContext());
+		}
+		if (messageService==null) {
+			messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		}
+	}
 	
 	public ActionForward edit(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		initServices();
 		if (locales==null) {
 			locales = service.findAll(SupportedLocale.class);
 			Collections.sort(locales);
@@ -99,19 +108,20 @@ public class UserAction extends LamsDispatchAction {
 		
 		// test requestor's permission
 		Organisation org = null;
-		Boolean requestorHasRole = false;
+		Boolean requestorHasRole = service.isUserGlobalGroupAdmin();
 		if (orgId!=null) {
 			org = (Organisation)service.findById(Organisation.class,orgId);
-			OrganisationType orgType = org.getOrganisationType();
-			Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
-				? org.getParentOrganisation().getOrganisationId() : orgId;
-			User requestor = (User)service.getUserByLogin(request.getRemoteUser());
-			requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
-				|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
+			if (!requestorHasRole) {
+				OrganisationType orgType = org.getOrganisationType();
+				Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
+					? org.getParentOrganisation().getOrganisationId() : orgId;
+				User requestor = (User)service.getUserByLogin(request.getRemoteUser());
+				requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
+					|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
+			}
 		}
-		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 		
-		if (!(requestorHasRole || isSysadmin)) {
+		if (!(requestorHasRole || request.isUserInRole(Role.SYSADMIN))) {
 			request.setAttribute("errorName", "UserAction");
 			request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
@@ -157,6 +167,7 @@ public class UserAction extends LamsDispatchAction {
 	
 	// display user's global roles, if any
 	private UserOrgRoleDTO getGlobalRoles(User user) {
+		initServices();
 		UserOrganisation uo = service.getUserOrganisation(user.getUserId(),
 				service.getRootOrganisation().getOrganisationId());
 		if (uo==null) return null;
@@ -173,6 +184,7 @@ public class UserAction extends LamsDispatchAction {
 	// display user's organisations and roles in them
 	private List<UserOrgRoleDTO> getUserOrgRoles(User user) {
 		
+		initServices();
 		List<UserOrgRoleDTO> uorDTOs = new ArrayList<UserOrgRoleDTO>();
 		List<UserOrganisation> uos = service.getUserOrganisationsForUserByTypeAndStatus(
 				user.getLogin(), 
@@ -215,12 +227,11 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		initServices();
 		
-		if (!request.isUserInRole(Role.SYSADMIN)) {
+		if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
@@ -240,18 +251,18 @@ public class UserAction extends LamsDispatchAction {
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 		
-		if (!request.isUserInRole(Role.SYSADMIN)) {
+		initServices();
+		
+		if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		Integer userId = WebUtil.readIntParam(request,"userId");
-		AdminServiceProxy.getService(getServlet().getServletContext()).disableUser(userId);
+		service.disableUser(userId);
 		String[] args = new String[1];
 		args[0] = userId.toString();
 		String message = messageService.getMessage("audit.user.disable", args);
@@ -270,18 +281,18 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		initServices();
 		
-		if (!request.isUserInRole(Role.SYSADMIN)) {
+		if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		Integer userId = WebUtil.readIntParam(request,"userId");
 		try {
-			AdminServiceProxy.getService(getServlet().getServletContext()).removeUser(userId);
+			service.removeUser(userId);
 		} catch (Exception e) {
 			request.setAttribute("errorName","UserAction");
 			request.setAttribute("errorMessage",e.getMessage());
@@ -306,12 +317,11 @@ public class UserAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		initServices();
 		
-		if (!request.isUserInRole(Role.SYSADMIN)) {
+		if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
 			request.setAttribute("errorName","UserAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.need.sysadmin"));
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");
 		}
 		

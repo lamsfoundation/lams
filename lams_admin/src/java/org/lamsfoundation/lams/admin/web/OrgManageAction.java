@@ -130,10 +130,11 @@ public class OrgManageAction extends Action {
 			for(int i=0; i<organisations.size(); i++){
 				Organisation organisation = (Organisation)organisations.get(i);
 				Organisation parentOrg = (type.equals(OrganisationType.CLASS_TYPE)) ? organisation.getParentOrganisation() : organisation;
-				// do not list this org as a child if requestor is not an admin or manager in the parent
+				// do not list this org as a child if requestor is not an admin or manager in the parent, or global admin
 				if (!request.isUserInRole(Role.SYSADMIN)) {
 					if (!(service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN)
-							|| service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER)))
+							|| service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER)
+							|| service.isUserGlobalGroupAdmin()))
 						continue;
 				}
 				// do not list this org if it is not a child of the requested parent
@@ -150,8 +151,10 @@ public class OrgManageAction extends Action {
 		}
 		orgManageForm.setOrgManageBeans(orgManageBeans);
 		request.setAttribute("OrgManageForm",orgManageForm);
-		// let the jsp know whether to display the 'create group' link
-		request.setAttribute("isSysadmin",request.isUserInRole(Role.SYSADMIN));
+		// let the jsp know whether to display links
+		request.setAttribute("createOrEditGroup",request.isUserInRole(Role.SYSADMIN)
+				|| service.isUserGlobalGroupAdmin());
+		request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 		return mapping.findForward("orglist");
 	}
 

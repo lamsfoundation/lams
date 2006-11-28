@@ -56,6 +56,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>
@@ -716,10 +718,12 @@ public class UserManagementService implements IUserManagementService {
 			allRoles.remove(role);
 		}
 		if(!orgType.getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
-			role.setRoleId(Role.ROLE_COURSE_ADMIN);
-			allRoles.remove(role);
 			role.setRoleId(Role.ROLE_COURSE_MANAGER);
 			allRoles.remove(role);
+			if(!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
+				role.setRoleId(Role.ROLE_COURSE_ADMIN);
+				allRoles.remove(role);
+			}
 		}
 		return allRoles;
 	}
@@ -756,5 +760,11 @@ public class UserManagementService implements IUserManagementService {
 				log.debug("removed userId="+user.getUserId()+" from orgId="+childOrg.getOrganisationId());
 			}
 		}
+	}
+	
+	public boolean isUserGlobalGroupAdmin() {
+		Integer requestorId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+		Integer rootOrgId = getRootOrganisation().getOrganisationId();
+		return isUserInRole(requestorId, rootOrgId, Role.COURSE_ADMIN);
 	}
 }

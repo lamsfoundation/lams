@@ -105,7 +105,8 @@ public class UserOrgAction extends Action {
 		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		List users = new ArrayList<User>();
 		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
-		if(request.isUserInRole(Role.SYSADMIN)){
+		if(request.isUserInRole(Role.SYSADMIN) 
+				|| service.isUserGlobalGroupAdmin()){
 			users = service.findAll(User.class);
 		}else if(service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)
 				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){

@@ -6,17 +6,19 @@
 		<a href="orgmanage.do?org=<bean:write name="OrgManageForm" property="parentId"/>"><fmt:message key="admin.course.manage" /></a>
 	</h2>
 	<p>&nbsp;</p>
-	<logic:equal name="isSysadmin" value="true">
+	<p align="right">
+	<logic:equal name="createOrEditGroup" value="true">
 		<c:url var="editaction" value="organisation.do">
 			<c:param name="method" value="edit" />
 			<c:param name="typeId" value="2" />
 			<c:param name="parentId" value="${OrgManageForm.parentId}" />
 		</c:url>
-		<p align="right">
-			<input class="button" type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
-			<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-		</p>
+		<input class="button" type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
 	</logic:equal>
+	<logic:equal name="manageGlobalRoles" value="true">
+		<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+	</logic:equal>
+	</p>
 </logic:equal>
 <logic:equal name="OrgManageForm" property="type" value="2">
 	<h2>
@@ -33,7 +35,9 @@
 	<p align="right">
 		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
 		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		<logic:equal name="createOrEditGroup" value="true">
+			<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		</logic:equal>
 	</p>
 </logic:equal>
 <table class=alternative-color width=100%>

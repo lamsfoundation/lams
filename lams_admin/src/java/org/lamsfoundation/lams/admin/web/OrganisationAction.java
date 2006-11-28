@@ -41,10 +41,13 @@ import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Fei Yang
@@ -72,7 +75,18 @@ public class OrganisationAction extends LamsDispatchAction {
 		initLocalesAndStatus();
 		DynaActionForm orgForm = (DynaActionForm)form;
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
-
+		
+		if(!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) { 
+			if (orgForm.get("typeId")!=null && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE)
+					|| orgForm.get("typeId")==null) {
+				// only sysadmin and global group admin can create/edit groups
+				messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+				request.setAttribute("errorName", "OrganisationAction");
+				request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
+				return mapping.findForward("error");
+			}
+		}
+		
 		if(orgId != null){//editing existing organisation
 			Organisation org = (Organisation)service.findById(Organisation.class,orgId);
 			BeanUtils.copyProperties(orgForm,org);
@@ -83,12 +97,6 @@ public class OrganisationAction extends LamsDispatchAction {
 			orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
 			SupportedLocale locale = org.getLocale();
 			orgForm.set("localeId",locale != null ? locale.getLocaleId() : null);
-		} else if(!request.isUserInRole(Role.SYSADMIN) && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE)) {
-			// only sysadmin can create new group
-			messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-			request.setAttribute("errorName", "OrganisationAction");
-			request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
-			return mapping.findForward("error");
 		} else {
 			// creating new organisation
 			orgForm.set("orgId", null);

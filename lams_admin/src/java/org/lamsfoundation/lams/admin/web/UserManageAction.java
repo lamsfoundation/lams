@@ -83,18 +83,14 @@ public class UserManageAction extends Action {
 			orgId = (Integer)request.getAttribute("org");
 		}
 		if((orgId==null)||(orgId<=0)){
-			request.setAttribute("errorName","UserManageAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
-			return mapping.findForward("error");
+			return forwardError(mapping, request, "error.org.invalid");
 		}
 		log.debug("orgId: "+orgId);
 		
 		// get org name
 		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
 		if(organisation==null) {
-			request.setAttribute("errorName","UserManageAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
-			return mapping.findForward("error");
+			return forwardError(mapping, request, "error.org.invalid");
 		}
 		String orgName = organisation.getName();
 		log.debug("orgName: "+orgName);
@@ -113,17 +109,18 @@ public class UserManageAction extends Action {
 		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		Organisation orgOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg : organisation;
         // check permission
-		if(request.isUserInRole(Role.SYSADMIN)){
+		Integer rootOrgId = service.getRootOrganisation().getOrganisationId();
+		if(request.isUserInRole(Role.SYSADMIN) 
+				|| (service.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))){
 			userManageForm.setCourseAdminCanAddNewUsers(true);
 			userManageForm.setCourseAdminCanBrowseAllUsers(true);
-		}else if(service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) 
-				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
+		}else if((service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) 
+				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER))
+				&& !orgId.equals(rootOrgId)){
 			userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 			userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
 		}else{
-			request.setAttribute("errorName","UserManageAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
-			return mapping.findForward("error");
+			return forwardError(mapping, request, "error.authorisation");
 		}
 		
 		userManageForm.setOrgId(orgId);
@@ -134,6 +131,16 @@ public class UserManageAction extends Action {
 		request.setAttribute("UserManageForm", userManageForm);
 		
 		return mapping.findForward("userlist");
+	}
+	
+	private ActionForward forwardError(ActionMapping mapping, HttpServletRequest request, String key) {
+		request.setAttribute("errorName","UserManageAction");
+		if (key.equals("error.org.invalid")) {
+			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
+		} else if (key.equals("error.authorisation")) {
+			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
+		}
+		return mapping.findForward("error");
 	}
 
 }

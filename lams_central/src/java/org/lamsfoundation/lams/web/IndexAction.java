@@ -45,9 +45,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -166,7 +166,7 @@ public class IndexAction extends Action {
 		List<IndexLinkBean> adminLinks = new ArrayList<IndexLinkBean>();
 		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER))
 			adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
-		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN))
+		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN) || getService().isUserGlobalGroupAdmin())
 			adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 		request.setAttribute("adminLinks", adminLinks);
 	}
