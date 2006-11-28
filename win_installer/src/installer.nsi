@@ -210,6 +210,11 @@ SectionGroup /e "!Install LAMS"
         
         SetOutPath $INSTDIR
         
+        ${if} $RETAIN_FILES == "1"
+            CopyFiles $INSTDIR $WINTEMP
+            DetailPrint "$WINTEMP"
+        ${endif}
+        
         Call DeployConfig
         Call ImportDatabase
         
@@ -401,7 +406,7 @@ Function DirectoryLeave
     
     IfFileExists "$INSTDIR\lamsDump.sql" instdirExists noDatabaseDump
     noDatabaseDump:    
-    IfFileExists "$INSTDIR\jboss-4.0.2" instdirExists newInstDir
+    IfFileExists "$INSTDIR\jboss-4.0.2" instdirExists end #if neither lamsDump.sql or jBoss folder exist we have no retained files (goto end)
     instdirExists:
         ; CHECK if there are files retained from a previous uninstall
         ; THEN after installation, overwrite retained files and free files from temp folder temp folder 
@@ -409,19 +414,21 @@ Function DirectoryLeave
         
         IfFileExists "$INSTDIR\repository" repositoryExists noRepository 
         repositoryExists:         
-            strcpy $6 "$6- Repository and uploaded files from previous installation$\n"
+            strcpy $6 "$6- Repository and uploaded files from previous installation: $\n$\t$INSTDIR\repository$\n$\n"
             Strcpy $RETAIN_REP "1"
         noRepository:
         
         IfFileExists "$INSTDIR\jboss-4.0.2\server\default\conf" configs noConfigs
         configs:
             strcpy $6 "$6- Configuration files from a previous installation: 'log4j.xml' and 'server.xml'$\n"
+            strcpy $6 "$6$\t$INSTDIR\jboss-4.0.2\server\default\conf$\n"
+            strcpy $6 "$6$\t$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml$\n$\n"
             Strcpy $RETAIN_CONF "1"
         noConfigs:
         
         IfFileExists "$INSTDIR\lamsDump.sql" database noDatabase
         database:
-            strcpy $6 "$6- Database dump from previous installation$\n"
+            strcpy $6 "$6- Database dump from previous installation $\n$\t$INSTDIR\lamsDump.sql$\n$\n"
             Strcpy $RETAIN_DB "1"
         noDatabase:
         
@@ -431,18 +438,21 @@ Function DirectoryLeave
         retainFiles:
             Strcpy $WINTEMP "C:\WINDOWS\Temp"
             Strcpy $RETAIN_FILES "1"
-            CopyFiles $INSTDIR $WINTEMP
+            #CopyFiles $INSTDIR $WINTEMP
             #MessageBox MB_OK|MB_ICONEXCLAMATION "$RETAIN_FILES \n $RETAIN_REP $\n $RETAIN_CONF $\n $RETAIN_DB"
+            goto end
     newInstDir:
         # Remove retained  files and begin installation
-        ##################test this again
-        /*
-        Strcpy $RETAIN_FILES "0"
-        Strcpy $RETAIN_CONF "0"
-        Strcpy $RETAIN_DB "0"
-        Strcpy $RETAIN_REP "0"
-        RMdir /r $INSTDIR
-        CreateDirectory $INSTDIR*/
+        MessageBox MB_YESNO|MB_ICONQUESTION "Are you sure? If you continue, retained files will be deleted.$\n" \
+                    IDYES deleteFiles \
+                    IDNO noDelete
+        deleteFiles:
+            RMdir /r $INSTDIR
+            CreateDirectory $INSTDIR
+            goto end
+        noDelete:
+            Abort
+    end:
 FunctionEnd
 
 
@@ -687,9 +697,7 @@ Function DeployConfig
     IfErrors 0 +2
         MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
     DetailPrint "MySQL will need to be restarted for this to take effect."
-    
     goto done
-    
     error:
         DetailPrint "Ant configure-deploy failed."
         MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
