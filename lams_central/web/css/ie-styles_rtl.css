@@ -76,8 +76,64 @@
 	display:block;
 }
 	
+/*layout of adding a topic button */
+#content a.button-add-item {
+	background: url('../images/css/btn_add_off_rtl.gif') no-repeat right top;
+	color: #333;
+	border: 0px none;
+	padding:5px 15px 6px 30px;
+	font-size:11px;
+	display:inline;
+	}
 
+#content a:hover.button-add-item {
+	background: url('../images/css/btn_add_over_rtl.gif')no-repeat right top;
+	color: #349018;
+	border: 0px none;
+	padding:5px 15px 6px 30px;
+	font-size:11px;
+	display:inline;
+	
+}
 
+a.button-add-item {
+	background: url('../images/css/btn_add_off_rtl.gif') no-repeat right top;
+	color: #333;
+	border: 0px none;
+	padding:5px 15px 6px 30px;
+	font-size:11px;
+	}
+
+a:hover.button-add-item {
+	background: url('../images/css/btn_add_over_rtl.gif')no-repeat right top;
+	color: #349018;
+	border: 0px none;
+	padding:5px 15px 6px 30px;
+	font-size:11px;
+
+	}
+	
+/*layout of a general button*/
+a.button {
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
+	color: #333;
+	border: 0px none;
+	padding:4px 15px 7px 15px;
+	font-size:11px;
+	display:table;
+	
+}
+
+a:hover.button {
+	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
+	color: #349018;
+	border: 0px none;
+	padding:4px 15px 7px 15px;
+	font-size:11px;
+	display:table;
+}	
+	
+	
 #content {
 	padding-bottom:0px
 	}

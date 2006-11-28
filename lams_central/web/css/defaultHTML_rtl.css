@@ -320,9 +320,9 @@ a.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:5px 20px 6px 20px;
-	text-decoration: none;
+	padding:3px 15px 5px 15px;
 	font-size:11px;
+	display:table;
 	
 }
 
@@ -330,9 +330,9 @@ a:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:5px 20px 6px 20px;
-	text-decoration: none;
+	padding:3px 15px 5px 15px;
 	font-size:11px;
+	display:table;
 }
 
 
@@ -341,18 +341,18 @@ a.button-add-item {
 	background: url('../images/css/btn_add_off.rtl.gif') no-repeat right top;
 	color: #333;
 	border: 0px none;
-	padding:5px 15px 6px 25px;
-    text-decoration: none;
+	padding:3px 25px 5px 15px;
 	font-size:11px;
+	display:table;
 }
 
 a:hover.button-add-item {
 	background: url('../images/css/btn_add_over.rtl.gif') no-repeat right top;
 	color: #349018;
 	border: 0px none;
-	padding:5px 15px 6px 25px;
-    text-decoration: none;
+	padding:3px 25px 5px 15px;
 	font-size:11px;
+	display:table;
 }
 
 
@@ -361,18 +361,18 @@ a:hover.button-add-item {
 	background: url('../images/css/btn_add_off.rtl.gif') no-repeat right top;
 	color: #333;
 	border: 0px none;
-	padding:5px 25px 6px 30px;
+	padding:3px 25px 1px 15px;
 	font-size:11px;
-	
+	display:table;
 	}
 
 #content a:hover.button-add-item {
 	background: url('../images/css/btn_add_over.rtl.gif') no-repeat right top;
 	color: #349018;
 	border: 0px none;
-	padding:5px 25px 6px 30px;
+	padding:3px 25px 1px 15px;
 	font-size:11px;
-
+	display:table;
 }
 
 /************ The sequence name box **********/
@@ -709,13 +709,13 @@ hr {border:0px;
 /* Warning message style */
 .warning {
 	color: #cc0000;
-	padding:8px 10px 10px 40px;
+	padding:8px 40px 10px 5px;
 	margin-top: 25px;
 	margin-left: auto;
 	margin-right: auto;
 	text-align: right;
 	font-weight: normal;
-	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
+	background: url('../images/css/warning.gif') no-repeat #ffeae0 right 10px;
 	width: 70%;
 	border: 1px solid #E82A28;
 }
@@ -723,14 +723,14 @@ hr {border:0px;
 .warning-login {
 	color: #cc0000;
 	padding:5px 5px;
-	padding-left: 35px;
+	padding-right: 35px;
 	padding-bottom: -10px;
 	margin-top: -5px;
 	margin-bottom: -10px;
 	margin-right: 15px;
 	text-align: right;
 	font-weight: normal;
-	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
+	background: url('../images/css/warning.gif') no-repeat #ffeae0 right 10px;
 	width: 70%;
 	border: 1px solid #E82A28;
 }
