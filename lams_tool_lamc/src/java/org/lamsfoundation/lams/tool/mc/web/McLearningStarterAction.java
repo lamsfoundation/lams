@@ -415,8 +415,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	        viewSummaryRequested=mcQueUsr.isViewSummaryRequested();
 	        logger.debug("viewSummaryRequested: " + viewSummaryRequested);
 	        
-	        if (viewSummaryRequested)
-	        {
+	        //if (viewSummaryRequested)
+	        //{
 		    	Long sessionUid=mcQueUsr.getMcSessionId();
 		    	logger.debug("users sessionUid: " + sessionUid);
 		    	McSession mcUserSession= mcService.getMcSessionByUID(sessionUid);
@@ -457,7 +457,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			    	request.setAttribute(REQUEST_BY_STARTER, new Boolean (true).toString());
 			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 		    	}
-	        }
+	        //}
 	    }
 	    else if (mode.equals("teacher"))
 	    {
