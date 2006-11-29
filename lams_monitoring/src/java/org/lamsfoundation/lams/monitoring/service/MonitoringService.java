@@ -518,8 +518,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public Lesson createLessonClassForLesson(long lessonId,
                                              Organisation organisation,
-                                             String learnerGroupName, List organizationUsers,
-                                             String staffGroupName, List staffs, Integer userId)
+                                             String learnerGroupName, List<User> organizationUsers,
+                                             String staffGroupName, List<User> staffs, Integer userId)
     {
         Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
         if ( newLesson == null) {
@@ -527,31 +527,34 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
        	checkOwnerOrStaffMember(userId, newLesson, "create lesson class");
 
-       	// make sure lesson isn't started
-       	if ( newLesson.isLessonStarted() ) {
-        	throw new MonitoringServiceException("Lesson for id="+lessonId+" has been started. Unable to create/change class for lesson.");
-       	}
+       	// if lesson isn't started, can add and remove users, so its just easier to recreate the lesson class
+        if ( ! newLesson.isLessonStarted() ) {
        	
-        if ( newLesson == null) {
-        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to create class for lesson.");
-        }
+	        if ( newLesson == null) {
+	        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to create class for lesson.");
+	        }
+	
+	       	LessonClass oldLessonClass = newLesson.getLessonClass();
+	       	
+	        LessonClass newLessonClass = this.createLessonClass(organisation,
+	        													learnerGroupName,
+	                                                            organizationUsers,
+	                                                            staffGroupName,
+	                                                            staffs,
+	                                                            newLesson);
+	        newLessonClass.setLesson(newLesson);
+	        newLesson.setLessonClass(newLessonClass);
+	        newLesson.setOrganisation(organisation);
+	        
+	        lessonDAO.updateLesson(newLesson);
+	        
+	        if ( oldLessonClass != null ) {
+	        	lessonClassDAO.deleteLessonClass(oldLessonClass);
+	        }
 
-       	LessonClass oldLessonClass = newLesson.getLessonClass();
-       	
-        LessonClass newLessonClass = this.createLessonClass(organisation,
-        													learnerGroupName,
-                                                            organizationUsers,
-                                                            staffGroupName,
-                                                            staffs,
-                                                            newLesson);
-        newLessonClass.setLesson(newLesson);
-        newLesson.setLessonClass(newLessonClass);
-        newLesson.setOrganisation(organisation);
-        
-        lessonDAO.updateLesson(newLesson);
-        
-        if ( oldLessonClass != null ) {
-        	lessonClassDAO.deleteLessonClass(oldLessonClass);
+        } else { // if started, can only add users
+        	lessonService.addLearners(newLesson, organizationUsers);
+        	lessonService.addStaffMembers(newLesson, staffs);        	
         }
         
         return newLesson;

@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -119,20 +120,8 @@ public class LessonClass extends Grouping {
     	if ( user == null )
     		return false;
 
-    	// should be one ordinary group for lesson class, and this is all the learners in the lesson class
-    	Group learnersGroup = getLearnersGroup();
-    	if ( learnersGroup == null ) {
-    		Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
-    		if ( lessonOrganisation == null ) {
-    			log.warn("Adding a learner to a lesson class with no related organisation. Learner group name will be \'learners'.");
-    		}
-    		String learnerGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
-    		learnerGroupName = learnerGroupName + "learners";
-    		Set<User> users = new HashSet<User>();
-    		users.add(user);
-    		getGroups().add(Group.createLearnerGroup(this, learnerGroupName,users));
-    	}
-
+    	Group learnersGroup = createLearnerGroupIfMissing();
+    	
     	if ( ! learnersGroup.hasLearner(user) ) {
     		learnersGroup.getUsers().add(user);
     		return true;
@@ -140,7 +129,44 @@ public class LessonClass extends Grouping {
     	return false;
     }
 
-	public Group getLearnersGroup() {
+    /** When the users's are added from an external LMS e.g. Moodle, the Learner Group may not exist.
+     * If that happens, then this code will ensure that there is a learners group, etc and so adding
+     * a user won't throw an exception. This is just fallback code!!!!
+     * @return the learner group
+     */
+	private Group createLearnerGroupIfMissing() {
+		Group learnersGroup = getLearnersGroup();
+		if ( learnersGroup == null ) {
+			// should be one ordinary group for lesson class, and this is all the learners in the lesson class
+			Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
+			if ( lessonOrganisation == null ) {
+				log.warn("Adding a learner to a lesson class with no related organisation. Learner group name will be \'learners'.");
+			}
+			String learnerGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
+			learnerGroupName = learnerGroupName + "learners";
+			getGroups().add(Group.createLearnerGroup(this, learnerGroupName,new HashSet()));
+			learnersGroup = getLearnersGroup();
+		}
+		return learnersGroup;
+	}
+
+    /** 
+     * Add one or more learners to the lesson class. Doesn't bother checking for duplicates as it goes into a set, 
+     * and User does a check on userID field for equals anyway.
+     * @return number of learners added
+     */ 
+    public int addLearners(Collection<User> newLearners) {
+    	if ( newLearners == null  )
+    		return 0;
+
+    	Group learnersGroup = createLearnerGroupIfMissing();
+    	int originalNumber = learnersGroup.getUsers().size();
+   		learnersGroup.getUsers().addAll(newLearners);
+   		int newNumber = learnersGroup.getUsers().size();
+   		return originalNumber - newNumber;
+    }
+
+    public Group getLearnersGroup() {
 		Group learnersGroup = null; 
     	Iterator iter = getGroups().iterator();
     	while (learnersGroup==null && iter.hasNext()) {
@@ -165,16 +191,7 @@ public class LessonClass extends Grouping {
     	// should be one ordinary group for lesson class, and this is all the learners in the lesson class
     	Group staffGroup = getStaffGroup(); 
     	if ( staffGroup == null ) {
-    		Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
-    		if ( lessonOrganisation == null ) {
-    			log.warn("Adding a staff member to a lesson class with no related organisation. Staff group name will be \'staff\'.");
-    		}
-    		String staffGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
-    		staffGroupName = staffGroupName + "staff";
-    		Set<User> users = new HashSet<User>();
-    		users.add(user);
-    		setStaffGroup(Group.createStaffGroup(this, staffGroupName,users));
-    		staffGroup = getStaffGroup();
+    		staffGroup = createStaffGroupIfMissing();
     	}
 
     	if ( ! staffGroup.hasLearner(user) ) {
@@ -184,5 +201,42 @@ public class LessonClass extends Grouping {
     	return false;
 
     }
+
+    /** 
+     * Add one or more staff members to the lesson class. Doesn't bother checking for duplicates it goes
+     * into a set, and User does a check on userID field for equals anyway.
+     * @return number of learners added
+     */ 
+    public int addStaffMembers(Collection<User> newStaff) {
+    	if ( newStaff == null  )
+    		return 0;
+
+    	Group staffGroup = createStaffGroupIfMissing();
+    	int originalNumber = staffGroup.getUsers().size();
+    	staffGroup.getUsers().addAll(newStaff);
+   		int newNumber = staffGroup.getUsers().size();
+   		return originalNumber - newNumber;
+    }
+
+    /** 
+     * When the users's are added from an external LMS e.g. Moodle, the Staff Group may not exist.
+     * If that happens, then this code will ensure that there is a learners group, etc and so adding
+     * a user won't throw an exception. This is just fallback code!!!!
+     * @return the staff group
+     */
+	private Group createStaffGroupIfMissing() {
+    	Group staffGroup = getStaffGroup(); 
+    	if ( staffGroup == null ) {
+    		Organisation lessonOrganisation = getLesson() != null ? getLesson().getOrganisation() : null;
+    		if ( lessonOrganisation == null ) {
+    			log.warn("Adding a staff member to a lesson class with no related organisation. Staff group name will be \'staff\'.");
+    		}
+    		String staffGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
+    		staffGroupName = staffGroupName + "staff";
+    		setStaffGroup(Group.createStaffGroup(this, staffGroupName,new HashSet<User>()));
+    		staffGroup = getStaffGroup();
+    	}
+    	return staffGroup;
+	}
 
 }

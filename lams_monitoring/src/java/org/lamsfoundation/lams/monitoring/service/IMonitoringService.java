@@ -107,7 +107,7 @@ public interface IMonitoringService
      * @param staffs a list of staffs who will be in charge of this lesson.
      * @return the lesson with lesson class and organization
      */
-    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation,String leanerGroupName, List organizationUsers,String staffGroupName, List staffs, Integer userID) throws UserAccessDeniedException;
+    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation,String leanerGroupName, List<User> organizationUsers,String staffGroupName, List<User> staffs, Integer userID) throws UserAccessDeniedException;
     
     /**
      * Start the specified the lesson. It must be created before calling this

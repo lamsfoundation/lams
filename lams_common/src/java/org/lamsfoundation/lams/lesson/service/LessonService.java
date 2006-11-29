@@ -24,7 +24,10 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.lesson.service;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -346,8 +349,64 @@ public class LessonService implements ILessonService
 			lessonClassDAO.updateLessonClass(lessonClass);
 		}
 		return ret;
-}
+    }
 
+    /** 
+     * Add a set of learners to the lesson class. 
+	 * 
+	 * If version of the method is designed to be called from Moodle or some other external system, 
+	 * and is less efficient in that it has to look up the user from the user id.
+	 * If we don't do this, then we may get a a session closed issue if this code is called from the 
+	 * LoginRequestValve (as the users will be from a previous session) 
+	 * 
+     * @param lessonId 
+     * @param userIds array of new learner ids
+     */ 
+    public void addLearners(Long lessonId, Integer[] userIds) throws LessonServiceException {
+		
+		Lesson lesson = lessonDAO.getLesson(lessonId);
+		if ( lesson == null ) {
+			throw new LessonServiceException("Lesson "+lessonId+" does not exist. Unable to add learner to lesson.");
+		}
+		LessonClass lessonClass = lesson.getLessonClass();
+		if ( lessonClass == null ) {
+			throw new LessonServiceException("Lesson class for "+lessonId+" does not exist. Unable to add learner to lesson.");
+		}
+
+		// initialise the lesson group, or we might get a lazy loading error in the future
+		// when logging in from an external system. Should only be two groups - learner and staff
+		// yes this is a bit of a hack!
+		Group learnersGroup = lessonClass.getLearnersGroup();
+		if ( learnersGroup != null )
+			lessonDAO.initialize(learnersGroup);
+
+		Set<User> users = new HashSet<User>();
+		for ( Integer userId: userIds) {
+			User user = (User) baseDAO.find(User.class,userId);
+			users.add(user);
+		}
+		addLearners(lesson, users);
+    }
+    
+	   /** 
+	     * Add a set of learners to the lesson class. To be called within LAMS - see 
+	     * addLearners(Long lessonId, Integer[] userIds) if calling from an external system.
+		 *
+	     * @param lesson lesson
+	     * @param users the users to add as learners
+	     */ 
+	    public void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
+    
+			LessonClass lessonClass = lesson.getLessonClass();
+			int numAdded = lessonClass.addLearners(users);
+			if ( numAdded > 0 ) {
+				lessonClassDAO.updateLessonClass(lessonClass);
+			}
+			if ( log.isDebugEnabled() ) {
+				log.debug("Added "+numAdded+" learners to lessonClass "+lessonClass.getGroupingId());
+			}
+	    }
+	    
     /** 
      * Add a new staff member to the lesson class. Checks for duplicates.
      * @param userId new learner id
@@ -375,4 +434,58 @@ public class LessonService implements ILessonService
 		return ret;
     }
 
+    /** 
+     * Add a set of staff to the lesson class. 
+	 * 
+	 * If version of the method is designed to be called from Moodle or some other external system, 
+	 * and is less efficient in that it has to look up the user from the user id.
+	 * If we don't do this, then we may get a a session closed issue if this code is called from the 
+	 * LoginRequestValve (as the users will be from a previous session) 
+	 * 
+     * @param lessonId 
+     * @param userIds array of new staff ids
+     */ 
+    public void addStaffMembers(Long lessonId, Integer[] userIds) throws LessonServiceException {
+		
+		Lesson lesson = lessonDAO.getLesson(lessonId);
+		if ( lesson == null ) {
+			throw new LessonServiceException("Lesson "+lessonId+" does not exist. Unable to add learner to lesson.");
+		}
+		LessonClass lessonClass = lesson.getLessonClass();
+		if ( lessonClass == null ) {
+			throw new LessonServiceException("Lesson class for "+lessonId+" does not exist. Unable to add learner to lesson.");
+		}
+
+		// initialise the lesson group, or we might get a lazy loading error in the future
+		// when logging in from an external system. Should only be two groups - learner and staff
+		// yes this is a bit of a hack!
+		lessonDAO.initialize(lessonClass.getStaffGroup());
+
+		Set<User> users = new HashSet<User>();
+		for ( Integer userId: userIds) {
+			User user = (User) baseDAO.find(User.class,userId);
+			users.add(user);
+		}
+		addStaffMembers(lesson, users);
+    }
+    
+	   /** 
+	     * Add a set of staff members to the lesson class. To be called within LAMS - see 
+	     * addLearners(Long lessonId, Integer[] userIds) if calling from an external system.
+		 *
+	     * @param lesson lesson
+	     * @param users the users to add as learners
+	     */ 
+	    public void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
+    
+			LessonClass lessonClass = lesson.getLessonClass();
+			int numAdded = lessonClass.addStaffMembers(users);
+			if ( numAdded > 0 ) {
+				lessonClassDAO.updateLessonClass(lessonClass);
+			}
+			if ( log.isDebugEnabled() ) {
+				log.debug("Added "+numAdded+" staff members to lessonClass "+lessonClass.getGroupingId());
+			}
+	    }
+	    
 }

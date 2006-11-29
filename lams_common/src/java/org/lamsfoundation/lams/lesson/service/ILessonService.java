@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.lesson.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -145,13 +146,57 @@ public interface ILessonService {
      * @paran userId new learner id
      * @return true if added user, returns false if the user already a learner and hence not added.
      */ 
-    public boolean addLearner(Long lessonId, Integer userId);
+    public boolean addLearner(Long lessonId, Integer userId) throws LessonServiceException;
+
+    /** 
+     * Add a set of learners to the lesson class. 
+	 * 
+	 * If version of the method is designed to be called from Moodle or some other external system, 
+	 * and is less efficient in that it has to look up the user from the user id.
+	 * If we don't do this, then we may get a a session closed issue if this code is called from the 
+	 * LoginRequestValve (as the users will be from a previous session) 
+	 * 
+     * @param lessonId new learner id
+     * @param userIds array of new learner ids
+     */ 
+    public void addLearners(Long lessonId, Integer[] userIds) throws LessonServiceException;
+
+	   /** 
+     * Add a set of learners to the lesson class. To be called within LAMS - see 
+     * addLearners(Long lessonId, Integer[] userIds) if calling from an external system.
+	 *
+     * @param lesson lesson
+     * @param users the users to add as learners
+     */ 
+    public void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
+
 
     /** 
      * Add a new staff member to the lesson class. Checks for duplicates.
      * @paran userId new learner id
      * @return true if added user, returns false if the user already a staff member and hence not added.
      */ 
-    public boolean addStaffMember(Long lessonId, Integer userId);
+    public boolean addStaffMember(Long lessonId, Integer userId) throws LessonServiceException;
  	
+    /** 
+     * Add a set of staff to the lesson class. 
+	 * 
+	 * If version of the method is designed to be called from Moodle or some other external system, 
+	 * and is less efficient in that it has to look up the user from the user id.
+	 * If we don't do this, then we may get a a session closed issue if this code is called from the 
+	 * LoginRequestValve (as the users will be from a previous session) 
+	 * 
+     * @param lessonId 
+     * @param userIds array of new staff ids
+     */ 
+    public void addStaffMembers(Long lessonId, Integer[] userIds) throws LessonServiceException;
+    
+	   /** 
+	     * Add a set of staff members to the lesson class. To be called within LAMS - see 
+	     * addLearners(Long lessonId, Integer[] userIds) if calling from an external system.
+		 *
+	     * @param lesson lesson
+	     * @param users the users to add as learners
+	     */ 
+	    public void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
 }

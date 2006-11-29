@@ -274,13 +274,7 @@ public class Group implements Serializable,Nullable,Comparable {
      */
     public boolean hasLearner(User learner)
     {
-        for(Iterator i=this.getUsers().iterator();i.hasNext();)
-        {
-            User user = (User)i.next();
-            if(user.getUserId().intValue()==learner.getUserId().intValue())
-                return true;
-        }
-        return false;
+    	return this.getUsers().contains(learner);
     }
 
     /**
