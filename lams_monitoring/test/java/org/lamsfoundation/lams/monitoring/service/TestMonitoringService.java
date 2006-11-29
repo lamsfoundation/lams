@@ -159,6 +159,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
         Lesson testLesson = monitoringService.initializeLesson("Test_Lesson",
                                                                "Test_Description",
+                                                               Boolean.TRUE,
                                                                TEST_LEARNING_DESIGN_ID,
                                                                null,
                                                                testUser.getUserId());
@@ -241,7 +242,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     }
     
     public void testGetLessonDetails() throws IOException{
-    	String packet = monitoringService.getLessonDetails(TEST_LESSION_ID);    	
+    	String packet = monitoringService.getLessonDetails(TEST_LESSION_ID,TEST_STAFF_ID);    	
     	System.out.print(packet);
     }
     public void testGetLessonLearners() throws IOException{
