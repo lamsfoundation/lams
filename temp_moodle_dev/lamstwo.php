@@ -56,5 +56,6 @@ $string['notvalidatedconfirm'] = 'It seems you have not validated the setting. A
 $string['notvalidconfirm'] = 'It seems the setting is not valid. Are you sure to save them?';
 $string['update'] = 'Update the lesson details';
 $string['updateExplanation'] = 'Please change name and description';
+$string['settingsValid'] = 'These settings are valid';
 
 ?>

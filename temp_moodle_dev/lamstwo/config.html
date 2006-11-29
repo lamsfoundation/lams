@@ -134,7 +134,7 @@
 				alert(req.responseText);
 				validated = 0;
 			}else{
-				alert("The setting is valid :-)");
+				alert("<?php print_string('settingsValid', 'lamstwo') ?>");
 				validated = 1;
 			}
 			clearTimeout(timer);
