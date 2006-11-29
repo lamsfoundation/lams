@@ -24,7 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +41,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -101,19 +99,8 @@ public class UserRolesSaveAction extends Action {
 			request.setAttribute("fullName", user.getFullName());
 			return mapping.findForward("userroles");
 		}
-		
-		// if user is to be added to a class, make user a member of parent course also if not already
-		List<Organisation> orgs = new ArrayList<Organisation>();
-		orgs.add(org);
-		OrganisationType orgType = org.getOrganisationType();
-		Organisation parentOrg = org.getParentOrganisation();
-		if (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE) 
-				&& service.getUserOrganisation(userId, parentOrg.getOrganisationId())==null) {
-			orgs.add(parentOrg);
-		}
-		for (Organisation o : orgs) {
-			service.setRolesForUserOrganisation(user, o, (List<String>)Arrays.asList(roles));
-		}
+	
+		service.setRolesForUserOrganisation(user, org, (List<String>)Arrays.asList(roles));
 		
 		return mapping.findForward("userlist");
 	}

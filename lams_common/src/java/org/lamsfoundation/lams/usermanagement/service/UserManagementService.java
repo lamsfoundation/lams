@@ -38,7 +38,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -49,6 +48,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -659,6 +659,12 @@ public class UserManagementService implements IUserManagementService {
 			Set uos = org.getUserOrganisations();
 			uos.add(uo);
 		}
+		
+		// if user is to be added to a class, make user a member of parent course also if not already
+		if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE) 
+				&& getUserOrganisation(user.getUserId(), org.getParentOrganisation().getOrganisationId())==null) {
+			setRolesForUserOrganisation(user, org.getParentOrganisation(), rolesList);
+		}
 
 		List<String> rolesCopy = new ArrayList<String>();
 		rolesCopy.addAll(rolesList);
@@ -687,17 +693,54 @@ public class UserManagementService implements IUserManagementService {
 			Role role = (Role)findById(Role.class, Integer.parseInt(roleId));
 			UserOrganisationRole uor = new UserOrganisationRole(uo, role);
 			save(uor);
-			log.debug("setting role: "+role.getName());
+			log.debug("setting role: "+role.getName()+" in organisation: "+org.getName());
 			uors.add(uor);
+			// when a user gets these roles, they need a workspace
 			if (role.getName().equals(Role.AUTHOR) 
 					|| role.getName().equals(Role.AUTHOR_ADMIN)
 					|| role.getName().equals(Role.SYSADMIN)) {
 				if (user.getWorkspace()==null) createWorkspaceForUser(user);
 			}
+			// when a user becomes group manager, they need monitor role in subgroups
+			if (role.getName().equals(Role.COURSE_MANAGER)) {
+				if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
+					setMonitorForGroupManager(user, org.getChildOrganisations());
+				}
+			}
 		}
 		uo.setUserOrganisationRoles(uors);
 		
 		save(user);
+	}
+	
+	private void setMonitorForGroupManager(User user, Set childOrgs) {
+		for (Object o : childOrgs) {
+			Organisation org = (Organisation)o;
+			
+			// add user to user organisation if doesn't exist
+			UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
+			if (uo == null) {
+				uo = new UserOrganisation(user, org);
+				save(uo);
+				Set uos = org.getUserOrganisations();
+				uos.add(uo);
+				log.debug("added "+user.getLogin()+" to "+org.getName());
+			}
+			
+			Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
+			if (uors!=null && !uors.isEmpty()) {
+				for (UserOrganisationRole uor : uors) {
+					if (uor.getRole().getName().equals(Role.MONITOR)) {
+						return;
+					}
+				}
+			}
+			UserOrganisationRole monitor = new UserOrganisationRole(uo, 
+					(Role)findById(Role.class, Role.ROLE_MONITOR));
+			uo.addUserOrganisationRole(monitor);
+			log.debug("setting role: "+monitor.getRole().getName()+" in organisation: "+org.getName());
+			save(uo);
+		}
 	}
 
 	public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType) {
