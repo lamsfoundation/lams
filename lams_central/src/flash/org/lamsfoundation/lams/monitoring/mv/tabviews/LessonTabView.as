@@ -254,6 +254,8 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	private function setupTab(){
+		//start_date_lbl.visible = false;
+		//schedule_date_lbl.visible = false;
 		_monitorController = getController();
 		
 		editClass_btn.addEventListener("click", _monitorController);
@@ -352,6 +354,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		populateStatusList(seq.state);
 		populateLessonDetails();
 		enableEditClass(seq.state);
+		//showStartFields(true, true);
 		
 		var requestLessonID:Number = seq.ID;
 		
@@ -459,10 +462,10 @@ public function update (o:Observable,infoObj:Object):Void{
 				showStartFields(true, false);
 				editClass_btn.enabled = true;
 				break;
-			//case Sequence.STARTED_STATE_ID :
-				//showStartFields(false, false);
-				//editClass_btn.enabled = true;
-				//break;
+			case Sequence.STARTED_STATE_ID :
+				showStartFields(false, false);
+				editClass_btn.enabled = true;
+				break;
 			default :
 				showStartFields(false, false);
 				editClass_btn.enabled = false;
@@ -475,19 +478,21 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		// is started?
 		if(s.isStarted){
-			
+			schedule_date_lbl.visible = false;
 			start_date_lbl.text = s.getStartDateTime();
 			start_date_lbl.visible = true;
-			schedule_date_lbl.text = "";
+					
 		} else {
 			// is scheduled to start?
+			start_date_lbl.visible = false;
 			if(s.isScheduled){
-				schedule_date_lbl.text = s.getScheduleDateTime();
 				schedule_date_lbl.visible = true;
+				schedule_date_lbl.text = s.getScheduleDateTime();
+				
 			} else {
 				schedule_date_lbl.visible = false;
 			}
-			start_date_lbl.visible = false;
+			
 		}
 		
 		start_btn.visible = a;
