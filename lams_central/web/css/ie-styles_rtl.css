@@ -118,7 +118,7 @@ a.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
 	color: #333;
 	border: 0px none;
-	padding:4px 15px 7px 15px;
+	padding:5px 15px 6px 15px;
 	font-size:11px;
 	display:table;
 	
@@ -128,7 +128,7 @@ a:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
 	border: 0px none;
-	padding:4px 15px 7px 15px;
+	padding:5px 15px 6px 15px;
 	font-size:11px;
 	display:table;
 }	

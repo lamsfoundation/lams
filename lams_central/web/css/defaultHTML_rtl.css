@@ -322,7 +322,7 @@ a.button {
 	border: 0px none;
 	padding:3px 15px 5px 15px;
 	font-size:11px;
-	display:table;
+	display: table;
 	
 }
 
@@ -332,47 +332,49 @@ a:hover.button {
 	border: 0px none;
 	padding:3px 15px 5px 15px;
 	font-size:11px;
-	display:table;
+	display: table;
 }
 
 
 /*layout of adding a topic button */
 a.button-add-item {
-	background: url('../images/css/btn_add_off.rtl.gif') no-repeat right top;
+	background: url('../images/css/btn_add_off.rtl.gif') no-repeat top right;
 	color: #333;
 	border: 0px none;
 	padding:3px 25px 5px 15px;
 	font-size:11px;
-	display:table;
+	display: table;
 }
 
 a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.rtl.gif') no-repeat right top;
+	background: url('../images/css/btn_add_over.rtl.gif') no-repeat top right;
 	color: #349018;
 	border: 0px none;
 	padding:3px 25px 5px 15px;
 	font-size:11px;
-	display:table;
+	display: table;
 }
 
 
 /*layout of adding a topic button */
 #content a.button-add-item {
-	background: url('../images/css/btn_add_off.rtl.gif') no-repeat right top;
+	background: url('../images/css/btn_add_off.rtl.gif') no-repeat top right;
 	color: #333;
 	border: 0px none;
-	padding:3px 25px 1px 15px;
+	padding:3px 25px 5px 15px;
 	font-size:11px;
-	display:table;
+	display: table;
 	}
 
 #content a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.rtl.gif') no-repeat right top;
+	background: url('../images/css/btn_add_over.rtl.gif') no-repeat top right;
 	color: #349018;
 	border: 0px none;
-	padding:3px 25px 1px 15px;
+	padding:3px 25px 5px 15px;
+	padding-left: 15px;
+	padding-right: 25px;
 	font-size:11px;
-	display:table;
+	display: table;
 }
 
 /************ The sequence name box **********/
@@ -858,7 +860,7 @@ float: left;
 background:url('../images/css/btn_over.gif') repeat-x 0px 0px; 
 color:#349018; 
 border:0px none; 
-padding:5px 20px 6px 20px;
+padding:5px 20px 6px 20px; 
 text-decoration:none;
 float: left;
 }
@@ -992,7 +994,7 @@ My Courses Pages
 	text-decoration: none;
 	border-left:1px solid #d2d2d2;
 	border-bottom: 0px;
-    display:block
+    display:block;
 }
 
 
