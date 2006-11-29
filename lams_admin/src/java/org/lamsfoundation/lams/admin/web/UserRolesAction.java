@@ -112,8 +112,8 @@ public class UserRolesAction extends Action {
 		Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 		User requestor = (User)service.getUserByLogin(request.getRemoteUser());
 		Integer rootOrgId = service.getRootOrganisation().getOrganisationId();
-		Boolean requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER)
-			|| (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN) && !rootOrgId.equals(orgId))
+		Boolean requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)
+			|| (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN) && !rootOrgId.equals(orgId))
 			|| (service.isUserGlobalGroupAdmin() && !rootOrgId.equals(orgId));
 		
 		if (!(requestorHasRole || isSysadmin)) {

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -45,9 +46,9 @@ public class Role implements Serializable,Comparable{
 	
 	public static final String AUTHOR_ADMIN = "AUTHOR ADMIN";
 	
-	public static final String COURSE_MANAGER = "COURSE MANAGER";
+	public static final String GROUP_MANAGER = "GROUP MANAGER";
 	
-	public static final String COURSE_ADMIN = "COURSE ADMIN";
+	public static final String GROUP_ADMIN = "GROUP ADMIN";
 	
 	public static final String SYSADMIN = "SYSADMIN";//for future use
 	
@@ -61,11 +62,11 @@ public class Role implements Serializable,Comparable{
 	 * 
 	 ************************************************************/
 		public static final Integer ROLE_SYSADMIN =new Integer(1);
-		public static final Integer ROLE_COURSE_MANAGER =new Integer(2);
+		public static final Integer ROLE_GROUP_MANAGER =new Integer(2);
 		public static final Integer ROLE_AUTHOR =new Integer(3);
 		public static final Integer ROLE_MONITOR =new Integer(4);
 		public static final Integer ROLE_LEARNER =new Integer(5);
-		public static final Integer ROLE_COURSE_ADMIN =new Integer(6);
+		public static final Integer ROLE_GROUP_ADMIN =new Integer(6);
 		public static final Integer ROLE_AUTHOR_ADMIN =new Integer(7);
 	/***********************************************************/
 	
@@ -215,12 +216,12 @@ public class Role implements Serializable,Comparable{
     public boolean isAuthor(){
     	return this.roleId.equals(ROLE_AUTHOR);
     }
-    public boolean isCourseManager(){
-    	return this.roleId.equals(ROLE_COURSE_MANAGER);
+    public boolean isGroupManager(){
+    	return this.roleId.equals(ROLE_GROUP_MANAGER);
     }
     
-    public boolean isCourseAdmin(){
-    	return this.roleId.equals(ROLE_COURSE_ADMIN);
+    public boolean isGroupAdmin(){
+    	return this.roleId.equals(ROLE_GROUP_ADMIN);
     }
     
     public boolean isMonitor(){

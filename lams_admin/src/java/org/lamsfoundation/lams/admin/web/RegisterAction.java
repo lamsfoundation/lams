@@ -99,10 +99,10 @@ public class RegisterAction extends LamsDispatchAction {
 		List groups = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",OrganisationType.COURSE_TYPE);
 		List subgroups = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",OrganisationType.CLASS_TYPE);
 		List sysadmins = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_SYSADMIN);
-		List admins = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_COURSE_ADMIN);
+		List admins = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_GROUP_ADMIN);
 		List authors = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_AUTHOR);
 		List monitors = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_MONITOR);
-		List managers = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_COURSE_MANAGER);
+		List managers = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_GROUP_MANAGER);
 		List learners = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_LEARNER);
 		
 		/** Set statistics in dyna form */

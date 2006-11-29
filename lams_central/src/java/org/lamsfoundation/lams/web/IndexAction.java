@@ -154,7 +154,7 @@ public class IndexAction extends Action {
 		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?state=active&tab=profile"));
 		
 		if(Configuration.getAsBoolean(ConfigurationKeys.LAMS_COMMUNITY_ENABLE))
-			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER) || 
+			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN) || request.isUserInRole(Role.GROUP_MANAGER) || 
 				request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN) || request.isUserInRole(Role.MONITOR))
 				headerLinks.add(new IndexLinkBean("index.community", "index.do?state=active&tab=community"));
 		
@@ -164,7 +164,7 @@ public class IndexAction extends Action {
 	
 	private void setAdminLinks(HttpServletRequest request) {
 		List<IndexLinkBean> adminLinks = new ArrayList<IndexLinkBean>();
-		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER))
+		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN) || request.isUserInRole(Role.GROUP_MANAGER))
 			adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement(" + getService().getRootOrganisation().getOrganisationId()+')'));
 		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN) || getService().isUserGlobalGroupAdmin())
 			adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
@@ -182,16 +182,16 @@ public class IndexAction extends Action {
 				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
 			}
 		}
-		if ((contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
+		if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 				&& state.equals(OrganisationState.ACTIVE)) {
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				if((!isSysAdmin)&&(contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER))){
+				if((!isSysAdmin)&&(contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER))){
 					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
 				}
-				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
+				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button"));
 			}else{//CLASS_TYPE
-				if(contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_MONITOR))
+				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button"));
 			}
 		}
@@ -206,7 +206,7 @@ public class IndexAction extends Action {
 					List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 					String url = null;
 					if(state.equals(OrganisationState.ACTIVE)){
-						if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_MONITOR)){
+						if(contains(roles,Role.ROLE_GROUP_MANAGER)||contains(roles,Role.ROLE_MONITOR)){
 							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
 								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
 							}
@@ -218,7 +218,7 @@ public class IndexAction extends Action {
 							}
 						}
 					}else if(state.equals(OrganisationState.ARCHIVED)){
-						if(contains(roles,Role.ROLE_COURSE_MANAGER)){
+						if(contains(roles,Role.ROLE_GROUP_MANAGER)){
 							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
 								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
 							}
@@ -252,7 +252,7 @@ public class IndexAction extends Action {
 					for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
 						classRoles.add(userOrganisationRole.getRole().getRoleId());
 					}
-					if(contains(roles,Role.ROLE_COURSE_MANAGER)) classRoles.add(Role.ROLE_COURSE_MANAGER);
+					if(contains(roles,Role.ROLE_GROUP_MANAGER)) classRoles.add(Role.ROLE_GROUP_MANAGER);
 					childOrgBeans.add(createOrgBean(organisation,classRoles,username,isSysAdmin));
 				}
 			}

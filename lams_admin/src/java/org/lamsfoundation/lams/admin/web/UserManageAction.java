@@ -114,8 +114,8 @@ public class UserManageAction extends Action {
 				|| (service.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))){
 			userManageForm.setCourseAdminCanAddNewUsers(true);
 			userManageForm.setCourseAdminCanBrowseAllUsers(true);
-		}else if((service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN) 
-				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER))
+		}else if((service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_ADMIN) 
+				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_MANAGER))
 				&& !orgId.equals(rootOrgId)){
 			userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 			userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());

@@ -115,7 +115,7 @@ public class OrgManageAction extends Action {
 		// Get list of child organisations depending on requestor's role and the organisation's type
 		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
 		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
-		if(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.COURSE_ADMIN) || request.isUserInRole(Role.COURSE_MANAGER)){
+		if(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN) || request.isUserInRole(Role.GROUP_MANAGER)){
 			// the organisation type of the children
 			Integer type;
 			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){
@@ -132,8 +132,8 @@ public class OrgManageAction extends Action {
 				Organisation parentOrg = (type.equals(OrganisationType.CLASS_TYPE)) ? organisation.getParentOrganisation() : organisation;
 				// do not list this org as a child if requestor is not an admin or manager in the parent, or global admin
 				if (!request.isUserInRole(Role.SYSADMIN)) {
-					if (!(service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_ADMIN)
-							|| service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.COURSE_MANAGER)
+					if (!(service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.GROUP_ADMIN)
+							|| service.isUserInRole(userId, parentOrg.getOrganisationId(), Role.GROUP_MANAGER)
 							|| service.isUserGlobalGroupAdmin()))
 						continue;
 				}

@@ -116,8 +116,8 @@ public class UserAction extends LamsDispatchAction {
 				Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
 					? org.getParentOrganisation().getOrganisationId() : orgId;
 				User requestor = (User)service.getUserByLogin(request.getRemoteUser());
-				requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_ADMIN)
-					|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.COURSE_MANAGER);
+				requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
+					|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER);
 			}
 		}
 		

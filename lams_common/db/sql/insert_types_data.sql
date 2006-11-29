@@ -15,11 +15,11 @@ INSERT INTO lams_privilege VALUES (13,'L','browse all users in the system');
 INSERT INTO lams_privilege VALUES (14,'M','write/create/delete permissions in all course content folders');
 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
-INSERT INTO lams_role VALUES (2, 'COURSE MANAGER', 'Course Manager', NOW());
+INSERT INTO lams_role VALUES (2, 'GROUP MANAGER', 'Group Manager', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
 INSERT INTO lams_role VALUES (4, 'MONITOR', 'Member of Staff', NOW());
 INSERT INTO lams_role VALUES (5, 'LEARNER', 'Student', NOW());
-INSERT INTO lams_role VALUES (6, 'COURSE ADMIN', 'Course Administrator', NOW());
+INSERT INTO lams_role VALUES (6, 'GROUP ADMIN', 'Group Administrator', NOW());
 INSERT INTO lams_role VALUES (7, 'AUTHOR ADMIN', 'Author Administrator', NOW());
 
 INSERT INTO lams_role_privilege VALUES (1,1,1);

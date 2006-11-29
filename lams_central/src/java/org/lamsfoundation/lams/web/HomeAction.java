@@ -253,7 +253,7 @@ public class HomeAction extends DispatchAction {
 				return mapping.findForward("error");
 			} else { 
 				Integer orgId = classId != null ? classId : courseId;
-				if (getService().isUserInRole(user.getUserID(), orgId, Role.MONITOR)||getService().isUserInRole(user.getUserID(), orgId, Role.COURSE_MANAGER)) {
+				if (getService().isUserInRole(user.getUserID(), orgId, Role.MONITOR)||getService().isUserInRole(user.getUserID(), orgId, Role.GROUP_MANAGER)) {
 					log.debug("user is staff");
 					String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 					req.setAttribute("serverUrl", serverUrl);

@@ -108,8 +108,8 @@ public class UserOrgAction extends Action {
 		if(request.isUserInRole(Role.SYSADMIN) 
 				|| service.isUserGlobalGroupAdmin()){
 			users = service.findAll(User.class);
-		}else if(service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_ADMIN)
-				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.COURSE_MANAGER)){
+		}else if(service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_ADMIN)
+				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_MANAGER)){
 			if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
 				users = service.findAll(User.class);
 			}else if(orgType.equals(OrganisationType.CLASS_TYPE)){

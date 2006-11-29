@@ -485,7 +485,7 @@ public class UserManagementService implements IUserManagementService {
                     		children.add(organisation);
                     		pOrg.setChildOrganisations(children);
                     		// get course managers and give them staff role in this new class
-                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(pOrg.getOrganisationId(),Role.COURSE_MANAGER, false);
+                    		Vector<UserDTO> managers = getUsersFromOrganisationByRole(pOrg.getOrganisationId(),Role.GROUP_MANAGER, false);
                     		for(UserDTO m: managers){
                     				User user = (User)findById(User.class,m.getUserID());
                     				UserOrganisation uo = new UserOrganisation(user,organisation);
@@ -702,7 +702,7 @@ public class UserManagementService implements IUserManagementService {
 				if (user.getWorkspace()==null) createWorkspaceForUser(user);
 			}
 			// when a user becomes group manager, they need monitor role in subgroups
-			if (role.getName().equals(Role.COURSE_MANAGER)) {
+			if (role.getName().equals(Role.GROUP_MANAGER)) {
 				if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
 					setMonitorForGroupManager(user, org.getChildOrganisations());
 				}
@@ -761,10 +761,10 @@ public class UserManagementService implements IUserManagementService {
 			allRoles.remove(role);
 		}
 		if(!orgType.getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
-			role.setRoleId(Role.ROLE_COURSE_MANAGER);
+			role.setRoleId(Role.ROLE_GROUP_MANAGER);
 			allRoles.remove(role);
 			if(!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
-				role.setRoleId(Role.ROLE_COURSE_ADMIN);
+				role.setRoleId(Role.ROLE_GROUP_ADMIN);
 				allRoles.remove(role);
 			}
 		}
@@ -808,6 +808,6 @@ public class UserManagementService implements IUserManagementService {
 	public boolean isUserGlobalGroupAdmin() {
 		Integer requestorId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		Integer rootOrgId = getRootOrganisation().getOrganisationId();
-		return isUserInRole(requestorId, rootOrgId, Role.COURSE_ADMIN);
+		return isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN);
 	}
 }

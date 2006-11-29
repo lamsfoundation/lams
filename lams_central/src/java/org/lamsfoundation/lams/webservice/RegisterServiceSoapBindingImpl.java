@@ -102,7 +102,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
 		UserOrganisation uo = new UserOrganisation(user, org);
 		service.save(uo);
 		Integer[] roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR,
-				Role.ROLE_COURSE_MANAGER, Role.ROLE_LEARNER };
+				Role.ROLE_GROUP_MANAGER, Role.ROLE_LEARNER };
 		for (Integer roleId : roles) {
 			UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) service.findById(
 					Role.class, roleId));
