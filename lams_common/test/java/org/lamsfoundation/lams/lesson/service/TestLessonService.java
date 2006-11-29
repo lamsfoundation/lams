@@ -113,16 +113,16 @@ public class TestLessonService extends AbstractLamsTestCase {
 	      // add some users.
 	      checkCount(newLessonClass, "initial setup", 0,1);
 	      
-	      lessonService.addLearner(newLesson.getLessonId(), mmm);
+	      lessonService.addLearner(newLesson.getLessonId(), mmm.getUserId());
 	      
-	      lessonService.addLearner(newLesson.getLessonId(), test1);
+	      lessonService.addLearner(newLesson.getLessonId(), test1.getUserId());
 	      checkCount(newLessonClass, "added test1 to learner:", 1,1);
-	      lessonService.addStaffMember(newLesson.getLessonId(), test1);
+	      lessonService.addStaffMember(newLesson.getLessonId(), test1.getUserId());
 	      checkCount(newLessonClass, "added test1 to staff:", 2,1);
 	       
-	      lessonService.addLearner(newLesson.getLessonId(), test1);
+	      lessonService.addLearner(newLesson.getLessonId(), test1.getUserId());
 	      checkCount(newLessonClass, "added test1 to learner again:", 1,1); // no change as already in group
-	      lessonService.addStaffMember(newLesson.getLessonId(), test1);
+	      lessonService.addStaffMember(newLesson.getLessonId(), test1.getUserId());
 	      checkCount(newLessonClass, "added test1 to staff:", 2,1); // no change as already in group
 	      
  	  }
