@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +40,7 @@ import java.util.List;
 public class IndexOrgBean {
 	
 	private String name;
+	private Date archivedDate;
 	private Integer type;
 	private List<IndexLinkBean> links;
 	private List<IndexLessonBean> lessons;
@@ -111,6 +113,18 @@ public class IndexOrgBean {
 	 */
 	public void setType(Integer type) {
 		this.type = type;
+	}
+	/**
+	 * @return Returns the archived date.
+	 */
+	public Date getArchivedDate() {
+		return archivedDate;
+	}
+	/**
+	 * @param type The archived date to set.
+	 */
+	public void setArchivedDate(Date archivedDate) {
+		this.archivedDate = archivedDate;
 	}
 
 }

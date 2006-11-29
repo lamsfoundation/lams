@@ -117,25 +117,47 @@ public class IndexAction extends Action {
 		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
 		if (request.isUserInRole(Role.SYSADMIN)) {
 			List<Organisation> organisations = getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,state);
-			log.debug("we got "+organisations.size()+" organisations whose type is "+OrganisationType.COURSE_DESCRIPTION+" and whose state is "+state);
+			// when listing archived orgs, make sure we get subgroups that are archived under still-active groups
+			if (state.equals(OrganisationState.ARCHIVED)) {
+				organisations.addAll(getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE));
+			}
 			for (Organisation org:organisations) {
+				log.debug("archived date: "+org.getArchivedDate());
 				List<Integer> roles = new ArrayList<Integer>();
 				roles.add(Role.ROLE_SYSADMIN);
 				List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
 				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
 					roles.add(userOrganisationRole.getRole().getRoleId());
 				}
-				orgBeans.add(createOrgBean(org, roles, request.getRemoteUser(),true));
+				// don't set the orgbean to display if subgroups are not archived
+				IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(),true);
+				if (state.equals(OrganisationState.ARCHIVED)
+						&& org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ACTIVE)
+						&& iob.getChildIndexOrgBeans().isEmpty()) {
+					continue;
+				}
+				orgBeans.add(iob);
 			}
 		} else {
 			List<UserOrganisation> userOrganisations = getService().getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,state);
-			log.debug("we got "+userOrganisations.size()+" organisations whose type is "+OrganisationType.COURSE_DESCRIPTION+" and whose state is "+state);
+			// when listing archived orgs, make sure we get subgroups that are archived under still-active groups
+			if (state.equals(OrganisationState.ARCHIVED)) {
+				userOrganisations.addAll(getService().getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE));
+			}
 			for (UserOrganisation userOrganisation: userOrganisations) {
+				log.debug("archived date: "+userOrganisation.getOrganisation().getArchivedDate());
 				List<Integer> roles = new ArrayList<Integer>();
 				for(Object userOrganisationRole:userOrganisation.getUserOrganisationRoles()){
 					roles.add(((UserOrganisationRole)userOrganisationRole).getRole().getRoleId());
 				}
-				orgBeans.add(createOrgBean(userOrganisation.getOrganisation(),roles,request.getRemoteUser(),false));
+				// don't set the orgbean to display if subgroups are not archived
+				IndexOrgBean iob = createOrgBean(userOrganisation.getOrganisation(),roles,request.getRemoteUser(),false);
+				if (state.equals(OrganisationState.ARCHIVED)
+						&& userOrganisation.getOrganisation().getOrganisationState().getOrganisationStateId().equals(OrganisationState.ACTIVE)
+						&& iob.getChildIndexOrgBeans().isEmpty()) {
+					continue;
+				}
+				orgBeans.add(iob);
 			}
 		}
 		request.setAttribute("orgBeans",orgBeans);
@@ -195,8 +217,11 @@ public class IndexAction extends Action {
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button"));
 			}
 		}
-		
 		orgBean.setLinks(links);
+		
+		if (state.equals(OrganisationState.ARCHIVED) && org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
+			orgBean.setArchivedDate(org.getArchivedDate());
+		}
 
 		List<IndexLessonBean> lessonBeans = new ArrayList<IndexLessonBean>();
 		Set<Lesson> lessons = org.getLessons();
