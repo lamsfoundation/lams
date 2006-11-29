@@ -40,6 +40,7 @@ import org.apache.struts.upload.FormFile;
 public interface IUserImportFileParser {
 
 	public static final String SEPARATOR = "|";
+	public static final String IMPORT_HELP_PAGE = "Import+Users";
 	
 	public List parseSpreadsheet(FormFile file) throws IOException;
 	
