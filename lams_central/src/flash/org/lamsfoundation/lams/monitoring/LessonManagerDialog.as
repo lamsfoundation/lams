@@ -566,12 +566,16 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	}
  
 	public function checkLearners(org:Organisation):Void{
+		var s:Object = _monitorModel.getSequence();
 		for(var i=0; i<_learnerList.length; i++){
 			trace('checking learner list item : ' + i);
 			trace(_learnerList[i].data.userID);
 			if(org.isLearner(_learnerList[i].data.userID)){
 				trace('selecting check box');
 				_learnerList[i].user_cb.selected = true;
+				if(s.isStarted){
+					_learnerList[i].user_cb.enabled = false;
+				}
 			}
 		}
 		
@@ -612,12 +616,16 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	}
 
 	public function checkStaff(org:Organisation):Void{
+		var s:Object = _monitorModel.getSequence();
 		trace('checking staff' + _staffList.length);
 		for(var i=0; i<_staffList.length; i++){
 			trace('checking staff list item : ' + i);
 			trace(_staffList[i].data.userID);
 			if(org.isMonitor(_staffList[i].data.userID)){
 				_staffList[i].user_cb.selected = true;
+				if(s.isStarted){
+					_staffList[i].user_cb.enabled = false;
+				}
 			}
 		}
 		
