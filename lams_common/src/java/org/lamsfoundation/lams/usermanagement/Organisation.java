@@ -92,6 +92,9 @@ public class Organisation implements Serializable, Comparable {
 
     /** persistent field */
     private Boolean courseAdminCanCreateGuestAccounts;
+    
+    /** persistent field */
+    private Date archivedDate;
 
     /** full constructor */
     public Organisation(String name, String description, Organisation parentOrganisation, 
@@ -452,5 +455,20 @@ public class Organisation implements Serializable, Comparable {
 	public int compareTo(Object o) {
 		return name.compareToIgnoreCase(((Organisation)o).getName());
 	}
+	
+	/** 
+     *            @hibernate.property
+     *             column="archived_date"
+     *             length="19"
+     *             not-null="false"
+     *         
+     */
+    public Date getArchivedDate() {
+        return this.archivedDate;
+    }
+
+    public void setArchivedDate(Date archivedDate) {
+        this.archivedDate = archivedDate;
+    }
 
 }

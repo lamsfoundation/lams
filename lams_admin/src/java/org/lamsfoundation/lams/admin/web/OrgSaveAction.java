@@ -22,6 +22,8 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -117,6 +119,11 @@ public class OrgSaveAction extends Action {
 
 			if(orgId!=0){
 				org = (Organisation)service.findById(Organisation.class,orgId);
+				// set archived date only when it first changes to become archived
+				if (state.getOrganisationStateId().equals(OrganisationState.ARCHIVED)
+						&& !org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
+					org.setArchivedDate(new Date());
+				}
 				writeAuditLog(org, orgForm, state, locale);
 				BeanUtils.copyProperties(org,orgForm);
 			}else{
