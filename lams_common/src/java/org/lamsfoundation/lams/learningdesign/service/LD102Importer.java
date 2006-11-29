@@ -314,13 +314,6 @@ public class LD102Importer implements ApplicationContextAware{
 		+ MULTI_TASK_OBJECT_TYPE);
 	}
 
-	/** Guaranteed not to return null - use when putting values into hash table
-	 */
-	private String getValue( String possValue )
-	{
-		return ( possValue==null ? "" : possValue );	
-	}
-
 	/* Check that the WDDX packet doesn't contain any invalid "<null />" strings 
 	 * returns true if they do exist */
 	private boolean containsNulls(String packet)
@@ -1278,7 +1271,7 @@ public class LD102Importer implements ApplicationContextAware{
 		    // as LAMS 2.0 will fail when someone tries to save the design. So assign it a sensible UIID
 		    Integer transitionUIID = WDDXProcessor.convertToInteger("Transition ID", clientObj.get(WDDXTAGS102.LD_ITEM_ID));
 		    transition.setTransitionUIID(transitionUIID != null && transitionUIID > 0 ? transitionUIID : ++maxId);
-		    
+
 		    transition.setCreateDateTime(createDate);			
 
 		    // if there is a completion type then we need to set up a gate and add an extra transition.
