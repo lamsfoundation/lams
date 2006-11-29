@@ -28,6 +28,6 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter{
 
 	    this.addField(McContent.class, "showMarks",new Boolean(false));
 	    this.addField(McContent.class, "randomize",new Boolean(false));
-	    this.addField(McOptsContent.class, "displayOrder, ",new Integer(0));
+	    this.addField(McOptsContent.class, "displayOrder",new Integer(0));
 	}
 }
