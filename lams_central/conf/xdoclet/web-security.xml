@@ -12,8 +12,8 @@
     		<role-name>LEARNER</role-name>
     		<role-name>MONITOR</role-name>
     		<role-name>AUTHOR</role-name>
-    	    <role-name>COURSE MANAGER</role-name>
-    		<role-name>COURSE ADMIN</role-name>
+    	    <role-name>GROUP MANAGER</role-name>
+    		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
@@ -49,8 +49,8 @@
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>MONITOR</role-name>
-    	    <role-name>COURSE MANAGER</role-name>
-    		<role-name>COURSE ADMIN</role-name>
+    	    <role-name>GROUP MANAGER</role-name>
+    		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
@@ -84,10 +84,10 @@
 	</security-role>
 
     <security-role>
-		<role-name>COURSE MANAGER</role-name>
+		<role-name>GROUP MANAGER</role-name>
 	</security-role>
    	<security-role>
-		<role-name>COURSE ADMIN</role-name>
+		<role-name>GROUP ADMIN</role-name>
 	</security-role>
 
 	<security-role>

@@ -6,8 +6,8 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR ADMIN</role-name>
-    	    <role-name>COURSE MANAGER</role-name>
-    		<role-name>COURSE ADMIN</role-name>
+    	    <role-name>GROUP MANAGER</role-name>
+    		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -27,10 +27,10 @@
 		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
     <security-role>
-		<role-name>COURSE MANAGER</role-name>
+		<role-name>GROUP MANAGER</role-name>
 	</security-role>
    	<security-role>
-		<role-name>COURSE ADMIN</role-name>
+		<role-name>GROUP ADMIN</role-name>
 	</security-role>
 	<security-role>
 		<role-name>SYSADMIN</role-name>
