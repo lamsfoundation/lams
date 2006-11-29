@@ -418,7 +418,7 @@ Function DirectoryLeave
             Strcpy $RETAIN_REP "1"
         noRepository:
         
-        IfFileExists "$INSTDIR\jboss-4.0.2\server\default\conf" configs noConfigs
+        IfFileExists "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" configs noConfigs
         configs:
             strcpy $6 "$6- Configuration files from a previous installation: 'log4j.xml' and 'server.xml'$\n"
             strcpy $6 "$6$\t$INSTDIR\jboss-4.0.2\server\default\conf$\n"
@@ -1065,6 +1065,7 @@ Section "Uninstall"
     ; RESTORE Retained folders to their original localtion then delete temp files
     ${if} $UNINSTALL_CF == 0 
     ${orif} $UNINSTALL_DB == 0
+    ${orif} $UNINSTALL_RP == 0
         CreateDirectory "$RETAIN_DIR"
         CopyFiles "$WINTEMP\lams" "$RETAIN_DIR\..\"
         RMDir /r "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\jbossweb-tomcat55.sar"
