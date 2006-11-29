@@ -228,6 +228,7 @@ CREATE TABLE lams_organisation (
      , admin_change_status TINYINT(1) NOT NULL DEFAULT 0
      , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
      , locale_id TINYINT(4)
+     , archived_date DATETIME
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
      , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
