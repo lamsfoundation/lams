@@ -778,7 +778,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	private void buildToolActivity(ToolActivity toolActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		if ( log.isDebugEnabled() ) {
-			log.debug("In tool activity UUID"+activityDetails.get(WDDXTAGS.TO_ACTIVITY_UIID)
+			log.debug("In tool activity UUID"+activityDetails.get(WDDXTAGS.ACTIVITY_UIID)
 					+" tool content id=" +activityDetails.get(WDDXTAGS.TOOL_CONTENT_ID));
 		}
 		
