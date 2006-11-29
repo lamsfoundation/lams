@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -37,7 +39,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.AdminConstants;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -233,7 +234,19 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		}
 		user.setAuthenticationMethod(authMethod);
 		
-		user.setEmail(parseStringCell(row.getCell(EMAIL)));
+		String email = parseStringCell(row.getCell(EMAIL));
+		if (email==null || email=="") {
+			rowResult.add(messageService.getMessage("error.email.required"));
+			hasError = true;
+		} else {
+			Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+			Matcher m = p.matcher(email);
+			if (!m.matches()) {
+				rowResult.add(messageService.getMessage("error.valid.email.required"));
+				hasError = true;
+			}
+		}
+		user.setEmail(email);
 		
 		String flashId = parseStringCell(row.getCell(FLASH_THEME));
 		CSSThemeVisualElement flashTheme = getFlashTheme(flashId);
