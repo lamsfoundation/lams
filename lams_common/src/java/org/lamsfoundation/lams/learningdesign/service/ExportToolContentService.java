@@ -749,7 +749,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						//cache DTO object class and transform it into a tag : for later import use by XStream.
 						String mainObject = root.getName();
 						root.setName(activity.getToolSignature());
-						Namespace ns = Namespace.getNamespace(IMS_TOOL_NS_PREFIX+activity.getToolSignature()+"_ims_" + activity.getToolVersion() + ".xsd");
+						Namespace ns = Namespace.getNamespace(IMS_TOOL_NS_PREFIX+activity.getToolSignature()+"_ims.xsd");
 						root.setNamespace(ns);
 						
 						//add mainObject tag: it save the Tool DTO class name. It is useful when importing by XStream (perhaps a future function) 
