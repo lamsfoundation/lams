@@ -350,20 +350,24 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			while (index != -1) {
 				log.debug("using role name: "+roleDescription.substring(fromIndex, index));
 				List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
-				Role role = (list==null ? null : (Role)list.get(0));
-				if (role!=null) { //ignore wrong spelled role
+				Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
+				if (role!=null) {
 					roles.add(role.getRoleId().toString());
 					log.debug("role: "+role.getName());
+				} else {
+					return null;		// if we can't translate the name to a role, return null
 				}
 				fromIndex = index + 1;
 				index = roleDescription.indexOf(SEPARATOR, fromIndex);
 			}
 			log.debug("using rolee name: "+roleDescription.substring(fromIndex, roleDescription.length()));
 			List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, roleDescription.length()));
-			Role role = (list==null ? null : (Role)list.get(0));
+			Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
 			if (role!=null) {
 				roles.add(role.getRoleId().toString());
 				log.debug("rolee: "+role.getName());
+			} else {
+				return null;
 			}
 			return roles;
 		}
