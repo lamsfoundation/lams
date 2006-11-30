@@ -323,7 +323,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</html:form>	
 
 	</body>
-</html:html>
+</lams:html>
 
 
 
