@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -149,11 +150,16 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 					if (org!=null || roles!=null) {  // save user+roles if org or roles are set
 						log.debug("org: "+org+" roles: "+roles);
 						if (org!=null && roles!=null) {
-							service.save(user);
-							writeAuditLog(user);
-							service.setRolesForUserOrganisation(user, org, roles);
-							//rowResult.add(org.getOrganisationId().toString());  // for stat summary in save action
-							log.debug("saved user: "+user.getUserId()+" with roles: "+roles);
+							if (!checkValidRoles(roles, service.isUserSysAdmin(), org.getOrganisationType())) {
+								String[] args = {"("+parseStringCell(row.getCell(ROLES))+")"};
+								rowResult.add(messageService.getMessage("error.roles.invalid", args));
+							} else {
+								service.save(user);
+								writeAuditLog(user);
+								service.setRolesForUserOrganisation(user, org, roles);
+								// rowResult.add(org.getOrganisationId().toString());  // for stat summary in save action
+								log.debug("saved user: "+user.getUserId()+" with roles: "+roles);
+							}
 						} else {
 							String[] args = new String[1];
 							String error;
@@ -173,6 +179,7 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 						log.debug("saved user: "+user.getUserId());
 					}
 				} catch (Exception e) {
+					log.debug(e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
 				log.debug("rowResult size: "+rowResult.size());
@@ -349,29 +356,60 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			int index = roleDescription.indexOf(SEPARATOR, fromIndex);
 			while (index != -1) {
 				log.debug("using role name: "+roleDescription.substring(fromIndex, index));
-				List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
-				Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
-				if (role!=null) {
-					roles.add(role.getRoleId().toString());
-					log.debug("role: "+role.getName());
+				String role = addRoleId(roleDescription, fromIndex, index);
+				if (role==null) {
+					return null;
 				} else {
-					return null;		// if we can't translate the name to a role, return null
+					roles.add(role);
 				}
 				fromIndex = index + 1;
 				index = roleDescription.indexOf(SEPARATOR, fromIndex);
 			}
 			log.debug("using rolee name: "+roleDescription.substring(fromIndex, roleDescription.length()));
-			List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, roleDescription.length()));
-			Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
-			if (role!=null) {
-				roles.add(role.getRoleId().toString());
-				log.debug("rolee: "+role.getName());
-			} else {
+			String role = addRoleId(roleDescription, fromIndex, roleDescription.length());
+			if (role==null) {
 				return null;
+			} else {
+				roles.add(role);
 			}
 			return roles;
 		}
 		return null;
+	}
+	
+	// return id of role name in given role description
+	private String addRoleId(String roleDescription, int fromIndex, int index) {
+		List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
+		Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
+		if (role!=null) {
+			log.debug("role: "+role.getName());
+			return role.getRoleId().toString();
+		} else {
+			return null;		// if we can't translate the name to a role, return null
+		}
+	}
+	
+	// return false if a role shouldn't be assigned in given org type
+	private boolean checkValidRoles(List<String> idList, boolean isSysadmin, OrganisationType orgType) {
+		// convert list of id's into list of Roles
+		List<Role> roleList = new ArrayList<Role>();
+		for (String id : idList) {
+			Role role = (Role)service.findById(Role.class, Integer.parseInt(id));
+			if (role!=null) {
+				roleList.add(role);
+			} else {
+				return false;
+			}
+		}
+		
+		// check they are valid
+		List<Role> validRoles = service.filterRoles(roleList, isSysadmin, orgType);
+		for (Role r : roleList) {
+			if (!validRoles.contains(r)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// set CSSThemeVisualElement to default flash theme if cell is empty

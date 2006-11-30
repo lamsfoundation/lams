@@ -364,4 +364,10 @@ public interface IUserManagementService {
 	 * @return
 	 */
 	public boolean isUserGlobalGroupAdmin();
+	
+	/**
+	 * Return true if user has sysadmin role in root organisation.
+	 * @return
+	 */
+	public boolean isUserSysAdmin();
 }

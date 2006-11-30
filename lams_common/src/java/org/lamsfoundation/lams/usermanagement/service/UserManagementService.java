@@ -805,9 +805,18 @@ public class UserManagementService implements IUserManagementService {
 		}
 	}
 	
+	private Integer getRequestorId() {
+		UserDTO userDTO = (UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER);
+		return userDTO.getUserID();		
+	}
+	
 	public boolean isUserGlobalGroupAdmin() {
-		Integer requestorId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 		Integer rootOrgId = getRootOrganisation().getOrganisationId();
-		return isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN);
+		return isUserInRole(getRequestorId(), rootOrgId, Role.GROUP_ADMIN);
+	}
+	
+	public boolean isUserSysAdmin() {
+		Integer rootOrgId = getRootOrganisation().getOrganisationId();
+		return isUserInRole(getRequestorId(), rootOrgId, Role.SYSADMIN);
 	}
 }
