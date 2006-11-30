@@ -211,7 +211,7 @@ SectionGroup /e "!Install LAMS"
         SetOutPath $INSTDIR
         
         ${if} $RETAIN_FILES == "1"
-            CopyFiles $INSTDIR $WINTEMP
+            CopyFiles /silent $INSTDIR $WINTEMP
             DetailPrint "$WINTEMP"
         ${endif}
         
@@ -1055,8 +1055,8 @@ Section "Uninstall"
         ;KEEP some configuration files
         CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
         CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar"
-        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
-        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\"
+        CopyFiles /silent "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
+        CopyFiles /silent "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\"
         DetailPrint 'Saving configuration files files to: $RETAIN_DIR'
     ${EndIf}
     
@@ -1069,7 +1069,7 @@ Section "Uninstall"
     ${orif} $UNINSTALL_DB == 1
     ${orif} $UNINSTALL_RP == 1
         CreateDirectory "$RETAIN_DIR"
-        CopyFiles "$WINTEMP\lams" "$RETAIN_DIR\..\"
+        CopyFiles /silent "$WINTEMP\lams" "$RETAIN_DIR\..\"
         RMDir /r "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\jbossweb-tomcat55.sar"
         Delete "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\server.xml"
     ${endif}
