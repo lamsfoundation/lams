@@ -29,7 +29,7 @@
 	
 }
 
-.mycourses-right-buttons {float:right; height:24px; padding-top:5px; margin-top:4px;}
+.mycourses-right-buttons {float:right; height:24px; padding-top:5px; padding-bottom:5px; margin-top:4px;}
 
 #content a.add-lesson-button {
 	background: url ('../images/css/add_lesson.jpg') no-repeat 0px 0px;
