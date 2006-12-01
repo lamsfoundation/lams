@@ -158,6 +158,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>				
 
 
+
+			<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
 					<h2>
 							<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
 					</h2>
@@ -171,6 +173,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<fmt:message key="label.edit" />
 								</html:button>
 						</c:if>													
+			</c:if>																			
 
 
 				<c:if
@@ -311,6 +314,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 				</c:if>				
 
+
+			<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
 					<h2>
 							<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />						
 					</h2>
@@ -324,7 +329,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<fmt:message key="label.edit" />
 								</html:button>
 					</c:if>													
-
+			</c:if>													
 				
 				<c:if
 					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
