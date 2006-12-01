@@ -1,11 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript">
+	function disableFinishButton() {
+		document.getElementById("finishButton").disabled = "disabled";
+	}
+</script>
+
 <div id="content">
 	<h1>
 		${chatDTO.title}
 	</h1>
 
-	<html:form action="/learning" method="post">
+	<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
 
 		<p class="small-space-top">
 			<lams:out value="${chatDTO.reflectInstructions}" />
@@ -17,7 +23,7 @@
 		<div class="space-bottom-top align-right">
 			<html:hidden property="dispatch" value="submitReflection" />
 			<html:hidden property="chatUserUID" />
-			<html:submit styleClass="button">
+			<html:submit styleClass="button" styleId="finishButton">
 				<fmt:message>button.finish</fmt:message>
 			</html:submit>
 		</div>
