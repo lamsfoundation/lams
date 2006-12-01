@@ -19,7 +19,14 @@
 		<c:set var="finish">
 			<html:rewrite page="/learning/finish.do?sessionMapID=${sessionMapID}" />
 		</c:set>
-
+		
+		<script type="text/javascript">
+			function submitFinish() {
+				document.getElementById("finish").disabled = "disabled";
+				location.href = '${finish}';
+			}		
+		</script>
+		
 		<c:choose>
 			<c:when
 				test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
@@ -30,8 +37,8 @@
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:button property="finish"
-					onclick="javascript:location.href='${finish}';" styleClass="button">
+				<html:button property="finish" styleId="finish"
+					onclick="submitFinish();" styleClass="button">
 					<fmt:message key="label.finish" />
 				</html:button>
 			</c:otherwise>

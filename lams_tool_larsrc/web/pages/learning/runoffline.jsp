@@ -10,6 +10,7 @@
 	<script type="text/javascript">
 	<!--
 		function finishSession(){
+			document.getElementById("finishButton").disabled = "disabled";
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&runOffline=true"/>';
 			return false;
 		}
@@ -65,7 +66,7 @@
 					</html:button>
 				</c:when>
 				<c:otherwise>
-					<html:button property="FinishButton"
+					<html:button property="FinishButton" styleId="finishButton"
 						onclick="return finishSession()" styleClass="button">
 						<fmt:message key="label.finished" />
 					</html:button>

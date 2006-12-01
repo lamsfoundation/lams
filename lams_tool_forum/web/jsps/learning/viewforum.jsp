@@ -83,6 +83,13 @@
 		</div>
 	</c:if>
 	
+	<script type="text/javascript">
+		function submitFinish() {
+			document.getElementById("finish").disabled = "disabled";
+			location.href = '${finish}';
+		}		
+	</script>
+	
 	<div align="right" class="space-bottom-top">
 		<c:if test='${sessionMap.mode != "teacher"}'>
 			<c:choose>
@@ -96,8 +103,8 @@
 				</c:when>
 	
 				<c:otherwise>
-					<html:button property="finish"
-						onclick="javascript:location.href='${finish}';"
+					<html:button property="finish" styleId="finish"
+						onclick="submitFinish();"
 						styleClass="button">
 						<fmt:message key="label.finish" />
 					</html:button>

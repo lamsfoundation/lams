@@ -37,6 +37,7 @@
 				location.href= tUrl;
 		}
 		function finish(){
+			document.getElementById("finishButton").disabled = "disabled";
 			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
 			return submitCount(finishUrl);
 		}
@@ -203,7 +204,7 @@
 			</c:when>
 			<c:otherwise>
 				<html:button property="finishButton" onclick="javascript:finish();"
-					styleClass="button">
+					styleClass="button" styleId="finishButton">
 					<fmt:message key="button.finish" />
 				</html:button>
 			</c:otherwise>

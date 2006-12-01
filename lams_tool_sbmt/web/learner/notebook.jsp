@@ -7,13 +7,18 @@
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
+	<script type="text/javascript">
+		function disableFinishButton() {
+			document.getElementById("finishButton").disabled = "disabled";
+		}
+	</script>	
 </head>
 
 <body class="stripes">
 
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	<html:form action="/learning/submitReflection" method="post">
+	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();">
 		<html:hidden property="userID" />
 		<html:hidden property="sessionMapID" />
 		<div id="content">
@@ -31,7 +36,7 @@
 				styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
-				<html:submit styleClass="button">
+				<html:submit styleClass="button" styleId="finishButton">
 					<fmt:message key="button.finish" />
 				</html:submit>
 			</div>
