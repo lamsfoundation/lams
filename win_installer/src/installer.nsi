@@ -191,9 +191,9 @@ Var WILDFIRE_PASS
 Var WINTEMP
 Var RETAIN_DIR
 Var RETAIN_FILES
-Var RETAIN_CONF
-Var RETAIN_DB
-Var RETAIN_REP
+#Var RETAIN_CONF
+#Var RETAIN_DB
+#Var RETAIN_REP
 
 
 # installer sections
@@ -211,8 +211,9 @@ SectionGroup /e "!Install LAMS"
         SetOutPath $INSTDIR
         
         ${if} $RETAIN_FILES == "1"
-            CopyFiles /silent $INSTDIR $WINTEMP
-            DetailPrint "$WINTEMP"
+            Createdirectory "$WINTEMP\lams"
+            CopyFiles /silent $INSTDIR\backup "$WINTEMP\lams"
+            DetailPrint "$WINTEMP\lams\backup"
         ${endif}
         
         Call DeployConfig
@@ -400,60 +401,26 @@ Function DirectoryLeave
     ${EndIf}
     
     Strcpy $RETAIN_FILES "0"
-    Strcpy $RETAIN_CONF "0"
-    Strcpy $RETAIN_DB "0"
-    Strcpy $RETAIN_REP "0"
+    #Strcpy $RETAIN_CONF "0"
+    #Strcpy $RETAIN_DB "0"
+    #Strcpy $RETAIN_REP "0"
     
-    IfFileExists "$INSTDIR\lamsDump.sql" instdirExists noDatabaseDump
-    noDatabaseDump:    
-    IfFileExists "$INSTDIR\jboss-4.0.2" instdirExists end #if neither lamsDump.sql or jBoss folder exist we have no retained files (goto end)
-    instdirExists:
+    IfFileExists "$INSTDIR\backup" backupExists end
+    backupExists:
         ; CHECK if there are files retained from a previous uninstall
         ; THEN after installation, overwrite retained files and free files from temp folder temp folder 
         strcpy $6 ""
-        
-        IfFileExists "$INSTDIR\repository" repositoryExists noRepository 
-        repositoryExists:         
-            #Strcpy $6 "$6- Repository and uploaded files from previous installation: $\n$\t$INSTDIR\repository$\n$\n"
-            Strcpy $6 "$6- Repository and uploaded files$\n"
-            Strcpy $RETAIN_REP "1"
-        noRepository:
-        
-        IfFileExists "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" configs noConfigs
-        configs:
-            Strcpy $6 "$6- Configuration files 'log4j.xml' and 'server.xml'$\n"
-            #Strcpy $6 "$6$\t$INSTDIR\jboss-4.0.2\server\default\conf$\n"
-            #Strcpy $6 "$6$\t$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml$\n$\n"
-            Strcpy $RETAIN_CONF "1"
-        noConfigs:
-        
-        IfFileExists "$INSTDIR\lamsDump.sql" database noDatabase
-        database:
-            Strcpy $6 "$6- LAMS database$\n"
-            #Strcpy $6 "$6- Database dump from previous installation $\n$\t$INSTDIR\lamsDump.sql$\n$\n"
-            Strcpy $RETAIN_DB "1"
-        noDatabase:
-        
-        MessageBox MB_YESNO|MB_ICONQUESTION "Installer has detected some files retained from a previous install, do you wish to use them? $\n$\n$6" \
+        MessageBox MB_YESNO|MB_ICONQUESTION "Installer has detected database, repository and uploaded files retained from a previous install, do you wish to use them?" \
                     IDYES retainFiles \
-                    IDNO newInstDir
+                    IDNO noRetain
+        noRetain:
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Files will be backed up as $INSTDIR\backup"
+            goto end
         retainFiles:
             Strcpy $WINTEMP "C:\WINDOWS\Temp"
             Strcpy $RETAIN_FILES "1"
             #CopyFiles $INSTDIR $WINTEMP
             #MessageBox MB_OK|MB_ICONEXCLAMATION "$RETAIN_FILES \n $RETAIN_REP $\n $RETAIN_CONF $\n $RETAIN_DB"
-            goto end
-    newInstDir:
-        # Remove retained  files and begin installation
-        MessageBox MB_YESNO|MB_ICONQUESTION "Are you sure? If you continue, retained files will be deleted.$\n" \
-                    IDYES deleteFiles \
-                    IDNO noDelete
-        deleteFiles:
-            RMdir /r $INSTDIR
-            CreateDirectory $INSTDIR
-            goto end
-        noDelete:
-            Abort
     end:
 FunctionEnd
 
@@ -785,11 +752,11 @@ Function ImportDatabase
     ${EndIf}
     */
     
-    ${if} $RETAIN_DB == 1
+    ${if} $RETAIN_FILES == '1'
         #replace the install dump with the retained dump
         #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase" 
-        CopyFiles "$INSTDIR\lamsDump.sql" "dump.sql"
-        DetailPrint "Using retained database: $INSTDIR\lamsDump.sql"
+        CopyFiles "$INSTDIR\backup\lamsDump.sql" "dump.sql"
+        DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
     ${endif}
     
     
@@ -851,21 +818,16 @@ Function WriteRegEntries
 FunctionEnd
 
 Function OverWriteRetainedFiles
-    ${if} $RETAIN_REP == "1"
+    # overwriting retain files (moved to windows/temp) to install directory files
+    ${if} $RETAIN_FILES == "1"
         #copy repository and uploaded files to install directory
         #MessageBox MB_OK|MB_ICONSTOP "repository files to be retained"
-        CopyFiles "$WINTEMP\lams\repository" "$INSTDIR\" 
+        CopyFiles "$WINTEMP\lams\backup\repository" "$INSTDIR\" 
         DetailPrint "$INSTDIR\repository"
-        CopyFiles "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
+        CopyFiles "$WINTEMP\lams\backup\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
         DetailPrint "Overwrite $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war"
+        MessageBox MB_OK|MB_ICONEXCLAMATION "COPYFILES $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" 
     ${endif}
-    ${if} $RETAIN_CONF == "1"
-        #copy configuration files to be kept
-        #MessageBox MB_OK|MB_ICONSTOP "CONF files to be retained"
-        CopyFiles "$WINTEMP\lams\jboss-4.0.2\server\default\conf\log4j.xml" "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml"
-        CopyFiles "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar" "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml"
-    ${endif}
-    
     RMdir "$WINTEMP\lams"
 FunctionEnd
 
@@ -912,9 +874,10 @@ FunctionEnd
 
 # Uninstaller
 #
-Var UNINSTALL_DB
-Var UNINSTALL_RP
-Var UNINSTALL_CF
+Var UNINSTALL_RETAIN
+#Var UNINSTALL_DB
+#Var UNINSTALL_RP
+#Var UNINSTALL_CF
 
 Function un.onInit
     ;!insertmacro MUI_LANGDLL_DISPLAY
@@ -957,9 +920,10 @@ Function un.PreUninstall
 FunctionEnd
 
 Function un.PostUninstall
-    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
-    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 3" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RETAIN "uninstall.ini" "Field 1" "State"
+    #!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
+    #!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
+    #!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 3" "State"
 FunctionEnd
 
 
@@ -1030,62 +994,59 @@ FunctionEnd
 
 
 Section "Uninstall"
-
+    
 
     strcpy $WINTEMP "C:\WINDOWS\Temp"
-    strcpy $RETAIN_DIR $INSTDIR
-    ;create a directory in temp to store retained folders until they can be put into permanent storage
-    ;NOTE that $TEMP cannot be used here as it does not point to C:\WINDOWS\TEMP
-    RMDir /r "$WINTEMP\lams"
-    CreateDirectory "$WINTEMP\lams"
-    
+    RMDir /r "$WINTEMP\lams\backup"
+    CreateDirectory "$WINTEMP\lams\backup"
+       
+    strcpy $RETAIN_DIR "$INSTDIR\backup"
+    CreateDirectory $RETAIN_DIR
+
     ;Now copy files that are to be retained to the temp folder
-    ${If} $UNINSTALL_RP == 1
+    ${If} $UNINSTALL_RETAIN == 1
         #MessageBox MB_OK|MB_ICONEXCLAMATION "retaining repository"
         ; KEEP repository and uploaded files
-        ; Copy repository and jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war to TEMP
+        ; Copy repository and jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war to backup
         ReadRegStr $6 HKLM "${REG_HEAD}" "dir_repository"
-        CopyFiles "$6" "$WINTEMP\Lams\"
-        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
-        CopyFiles "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\lams.ear\"
+       
+        CreateDirectory "$RETAIN_DIR\repository"
+        CreateDirectory "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
+        
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files to $RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
+        copyfiles /silent $6 "$RETAIN_DIR"
+        copyfiles /silent "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\*" "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
+        
         DetailPrint 'Saving repository and uploaded files to: $RETAIN_DIR'
-    ${EndIf}
-    ${If} $UNINSTALL_CF == 1 
-        #Messagebox MB_OK|MB_ICONEXCLAMATION "retaining conf"
-        ;KEEP some configuration files
-        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
-        CreateDirectory "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar"
-        CopyFiles /silent "$INSTDIR\jboss-4.0.2\server\default\conf\log4j.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\conf"
-        CopyFiles /silent "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\server.xml" "$WINTEMP\lams\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\"
-        DetailPrint 'Saving configuration files files to: $RETAIN_DIR'
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files from instdir to temp"
+        copyfiles /silent "$INSTDIR\backup\*" "$WINTEMP\lams\backup"
     ${EndIf}
     
-    ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
-    RMDir /r $INSTDIR
+    setoutpath $temp
+    RMdir /r "$INSTDIR\jboss-4.0.2\"
+    RMdir /r "$INSTDIR\"
+    MessageBox MB_OK|MB_ICONEXCLAMATION "INSTDIR DELETED FFS!"
     
-
     ; RESTORE Retained folders to their original localtion then delete temp files
-    ${if} $UNINSTALL_CF == 1 
-    ${orif} $UNINSTALL_DB == 1
-    ${orif} $UNINSTALL_RP == 1
+    ${if} $UNINSTALL_RETAIN == 1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files from temp to $INSTDIR"
         CreateDirectory "$RETAIN_DIR"
-        CopyFiles /silent "$WINTEMP\lams" "$RETAIN_DIR\..\"
-        RMDir /r "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\jbossweb-tomcat55.sar"
-        Delete "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\server.xml"
+        CopyFiles /silent "$WINTEMP\lams\backup\*" "$RETAIN_DIR"
     ${endif}
     RMDir /r "$WINTEMP\lams"
-    
+    MessageBox MB_OK|MB_ICONEXCLAMATION "if the jboss folder is still there now, im stumped!"
     
     ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
     
+    ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
     ReadRegStr $1 HKLM "${REG_HEAD}" "db_name"
     ReadRegStr $2 HKLM "${REG_HEAD}" "db_user"
     ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
-    ${If} $UNINSTALL_DB == 1
-        #Messagebox MB_OK|MB_ICONEXCLAMATION "retaining db"
+    ${If} $UNINSTALL_RETAIN == 1
+        Messagebox MB_OK|MB_ICONEXCLAMATION "retaining db"
         ; DUMP the database file into the retained install directory  
         Strcpy $4 "$0\bin\mysqldump -r $RETAIN_DIR\lamsDump.sql $1 -u $2 -p$3"
         nsExec::ExecToStack $4
