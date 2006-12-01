@@ -3,7 +3,6 @@
 <script type="text/javascript">
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = "disabled";
-		alert("testing disabled");	
 	}
 </script>
 

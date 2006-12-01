@@ -30,7 +30,13 @@
 	</c:if>
 </html:form>
 
-<html:form action="/learning" method="post">
+<script type="text/javascript">
+	function disableFinishButton() {
+		document.getElementById("finishButton").disabled = "disabled";
+	}
+</script>
+
+<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
 	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
 	<div class="space-bottom-top align-right">
 		<c:choose>
@@ -44,7 +50,7 @@
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:submit styleClass="button">
+				<html:submit styleClass="button" styleId="finishButton">
 					<fmt:message key="button.finish" />
 				</html:submit>
 			</c:otherwise>
