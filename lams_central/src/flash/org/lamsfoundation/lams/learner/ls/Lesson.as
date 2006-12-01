@@ -240,6 +240,10 @@ class Lesson {
 					clearInterval(_loadCheckIntervalID);
 					var msg:String = Dictionary.getValue('al_timeout');
 					LFMessage.showMessageAlert(msg);
+					
+					// clear count and restart polling check
+					_loadCheckCount = 0;
+					getFlashProgress();
 				}
 			}
 		} else {
