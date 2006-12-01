@@ -81,13 +81,13 @@
         	window.close();
 		}
     }  				
-</script>				
-<p id="saveCancelButtons" style="text-align: right">
-	<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button">
-		<fmt:message key="${saveButtonLabelKey}" /> 
-	</html:link>
-	<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button">
-		<fmt:message key="${cancelButtonLabelKey}" />
-	</html:link>
+</script>	
+<p id="saveCancelButtons" >
+		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">
+			<fmt:message key="${cancelButtonLabelKey}" />
+		</html:link>
+		<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button right-buttons space-left">
+			<fmt:message key="${saveButtonLabelKey}" /> 
+		</html:link>
 </p>
 <!-- end tab content -->
