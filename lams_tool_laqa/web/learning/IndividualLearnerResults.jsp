@@ -92,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</strong>
 
 								<br>
-								<c:out value="${answerEntry.value}" escapeXml="false" />
+								<c:out value="${answerEntry.value}" escapeXml="true" />
 
 							</p>
 
