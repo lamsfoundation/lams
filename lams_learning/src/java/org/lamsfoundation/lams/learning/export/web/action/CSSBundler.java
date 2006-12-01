@@ -181,7 +181,7 @@ public class CSSBundler {
 			String themeFilename = (!rtl) ? theme + ".css" : theme + "_" + RTL_DIR + ".css";
 			addThemeFile(cssDirectory, themeFilename);
 
-			themeFilename = theme + "_" + RTL_DIR + "_learner.css";
+			themeFilename = (!rtl) ? theme + "_learner.css" : theme + "_" + RTL_DIR + "_learner.css";
 			addThemeFile(cssDirectory, themeFilename);
 		}
 		
