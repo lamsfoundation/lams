@@ -108,5 +108,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</html:submit>
 	</c:if>
 
+	<p>&nbsp;</p>
 </div>
 <!--options content ends here-->
