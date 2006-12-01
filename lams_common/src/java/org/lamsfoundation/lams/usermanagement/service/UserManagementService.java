@@ -807,16 +807,18 @@ public class UserManagementService implements IUserManagementService {
 	
 	private Integer getRequestorId() {
 		UserDTO userDTO = (UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER);
-		return userDTO.getUserID();		
+		return (userDTO!=null ? userDTO.getUserID() : null);		
 	}
 	
 	public boolean isUserGlobalGroupAdmin() {
 		Integer rootOrgId = getRootOrganisation().getOrganisationId();
-		return isUserInRole(getRequestorId(), rootOrgId, Role.GROUP_ADMIN);
+		Integer requestorId = getRequestorId();
+		return (requestorId!=null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false);
 	}
 	
 	public boolean isUserSysAdmin() {
 		Integer rootOrgId = getRootOrganisation().getOrganisationId();
-		return isUserInRole(getRequestorId(), rootOrgId, Role.SYSADMIN);
+		Integer requestorId = getRequestorId();
+		return (requestorId!=null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false);
 	}
 }
