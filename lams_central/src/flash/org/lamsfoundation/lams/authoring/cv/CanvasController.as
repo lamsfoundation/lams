@@ -250,10 +250,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				if (!_pi.isPIExpanded()){
 					_canvasModel.setPIHeight(_pi.piFullHeight());
+					//_pi.showExpand(false);
 				}
 			}else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)){
 				if (!_pi.isPIExpanded()){
 					_canvasModel.setPIHeight(_pi.piFullHeight());
+					
 				}
 			}else{
 				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick to open Content','CanvasController');

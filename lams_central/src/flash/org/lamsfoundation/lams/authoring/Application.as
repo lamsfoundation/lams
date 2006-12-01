@@ -460,6 +460,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			//Property Inspector
 			_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
 			_pi_mc._y = h - _canvas.model.getPIHeight();
+			_pi_mc.showExpand(false);
 			
 			//var pi = _canvas.getPropertyInspector();
 			//pi._y = h;//- pi._height;
@@ -481,6 +482,11 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		//Property Inspector
 		_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
 		_pi_mc._y = h - _canvas.model.getPIHeight();
+		var piHeight:Number = _canvas.model.getPIHeight();
+		_pi_mc.showExpand(false)
+		if (piHeight != _pi_mc.piFullHeight()){
+			_pi_mc.showExpand(true);
+		}
 		
 		//var pi = _canvas.getPropertyInspector();
 		//pi._y = h;//- pi._height;

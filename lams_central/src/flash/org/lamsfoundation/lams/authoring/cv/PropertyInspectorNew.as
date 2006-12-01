@@ -52,6 +52,8 @@ class PropertyInspectorNew extends MovieClip{
 	private var clickTarget_mc:MovieClip;
 	private var _depth:Number;
 	private var delimitLine:MovieClip;
+	private var expand_mc:MovieClip;
+	private var collapse:MovieClip;
 	
 	//Properties tab
     private var title_lbl:Label;
@@ -300,11 +302,13 @@ class PropertyInspectorNew extends MovieClip{
 			trace("P Pressed in 'localOnRelease' and _piIsExpended is: "+_piIsExpended)
 			_piIsExpended = false
 			_canvasModel.setPIHeight(piHeightHide);
+			showExpand(true);
 			
 		}else {
 			trace("P Pressed in 'localOnRelease' and _piIsExpended is: "+_piIsExpended)
 			_piIsExpended = true
 			_canvasModel.setPIHeight(piHeightFull);
+			showExpand(false);
 			//Application.getInstance().onResize();
 		}
 	}
@@ -317,6 +321,13 @@ class PropertyInspectorNew extends MovieClip{
 		return piHeightFull;
 	}
 	
+	
+	public function showExpand(e:Boolean){
+      
+        //show hide the icons
+		expand_mc._visible = e;
+                
+    }
 	
 	public function localOnReleaseOutside():Void{
 		Debugger.log('Release outside so no event has been fired, current state is: ' + _piIsExpended,Debugger.GEN,'localOnReleaseOutside','PropertyInspectorNew');
@@ -962,6 +973,8 @@ class PropertyInspectorNew extends MovieClip{
 
         
     }
+	
+	
 	
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and applies them
