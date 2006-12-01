@@ -27,6 +27,8 @@ import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.common.ui.Cursor;
+import org.lamsfoundation.lams.common.ui.LFMessage;
+import org.lamsfoundation.lams.common.dict.Dictionary;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 import mx.managers.*;
@@ -50,7 +52,7 @@ class Lesson {
 	private var _finishedDesign:Boolean = false;
 	
     private static var LOAD_CHECK_INTERVAL:Number = 50;
-	private static var LOAD_CHECK_TIMEOUT_COUNT:Number = 600;
+	private static var LOAD_CHECK_TIMEOUT_COUNT:Number = 300;
 	
 	private var _loadCheckCount = 0;
 	private var _loadCheckIntervalID:Number;
@@ -236,6 +238,8 @@ class Lesson {
 				} else if(_loadCheckCount >= LOAD_CHECK_TIMEOUT_COUNT) {
 					Debugger.log('Reached timeout waiting for data to load.',Debugger.CRITICAL,'getFlashProgress','Lesson');
 					clearInterval(_loadCheckIntervalID);
+					var msg:String = Dictionary.getValue('al_timeout');
+					LFMessage.showMessageAlert(msg);
 				}
 			}
 		} else {
