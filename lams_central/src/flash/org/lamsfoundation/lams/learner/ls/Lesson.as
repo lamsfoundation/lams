@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.Progress;
+import org.lamsfoundation.lams.common.ui.Cursor;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 import mx.managers.*;
@@ -46,6 +47,13 @@ class Lesson {
 	
 	private var _instance:Lesson;
 	private var _className:String = "Lesson";
+	private var _finishedDesign:Boolean = false;
+	
+    private static var LOAD_CHECK_INTERVAL:Number = 50;
+	private static var LOAD_CHECK_TIMEOUT_COUNT:Number = 600;
+	
+	private var _loadCheckCount = 0;
+	private var _loadCheckIntervalID:Number;
 	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
@@ -124,7 +132,7 @@ class Lesson {
 			
 		// get Learning Design for lesson
 		openLearningDesign();
-			
+		
 		return true;
 	}
 	
@@ -173,18 +181,21 @@ class Lesson {
 	private function storeLessonData(dto:Object){
 		lessonModel.populateFromDTO(dto);
 		joinLesson();
+			
 	}
 	
 	private function startLesson(pkt:Object){
 		trace('received message back from server aftering joining lesson...');
 		
-		// check was successful join
-		getFlashProgress();
-		
 		// set lesson as active
 		lessonModel.setActive();
 		trace('pktobject value: '+String(pkt));
 		getURL(_root.serverURL + 'learning'+String(pkt)+'?lessonID='+lessonModel.getLessonID(),'contentFrame');
+		
+		
+		// check was successful join
+		getFlashProgress();
+		
 		
 	}  
 	
@@ -206,6 +217,35 @@ class Lesson {
 	}
 	
 	private function getFlashProgress():Void{
+		Debugger.log('Loading flash progress.',Debugger.CRITICAL,'getFlashProgress','Lesson');
+				
+		if(!finishedDesign) { 
+			// first time through set interval for method polling
+			if(!_loadCheckIntervalID) {
+				_loadCheckIntervalID = setInterval(Proxy.create(this, getFlashProgress), LOAD_CHECK_INTERVAL);
+			} else {
+				_loadCheckCount++;
+				Debugger.log('Waiting (' + _loadCheckCount + ') for data to load...',Debugger.CRITICAL,'getFlashProgress','Lesson');
+				
+				// if design loaded
+				if(finishedDesign) {
+					clearInterval(_loadCheckIntervalID);
+					
+					callFlashProgress();
+			
+				} else if(_loadCheckCount >= LOAD_CHECK_TIMEOUT_COUNT) {
+					Debugger.log('Reached timeout waiting for data to load.',Debugger.CRITICAL,'getFlashProgress','Lesson');
+					clearInterval(_loadCheckIntervalID);
+				}
+			}
+		} else {
+			callFlashProgress();
+			clearInterval(_loadCheckIntervalID);
+		}
+		
+	}
+	
+	private function callFlashProgress():Void {
 		var callback:Function = Proxy.create(this,saveProgressData);
 		var lessonId:Number = lessonModel.ID;
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&lessonID='+String(lessonId), callback, false);
@@ -245,8 +285,9 @@ class Lesson {
 	
 	private function openLearningDesign(){
 		trace('opening learning design...');
+		finishedDesign = false;
+		
 		var designId:Number = lessonModel.learningDesignID;
-
         var callback:Function = Proxy.create(this,saveDataDesignModel);
            
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
@@ -256,12 +297,14 @@ class Lesson {
 	private function saveDataDesignModel(learningDesignDTO:Object){
 		trace('returning learning design...');
 		trace('saving model data...');
-		
-		var model:DesignDataModel = new DesignDataModel();
-		model.setDesign(learningDesignDTO);
-		lessonModel.setLearningDesignModel(model);
-		
-		// activite Progress movie
+		if(learningDesignDTO instanceof LFError) {
+			Cursor.showCursor(Application.C_DEFAULT);
+			learningDesignDTO.showErrorAlert();
+		} else {
+			var model:DesignDataModel = new DesignDataModel();
+			model.setDesign(learningDesignDTO);
+			lessonModel.setLearningDesignModel(model);
+		}
 		
 	}
 	
@@ -340,6 +383,14 @@ class Lesson {
 	
 	public function get y():Number{
 		return lessonModel.y;
+	}
+	
+	public function set finishedDesign(a:Boolean){
+		_finishedDesign = a;
+	}
+	
+	public function get finishedDesign():Boolean{
+		return _finishedDesign;
 	}
 
     function get className():String { 

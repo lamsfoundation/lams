@@ -160,6 +160,7 @@ class LessonView extends AbstractView {
 				break;
 			case 'DESIGNMODEL' :
 				trace('updating design model for lesson..');
+				lm.getLesson().finishedDesign = true;
 				break;
 			case 'PROGRESS' :
 				Debugger.log('progress data receieved for user..' + lm.progressData.getUserName(),Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
