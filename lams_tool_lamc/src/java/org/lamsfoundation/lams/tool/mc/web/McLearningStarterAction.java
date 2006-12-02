@@ -502,7 +502,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 		
 		
 		String userID=mcLearningForm.getUserID();
@@ -517,7 +519,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
         logger.debug("notebookEntry: " + notebookEntry);
 		
 		if (notebookEntry != null) {
-		    
 		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
 		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 		}

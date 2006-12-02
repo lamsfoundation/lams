@@ -213,13 +213,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:if>
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
 				<h2>
-					<fmt:message key="label.notebook.entries" />
+							<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
 				</h2>
-		
+
 				<p>
 					<c:choose>
 						<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-							<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="true"/>
+							<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>
 						</c:when>
 						<c:otherwise>
 							<em><fmt:message key="message.no.reflection.available" /></em>  

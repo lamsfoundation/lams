@@ -1051,7 +1051,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 
 		logger.debug("mcGeneralLearnerFlowDTO for jsp: " +  mcGeneralLearnerFlowDTO);
 		
@@ -1239,7 +1241,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
     		
 		mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 		
@@ -1359,7 +1363,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 		
 		logger.debug("mcContent.isRetries(): " + mcContent.isRetries());
 		mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
@@ -1607,7 +1613,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 		
 		logger.debug("mcContent.isRetries(): " + mcContent.isRetries());
 		mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
@@ -1636,6 +1644,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
 		if (notebookEntry != null) {
 		    String notebookEntryPresentable = notebookEntry.getEntry();
+		    notebookEntryPresentable=McUtils.replaceNewLines(notebookEntryPresentable);
 		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 		}
 
@@ -1830,7 +1839,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());		
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 		
 		logger.debug("mcContent.isRetries(): " + mcContent.isRetries());
 		mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
@@ -1953,7 +1964,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
+		
+		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
+		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 		
 		logger.debug("mcContent.isRetries(): " + mcContent.isRetries());
 		mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());

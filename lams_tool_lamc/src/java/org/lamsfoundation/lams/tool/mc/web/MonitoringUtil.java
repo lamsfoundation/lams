@@ -1238,7 +1238,8 @@ public class MonitoringUtil implements McAppConstants{
 								CoreNotebookConstants.NOTEBOOK_TOOL,
 								MY_SIGNATURE, new Integer(mcQueUsr.getQueUsrId().intValue()));
 						
-				        logger.debug("notebookEntry: " + notebookEntry);			 
+				        logger.debug("notebookEntry: " + notebookEntry);
+				        
 						if (notebookEntry != null)
 						{
 						    logger.debug("found at least one notebookEntry: " + notebookEntry.getEntry());
