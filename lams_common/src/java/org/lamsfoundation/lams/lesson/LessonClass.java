@@ -163,7 +163,7 @@ public class LessonClass extends Grouping {
     	int originalNumber = learnersGroup.getUsers().size();
    		learnersGroup.getUsers().addAll(newLearners);
    		int newNumber = learnersGroup.getUsers().size();
-   		return originalNumber - newNumber;
+   		return newNumber - originalNumber;
     }
 
     public Group getLearnersGroup() {
@@ -215,7 +215,7 @@ public class LessonClass extends Grouping {
     	int originalNumber = staffGroup.getUsers().size();
     	staffGroup.getUsers().addAll(newStaff);
    		int newNumber = staffGroup.getUsers().size();
-   		return originalNumber - newNumber;
+   		return newNumber - originalNumber;
     }
 
     /** 
