@@ -98,7 +98,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</p>
 											<p>
 												<c:out value="${userData.responsePresentable}"
-													escapeXml="true" />
+													escapeXml="false" />
 		
 											</p>
 										</c:if>
@@ -141,7 +141,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</p>
 												<p>
 													<c:out value="${userData.responsePresentable}"
-														escapeXml="true" />
+														escapeXml="false" />
 													<hr size=1> 												
 												</p>
 											</c:if>
@@ -237,7 +237,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</p>
 											<p>
 												<c:out value="${userData.responsePresentable}"
-													escapeXml="true" />
+													escapeXml="false" />
 		
 											</p>
 										</c:if>
@@ -280,7 +280,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</p>
 												<p>
 													<c:out value="${userData.responsePresentable}"
-														escapeXml="true" />
+														escapeXml="false" />
 													<hr size=1> 												
 												</p>
 											</c:if>
