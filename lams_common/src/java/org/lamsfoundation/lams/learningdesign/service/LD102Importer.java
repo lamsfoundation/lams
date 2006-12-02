@@ -85,6 +85,7 @@ public class LD102Importer implements ApplicationContextAware{
 
 	private static final String MSG_KEY_PERM_GATE = "imported.permission.gate.title";
 	private static final String MSG_KEY_SYNC_GATE = "imported.synchronise.gate.title";
+	private static final String MSG_KEY_SR_WARNING = "import.shareresources.warning";
 	private static final String MSG_KEY_VALIDATION_ERROR = "error.import.validation";
 			
 	private Logger log = Logger.getLogger(LD102Importer.class);
@@ -106,6 +107,7 @@ public class LD102Importer implements ApplicationContextAware{
 	private Date createDate = new Date();
 	private User importer = null;
 	private UserDTO importerDTO = null; // pass the dto to tools, rather than the real user object 
+	private boolean needShareResourcesWarning = false;
 	
 	/** 
 	* Store relationship between an activity and its grouping for processing after all the activities have been process.
@@ -405,6 +407,9 @@ public class LD102Importer implements ApplicationContextAware{
 			throw new ImportToolContentException("Invalid packet format - it is not a learning design packet. See log for details.");
 		}
 		
+		if (needShareResourcesWarning) {
+			toolsErrorMsgs.add(messageService.getMessage(MSG_KEY_SR_WARNING));
+		}
 		return(ldInProgress != null ? ldInProgress.getLearningDesignId() : null);
 
 	}
@@ -1032,6 +1037,9 @@ public class LD102Importer implements ApplicationContextAware{
 	    	return null;
 	    }
 	    
+	    if ( WDDXTAGS102.TOOL_TYPE_URL_CONTENT.equals(toolType) ) {
+	    	needShareResourcesWarning = true;
+	    }
 	    
 		activity.setTitle( overrideTitle != null ? overrideTitle : toolTitle);
 		activity.setDescription( overrideDescription != null ? overrideDescription : toolDescription);

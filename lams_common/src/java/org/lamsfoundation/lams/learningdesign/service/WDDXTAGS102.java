@@ -129,6 +129,7 @@ public class WDDXTAGS102 {
 	public static final String CONTENT_URL_RUNTIME_LEARNER_SUBMIT_FILE = "runtimeSubmissionLearnerFile";
 	public static final String CONTENT_URL_URLS = "urls";
 	
+	public static final String TOOL_TYPE_URL_CONTENT = "urlcontent";
 	public static final String CONTENT_URL_URL_SHOWBUTTONS = "showbuttons";
 	public static final String CONTENT_URL_URL_VIEW_ORDER = "order";
 	public static final String CONTENT_URL_URL_TITLE = "title";
