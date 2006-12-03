@@ -751,7 +751,7 @@ public class MonitoringUtil implements QaAppConstants{
 		request.setAttribute(QA_STATS_DTO, qaStatsDTO);
 	}
 	
-	public static void generateGroupsSessionData(HttpServletRequest request, IQaService qaService, QaContent qaContent)
+	public static void generateGroupsSessionData(HttpServletRequest request, IQaService qaService, QaContent qaContent, boolean forExport)
 	{
 	    logger.debug("generateGroupsSessionData: " + qaContent);
 	    
@@ -759,6 +759,9 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("listAllGroupsDTO: " + listAllGroupsDTO);
 		
 	    request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
+
+	    if (forExport)
+	        request.getSession().setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 	}
 
 	

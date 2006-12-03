@@ -258,7 +258,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("ending  initStatsContent...");
     	
     	MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-    	MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+    	MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
     	
 	}
 
@@ -399,7 +399,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
 
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
     	logger.debug("ending  initInstructionsContent...");
 	}
 
@@ -535,7 +535,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
         
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 	    /* note that we are casting monitoring form subclass into Authoring form*/
 	    logger.debug("watch here: note that we are casting monitoring form subclass into Authoring form");
@@ -682,7 +682,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
     	logger.debug("end  initSummaryContent...");
 	}
@@ -827,7 +827,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
         return (mapping.findForward(LOAD_MONITORING));
     }
@@ -944,7 +944,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -1069,7 +1069,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -1180,7 +1180,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		request.setAttribute("currentMonitoredToolSession", "All");
 		
 	    return (mapping.findForward(LOAD_MONITORING));	
@@ -1321,7 +1321,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -1439,7 +1439,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		request.setAttribute("currentMonitoredToolSession", "All");
 		
 	    return (mapping.findForward(LOAD_MONITORING));	
@@ -1564,7 +1564,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -1637,7 +1637,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		request.setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 		
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
     }
     
@@ -1820,7 +1820,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 	}
 
 	
@@ -1909,7 +1909,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 	}
 	
 	
@@ -2022,7 +2022,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
@@ -2134,7 +2134,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		request.setAttribute("currentMonitoredToolSession", "All");
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
@@ -2248,7 +2248,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		}
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return (mapping.findForward(LOAD_MONITORING));
@@ -2355,7 +2355,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		}
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		request.setAttribute("currentMonitoredToolSession", "All");
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
@@ -2466,7 +2466,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 		return mapping.findForward(LEARNER_NOTEBOOK);
 	}
@@ -2709,7 +2709,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 
         return mapping.findForward(LOAD_MONITORING);
     }
@@ -2975,7 +2975,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 	
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
         return mapping.findForward(LOAD_MONITORING);
 	}
@@ -3173,7 +3173,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
         return mapping.findForward(LOAD_MONITORING);
     }
@@ -3299,7 +3299,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 		logger.debug("fwd ing to newQuestionBox: ");
         return (mapping.findForward("newQuestionBox"));
@@ -3467,7 +3467,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 		logger.debug("fwd ing to editQuestionBox: ");
         return (mapping.findForward("editQuestionBox"));
@@ -3663,7 +3663,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
 		
         return mapping.findForward(LOAD_MONITORING);
@@ -3832,7 +3832,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
         return mapping.findForward(LOAD_MONITORING);
 
@@ -3999,7 +3999,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* ... till here*/
 		
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
 		
         return mapping.findForward(LOAD_MONITORING);
     }

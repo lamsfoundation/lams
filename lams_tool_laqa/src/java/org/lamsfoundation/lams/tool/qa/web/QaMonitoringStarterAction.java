@@ -254,7 +254,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		MonitoringUtil.buildQaStatsDTO(request,qaService, qaContent);
 		
 		request.setAttribute("currentMonitoredToolSession", "All");
-		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent);
+		MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent,false);
 		
 		logger.debug("fwding to : " + LOAD_MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	

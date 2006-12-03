@@ -171,6 +171,13 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
         request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
         
         qaMonitoringAction.prepareReflectionData(request, content, qaService, null, true, "All");
+        
+        
+        request.setAttribute("currentMonitoredToolSession", "All");
+		MonitoringUtil.generateGroupsSessionData(request, qaService, content, true);
+        
+        
+        
         logger.debug("ending teacher mode: ");
     }
 }

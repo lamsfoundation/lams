@@ -58,44 +58,115 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 			<table width="80%" cellspacing="8" class="forms">
-			
-					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+
+
+
+
+
+					<c:forEach var="groupDto" items="${listAllGroupsDTO}">
+			  	 		<c:set var="sessionId" scope="request" value="${groupDto.sessionId}"/>
+			  	 		<c:set var="sessionName" scope="request" value="${groupDto.sessionName}"/>
+			  	 		<c:set var="groupData" scope="request" value="${groupDto.groupData}"/>
+			  	 		
 			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 			<td> <b> <fmt:message key="group.label"/> : </b> <c:out value="${sessionName}"/> </td>
 			  	 		</tr>
+			  	 		
+									  	 		
+			  	 		
+			  	 		
+					<c:forEach var="currentDto" items="${groupData}">
+			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+
+			  	 		
 						<tr>			
-							<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question"/> : </b> 
+							<td valign=top class="align-left"><b>  <fmt:message key="label.question"/> : </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<td valign=top>
 								<table align=center>
-									<tr> 
-										 <td NOWRAP valign=top> <b>  <fmt:message key="label.user"/>  </b> </td>  
-				  						 <td NOWRAP valign=top> <b>  <fmt:message key="label.learning.attemptTime"/> </b></td>
-				  						 <td NOWRAP valign=top> <b>  <fmt:message key="label.response"/>  	</b></td>
-						  			</tr>				 
+
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
 								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
+								  	 		<c:set var="userSessionId" scope="request" value="${userData.sessionId}"/>
+								  	 		
+								  	 		
+	  	 									<c:if test="${sessionId == userSessionId}"> 											  	 		
+		  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
 
-	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-			  	 									<tr>
-														 <td NOWRAP valign=top>   <c:out value="${userData.userName}"/>   </td>  
-														 <td NOWRAP valign=top>    <lams:Date value="${userData.attemptTime}"/>  </td>														 
-														 <td NOWRAP valign=top>   <c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>
-													</tr>
-											</c:if>														  					 
-	 									</c:forEach>		  	
+															<tr> 
+																 <td  valign=top>  <c:out value="${userData.userName}"/>   </td>  
+																 <td  valign=top>   <lams:Date value="${userData.attemptTime}"/> </td>														 
+															</tr>	 
+															
+															<tr>
+																 <td colspan=2  valign=top>   
+																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
+																 </td>
+															</tr>
+												</c:if>														  					 									  													  			
+											</c:if>														  					 									  													  														
+ 									</c:forEach>		
+	 									
+								  	 		<tr>
+								  	 			<td> &nbsp&nbsp&nbsp</td>
+								  	 		</tr>
+	 									  	
 									</c:forEach>		  	
 								</table>
 							</td>  
 			  			</tr>
 					</c:forEach>		  	
+				</c:forEach>		  	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			
 
 						<tr>			
 							<td valign=top class="align-left">
