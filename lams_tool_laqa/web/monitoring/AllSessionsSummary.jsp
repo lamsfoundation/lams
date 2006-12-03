@@ -92,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${userData.visible != 'true' }"> 			
 														                         <i><fmt:message key="label.response.hidden"/> </i> 
 																	</c:if> 								
-																	 <c:out value="${userData.responsePresentable}" escapeXml="true"/> 
+																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 																 </td>
 															</tr>
 														</c:if>
@@ -141,7 +141,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																			<c:if test="${userData.visible != 'true' }"> 			
 																                         <i><fmt:message key="label.response.hidden"/> </i> 
 																			</c:if> 								
-											 						 			<textarea name="updatedResponse" rows=6 cols=60><c:out value="${userData.response}" escapeXml="true"/></textarea>
+											 						 			<textarea name="updatedResponse" rows=6 cols=60><c:out value="${userData.response}" escapeXml="false"/></textarea>
 																		 </td>
 																	</tr>
 																	
@@ -185,7 +185,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																		<c:if test="${userData.visible != 'true' }"> 			
 															                         <i><fmt:message key="label.response.hidden"/> </i> 
 																		</c:if> 								
-																		 <c:out value="${userData.responsePresentable}" escapeXml="true"/> 
+																		 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 																	 </td>
 																</tr>
 																
