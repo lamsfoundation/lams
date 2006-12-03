@@ -1,11 +1,17 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
+<script type="text/javascript">
+	function disableFinishButton() {
+		document.getElementById("finishButton").disabled = true;
+	}
+</script>
+
 <div id="content">
 <h1>
 	<c:out value="${title}" escapeXml="false" />
 </h1>
 
-	<html:form action="/learner" method="post">
+	<html:form action="/learner" method="post" onsubmit="disableFinishButton();">
 	 
 		<p><lams:out value="${reflectInstructions}" /></p>				
 			 
@@ -14,7 +20,8 @@
 		<div align="right" class="space-bottom-top">
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />
-			<html:submit property="method" styleClass="button">
+			<html:hidden property="method" value="Finish"/>
+			<html:submit styleClass="button" styleId="finishButton">
 				<fmt:message key="button.finish" />
 			</html:submit>
 		</div>
