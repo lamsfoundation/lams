@@ -95,6 +95,7 @@ public class McGeneralAuthoringDTO implements Comparable
             .append("toolContentID: ", toolContentID)
             .append("contentFolderID: ", contentFolderID)
             .append("httpSessionID: ", httpSessionID)
+            .append("editableQuestionText: ", editableQuestionText)
             .append("passMarksMap: ", passMarksMap)
             .append("totalMarks: ", totalMarks)
             .append("marksMap: ", marksMap)

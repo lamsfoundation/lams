@@ -736,8 +736,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 		    logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
+		    request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
+		    
 		    logger.debug("forwarding using newEditableQuestionBox");
-			return newEditableQuestionBox(mapping, form,  request, response);
+		    return newEditableQuestionBox(mapping, form,  request, response);
 	 	}
 
 	}
@@ -1383,7 +1385,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("mcContent: " + mcContent);
 		
 
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
+		McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO)  request.getAttribute(MC_GENERAL_AUTHORING_DTO);
+		logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
+		
+		if (mcGeneralAuthoringDTO == null)
+		    mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
 		
 		mcGeneralAuthoringDTO.setMarkValue(editableMark);
 		
@@ -1448,6 +1454,29 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         mcAuthoringForm.setTotalMarks(totalMark);
         mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
+        
+        String requestNewEditableQuestionBox=(String )request.getAttribute("requestNewEditableQuestionBox");
+        logger.debug("requestNewEditableQuestionBox: " + requestNewEditableQuestionBox);
+        
+        String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
+        logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
+
+	    String newQuestion=request.getParameter("newQuestion");
+	    logger.debug("newQuestion: " + newQuestion);
+
+        //if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false")))
+        if ( (requestNewEditableQuestionBox != null) && requestNewEditableQuestionBox.equals("true"))
+        {
+    	    //String newQuestion=request.getParameter("newQuestion");
+    	    //logger.debug("newQuestion: " + newQuestion);
+    	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+    	    
+    	    String feedback=request.getParameter("feedback");
+    	    logger.debug("feedback: " + feedback);
+    	    mcAuthoringForm.setFeedback(feedback);
+        }
+        
+        
         
         logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
     	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
@@ -2953,6 +2982,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
 		logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
+		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
 		return newEditableQuestionBox(mapping, form,  request, response);
     }
 
@@ -3201,8 +3231,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
 		logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
+		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
 		return newEditableQuestionBox(mapping, form,  request, response);
-
     }
 
 
@@ -3453,8 +3483,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
 		logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
+		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
 		return newEditableQuestionBox(mapping, form,  request, response);
-
     }
 
 
@@ -3691,9 +3721,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 		
 		logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
-
+		
+		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
 		return newEditableQuestionBox(mapping, form,  request, response);
-
     }
 
     
