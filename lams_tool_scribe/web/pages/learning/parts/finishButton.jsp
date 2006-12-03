@@ -4,7 +4,7 @@
 	function disableFinishButton() {
 		var finishButton = document.getElementById("finishButton");
 		if (finishButton != null) {
-			finsihButton.disabled = "disabled";
+			finishButton.disabled = "disabled";
 		}
 	}
 </script>
