@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
 	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = "disabled";
+		document.getElementById("finishButton").disabled = true;
 	}
 </script>
 

@@ -37,7 +37,7 @@
 				location.href= tUrl;
 		}
 		function finish(){
-			document.getElementById("finishButton").disabled = "disabled";
+			document.getElementById("finishButton").disabled = true;
 			var finishUrl= "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
 			return submitCount(finishUrl);
 		}

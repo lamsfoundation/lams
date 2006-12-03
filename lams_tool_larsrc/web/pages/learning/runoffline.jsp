@@ -10,7 +10,7 @@
 	<script type="text/javascript">
 	<!--
 		function finishSession(){
-			document.getElementById("finishButton").disabled = "disabled";
+			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&runOffline=true"/>';
 			return false;
 		}

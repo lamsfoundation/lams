@@ -34,7 +34,7 @@
 	function disableFinishButton() {
 		var finishButton = document.getElementById("finishButton");
 		if (finishButton != null) {
-			finishButton.disabled = "disabled";
+			finishButton.disabled = true;
 		}
 	}
 </script>

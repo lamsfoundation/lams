@@ -48,7 +48,7 @@
 			return false;
 		}
 		function finishSession(){
-			document.getElementById("finishButton").disabled = "disabled";
+			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}

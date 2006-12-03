@@ -22,7 +22,7 @@
 		
 		<script type="text/javascript">
 			function submitFinish() {
-				document.getElementById("finish").disabled = "disabled";
+				document.getElementById("finish").disabled = true;
 				location.href = '${finish}';
 			}		
 		</script>
