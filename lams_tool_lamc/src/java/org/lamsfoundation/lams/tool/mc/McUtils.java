@@ -58,10 +58,15 @@ public abstract class McUtils implements McAppConstants {
     public static String replaceNewLines(String text)
     {
         logger.debug("using text: " + text);
-        String newText = text.replaceAll("\n","<br>");
-        logger.debug("newText: " + newText);
+        String newText = "";
+        if (text != null)
+        {
+            newText = text.replaceAll("\n","<br>");
+            logger.debug("newText: " + newText);
+        }
         
         return newText;
+
     }
 
 

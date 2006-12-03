@@ -111,6 +111,10 @@ public class McGeneralLearnerFlowDTO implements Comparable
     protected String totalMarksPossible;
     
     protected Map mapFeedbackContent;
+    
+    protected Map mapFinalAnswersIsContent;
+    
+    protected Map mapFinalAnswersContent;
 
         
     /**
@@ -610,5 +614,29 @@ public class McGeneralLearnerFlowDTO implements Comparable
      */
     public void setShowMarks(String showMarks) {
         this.showMarks = showMarks;
+    }
+    /**
+     * @return Returns the mapFinalAnswersContent.
+     */
+    public Map getMapFinalAnswersContent() {
+        return mapFinalAnswersContent;
+    }
+    /**
+     * @param mapFinalAnswersContent The mapFinalAnswersContent to set.
+     */
+    public void setMapFinalAnswersContent(Map mapFinalAnswersContent) {
+        this.mapFinalAnswersContent = mapFinalAnswersContent;
+    }
+    /**
+     * @return Returns the mapFinalAnswersIsContent.
+     */
+    public Map getMapFinalAnswersIsContent() {
+        return mapFinalAnswersIsContent;
+    }
+    /**
+     * @param mapFinalAnswersIsContent The mapFinalAnswersIsContent to set.
+     */
+    public void setMapFinalAnswersIsContent(Map mapFinalAnswersIsContent) {
+        this.mapFinalAnswersIsContent = mapFinalAnswersIsContent;
     }
 }

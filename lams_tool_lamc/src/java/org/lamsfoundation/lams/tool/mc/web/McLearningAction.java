@@ -1502,7 +1502,25 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
 		Long toolContentUID=mcContent.getUid();
 		logger.debug("toolContentUID: " + toolContentUID);
+		
+		
+		Map mapFinalAnswersIsContent= new TreeMap(new McComparator());
+		Map mapFinalAnswersContent= new TreeMap(new McComparator());
+		
+	    McUsrAttempt mcUsrAttemptLocal = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), mcSession.getUid());
+    	logger.debug("obtain mcUsrAttemptLocal with highest attempt order: " + mcUsrAttemptLocal);
+    	String highestAttemptOrder="";
     	
+		List listUserAttempts=null;
+    	if (mcUsrAttemptLocal != null)
+    	{
+        	highestAttemptOrder=mcUsrAttemptLocal.getAttemptOrder().toString();
+        	logger.debug("found highestAttemptOrder: " + highestAttemptOrder);	
+    	}
+    	request.setAttribute("highestAttempOrder", highestAttemptOrder);
+		
+		
+		
 		Map mapQueAttempts= new TreeMap(new McComparator());
 		Map mapQueCorrectAttempts= new TreeMap(new McComparator());
 		Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
@@ -1511,7 +1529,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 			logger.debug("doing question with display order: " + i);
 			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(i), toolContentUID);
 			logger.debug("mcQueContent uid: " + mcQueContent.getUid());
-
+			
+			
+			
+		    McUsrAttempt mcUsrAttemptFinal=mcService.getUserAttemptForQuestionContentAndSessionUid(mcQueUsr.getUid(), mcQueContent.getUid(), 		            
+		            																				mcSession.getUid(), new Integer(highestAttemptOrder));
+		    logger.debug("mcUsrAttemptFinal: " + mcUsrAttemptFinal);
+		    logger.debug("mcUsrAttemptFinal is Correct?: " + mcUsrAttemptFinal.isAttemptCorrect());
+		    
+		    mapFinalAnswersIsContent.put(new Integer(i).toString() ,  new Boolean(mcUsrAttemptFinal.isAttemptCorrect()).toString());
+		    mapFinalAnswersContent.put(new Integer(i).toString() ,  mcUsrAttemptFinal.getMcOptionsContent().getMcQueOptionText().toString());
+		    
 			Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
 			Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
 			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
@@ -1602,6 +1630,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    	}    			
 		}
 
+		logger.debug("final mapFinalAnswersContent is: " + mapFinalAnswersContent);
+		logger.debug("final mapFinalAnswersIsContent is: " + mapFinalAnswersIsContent);
+		
+		mcGeneralLearnerFlowDTO.setMapFinalAnswersIsContent(mapFinalAnswersIsContent);
+		mcGeneralLearnerFlowDTO.setMapFinalAnswersContent(mapFinalAnswersContent);
+		
+		
 		logger.debug("final mapQueAttempts is: " + mapQueAttempts);
 		logger.debug("final mapQueCorrectAttempts is: " + mapQueCorrectAttempts);
 		logger.debug("final mapQueIncorrectAttempts is: " + mapQueIncorrectAttempts);
@@ -1610,6 +1645,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		mcGeneralLearnerFlowDTO.setMapQueCorrectAttempts(mapQueCorrectAttempts);
 		mcGeneralLearnerFlowDTO.setMapQueIncorrectAttempts(mapQueIncorrectAttempts);
 		
+				
 		logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());

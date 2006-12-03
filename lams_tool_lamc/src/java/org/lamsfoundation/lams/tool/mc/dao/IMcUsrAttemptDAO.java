@@ -146,6 +146,8 @@ public interface IMcUsrAttemptDAO
 	public List getMarks();
 	
 	public List getMarksForContent(McContent mcContent);
+	
+	public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder);
 }
 
 

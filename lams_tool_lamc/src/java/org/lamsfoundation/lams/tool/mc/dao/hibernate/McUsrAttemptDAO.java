@@ -339,6 +339,45 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    }
 
 
+		public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder)
+	    {
+		    logger.debug("starting getUserAttemptsForQuestionContentAndSessionUid:");
+		    logger.debug("queUsrUid:"  + queUsrUid);
+		    logger.debug("mcQueContentId:"  + mcQueContentId);
+		    logger.debug("mcSessionUid:"  + mcSessionUid);
+		    logger.debug("attemptOrder:"  + attemptOrder);
+		    
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+			.setLong("mcQueContentId", mcQueContentId.longValue())
+			.list();
+	        
+	        if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt:"  + attempt);
+		    	    
+		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
+		    	    {
+		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
+			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
+			    	    {
+			    	        logger.debug("user belong to this session:"  + mcSessionUid);
+			    	        logger.debug("isAttemptCorrect:"  + attempt.isAttemptCorrect());
+			    	        if (attempt.getAttemptOrder().intValue() == attemptOrder.intValue())  
+			    	            return attempt; 
+			    	    }
+		    	    }
+		    	}
+			}
+	        return null;
+	    }
+
+		
+		
+		
 		public McUsrAttempt getAttemptWithLastAttemptOrderForUserInSession(Long queUsrUid, final Long mcSessionUid)
 	    {
 		    logger.debug("starting getLastAttemptOrderForUserInSession:");

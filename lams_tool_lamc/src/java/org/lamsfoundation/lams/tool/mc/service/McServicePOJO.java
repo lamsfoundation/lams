@@ -1047,6 +1047,24 @@ public class McServicePOJO implements
         }
     }
     
+    
+    
+    public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException
+    {
+    	try
+        {
+    		return mcUsrAttemptDAO.getUserAttemptForQuestionContentAndSessionUid(queUsrUid,  mcQueContentId, mcSessionUid, attemptOrder);
+        }
+        catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is running getUserAttemptForQuestionContentAndSessionUid:"
+                                                 + e.getMessage(),e);
+        }        
+    }
+    
+    
+    
+    
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException
     {
     	try

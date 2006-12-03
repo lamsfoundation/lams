@@ -97,54 +97,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</ul>
 
 
-
-							<!--  ATTEMPTS -->
-							<h4>
-								<fmt:message key="label.attempts" />
-							</h4>
-
+							<c:set var="attemptCount" scope="request" value="0" />
 							<c:forEach var="attemptEntry"
 								items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
 								<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-
-									<c:set var="aIndex" scope="request" value="1" />
-									<c:forEach var="i" begin="1" end="30" step="1">
-
-
-										<c:forEach var="distinctAttemptEntry"
-											items="${attemptEntry.value}">
-
-											<div>
-												<c:if test="${distinctAttemptEntry.key == i}">
-													<p>
-														<strong><fmt:message key="label.attempt" /> <c:out
-																value="${requestScope.aIndex}" />: </strong>
-													</p>
-													<c:set var="aIndex" scope="request"
-														value="${requestScope.aIndex +1}" />
-													<ul>
-														<c:forEach var="singleAttemptEntry"
-															items="${distinctAttemptEntry.value}">
-															<li>
-																<c:out value="${singleAttemptEntry.value}" escapeXml="false" />
-															</li>
-														</c:forEach>
-													</ul>
-
-												</c:if>
-											</div>
-
-										</c:forEach>
-
-
-									</c:forEach>
+									<c:set var="attemptCount" scope="request" value="${attemptCount +1}" />								
 								</c:if>
 							</c:forEach>
-							<!-- END ATTEMPTS -->
+
+							<h4> <fmt:message key="label.attempt.count" />   <c:out value="${highestAttempOrder}" /> </h4>
+							
+
+
+							<c:forEach var="attemptEntryFinal"
+								items="${mcGeneralLearnerFlowDTO.mapFinalAnswersContent}">
+								<c:if test="${requestScope.mainQueIndex == attemptEntryFinal.key}">
+									&nbsp <h4> <fmt:message key="label.final.attempt" /> </h4> <c:out value="${attemptEntryFinal.value}" />
+								</c:if>
+							</c:forEach>
+
+							<c:forEach var="attemptEntryCorrect"
+								items="${mcGeneralLearnerFlowDTO.mapFinalAnswersIsContent}">
+								<c:if test="${requestScope.mainQueIndex == attemptEntryCorrect.key}">
+									<c:if test="${attemptEntryCorrect.value == 'true'}">
+										<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">									
+									</c:if>
+									<c:if test="${attemptEntryCorrect.value == 'false'}">
+										<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
+									</c:if>									
+								</c:if>
+							</c:forEach>
 
 						</c:if>
 					</c:forEach>
-					<!--  END CANDIDATE ANSWERS -->
+
 
 					<c:forEach var="feedbackEntry"
 						items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">

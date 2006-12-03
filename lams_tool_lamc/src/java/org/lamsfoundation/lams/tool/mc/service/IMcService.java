@@ -290,5 +290,7 @@ public interface IMcService
     
     public List getMarksForContent(McContent mcContent) throws McApplicationException;
     
+    public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;    
+    
 }
 
