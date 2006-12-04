@@ -1,0 +1,26 @@
+/*
+*************************************************
+LAMS 2.0
+CVS ID $id$
+
+*************************************************
+IE 7 Style Adjustments
+********************************************** */
+/* style for IE - controls the  height difference display problems in IE */
+
+
+.nav-box-right {
+	height: 31px;
+	width: auto;
+	margin-right: 2px;
+	margin-top: 0px;
+	float: right;
+	text-align: center;
+	}
+
+#nav-right { /* layout of box that contains the main navigation */
+	margin-top:15px;
+	width: auto;
+	height: 40px;
+	margin-right: 1px;
+}
