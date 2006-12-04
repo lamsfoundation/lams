@@ -35,10 +35,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author jliew
