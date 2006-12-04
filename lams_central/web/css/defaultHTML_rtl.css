@@ -350,7 +350,7 @@ a.button {
 	border: 0px none;
 	padding:3px 15px 5px 15px;
 	font-size:11px;
-	display: table;
+	display: table-cell;
 	
 }
 
@@ -360,33 +360,33 @@ a:hover.button {
 	border: 0px none;
 	padding:3px 15px 5px 15px;
 	font-size:11px;
-	display: table;
+	display: table-cell;
 }
 
 
 /*layout of adding a topic button */
 a.button-add-item {
-	background: url('../images/css/btn_add_off.rtl.gif') no-repeat top right;
+	background: url('../images/css/btn_add_off_rtl.gif') no-repeat top right;
 	color: #333;
 	border: 0px none;
 	padding:3px 25px 5px 15px;
 	font-size:11px;
-	display: table;
+	display: table-cell;
 }
 
 a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.rtl.gif') no-repeat top right;
+	background: url('../images/css/btn_add_over_rtl.gif') no-repeat top right;
 	color: #349018;
 	border: 0px none;
 	padding:3px 25px 5px 15px;
 	font-size:11px;
-	display: table;
+	display: table-cell;
 }
 
 
 /*layout of adding a topic button */
 #content a.button-add-item {
-	background: url('../images/css/btn_add_off.rtl.gif') no-repeat top right;
+	background: url('../images/css/btn_add_off_rtl.gif') no-repeat top right;
 	color: #333;
 	border: 0px none;
 	padding:3px 25px 5px 15px;
@@ -395,7 +395,7 @@ a:hover.button-add-item {
 	}
 
 #content a:hover.button-add-item {
-	background: url('../images/css/btn_add_over.rtl.gif') no-repeat top right;
+	background: url('../images/css/btn_add_over_rtl.gif') no-repeat top right;
 	color: #349018;
 	border: 0px none;
 	padding:3px 25px 5px 15px;
