@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author jliew
@@ -89,6 +90,21 @@ public class UserSearchAction extends Action {
 		String firstName = ((String)userSearchForm.get("sFirstName")).trim();
 		String lastName = ((String)userSearchForm.get("sLastName")).trim();
 		Boolean showAll = (Boolean)userSearchForm.get("showAll");
+		Boolean searched = (Boolean)userSearchForm.get("searched");
+		String resultsSection = ((String)userSearchForm.get("resultsSection")).trim();
+		//Integer sort = WebUtil.readIntParam(request,"sort",true);
+		Integer start = WebUtil.readIntParam(request,"start",true);
+		
+		// if start is set, we're returning a subset of a previous set of results; use the old search terms
+		if (start!=null) {
+			userId = WebUtil.readStrParam(request, "uid", true);
+			login = WebUtil.readStrParam(request, "l", true);
+			firstName = WebUtil.readStrParam(request, "fn", true);
+			lastName = WebUtil.readStrParam(request, "ln", true);
+			showAll = WebUtil.readBooleanParam(request, "sa");
+			resultsSection = WebUtil.readStrParam(request, "rs", true);
+			searched = true;
+		}
 		
 		log.debug("got userId: '"+userId+"'");
 		log.debug("got login: '"+login+"'");
@@ -99,13 +115,13 @@ public class UserSearchAction extends Action {
 		if (showAll) {
 			userList = service.findAll(User.class);
 		} else {
-			if(userId.length()==0) {
+			if (userId.length()==0) {
 				Map<String, String> stringProperties = new HashMap<String,String>();
 				if(login.length()>0) stringProperties.put("login","%"+login+"%");
 				if(firstName.length()>0) stringProperties.put("firstName","%"+firstName+"%");
 				if(lastName.length()>0) stringProperties.put("lastName","%"+lastName+"%");
 				if(!stringProperties.isEmpty()) userList = service.searchByStringProperties(User.class,stringProperties);
-			}else{
+			} else {
 				Map<String, Object> objectProperties = new HashMap<String,Object>();
 				objectProperties.put("userId",userId);
 				if(login.length()>0) objectProperties.put("login",login);
@@ -115,17 +131,31 @@ public class UserSearchAction extends Action {
 			}
 		}
 		
-		if(userList.isEmpty() && (Boolean)userSearchForm.get("searched")){
-			ActionMessages messages = new ActionMessages();
-			messages.add("results",new ActionMessage("msg.results.none"));
-			saveMessages(request,messages);
+		if (searched) {
+			if (userList.isEmpty()) {
+				ActionMessages messages = new ActionMessages();
+				messages.add("results",new ActionMessage("msg.results.none"));
+				saveMessages(request,messages);
+			} else {
+				userList = removeDisabledUsers(userList);
+				/*if (start!=null && start<userList.size()) {
+					int fromIndex = start.intValue();
+					request.setAttribute("userList", userList.subList(fromIndex, fromIndex+RESULTS_SECTION));
+				}*/
+			}
 		}
-		
-		userList = removeDisabledUsers(userList);
 		
 		userSearchForm.set("showAll", false);
 		userSearchForm.set("searched", true);
-		request.setAttribute("userList",userList);
+		request.setAttribute("userList", userList);
+		request.setAttribute("fullSize", userList.size());
+		request.setAttribute("resultsSection", (resultsSection.equals("all") ? userList.size() : resultsSection));
+		request.setAttribute("start", (start!=null ? start : 0));
+		request.setAttribute("uid", userId);
+		request.setAttribute("login", login);
+		request.setAttribute("firstName", firstName);
+		request.setAttribute("lastName", lastName);
+		request.setAttribute("showAll", showAll);
 		return mapping.findForward("usersearchlist");
 	}
 	

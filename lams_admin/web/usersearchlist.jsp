@@ -34,37 +34,71 @@
 	<td></td>
 </tr>
 
-<logic:notEmpty name="userList">
-	<logic:iterate id="user" name="userList">
-		<tr>
-			<td>
-				<bean:write name="user" property="userId" />
-			</td>
-			<td>
-				<bean:write name="user" property="login" />
-			</td>
-			<td>
-				<bean:write name="user" property="firstName" />
-			</td>
-			<td>
-				<bean:write name="user" property="lastName" />
-			</td>
-			<td>
-				<a href="user.do?method=edit&userId=<bean:write name='user' property='userId' />"><fmt:message key="admin.edit"/></a>
-				&nbsp;
-				<a href="user.do?method=remove&userId=<bean:write name='user' property='userId' />"><fmt:message key="admin.user.delete"/></a>
-			</td>
-		</tr>
-	</logic:iterate>
-</logic:notEmpty>
-
 <tr>
-	<td colspan=5 class="align-right">
-		<html:checkbox property="showAll">&nbsp;<fmt:message key="label.show.all.users"/></html:checkbox>&nbsp;
+	<td colspan=5>
+		<html:checkbox property="showAll">&nbsp;<fmt:message key="label.show.all.users"/></html:checkbox>&nbsp;&nbsp;&nbsp;
+		<html:select property="resultsSection" style="width:40px">
+			<html:option value="10 ">10</html:option>
+			<html:option value="20 ">20</html:option>
+			<html:option value="30 ">30</html:option>
+			<html:option value="40 ">40</html:option>
+			<html:option value="50 ">50</html:option>
+			<html:option value="all">All</html:option>
+		</html:select>&nbsp;<fmt:message key="label.results.per.page"/>
+	</td>
+<tr>
+	<td colspan=5 align="center">
 		<html-el:submit styleClass="button"><fmt:message key="admin.search"/></html-el:submit>
 		<input class="button" type="button" value='<fmt:message key="admin.reset"/>' onclick="resetFields();" />
 	</td>
 </tr>
+
+<logic:notEmpty name="userList">
+	<tr>
+		<td colspan=5><c:out value="${fullSize}"/> users found.</td>
+	</tr>
+	<c:forEach var="user" items="${userList}" begin="${start}" end="${start+resultsSection-1}" varStatus="status">
+		<tr>
+			<td>
+				<c:out value="${user.userId}"/>
+			</td>
+			<td>
+				<c:out value="${user.login}"/>
+			</td>
+			<td>
+				<c:out value="${user.firstName}"/>
+			</td>
+			<td>
+				<c:out value="${user.lastName}"/>
+			</td>
+			<td>
+				<a href="user.do?method=edit&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.edit"/></a>
+				&nbsp;
+				<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>
+			</td>
+		</tr>
+	</c:forEach>
+	<tr>
+		<td colspan=5 align="center">
+			<c:forEach var="index" varStatus="status" begin="0" end="${fullSize-1}" step="${resultsSection}">
+				<c:if test="${start == index}"><c:out value="${status.count}"/>&nbsp;</c:if>
+				<c:if test="${start != index}">
+					<c:url var="pageLink" value="usersearch.do">
+						<c:param name="start" value="${index}" />
+						<c:param name="uid" value="${uid}" />
+						<c:param name="l" value="${login}" />
+						<c:param name="fn" value="${firstName}" />
+						<c:param name="ln" value="${lastName}" />
+						<c:param name="sa" value="${showAll}" />
+						<c:param name="rs" value="${resultsSection}" />
+					</c:url>
+					<a href="<c:out value="${pageLink}"/>"><c:out value="${status.count}"/></a>&nbsp;
+				</c:if>
+			</c:forEach>
+		</td>
+	</tr>
+</logic:notEmpty>
+
 </table>
 </html-el:form>
 </logic:notEqual>
