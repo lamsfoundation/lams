@@ -40,6 +40,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
 		{
+			if (actionMethod == 'submitReflection') {
+				document.getElementById("finishButton").disabled = true;
+			}		
 			document.QaLearningForm.method.value=actionMethod; 
 			document.QaLearningForm.submit();
 		}
@@ -79,7 +82,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				styleClass="text-area"></html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:button property="submitReflection"
+				<html:button property="submitReflection" styleId="finishButton"
 					onclick="javascript:submitMethod('submitReflection');"
 					styleClass="button">
 					<fmt:message key="button.endLearning" />
