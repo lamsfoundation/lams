@@ -57,6 +57,7 @@ public class CssTag extends TagSupport {
 	private static final Logger log = Logger.getLogger(CssTag.class);
 	private static final String IE_STYLESHEET_NAME = "ie-styles";
 	private static final String IE_STYLESHEET_NAME_RTL = "ie-styles_rtl";
+	private static final String IE7_STYLESHEET_NAME = "ie7-styles";
 	private static final String IE7_STYLESHEET_NAME_RTL = "ie7-styles_rtl";
 	private String localLinkPath = null; 
 	private String style = null; 
@@ -117,7 +118,7 @@ public class CssTag extends TagSupport {
 			
 			// Special IE stylesheet for all those IE related formatting issues
 			String ieStylesheetName = (!rtl)?IE_STYLESHEET_NAME:IE_STYLESHEET_NAME_RTL;
-			String ie7StylesheetName = (!rtl)?null:IE7_STYLESHEET_NAME_RTL;
+			String ie7StylesheetName = (!rtl)?IE7_STYLESHEET_NAME:IE7_STYLESHEET_NAME_RTL;
 			String ieLink = localLinkPath != null ? generateLocalURL(ieStylesheetName) : generateURL(ieStylesheetName,serverURL);
 			
 			writer.println("<!--[if IE]>");
@@ -126,14 +127,12 @@ public class CssTag extends TagSupport {
 			writer.println("</style>");
 			writer.println("<![endif]-->");
 			
-			if(ie7StylesheetName != null) {
-				String ie7Link = localLinkPath != null ? generateLocalURL(ie7StylesheetName) : generateURL(ie7StylesheetName,serverURL);
-				writer.println("<!--[if IE 7]>");
-				writer.println("<style type=\"text/css\">");
-				writer.println("@import url ("+ie7Link+");");
-				writer.println("</style>");
-				writer.println("<![endif]-->");
-			}
+			String ie7Link = localLinkPath != null ? generateLocalURL(ie7StylesheetName) : generateURL(ie7StylesheetName,serverURL);
+			writer.println("<!--[if IE 7]>");
+			writer.println("<style type=\"text/css\">");
+			writer.println("@import url ("+ie7Link+");");
+			writer.println("</style>");
+			writer.println("<![endif]-->");
 
 		} catch ( IOException e ) {
 			log.error("CssTag unable to write out CSS details due to IOException.", e);
