@@ -154,6 +154,34 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:forEach>
 			<!-- END QUESTION  -->
 
+
+			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
+					<h4>
+						<fmt:message key="label.group.results" />
+					</h4>
+					
+					<table class="alternative-color" cellspacing="0">
+					  <tr>
+					  	<td width="30%"> 
+						  	  <strong> <fmt:message key="label.topMark"/> </strong>
+						 </td> 
+						 <td>	
+							  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
+					  	</td>
+					  </tr>	
+		
+					  <tr>
+					  	<td> 
+						  	 <strong><fmt:message key="label.avMark"/> </strong>
+					  	</td>
+					  	<td>
+							  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
+					  	</td>
+					  </tr>	
+					</table>
+				</c:if>				
+
+
 			<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}">
 				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
 
