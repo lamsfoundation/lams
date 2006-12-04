@@ -405,7 +405,7 @@ Function DirectoryLeave
     #Strcpy $RETAIN_DB "0"
     #Strcpy $RETAIN_REP "0"
     
-    IfFileExists "$INSTDIR\backup" backupExists end
+    IfFileExists "$INSTDIR\backup\backup.zip" backupExists end
     backupExists:
         ; CHECK if there are files retained from a previous uninstall
         ; THEN after installation, overwrite retained files and free files from temp folder temp folder 
@@ -559,6 +559,7 @@ Function DeployConfig
     # extract support files to write configuration
     SetOutPath $INSTDIR
     File /r "..\apache-ant-1.6.5"
+    File /r "..\zip"
     SetOutPath $TEMP
     File "build.xml"
     File "..\templates\mysql-ds.xml"
@@ -820,8 +821,17 @@ FunctionEnd
 Function OverWriteRetainedFiles
     # overwriting retain files (moved to windows/temp) to install directory files
     ${if} $RETAIN_FILES == "1"
-        #copy repository and uploaded files to install directory
         #MessageBox MB_OK|MB_ICONSTOP "repository files to be retained"
+        
+        #unzip repository files
+        setoutpath "$INSTDIR\backup"
+        strcpy $4 '$INSTDIR\zip\7za.exe x -aoa "backup.zip"'
+        nsExec::ExecToStack $4
+        pop $0
+        pop $1
+        MessageBox MB_OK|MB_ICONSTOP "Extracting retained files: $0$\n$1"
+        
+        #copy repository and uploaded files to install directory
         CopyFiles "$WINTEMP\lams\backup\repository" "$INSTDIR\" 
         DetailPrint "$INSTDIR\repository"
         CopyFiles "$WINTEMP\lams\backup\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
@@ -868,6 +878,10 @@ FunctionEnd
 Function .onInstSuccess
     Call RemoveTempFiles
     RMDir /r "$INSTDIR\apache-ant-1.6.5"
+    RMDir /r "$INSTDIR\zip"
+    RMDir /r "$INSTDIR/backup/repository"
+    RMDIR /r "$INSTDIR/backup/jboss-4.0.2"
+    Delete "$INSTDIR/backup/lamsDump.sql"
 FunctionEnd
 
 
@@ -1000,6 +1014,7 @@ Section "Uninstall"
     RMDir /r "$WINTEMP\lams\backup"
     CreateDirectory "$WINTEMP\lams\backup"
        
+    #strcpy $RETAIN_DIR "$INSTDIR\backup_$TIMESTAMP"
     strcpy $RETAIN_DIR "$INSTDIR\backup"
     CreateDirectory $RETAIN_DIR
 
@@ -1013,47 +1028,64 @@ Section "Uninstall"
         CreateDirectory "$RETAIN_DIR\repository"
         CreateDirectory "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
         
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files to $RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files to $RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
         copyfiles /silent $6 "$RETAIN_DIR"
         copyfiles /silent "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\*" "$RETAIN_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
         
         DetailPrint 'Saving repository and uploaded files to: $RETAIN_DIR'
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files from instdir to temp"
-        copyfiles /silent "$INSTDIR\backup\*" "$WINTEMP\lams\backup"
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files from instdir to temp"
+        copyfiles /silent "$RETAIN_DIR\*" "$WINTEMP\lams\backup"
     ${EndIf}
     
     setoutpath $temp
     RMdir /r "$INSTDIR\jboss-4.0.2\"
     RMdir /r "$INSTDIR\"
-    MessageBox MB_OK|MB_ICONEXCLAMATION "INSTDIR DELETED FFS!"
-    
-    ; RESTORE Retained folders to their original localtion then delete temp files
-    ${if} $UNINSTALL_RETAIN == 1
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Copying files from temp to $INSTDIR"
-        CreateDirectory "$RETAIN_DIR"
-        CopyFiles /silent "$WINTEMP\lams\backup\*" "$RETAIN_DIR"
-    ${endif}
-    RMDir /r "$WINTEMP\lams"
-    MessageBox MB_OK|MB_ICONEXCLAMATION "if the jboss folder is still there now, im stumped!"
+    #MessageBox MB_OK|MB_ICONEXCLAMATION "INSTDIR DELETED FFS!"
     
     ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
     
-    ;REMOVING ENTIRE REMAINING LAMS DIRECTORY
+    
+    
+    
+    ; RESTORE Retained folders to their original localtion then delete temp files
+    ; DUMP database into backup folder
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
     ReadRegStr $1 HKLM "${REG_HEAD}" "db_name"
     ReadRegStr $2 HKLM "${REG_HEAD}" "db_user"
     ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
     ${If} $UNINSTALL_RETAIN == 1
-        Messagebox MB_OK|MB_ICONEXCLAMATION "retaining db"
-        ; DUMP the database file into the retained install directory  
-        Strcpy $4 "$0\bin\mysqldump -r $RETAIN_DIR\lamsDump.sql $1 -u $2 -p$3"
+        #Messagebox MB_OK|MB_ICONEXCLAMATION "retaining db"
+        ; DUMP the database file into the retained install directory 
+           
+        CreateDirectory "$RETAIN_DIR" 
+        Strcpy $4 "$0\bin\mysqldump -r $WINTEMP\lams\backup\lamsDump.sql $1 -u $2 -p$3"
         nsExec::ExecToStack $4
         Pop $8
         Pop $9
         DetailPrint 'Dumping database to: $RETAIN_DIR'
+        
+        Setoutpath $INSTDIR
+        File /r "..\zip"
+        
+        #ZIP UP ALL RETAINED FILES 
+        IfFileExists "$WINTEMP\lams\backup\backup.zip" removeZip leaveFolder
+        removeZip:
+            delete "$WINTEMP\lams\backup\backup.zip"
+        leaveFolder:
+        
+        SetOutPath "$WINTEMP\lams\backup"
+        Strcpy $4 '$INSTDIR\zip\7za.exe a -r -tzip "$RETAIN_DIR\backup.zip" "*"'
+        nsExec::ExecToStack $4 
+        rmdir /r "$INSTDIR\zip"
+        pop $5
+        pop $6
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "ZIP RESULT: $5$\n$6$\n"
+        rmdir $RETAIN_DIR
     ${EndIf}
+    RMDir /r "$WINTEMP\lams"
+    
     StrLen $9 $3
     StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
     DetailPrint $4
