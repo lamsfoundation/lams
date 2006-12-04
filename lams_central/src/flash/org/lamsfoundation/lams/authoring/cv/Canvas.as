@@ -349,7 +349,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(_ddm.learningDesignID == null) { mode = Workspace.MODE_SAVE }
 		
 		//clear the learningDesignID so it will not overwrite the existing one
-		_ddm.learningDesignID = null;
+		//_ddm.learningDesignID = null;
 		
 		
         var onOkCallback:Function = Proxy.create(this, saveDesignToServer);
@@ -373,7 +373,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function saveDesignToServer(workspaceResultDTO:Object):Boolean{
 		_global.breakpoint();
-		
+		_ddm.learningDesignID = null;
 		//TODO: Set the results from wsp into design.
 		if(workspaceResultDTO != null){
 			if(workspaceResultDTO.selectedResourceID != null){
