@@ -44,6 +44,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
+			if (actionMethod == 'learnerFinished') {
+				document.getElementById("finishButton").disabled = true;
+			}
 			document.VoteLearningForm.dispatch.value=actionMethod; 
 			document.VoteLearningForm.submit();
 		}
@@ -216,7 +219,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:message key="label.retake" />
 					</html:submit>
 
-					<html:submit property="learnerFinished"
+					<html:submit property="learnerFinished" styleId="finishButton"
 						onclick="javascript:submitMethod('learnerFinished');"
 						styleClass="button">
 						<fmt:message key="label.finished" />
