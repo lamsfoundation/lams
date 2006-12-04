@@ -57,11 +57,58 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+
 			<table width="80%" cellspacing="8" class="forms">
 
+			<c:if test="${(portfolioExportMode == 'learner')}">
+					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}"> 	 
+					       <c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+			
+					<tr>
+						<td> &nbsp&nbsp&nbsp</td>
+					</tr>
+			
+					   <tr>
+						<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question"/> : </b>
+							<c:out value="${currentDto.question}" escapeXml="false"/>
+						</td>
+					   </tr>
+			
+					  <tr>
+						<td NOWRAP valign=top>
+						<table align=center>
+						<tr>
+							<td NOWRAP valign=top> <b>  <fmt:message key="label.user"/>  </b> </td>
+							<td NOWRAP valign=top> <b>  <fmt:message key="label.learning.attemptTime"/> </b></td> 	 
+							<td NOWRAP valign=top> <b>  <fmt:message key="label.response"/>        </b></td> 	 
+						</tr>
+			
+			
+						  <c:forEach var="questionAttemptData"items="${currentDto.questionAttempts}">
+							  <c:forEach var="sData" items="${questionAttemptData.value}">
+							    <c:set var="userData" scope="request" value="${sData.value}"/>
+							     <c:set var="responseUid" scope="request" value="${userData.uid}"/>
+			
+									<c:if test="${currentQuestionId == userData.questionUid}">
+									    <tr>
+										<td NOWRAP valign=top>
+											<c:out value="${userData.userName}"/>   </td>
+										<td NOWRAP valign=top> 
+											<lams:Date value="${userData.attemptTime}"/>  </td>
+										<td NOWRAP valign=top>
+											<c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>
+									     </tr>
+									 </c:if>
+							</c:forEach>
+						</c:forEach>
+					     </table>
+					     </td>
+					</tr>
+					</c:forEach>
+			</c:if>	
 
 
-
+			<c:if test="${(portfolioExportMode != 'learner')}">
 
 					<c:forEach var="groupDto" items="${listAllGroupsDTO}">
 			  	 		<c:set var="sessionId" scope="request" value="${groupDto.sessionId}"/>
@@ -123,50 +170,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  			</tr>
 					</c:forEach>		  	
 				</c:forEach>		  	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			
+		</c:if>			
 
 						<tr>			
 							<td valign=top class="align-left">
