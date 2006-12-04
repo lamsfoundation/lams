@@ -17,10 +17,3 @@ IE 7 Style Adjustments
 	float: right;
 	text-align: center;
 	}
-
-#nav-right { /* layout of box that contains the main navigation */
-	margin-top:15px;
-	width: auto;
-	height: 40px;
-	margin-right: 1px;
-}
