@@ -38,13 +38,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css />
 	<title><fmt:message key="activity.title" />
 	</title>
+	<script type="text/javascript">
+		function disableFinishButton() {
+			var elem = document.getElementById("finishButton");
+			if (elem != null) {
+				elem.disabled = true;
+			}
+		}
+	</script>
 </head>
 
 <body class="stripes">
 
 	<div id="content">
 		<html:form action="/learning?method=displayMc&validate=false"
-			method="POST" target="_self">
+			method="POST" target="_self" onsubmit="disableFinishButton();">
 			<html:hidden property="toolContentID" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="httpSessionID" />
@@ -117,7 +125,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if
 						test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
 						<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-							<html:submit property="learnerFinished" styleClass="button">
+							<html:hidden property="learnerFinished" value="Finished" />
+							
+							<html:submit styleClass="button" styleId="finishButton">
 								<fmt:message key="label.finished" />
 							</html:submit>
 						</c:if>
@@ -136,8 +146,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<div class="space-bottom-top align-right">
 					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-						<html:submit property="learnerFinished" styleClass="button">
-							<fmt:message key="label.finished" />
+						<html:hidden property="learnerFinished" value="Finished" />
+													  			  		
+						<html:submit styleClass="button" styleId="finishButton">
+							<fmt:message key="label.finished"/>
 						</html:submit>
 					</c:if>
 
