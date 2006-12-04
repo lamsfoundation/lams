@@ -33,9 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<organizations default="default">
 				<learning-design identifier="default" uri="" level="A" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd">
 					<title>
-						<lams:langstring>
-							<xsl:value-of select="*/title"/>
-						</lams:langstring>
+						<xsl:value-of select="*/title"/>
 					</title>
 					<!-- ================================== lams LD ================================== -->
 					<xsl:for-each select="/*/*">
