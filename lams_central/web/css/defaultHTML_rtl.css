@@ -315,6 +315,34 @@ Layout of main content section
 	text-decoration: none;
 }
 
+/*layout of authoring buttons*/
+
+/*layout of a general button*/
+#saveCancelButtons a.button {
+	background: url('../images/css/btn_off.gif') repeat-x 0px 2px;
+	color: #333;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+	font-size:11px;
+}
+
+/*  style to disbable input buttons */
+#saveCancelButtons a.button .disabled {
+	color: #999;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 2px;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	}
+
+#saveCancelButtons a:hover.button {
+	background: url('../images/css/btn_over.gif') repeat-x 0px 2px;
+	color: #349018;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+}
+
 /*layout of a general button*/
 a.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
@@ -848,16 +876,16 @@ margin-left:50px;
 text-align:left;
 }
 #login-right-col a.button {
-background:url('../images/css/btn_off.gif') repeat-x 0px 0px; 
+background:url('../images/css/btn_off.gif') repeat-x 0px 2px; 
 color:#333; 
 border:0px none; 
-padding:5px 20px 10px 20px;
+padding:5px 20px 6px 20px;
 text-decoration:none;
 float: left;
 }
 
 #login-right-col a:hover.button {
-background:url('../images/css/btn_over.gif') repeat-x 0px 0px; 
+background:url('../images/css/btn_over.gif') repeat-x 0px 2px; 
 color:#349018; 
 border:0px none; 
 padding:5px 20px 6px 20px; 
