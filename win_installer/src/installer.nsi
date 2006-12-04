@@ -191,9 +191,7 @@ Var WILDFIRE_PASS
 Var WINTEMP
 Var RETAIN_DIR
 Var RETAIN_FILES
-#Var RETAIN_CONF
-#Var RETAIN_DB
-#Var RETAIN_REP
+
 
 
 # installer sections
@@ -401,9 +399,7 @@ Function DirectoryLeave
     ${EndIf}
     
     Strcpy $RETAIN_FILES "0"
-    #Strcpy $RETAIN_CONF "0"
-    #Strcpy $RETAIN_DB "0"
-    #Strcpy $RETAIN_REP "0"
+
     
     IfFileExists "$INSTDIR\backup\backup.zip" backupExists end
     backupExists:
@@ -550,7 +546,10 @@ Function PostWildfireConfig
     Pop $0
     Pop $1
     ${If} $0 == 0
-        MessageBox MB_OK|MB_ICONINFORMATION "Wildfire does not appear to be running - LAMS will be OK, but chat rooms will be unavailable."
+        MessageBox MB_OKCANCEL|MB_ICONQUESTION "Wildfire does not appear to be running - LAMS will be OK, but chat rooms will be unavailable." IDOK noWildfire IDCANCEL cancel
+        cancel:
+            Abort
+        noWildfire:
     ${EndIf}
 FunctionEnd
 
@@ -827,16 +826,15 @@ Function OverWriteRetainedFiles
         setoutpath "$INSTDIR\backup"
         strcpy $4 '$INSTDIR\zip\7za.exe x -aoa "backup.zip"'
         nsExec::ExecToStack $4
-        pop $0
-        pop $1
-        MessageBox MB_OK|MB_ICONSTOP "Extracting retained files: $0$\n$1"
+        #pop $0
+        #pop $1
+        #MessageBox MB_OK|MB_ICONSTOP "Extracting retained files: $0$\n$1"
         
         #copy repository and uploaded files to install directory
         CopyFiles "$WINTEMP\lams\backup\repository" "$INSTDIR\" 
         DetailPrint "$INSTDIR\repository"
         CopyFiles "$WINTEMP\lams\backup\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
         DetailPrint "Overwrite $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war"
-        MessageBox MB_OK|MB_ICONEXCLAMATION "COPYFILES $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war" 
     ${endif}
     RMdir "$WINTEMP\lams"
 FunctionEnd
@@ -918,7 +916,10 @@ Function un.onInit
         Pop $0
         Pop $1
         DetailPrint "Sent stop command to LAMS service."
+        sleep 10000
         Goto checklams
+        # sleep for 10s to ensure that JBoss closes properly
+        
     quit:
         Delete "$TEMP\LocalPortScanner.class"
         MessageBox MB_OK|MB_ICONSTOP "Uninstall cannot continue while LAMS is running."
@@ -935,9 +936,7 @@ FunctionEnd
 
 Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RETAIN "uninstall.ini" "Field 1" "State"
-    #!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_DB "uninstall.ini" "Field 1" "State"
-    #!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RP "uninstall.ini" "Field 2" "State"
-    #!insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_CF "uninstall.ini" "Field 3" "State"
+    
 FunctionEnd
 
 
@@ -1079,8 +1078,8 @@ Section "Uninstall"
         Strcpy $4 '$INSTDIR\zip\7za.exe a -r -tzip "$RETAIN_DIR\backup.zip" "*"'
         nsExec::ExecToStack $4 
         rmdir /r "$INSTDIR\zip"
-        pop $5
-        pop $6
+        #pop $5
+        #pop $6
         #MessageBox MB_OK|MB_ICONEXCLAMATION "ZIP RESULT: $5$\n$6$\n"
         rmdir $RETAIN_DIR
     ${EndIf}
