@@ -207,7 +207,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 						<div class="space-bottom-top" align="right">
-								<html:button property="endLearning"
+								<html:button property="endLearning" styleId="finishButton"
 									onclick="javascript:submitMethod('endLearning');"
 									styleClass="button">
 									<fmt:message key="button.endLearning" />
@@ -347,7 +347,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:if>						
 
 						<div class="space-bottom-top align-right">
-								<html:button property="endLearning"
+								<html:button property="endLearning" styleId="finishButton"
 									onclick="javascript:submitMethod('endLearning');"
 									styleClass="button">
 									<fmt:message key="button.endLearning" />
