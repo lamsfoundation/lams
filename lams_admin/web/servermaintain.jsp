@@ -5,6 +5,7 @@
 	<a href="serverlist.do"><fmt:message key="sysadmin.maintain.external.servers" /></a> :
 	<fmt:message key="sysadmin.maintain.server.edit"/>
 </h2>
+<lams:help page="LAMS+v2.0+Integration+Setup+Step-by-Step+Guide"/>
 <br />
 <html:errors/>
 <br />
