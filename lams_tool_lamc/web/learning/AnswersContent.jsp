@@ -65,13 +65,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				return (true);
 			}
 			
+			function disableContinueButton() {
+				var elem = document.getElementById("continueButton");
+				if (elem != null) {
+					elem.disabled = true;
+				}				
+			}
+			
 		</script>
 </head>
 
 <body class="stripes">
 
 <div id="content">
-	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self" onsubmit="disableContinueButton();">
 		<html:hidden property="toolContentID"/>						
 		<html:hidden property="toolSessionID"/>						
 		<html:hidden property="httpSessionID"/>			
