@@ -13,6 +13,7 @@ for more information.
 =======================
 To use LAMS 2.0, first make sure it is started - use the 'Start LAMS' shortcut
 in the LAMSv2 Start Menu folder if you're not sure.  MySQL must be running.
+For chat rooms to function, Wildfire must also be running.
 
 While LAMS 2.0 is running, you may access the login page using the 'Access 
 LAMS' short cut in the LAMSv2 Start Menu folder.
