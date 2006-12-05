@@ -83,20 +83,7 @@ function UpdateRosterDisplay() {
 		}
 	}
 	
-	// change the name on the 'Send To' label
-	if (MODE == "moderator" && !(this.currentIndex === null)) {
-		var user = this.users[this.currentIndex];
-		var sendToUserElem = document.getElementById("sendToUser");
-		sendToUserElem.innerHTML = "";
-		sendToUserElem.appendChild(createElem("span", null, {color:getColour(user.nick)}, user.nick));
-		document.getElementById("sendToEveryone").style.display = "none";
-		document.getElementById("sendToUser").style.display = "";
-	} 
-	
-	//else {
-	//	document.getElementById("sendToUser").style.display = "none";
-	//	document.getElementById("sendToEveryone").style.display = "";
-	//}
+	rosterDiv.parentNode.innerHTML = rosterDiv.parentNode.innerHTML;
 }
 function Roster() {
 	this.users = [];
