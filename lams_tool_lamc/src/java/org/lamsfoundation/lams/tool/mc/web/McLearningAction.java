@@ -834,8 +834,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	    else
 	    {
-		 	//assuming there can not be more than 50 candidates
-		 	for (int i=0 ; i < 51 ; i++)
+	        Long maxCandidateCount=mcService.loadMaxUid();
+	        logger.debug("maxCandidateCount: " + maxCandidateCount);
+
+	        for (int i=0 ; i <= maxCandidateCount.intValue() ; i++)
 		 	{
 		 	   String currentCheckedCa= request.getParameter("checkedCa" + i);    
 		 	   logger.debug("currentCheckedCa : " + currentCheckedCa);
@@ -846,7 +848,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 				 	learnerInput.add(currentCheckedCa);
 		 	   }
 		 	}
-		 	
+
 		 	mcLearningForm.resetCa(mapping, request);
 	    }
 	    

@@ -691,6 +691,22 @@ public class McServicePOJO implements
         }
     }
     
+    
+    public Long loadMaxUid() throws McApplicationException
+    {
+    	try
+        {
+            return mcOptionsContentDAO.loadMaxUid();
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting max uid"
+                                                 + " in the mc options content: "
+                                                 + e.getMessage(),e);
+        }        
+    }
+    
+    
     public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException
     {
     	try

@@ -52,12 +52,51 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	 	
 	 	private static final String LOAD_CORRECT_OPTION = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
 	 	
+	 	
+	 	private static final String LOAD_MAX_UID = "from mcOptsContent in class McOptsContent";
+	 	
 	 	public McOptsContent getMcOptionsContentByUID(Long uid)
 		{
 			 return (McOptsContent) this.getHibernateTemplate()
 	         .get(McOptsContent.class, uid);
 		}
+
+	 	
+	 	public Long loadMaxUid()
+	    {
+	 	   logger.debug("starting loadMaxUid");
+	 	   HibernateTemplate templ = this.getHibernateTemplate();
 		
+			List list = getSession().createQuery(LOAD_MAX_UID)
+				.list();
+	
+			logger.debug("list:" + list);
+			
+			int maxUid=0;
+			Long uid=null;
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+		    		logger.debug("mcOptsContent:" + mcOptsContent);
+		    		uid=mcOptsContent.getUid();
+		    		logger.debug("uid:" + uid);
+		    		
+		    		if (uid.intValue() > maxUid)
+		    		{
+		    		    logger.debug("assign max to :" + uid);
+		    		    maxUid=uid.intValue();
+		    		}
+		    		
+		    		
+		    	}
+			}
+			logger.debug("final max uid:" + maxUid);
+			return new Long(maxUid);
+	    }
+
+	 	
 	 	
 	 	public List findMcOptionsContentByQueId(Long mcQueContentId)
 	    {
