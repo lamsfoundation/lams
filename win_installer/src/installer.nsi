@@ -22,12 +22,6 @@
 
 /* $$Id$$ */
 
-/*
- * TODO: uninstaller option to keep database/repository
- * TODO: installer option to use existing db/repo
- * TODO: desktop icons, readme?
- */
-
 # includes
 !include "TextFunc.nsh"
 !include "Functions.nsh"
@@ -39,7 +33,7 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.0 RC2"
+!define VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
@@ -78,8 +72,10 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 
 # display finish page stuff
 !define MUI_FINISHPAGE_RUN $INSTDIR\lams-start.exe
-!define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now."
+!define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now"
 ;!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
+!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\readme.txt
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the readme file"
 !define MUI_FINISHPAGE_LINK "Visit LAMS Community"
 !define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
 
@@ -230,6 +226,8 @@ SectionGroup /e "!Install LAMS"
         SetOutPath $INSTDIR
         File /a "..\build\lams-start.exe"
         File /a "..\build\lams-stop.exe"
+        File /a "..\license.txt"
+        File /a "..\readme.txt"
         Call SetupStartMenu
         
         ${if} $RETAIN_FILES == "1"
