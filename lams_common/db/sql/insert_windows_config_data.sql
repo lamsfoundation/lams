@@ -16,7 +16,7 @@ insert into lams_configuration (config_key, config_value) values ('CleanupPrevie
 insert into lams_configuration (config_key, config_value) values ('AuthoringActivitiesColour', 'true');
 insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.02.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
