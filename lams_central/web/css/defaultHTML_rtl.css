@@ -272,8 +272,7 @@ Layout of main content section
 	background: url('../images/css/body_bg.jpg') repeat-y top right;
 	padding: 0px 15px 40px 15px;
 	font-size: 11px;
-	margin-top: -5px
-	
+	margin-top: -5px;
 }
 
 /*layout of Links within the content area */
@@ -381,8 +380,17 @@ a:hover.button-add-item {
 	padding:3px 25px 5px 15px;
 	font-size:11px;
 	display: table-cell;
+	
 }
 
+#button-table {
+	display: table;	
+	border-spacing: 10px 0px;
+}
+
+#button-row {
+	display: table-row-group;
+}
 
 /*layout of adding a topic button */
 #content a.button-add-item {
@@ -391,7 +399,7 @@ a:hover.button-add-item {
 	border: 0px none;
 	padding:3px 25px 5px 15px;
 	font-size:11px;
-	display: table;
+	display: table-cell;
 	}
 
 #content a:hover.button-add-item {
@@ -402,7 +410,7 @@ a:hover.button-add-item {
 	padding-left: 15px;
 	padding-right: 25px;
 	font-size:11px;
-	display: table;
+	display: table-cell;
 }
 
 /************ The sequence name box **********/
@@ -435,7 +443,7 @@ a:hover.button-add-item {
 	color:#FF6666;
 	text-decoration: none;
 	border-bottom: 1px dotted #FF6666;
-	}
+}
 	
 	
 #content a:hover.disabled-sequence-name-link {

@@ -25,7 +25,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="tabbed" />
 
 		<script language="JavaScript" type="text/JavaScript">
 
@@ -193,7 +192,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:message key="label.add.candidates" />
 					</html:submit>
 				</div>
-
+				<div class="float-right">
 				<fmt:message key="label.questions.worth"></fmt:message>
 				<select name="mark">
 					<c:forEach var="markEntry"
@@ -210,6 +209,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 				</select>
 				<fmt:message key="label.marks"></fmt:message>
+				</div>
 			</div>
 
 			<div class="field-name">
@@ -217,15 +217,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 			<html:textarea property="feedback" rows="3" cols="70"></html:textarea>
 
-			<div class="space-bottom-top">
-				<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"				
-					class="button-add-item"> <fmt:message key="label.add.new.question" />
-				</a>
-
-				<a href="#" onclick="javascript:window.parent.hideMessage()"
-					class="button space-left"> <fmt:message key="label.cancel" />
-				</a>
-			</div>
+			
+			<lams:ImgButtonWrapper>
+					<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"				
+						class="button-add-item"> <fmt:message key="label.add.new.question" />
+					</a>
+	
+					<a href="#" onclick="javascript:window.parent.hideMessage()"
+						class="button space-left"> <fmt:message key="label.cancel" />
+					</a>
+			</lams:ImgButtonWrapper>
 
 		</html:form>
 	</body>

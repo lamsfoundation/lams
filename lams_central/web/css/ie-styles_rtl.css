@@ -102,7 +102,8 @@ a.button-add-item {
 	border: 0px none;
 	padding:5px 15px 6px 30px;
 	font-size:11px;
-	}
+	margin: 5px;
+}
 
 a:hover.button-add-item {
 	background: url('../images/css/btn_add_over_rtl.gif')no-repeat right top;
@@ -110,8 +111,8 @@ a:hover.button-add-item {
 	border: 0px none;
 	padding:5px 15px 6px 30px;
 	font-size:11px;
-
-	}
+	margin: 5px;
+}
 	
 /*layout of a general button*/
 a.button {
@@ -120,8 +121,7 @@ a.button {
 	border: 0px none;
 	padding:5px 15px 6px 15px;
 	font-size:11px;
-	display:table;
-	
+	margin: 5px;
 }
 
 a:hover.button {
@@ -130,13 +130,20 @@ a:hover.button {
 	border: 0px none;
 	padding:5px 15px 6px 15px;
 	font-size:11px;
-	display:table;
+	margin: 5px;
 }	
-	
-	
+
+#button-table {
+	display: block;
+}
+
+#button-row {
+	display: block;
+}
+
 #content {
 	padding-bottom:0px
-	}
+}
 	
 .right-buttons {float:left; padding-top:5px; padding-bottom:5px; margin-bottom:20px;}
 
