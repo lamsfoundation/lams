@@ -54,6 +54,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 
 	private var _learningDesignID:Number;
+	private var _prevLearningDesignID:Number;	// used for backup retrieval of the learning Design ID
 	private var _title:String;
 	private var _description:String;
 	private var _helpText:String;
@@ -712,6 +713,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set learningDesignID(a:Number):Void{
 		_learningDesignID = a;
+	}
+	
+	public function get prevLearningDesignID():Number{
+		return _prevLearningDesignID;
+	}
+	
+	public function set prevLearningDesignID(a:Number):Void{
+		_prevLearningDesignID = a;
 	}
 	
 	public function get title():String{

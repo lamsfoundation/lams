@@ -347,9 +347,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function saveDesignToServerAs(mode:String){
 		// if design as not been previously saved then we should use SAVE mode
 		if(_ddm.learningDesignID == null) { mode = Workspace.MODE_SAVE }
-		
-		//clear the learningDesignID so it will not overwrite the existing one
-		//_ddm.learningDesignID = null;
+		else { 
+			//hold exisiting learningDesignID value in model (backup)
+			_ddm.prevLearningDesignID = _ddm.learningDesignID;
+			
+			//clear the learningDesignID so it will not overwrite the existing one
+			_ddm.learningDesignID = null;
+		}
 		
 		
         var onOkCallback:Function = Proxy.create(this, saveDesignToServer);
@@ -373,7 +377,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function saveDesignToServer(workspaceResultDTO:Object):Boolean{
 		_global.breakpoint();
-		_ddm.learningDesignID = null;
+
 		//TODO: Set the results from wsp into design.
 		if(workspaceResultDTO != null){
 			if(workspaceResultDTO.selectedResourceID != null){
@@ -417,6 +421,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		
 		if(r instanceof LFError){
+			// reset old learning design ID if failed completing a save-as operation
+			if(_ddm.prevLearningDesignID != null && _ddm.saveMode == 1) {
+				_ddm.prevLearningDesignID = null;
+			}
+			
 			Cursor.showCursor(Application.C_DEFAULT);
 			r.showErrorAlert();
 		}else{

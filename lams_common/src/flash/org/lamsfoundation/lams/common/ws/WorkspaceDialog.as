@@ -25,6 +25,9 @@ import mx.controls.*
 import mx.utils.*
 import mx.managers.*
 import mx.events.*
+import org.lamsfoundation.lams.authoring.Application;
+import org.lamsfoundation.lams.authoring.cv.Canvas;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
@@ -720,9 +723,7 @@ class WorkspaceDialog extends MovieClip{
     * Called by the cancel button 
     */
     private function cancel(){
-        trace('Cancel');
-        //close parent window
-        _container.deletePopUp();
+		close();
     }
 	
 	public function showHideBtn(v:Boolean):Void{
@@ -969,7 +970,7 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 	public function closeThisDialogue(){
-		 _container.deletePopUp();
+		 close();
 	}
 
 	
@@ -998,9 +999,23 @@ class WorkspaceDialog extends MovieClip{
     */
     private function click(e:Object){
         trace('WorkspaceDialog.click');
-        e.target.deletePopUp();
+		close(e.target);
+        // e.target.deletePopUp();
     }
 	
+	private function close(container:Object){
+		// restore learningDesignID
+		var ddm:DesignDataModel = Application.getInstance().getCanvas().ddm;
+		
+		if(ddm.prevLearningDesignID != null) {
+			ddm.learningDesignID = ddm.prevLearningDesignID;
+			ddm.prevLearningDesignID = null;
+		}
+		
+        //close parent window
+		if(container != null) { container.deletePopUp(); }
+        else { _container.deletePopUp(); }
+	}
 
 	/**
 	 * Recursive function to set any folder with children to be a branch
