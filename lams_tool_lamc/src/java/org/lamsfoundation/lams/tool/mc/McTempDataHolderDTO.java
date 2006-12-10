@@ -39,6 +39,7 @@ public class McTempDataHolderDTO implements Comparable
     protected String totalUserMark;
     protected String totalReportableUserMark;
     protected String totalMarksPossible;
+    protected String displayOrder;
 
     
 	public int compareTo(Object o)
@@ -58,6 +59,7 @@ public class McTempDataHolderDTO implements Comparable
             .append("totalUserMark : ", totalUserMark)
             .append("totalReportableUserMark : ", totalReportableUserMark)
             .append("totalMarksPossible : ", totalMarksPossible)
+            .append("displayOrder : ", displayOrder)
             .toString();
     }
     
@@ -121,5 +123,17 @@ public class McTempDataHolderDTO implements Comparable
      */
     public void setTotalMarksPossible(String totalMarksPossible) {
         this.totalMarksPossible = totalMarksPossible;
+    }
+    /**
+     * @return Returns the displayOrder.
+     */
+    public String getDisplayOrder() {
+        return displayOrder;
+    }
+    /**
+     * @param displayOrder The displayOrder to set.
+     */
+    public void setDisplayOrder(String displayOrder) {
+        this.displayOrder = displayOrder;
     }
 }

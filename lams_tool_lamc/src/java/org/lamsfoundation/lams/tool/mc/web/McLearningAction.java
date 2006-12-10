@@ -872,9 +872,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	List allQuestionUidsList = getAllQuestionUids(mcContent);
     	logger.debug("allQuestionUidsList: " + allQuestionUidsList);
 
-
-    	boolean allQuestionsChecked=allQuestionsChecked(learnerInput, allQuestionUidsList);
+    	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+    	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
+    	
+    	McTempDataHolderDTO mcTempDataHolderDTO= new McTempDataHolderDTO();
+    	
+    	boolean allQuestionsChecked=allQuestionsChecked(mcService,learnerInput, allQuestionUidsList, mcTempDataHolderDTO);
     	logger.debug("allQuestionsChecked: " + allQuestionsChecked);
+    	logger.debug("mcTempDataHolderDTO displayOrder: " + mcTempDataHolderDTO.getDisplayOrder());
+    	
     	
     	if (!allQuestionsChecked)
         {
@@ -889,14 +895,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	        McLearningStarterAction mcLearningStarterAction= new McLearningStarterAction();
 	        mcLearningStarterAction.commonContentSetup(request, mcContent, mcService, mcLearningForm, toolSessionID);
+	    
+	        mcGeneralLearnerFlowDTO.setQuestionIndex(mcTempDataHolderDTO.getDisplayOrder());
+
+	        request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+			logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
 	        
 	        logger.debug("returning to LOAD_LEARNER: " + LOAD_LEARNER);
 	      	return (mapping.findForward(LOAD_LEARNER));
         }
     	
-    	
-    	
-	 	McTempDataHolderDTO mcTempDataHolderDTO= new McTempDataHolderDTO();
+	 	
 
 	 	List selectedQuestionAndCandidateAnswersDTO=buildSelectedQuestionAndCandidateAnswersDTO(allQuestionUidsList, learnerInput,mcTempDataHolderDTO 
 	 	        , mcService, mcContent);
@@ -917,8 +926,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		String totalMarksPossible=mcTempDataHolderDTO.getTotalMarksPossible(); 
 		logger.debug("totalMarksPossible: " + totalMarksPossible);
 		
-		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-    	logger.debug("constructed a new mcGeneralLearnerFlowDTO");
+		
     	mcGeneralLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
     	
     	int totalQuestionCount=mcContent.getMcQueContents().size();
@@ -1085,7 +1093,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     
     
     
-    public boolean allQuestionsChecked(List learnerInput, List allQuestionUidsList)
+    public boolean allQuestionsChecked(IMcService mcService, List learnerInput, 
+            List allQuestionUidsList, McTempDataHolderDTO mcTempDataHolderDTO)
     {
     	logger.debug("starting allQuestionsChecked learnerInput: " +  learnerInput);
     	logger.debug("using  allQuestionUidsList: " +  allQuestionUidsList);
@@ -1122,7 +1131,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
     	    if (questionSelected == false)
     	    {
-    	        logger.debug("this question is not selected at all, question uid :" +  uid);
+    	        logger.debug("mcTempDataHolderDTO displayOrder:" +  uid);
+    	        String unselectedQuestionUid=uid;
+    	        McQueContent mcQueContent=mcService.findMcQuestionContentByUid(new Long(unselectedQuestionUid));
+    	        logger.debug("mcQueContent :" +  mcQueContent);
+    	        logger.debug("mcQueContent displayorder:" +  mcQueContent.getDisplayOrder());
+    	        mcTempDataHolderDTO.setDisplayOrder(mcQueContent.getDisplayOrder().toString());
     	        return false;
     	    }
     	}

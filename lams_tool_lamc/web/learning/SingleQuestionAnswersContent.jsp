@@ -41,6 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if>
 
 <html:hidden property="nextQuestionSelected" />
+<html:hidden property="continueOptionsCombined" />
 <html:hidden property="questionIndex"
 	value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
@@ -103,9 +104,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-		<html:submit property="continueOptionsCombined" onclick="javascript:verifyCandidateSelected()" styleClass="button">
-			<fmt:message key="button.continue" />
-		</html:submit>
+		<img src="<c:out value="${tool}"/>images/send.gif"
+			align=left onclick="javascript:if (verifyCandidateSelected()){ submitAllAnswers();}">
 	</c:if>
 
 	<p>&nbsp;</p>

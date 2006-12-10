@@ -45,7 +45,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				document.McLearningForm.nextQuestionSelected.value = 1;
 				document.McLearningForm.submit();
 			}
-			
+
+			function submitAllAnswers() 
+			{
+				document.McLearningForm.continueOptionsCombined.value = 1;			
+				document.McLearningForm.submit();
+			}
+
 			function verifyCandidateSelected()
 			{
 				var candidateSelected = false;
