@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<head>
-		<%@ include file="/common/learnerheader.jsp"%>
+		<%@ include file="/common/header.jsp"%>
 		
 		<script language="JavaScript" type="text/JavaScript">
 
@@ -244,36 +244,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:textarea property="feedback" rows="3" cols="70"></html:textarea>							
 					</td>
 				</tr>
-
-				
-
-				<tr>
-					<td align="center" valign="bottom">
-						<table>
-							<tr>
-							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"
-									class="button-add-item"> <fmt:message key="label.add.new.question" />
-								</a>
-							</td> 
-	
-							<td>
-								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
-									<fmt:message key="label.cancel" />
-								</a>
-							</td> 	
-							</tr>					
-						</table>
-					</td>
-				</tr>
-
-
-			</table>				
-			</td>
-			</tr>
-				
 			</html:form>
 			
+		<tr><td>
+		<lams:ImgButtonWrapper>
+			<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"
+				class="button-add-item"> <fmt:message key="label.add.new.question" />
+			</a>
+			<a href="#" onclick="javascript:window.parent.hideMessage()" class="button space-left">
+				<fmt:message key="label.cancel" />
+			</a>
+		</lams:ImgButtonWrapper>
+		</td></tr>	
 		</table>
 	</body>
 </lams:html>
