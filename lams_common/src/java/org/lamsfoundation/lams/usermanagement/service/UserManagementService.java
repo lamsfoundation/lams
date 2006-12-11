@@ -821,4 +821,12 @@ public class UserManagementService implements IUserManagementService {
 		Integer requestorId = getRequestorId();
 		return (requestorId!=null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false);
 	}
+	
+	public Integer getCountRoleForSystem(Integer roleId) {
+		Integer count = roleDAO.getCountRoleForSystem(roleId);
+		if(count != null)
+			return count;
+		else
+			return new Integer(0);
+	}
 }

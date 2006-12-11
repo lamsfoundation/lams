@@ -98,22 +98,17 @@ public class RegisterAction extends LamsDispatchAction {
 		/** Get Server statistics for registration */
 		List groups = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",OrganisationType.COURSE_TYPE);
 		List subgroups = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",OrganisationType.CLASS_TYPE);
-		List sysadmins = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_SYSADMIN);
-		List admins = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_GROUP_ADMIN);
-		List authors = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_AUTHOR);
-		List monitors = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_MONITOR);
-		List managers = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_GROUP_MANAGER);
-		List learners = service.findByProperty(UserOrganisationRole.class, "role.roleId", Role.ROLE_LEARNER);
 		
 		/** Set statistics in dyna form */
 		registerForm.set("groupno", Integer.valueOf(groups.size()));
 		registerForm.set("subgroupno", Integer.valueOf(subgroups.size()));
-		registerForm.set("sysadminno", Integer.valueOf(sysadmins.size()));
-		registerForm.set("adminno", Integer.valueOf(admins.size()));
-		registerForm.set("authorno", Integer.valueOf(authors.size()));
-		registerForm.set("monitorno", Integer.valueOf(monitors.size()));
-		registerForm.set("managerno", Integer.valueOf(managers.size()));
-		registerForm.set("learnerno", Integer.valueOf(learners.size()));
+		registerForm.set("sysadminno", service.getCountRoleForSystem(Role.ROLE_SYSADMIN));
+		registerForm.set("adminno", service.getCountRoleForSystem(Role.ROLE_GROUP_ADMIN));
+		registerForm.set("authorno", service.getCountRoleForSystem(Role.ROLE_AUTHOR));
+		registerForm.set("monitorno", service.getCountRoleForSystem(Role.ROLE_MONITOR));
+		registerForm.set("managerno", service.getCountRoleForSystem(Role.ROLE_GROUP_MANAGER));
+		registerForm.set("learnerno", service.getCountRoleForSystem(Role.ROLE_LEARNER));
+		
 		
 		return mapping.findForward("register");
 	}

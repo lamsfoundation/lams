@@ -370,4 +370,11 @@ public interface IUserManagementService {
 	 * @return
 	 */
 	public boolean isUserSysAdmin();
+	
+	/**
+	 * Count the number of unique (distinct) users with a particular role in the system. 
+	 * @param roleId	Role ID
+	 * @return
+	 */
+	public Integer getCountRoleForSystem(Integer roleId);
 }
