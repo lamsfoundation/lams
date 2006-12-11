@@ -63,14 +63,14 @@
 				<%@ include file="/jsps/authoring/parts/msgattachment.jsp"%>
 			</div>
 
-			<div style="padding-bottom:30px;">
+			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('topicFormId').submit();"
 					class="button-add-item"> <fmt:message key="button.add" /> </a>
 					
 				<a href="#" onclick="javascript:window.parent.hideMessage()"
 					class="button space-left"> <fmt:message key="button.cancel" />
 				</a>
-			</div>
+			</lams:ImgButtonWrapper>
 		</html:form>
 	</body>
 </lams:html>

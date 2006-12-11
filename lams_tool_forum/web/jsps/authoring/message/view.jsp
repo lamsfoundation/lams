@@ -56,24 +56,26 @@
 			</c:if>
 			<tr>
 				<td align="center">
-					<html:link href="javascript:window.parent.hideMessage()"
-						styleClass="button space-left">
-						<fmt:message key="button.cancel" />
-					</html:link>
-					<c:set var="deletetopic">
-						<html:rewrite
-							page="/authoring/deleteTopic.do?sessionMapID=${sessionMapID}&topicIndex=${topicIndex}" />
-					</c:set>
-					<html:link href="${deletetopic}" styleClass="button space-left">
-						<fmt:message key="label.delete" />
-					</html:link>
-					<c:set var="edittopic">
-						<html:rewrite
-							page="/authoring/editTopic.do?sessionMapID=${sessionMapID}&topicIndex=${topicIndex}&create=${topic.message.created.time}" />
-					</c:set>
-					<html:link href="${edittopic}" styleClass="button space-left">
-						<fmt:message key="label.edit" />
-					</html:link>
+					<lams:ImgButtonWrapper>
+						<html:link href="javascript:window.parent.hideMessage()"
+							styleClass="button space-left">
+							<fmt:message key="button.cancel" />
+						</html:link>
+						<c:set var="deletetopic">
+							<html:rewrite
+								page="/authoring/deleteTopic.do?sessionMapID=${sessionMapID}&topicIndex=${topicIndex}" />
+						</c:set>
+						<html:link href="${deletetopic}" styleClass="button space-left">
+							<fmt:message key="label.delete" />
+						</html:link>
+						<c:set var="edittopic">
+							<html:rewrite
+								page="/authoring/editTopic.do?sessionMapID=${sessionMapID}&topicIndex=${topicIndex}&create=${topic.message.created.time}" />
+						</c:set>
+						<html:link href="${edittopic}" styleClass="button space-left">
+							<fmt:message key="label.edit" />
+						</html:link>
+					</lams:ImgButtonWrapper>
 
 				</td>
 			</tr>
