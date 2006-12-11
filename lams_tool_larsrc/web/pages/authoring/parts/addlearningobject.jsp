@@ -65,12 +65,12 @@
 		<%@ include file="instructions.jsp"%>
 
 		
-		<div class="space-bottom-top">
+		<lams:ImgButtonWrapper>
 			<a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message
 					key="label.authoring.basic.add.learning.object" /> </a>
 			<a href="javascript:;" onclick="cancelResourceItem()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
-		</div>
+		</lams:ImgButtonWrapper>
 
 	</body>
 </lams:html>
