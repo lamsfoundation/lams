@@ -74,36 +74,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 					</td>
 				</tr>
-				
-
-				<tr>
-					<td align="center" valign="bottom">
-						<table>
-							<tr>
-							<td> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-								<a href="#" onclick="getElementById('newNominationForm').submit();" class="button-add-item">
-									<fmt:message key="label.save.nomination" />
-								</a>
-							</td> 
-	
-							<td>
-								<a href="#" onclick="javascript:window.parent.hideMessage()" class="button">
-									<fmt:message key="label.cancel" />
-								</a>
-							</td> 	
-							</tr>					
-						</table>
-					</td>
-				</tr>
-
-
 			</table>				
 			</td>
 			</tr>
-				
+			</table>
+		
+			<lams:ImgButtonWrapper>
+				<a href="#" onclick="getElementById('newNominationForm').submit();" class="button-add-item">
+					<fmt:message key="label.save.nomination" />
+				</a>
+				<a href="#" onclick="javascript:window.parent.hideMessage()" class="button space-left">
+					<fmt:message key="label.cancel" />
+				</a>
+			</lams:ImgButtonWrapper>	
 			</html:form>
 			
-		</table>
 
 		</div>
 		

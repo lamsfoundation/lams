@@ -54,15 +54,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				value="${voteGeneralAuthoringDTO.editableNominationText}"
 				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 
-			<div class="space-bottom-top">
+			
+			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('newNominationForm').submit();"
 					class="button-add-item"> <fmt:message
 						key="label.save.nomination" /> </a>
 
 				<a href="#" onclick="javascript:window.parent.hideMessage()"
 					class="button space-left"> <fmt:message key="label.cancel" /> </a>
-			</div>
-
+			</lams:ImgButtonWrapper>
+			
 		</html:form>
 
 
