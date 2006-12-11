@@ -69,14 +69,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 			<html:textarea property="feedback" rows="3" cols="75"></html:textarea>
 
-			<div class="space-bottom-top">
+			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('newQuestionForm').submit();"
 					class="button-add-item"> <fmt:message key="label.save.question" />
 				</a>
 				<a href="#" onclick="javascript:window.parent.hideMessage()"
 					class="button space-left"> <fmt:message key="label.cancel" />
 				</a>
-			</div>
+			</lams:ImgButtonWrapper>
 		</html:form>
 
 	</body>
