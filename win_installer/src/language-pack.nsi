@@ -27,10 +27,6 @@
 !include "MUI.nsh"
 !include "LogicLib.nsh"
 
-# functions from TextFunc.nsh
-#!insertmacro FileJoin
-#!insertmacro LineFind
-
 # constants
 !define VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -38,17 +34,15 @@
 
 # installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
-!define MUI_UNICON "..\graphics\lams2.ico"
 
 Name "LAMS ${VERSION} Language Pack Update"
 
 # Installer attributes
 OutFile "..\build\LAMSLanguagePack-${VERSION}.exe"
 InstallDir "C:\lams"
-CRCCheck on
-XPStyle on
 Icon ..\graphics\lams2.ico
-SilentInstall silent
+InstallDirRegKey HKLM "${REG_HEAD}" ""
+LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
 VIProductVersion 2.0.0.0
 VIAddVersionKey ProductName "LAMS Language Pack ${VERSION}"
 VIAddVersionKey ProductVersion "${VERSION}"
@@ -64,12 +58,16 @@ VIAddVersionKey LegalCopyright ""
 # set welcome page
 !define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
 !define MUI_WELCOMEPAGE_TEXT 'This wizard will guide you through updating your LAMS 2.0 with the latest language packs available.\r\n\r\n\
-                              Please ensure you have a working version of LAMS 2.0 and that you have JBoss 4.0.2 installed\r\n\r\n\
+                              This language pack requires that you have a working version of LAMS 2.0 installed\n\n\
+                              It is recommended that you close all other programs before continuing with the installation\r\n\r\n\
                               Click next to continue'
 
 # set components page type
-;!define MUI_COMPONENTSPAGE_NODESC
-!define MUI_COMPONENTSPAGE_SMALLDESC
+#!define MUI_COMPONENTSPAGE_SMALLDESC
+!define MUI_COMPONENTSPAGE_NODESC 
+!define MUI_COMPONENTSPAGE_TEXT 'Existing language files will be backed up in:$\n\
+                                 $\t "(lams install directory)\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\lams-dictionary.zip"$\n$\n\
+                                 Language Files will then be overwritten by the new LAMS Language Pack ${VERSION}'
 
 # set instfiles page to wait when done
 !define MUI_FINISHPAGE_NOAUTOCLOSE
@@ -78,22 +76,25 @@ VIAddVersionKey LegalCopyright ""
 # display finish page stuff
 !define MUI_FINISHPAGE_RUN $INSTDIR\lams-start.exe
 !define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now"
-;!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
-;!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\readme.txt
+!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
+!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\readme.txt
 ;!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the readme file"
 !define MUI_FINISHPAGE_LINK "Visit LAMS Community"
 !define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
 
 
-# installer screen progression
+# installer screen pages
+;--------------------------------
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\license.txt"
 !insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
+;--------------------------------
 
 # supported translations
 !insertmacro MUI_LANGUAGE "English" # first language is the default language
-/*
+/*  
   !insertmacro MUI_LANGUAGE "French"
   !insertmacro MUI_LANGUAGE "German"
   !insertmacro MUI_LANGUAGE "Spanish"
@@ -112,7 +113,6 @@ VIAddVersionKey LegalCopyright ""
   !insertmacro MUI_LANGUAGE "Bulgarian"  
   !insertmacro MUI_LANGUAGE "Thai"
   !insertmacro MUI_LANGUAGE "Arabic"
-
   !insertmacro MUI_LANGUAGE "TradChinese"
   !insertmacro MUI_LANGUAGE "Japanese"
   !insertmacro MUI_LANGUAGE "Swedish"
@@ -147,15 +147,42 @@ VIAddVersionKey LegalCopyright ""
   !insertmacro MUI_LANGUAGE "Irish"
 */
 
-
+# Variables
+;--------------------------------
+Var BACKUP_DIR
+Var LAMS_DIR
+;--------------------------------
 
 
 Section "LAMS Language Pack ${VERSION}" LanguagePack
-    SetOutPath $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar"
+    # write this language pack version to registry
+    ##########################UNCOMMENT LATER
+    #WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${VERSION}
+    #Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
+    
+    setoutpath $EXEDIR
+    File /r "..\zip"
+
+    ;backup existing language files
+    call zipLanguages
+
+
+
+    #lams_blah\conf\language\*.properties
+    # lams_central\flashxml\*
+
 SectionEnd
 
+;--------------------------------
+;Descriptions
+  ;Language strings
+  LangString DESC_LanguagePack ${LANG_ENGLISH} "LAMS 2.0 Language pack update ${VERSION} "
 
-
+  ;Assign language strings to sections
+  !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${LanguagePack} $(DESC_LanguagePack)
+  !insertmacro MUI_FUNCTION_DESCRIPTION_END
+;--------------------------------
 
 # Installer functions
 Function .onInit
@@ -163,56 +190,55 @@ Function .onInit
     # select language
     ;!insertmacro MUI_LANGDLL_DISPLAY
     
-    # Abort install if already installed
+    # Abort install if already installed or if a newer version is installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
-    
     ${VersionCompare} "${VERSION}" "$0" $1
-    
     ${If} $1 == "0"
-        MessageBox MB_OK|MB_ICONSTOP "You already have this language pack installed"
+        MessageBox MB_OK|MB_ICONSTOP "You already have LAMS Language Pack ${VERSION} installed"
         Abort
     ${EndIf}    
     ${if} $1 == "2"
         MessageBox MB_OK|MB_ICONSTOP "Your current language pack is a newer version than this version"
         Abort
     ${EndIf}
+    
+    # Abort if there is no version of LAMS2 installed
+    ReadRegStr $0 HKLM "${REG_HEAD}" "version"
+    ${If} $0 = ""
+        MessageBox MB_OK|MB_ICONSTOP "No version of LAMS 2.x is installed$\n$\n\
+                                      Please install LAMS 2 before continuing"
+        Abort
+    ${EndIf}
+    
+    #set thte installation directory
+    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
+    strcpy $LAMS_DIR $0
+    strcpy $INSTDIR "$0\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams"
 FunctionEnd
 
+Function .onInstSuccess
+    RMDir /r "$EXEDIR\zip"
+FunctionEnd
 
-
-
-
-
-
-
-
-
-
-
-/*
-# Defines
-!define VERSION 2.0
-!define COMPANY "LAMS Foundation"
-!define URL http://lamscommunity.org
-
-# Included files
-!include Sections.nsh
-
-# Reserved Files
-
-# Variables
-
-# Installer pages
-Page instfiles
-
-# includes
-!include "TextFunc.nsh"
-!include "Functions.nsh"
-!include "MUI.nsh"
-!include "LogicLib.nsh"
-*/
-
-# installer sections
-#
-
-
+;backup existing language files 
+;zip to $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\lams-dictionary-bak.zip
+Function zipLanguages
+    strcpy $BACKUP_DIR "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\backup"
+    
+    detailprint 'Zipping existing files to "$BACKUP_DIR"' 
+    
+    #zip existing language files
+    setoutpath $INSTDIR
+    rmdir /r "$BACKUP_DIR"
+    createdirectory "$BACKUP_DIR"
+    Strcpy $4 '$EXEDIR\zip\7za.exe a -r -tzip "$BACKUP_DIR\lamsDictionaryBak.zip" "*"'
+    nsExec::ExecToStack $4 
+    pop $8
+    pop $9
+    detailprint $8
+    detailprint $9
+    detailprint 'backupdir: $BACKUP_DIR'
+    detailprint 'instdir: $INSTDIR'
+    detailprint '$4'
+    detailprint 'done'
+FunctionEnd
