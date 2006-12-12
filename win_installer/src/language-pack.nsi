@@ -28,7 +28,7 @@
 !include "LogicLib.nsh"
 
 # constants
-!define VERSION "20061211" ; DATE of language pack in fromat YYYYMMDD
+!define VERSION "2006-12-12" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
@@ -151,14 +151,25 @@ VIAddVersionKey LegalCopyright ""
 ;--------------------------------
 Var BACKUP_DIR
 Var LAMS_DIR
+Var VERSION_INT
 ;--------------------------------
 
 
 Section "LAMS Language Pack ${VERSION}" LanguagePack
     # write this language pack version to registry
     ##########################UNCOMMENT LATER
-    WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${VERSION}
+    
+    
+    #WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${VERSION}
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
     Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
+    
+    
+    
+
+    
+    
+    
     
     setoutpath $EXEDIR
     File /r "..\zip"
@@ -190,15 +201,19 @@ Function .onInit
     # select language
     ;!insertmacro MUI_LANGDLL_DISPLAY
     
+    #get the version in from the version date yyyy-mm-dd
+    call getVersionInt
+    
+    
     # Abort install if already installed or if a newer version is installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
-    ${VersionCompare} "${VERSION}" "$0" $1
+    ${VersionCompare} "$VERSION_INT" "$0" $1
     ${If} $1 == "0"
-        MessageBox MB_OK|MB_ICONSTOP "You already have LAMS Language Pack ${VERSION} installed"
+        MessageBox MB_OK|MB_ICONSTOP "You already have LAMS-LanguagePack-${VERSION} installed"
         Abort
     ${EndIf}    
     ${if} $1 == "2"
-        MessageBox MB_OK|MB_ICONSTOP "Your current language pack is a newer version than this version"
+        MessageBox MB_OK|MB_ICONSTOP "Your current language pack is a newer version than this version: LAMS-LanguagePack-$0"
         Abort
     ${EndIf}
     
@@ -242,3 +257,29 @@ Function zipLanguages
     detailprint '$4'
     detailprint 'done'
 FunctionEnd
+
+Function getVersionInt
+    push ${VERSION}
+    push "-"
+    push 0
+    push 1
+    call Strtok
+    pop $VERSION_INT
+    
+    push ${VERSION}
+    push "-"
+    push 1
+    push 1
+    call Strtok
+    pop $0
+    strcpy $VERSION_INT "$VERSION_INT$0"
+    
+    push ${VERSION}
+    push "-"
+    push 2
+    push 1
+    call Strtok
+    pop $0
+    strcpy $VERSION_INT "$VERSION_INT$0"
+FunctionEnd
+
