@@ -824,8 +824,12 @@ class WorkspaceDialog extends MovieClip{
 		if(snode == treeview.dataProvider.firstChild){
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
-			//run a confirm dialogue as user is about to overwrite a design!
-			LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true));
+			if(snode.parentNode != null) { 
+				if(searchForFile(snode.parentNode, resourceTitle_txi.text, true)) {
+					//run a confirm dialogue as user is about to overwrite a design!
+					LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true));
+				}
+			}
 			_workspaceController.clearBusy();
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 			if(snode.attributes.data.resourceID < 0){	
@@ -840,10 +844,15 @@ class WorkspaceDialog extends MovieClip{
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
 			_workspaceController.clearBusy();
 		}
+		
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 	}
 	
-	private function searchForFile(snode:XMLNode, filename:String){
+	private function searchForFile(snode:XMLNode, filename:String, nodeIsParent:Boolean){
+		
+		var _nodeIsParent = nodeIsParent;
+		if(_nodeIsParent == null) { _nodeIsParent = false; }
+		
 		Debugger.log('Searching for file (' + snode.childNodes.length + '): ' + filename,Debugger.GEN,'openFile','org.lamsfoundation.lams.WorkspaceDialog');
 		var cnode:XMLNode;
 		
@@ -871,7 +880,7 @@ class WorkspaceDialog extends MovieClip{
 			} while(cnode != null);
 			
 			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
-				doWorkspaceDispatch(false);
+				doWorkspaceDispatch(nodeIsParent);
 			}
 			return false;
 			
