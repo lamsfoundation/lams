@@ -260,10 +260,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}else{
 				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick to open Content','CanvasController');
 				_canvasModel.openToolActivityContent(ca.activity);
+				
+				// invalidate design after opening tool content window
+				_canvasModel.getCanvas().ddm.validDesign = false;
+				_canvasModel.getCanvas().checkValidDesign();
 			}
 		}
-		_canvasModel.getCanvas().ddm.validDesign = false;
-		_canvasModel.getCanvas().checkValidDesign();
     }
    
 	/**

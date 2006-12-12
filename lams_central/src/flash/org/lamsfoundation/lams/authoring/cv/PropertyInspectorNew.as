@@ -196,9 +196,6 @@ class PropertyInspectorNew extends MovieClip{
 	}
 	
 	public function setupLabels(){
-		
-		//trace("I am in PI setupLabels")
-		//trace("PI_mc "+PI_mc)
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>"
 		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
 		days_lbl.text = Dictionary.getValue('pi_days');
@@ -720,6 +717,8 @@ class PropertyInspectorNew extends MovieClip{
 		o.minOptions = minAct_stp.value;
 		o.maxOptions = maxAct_stp.value;
 		oa.init();
+		
+		setModified();
 	}
 	
 	private function showParallelActivityProperties(ca:ComplexActivity){
@@ -940,6 +939,8 @@ class PropertyInspectorNew extends MovieClip{
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
 		}
+		
+		setModified();
 	}
 	
 	private function getGroupingActivitiesDP(){
@@ -1069,6 +1070,8 @@ class PropertyInspectorNew extends MovieClip{
 		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
 		Debugger.log('Set gate type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onGateTypeChange','PropertyInspector');
 		checkEnableGateControls();
+		
+		setModified();
 	}
 	
 	/**
@@ -1083,6 +1086,8 @@ class PropertyInspectorNew extends MovieClip{
 		g.groupingTypeID = evt.target.value;
 		Debugger.log('Set group type to: '+g.groupingTypeID,Debugger.GEN,'onGroupTypeChange','PropertyInspector');
 		showRelevantGroupOptions();
+		
+		setModified();
 	}
 	
 	private function onAppliedGroupingChange(evt:Object){
@@ -1105,6 +1110,8 @@ class PropertyInspectorNew extends MovieClip{
 		Debugger.log('Set grouping UIID to: '+a.activity.groupingUIID ,Debugger.GEN,'onAppliedGroupingChange','PropertyInspector');
 		//_canvasModel.selectedItem.refresh();
 		a.refresh()
+		
+		setModified();
 	}
 	
 	/**
@@ -1114,12 +1121,8 @@ class PropertyInspectorNew extends MovieClip{
 	 * @return  
 	 */
 	private function onGroupingMethodChange(evt:Object){
-		//
-		//checkEnableGroupsOptions();
-		
-		 
 		checkEnableGroupsOptions();
-		
+		setModified();
 	}
 	
 	
@@ -1132,8 +1135,7 @@ class PropertyInspectorNew extends MovieClip{
 		Debugger.log('activity.gateStartTimeOffset :'+_canvasModel.selectedItem.activity.gateStartTimeOffset ,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
 		Debugger.log('activity.gateEndTimeOffset :'+_canvasModel.selectedItem.activity.gateEndTimeOffset,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
 		
-		
-		
+		setModified();
 		
 	}
 	
@@ -1160,6 +1162,8 @@ class PropertyInspectorNew extends MovieClip{
 			Debugger.log('_canvasModel.selectedItem.activity.runOffline:'+_canvasModel.selectedItem.activity.runOffline,Debugger.GEN,'click','PropertyInspector');
 			_canvasModel.selectedItem.refresh(_canvasModel.selectedItem.activity.runOffline)
 		}
+		
+		setModified();
 	}
 	
 	
@@ -1184,6 +1188,19 @@ class PropertyInspectorNew extends MovieClip{
 			_canvasModel.selectedItem.init();
 		}
 		
+		setModified();
+		
+	}
+	
+	/**
+	* 
+	* Invalidate design (set modified/unsaved flag) when Activity properties are modified
+	* 
+	*/
+	private function setModified():Void{
+		_canvasModel.getCanvas().ddm.validDesign = false;
+		_canvasModel.getCanvas().checkValidDesign();
+		fscommand("setSaved", "false");
 	}
 	
 }
