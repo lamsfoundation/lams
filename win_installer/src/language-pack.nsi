@@ -28,7 +28,7 @@
 !include "LogicLib.nsh"
 
 # constants
-!define VERSION "2.0"
+!define VERSION "20061211" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
@@ -157,8 +157,8 @@ Var LAMS_DIR
 Section "LAMS Language Pack ${VERSION}" LanguagePack
     # write this language pack version to registry
     ##########################UNCOMMENT LATER
-    #WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${VERSION}
-    #Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${VERSION}
+    Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
     
     setoutpath $EXEDIR
     File /r "..\zip"
