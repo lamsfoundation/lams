@@ -53,7 +53,9 @@ class PropertyInspectorNew extends MovieClip{
 	private var _depth:Number;
 	private var delimitLine:MovieClip;
 	private var expand_mc:MovieClip;
-	private var collapse:MovieClip;
+	private var collapse_mc:MovieClip;
+	
+	private static var ICON_OFFSET:Number = 20;
 	
 	//Properties tab
     private var title_lbl:Label;
@@ -323,6 +325,7 @@ class PropertyInspectorNew extends MovieClip{
       
         //show hide the icons
 		expand_mc._visible = e;
+		collapse_mc._visible = !e;
                 
     }
 	
@@ -971,8 +974,12 @@ class PropertyInspectorNew extends MovieClip{
         body_pnl.setSize(w,h-bar_pnl.height);
 		cover_pnl.setSize(w,h-bar_pnl.height);
         bar_pnl.setSize(w);
-
-        
+		
+		// size the expand/colapse icon
+		expand_mc._x = w - ICON_OFFSET;
+		collapse_mc._x = w - ICON_OFFSET;
+		expand_mc.redraw(true);
+		collapse_mc.redraw(true);
     }
 	
 	
