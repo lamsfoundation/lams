@@ -217,6 +217,9 @@ public interface ISurveyService
 	//******************************************************************************************
 	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLeaner(SurveyUser learner);
 	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByContentId(Long toolContentID);
+	
+	//This export for exporting Excel format file in Survey monitoring summary page:
+	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID);
 
 	//******************************************************************************************
 	//  	NOTEBOOK Functions

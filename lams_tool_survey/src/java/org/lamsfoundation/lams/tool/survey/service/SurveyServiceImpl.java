@@ -479,6 +479,28 @@ public class SurveyServiceImpl implements
 		
 		return summary;
 	}
+	public SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportBySessionId(Long toolSessionID) {
+		
+		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> summary = 
+			new TreeMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>(new SurveySessionComparator());
+		
+		//get  tool sessions
+		SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionID);
+		List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
+		
+		//container for this user's answers
+		List<List<AnswerDTO>> learnerAnswers  = new ArrayList<List<AnswerDTO>>();
+		if(users != null){
+			//for every user, get answers of all questions. 
+			for (SurveyUser user : users) {
+				List<AnswerDTO> answers = getQuestionAnswers(user.getSession().getSessionId(), user.getUid());
+				learnerAnswers.add(answers);
+			}
+		}
+		toQuestionMap(summary, session, learnerAnswers);
+		
+		return summary;
+	}
 
 
 

@@ -3,6 +3,15 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+<script type="text/javascript">
+	function exportSurvey(sessionId){
+		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
+	    var reqIDVar = new Date();
+		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		url = url + param;
+		location.href=url;
+	}
+</script>	
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
@@ -14,15 +23,15 @@
 		<c:set var="questions"  value="${group.value}"/>
 		
 		<c:if test="${empty questions}">
-		<table cellpadding="0"  class="alternative-color">
-			<tr>
-				<td colspan="2">
-					<div align="left">
-						<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
-					</div>
-				</td>
-			</tr>
-		</table>
+			<table cellpadding="0"  class="alternative-color">
+				<tr>
+					<td colspan="2">
+						<div align="left">
+							<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
+						</div>
+					</td>
+				</tr>
+			</table>
 		</c:if>
 		<c:forEach var="question" items="${questions}" varStatus="queStatus">
 			<%-- display group name on first row--%>
@@ -151,7 +160,15 @@
 						</c:if>
 					</c:forEach>
 				</c:if>
-			
+
 		</c:forEach>
-		
+			<table>		
+					<tr>
+						<td >
+							<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="button">
+									<fmt:message key="label.monitoring..button.export.excel" />
+							</html:link>
+						</td>
+					</tr>		
+			</table>
 	</c:forEach>
