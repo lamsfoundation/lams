@@ -210,7 +210,7 @@ Function .onInit
         Abort
     ${EndIf}
     
-    #set thte installation directory
+    #set the installation directory
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
     strcpy $LAMS_DIR $0
     strcpy $INSTDIR "$0\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams"
