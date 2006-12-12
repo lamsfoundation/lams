@@ -888,6 +888,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				
 				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent', 600, 800, true, true, false, false, false);
 			
+				// set modified (not-saved) flag so that potential changes cannot be lost.
+				fscommand('setSaved', 'false');
+			
 			}else{
 				new LFError("We dont have a valid toolContentID","openToolActivityContent",this);
 			}
