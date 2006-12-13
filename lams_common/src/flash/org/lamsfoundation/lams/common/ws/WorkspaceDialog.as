@@ -848,10 +848,13 @@ class WorkspaceDialog extends MovieClip{
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 	}
 	
-	private function searchForFile(snode:XMLNode, filename:String, nodeIsParent:Boolean){
+	private function searchForFile(snode:XMLNode, filename:String, isParentNode:Boolean){
 		
-		var _nodeIsParent = nodeIsParent;
-		if(_nodeIsParent == null) { _nodeIsParent = false; }
+		var _isParentNode:Boolean = isParentNode;
+		
+		if(_isParentNode == null) {
+			_isParentNode = false;
+		}
 		
 		Debugger.log('Searching for file (' + snode.childNodes.length + '): ' + filename,Debugger.GEN,'openFile','org.lamsfoundation.lams.WorkspaceDialog');
 		var cnode:XMLNode;
@@ -880,7 +883,10 @@ class WorkspaceDialog extends MovieClip{
 			} while(cnode != null);
 			
 			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
-				doWorkspaceDispatch(nodeIsParent);
+				if(!_isParentNode)
+					doWorkspaceDispatch(false);
+				else
+					doWorkspaceDispatch(false, snode)
 			}
 			return false;
 			
@@ -946,27 +952,30 @@ class WorkspaceDialog extends MovieClip{
 	 * @param   useResourceID //if its true then we will send the resorceID of teh item selected in the tree - usually this means we are overwriting something
 	 * @return  
 	 */
-	public function doWorkspaceDispatch(useResourceID:Boolean){
+	public function doWorkspaceDispatch(useResourceID:Boolean, snode:XMLNode){
 		//ObjectUtils.printObject();
+		var _snode = snode;
+		if(_snode == null) {
+			_snode = treeview.selectedNode;		// item selected in tree
+		}
 		
-		var snode = treeview.selectedNode;		// item selected in tree
-		
-		if(snode == null){
+		if(_snode == null){
 			// set to file item found in search
-			snode = _resultDTO.file;
+			_snode = _resultDTO.file;
 		}
 		
 		if(useResourceID){
 			//its an LD
-			_resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
-			_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.workspaceFolderID);
+			_resultDTO.selectedResourceID = Number(_snode.attributes.data.resourceID);
+			_resultDTO.targetWorkspaceFolderID = Number(_snode.attributes.data.workspaceFolderID);
 		}else{
 			//its a folder
 			_resultDTO.selectedResourceID  = null;
-			_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
+			_resultDTO.targetWorkspaceFolderID = Number(_snode.attributes.data.resourceID);
 			
 		}
 		
+		Debugger.log("SNode: " + _snode.attributes.data.name + ", Target WorkspceFolder ID: " + _resultDTO.targetWorkspaceFolderID + " , useResourceID: " + useResourceID + " , selectedResourceID: " + _resultDTO.selectedResourceID, Debugger.CRITICAL, "doWorkspaceDispatch", "WorkspaceDialog");
 		_resultDTO.resourceName = resourceTitle_txi.text;
 		_resultDTO.resourceDescription = resourceDesc_txa.text;
 		_resultDTO.resourceLicenseText = license_txa.text;

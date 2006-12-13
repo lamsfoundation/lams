@@ -46,6 +46,10 @@ if(StringUtils.isEmpty(langDate)){
 if(StringUtils.isEmpty(actColour)){
 	_root.actColour = "true";
 }
+
+if(StringUtils.isEmpty(requestSrc)) {
+	_root.requestSrc = null;
+}
 					   
 
 //Set stage alignment to top left and prent scaling
