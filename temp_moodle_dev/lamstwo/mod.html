@@ -298,6 +298,8 @@ if (!isset($form->create_sequence_url)) {
 	}
 	
 	function openAuthor(url,name,options,fullscreen) {
+		url = url + "&requestSrc=" + escape("<?php echo $CFG->lamstwo_requestsource; ?>");
+		url = url + "&notifyCloseURL=" + escape(window.location.href);
 		if(authorWin && !authorWin.closed){
 			authorWin.focus();
 		}else{

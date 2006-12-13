@@ -188,6 +188,12 @@ public class HomeAction extends DispatchAction {
 			} else {
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
+				
+				String requestSrc = req.getParameter("requestSrc");
+				String notifyCloseURL = req.getParameter("notifyCloseURL");
+				req.setAttribute("requestSrc", requestSrc);
+				req.setAttribute("notifyCloseURL", notifyCloseURL);
+				
 				return mapping.findForward("author");
 			}
 			

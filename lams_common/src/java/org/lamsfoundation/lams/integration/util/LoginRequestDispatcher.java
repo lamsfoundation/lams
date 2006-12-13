@@ -20,6 +20,9 @@
  */
 package org.lamsfoundation.lams.integration.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,6 +58,10 @@ public class LoginRequestDispatcher {
 	public static final String PARAM_COUNTRY = "country";
 
 	public static final String PARAM_LANGUAGE = "lang";
+	
+	public static final String PARAM_REQUEST_SRC ="requestSrc";
+	
+	public static final String PARAM_NOTIFY_CLOSE_URL ="notifyCloseURL";
 
 	public static final String METHOD_AUTHOR = "author";
 
@@ -88,7 +95,7 @@ public class LoginRequestDispatcher {
 
 		String method = request.getParameter(PARAM_METHOD);
 		String lessonId = request.getParameter(PARAM_LESSON_ID);
-
+		
 		try {
 			addUserToLessonClass(request, lessonId, method);
 		} catch (UserInfoFetchException e) {
@@ -97,7 +104,24 @@ public class LoginRequestDispatcher {
 
 		/** AUTHOR * */
 		if (METHOD_AUTHOR.equals(method)) {
-			return request.getContextPath() + URL_AUTHOR;
+			
+			String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
+			String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+			
+			String parameters = "";
+			
+			if (requestSrc != null && notifyCloseURL != null) {
+				try {
+					parameters = "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8");
+					parameters += "&" + PARAM_NOTIFY_CLOSE_URL + "=" + URLEncoder.encode(notifyCloseURL, "UTF8");				
+	 			} catch (UnsupportedEncodingException e) {
+					log.error(e);
+				}
+			} else {
+				log.error("Parameters 'requestSrc' and 'notifyCloseURL' are not present");
+			}
+			
+			return request.getContextPath() + URL_AUTHOR + parameters;
 		}
 		/** MONITOR * */
 		else if (METHOD_MONITOR.equals(method) && lessonId != null) {

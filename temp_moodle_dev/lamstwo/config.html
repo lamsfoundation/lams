@@ -23,6 +23,13 @@
     <?php print_string('serverkey', 'lamstwo') ?>
     </td>
 </tr>
+<tr valign="top">
+    <td align="right">request_source:</td>
+    <td> <input name="lamstwo_requestsource" id="lamstwo_requestsource" type="text" size="50" value="<?php p($CFG->lamstwo_requestsource) ?>" onChange="resetValidated()" />    </td>
+    <td>
+    <?php print_string('requestsource', 'lamstwo') ?>
+    </td>
+</tr>
 
 <tr>
     <td colspan="3" align="center">

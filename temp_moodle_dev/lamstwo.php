@@ -17,6 +17,7 @@ $string['sequence'] = 'Sequence';
 $string['serverid'] = 'Enter the server ID';
 $string['serverkey'] = 'Enter the server key';
 $string['serverurl'] = 'Enter the basic URL used to access the LAMS server. For example http://localhost:8080/lams';
+$string['requestsource'] = 'This will be used in the message \"Close and return to {request_source}\" in the authoring module in LAMS.';
 $string['visibletostudents'] = 'Show activity to students';
 $string['wikistartederror'] = 'Wiki already has entries - can\'t change.';
 $string['wrongversionrange'] = '$a is not a correct range!';
