@@ -152,6 +152,7 @@ VIAddVersionKey LegalCopyright ""
 Var BACKUP_DIR
 Var LAMS_DIR
 Var VERSION_INT
+Var FLASHXML_DIR
 ;--------------------------------
 
 
@@ -166,8 +167,12 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     ;backup existing language files
     call zipLanguages
     
-    ; copy language files from LAMS prjects to a folder in $INSTDIR
+    ; copy language files from LAMS projects to a folder in $INSTDIR
     call copyProjects
+    
+    ; copy the flash dictionary files from central/web/flashxml to: 
+    ; <JBoss_dir>\server\default\lams.ear\lams-central.war\flashxml
+    call copyFlashxml
     
     
     ####################
@@ -198,7 +203,6 @@ Function .onInit
     
     #get the version in from the version date yyyy-mm-dd
     call getVersionInt
-    
     
     # Abort install if already installed or if a newer version is installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
@@ -371,3 +375,15 @@ Function copyProjects
     
 FunctionEnd
 
+
+; copys the files from lams_central/web/flashxml to:
+; "<JBOSS>/\server\default\lams.ear\lams-central.war\flashxml
+Function copyFlashxml
+    strcpy $FLASHXML_DIR "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war\flashxml"
+
+    setoutpath $FLASHXML_DIR
+    detailprint "Extracting language files for FLASH"
+    file /a /r /x "CVS" "..\..\lams_central\web\flashxml\*"
+    detailprint "DONE!"
+    
+FunctionEnd
