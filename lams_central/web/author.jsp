@@ -216,7 +216,7 @@ function setSaved(args){
 function myOnBeforeUnload(){
 	//alert("myOnBeforeUnload");
 	if(!saved){
-	  var message = '<fmt:message key="msg.design.not.saved"/>';
+	  var message = "<fmt:message key="msg.design.not.saved"/>";
 	  if (typeof evt == 'undefined') {
 		 evt = window.event;
 	  }
