@@ -26,6 +26,7 @@
 !include "Functions.nsh"
 !include "MUI.nsh"
 !include "LogicLib.nsh"
+!include "Array.nsh"
 
 # constants
 !define VERSION "2006-12-12" ; DATE of language pack in fromat YYYYMMDD
@@ -149,6 +150,11 @@ VIAddVersionKey LegalCopyright ""
 
 # Variables
 ;--------------------------------
+Var MYSQL_DIR
+Var MYSQL_ROOT_PASS
+Var DB_NAME
+Var DB_USER
+Var DB_PASS
 Var BACKUP_DIR
 Var LAMS_DIR
 Var VERSION_INT
@@ -170,15 +176,20 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     ; copy language files from LAMS projects to a folder in $INSTDIR
     call copyProjects
     
+    ; get the language files locations specific to this server from the database
+    ; unpack to $INSTDIR\library\llidx
+    call copyllid
+    
     ; copy the flash dictionary files from central/web/flashxml to: 
     ; <JBoss_dir>\server\default\lams.ear\lams-central.war\flashxml
     call copyFlashxml
-    
     
     ####################
     # TODO  Work out what language files to copy to the 'library' directory
     # TODO  Copy the flshxml files
     ####################
+    
+    #SELECT concat("@",learning_library_id,"@") FROM lams_learning_library SELECT concat("@",learning_library_id,"@") FROM lams_learning_library
     
     #lams_blah\conf\language\*.properties
     # lams_central\flashxml\*
@@ -245,7 +256,7 @@ Function zipLanguages
     setoutpath $INSTDIR
     rmdir /r "$BACKUP_DIR"
     createdirectory "$BACKUP_DIR"
-    Strcpy $4 '$EXEDIR\zip\7za.exe a -r -tzip "$BACKUP_DIR\lamsDictionaryBak.zip" "*"'
+    Strcpy $4 '$EXEDIR\zip\7za.exe a -r -tzip "$BACKUP_DIR\lamsDictionaryBak-${VERSION}.zip" "*"'
     nsExec::ExecToStack $4 
     pop $8
     pop $9
@@ -291,7 +302,6 @@ Function copyProjects
     setoutpath "$INSTDIR"
     detailprint "Extracting language files for lams_common"
     file /a "..\..\lams_common\conf\language\*"
-    
     
     ;copying ADMIN project language files
     setoutpath "$INSTDIR\admin"
@@ -375,15 +385,26 @@ Function copyProjects
     
 FunctionEnd
 
+${Array} FOLDERS
+
+; first, finds the location of the language files in the database
+; then copy the required files to the dirname
+Function copyllid
+    ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
+    ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
+    ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
+    ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
+    ;DO I NEED SQL_ROOT_PASS??????????????????
+    
+    ${FOLDERS->init}
+FunctionEnd
 
 ; copys the files from lams_central/web/flashxml to:
 ; "<JBOSS>/\server\default\lams.ear\lams-central.war\flashxml
 Function copyFlashxml
     strcpy $FLASHXML_DIR "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war\flashxml"
-
     setoutpath $FLASHXML_DIR
     detailprint "Extracting language files for FLASH"
     file /a /r /x "CVS" "..\..\lams_central\web\flashxml\*"
-    detailprint "DONE!"
-    
+    detailprint "DONE!"  
 FunctionEnd
