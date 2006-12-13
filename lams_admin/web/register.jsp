@@ -491,6 +491,24 @@
 					<input type="hidden" name="learnerno" value="<bean:write name="RegisterForm" property="learnerno"/>"/>	
 				</td>
 			</tr>
+			<tr>
+				<td>
+					<fmt:message key="role.AUTHOR.ADMIN"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="authoradminno"/>
+					<input type="hidden" name="authoradminno" value="<bean:write name="RegisterForm" property="authoradminno"/>"/>	
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="admin.register.server.stats.total.users"/>
+				</td>
+				<td>
+					<bean:write name="RegisterForm" property="userno"/>
+					<input type="hidden" name="userno" value="<bean:write name="RegisterForm" property="userno"/>"/>	
+				</td>
+			</tr>
 	</table>
 	
 	<p align="center">

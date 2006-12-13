@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -108,6 +109,8 @@ public class RegisterAction extends LamsDispatchAction {
 		registerForm.set("monitorno", service.getCountRoleForSystem(Role.ROLE_MONITOR));
 		registerForm.set("managerno", service.getCountRoleForSystem(Role.ROLE_GROUP_MANAGER));
 		registerForm.set("learnerno", service.getCountRoleForSystem(Role.ROLE_LEARNER));
+		registerForm.set("authoradminno", service.getCountRoleForSystem(Role.ROLE_AUTHOR_ADMIN));
+		registerForm.set("userno", Integer.valueOf(service.findAll(User.class).size()));
 		
 		
 		return mapping.findForward("register");

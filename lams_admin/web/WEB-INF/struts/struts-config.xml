@@ -21,6 +21,10 @@
       name="CacheActionForm"
       type="org.lamsfoundation.lams.admin.web.CacheActionForm"
     />
+    <form-bean
+      name="ImportExcelForm"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
+    />
 
    <form-bean name="OrganisationForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="orgId" type="java.lang.Integer" />
@@ -79,6 +83,8 @@
     <form-property name="sFirstName" type="java.lang.String" />
     <form-property name="sLastName" type="java.lang.String" />
     <form-property name="searched" type="java.lang.Boolean" initial="false" />
+    <form-property name="showAll" type="java.lang.Boolean" initial="false" />
+    <form-property name="resultsSection" type="java.lang.String" />
 </form-bean>
 
 <form-bean name="LoginMaintainForm" type="org.apache.struts.action.DynaActionForm">
@@ -109,6 +115,8 @@
 
 <form-bean name="RegisterForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="sitename" type="java.lang.String" />
+	<form-property name="rname" type="java.lang.String" />
+	<form-property name="remail" type="java.lang.String" />
 	<form-property name="serverurl" type="java.lang.String" />
 	<form-property name="serverversion" type="java.lang.String" />
 	<form-property name="serverbuild" type="java.lang.String" />
@@ -124,9 +132,9 @@
 	<form-property name="monitorno" type="java.lang.Integer" />
 	<form-property name="managerno" type="java.lang.Integer" />
 	<form-property name="learnerno" type="java.lang.Integer" />
+	<form-property name="authoradminno" type="java.lang.Integer" />
+	<form-property name="userno" type="java.lang.Integer" />
 	<form-property name="public" type="java.lang.Boolean" initial="true" />
-	<form-property name="rname" type="java.lang.String" />
-	<form-property name="remail" type="java.lang.String" />
 </form-bean>
   </form-beans>
 
@@ -158,7 +166,7 @@
     >
       <forward
         name="organisation"
-        path=".organisation"
+        path="/organisation.do?method=edit"
         redirect="false"
       />
       <forward
@@ -166,16 +174,9 @@
         path="/orgmanage.do"
         redirect="false"
       />
-    </action>
-    <action
-      path="/orgmanage"
-      type="org.lamsfoundation.lams.admin.web.OrgManageAction"
-      unknown="false"
-      validate="false"
-    >
       <forward
-        name="orglist"
-        path=".orglist"
+        name="userlist"
+        path="/usermanage.do"
         redirect="false"
       />
     </action>
@@ -195,6 +196,18 @@
       />
     </action>
     <action
+      path="/orgmanage"
+      type="org.lamsfoundation.lams.admin.web.OrgManageAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="orglist"
+        path=".orglist"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/serverlist"
       type="org.lamsfoundation.lams.admin.web.ServerListAction"
       unknown="false"
@@ -203,6 +216,26 @@
       <forward
         name="serverlist"
         path=".serverlist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/importexcelsave"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelSaveAction"
+      name="ImportExcelForm"
+      scope="request"
+      input=".importexcel"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importresult"
+        path=".importresult"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -252,22 +285,14 @@
       />
     </action>
     <action
-      path="/organisation"
-      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
-      name="OrganisationForm"
-      scope="request"
-      parameter="method"
+      path="/sysadminstart"
+      type="org.lamsfoundation.lams.admin.web.action.SysAdminStartAction"
       unknown="false"
       validate="false"
     >
       <forward
-        name="organisation"
-        path=".organisation"
-        redirect="false"
-      />
-      <forward
-        name="orglist"
-        path="/orgmanage.do"
+        name="sysadmin"
+        path=".sysadmin"
         redirect="false"
       />
     </action>
@@ -292,6 +317,26 @@
       />
     </action>
     <action
+      path="/organisation"
+      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
+      name="OrganisationForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="organisation"
+        path=".organisation"
+        redirect="false"
+      />
+      <forward
+        name="orglist"
+        path="/orgmanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/config"
       type="org.lamsfoundation.lams.admin.web.ConfigAction"
       name="ConfigForm"
@@ -308,7 +353,7 @@
       />
       <forward
         name="sysadmin"
-        path=".sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -359,7 +404,7 @@
     >
       <forward
         name="sysadmin"
-        path=".sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
       <forward
@@ -421,6 +466,28 @@
         path="/usermanage.do"
         redirect="false"
       />
+      <forward
+        name="userorg"
+        path="/userorg.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/toolcontentlist"
+      type="org.lamsfoundation.lams.admin.web.ToolContentListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="toolcontentlist"
+        path=".toolcontentlist"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
     </action>
     <action
       path="/servermaintain"
@@ -459,12 +526,31 @@
       />
       <forward
         name="sysadmin"
-        path=".sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path="http://lamscommunity.org/registration"
         redirect="false"
       />
       <forward
         name="error"
         path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/importexcel"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelAction"
+      name="ImportExcelForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importexcel"
+        path=".importexcel"
         redirect="false"
       />
     </action>
@@ -564,10 +650,6 @@
       />
     </action>
 
-       <action
-      path="/sysadminstart"
-      forward=".sysadmin"
-    />
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

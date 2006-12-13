@@ -104,5 +104,7 @@
 	<form-property name="monitorno" type="java.lang.Integer" />
 	<form-property name="managerno" type="java.lang.Integer" />
 	<form-property name="learnerno" type="java.lang.Integer" />
+	<form-property name="authoradminno" type="java.lang.Integer" />
+	<form-property name="userno" type="java.lang.Integer" />
 	<form-property name="public" type="java.lang.Boolean" initial="true" />
 </form-bean>
