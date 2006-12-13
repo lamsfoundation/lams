@@ -27,7 +27,6 @@ import java.text.NumberFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.validator.Arg;
 import org.apache.commons.validator.Field;
 import org.apache.commons.validator.Validator;
 import org.apache.commons.validator.ValidatorAction;
@@ -35,8 +34,6 @@ import org.apache.commons.validator.util.ValidatorUtils;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.apache.struts.validator.Resources;
-import org.jivesoftware.smackx.FormField;
 
 /**
  * This class is used by commons validator. To validate various properties 
