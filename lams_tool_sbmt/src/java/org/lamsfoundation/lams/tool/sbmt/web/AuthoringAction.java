@@ -73,7 +73,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * 				  parameter="dispatch"
  *                input="/authoring/authoring.jsp" 
  *                scope="request" 
- *                validate="false"
+ *                validate="true"
  * 
  * @struts.action-forward name="success" path="/authoring/authoring.jsp"
  * @struts.action-forward name="instructionFileList" path="/authoring/parts/instructionfilelist.jsp"

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE form-validation PUBLIC "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1.3//EN" "http://jakarta.apache.org/commons/dtds/validator_1_1_3.dtd">
+<form-validation>
+  <!--
+    Define global validation config in validation-global.xml
+  -->
+  <formset>
+  <form name="SbmtAuthoringForm">
+	<field property="offlineFile.fileSize" depends="maxFileSize">
+			<var>
+                  <var-name>largeFile</var-name>
+                  <var-value>true</var-value>
+             </var>
+	</field>
+	<field property="onlineFile.fileSize" depends="maxFileSize" >
+			<var>
+                  <var-name>largeFile</var-name>
+                  <var-value>true</var-value>
+             </var>
+	</field>
+</form>
+
+  </formset>
+</form-validation>

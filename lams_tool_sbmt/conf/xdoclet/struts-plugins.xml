@@ -1,0 +1,5 @@
+  <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+    <set-property property="pathnames"
+                     value="/WEB-INF/struts/validator-rules.xml,
+                            /WEB-INF/struts/validation.xml"/>
+  </plug-in>

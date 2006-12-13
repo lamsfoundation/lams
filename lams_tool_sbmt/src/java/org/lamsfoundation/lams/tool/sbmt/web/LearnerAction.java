@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -304,9 +305,12 @@ public class LearnerAction extends DispatchAction {
 			error = true;
 		}
 		
-		if(error)
-			this.addErrors(request,errors);
+		boolean oversize = !FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
+		error = error?error:oversize;
 		
+		if(error){
+			this.addErrors(request,errors);
+		}
 		return error;
 	}
 
