@@ -23,19 +23,20 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
-import org.apache.struts.validator.Resources;
-import org.apache.commons.validator.Arg;
-import org.apache.commons.validator.ValidatorAction;
-import org.apache.commons.validator.Field;
-import org.apache.struts.action.ActionMessages;
-import org.apache.commons.validator.Validator;
-import org.apache.commons.validator.util.ValidatorUtils;
+import java.text.NumberFormat;
+
 import javax.servlet.http.HttpServletRequest;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.apache.struts.upload.MultipartRequestWrapper;
+
+import org.apache.commons.validator.Arg;
+import org.apache.commons.validator.Field;
+import org.apache.commons.validator.Validator;
+import org.apache.commons.validator.ValidatorAction;
+import org.apache.commons.validator.util.ValidatorUtils;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.apache.struts.action.ActionForm;
+import org.apache.struts.validator.Resources;
+import org.jivesoftware.smackx.FormField;
 
 /**
  * This class is used by commons validator. To validate various properties 
@@ -46,6 +47,7 @@ import org.apache.struts.action.ActionForm;
 public class FileValidatorUtil {
     
     public static final String LARGE_FILE = "largeFile";
+	private static final String MSG_KEY = "errors.maxfilesize";
 
     /** 
      * To enable this validator copy the XML entry below to validator-rules.xml
@@ -79,29 +81,68 @@ public class FileValidatorUtil {
     public static boolean validateFileSize(Object bean, ValidatorAction va,
             Field field, ActionMessages errors, Validator validator,
             HttpServletRequest request) {
+        
+        int fileSize = 0;
+        try {
+        	String fileSizeStr = ValidatorUtils.getValueAsString(bean, field.getProperty());
+        	fileSize = Integer.parseInt(fileSizeStr);
+		} catch (Exception e) {
+			//catch null point exception: e.g., offlineFile.fileSize, if offlineFile is null, 
+			//ValidatorUtils.getValueAsString() will throw null.
+			//skip, do nothing
+			return true;
+		}
+		
+		boolean largeFile = Boolean.valueOf(field.getVarValue(LARGE_FILE)).booleanValue();
+		
+		return validateFileSize(fileSize, largeFile, errors);
+    }
+    /**
+     * 
+     * @param file
+     * @param largeFile
+     * @param errors
+     * @return Be careful, if the file size is under maximum size, return TRUE. Otherwise, return false.   
+     */
+    public static boolean validateFileSize(FormFile file, boolean largeFile, ActionMessages errors){
+        int fileSize = 0;
+        try {
+        	fileSize = file.getFileSize();
+		} catch (Exception e) {
+			//skip, do nothing
+			return true;
+		}
+		
+		return validateFileSize(fileSize, largeFile, errors);
 
-        int maxFileSize;
+    }
+    
+    private static boolean validateFileSize(int fileSize, boolean largeFile, ActionMessages errors){
+    	float maxFileSize;
         
         //whether we are using large file or not?
-        if(Boolean.valueOf(field.getVarValue(LARGE_FILE)).booleanValue())
+        if(largeFile)
             maxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE);
         else
             maxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
         
-        String fileSizeStr = ValidatorUtils.getValueAsString(bean, field.getProperty());
-        int fileSize = Integer.parseInt(fileSizeStr);
-              
         if(fileSize >  maxFileSize){
             //Set arg0 in message bundle
-            Arg arg = new Arg();
-            arg.setPosition(0);
-            arg.setResource(false); //dont treat this as a locale key
-            arg.setKey(String.valueOf(maxFileSize));
-            field.addArg(arg);
+            String unit= "";
+            if(maxFileSize >= 1024){
+            	maxFileSize = maxFileSize/1024;
+            	unit = "K";
+            }
+            if(maxFileSize >= 1024){
+            	maxFileSize = maxFileSize/1024;
+            	unit = "M";
+            }
+            NumberFormat format = NumberFormat.getInstance();
+			format.setMaximumFractionDigits(1);
+			String maxSize = format.format(maxFileSize) + unit;
             
             //set error message
-            errors.add(field.getKey(), Resources.getActionMessage(request, va,
-                    field));
+            errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(MSG_KEY,maxSize));
             return false;
         }
         return true;
