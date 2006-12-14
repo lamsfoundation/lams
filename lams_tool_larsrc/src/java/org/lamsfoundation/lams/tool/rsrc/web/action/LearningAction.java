@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -585,6 +586,12 @@ public class LearningAction extends Action {
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){
+			
+			if(itemForm.getFile()!= null && FileUtil.isExecutableFile(itemForm.getFile().getFileName())){
+	        	ActionMessage msg = new ActionMessage("error.attachment.executable");
+	        	errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
+	    	}
+	    	
 //			validate item size
 			FileValidatorUtil.validateFileSize(itemForm.getFile(), false, errors );
 			

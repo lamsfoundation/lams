@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -290,28 +291,28 @@ public class LearnerAction extends DispatchAction {
 	
 	//validate uploaded form
 	private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
-		ActionErrors errors = new ActionErrors();
-		boolean error = false;
+		ActionMessages errors = new ActionMessages();
 		if(learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())){
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
 					this.getResources(request).getMessage("learner.form.filepath.displayname")));
-			
-			error = true;
 		}
 		if(StringUtils.isBlank(learnerForm.getDescription())){
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
 					this.getResources(request).getMessage("label.learner.fileDescription")));
-			
-			error = true;
 		}
 		
-		boolean oversize = !FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
-		error = error?error:oversize;
+		FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
 		
-		if(error){
+    	if(learnerForm.getFile()!= null && FileUtil.isExecutableFile(learnerForm.getFile().getFileName())){
+        	ActionMessage msg = new ActionMessage("error.attachment.executable");
+        	errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
+    	}
+    	
+		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
+			return true;
 		}
-		return error;
+		return false;
 	}
 
 	/**
