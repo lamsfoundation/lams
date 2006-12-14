@@ -160,6 +160,7 @@ Var BACKUP_DIR
 Var LAMS_DIR
 Var VERSION_INT
 Var FLASHXML_DIR
+Var SQL_QUERY
 ;--------------------------------
 
 
@@ -253,6 +254,7 @@ FunctionEnd
 
 Function .onInstSuccess
     RMDir /r "$EXEDIR\zip"
+    RMDir /r "$EXEDIR\build"
 FunctionEnd
 
 ;backup existing language files 
@@ -410,83 +412,52 @@ ${Array} FOLDERS
 ; first, finds the location of the language files in the database
 ; then copy the required files to the dirname
 Function copyllid
-    
     setoutpath "$INSTDIR\temp\sqlscripts"
     File /a "*.sql"
-    
-    
-    strcpy $0 = "llid-ChatAndScribe.sql"
-    push $0
+    #strcpy $SQL_QUERY '"SELECT concat($\'@$\',learning_library_id,$\'@$\') FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
+    #strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     call executeSQLScript
     pop $0
-    detailprint "SQL script result: $\n$0"
+    detailprint "SQL script result for Chat and Scribe: $\n$0"
     
-    ;${FOLDERS->init}
+    strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Forum and Scribe$\';"'
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    call executeSQLScript
+    pop $0
+    detailprint "SQL script result for Forum and Scribe: $\n$0"
     
+    strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Resources and Forum$\';"'
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    call executeSQLScript
+    pop $0
+    detailprint "SQL script result for Resource and Forum: $\n$0"
 FunctionEnd
 
 ; Executing sql scripts
 ; Puts the result of sql script on the stack
 Function executeSQLScript
     
-    #ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
-    #ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
-    #ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
-    #ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
-    
-    ; this will be the file path to the sql script
-    pop $0
-    
-    ; path to the sql command line tools
-    ;ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Microsoft SQL Server\80\Tools\ClientSetup" "SQLPath"
-    
-    
-    ;the location of the shell scripts
-    strcpy $1 "$INSTDIR\temp\sqlscripts"
-    
-    ; the computer name
-    #ReadRegStr $R2 HKLM "SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" "ComputerName"
-    
-    #GetTempFileName $R0
-    #ExecWait  '"$R1\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s  "$R2" -i -D "$1\$0" -o  "$R0" -B'
-    strcpy $3 '"SELECT concat($\'@$\',learning_library_id,$\'@$\') FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
-    strcpy $4 '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $3'
-    #strcpy $4 '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME < "$1\llid-ChatAndScribe.sql"'
-    nsExec::ExecToStack /OEM $4
-    detailprint $4  
+    nsExec::ExecToStack $SQL_QUERY
+    detailprint $SQL_QUERY  
     
     pop $0 
     pop $1
     
+    strcpy $1 $1 -2
+    push $1
+    
     #check for errors and write result to install window
-    ${if} $0 == 0
+    ${if} $0 != 0 
         goto Errors
     ${endif}
     
-    strcpy $1 $1 -2
-    detailprint $1
-    push $1
     goto Finish
     
     Errors:
         DetailPrint "Can't read from $MYSQL_DIR\$DB_NAME$ database"
     Finish:
         clearerrors
-    /*; this dumps the logfile to the detail window
-    ClearErrors
-    FileOpen $R1 $R0 "r"
-    IfErrors FileOpenFailed
-    MoreMessages:
-        ClearErrors
-        FileRead $R1 $R0
-        IfErrors NoMoreMessages
-        StrCpy $R0 $R0 -2 ; remove newline
-        DetailPrint $R0
-        Goto MoreMessages
-    FileOpenFailed:
-    DetailPrint "Can't read from $R0"
-    NoMoreMessages:
-    FileClose $R1
-    ClearErrors*/
     
 FunctionEnd
