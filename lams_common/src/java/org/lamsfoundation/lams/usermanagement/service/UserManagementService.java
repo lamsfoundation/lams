@@ -701,16 +701,23 @@ public class UserManagementService implements IUserManagementService {
 					|| role.getName().equals(Role.SYSADMIN)) {
 				if (user.getWorkspace()==null) createWorkspaceForUser(user);
 			}
-			// when a user becomes group manager, they need monitor role in subgroups
-			if (role.getName().equals(Role.GROUP_MANAGER)) {
-				if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
-					setMonitorForGroupManager(user, org.getChildOrganisations());
-				}
-			}
 		}
 		uo.setUserOrganisationRoles(uors);
-		
 		save(user);
+		// make sure group managers have monitor in each subgroup
+		checkGroupManager(user, org);
+	}
+	
+	private void checkGroupManager(User user, Organisation org) {
+		if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
+			if (hasRoleInOrganisation(user, Role.ROLE_GROUP_MANAGER, org)) {
+				setMonitorForGroupManager(user, org.getChildOrganisations());
+			}
+		} else if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+			if (hasRoleInOrganisation(user, Role.ROLE_GROUP_MANAGER, org.getParentOrganisation())) {
+				setMonitorForGroupManager(user, org.getParentOrganisation().getChildOrganisations());
+			}
+		}
 	}
 	
 	private void setMonitorForGroupManager(User user, Set childOrgs) {
@@ -729,10 +736,15 @@ public class UserManagementService implements IUserManagementService {
 			
 			Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
 			if (uors!=null && !uors.isEmpty()) {
+				boolean isMonitor = false;
 				for (UserOrganisationRole uor : uors) {
 					if (uor.getRole().getName().equals(Role.MONITOR)) {
-						return;
+						isMonitor = true;
+						break;
 					}
+				}
+				if (isMonitor) {
+					continue;
 				}
 			}
 			UserOrganisationRole monitor = new UserOrganisationRole(uo, 
