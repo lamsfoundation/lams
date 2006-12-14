@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
 import org.lamsfoundation.lams.tool.survey.web.form.SurveyForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -658,7 +659,13 @@ public class AuthoringAction extends Action {
 		if(file == null || StringUtils.isBlank(file.getFileName()))
 		    return mapping.findForward(SurveyConstants.SUCCESS);
 		
-		
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(file, true, errors );
+		if(!errors.isEmpty()){
+			this.saveErrors(request, errors);
+			return mapping.findForward("success");
+		}
+
 		ISurveyService service = getSurveyService();
 		//upload to repository
 		SurveyAttachment  att = service.uploadInstructionFile(file, type);
@@ -991,6 +998,7 @@ public class AuthoringAction extends Action {
 //			ActionMessage error = new ActionMessage("error.title.empty");
 //			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 //		}
+		
 		//define it later mode(TEACHER) skip below validation.
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
