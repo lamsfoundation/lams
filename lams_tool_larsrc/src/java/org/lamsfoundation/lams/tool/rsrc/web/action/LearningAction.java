@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -584,6 +585,9 @@ public class LearningAction extends Action {
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){
+//			validate item size
+			FileValidatorUtil.validateFileSize(itemForm.getFile(), false, errors );
+			
 			//for edit validate: file already exist
 			if(!itemForm.isHasFile() &&
 				(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName())))

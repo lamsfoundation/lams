@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -667,6 +668,13 @@ public class AuthoringAction extends Action {
 		if(file == null || StringUtils.isBlank(file.getFileName()))
 			return mapping.findForward(ResourceConstants.SUCCESS);
 		
+		//validate file size
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(file, true, errors );
+		if(!errors.isEmpty()){
+			this.saveErrors(request, errors);
+			return mapping.findForward(ResourceConstants.SUCCESS);
+		}
 		
 		IResourceService service = getResourceService();
 		//upload to repository
@@ -1047,6 +1055,8 @@ public class AuthoringAction extends Action {
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){
+			//validate item size
+			FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors );
 			//for edit validate: file already exist
 			if(!itemForm.isHasFile() &&
 				(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName())))
@@ -1077,6 +1087,7 @@ public class AuthoringAction extends Action {
 //			ActionMessage error = new ActionMessage("error.resource.item.title.blank");
 //			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 //		}
+		
 		//define it later mode(TEACHER) skip below validation.
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
