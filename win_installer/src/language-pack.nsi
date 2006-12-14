@@ -161,12 +161,17 @@ Var LAMS_DIR
 Var VERSION_INT
 Var FLASHXML_DIR
 Var SQL_QUERY
+Var FOLDER_FLAG
+${Array} RF_FOLDERS
+${Array} CS_FOLDERS
+${Array} FS_FOLDERS
 ;--------------------------------
 
 
 Section "LAMS Language Pack ${VERSION}" LanguagePack
     # write this language pack version to registry
-    WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
+    ###############UNCOMMENT BELOW LINE BEFORE DEPLOY
+    #WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
     Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
     
     setoutpath $EXEDIR
@@ -407,43 +412,79 @@ Function copyFlashxml
     detailprint "DONE!"  
 FunctionEnd
 
-${Array} FOLDERS
 
 ; first, finds the location of the language files in the database
 ; then copy the required files to the dirname
 Function copyllid
+
+    ${CS_FOLDERS->Init}
+    ${FS_FOLDERS->Init}
+    ${RF_FOLDERS->Init}
+    
+    
     setoutpath "$INSTDIR\temp\sqlscripts"
-    File /a "*.sql"
-    #strcpy $SQL_QUERY '"SELECT concat($\'@$\',learning_library_id,$\'@$\') FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
-    #strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $FOLDER_FLAG "0"
     call executeSQLScript
     pop $0
     detailprint "SQL script result for Chat and Scribe: $\n$0"
     
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Forum and Scribe$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $FOLDER_FLAG "1"
     call executeSQLScript
     pop $0
     detailprint "SQL script result for Forum and Scribe: $\n$0"
     
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Resources and Forum$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $FOLDER_FLAG "2"
     call executeSQLScript
     pop $0
     detailprint "SQL script result for Resource and Forum: $\n$0"
+    
+    IntOp $R0 "$myArray_UBound" + 1
+    ${while} $RO != 0
+        ${FS_FOLDERS->Pop} $R1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
+        IntOp $R0 "$myArray_UBound" + 1
+    ${endwhile}
+    
+    
 FunctionEnd
+
+
 
 ; Executing sql scripts
 ; Puts the result of sql script on the stack
 Function executeSQLScript
-    
     nsExec::ExecToStack $SQL_QUERY
     detailprint $SQL_QUERY  
-    
     pop $0 
     pop $1
+    
+    ; Getting the muliple entries out
+    ${while} $1 != ""
+        push "$\n"
+        push $1
+        call SplitFirstStrPart
+        pop $R0
+        pop $1
+        
+        ${if} $FOLDER_FLAG == "0"
+            ${CS_FOLDERS->Push} $RO
+            #MessageBox MB_OK|MB_ICONEXCLAMATION "Chat and scribe: $R0 $\n"
+        ${endif} 
+        ${if} $FOLDER_FLAG == "1"
+            ${FS_FOLDERS->Push} $RO
+            #MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R0"
+        ${endif}
+        ${if} $FOLDER_FLAG == "2"
+            ${RF_FOLDERS->Push} $RO
+            #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R0"
+        ${endif} 
+    ${endwhile}
     
     strcpy $1 $1 -2
     push $1
@@ -460,4 +501,38 @@ Function executeSQLScript
     Finish:
         clearerrors
     
+FunctionEnd
+
+Function SplitFirstStrPart
+  Exch $R0
+  Exch
+  Exch $R1
+  Push $R2
+  Push $R3
+  StrCpy $R3 $R1
+  StrLen $R1 $R0
+  IntOp $R1 $R1 + 1
+  loop:
+    IntOp $R1 $R1 - 1
+    StrCpy $R2 $R0 1 -$R1
+    StrCmp $R1 0 exit0
+    StrCmp $R2 $R3 exit1 loop
+  exit0:
+  StrCpy $R1 ""
+  Goto exit2
+  exit1:
+    IntOp $R1 $R1 - 1
+    StrCmp $R1 0 0 +3
+     StrCpy $R2 ""
+     Goto +2
+    StrCpy $R2 $R0 "" -$R1
+    IntOp $R1 $R1 + 1
+    StrCpy $R0 $R0 -$R1
+    StrCpy $R1 $R2
+  exit2:
+  Pop $R3
+  Pop $R2
+  Exch $R1 ;rest
+  Exch
+  Exch $R0 ;first
 FunctionEnd
