@@ -422,8 +422,6 @@ Function copyllid
     ${FS_FOLDERS->Init}
     ${RF_FOLDERS->Init}
     
-    
-    setoutpath "$INSTDIR\temp\sqlscripts"
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "0"
@@ -445,21 +443,40 @@ Function copyllid
     pop $0
     detailprint "SQL script result for Resource and Forum: $\n$0"
     
-    /*IntOp $R0 "$FS_FOLDERS_UBound" + 1
-    ${FS_FOLDERS->Pop} $R1
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
-    IntOp $R0 "$FS_FOLDERS_UBound" + 1
-    */
+    IntOp $R0 "$CS_FOLDERS_UBound" + 1
+    ${do}
+        ${CS_FOLDERS->Get} $CS_FOLDERS_UBound $R1
+        ${CS_FOLDERS->Delete} $CS_FOLDERS_UBound
+        IntOp $R0 "$CS_FOLDERS_UBound" + 1
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "Chat and Scribe: $R1 $\nElements $R0"
+        
+        setoutpath "$INSTDIR\library\llid$R1"
+            
+    ${loopuntil} $R0 == "0"
     
     IntOp $R0 "$FS_FOLDERS_UBound" + 1
-    ${while} $R0 != 0
-        ${FS_FOLDERS->Pop} $R1
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
+    ${do}
+        ${FS_FOLDERS->Get} $FS_FOLDERS_UBound $R1
+        ${FS_FOLDERS->Delete} $FS_FOLDERS_UBound
         IntOp $R0 "$FS_FOLDERS_UBound" + 1
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
-    ${endwhile}
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
     
+        setoutpath "$INSTDIR\library\llid$R1"
+
+    ${loopuntil} $R0 == "0"
     
+    IntOp $R0 "$RF_FOLDERS_UBound" + 1
+    ${do}
+        ${RF_FOLDERS->Get} $RF_FOLDERS_UBound $R1
+        ${RF_FOLDERS->Delete} $RF_FOLDERS_UBound
+        IntOp $R0 "$RF_FOLDERS_UBound" + 1
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R1 $\nElements $R0"
+    
+        setoutpath "$INSTDIR\library\llid$R1"
+
+    ${loopuntil} $R0 == "0"
+    
+
 FunctionEnd
 
 
