@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -52,6 +53,7 @@ import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -422,7 +424,16 @@ public class AuthoringAction extends LamsDispatchAction {
 
 			savedFiles = getAttList(KEY_ONLINE_FILES, map);
 		}
-
+		
+		//validate file max size
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(file, true, errors );
+		if(!errors.isEmpty()){
+			request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
+			this.saveErrors(request, errors);
+			return mapping.findForward("success");
+		}
+		
 		if (file.getFileName().length() != 0) {
 
 			// upload file to repository
