@@ -28,6 +28,7 @@
 !include "LogicLib.nsh"
 !include "Array.nsh"
 
+
 # constants
 !define VERSION "2006-12-12" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -215,6 +216,15 @@ Function .onInit
     #get the version in from the version date yyyy-mm-dd
     call getVersionInt
     
+    ;set the location of the temp folder for this installation
+    ;strcpy $TEMP '$INSTDIR\temp'
+    
+    # getting the mysql database details
+    ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
+    ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
+    ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
+    ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
+    
     # Abort install if already installed or if a newer version is installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
     ${VersionCompare} "$VERSION_INT" "$0" $1
@@ -385,20 +395,6 @@ Function copyProjects
     
 FunctionEnd
 
-${Array} FOLDERS
-
-; first, finds the location of the language files in the database
-; then copy the required files to the dirname
-Function copyllid
-    ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
-    ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
-    ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
-    ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
-    ;DO I NEED SQL_ROOT_PASS??????????????????
-    
-    ${FOLDERS->init}
-FunctionEnd
-
 ; copys the files from lams_central/web/flashxml to:
 ; "<JBOSS>/\server\default\lams.ear\lams-central.war\flashxml
 Function copyFlashxml
@@ -407,4 +403,90 @@ Function copyFlashxml
     detailprint "Extracting language files for FLASH"
     file /a /r /x "CVS" "..\..\lams_central\web\flashxml\*"
     detailprint "DONE!"  
+FunctionEnd
+
+${Array} FOLDERS
+
+; first, finds the location of the language files in the database
+; then copy the required files to the dirname
+Function copyllid
+    
+    setoutpath "$INSTDIR\temp\sqlscripts"
+    File /a "*.sql"
+    
+    
+    strcpy $0 = "llid-ChatAndScribe.sql"
+    push $0
+    call executeSQLScript
+    pop $0
+    detailprint "SQL script result: $\n$0"
+    
+    ;${FOLDERS->init}
+    
+FunctionEnd
+
+; Executing sql scripts
+; Puts the result of sql script on the stack
+Function executeSQLScript
+    
+    #ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
+    #ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
+    #ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
+    #ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
+    
+    ; this will be the file path to the sql script
+    pop $0
+    
+    ; path to the sql command line tools
+    ;ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Microsoft SQL Server\80\Tools\ClientSetup" "SQLPath"
+    
+    
+    ;the location of the shell scripts
+    strcpy $1 "$INSTDIR\temp\sqlscripts"
+    
+    ; the computer name
+    #ReadRegStr $R2 HKLM "SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" "ComputerName"
+    
+    #GetTempFileName $R0
+    #ExecWait  '"$R1\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s  "$R2" -i -D "$1\$0" -o  "$R0" -B'
+    strcpy $3 '"SELECT concat($\'@$\',learning_library_id,$\'@$\') FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
+    strcpy $4 '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $3'
+    #strcpy $4 '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME < "$1\llid-ChatAndScribe.sql"'
+    nsExec::ExecToStack /OEM $4
+    detailprint $4  
+    
+    pop $0 
+    pop $1
+    
+    #check for errors and write result to install window
+    ${if} $0 == 0
+        goto Errors
+    ${endif}
+    
+    strcpy $1 $1 -2
+    detailprint $1
+    push $1
+    goto Finish
+    
+    Errors:
+        DetailPrint "Can't read from $MYSQL_DIR\$DB_NAME$ database"
+    Finish:
+        clearerrors
+    /*; this dumps the logfile to the detail window
+    ClearErrors
+    FileOpen $R1 $R0 "r"
+    IfErrors FileOpenFailed
+    MoreMessages:
+        ClearErrors
+        FileRead $R1 $R0
+        IfErrors NoMoreMessages
+        StrCpy $R0 $R0 -2 ; remove newline
+        DetailPrint $R0
+        Goto MoreMessages
+    FileOpenFailed:
+    DetailPrint "Can't read from $R0"
+    NoMoreMessages:
+    FileClose $R1
+    ClearErrors*/
+    
 FunctionEnd
