@@ -421,7 +421,7 @@ Function copyllid
     ${CS_FOLDERS->Init}
     ${FS_FOLDERS->Init}
     ${RF_FOLDERS->Init}
-    
+
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "0"
@@ -451,7 +451,9 @@ Function copyllid
         #MessageBox MB_OK|MB_ICONEXCLAMATION "Chat and Scribe: $R1 $\nElements $R0"
         
         setoutpath "$INSTDIR\library\llid$R1"
-            
+        detailprint "Copying language files for chat and scribe"
+        file /a "..\..\lams_build\librarypackages\chatscribe\language\*"
+        
     ${loopuntil} $R0 == "0"
     
     IntOp $R0 "$FS_FOLDERS_UBound" + 1
@@ -462,7 +464,8 @@ Function copyllid
         #MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
     
         setoutpath "$INSTDIR\library\llid$R1"
-
+        detailprint "Copying language files for forum and scribe"
+        file /a "..\..\lams_build\librarypackages\forumscribe\language\*"
     ${loopuntil} $R0 == "0"
     
     IntOp $R0 "$RF_FOLDERS_UBound" + 1
@@ -471,9 +474,9 @@ Function copyllid
         ${RF_FOLDERS->Delete} $RF_FOLDERS_UBound
         IntOp $R0 "$RF_FOLDERS_UBound" + 1
         #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R1 $\nElements $R0"
-    
         setoutpath "$INSTDIR\library\llid$R1"
-
+        detailprint "Copying language files for resource and forum"
+        file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\*"
     ${loopuntil} $R0 == "0"
     
 
