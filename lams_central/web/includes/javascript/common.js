@@ -46,3 +46,31 @@
 			
 		}
 	}
+	function trimAll( strValue ) {
+		 var replaceExpr = /^(\s*)$/;
+
+	    //check for all spaces
+	    if(replaceExpr.test(strValue)) {
+	       strValue = strValue.replace(replaceExpr, '');
+	       if( strValue.length == 0)
+	          return strValue;
+	    }
+	
+	   //check for leading & trailing spaces
+	   replaceExpr = /^(\s*)([\W\w]*)(\b\s*$)/;
+	   if(replaceExpr.test(strValue)) {
+	       //remove leading and trailing whitespace characters
+	       strValue = strValue.replace(replaceExpr, '$2');
+	    }
+	  return strValue;
+	}
+	
+	function isEmpty( strValue ) {
+	
+	   var strTemp = strValue;
+	   strTemp = trimAll(strTemp);
+	   if(strTemp.length > 0){
+	     return false;
+	   }
+	   return true;
+	}
