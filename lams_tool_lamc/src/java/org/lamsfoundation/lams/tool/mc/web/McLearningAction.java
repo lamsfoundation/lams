@@ -785,7 +785,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	    String questionListingMode=mcLearningForm.getQuestionListingMode();
 	    logger.debug("questionListingMode: " + questionListingMode);
-	    
+	    	    
 	    List learnerInput= new LinkedList();
 	    if (questionListingMode.equals(QUESTION_LISTING_MODE_SEQUENTIAL))
 	    {
@@ -834,19 +834,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	    else
 	    {
-	        Long maxCandidateCount=mcService.loadMaxUid();
-	        logger.debug("maxCandidateCount: " + maxCandidateCount);
-
-	        for (int i=0 ; i <= maxCandidateCount.intValue() ; i++)
-		 	{
-		 	   String currentCheckedCa= request.getParameter("checkedCa" + i);    
-		 	   logger.debug("currentCheckedCa : " + currentCheckedCa);
-		 	   
-		 	   if (currentCheckedCa != null)
-		 	   {
-				 	logger.debug("currentCheckedCa: " + currentCheckedCa);
-				 	learnerInput.add(currentCheckedCa);
-		 	   }
+		    Map parameters = request.getParameterMap();
+		    Iterator iter = parameters.keySet().iterator();
+		    while ( iter.hasNext() ) {
+		    	String key = (String) iter.next();
+		    	if ( key.startsWith("checkedCa") ) {
+			    	String currentCheckedCa = (String) request.getParameter(key);
+		    		logger.debug("Found matching checkedCa: key "+key+" value "+currentCheckedCa+".");
+					if (currentCheckedCa != null ) {
+						learnerInput.add(currentCheckedCa);
+					}
+		    	}
 		 	}
 
 		 	mcLearningForm.resetCa(mapping, request);
