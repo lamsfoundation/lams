@@ -43,6 +43,7 @@ public class AdminServiceProxy {
 	private static MessageService messageService;
 	private static IIntegrationService integrationService;
 	private static IAuditService auditService;
+	private static ISpreadsheetService spreadsheetService;
 	
 	public static final IUserManagementService getService(ServletContext servletContext){
 		if (manageService == null) {
@@ -76,5 +77,13 @@ public class AdminServiceProxy {
 			auditService = (IAuditService)ctx.getBean("auditService");
 		}
 		return auditService;
+	}
+	
+	public static final ISpreadsheetService getSpreadsheetService(ServletContext servletContext){
+		if(spreadsheetService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+			spreadsheetService = (ISpreadsheetService)ctx.getBean("spreadsheetService");
+		}
+		return spreadsheetService;
 	}
 }

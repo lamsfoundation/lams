@@ -2,35 +2,34 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
- * USA
- * 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
-package org.lamsfoundation.lams.admin.util;
+
+/* $Id$ */
+package org.lamsfoundation.lams.admin.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -54,66 +53,108 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * TODO Add description here
- * TODO add existing users to an org?
- * TODO write audit log
- *
  * <p>
- * <a href="ExcelUserImportFileParser.java.html"><i>View Source</i></a>
+ * <a href="SpreadsheetService.java.html"><i>View Source</i></a>
  * </p>
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author <a href="mailto:jliew@melcoe.mq.edu.au">Jun-Dir Liew</a>
  */
-public class ExcelUserImportFileParser implements IUserImportFileParser{
-	
-	private static Logger log = Logger.getLogger(ExcelUserImportFileParser.class);
-	private static IUserManagementService service;
-	private static MessageService messageService;
-	private static IAuditService auditService;
+public class SpreadsheetService implements ISpreadsheetService {
 
-	// spreadsheet column indexes
+	private static Logger log = Logger.getLogger(SpreadsheetService.class);
+	public IUserManagementService service;
+	public MessageService messageService;
+	public IAuditService auditService;
+	
+	public IUserManagementService getService() {
+		return service;
+	}
+
+	public void setService(IUserManagementService service) {
+		this.service = service;
+	}
+	
+	public MessageService getMessageService() {
+		return messageService;
+	}
+
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+	
+	public IAuditService getAuditService() {
+		return auditService;
+	}
+
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
+	
+	// spreadsheet column indexes for user spreadsheet
 	private static final short LOGIN = 0;
 	private static final short PASSWORD = 1;
 	private static final short TITLE = 2;
 	private static final short FIRST_NAME = 3;
 	private static final short LAST_NAME = 4;
-	private static final short ORGANISATION = 5;
-	private static final short ROLES = 6;
-	private static final short AUTH_METHOD = 7;
-	private static final short EMAIL = 8;
-	private static final short FLASH_THEME = 9;
-	private static final short HTML_THEME = 10;
-	private static final short LOCALE = 11;
-	private static final short ADDRESS1 = 12;
-	private static final short ADDRESS2 = 13;
-	private static final short ADDRESS3 = 14;
-	private static final short CITY = 15;
-	private static final short STATE = 16;
-	private static final short POSTCODE = 17;
-	private static final short COUNTRY = 18;
-	private static final short DAY_PHONE = 19;
-	private static final short EVE_PHONE = 20;
-	private static final short MOB_PHONE = 21;
-	private static final short FAX = 22;
+	private static final short AUTH_METHOD = 5;
+	private static final short EMAIL = 6;
+	private static final short FLASH_THEME = 7;
+	private static final short HTML_THEME = 8;
+	private static final short LOCALE = 9;
+	private static final short ADDRESS1 = 10;
+	private static final short ADDRESS2 = 11;
+	private static final short ADDRESS3 = 12;
+	private static final short CITY = 13;
+	private static final short STATE = 14;
+	private static final short POSTCODE = 15;
+	private static final short COUNTRY = 16;
+	private static final short DAY_PHONE = 17;
+	private static final short EVE_PHONE = 18;
+	private static final short MOB_PHONE = 19;
+	private static final short FAX = 20;
+	
+	// spreadsheet column indexes for userorgrole spreadsheet
+	private static final short ORGANISATION = 1;
+	private static final short ROLES = 2;
 	
 	ArrayList<ArrayList> results = new ArrayList<ArrayList>();
 	ArrayList<String> rowResult = new ArrayList<String>();
 	private boolean emptyRow;
 	private boolean hasError;
-	
-	public ExcelUserImportFileParser(IUserManagementService service, MessageService messageService, IAuditService auditService){
-		this.service = service;
-		this.messageService = messageService;
-		this.auditService = auditService;
-	}
 
-	/** 
-	 * @see org.lamsfoundation.lams.admin.util.IUserImportFileParser#parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly)
-	 */
-	public List parseSpreadsheet(FormFile fileItem) throws IOException{
+	private HSSFSheet getSheet(FormFile fileItem) throws IOException {
 		POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 		HSSFWorkbook wb = new HSSFWorkbook(fs);
-		HSSFSheet sheet = wb.getSheetAt(0);
+		return wb.getSheetAt(0);
+	}
+	
+	public boolean isUserSpreadsheet(FormFile fileItem) throws IOException {
+		HSSFSheet sheet = getSheet(fileItem);
+		HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
+		String string = parseStringCell(row.getCell(PASSWORD));
+		return (StringUtils.equals(string, "* password")) ? true : false;
+	}
+	
+	public boolean isRolesSpreadsheet(FormFile fileItem) throws IOException {
+		HSSFSheet sheet = getSheet(fileItem);
+		HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
+		String string = parseStringCell(row.getCell(ORGANISATION));
+		return (StringUtils.equals(string, "* organisation")) ? true : false;
+	}
+	
+	public List parseSpreadsheet(FormFile fileItem) throws IOException {
+		if (isUserSpreadsheet(fileItem)) {
+			return parseUserSpreadsheet(fileItem);
+		} else if (isRolesSpreadsheet(fileItem)) {
+			return parseRolesSpreadsheet(fileItem);
+		}
+		return new ArrayList();
+	}
+	
+	public List parseUserSpreadsheet(FormFile fileItem) throws IOException {
+		results = new ArrayList<ArrayList>();
+		HSSFSheet sheet = getSheet(fileItem);
 		int startRow = sheet.getFirstRowNum();
 		int endRow = sheet.getLastRowNum();
 		
@@ -121,20 +162,13 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		
 		HSSFRow row;
 		User user = null;
-		Organisation org;
-		List<String> roles;
 		for (int i = startRow + 1; i < endRow + 1; i++) {
 			log.debug("starting row: "+i);
 			emptyRow = true;
 			hasError = false;
 			rowResult = new ArrayList<String>();
-			org = null;
-			roles = null;
 			row = sheet.getRow(i);
 			user = parseUser(row, i);
-			String orgId = parseStringCell(row.getCell(ORGANISATION));
-			if (orgId!=null) org = (Organisation)service.findById(Organisation.class, new Integer(orgId));
-			roles = parseRolesCell(row.getCell(ROLES));
 			
 			if (emptyRow) {
 				log.debug("emptyRow: "+emptyRow);
@@ -146,38 +180,9 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 				continue;
 			} else {
 				try {
-					user.setCreateDate(new Date());
-					if (org!=null || roles!=null) {  // save user+roles if org or roles are set
-						log.debug("org: "+org+" roles: "+roles);
-						if (org!=null && roles!=null) {
-							if (!checkValidRoles(roles, service.isUserSysAdmin(), org.getOrganisationType())) {
-								String[] args = {"("+parseStringCell(row.getCell(ROLES))+")"};
-								rowResult.add(messageService.getMessage("error.roles.invalid", args));
-							} else {
-								service.save(user);
-								writeAuditLog(user);
-								service.setRolesForUserOrganisation(user, org, roles);
-								// rowResult.add(org.getOrganisationId().toString());  // for stat summary in save action
-								log.debug("saved user: "+user.getUserId()+" with roles: "+roles);
-							}
-						} else {
-							String[] args = new String[1];
-							String error;
-							if (org!=null) {
-								args[0] = "("+parseStringCell(row.getCell(ROLES))+")";
-								error = messageService.getMessage("error.roles.invalid", args);
-							} else {
-								args[0] = "("+orgId+")";
-								error = messageService.getMessage("error.org.invalid", args);
-							}
-							rowResult.add(error);
-						}
-					} else {
-						service.save(user);
-						writeAuditLog(user);
-						//rowResult.add(String.valueOf(0));  // for stat summary in save action
-						log.debug("saved user: "+user.getUserId());
-					}
+					service.save(user);
+					writeAuditLog(user);
+					log.debug("saved user: "+user.getUserId());
 				} catch (Exception e) {
 					log.debug(e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
@@ -190,7 +195,94 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		return results;
 	}
 	
-	/**
+	public List parseRolesSpreadsheet(FormFile fileItem) throws IOException {
+		results = new ArrayList<ArrayList>();
+		HSSFSheet sheet = getSheet(fileItem);
+		int startRow = sheet.getFirstRowNum();
+		int endRow = sheet.getLastRowNum();
+		
+		log.debug("sheet rows: "+startRow+".."+endRow);
+		
+		HSSFRow row;
+		List<String> roles;
+		for (int i = startRow + 1; i < endRow + 1; i++) {
+			log.debug("starting row: "+i);
+			emptyRow = true;
+			hasError = false;
+			rowResult = new ArrayList<String>();
+			row = sheet.getRow(i);
+			
+			String login = parseStringCell(row.getCell(LOGIN));
+			String orgId = parseStringCell(row.getCell(ORGANISATION));
+			roles = parseRolesCell(row.getCell(ROLES));
+			
+			if (emptyRow) {
+				log.debug("emptyRow: "+emptyRow);
+				break;
+			}
+			if (hasError) {
+				log.debug("hasError: "+hasError);
+				results.add(rowResult);
+				continue;
+			} else {
+				try {
+					saveUserRoles(login, orgId, roles, row);
+				} catch (Exception e) {
+					log.debug(e);
+					rowResult.add(messageService.getMessage("error.fail.add"));
+				}
+				log.debug("rowResult size: "+rowResult.size());
+				results.add(rowResult);
+			}
+		}
+		log.debug("found "+results.size()+" users in spreadsheet.");
+		return results;
+	}
+	
+	private void setError(String message, String arg) {
+		if (StringUtils.isBlank(arg)) {
+			rowResult.add(messageService.getMessage(message));
+		} else {
+			String[] args = new String[1];
+			args[0] = arg;
+			rowResult.add(messageService.getMessage(message, args));
+		}
+		hasError = true;
+	}
+	
+	/*
+	 * user must already exist
+	 */
+	private void saveUserRoles(String login, String orgId, List<String> roles, HSSFRow row) {
+		User user = null;
+		if (StringUtils.isNotBlank(login)) {
+			user = service.getUserByLogin(login);
+		} else if (StringUtils.isBlank(login)) {
+			setError("error.login.required", "");
+		}
+		if (user==null) {
+			setError("user.does.not.exist", login);
+		}
+		
+		Organisation org = null;
+		if (StringUtils.isNotBlank(orgId)) {
+			org = (Organisation)service.findById(Organisation.class, new Integer(orgId));
+		}
+		if (StringUtils.isBlank(orgId) || org==null){
+			setError("error.org.invalid", "("+orgId+")");
+		} else {
+			if (roles==null || !checkValidRoles(roles, service.isUserSysAdmin(), org.getOrganisationType())) {
+				setError("error.roles.invalid", "("+parseStringCell(row.getCell(ROLES))+")");
+			}
+		}
+		
+		if (!hasError) {
+			service.setRolesForUserOrganisation(user, org, roles);
+			log.debug("added: "+login+" to: "+org.getName()+" with roles: "+roles);
+		}
+	}
+	
+	/*
 	 * gathers error messages for each cell as required, unless it's the login field in which case,
 	 * flags whole row as empty.
 	 */
@@ -210,7 +302,6 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			return null;
 		}
 
-		user.setDisabledFlag(false);
 		user.setLogin(login);
 		
 		String password = HashUtil.sha1(parseStringCell(row.getCell(PASSWORD)));
@@ -222,15 +313,17 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		if (fname==null || fname=="") {
 			rowResult.add(messageService.getMessage("error.firstname.required"));
 			hasError = true;
+		} else {
+			user.setFirstName(fname);
 		}
-		user.setFirstName(fname);
 		
 		String lname = parseStringCell(row.getCell(LAST_NAME));
 		if (lname==null || lname=="") {
 			rowResult.add(messageService.getMessage("error.lastname.required"));
 			hasError = true;
+		} else {
+			user.setLastName(lname);
 		}
-		user.setLastName(lname);
 		
 		String authMethodName = parseStringCell(row.getCell(AUTH_METHOD));
 		AuthenticationMethod authMethod = getAuthMethod(authMethodName);
@@ -238,8 +331,9 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			args[0] = "("+authMethodName+")";
 			rowResult.add(messageService.getMessage("error.authmethod.invalid", args));
 			hasError = true;
+		} else {
+			user.setAuthenticationMethod(authMethod);
 		}
-		user.setAuthenticationMethod(authMethod);
 		
 		String email = parseStringCell(row.getCell(EMAIL));
 		if (email==null || email=="") {
@@ -252,8 +346,8 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 				rowResult.add(messageService.getMessage("error.valid.email.required"));
 				hasError = true;
 			}
+			user.setEmail(email);
 		}
-		user.setEmail(email);
 		
 		String flashId = parseStringCell(row.getCell(FLASH_THEME));
 		CSSThemeVisualElement flashTheme = getFlashTheme(flashId);
@@ -261,8 +355,9 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			args[0] = "("+flashId+")";
 			rowResult.add(messageService.getMessage("error.flash.theme.invalid", args));
 			hasError = true;
+		} else {
+			user.setFlashTheme(flashTheme);
 		}
-		user.setFlashTheme(flashTheme);
 
 		String htmlId = parseStringCell(row.getCell(HTML_THEME));
 		CSSThemeVisualElement htmlTheme = getHtmlTheme(htmlId);
@@ -270,8 +365,9 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			args[0] = "("+htmlId+")";
 			rowResult.add(messageService.getMessage("error.html.theme.invalid", args));
 			hasError = true;
+		} else {
+			user.setHtmlTheme(htmlTheme);
 		}
-		user.setHtmlTheme(htmlTheme);
 		
 		String localeId = parseStringCell(row.getCell(LOCALE));
 		SupportedLocale locale = getLocale(localeId);
@@ -279,8 +375,9 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 			args[0] = "("+localeId+")";
 			rowResult.add(messageService.getMessage("error.locale.invalid", args));
 			hasError = true;
+		} else {
+			user.setLocale(locale);
 		}
-		user.setLocale(locale);
 		
 		user.setAddressLine1(parseStringCell(row.getCell(ADDRESS1)));
 		user.setAddressLine2(parseStringCell(row.getCell(ADDRESS2)));
@@ -293,12 +390,12 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		user.setEveningPhone(parseStringCell(row.getCell(EVE_PHONE)));
 		user.setMobilePhone(parseStringCell(row.getCell(MOB_PHONE)));
 		user.setFax(parseStringCell(row.getCell(FAX)));
+		
 		return (hasError ? null : user);
 	}
 	
 	/*
 	 * the methods below return legible data from individual cells
-	 * only specify msgIndex if you want to retrieve an error message, otherwise, use -1
 	 */
 	private String parseStringCell(HSSFCell cell){
 		if (cell!=null) {
@@ -463,5 +560,4 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		String message = messageService.getMessage("audit.user.create", args);
 		auditService.log(AdminConstants.MODULE_NAME, message);
 	}
-	
 }

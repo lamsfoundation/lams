@@ -35,10 +35,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.admin.util.ExcelUserImportFileParser;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.admin.service.ISpreadsheetService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author jliew
@@ -64,17 +62,13 @@ public class ImportExcelSaveAction extends Action {
 			return mapping.findForward("sysadmin");
 		}
 		
+		MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		ISpreadsheetService spreadsheetService = AdminServiceProxy.getSpreadsheetService(getServlet().getServletContext());
 		ImportExcelForm importExcelForm = (ImportExcelForm)form;
 		FormFile file = importExcelForm.getFile();
-		//Integer orgId = importExcelForm.getOrgId();
 		
-		IUserManagementService service = AdminServiceProxy.getService(getServlet().getServletContext());
-		MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		IAuditService auditService = AdminServiceProxy.getAuditService(getServlet().getServletContext());
-		//Organisation org = (Organisation)service.findById(Organisation.class, orgId);
-		
-		ExcelUserImportFileParser parser = new ExcelUserImportFileParser(service, messageService, auditService);
-		List results = parser.parseSpreadsheet(file);
+		List results = spreadsheetService.parseSpreadsheet(file);
+		String successMessageKey = (spreadsheetService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
 		
 		int successful = 0;
 		for(int i=0; i<results.size(); i++) {
@@ -85,7 +79,7 @@ public class ImportExcelSaveAction extends Action {
 		args[0] = String.valueOf(successful);
 		
 		request.setAttribute("results", results);
-		request.setAttribute("successful", messageService.getMessage("msg.users.added", args));
+		request.setAttribute("successful", messageService.getMessage(successMessageKey, args));
 		return mapping.findForward("importresult");
 	}
 

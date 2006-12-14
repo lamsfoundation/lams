@@ -1,12 +1,12 @@
 <%@ include file="/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.admin.util.IUserImportFileParser" %>
+<%@ page import="org.lamsfoundation.lams.admin.service.ISpreadsheetService" %>
 
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.user.import" />
 </h2>
 
-<lams:help page="<%= IUserImportFileParser.IMPORT_HELP_PAGE %>"/>
+<lams:help page="<%= ISpreadsheetService.IMPORT_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 

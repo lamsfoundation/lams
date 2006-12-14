@@ -7,4 +7,16 @@
 	<bean id="adminMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
 		<property name="messageSource"><ref local="adminMessageSource"/></property>										
 	</bean>
+	
+	<bean id="spreadsheetService" class="org.lamsfoundation.lams.admin.service.SpreadsheetService">
+   		<property name="service">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="messageService">
+   			<ref bean="adminMessageService"/>
+   		</property>
+		<property name="auditService">
+			<ref bean="auditService"/>
+		</property>   		
+    </bean>
 </beans>
