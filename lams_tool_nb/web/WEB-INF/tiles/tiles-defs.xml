@@ -28,11 +28,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="content" value="/template/baseContent.jsp" />	
 		<put name="footer" value="/footer.jsp"/>	
 	</definition>
-	
-<!-- ============= Exception Page Definitions ====================== -->	
-	<definition name=".error" extends=".baseDef" >
-		<put name="content" value="/errorbox.jsp" />	
-	</definition>
 
 <!-- ============= Exception Page Definitions ====================== -->	
 	<definition name=".message" extends=".baseDef" >
