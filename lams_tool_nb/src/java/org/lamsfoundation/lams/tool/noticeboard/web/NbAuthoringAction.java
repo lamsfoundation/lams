@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -350,7 +351,16 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			//throws exception if the content id does not exist
 			checkContentId(content_id);
 			NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);
-	    	
+			
+			//validate file max size
+			ActionMessages errors = new ActionMessages();
+			FileValidatorUtil.validateFileSize(nbForm.getOnlineFile(), true, errors );
+			FileValidatorUtil.validateFileSize(nbForm.getOfflineFile(), true, errors );
+			if(!errors.isEmpty()){
+				this.saveErrors(request, errors);
+				return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
+			}
+			
 	    	//check if the file uploaded is an online instructions file or offline instructions file.
 	    	//if one of the types is null, then the other one must have been uploaded. 
 	    	//here we check if the file is an online one

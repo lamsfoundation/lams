@@ -69,7 +69,7 @@
 											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<c:set var="sessionMap"
 				value="${sessionScope[formBean.sessionMapID]}" scope="request" />
-
+			
 			<%-- in define later mode we edit only the basic content. But if we don't have the instructions tab, then the instructions are lost when saving. --%>
 			<h1>
 				<fmt:message key="activity.title" />
@@ -88,7 +88,14 @@
 
 			<div id="content">
 				<!-- show any error messages here -->
-				<%@ include file="../errorbox.jsp"%>
+				<logic:messagesPresent>
+					<p class="warning">
+					        <html:messages id="error">
+					            <c:out value="${error}" escapeXml="false"/><br/>
+					        </html:messages>
+					</p>
+				</logic:messagesPresent>
+								
 				<lams:help toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"
 					module="authoring" />
 				<!--  Set up tabs  -->

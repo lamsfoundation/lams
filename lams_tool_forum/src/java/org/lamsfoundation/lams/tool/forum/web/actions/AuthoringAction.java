@@ -25,6 +25,8 @@
 
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
+import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,14 +68,13 @@ import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.UploadFileUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE; 
 
 /**
  * @author Steve.Ni
@@ -449,6 +450,12 @@ public class AuthoringAction extends Action {
 		if(file == null || StringUtils.isBlank(file.getFileName()))
 			return mapping.findForward("success");
 		
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(file, true, errors );
+		if(!errors.isEmpty()){
+			this.saveErrors(request, errors);
+			return mapping.findForward("success");
+		}
 		
 		forumService = getForumManager();
 		//upload to repository
@@ -938,16 +945,7 @@ public class AuthoringAction extends Action {
 					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 				}
 			}
-			if (form.getOnlineFile() != null && !(form.getOnlineFile().getFileName().trim().equals(""))
-					&& convertToMeg(form.getOnlineFile().getFileSize()) > UploadFileUtil.getMaxFileSize()) {
-				ae = new ActionMessage("error.inputFileTooLarge");
-				errors.add(ActionMessages.GLOBAL_MESSAGE, ae);
-			}
-			if (form.getOfflineFile() != null && !(form.getOfflineFile().getFileName().trim().equals(""))
-					&& convertToMeg(form.getOfflineFile().getFileSize()) > UploadFileUtil.getMaxFileSize()) {
-				ae = new ActionMessage("error.inputFileTooLarge");
-				errors.add(ActionMessages.GLOBAL_MESSAGE, ae);
-			}
+			
 		} catch (Exception e) {
 			log.error(e.toString());
 		}

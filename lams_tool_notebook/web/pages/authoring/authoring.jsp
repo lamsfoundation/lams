@@ -39,6 +39,13 @@
 			<c:if test="${unsavedChanges}">
 				<fmt:message key="message.unsavedChanges" />
 			</c:if>
+			<logic:messagesPresent>
+				<p class="warning">
+				        <html:messages id="error">
+				            <c:out value="${error}" escapeXml="false"/><br/>
+				        </html:messages>
+				</p>
+			</logic:messagesPresent>			
 		</div>
 
 		<lams:help toolSignature="<%=NotebookConstants.TOOL_SIGNATURE%>"

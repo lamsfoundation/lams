@@ -19,7 +19,7 @@
 		<tr>
 			<td>
 				<span class="field-name"><fmt:message key="message.label.attachment" /></span>
-				<html:file tabindex="3" property="attachmentFile" />
+				<html:file tabindex="3" property="attachmentFile" /><BR>
 				<html:errors property="message.attachment" />
 			</td>
 		</tr>

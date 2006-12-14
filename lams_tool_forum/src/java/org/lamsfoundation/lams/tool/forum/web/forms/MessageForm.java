@@ -34,6 +34,7 @@ import org.apache.struts.upload.FormFile;
 import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 
 /**
  *
@@ -79,6 +80,15 @@ public class MessageForm extends ValidatorForm {
             	ActionMessage error = new ActionMessage("error.body.required");
                errors.add("message.body", error);
             }
+            
+            
+//          validate item size
+            boolean largeFile = true;
+            if(request.getRequestURI().indexOf("/learning/") != -1)
+            	largeFile = false;
+            
+			FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile,"message.attachment", errors );
+			
         } catch (Exception e) {
             logger.error("", e);
         }

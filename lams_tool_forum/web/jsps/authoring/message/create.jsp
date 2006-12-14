@@ -15,8 +15,7 @@
 			enctype="multipart/form-data" styleId="topicFormId">
 			<html:hidden property="sessionMapID" />
 			<c:set var="formBean"
-				value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<c:set var="sessionMap"
 				value="${sessionScope[formBean.sessionMapID]}" />
 
@@ -35,7 +34,11 @@
 			</div>
 
 			<div class="small-space-bottom">
-				<lams:FCKEditor id="message.body" value=""
+				<c:set var="body" value=""/>
+				<c:if test="${not empty formBean.message}">
+					<c:set var="body" value="${formBean.message.body}"/>
+				</c:if>
+				<lams:FCKEditor id="message.body" value="${body}"
 					contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 				<html:errors property="message.body" />
 			</div>
@@ -45,7 +48,8 @@
 			</div>
 
 			<div class="small-space-bottom">
-				<html:file tabindex="3" property="attachmentFile" />
+				<html:file tabindex="3" property="attachmentFile" /><BR>
+				<html:errors property="message.attachment" />
 			</div>
 
 			<lams:ImgButtonWrapper>
