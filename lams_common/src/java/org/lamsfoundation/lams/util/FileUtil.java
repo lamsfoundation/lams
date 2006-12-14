@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -370,5 +371,42 @@ public class FileUtil {
 	     sourceChannel.close();
 	     destinationChannel.close();
    }
-  
+	/**
+	 * get file extension name from a String, such as from "textabc.doc", return "doc"
+	 * fileName also can contain directory infomation.
+	 */
+	public static String getFileExtension(String fileName) {
+		if(fileName == null)
+			return "";
+			
+		fileName = fileName.trim();
+		int dotPos = fileName.lastIndexOf(".");
+		if (dotPos == -1)
+			return "";
+		return fileName.substring(dotPos + 1, fileName.length());
+	}
+	
+	/**
+	 * Check whether file is executable according to its extenstion and executable extension name list from LAMS configuaration.
+	 * @param filename
+	 * @return
+	 */
+	  public static boolean isExecutableFile(String filename){
+		  String extname = FileUtil.getFileExtension(filename);
+		  if(StringUtils.isBlank(extname))
+			  return false;
+		  extname = "." + extname;
+		  
+		  String exeListStr = Configuration.get(ConfigurationKeys.EXE_EXTENSIONS);
+		  String[] extList = StringUtils.split(exeListStr, ',');
+		  boolean executable = false;
+		  for (String ext : extList) {
+			if(StringUtils.equalsIgnoreCase(ext, extname)){
+				executable = true;
+				break;
+			}
+		}
+		  
+		  return executable;
+	  }
 }
