@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -2506,6 +2507,14 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
             /*no file uploaded*/
             return;
         
+        //validate upload file size.
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(uploadedFile, true, errors );
+		if(!errors.isEmpty()){
+			this.saveErrors(request, errors);
+			return;
+		}
+		
         logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
         
         /* if a file with the same name already exists then move the old one to deleted */
