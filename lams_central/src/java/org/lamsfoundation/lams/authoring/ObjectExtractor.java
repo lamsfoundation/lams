@@ -69,6 +69,8 @@ import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -290,8 +292,11 @@ public class ObjectExtractor implements IObjectExtractor {
 		    learningDesign.setHelpText(WDDXProcessor.convertToString(table,WDDXTAGS.HELP_TEXT));
 		if (keyExists(table, WDDXTAGS.CREATION_DATE))	
 		    learningDesign.setCreateDateTime(WDDXProcessor.convertToDate(table,WDDXTAGS.CREATION_DATE));
-		if (keyExists(table, WDDXTAGS.VERSION))	
-		    learningDesign.setVersion(WDDXProcessor.convertToString(table,WDDXTAGS.VERSION));
+//		if (keyExists(table, WDDXTAGS.VERSION))	
+//		    learningDesign.setVersion(WDDXProcessor.convertToString(table,WDDXTAGS.VERSION));
+		//don't receive version from flash anymore(it was hardcode). Get it from lams configuration database.
+		learningDesign.setVersion(Configuration.get(ConfigurationKeys.VERSION));
+		
 		if (keyExists(table, WDDXTAGS.DURATION))	
 		    learningDesign.setDuration(WDDXProcessor.convertToLong(table,WDDXTAGS.DURATION));
 		if (keyExists(table, WDDXTAGS.LAST_MODIFIED_DATE))	
