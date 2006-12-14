@@ -91,8 +91,8 @@ public class FileValidatorUtil {
 		}
 		
 		boolean largeFile = Boolean.valueOf(field.getVarValue(LARGE_FILE)).booleanValue();
-		
-		return validateFileSize(fileSize, largeFile, errors);
+		//so far put message into GLOABLE_MESSAGE rather than special key
+		return validateFileSize(fileSize, largeFile, ActionMessages.GLOBAL_MESSAGE , errors);
     }
     /**
      * 
@@ -102,19 +102,32 @@ public class FileValidatorUtil {
      * @return Be careful, if the file size is under maximum size, return TRUE. Otherwise, return false.   
      */
     public static boolean validateFileSize(FormFile file, boolean largeFile, ActionMessages errors){
-        int fileSize = 0;
-        try {
-        	fileSize = file.getFileSize();
-		} catch (Exception e) {
-			//skip, do nothing
-			return true;
-		}
-		
-		return validateFileSize(fileSize, largeFile, errors);
+      return validateFileSize(file, largeFile,ActionMessages.GLOBAL_MESSAGE, errors);
 
     }
     
-    private static boolean validateFileSize(int fileSize, boolean largeFile, ActionMessages errors){
+    /**
+     * 
+     * @param file
+     * @param largeFile
+     * @param errorKey the key in ActionMessages(errorKey,ActionMessage());
+     * @param errors
+     * @return Be careful, if the file size is under maximum size, return TRUE. Otherwise, return false.   
+     */
+    public static boolean validateFileSize(FormFile file, boolean largeFile, String errorKey, ActionMessages errors){
+    	int fileSize = 0;
+    	try {
+    		fileSize = file.getFileSize();
+    	} catch (Exception e) {
+    		//skip, do nothing
+    		return true;
+    	}
+    	
+    	return validateFileSize(fileSize, largeFile,errorKey, errors);
+    	
+    }
+    
+    private static boolean validateFileSize(int fileSize, boolean largeFile, String errorKey, ActionMessages errors){
     	float maxFileSize;
         
         //whether we are using large file or not?
@@ -139,7 +152,7 @@ public class FileValidatorUtil {
 			String maxSize = format.format(maxFileSize) + unit;
             
             //set error message
-            errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(MSG_KEY,maxSize));
+            errors.add(errorKey, new ActionMessage(MSG_KEY,maxSize));
             return false;
         }
         return true;
