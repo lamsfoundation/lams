@@ -23,9 +23,11 @@
 
 # includes
 #!include "TextFunc.nsh"
+
 !include "Functions.nsh"
 !include "MUI.nsh"
 !include "LogicLib.nsh"
+!define ArrayNoTemp4
 !include "Array.nsh"
 
 
@@ -152,7 +154,6 @@ VIAddVersionKey LegalCopyright ""
 # Variables
 ;--------------------------------
 Var MYSQL_DIR
-Var MYSQL_ROOT_PASS
 Var DB_NAME
 Var DB_USER
 Var DB_PASS
@@ -444,11 +445,18 @@ Function copyllid
     pop $0
     detailprint "SQL script result for Resource and Forum: $\n$0"
     
-    IntOp $R0 "$myArray_UBound" + 1
-    ${while} $RO != 0
+    /*IntOp $R0 "$FS_FOLDERS_UBound" + 1
+    ${FS_FOLDERS->Pop} $R1
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
+    IntOp $R0 "$FS_FOLDERS_UBound" + 1
+    */
+    
+    IntOp $R0 "$FS_FOLDERS_UBound" + 1
+    ${while} $R0 != 0
         ${FS_FOLDERS->Pop} $R1
         MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
-        IntOp $R0 "$myArray_UBound" + 1
+        IntOp $R0 "$FS_FOLDERS_UBound" + 1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
     ${endwhile}
     
     
@@ -463,6 +471,8 @@ Function executeSQLScript
     detailprint $SQL_QUERY  
     pop $0 
     pop $1
+    strcpy $1 $1 -2
+    push $1
     
     ; Getting the muliple entries out
     ${while} $1 != ""
@@ -473,21 +483,20 @@ Function executeSQLScript
         pop $1
         
         ${if} $FOLDER_FLAG == "0"
-            ${CS_FOLDERS->Push} $RO
+            ${CS_FOLDERS->Push} $R0
             #MessageBox MB_OK|MB_ICONEXCLAMATION "Chat and scribe: $R0 $\n"
         ${endif} 
         ${if} $FOLDER_FLAG == "1"
-            ${FS_FOLDERS->Push} $RO
+            ${FS_FOLDERS->Push} $R0
             #MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R0"
         ${endif}
         ${if} $FOLDER_FLAG == "2"
-            ${RF_FOLDERS->Push} $RO
+            ${RF_FOLDERS->Push} $R0
             #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R0"
         ${endif} 
     ${endwhile}
     
-    strcpy $1 $1 -2
-    push $1
+    
     
     #check for errors and write result to install window
     ${if} $0 != 0 
@@ -497,7 +506,7 @@ Function executeSQLScript
     goto Finish
     
     Errors:
-        DetailPrint "Can't read from $MYSQL_DIR\$DB_NAME$ database"
+        DetailPrint "Can't read from $MYSQL_DIR\$DB_NAME database"
     Finish:
         clearerrors
     
