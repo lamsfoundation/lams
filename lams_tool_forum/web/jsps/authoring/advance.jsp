@@ -63,6 +63,24 @@
 			property="forum.reflectInstructions" styleId="reflectInstructions"
 			cols="30" rows="3" /> </span>
 </p>
+<script type="text/javascript">
+<!--
+//automatically turn on refect option if there are text input in refect instruction area
+	var ra = document.getElementById("reflectInstructions");
+	var rao = document.getElementById("reflectOn");
+	function turnOnRefect(){
+		if(isEmpty(ra.value)){
+		//turn off	
+			rao.checked = false;
+		}else{
+		//turn on
+			rao.checked = true;		
+		}
+	}
+	ra.onkeydown=turnOnRefect;
+	ra.onkeyup=turnOnRefect;
+//-->
+</script>
 
 <h2>
 	<fmt:message key="message.posting.limiting" />
