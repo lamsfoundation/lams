@@ -12,10 +12,18 @@
 
 <p><fmt:message key="msg.import.intro"/></p>
 <p>
-<fmt:message key="label.notes"/>:<br/>
 <ul>
-<li><fmt:message key="msg.import.1"/></li>
-<li><fmt:message key="msg.import.2"/></li>
+	<li>
+		<fmt:message key="msg.import.1"/>
+	</li>
+	<li>
+		<fmt:message key="msg.import.2"/>
+		<ul><li><a href="file/lams_users_template.xls">lams_users_template.xls</a></li></ul>
+	</li>
+	<li>
+		<fmt:message key="msg.import.3"/>
+		<ul><li><a href="file/lams_roles_template.xls">lams_roles_template.xls</a></li></ul>
+	</li>
 </ul>
 </p>
 <p><fmt:message key="msg.import.conclusion"/></p>
@@ -25,11 +33,7 @@
 
 <table>
 	<tr>
-		<td colspan="2">
-			<fmt:message key="label.download.template" /> <a href="file/lams_users_template.xls"><fmt:message key="label.spreadsheet" /></a>
-		</td>
-	<tr>
-		<td><fmt:message key="label.excel.spreadsheet" />:</td>
+		<td align="right"><fmt:message key="label.excel.spreadsheet" />:&nbsp;</td>
 		<td><html:file property="file" /></td>
 	</tr>
 </table>
