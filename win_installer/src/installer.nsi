@@ -750,12 +750,7 @@ Function ImportDatabase
     ${EndIf}
     */
     
-    ${if} $RETAIN_FILES == '1'
-        #replace the install dump with the retained dump
-        #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase" 
-        CopyFiles "$INSTDIR\backup\lamsDump.sql" "dump.sql"
-        DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
-    ${endif}
+    
     
     
     # use Ant to import database
@@ -773,6 +768,23 @@ Function ImportDatabase
     ${If} $0 == ""
         goto error
     ${EndIf}
+    
+    ${if} $RETAIN_FILES == '1'
+        #replace the install dump with the retained dump
+        #CopyFiles "$INSTDIR\backup\lamsDump.sql" "$TEMP\dump.sql"
+        DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
+        strcpy $0 "$MYSQL_DIR\bin\mysql $DB_NAME -uroot - p$MYSQL_ROOT_PASS < $INSTDIR\backup\lamsDump.sql"
+        nsExec::ExecToStack $0
+        pop $1
+        pop $2
+        DetailPrint $0
+        DetailPrint $1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase $\n$0 $\n$1 $\n$2" 
+    
+        ${if} $0 != 0
+            goto error
+        ${endif}
+    ${endif}
     
     goto done
     
@@ -838,12 +850,12 @@ Function OverWriteRetainedFiles
 FunctionEnd
 
 Function SetupStartMenu
-	CreateDirectory "$SMPROGRAMS\LAMSv2"
+    CreateDirectory "$SMPROGRAMS\LAMSv2"
     CreateShortCut "$SMPROGRAMS\LAMSv2\Access LAMS.lnk" "http://$LAMS_DOMAIN:$LAMS_PORT/lams/"
     CreateShortCut "$SMPROGRAMS\LAMSv2\LAMS Community.lnk" "http://www.lamscommunity.org"
-	CreateShortCut "$SMPROGRAMS\LAMSv2\Start LAMS.lnk" "$INSTDIR\lams-start.exe"
-	CreateShortCut "$SMPROGRAMS\LAMSv2\Stop LAMS.lnk" "$INSTDIR\lams-stop.exe"
-	CreateShortCut "$SMPROGRAMS\LAMSv2\Uninstall LAMS.lnk" "$INSTDIR\lams-uninstall.exe"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\Start LAMS.lnk" "$INSTDIR\lams-start.exe"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\Stop LAMS.lnk" "$INSTDIR\lams-stop.exe"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\Uninstall LAMS.lnk" "$INSTDIR\lams-uninstall.exe"
 FunctionEnd
 
 

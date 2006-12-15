@@ -192,15 +192,8 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     ; <JBoss_dir>\server\default\lams.ear\lams-central.war\flashxml
     call copyFlashxml
     
-    ####################
-    # TODO  Work out what language files to copy to the 'library' directory
-    # TODO  Copy the flshxml files
-    ####################
-    
-    #SELECT concat("@",learning_library_id,"@") FROM lams_learning_library SELECT concat("@",learning_library_id,"@") FROM lams_learning_library
-    
-    #lams_blah\conf\language\*.properties
-    # lams_central\flashxml\*
+    ; Finally, add rows in the database (lams_supported_locale) for all new language files
+    call updateDatase
 SectionEnd
 
 ;--------------------------------
@@ -422,6 +415,7 @@ Function copyllid
     ${FS_FOLDERS->Init}
     ${RF_FOLDERS->Init}
 
+    ; getting the rows for Chat and Scribe
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "0"
@@ -429,6 +423,7 @@ Function copyllid
     pop $0
     detailprint "SQL script result for Chat and Scribe: $\n$0"
     
+    ; getting the rows for Forum and Scribe
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Forum and Scribe$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "1"
@@ -436,6 +431,7 @@ Function copyllid
     pop $0
     detailprint "SQL script result for Forum and Scribe: $\n$0"
     
+    ; getting the rows for Resources and Forum
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Resources and Forum$\';"'
     strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "2"
@@ -443,6 +439,7 @@ Function copyllid
     pop $0
     detailprint "SQL script result for Resource and Forum: $\n$0"
     
+    ; copy all the folders for llid Chat and Scribe
     IntOp $R0 "$CS_FOLDERS_UBound" + 1
     ${do}
         ${CS_FOLDERS->Get} $CS_FOLDERS_UBound $R1
@@ -456,6 +453,7 @@ Function copyllid
         
     ${loopuntil} $R0 == "0"
     
+    ; copy all the folders for llid Forum and Scribe
     IntOp $R0 "$FS_FOLDERS_UBound" + 1
     ${do}
         ${FS_FOLDERS->Get} $FS_FOLDERS_UBound $R1
@@ -468,6 +466,7 @@ Function copyllid
         file /a "..\..\lams_build\librarypackages\forumscribe\language\*"
     ${loopuntil} $R0 == "0"
     
+    ; copy all the folders for llid Resource and Forum
     IntOp $R0 "$RF_FOLDERS_UBound" + 1
     ${do}
         ${RF_FOLDERS->Get} $RF_FOLDERS_UBound $R1
@@ -478,8 +477,7 @@ Function copyllid
         detailprint "Copying language files for resource and forum"
         file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\*"
     ${loopuntil} $R0 == "0"
-    
-
+ 
 FunctionEnd
 
 
@@ -565,3 +563,16 @@ Function SplitFirstStrPart
   Exch
   Exch $R0 ;first
 FunctionEnd
+
+Function updateDatase
+    ; get the procedure scripts required
+    setoutpath "$INSTDIR\sqlscripts"
+    File /a 
+    
+    
+    
+    ; remove the sql scripts
+    rmdir /r "$INSTDIR\sqlscripts"
+FunctionEnd
+
+
