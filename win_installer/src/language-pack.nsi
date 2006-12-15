@@ -569,9 +569,9 @@ Function updateDatase
     setoutpath "$INSTDIR"
     File /a insertlocale.sql
     File /a LanguagePack.xml
-    #File /r "..\apache-ant-1.6.5"
-    File /a "..\apache-ant-1.6.5\bin\ant.bat"
-    File /a "..\apache-ant-1.6.5\lib\ant.jar"
+    File /r "..\apache-ant-1.6.5"
+    #File /a "..\apache-ant-1.6.5\bin\ant.bat"
+    #File /a "..\apache-ant-1.6.5\lib\ant.jar"
     
     
     ; update locals must be stored as a procedure first
@@ -684,7 +684,7 @@ Function updateDatase
     
     done: 
         ; remove the sql scripts
-        delete "$INSTDIR\insertlocale.sql"
+        #delete "$INSTDIR\insertlocale.sql"
         delete "LanguagePack.xml"
         rmdir /r $TEMP
         rmdir /r "$INSTDIR\apache-ant-1.6.5"
