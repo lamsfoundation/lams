@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.admin.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -390,6 +391,8 @@ public class SpreadsheetService implements ISpreadsheetService {
 		user.setEveningPhone(parseStringCell(row.getCell(EVE_PHONE)));
 		user.setMobilePhone(parseStringCell(row.getCell(MOB_PHONE)));
 		user.setFax(parseStringCell(row.getCell(FAX)));
+		user.setDisabledFlag(false);
+		user.setCreateDate(new Date());
 		
 		return (hasError ? null : user);
 	}
