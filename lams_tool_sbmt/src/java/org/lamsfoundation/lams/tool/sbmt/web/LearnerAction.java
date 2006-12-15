@@ -303,7 +303,11 @@ public class LearnerAction extends DispatchAction {
 		
 		FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
 		
+		if(learnerForm.getFile() != null)
+			log.debug("Learner submit file : " + learnerForm.getFile().getFileName());
+		
     	if(learnerForm.getFile()!= null && FileUtil.isExecutableFile(learnerForm.getFile().getFileName())){
+    		log.debug("File is executatable : " + learnerForm.getFile().getFileName());
         	ActionMessage msg = new ActionMessage("error.attachment.executable");
         	errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
     	}
