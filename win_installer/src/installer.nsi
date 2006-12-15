@@ -750,6 +750,13 @@ Function ImportDatabase
     ${EndIf}
     */
     
+     ${if} $RETAIN_FILES == '1'      
+         #replace the install dump with the retained dump    
+         #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase"   
+         CopyFiles "$INSTDIR\backup\lamsDump.sql" "dump.sql"     
+         DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"     
+     ${endif}
+    
     
     
     
@@ -769,7 +776,7 @@ Function ImportDatabase
         goto error
     ${EndIf}
     
-    ${if} $RETAIN_FILES == '1'
+    /*${if} $RETAIN_FILES == '1'
         #replace the install dump with the retained dump
         #CopyFiles "$INSTDIR\backup\lamsDump.sql" "$TEMP\dump.sql"
         DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
@@ -785,7 +792,7 @@ Function ImportDatabase
             goto error
         ${endif}
     ${endif}
-    
+    */
     goto done
     
     error:
