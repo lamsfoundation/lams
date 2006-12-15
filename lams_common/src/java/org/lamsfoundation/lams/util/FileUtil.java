@@ -397,6 +397,7 @@ public class FileUtil {
 			  return false;
 		  extname = "." + extname;
 		  
+		  log.debug("Check executable file for extension name " + extname);
 		  String exeListStr = Configuration.get(ConfigurationKeys.EXE_EXTENSIONS);
 		  String[] extList = StringUtils.split(exeListStr, ',');
 		  boolean executable = false;
