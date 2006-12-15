@@ -1,0 +1,32 @@
+DROP PROCEDURE IF EXISTS updateLocales
+create procedure updateLocales
+begin
+	/*Currently supported languages
+	 * To enter a new one, simply enter:
+	 * insertLocale(language_iso_code, country_iso_code, description, direction)
+	 * at the bottom of the code
+	 */
+	call insertLocale('en','AU','English (Australia)','LTR');
+	call insertLocale('es','ES','Español','LTR');
+	call insertLocale('mi', 'NZ', 'MÄ?ori', 'LTR');
+	call insertLocale('de','DE','Deutsch','LTR');
+	call insertLocale('zh', 'CN', 'ç®€ä½“ä¸­æ–‡', 'LTR');
+	call insertLocale('fr', 'FR', 'FranÃ§ais', 'LTR');
+	call insertLocale('it', 'IT', 'Italiano', 'LTR')
+	call insertLocale('no', 'NO', 'Norsk', 'LTR');
+	call insertLocale('sv', 'SE', 'Svenska', 'LTR');
+	call insertLocale('ko', 'KR', 'í•œêµ­ì–´', 'LTR');
+	call insertLocale('pl', 'PL', 'Polski', 'LTR');
+	call insertLocale('pt', 'BR', 'PortuguÃªs (Brasil)', 'LTR');
+	call insertLocale('hu', 'HU', 'Magyar', 'LTR');
+	call insertLocale('cy', 'GB', 'Cymraeg (Cymru)', 'LTR');
+	call insertLocale('th', 'TH', 'Thai', 'LTR');
+	call insertLocale('el', 'GR', 'Î•Î»Î»Î·Î½Î¹ÎºÎ¬', 'LTR');
+	call insertLocale('nl', 'BE', 'Nederlands (BelgiÃ«)', 'LTR');
+	call insertLocale('ar', 'JO', 'Ø¹Ø±Ø¨ÙŠ', 'RTL');
+	call insertLocale('da', 'DK', 'Dansk', 'LTR');
+	call insertLocale('ru', 'RU', 'Ð ÑƒÑ?Ñ?ÐºÐ¸Ð¹', 'LTR');
+	call insertLocale('vi', 'VN', 'Tiáº¿ng Viá»‡t', 'LTR');
+	call insertLocale('zh', 'TW', 'Chinese (Taiwan)', 'LTR');
+	commit
+end
