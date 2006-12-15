@@ -183,7 +183,7 @@
 	   			<!-- front end programs like HTML, JSP, CSS etc. -->
 	   			<fileset dir="${conf.web.dir}">
 						<include name="**/*.jsp"/>
-						<include name="file/lams_users_template.xls"/>
+						<include name="file/*.xls"/>
 				</fileset>
 	   			
 	   	   </war>
@@ -288,7 +288,7 @@
 	<target name="synchronize-deploy" description="copy non-java file into deploy folder">
 		<copy verbose="yes" todir="${jboss.deploy}/${product}.war">
 			<fileset dir="${conf.web.dir}">
-				<include name="**/*.*" />
+				<include name="**/*.jsp" />
 			</fileset>
 		</copy>
 	</target>
