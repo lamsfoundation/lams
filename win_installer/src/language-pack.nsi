@@ -566,13 +566,128 @@ FunctionEnd
 
 Function updateDatase
     ; get the procedure scripts required
-    setoutpath "$INSTDIR\sqlscripts"
-    File /a 
+    setoutpath "$INSTDIR"
+    File /a insertlocale.sql
+    File /a LanguagePack.xml
+    #File /r "..\apache-ant-1.6.5"
+    File /a "..\apache-ant-1.6.5\bin\ant.bat"
+    File /a "..\apache-ant-1.6.5\lib\ant.jar"
+    
+    
+    ; update locals must be stored as a procedure first
+    ; nsExec wont let me do "mysql < insertLocale.sql"  so i had to use ant
+    /*
+    detailprint "Attempting to store procedure"
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -B $DB_NAME \< "$INSTDIR\sqlscripts\insertLocale.sql"'
+    detailprint $SQL_QUERY
+    nsExec::ExecToStack $SQL_QUERY
+    pop $0
+    pop $1
+    ${If} $0 == 0
+        DetailPrint "Procedure successfully stored in database"
+    ${Else}
+        DetailPrint "ERROR: DB001 - Unable to store procedure: $1" 
+    ${EndIf} 
+    */
+    
+    ; create installer.properties
+    ClearErrors
+    FileOpen $0 $TEMP\installer.properties w
+    IfErrors 0 +2
+        goto error
+        
+    # convert '\' to '/' for Ant's benefit
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "TEMP=$2$\r$\n"
+            
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "INSTDIR=$2/$\r$\n"
+    ;FileWrite $0 "URL=http://$LAMS_DOMAIN:$LAMS_PORT/lams/$\r$\n"
+    FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
+    FileWrite $0 "DB_USER=$DB_USER$\r$\n"
+    FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
+    Push $LAMS_DIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "EARDIR=$2/jboss-4.0.2/server/default/deploy/lams.ear$\r$\n"
+
+    ; For debugging purposes
+    copyfiles "$TEMP\installer.properties" $INSTDIR
+    
+    SetOutPath $TEMP
+    File /a "LanguagePack.xml"
+    
+    
+    ; update locals must be stored as a procedure first
+    ; use ANT to store procedures
+    DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat insertLocale-db'
+    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\LanguagePack.xml insertLocale-db'
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    DetailPrint "Database insert status: $0"
+    DetailPrint "Database insert output: $1"
+    
+    
+    ; execute the procedures
+    detailprint "Attempting to execute database procedure"
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "call updateLocale()"'
+    detailprint $SQL_QUERY
+    Execwait $SQL_QUERY
+    pop $0
+    pop $1
+    ${If} $0 == 0
+        DetailPrint "Procedure successfully exectuted"
+    ${Else}
+        DetailPrint "ERROR: DB002 - Unable to execute procedure: $1" 
+    ${EndIf}
+    
+    ; remove the procedures
+    detailprint "Attempting to remove the procedure from the Database"
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "DROP PROCEDURE IF EXISTS updateLocales"'
+    detailprint $SQL_QUERY
+    nsExec::ExecToStack $SQL_QUERY
+    pop $0
+    pop $1
+    ${If} $0 == 0
+        DetailPrint "Procedure successfully removed from database"
+    ${Else}
+        DetailPrint "ERROR: DB003 - Unable to remove procedure: $1" 
+    ${EndIf} 
+    
+    ; remove the procedures
+    detailprint "Attempting to remove the procedure from the Database"
+    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "DROP PROCEDURE IF EXISTS insertlocale"'
+    detailprint $SQL_QUERY
+    nsExec::ExecToStack $SQL_QUERY
+    pop $0
+    pop $1
+    ${If} $0 == 0
+        DetailPrint "Procedure successfully removed from database"
+    ${Else}
+        DetailPrint "ERROR: DB003 - Unable to remove procedure: $1" 
+    ${EndIf} 
     
     
     
-    ; remove the sql scripts
-    rmdir /r "$INSTDIR\sqlscripts"
+    goto done
+    error:
+        DetailPrint "Ant configure-deploy failed."
+        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
+        #Abort "LAMS configuration failed."
+    
+    done: 
+        ; remove the sql scripts
+        delete "$INSTDIR\insertlocale.sql"
+        delete "LanguagePack.xml"
+        rmdir /r $TEMP
+        rmdir /r "$INSTDIR\apache-ant-1.6.5"
 FunctionEnd
 
 
