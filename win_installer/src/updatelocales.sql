@@ -1,7 +1,9 @@
-DROP PROCEDURE IF EXISTS updateLocales
-create procedure updateLocales
-begin
-	/*Currently supported languages
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS updateLocales $$
+CREATE PROCEDURE updateLocales ()
+BEGIN
+  	/*Currently supported languages
 	 * To enter a new one, simply enter:
 	 * insertLocale(language_iso_code, country_iso_code, description, direction)
 	 * at the bottom of the code
@@ -11,8 +13,9 @@ begin
 	call insertLocale('mi', 'NZ', 'MÄ?ori', 'LTR');
 	call insertLocale('de','DE','Deutsch','LTR');
 	call insertLocale('zh', 'CN', 'ç®€ä½“ä¸­æ–‡', 'LTR');
+
 	call insertLocale('fr', 'FR', 'FranÃ§ais', 'LTR');
-	call insertLocale('it', 'IT', 'Italiano', 'LTR')
+	call insertLocale('it', 'IT', 'Italiano', 'LTR');
 	call insertLocale('no', 'NO', 'Norsk', 'LTR');
 	call insertLocale('sv', 'SE', 'Svenska', 'LTR');
 	call insertLocale('ko', 'KR', 'í•œêµ­ì–´', 'LTR');
@@ -28,5 +31,8 @@ begin
 	call insertLocale('ru', 'RU', 'Ð ÑƒÑ?Ñ?ÐºÐ¸Ð¹', 'LTR');
 	call insertLocale('vi', 'VN', 'Tiáº¿ng Viá»‡t', 'LTR');
 	call insertLocale('zh', 'TW', 'Chinese (Taiwan)', 'LTR');
-	commit
-end
+	commit;
+
+END $$
+
+DELIMITER ;
