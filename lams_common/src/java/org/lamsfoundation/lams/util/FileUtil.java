@@ -393,11 +393,12 @@ public class FileUtil {
 	 */
 	  public static boolean isExecutableFile(String filename){
 		  String extname = FileUtil.getFileExtension(filename);
+		  log.debug("Check executable file for extension name " + extname);
+		  
 		  if(StringUtils.isBlank(extname))
 			  return false;
 		  extname = "." + extname;
 		  
-		  log.debug("Check executable file for extension name " + extname);
 		  String exeListStr = Configuration.get(ConfigurationKeys.EXE_EXTENSIONS);
 		  String[] extList = StringUtils.split(exeListStr, ',');
 		  boolean executable = false;
