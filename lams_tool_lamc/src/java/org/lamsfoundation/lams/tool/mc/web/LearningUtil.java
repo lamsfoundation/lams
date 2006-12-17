@@ -848,6 +848,7 @@ public class LearningUtil implements McAppConstants {
     		List listCandidateAnswerUids=mcService.findMcOptionUidsByQueId(mcQueContent.getUid());
     		logger.debug("listCandidateAnswerUids: " + listCandidateAnswerUids);
 
+    		logger.debug("randomize check: " + randomize);
     		
     		if (randomize)
     		{
@@ -906,7 +907,7 @@ public class LearningUtil implements McAppConstants {
 	public static Map convertToStringMap(List list)
 	{
 		logger.debug("using convertToStringMap: " + list);
-		Map map= new TreeMap(new McStringComparator());
+		Map map= new TreeMap(new McComparator());
 		
 		Iterator listIterator=list.iterator();
     	Long mapIndex=new Long(1);
