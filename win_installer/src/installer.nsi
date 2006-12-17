@@ -887,16 +887,49 @@ FunctionEnd
 
 Function .onInstFailed
     Call RemoveTempFiles
-    RMDir /r $INSTDIR
+    
+    ;remove all files from the instdir excluding the backed up files
+    RMDir /r "$INSTDIR\jboss-4.0.2"
+    RMDir /r "$INSTDIR\dump"
+    RMDir /r "$INSTDIR\repository"
+    RMDir /r "$INSTDIR\temp"
+    RMDir /r "$INSTDIR\build"
+    Delete "$INSTDIR\index.html"
+    Delete "$INSTDIR\installer.properties"
+    Delete "$INSTDIR\installer_ant.log"
+    Delete "$INSTDIR\lams-start.exe"
+    Delete "$INSTDIR\lams-stop.exe"
+    Delete "$INSTDIR\lams_uninstall.exe"
+    Delete "$INSTDIR\license.txt"
+    Delete "$INSTDIR\readme.txt"
+    
+    ; remove the db 
+    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
+    ReadRegStr $1 HKLM "${REG_HEAD}" "db_name"
+    ReadRegStr $2 HKLM "${REG_HEAD}" "db_user"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
+    StrLen $9 $3
+    StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
+    DetailPrint $4
+    ${If} $9 != 0
+        StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
+    ${EndIf}
+    nsExec::ExecToStack $4
+    Pop $0
+    Pop $1
+    ${If} $0 == 1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
+        DetailPrint "Failed to remove LAMS database."
+    ${EndIf}
 FunctionEnd
 
 Function .onInstSuccess
     Call RemoveTempFiles
     RMDir /r "$INSTDIR\apache-ant-1.6.5"
     RMDir /r "$INSTDIR\zip"
-    RMDir /r "$INSTDIR/backup/repository"
-    RMDIR /r "$INSTDIR/backup/jboss-4.0.2"
-    Delete "$INSTDIR/backup/lamsDump.sql"
+    RMDir /r "$INSTDIR\backup\repository"
+    RMDIR /r "$INSTDIR\backup\jboss-4.0.2"
+    Delete "$INSTDIR\backup\lamsDump.sql"
 FunctionEnd
 
 
