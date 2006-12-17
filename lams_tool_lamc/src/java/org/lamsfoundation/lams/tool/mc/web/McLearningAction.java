@@ -1722,8 +1722,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    String passMarkApplicable=null;
 	    String userOverPassMark =null;
 
-    	passMarkApplicable=(String)sessionMap.get(PASSMARK_APPLICABLE);
-    	logger.debug("passMarkApplicable: " + passMarkApplicable);
+	    if (sessionMap != null)
+	        passMarkApplicable=(String)sessionMap.get(PASSMARK_APPLICABLE);
+    	
+	    logger.debug("passMarkApplicable: " + passMarkApplicable);
     	
     	if (passMarkApplicable == null)
     	{
@@ -1732,7 +1734,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		 	logger.debug("passMarkApplicable: " + passMarkApplicable);
     	}
     	        
-    	userOverPassMark=(String)sessionMap.get(USER_OVER_PASSMARK);
+    	if (sessionMap != null)    	
+    	    userOverPassMark=(String)sessionMap.get(USER_OVER_PASSMARK);
+    	
 	 	logger.debug("userOverPassMark: " + userOverPassMark);
 	 	
     	if (userOverPassMark == null)
@@ -1742,18 +1746,29 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	}
 
 
-    	mcGeneralLearnerFlowDTO.setPassMarkApplicable(passMarkApplicable);
-    	mcLearningForm.setPassMarkApplicable(passMarkApplicable);
-	    
-    	mcGeneralLearnerFlowDTO.setUserOverPassMark (userOverPassMark);
-    	mcLearningForm.setUserOverPassMark (userOverPassMark);
+    	if (passMarkApplicable != null)
+    	{
+        	mcGeneralLearnerFlowDTO.setPassMarkApplicable(passMarkApplicable);
+        	mcLearningForm.setPassMarkApplicable(passMarkApplicable);
+    	}
+    	    
+    	if (userOverPassMark != null)
+    	{
+        	mcGeneralLearnerFlowDTO.setUserOverPassMark (userOverPassMark);
+        	mcLearningForm.setUserOverPassMark (userOverPassMark);
+    	}
+    	
+    	if (sessionMap != null)
+    	{
+    	    if (passMarkApplicable != null)
+    	        sessionMap.put(PASSMARK_APPLICABLE, passMarkApplicable);
+    	    
+    	    if (userOverPassMark != null)
+    	        sessionMap.put(USER_OVER_PASSMARK, userOverPassMark);
+        	request.getSession().setAttribute(httpSessionID, sessionMap);        	
+    	}
 
     	
-    	sessionMap.put(PASSMARK_APPLICABLE, passMarkApplicable);
-    	sessionMap.put(USER_OVER_PASSMARK, userOverPassMark);
-    	request.getSession().setAttribute(httpSessionID, sessionMap);
-    	
-
 	    String totalMarksPossible=LearningUtil.getTotalMarksPossible(mcContent);
 	    logger.debug("totalMarksPossible: " + totalMarksPossible);
 	    mcGeneralLearnerFlowDTO.setTotalMarksPossible(totalMarksPossible);

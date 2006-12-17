@@ -126,6 +126,7 @@ public interface McAppConstants {
     public static final String MAX_QUESTION_INDEX 						= "maxQuestionIndex";
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
+    public static final String SIMPLE_LEARNING_ERROR					= "simpleLearningError";
     
     public static final String DEFAULT_MCQ_TITLE 						= "MCQ";
     public static final String DEFAULT_MCQ_INSTRUCTIONS					= "Instructions";
@@ -296,6 +297,7 @@ public interface McAppConstants {
     public static final String MAP_USER_RESPONSES						="mapUserResponses";
     public static final String MAP_MAIN_REPORT							="mapMainReport";
     public static final String MAP_STATS								="mapStats";
+    
         
     /*
      * Monitoring Mode constants

@@ -313,6 +313,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    if (mcQueUsr == null)
 		    {
 				logger.error("error.learner.required");
+				persistError(request,"error.learner.required");
+				logger.error("forwarding to: " + SIMPLE_LEARNING_ERROR);
+				return (mapping.findForward(SIMPLE_LEARNING_ERROR));
 		    }
 		    
 		    /* check whether the user's session really referrs to the session id passed to the url*/

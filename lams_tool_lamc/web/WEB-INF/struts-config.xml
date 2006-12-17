@@ -209,6 +209,13 @@
 		    redirect="false"
 	  	/>   
 	  	
+
+		<forward
+		    name="simpleLearningError"
+		    path="/learning/SimpleLearnerError.jsp"
+		    redirect="false"
+	  	/>   
+	  	
 	</action>  
 	
 	
