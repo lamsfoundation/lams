@@ -102,10 +102,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</html:submit>
 	</c:if>
 
-
 	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-		<img src="<c:out value="${tool}"/>images/send.gif"
-			align=left onclick="javascript:if (verifyCandidateSelected()){ submitAllAnswers();}">
+		<html:button property="continueOptionsCombined" onclick="javascript:if (verifyCandidateSelected()){ submitAllAnswers();}" styleClass="button">
+			<fmt:message key="button.submit" />
+		</html:button>
 	</c:if>
 
 	<p>&nbsp;</p>

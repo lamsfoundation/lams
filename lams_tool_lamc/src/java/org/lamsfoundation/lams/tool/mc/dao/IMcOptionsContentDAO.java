@@ -111,8 +111,6 @@ public interface IMcOptionsContentDAO
 	public void removeMcOptionsContent(McOptsContent mcOptsContent);
 	
 	public List findMcOptionNamesByQueId(Long mcQueContentId);
-	
-	public Long loadMaxUid();
 }
 
 

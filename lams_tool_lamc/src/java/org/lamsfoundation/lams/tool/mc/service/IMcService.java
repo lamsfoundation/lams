@@ -93,8 +93,6 @@ public interface IMcService
     
     public McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException;
     
-    public Long loadMaxUid() throws McApplicationException;
-    
     public void cleanAllQuestionsSimple(final Long mcContentUid) throws McApplicationException;
     
     public void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
