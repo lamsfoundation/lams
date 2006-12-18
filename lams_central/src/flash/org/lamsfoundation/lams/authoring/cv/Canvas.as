@@ -460,14 +460,22 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				//var msg:String = "Congratulations! - Your design is valid has been saved"+r.learningDesignID;
 				//TODO take this from the dictionary
 				var msg:String = Dictionary.getValue('cv_valid_design_saved');
-				LFMessage.showMessageAlert(msg);
-			}else{
-				
+				var _requestSrc = _root.requestSrc;
+				if(_requestSrc != null) {
+					//show the window, on load, populate it
+					var cc:CanvasController = canvasView.getController();
+					var saveConfirmDialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('al_alert'),closeButton:false,scrollContentPath:"SaveConfirmDialog",msg:msg, requestSrc:_requestSrc, canvasModel:canvasModel,canvasController:cc});
+	
+					//var extHandler = Proxy.create(this,closeReturnExt);
+					//LFMessage.showMessageConfirm(msg, null, extHandler, null, Dictionary.getValue('cv_close_return_to_ext_src', [_requestSrc]));
+				} else {
+					LFMessage.showMessageAlert(msg);
+				}
+			} else {
 				var msg:String = Dictionary.getValue('cv_invalid_design_saved');
 				//public static function howMessageConfirm(msg, okHandler:Function, cancelHandler:Function,okLabel:String,cancelLabel:String){
 				var okHandler = Proxy.create(this,showDesignValidationIssues,r);
 				LFMessage.showMessageConfirm(msg,okHandler,null,Dictionary.getValue('cv_show_validation'));
-				
 			}
 			
 			checkValidDesign();
@@ -489,6 +497,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//show the window, on load, populate it
 		var cc:CanvasController = canvasView.getController();
 		var validationIssuesDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('ld_val_title'),closeButton:true,scrollContentPath:"ValidationIssuesDialog",validationIssues:dp, canvasModel:canvasModel,canvasController:cc});
+	}
+	
+	public function closeReturnExt() {
+		fscommand("closeWindow", null);
 	}
 	
 	/**

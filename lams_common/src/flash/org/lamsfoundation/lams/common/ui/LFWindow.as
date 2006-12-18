@@ -262,4 +262,8 @@ class LFWindow extends Window{
     function get scrollContent():Object{
         return content.content;
     }
+	
+	function set resize(a:Boolean):Void {
+		resize_mc._visible = a;
+	}
 }
