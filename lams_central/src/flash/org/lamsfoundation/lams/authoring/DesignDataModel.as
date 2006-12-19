@@ -100,7 +100,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//set the defualts:
 		_objectType = "LearningDesign";
 		_copyTypeID = COPY_TYPE_ID_AUTHORING;
-		_version = "1.1_beta";
+		_version = null;
 		_readOnly = false;
 		_validDesign = false;
 		_autoSaved = false;
