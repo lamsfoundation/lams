@@ -106,8 +106,8 @@ public class LoginRequestValve extends ValveBase {
 					log.info("LOGIN REQUEST DETECTED - LOGIN SUCCESSFUL");
 					log.info("character encoding of the request - "
 							+ request.getCharacterEncoding());
-					redirect = URLDecoder.decode(redirect, "US-ASCII");
-					log.info("Redirect URL decoded - " + redirect);
+					//redirect = URLDecoder.decode(redirect, "US-ASCII");
+					log.info("Redirect URL - " + redirect);
 					// create catalina internal session
 					Session session = request.getContext().getManager().findSession(hses.getId());
 					// Create and populate a SavedRequest object for this
