@@ -171,8 +171,7 @@ ${Array} FS_FOLDERS
 
 Section "LAMS Language Pack ${VERSION}" LanguagePack
     # write this language pack version to registry
-    ###############UNCOMMENT BELOW LINE BEFORE DEPLOY
-    #WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
     Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
     
     setoutpath $EXEDIR
@@ -193,7 +192,7 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     call copyFlashxml
     
     ; Finally, add rows in the database (lams_supported_locale) for all new language files
-    call updateDatase
+    call updateDatabase
 SectionEnd
 
 ;--------------------------------
@@ -564,7 +563,7 @@ Function SplitFirstStrPart
   Exch $R0 ;first
 FunctionEnd
 
-Function updateDatase
+Function updateDatabase
     SetOutPath $INSTDIR
     file /a "languages.txt"
     
