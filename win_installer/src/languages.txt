@@ -1,0 +1,23 @@
+en-AU-English (Australia)-LTR
+es-ES-Español-LTR
+mi-NZ-M�?ori-LTR
+de-DE-Deutsch-LTR
+zh-CN-简体中文-LTR
+fr-FR-Français-LTR
+it-IT-Italiano-LTR
+no-NO-Norsk-LTR
+sv-SE-Svenska-LTR
+ko-KR-한국어-LTR
+pl-PL-Polski-LTR
+pt-BR-Português (Brasil)-LTR
+hu-HU-Magyar-LTR
+bg-BG-Българ�?ки-LTR
+cy-GB-Cymraeg (Cymru)-LTR
+th-TH-Thai-LTR
+el-GR-Ελληνικά-LTR
+nl-BE-Nederlands (België)-LTR
+ar-JO-عربي-RTL
+da-DK-Dansk-LTR
+ru-RU-Ру�?�?кий-LTR
+vi-VN-Tiếng Việt-LTR
+zh-TW-Chinese (Taiwan)-LTR

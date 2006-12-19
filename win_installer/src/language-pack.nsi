@@ -565,6 +565,70 @@ Function SplitFirstStrPart
 FunctionEnd
 
 Function updateDatase
+    SetOutPath $INSTDIR
+    file /a "languages.txt"
+    
+    Fileopen $R0 "$INSTDIR\languages.txt" r
+    Fileread $R0 $R1
+    ${while} $R1 != ""
+        
+        push "-"
+        push $R1
+        call SplitFirstStrPart
+        pop $0
+        pop $R1
+        
+        push "-"
+        push $R1
+        call SplitFirstStrPart
+        pop $1
+        pop $R1
+        
+        push "-"
+        push $R1
+        call SplitFirstStrPart
+        pop $2
+        pop $R1
+        
+        push "-"
+        push $R1
+        call SplitFirstStrPart
+        pop $3
+        pop $R1
+        
+        Fileread $R0 $R1
+        strlen $8 R1
+        ${if} $8 > 3
+            strcpy $3 $3 -2
+        ${endif}
+
+        strcpy $9 'select count(*) from lams_supported_locale where language_iso_code = \"$0\" and country_iso_code = \"$1\"'
+        strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "$9"'
+        nsExec::ExecToStack $SQL_QUERY
+        
+        pop $4
+        pop $5
+        strcpy $5 $5 -2
+        
+        Detailprint "RESULT: $4"
+        Detailprint "OUTPUT: $5"
+        Detailprint 'TEXT: $0 - $1 - $2 - $3 '
+        Detailprint 'QUERY: $SQL_QUERY'
+        ${if} $5 == 0
+            Detailprint "INSERTING ROWS!"
+            strcpy $9 "insert into lams_supported_locale(language_iso_code, country_iso_code, description, direction) values ($\'$0$\',$\'$1$\',$\'$2$\',$\'$3$\')"
+            strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "$9"'
+            nsExec::ExecToStack $SQL_QUERY
+            pop $7
+            pop $8
+            Detailprint 'QUERY: $SQL_QUERY'
+            Detailprint "INSERT RESULT: $7"
+            Detailprint "INSERT OUTPUT: $8"
+        ${endif} 
+    ${endwhile} 
+    
+
+    /*
     ; get the procedure scripts required
     setoutpath "$INSTDIR"
     File /a insertlocale.sql
@@ -590,6 +654,7 @@ Function updateDatase
     ${EndIf} 
     */
     
+    /*
     ; create installer.properties
     ClearErrors
     FileOpen $0 $TEMP\installer.properties w
@@ -628,12 +693,13 @@ Function updateDatase
     ; update locals must be stored as a procedure first
     ; use ANT to store procedures
     DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat insertLocale-db'
-    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\LanguagePack.xml insertLocale-db'
+    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\LanguagePack.xml execute-sql'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "Database insert status: $0"
     DetailPrint "Database insert output: $1"
     
+
     
     ; execute the procedures
     detailprint "Attempting to execute database procedure"
@@ -684,10 +750,11 @@ Function updateDatase
     
     done: 
         ; remove the sql scripts
-        #delete "$INSTDIR\insertlocale.sql"
+        delete "$INSTDIR\insertlocale.sql"
         delete "LanguagePack.xml"
         rmdir /r $TEMP
         rmdir /r "$INSTDIR\apache-ant-1.6.5"
+    */
 FunctionEnd
 
 
