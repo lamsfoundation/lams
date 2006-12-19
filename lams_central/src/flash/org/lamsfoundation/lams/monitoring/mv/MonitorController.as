@@ -391,6 +391,17 @@ class MonitorController extends AbstractController {
 				case LessonTabView.UNARCHIVE_CBI :
 					trace('unarchiving...');
 					_monitorModel.unarchiveSequence();
+				case LessonTabView.REMOVE_CBI :
+					trace('removing...');
+					var confirmMsg:String = Dictionary.getValue('ls_remove_confirm_msg');
+					var warningMsg:String = Dictionary.getValue('ls_remove_warning_msg', [_monitorModel.getSequence().getSequenceName()]);
+					
+					var warningNoHandler = Proxy.create(_monitorModel, _monitorModel.removeSequence);
+					var confirmOkHandler = Proxy.create(this, removalAlert, warningMsg, null, warningNoHandler);
+					
+					removalAlert(confirmMsg, confirmOkHandler, null);
+					
+					break;
 				default :
 					trace('no such combo box item');
 					
@@ -407,6 +418,7 @@ class MonitorController extends AbstractController {
 	public function clearBusy(){
 		_isBusy = false;
 	}
+	
 	public function get appData():Object{
 		trace("called monitor application")
 		var myObj:Object = new Object();
@@ -415,5 +427,15 @@ class MonitorController extends AbstractController {
 		myObj.ttHolder = Application.tooltip;
 		return myObj;
 		
+	}
+	
+	/**
+	* Alert message after applying the remove action on a archived lesson.
+	* 
+	* @param msg		Message to display
+	* @param okHandler	Method to pass to onPress of OK button
+	*/
+	private function removalAlert(msg:String, okHandler:Function, cancelHandler:Function) {
+		LFMessage.showMessageConfirm(msg,okHandler,cancelHandler,Dictionary.getValue('al_yes'),Dictionary.getValue('al_no'));
 	}
 }

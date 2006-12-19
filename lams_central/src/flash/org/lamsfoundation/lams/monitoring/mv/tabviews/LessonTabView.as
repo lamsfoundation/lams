@@ -54,11 +54,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var DISABLE_CBI:Number = 2;
 	public static var ARCHIVE_CBI:Number = 3;
 	public static var UNARCHIVE_CBI:Number = 4;
+	public static var REMOVE_CBI:Number = 5;
 	
 	public static var NOT_STARTED_STATUS:Number = 2;
 	public static var STARTED_STATUS:Number = 3;
 	public static var SUSPENDED_STATUS:Number = 4;
 	public static var ARCHIVED_STATUS:Number = 6;
+	public static var REMOVED_STATUS:Number = 7;
 	
 	private var _className = "LessonTabView";
 	
@@ -433,6 +435,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			case Sequence.ARCHIVED_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_activate'), LessonTabView.UNARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_remove'), LessonTabView.REMOVE_CBI);
 				break;
 			case Sequence.ACTIVE_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
@@ -441,6 +444,9 @@ public function update (o:Observable,infoObj:Object):Void{
 			case Sequence.NOTSTARTED_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
+				break;
+			case Sequence.REMOVED_STATE_ID :
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				break;
 			default :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
@@ -525,6 +531,9 @@ public function update (o:Observable,infoObj:Object):Void{
 		switch(seqStatus){
 			case LessonTabView.ARCHIVED_STATUS :
 				seqStat = Dictionary.getValue('ls_status_archived_lbl');
+				break;
+			case LessonTabView.REMOVED_STATUS :
+				seqStat = Dictionary.getValue('ls_status_removed_lbl');
 				break;
 			case LessonTabView.STARTED_STATUS :
 				seqStat = Dictionary.getValue('ls_status_started_lbl');

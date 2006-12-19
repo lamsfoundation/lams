@@ -834,6 +834,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to remove lesson.");
         }
         checkOwnerOrStaffMember(userId, requestedLesson, "remove lesson");
+        
+        // TODO give sysadmin rights to do this too!
+        
         setLessonState(requestedLesson,Lesson.REMOVED_STATE);
     }
     /**

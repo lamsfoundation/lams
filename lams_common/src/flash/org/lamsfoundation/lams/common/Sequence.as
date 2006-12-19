@@ -42,6 +42,7 @@ class Sequence {
 	public static var SUSPENDED_STATE_ID:Number = 4;
 	public static var FINISHED_STATE_ID:Number = 5;
 	public static var ARCHIVED_STATE_ID:Number = 6;
+	public static var REMOVED_STATE_ID:Number = 7;
 	
 	/**
 	* View state data
