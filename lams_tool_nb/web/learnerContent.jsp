@@ -58,7 +58,7 @@
 					</c:when>
 					<c:otherwise>
 						
-						<html:hidden property="method" value="Finish"/>
+						<input type="hidden" name="method" value="<fmt:message key="button.finish" />">
 							
 						<html:submit styleClass="button" styleId="finishButton">
 							<fmt:message key="button.finish" />
