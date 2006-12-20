@@ -563,103 +563,25 @@ Function SplitFirstStrPart
   Exch $R0 ;first
 FunctionEnd
 
+;checks if the languages in the language pack exist
+;inserts rows into lams_supported_locale iff the languages dont exist 
 Function updateDatabase
-    SetOutPath $INSTDIR
-    file /a "languages.txt"
-    
-    Fileopen $R0 "$INSTDIR\languages.txt" r
-    Fileread $R0 $R1
-    ${while} $R1 != ""
-        
-        push "-"
-        push $R1
-        call SplitFirstStrPart
-        pop $0
-        pop $R1
-        
-        push "-"
-        push $R1
-        call SplitFirstStrPart
-        pop $1
-        pop $R1
-        
-        push "-"
-        push $R1
-        call SplitFirstStrPart
-        pop $2
-        pop $R1
-        
-        push "-"
-        push $R1
-        call SplitFirstStrPart
-        pop $3
-        pop $R1
-        
-        Fileread $R0 $R1
-        strlen $8 R1
-        ${if} $8 > 3
-            strcpy $3 $3 -2
-        ${endif}
-
-        strcpy $9 'select count(*) from lams_supported_locale where language_iso_code = \"$0\" and country_iso_code = \"$1\"'
-        strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "$9"'
-        nsExec::ExecToStack $SQL_QUERY
-        
-        pop $4
-        pop $5
-        strcpy $5 $5 -2
-        
-        Detailprint "RESULT: $4"
-        Detailprint "OUTPUT: $5"
-        Detailprint 'TEXT: $0 - $1 - $2 - $3 '
-        Detailprint 'QUERY: $SQL_QUERY'
-        ${if} $5 == 0
-            Detailprint "INSERTING ROWS!"
-            strcpy $9 "insert into lams_supported_locale(language_iso_code, country_iso_code, description, direction) values ($\'$0$\',$\'$1$\',$\'$2$\',$\'$3$\')"
-            strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "$9"'
-            nsExec::ExecToStack $SQL_QUERY
-            pop $7
-            pop $8
-            Detailprint 'QUERY: $SQL_QUERY'
-            Detailprint "INSERT RESULT: $7"
-            Detailprint "INSERT OUTPUT: $8"
-        ${endif} 
-    ${endwhile} 
-    
-
-    /*
     ; get the procedure scripts required
     setoutpath "$INSTDIR"
-    File /a insertlocale.sql
+    File /a updateLocales.sql
     File /a LanguagePack.xml
     File /r "..\apache-ant-1.6.5"
     #File /a "..\apache-ant-1.6.5\bin\ant.bat"
     #File /a "..\apache-ant-1.6.5\lib\ant.jar"
     
-    
     ; update locals must be stored as a procedure first
     ; nsExec wont let me do "mysql < insertLocale.sql"  so i had to use ant
-    /*
-    detailprint "Attempting to store procedure"
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -B $DB_NAME \< "$INSTDIR\sqlscripts\insertLocale.sql"'
-    detailprint $SQL_QUERY
-    nsExec::ExecToStack $SQL_QUERY
-    pop $0
-    pop $1
-    ${If} $0 == 0
-        DetailPrint "Procedure successfully stored in database"
-    ${Else}
-        DetailPrint "ERROR: DB001 - Unable to store procedure: $1" 
-    ${EndIf} 
-    */
-    
-    /*
     ; create installer.properties
     ClearErrors
     FileOpen $0 $TEMP\installer.properties w
     IfErrors 0 +2
         goto error
-        
+       
     # convert '\' to '/' for Ant's benefit
     Push $TEMP
     Push "\"
@@ -672,7 +594,6 @@ Function updateDatabase
     Call StrSlash
     Pop $2
     FileWrite $0 "INSTDIR=$2/$\r$\n"
-    ;FileWrite $0 "URL=http://$LAMS_DOMAIN:$LAMS_PORT/lams/$\r$\n"
     FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
     FileWrite $0 "DB_USER=$DB_USER$\r$\n"
     FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
@@ -682,64 +603,19 @@ Function updateDatabase
     Pop $2
     FileWrite $0 "EARDIR=$2/jboss-4.0.2/server/default/deploy/lams.ear$\r$\n"
 
-    ; For debugging purposes
     copyfiles "$TEMP\installer.properties" $INSTDIR
     
-    SetOutPath $TEMP
+    SetOutPath $INSTDIR
     File /a "LanguagePack.xml"
-    
-    
+
     ; update locals must be stored as a procedure first
     ; use ANT to store procedures
     DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat insertLocale-db'
-    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\LanguagePack.xml execute-sql'
+    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "Database insert status: $0"
     DetailPrint "Database insert output: $1"
-    
-
-    
-    ; execute the procedures
-    detailprint "Attempting to execute database procedure"
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "call updateLocale()"'
-    detailprint $SQL_QUERY
-    Execwait $SQL_QUERY
-    pop $0
-    pop $1
-    ${If} $0 == 0
-        DetailPrint "Procedure successfully exectuted"
-    ${Else}
-        DetailPrint "ERROR: DB002 - Unable to execute procedure: $1" 
-    ${EndIf}
-    
-    ; remove the procedures
-    detailprint "Attempting to remove the procedure from the Database"
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "DROP PROCEDURE IF EXISTS updateLocales"'
-    detailprint $SQL_QUERY
-    nsExec::ExecToStack $SQL_QUERY
-    pop $0
-    pop $1
-    ${If} $0 == 0
-        DetailPrint "Procedure successfully removed from database"
-    ${Else}
-        DetailPrint "ERROR: DB003 - Unable to remove procedure: $1" 
-    ${EndIf} 
-    
-    ; remove the procedures
-    detailprint "Attempting to remove the procedure from the Database"
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B "$DB_NAME" -e "DROP PROCEDURE IF EXISTS insertlocale"'
-    detailprint $SQL_QUERY
-    nsExec::ExecToStack $SQL_QUERY
-    pop $0
-    pop $1
-    ${If} $0 == 0
-        DetailPrint "Procedure successfully removed from database"
-    ${Else}
-        DetailPrint "ERROR: DB003 - Unable to remove procedure: $1" 
-    ${EndIf} 
-    
-    
     
     goto done
     error:
@@ -749,11 +625,12 @@ Function updateDatabase
     
     done: 
         ; remove the sql scripts
-        delete "$INSTDIR\insertlocale.sql"
-        delete "LanguagePack.xml"
+        delete "$INSTDIR\updateLocales.sql"
+        delete "$INSTDIR\LanguagePack.xml"
+        delete "$INSTDIR\installer.properties"
         rmdir /r $TEMP
         rmdir /r "$INSTDIR\apache-ant-1.6.5"
-    */
+    
 FunctionEnd
 
 

@@ -10,9 +10,9 @@
 			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"
-			encoding="utf8">
-			<transaction src="${INSTDIR}/insertlocale.sql" />
+			encoding="utf8"
+			>
+			<transaction src="${INSTDIR}/updateLocales.sql" />
 		</sql>
 	</target>
-	
 </project>
