@@ -170,6 +170,10 @@ ${Array} FS_FOLDERS
 
 
 Section "LAMS Language Pack ${VERSION}" LanguagePack
+    ;make the section compulsory
+    SectionIn RO
+    
+    
     # write this language pack version to registry
     WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
     Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
