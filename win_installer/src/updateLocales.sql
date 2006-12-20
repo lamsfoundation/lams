@@ -44,4 +44,6 @@ INSERT INTO lams_supported_locale (language_iso_code, country_iso_code, descript
 FROM locale_temp t WHERE t.combined NOT IN
 (SELECT CONCAT_WS(',',l.language_iso_code,l.country_iso_code) FROM lams_supported_locale l));
 
+UPDATE lams_configuration set config_value='2006-12-20' WHERE config_key='DictionaryDateCreated';
+
 drop table if exists locale_temp;
