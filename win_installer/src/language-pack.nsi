@@ -32,9 +32,18 @@
 
 
 # constants
-!define VERSION "2006-12-12" ; DATE of language pack in fromat YYYYMMDD
+!define VERSION "2006-20-12" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
+
+# display finish page stuff
+!define MUI_FINISHPAGE_RUN $LAMS_DIR\lams-start.exe
+!define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now"
+;!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
+!define MUI_FINISHPAGE_SHOWREADME $LAMS_DIR\readme.txt
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the readme file"
+!define MUI_FINISHPAGE_LINK "Visit LAMS Community"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
 
 # installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
@@ -76,16 +85,6 @@ VIAddVersionKey LegalCopyright ""
 # set instfiles page to wait when done
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
-
-# display finish page stuff
-!define MUI_FINISHPAGE_RUN $INSTDIR\lams-start.exe
-!define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now"
-!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
-!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\readme.txt
-;!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the readme file"
-!define MUI_FINISHPAGE_LINK "Visit LAMS Community"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
-
 
 # installer screen pages
 ;--------------------------------
@@ -163,6 +162,7 @@ Var VERSION_INT
 Var FLASHXML_DIR
 Var SQL_QUERY
 Var FOLDER_FLAG
+Var OLD_VERSION
 ${Array} RF_FOLDERS
 ${Array} CS_FOLDERS
 ${Array} FS_FOLDERS
@@ -235,6 +235,8 @@ Function .onInit
         MessageBox MB_OK|MB_ICONSTOP "Your current language pack is a newer version than this version: LAMS-LanguagePack-$0"
         Abort
     ${EndIf}
+    strcpy $OLD_VERSION $0
+    
     
     # Abort if there is no version of LAMS2 installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "version"
@@ -253,6 +255,17 @@ FunctionEnd
 Function .onInstSuccess
     RMDir /r "$EXEDIR\zip"
     RMDir /r "$EXEDIR\build"
+FunctionEnd
+
+Function .onInstFailed
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" $OLD_VERSION
+    RMDir /r "$EXEDIR\zip"
+    RMDir /r "$EXEDIR\build"
+    delete "$INSTDIR\updateLocales.sql"
+    delete "$INSTDIR\LanguagePack.xml"
+    delete "$INSTDIR\installer.properties"
+    rmdir /r $TEMP
+    rmdir /r "$INSTDIR\apache-ant-1.6.5" 
 FunctionEnd
 
 ;backup existing language files 
@@ -420,7 +433,7 @@ Function copyllid
     strcpy $FOLDER_FLAG "0"
     call executeSQLScript
     pop $0
-    detailprint "SQL script result for Chat and Scribe: $\n$0"
+    #detailprint "SQL script result for Chat and Scribe: $\n$0"
     
     ; getting the rows for Forum and Scribe
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Forum and Scribe$\';"'
@@ -428,7 +441,7 @@ Function copyllid
     strcpy $FOLDER_FLAG "1"
     call executeSQLScript
     pop $0
-    detailprint "SQL script result for Forum and Scribe: $\n$0"
+    #detailprint "SQL script result for Forum and Scribe: $\n$0"
     
     ; getting the rows for Resources and Forum
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Resources and Forum$\';"'
@@ -436,7 +449,7 @@ Function copyllid
     strcpy $FOLDER_FLAG "2"
     call executeSQLScript
     pop $0
-    detailprint "SQL script result for Resource and Forum: $\n$0"
+    #detailprint "SQL script result for Resource and Forum: $\n$0"
     
     ; copy all the folders for llid Chat and Scribe
     IntOp $R0 "$CS_FOLDERS_UBound" + 1
@@ -513,8 +526,6 @@ Function executeSQLScript
         ${endif} 
     ${endwhile}
     
-    
-    
     #check for errors and write result to install window
     ${if} $0 != 0 
         goto Errors
@@ -530,37 +541,37 @@ Function executeSQLScript
 FunctionEnd
 
 Function SplitFirstStrPart
-  Exch $R0
-  Exch
-  Exch $R1
-  Push $R2
-  Push $R3
-  StrCpy $R3 $R1
-  StrLen $R1 $R0
-  IntOp $R1 $R1 + 1
-  loop:
-    IntOp $R1 $R1 - 1
-    StrCpy $R2 $R0 1 -$R1
-    StrCmp $R1 0 exit0
-    StrCmp $R2 $R3 exit1 loop
-  exit0:
-  StrCpy $R1 ""
-  Goto exit2
-  exit1:
-    IntOp $R1 $R1 - 1
-    StrCmp $R1 0 0 +3
-     StrCpy $R2 ""
-     Goto +2
-    StrCpy $R2 $R0 "" -$R1
+    Exch $R0
+    Exch
+    Exch $R1
+    Push $R2
+    Push $R3
+    StrCpy $R3 $R1
+    StrLen $R1 $R0
     IntOp $R1 $R1 + 1
-    StrCpy $R0 $R0 -$R1
-    StrCpy $R1 $R2
-  exit2:
-  Pop $R3
-  Pop $R2
-  Exch $R1 ;rest
-  Exch
-  Exch $R0 ;first
+    loop:
+        IntOp $R1 $R1 - 1
+        StrCpy $R2 $R0 1 -$R1
+        StrCmp $R1 0 exit0
+        StrCmp $R2 $R3 exit1 loop
+    exit0:
+        StrCpy $R1 ""
+        Goto exit2
+    exit1:
+        IntOp $R1 $R1 - 1
+        StrCmp $R1 0 0 +3
+        StrCpy $R2 ""
+        Goto +2
+        StrCpy $R2 $R0 "" -$R1
+        IntOp $R1 $R1 + 1
+        StrCpy $R0 $R0 -$R1
+        StrCpy $R1 $R2
+    exit2:
+        Pop $R3
+        Pop $R2
+        Exch $R1 ;rest
+        Exch
+        Exch $R0 ;first
 FunctionEnd
 
 ;checks if the languages in the language pack exist
@@ -621,7 +632,7 @@ Function updateDatabase
     error:
         DetailPrint "Ant configure-deploy failed."
         MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
-        #Abort "LAMS configuration failed."
+        Abort "LAMS configuration failed."
     
     done: 
         ; remove the sql scripts
@@ -630,7 +641,7 @@ Function updateDatabase
         delete "$INSTDIR\installer.properties"
         rmdir /r $TEMP
         rmdir /r "$INSTDIR\apache-ant-1.6.5"
-    
+        
 FunctionEnd
 
 

@@ -1,0 +1,17 @@
+BUILDING language-pack.nsi
+--------------------------
+
+- Builds to win_installer\build
+
+1) Make sure you have all the latest language files in your lams workspace, you
+   can do this by simply synchronising with the CVS repository
+2) Put the date that you want for the install at this line (around line 35):
+   !define VERSION "2006-20-12" (example)
+   Make sure it is in the form "yyyy-mm-dd"
+3) In updateLocales.sql, you must alter it to insert the required rows in the 
+   database. Update updateLocales.sql, so that every language to be supported by
+   the current version is in the list
+   An example line is below:
+   INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('pt','BR','Português (Brasil)','LTR','pt,BR');
+4) Compile language-pack.nsi
+5) Run win_installer\build\LAMSLanguagePack-[DATE]
