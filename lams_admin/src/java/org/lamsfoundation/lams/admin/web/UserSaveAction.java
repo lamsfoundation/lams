@@ -91,7 +91,7 @@ public class UserSaveAction extends Action {
 		log.debug("orgId: " + orgId);
 		Boolean edit = false;
 		Boolean passwordChanged = true;
-		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
+		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class, (Integer)userForm.get("localeId"));
 		log.debug("locale: " + locale);
 		
 		if (isCancelled(request)) {

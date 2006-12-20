@@ -138,7 +138,7 @@ CREATE TABLE lams_organisation_state (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_supported_locale (
-       locale_id TINYINT(4) NOT NULL AUTO_INCREMENT
+       locale_id INTEGER NOT NULL AUTO_INCREMENT
      , language_iso_code VARCHAR(2) NOT NULL
      , country_iso_code VARCHAR(2)
      , description VARCHAR(255) NOT NULL
@@ -227,7 +227,7 @@ CREATE TABLE lams_organisation (
      , admin_browse_all_users TINYINT(1) NOT NULL DEFAULT 0
      , admin_change_status TINYINT(1) NOT NULL DEFAULT 0
      , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
-     , locale_id TINYINT(4)
+     , locale_id INTEGER
      , archived_date DATETIME
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
@@ -306,7 +306,7 @@ CREATE TABLE lams_user (
      , flash_theme_id BIGINT(20)
      , html_theme_id BIGINT(20)
      , chat_id VARCHAR(255)
-     , locale_id TINYINT(4)
+     , locale_id INTEGER
      , portrait_uuid BIGINT(20)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)

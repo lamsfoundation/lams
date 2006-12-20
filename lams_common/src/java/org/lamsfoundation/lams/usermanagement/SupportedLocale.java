@@ -18,7 +18,7 @@ public class SupportedLocale implements Serializable,Comparable {
 	private static final long serialVersionUID = 4096710015819299886L;
 
 	/** identifier field */
-    private Byte localeId;
+    private Integer localeId;
 
     /** persistent field */
     private String languageIsoCode;
@@ -47,15 +47,15 @@ public class SupportedLocale implements Serializable,Comparable {
     /** 
      *            @hibernate.id
      *             generator-class="native"
-     *             type="java.lang.Byte"
+     *             type="java.lang.Integer"
      *             column="locale_id"
      *         
      */
-    public Byte getLocaleId() {
+    public Integer getLocaleId() {
         return this.localeId;
     }
 
-    public void setLocaleId(Byte localeId) {
+    public void setLocaleId(Integer localeId) {
         this.localeId = localeId;
     }
 

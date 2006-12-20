@@ -109,7 +109,7 @@ public class ProfileSaveAction extends Action {
 		}
 		
 		BeanUtils.copyProperties(requestor,userForm);
-		SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class, (Byte)userForm.get("localeId"));
+		SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class, (Integer)userForm.get("localeId"));
 		requestor.setLocale(locale);
 		getService().save(requestor);
 		log.debug("profile edited: "+requestor);

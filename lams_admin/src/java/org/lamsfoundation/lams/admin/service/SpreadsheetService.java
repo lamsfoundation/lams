@@ -549,7 +549,7 @@ public class SpreadsheetService implements ISpreadsheetService {
 			return service.getSupportedLocale(defaultLocale.substring(0, 2), defaultLocale.substring(3));
 		} else {
 			try {
-				return (SupportedLocale)service.findById(SupportedLocale.class, new Byte(localeId));
+				return (SupportedLocale)service.findById(SupportedLocale.class, new Integer(localeId));
 			} catch (Exception e) {
 				return null;
 			}

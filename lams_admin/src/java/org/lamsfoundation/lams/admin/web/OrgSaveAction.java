@@ -114,7 +114,7 @@ public class OrgSaveAction extends Action {
 		if(errors.isEmpty()){
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Byte)orgForm.get("localeId"));
+			SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class,(Integer)orgForm.get("localeId"));
 			OrganisationState state = (OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId"));
 
 			if(orgId!=0){
@@ -216,7 +216,7 @@ public class OrgSaveAction extends Action {
 				message = messageService.getMessage(key, args);
 				auditService.log(AdminConstants.MODULE_NAME, message);
 			}*/
-			if(!org.getLocale().getLocaleId().equals((Byte)orgForm.get("localeId"))) {
+			if(!org.getLocale().getLocaleId().equals((Integer)orgForm.get("localeId"))) {
 				args[0] = "locale";
 				args[2] = org.getLocale().getDescription();
 				args[3] = newLocale.getDescription();

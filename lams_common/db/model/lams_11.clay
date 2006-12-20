@@ -5116,17 +5116,17 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <table-description></table-description>
 <table-figure-bounds height="-1" width="-1" x="1152" y="228"/>
 <column-list>
-<column alias="" auto-increment="true" column-size="4" decimal-digits="0" default-value="" mandatory="true" name="locale_id" remarks="">
+<column alias="" auto-increment="true" column-size="0" decimal-digits="0" default-value="" mandatory="true" name="locale_id" remarks="">
 <column-description></column-description>
-<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
-<variant type-name-pattern="TINYINT"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
-<variant type-name-pattern="TINYINT UNSIGNED"/>
-<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="TINYINT ZEROFILL"/>
+<data-type jdbc-type="4" name="INTEGER" selected-variant-pattern="INTEGER">
+<variant type-name-pattern="INTEGER"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n)"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n) ZEROFILL"/>
+<variant type-name-pattern="INTEGER UNSIGNED"/>
+<variant type-name-pattern="INTEGER UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INTEGER ZEROFILL"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="2" decimal-digits="0" default-value="" mandatory="true" name="language_iso_code" remarks="ISO 639-1 Language Code (2 letter version) Java only supports 2 letter properly, not the 3 letter codes.">

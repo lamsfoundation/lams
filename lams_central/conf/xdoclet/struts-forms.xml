@@ -17,7 +17,7 @@
 	<form-property name="mobilePhone" type="java.lang.String" />
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
-	<form-property name="localeId" type="java.lang.Byte" />
+	<form-property name="localeId" type="java.lang.Integer" />
 </form-bean>
 
 <!--  uncomment to use wddxPost   

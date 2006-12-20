@@ -15,7 +15,7 @@
         <id
             name="localeId"
             column="locale_id"
-            type="java.lang.Byte"
+            type="java.lang.Integer"
         >
             <generator class="native">
               <!--  
