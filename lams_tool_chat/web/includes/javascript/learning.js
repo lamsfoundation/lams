@@ -130,20 +130,22 @@ function sendMsg(aForm) {
 		var toNick = roster.users[roster.currentIndex].nick;
 		aMsg.setTo(CONFERENCEROOM + "/" + toNick);
 		aMsg.setType("chat");
+		var message = "[" + toNick + "] " + aForm.msg.value;
+		aMsg.setBody(message);
   		// apending the private message to the incoming window,
   		// since the jabber server will not echo sent private messages.
   		// TODO: need to check if this is correct behaviour
 		if (!(NICK == toNick)) {
-			updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
+			updateMessageDisplay(generateMessageHTML(NICK, message, PRIVATE_MSG));
 		}
 	} else {
 		aMsg.setTo(CONFERENCEROOM);
 		aMsg.setType("groupchat");
+		aMsg.setBody(aForm.msg.value);
 	}
   		
   // }
 	aMsg.setFrom(USERNAME + "@" + XMPPDOMAIN + "/" + RESOURCE);
-	aMsg.setBody(aForm.msg.value);
 	con.send(aMsg);
 	aForm.msg.value = "";
 	return false;
