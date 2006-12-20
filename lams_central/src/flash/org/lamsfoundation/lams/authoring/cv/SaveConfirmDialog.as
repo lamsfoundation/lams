@@ -42,8 +42,8 @@ import mx.events.*
 */
 class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 	
-	private var MARGIN = 10;
-	private var SPACING = 10;
+	private static var MARGIN:Number = 10;
+	private static var SPACING:Number = 10;
 	private var _canvasModel:CanvasModel;
 	private var _canvasController:CanvasController;
 	private var _msg:String;
@@ -190,7 +190,7 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 		if(tgt.indexOf('okBtn') != -1) {
 			_container.deletePopUp();
 		} else if(tgt.indexOf('retBtn') != -1) {
-			fscommand('closeWindow', null);
+			ApplicationParent.extCall('closeWindow', null);
 			_container.deletePopUp();
 		} else {
 			_container.deletePopUp();

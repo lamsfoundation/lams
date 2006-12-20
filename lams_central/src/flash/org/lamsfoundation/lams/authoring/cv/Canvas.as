@@ -451,7 +451,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.copyTypeID = r.copyTypeID;
 			
 			_ddm.modified = false;
-			fscommand('setSaved', 'true');
+			
+			ApplicationParent.extCall("setSaved", "true");
+			
 			LFMenuBar.getInstance().enableExport(true);
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
@@ -500,7 +502,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	public function closeReturnExt() {
-		fscommand("closeWindow", null);
+		ApplicationParent.extCall("closeWindow", null);
 	}
 	
 	/**
@@ -1022,7 +1024,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			//JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r+'&mode=preview', 'lWindow', 570, 796, true, true, false, false, false);
 			
 			// open preview in new window
-			fscommand("openPreview", r);
+			ApplicationParent.extCall("openPreview", r);
 			
 			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
 			//_global.breakpoint();
@@ -1125,7 +1127,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		_ddm.modified = true;
 		
-		fscommand('setSaved', 'false');
+		ApplicationParent.extCall('setSaved', 'false');
 	}
 	
 	
@@ -1211,7 +1213,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
 			Debugger.log("Opening help page with locale " + _root.lang + _root.country + ": " + ca.activity.helpURL,Debugger.GEN,'getHelp','Canvas');
 			var locale:String = _root.lang + _root.country;
-			fscommand("openURL", ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale);
+			
+			ApplicationParent.extCall("openURL", ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale);
+		
 		} else {
 			if (ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				var callback:Function = Proxy.create(this, openGroupHelp);
@@ -1229,14 +1233,15 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GROUP
 		var locale:String = _root.lang + _root.country;
 		var target:String = actToolSignature + app.module + '#' + actToolSignature+ app.module + '-' + locale;
-		fscommand("openURL", url + target);
+		
+		ApplicationParent.extCall("openURL", url + target);
 	}
 	
 	private function openGateHelp(url:String){
 		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GATE
 		var locale:String = _root.lang + _root.country;
 		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
-		fscommand("openURL", url + target);
+		ApplicationParent.extCall("openURL", url + target);
 	}
 	
 	public function get toolActivityWidth():Number{

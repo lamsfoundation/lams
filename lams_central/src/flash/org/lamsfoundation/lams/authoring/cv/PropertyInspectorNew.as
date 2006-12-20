@@ -1207,7 +1207,8 @@ class PropertyInspectorNew extends MovieClip{
 	private function setModified():Void{
 		_canvasModel.getCanvas().ddm.validDesign = false;
 		_canvasModel.getCanvas().checkValidDesign();
-		fscommand("setSaved", "false");
+		
+		ApplicationParent.extCall("setSaved", "false");
 	}
 	
 }

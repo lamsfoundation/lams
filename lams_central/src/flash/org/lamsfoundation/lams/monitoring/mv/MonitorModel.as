@@ -575,7 +575,8 @@ class MonitorModel extends Observable{
 		var tabName:String = selectedTabName();
 		var locale:String = _root.lang + _root.country;
 		var target:String = app.module +tabName+ '#' + app.module +tabName+ '-' + locale;
-		fscommand("openURL", url + target);
+		
+		ApplicationParent.extCall("openURL", url + target);
 	}
 	/**
 	* Periodically checks if users have been loaded

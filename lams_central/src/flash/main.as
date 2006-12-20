@@ -50,7 +50,10 @@ if(StringUtils.isEmpty(actColour)){
 if(StringUtils.isEmpty(requestSrc)) {
 	_root.requestSrc = null;
 }
-					   
+				
+if(StringUtils.isEmpty(isMac)) {
+	_root.isMac = false;
+}				
 
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";

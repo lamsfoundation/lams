@@ -96,6 +96,21 @@ class ApplicationParent {
         return ApplicationParent._instance;
     }
 	
+	public static function extCall(method:String, param:String):Void {
+		var isMac:Boolean = (_root.isMac == "true")?true:false;
+		var versionNo:Number = _root.getSWFVersion();
+		Debugger.log("ExtCall:: method: " + method + " :: isMac: " + isMac, Debugger.GEN, "extCall", "ApplicationParent");
+		
+		if((versionNo <= 8) && (isMac)) {
+			Debugger.log("using Javascript method", Debugger.GEN, "extCall", "ApplicationParent");
+			getURL("javascript: " + method + "(" + param + ")");
+		} else {
+			Debugger.log("using FSCommand method", Debugger.GEN, "extCall", "ApplicationParent");
+			fscommand(method, param);
+		}
+
+	}
+	
 	/**
     * Called when Dictionary loaded
 	* @param evt:Object	the event object
@@ -147,7 +162,8 @@ class ApplicationParent {
 	public function openHelp(url:String) {
 		var locale:String = _root.lang + _root.country;
 		var target:String = this.module + '#' + this.module + '-' + locale;
-		fscommand("openURL", url + target);
+		
+		ApplicationParent.extCall("openURL", url + target);
 	}
 	
 	 /**

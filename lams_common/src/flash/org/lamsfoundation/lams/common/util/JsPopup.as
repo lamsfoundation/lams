@@ -78,14 +78,25 @@ class JsPopup{
 	 * @return  				returns nothing.
 	 */
 	public function launchPopupWindow(url:String, windowTitle:String, height:Number, width:Number, resize:Boolean, status:Boolean, scrollbar:Boolean, menubar:Boolean, toolbar:Boolean):Void{
-			//(args, title, h, w, resize, status, scrollbar)
-			//getURL(url,"_blank");
 			
 			// open popup window using javascript method in hosting jsp
-			fscommand("openPopUp", [url, windowTitle, height, width,getValue(resize), getValue(status) , getValue(scrollbar) , getValue(menubar) , getValue(toolbar)]);
+			var isMac:Boolean = (_root.isMac == "true")?true:false;
+			var versionNo:Number = _root.getSWFVersion();
+		
+			if((versionNo <= 8) && (isMac)) {
+				getURL("javascript: openPopUp('" + url + "'," +
+											  "'" + windowTitle + "'," +
+											  "'" + height + "'," + 
+											  "'" + width + "'," + 
+											  "'" + getValue(resize) + "'," +
+											  "'" + getValue(status) + "'," +
+											  "'" + getValue(scrollbar) + "'," +
+											  "'" + getValue(menubar) + "'," +
+											  "'" + getValue(toolbar) + "')");
+			} else {
+				fscommand("openPopUp", [url, windowTitle, height, width,getValue(resize), getValue(status) , getValue(scrollbar) , getValue(menubar) , getValue(toolbar)]);
+			}
 			
-			//getURL("javascript:openPreview('"+url+"', '"+windowTitle+"');");
-			//openPreview
 	}
 	
 	private function getValue(option:Boolean):String{
