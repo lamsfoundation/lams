@@ -35,3 +35,21 @@
 		styleId="reflectInstructions" cols="30" rows="3" />
 </p>
 
+<script type="text/javascript">
+<!--
+//automatically turn on refect option if there are text input in refect instruction area
+	var ra = document.getElementById("reflectInstructions");
+	var rao = document.getElementById("reflectOn");
+	function turnOnRefect(){
+		if(isEmpty(ra.value)){
+		//turn off	
+			rao.checked = false;
+		}else{
+		//turn on
+			rao.checked = true;		
+		}
+	}
+
+	ra.onkeyup=turnOnRefect;
+//-->
+</script>

@@ -77,7 +77,7 @@
 			rao.checked = true;		
 		}
 	}
-	ra.onkeydown=turnOnRefect;
+
 	ra.onkeyup=turnOnRefect;
 //-->
 </script>

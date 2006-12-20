@@ -89,8 +89,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</label>
 </p>
 <p>
-	<html:textarea cols="30" rows="3" property="reflectionSubject"></html:textarea>
+	<html:textarea cols="30" rows="3" property="reflectionSubject" styleId="reflectInstructions"></html:textarea>
 </p>
 
+<script type="text/javascript">
+<!--
+//automatically turn on refect option if there are text input in refect instruction area
+	var ra = document.getElementById("reflectInstructions");
+	var rao = document.getElementById("reflect");
+	function turnOnRefect(){
+		if(isEmpty(ra.value)){
+		//turn off	
+			rao.checked = false;
+		}else{
+		//turn on
+			rao.checked = true;		
+		}
+	}
 
+	ra.onkeyup=turnOnRefect;
+//-->
+</script>
 
