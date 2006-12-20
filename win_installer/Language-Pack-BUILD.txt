@@ -13,5 +13,7 @@ BUILDING language-pack.nsi
    the current version is in the list
    An example line is below:
    INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('pt','BR','Português (Brasil)','LTR','pt,BR');
-4) Compile language-pack.nsi
-5) Run win_installer\build\LAMSLanguagePack-[DATE]
+4) In updateLocales.sql change the date to the date of this language pack at the line
+   UPDATE lams_configuration set DictionaryDateCreated("2006-12-20"); (example)   
+5) Compile language-pack.nsi
+6) Run win_installer\build\LAMSLanguagePack-[DATE]
