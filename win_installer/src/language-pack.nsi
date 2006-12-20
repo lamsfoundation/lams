@@ -49,7 +49,7 @@
 !define MUI_ICON "..\graphics\lams2.ico"
 
 Name "LAMS ${VERSION} Language Pack Update"
-
+BrandingText "LAMS-Language-Pack-${VERSION} -- built on ${__DATE__} ${__TIME__}"
 # Installer attributes
 OutFile "..\build\LAMSLanguagePack-${VERSION}.exe"
 InstallDir "C:\lams"
