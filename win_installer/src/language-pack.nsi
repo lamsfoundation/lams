@@ -30,7 +30,7 @@
 
 
 # constants
-!define VERSION "2006-12-20" ; DATE of language pack in fromat YYYYMMDD
+!define VERSION "2006-12-23" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams is deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
@@ -231,12 +231,24 @@ Function zipLanguages
     nsExec::ExecToStack $4 
     pop $8
     pop $9
+    
+    ${if} $8 != 0
+        goto failedzip
+    ${endif}
+    
     detailprint $8
     detailprint $9
     detailprint 'backupdir: $BACKUP_DIR'
     detailprint 'instdir: $INSTDIR'
     detailprint '$4'
     detailprint 'done'
+    goto finish
+    
+    failedzip:
+        DetailPrint "7za.exe zip failed"
+        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$9"
+        Abort "LAMS configuration failed."
+    finish:
 FunctionEnd
 
 Function getVersionInt
@@ -353,8 +365,7 @@ Function copyProjects
     ;copying TOOL_VOTE project language files
     setoutpath "$INSTDIR\tool\vote"
     detailprint "Extracting language files for lams_tool_vote"
-    file /a "..\..\lams_tool_vote\conf\language\*"
-    
+    file /a "..\..\lams_tool_vote\conf\language\*" 
 FunctionEnd
 
 ; copys the files from lams_central/web/flashxml to:
@@ -581,11 +592,13 @@ Function updateDatabase
     Pop $1 ; console output
     DetailPrint "Database insert status: $0"
     DetailPrint "Database insert output: $1"
+    ${if} $0 != 0
+        goto error
+    ${endif}
     
     goto done
-    
     error:
-        DetailPrint "Ant configure-deploy failed."
+        DetailPrint "Ant insertLocale-db failed."
         MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
         Abort "LAMS configuration failed."
     
