@@ -49,6 +49,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				closeWindow();
 			}else if(command == "openURL"){
 				openURL(args);
+			}else if(command == "closeWindowRefresh") {
+				closeWindowRefresh();
 			}
 			
 		}
@@ -99,6 +101,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			} else {
 				window.location.href = "javascript: window.close()";
 			}
+		}
+		
+		function closeWindowRefresh() {
+			window.opener.location.reload();
+			closeWindow();
 		}
 		
 		function openURL(args){
