@@ -123,11 +123,14 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
     Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
     
-    setoutpath $EXEDIR
-    File /r "..\zip"
+    setoutpath "$INSTDIR\zip"
+    File /r "..\zip\7za.exe"
 
     ;backup existing language files
     call zipLanguages
+    
+    rmdir "$INSTDIR\zip"
+    
     
     ; copy language files from LAMS projects to a folder in $INSTDIR
     call copyProjects
@@ -144,8 +147,6 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     call updateDatabase
     
     DetailPrint "LAMS Language Pack ${VERSION} install successfull"
-    DetailPrint "$TEMP"
-
 SectionEnd
 
 
@@ -168,6 +169,7 @@ Function .onInit
     ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
     
     # Abort install if already installed or if a newer version is installed
+    strcpy $OLD_VERSION "20061205" ;default old version (Date of First language pack of LAMS2)
     ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
     ${VersionCompare} "$VERSION_INT" "$0" $1
     ${If} $1 == "0"
@@ -178,8 +180,9 @@ Function .onInit
         MessageBox MB_OK|MB_ICONSTOP "Your current language pack is a newer version than this version: LAMS-LanguagePack-$0"
         Abort
     ${EndIf}
-    strcpy $OLD_VERSION $0
-    
+    ${If} $0 != ""
+        strcpy $OLD_VERSION $0
+    ${EndIf}
     
     # Abort if there is no version of LAMS2 installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "version"
@@ -222,9 +225,9 @@ Function zipLanguages
     
     #zip existing language files
     setoutpath $INSTDIR
-    rmdir /r "$BACKUP_DIR"
+    ;rmdir /r "$BACKUP_DIR"
     createdirectory "$BACKUP_DIR"
-    Strcpy $4 '$EXEDIR\zip\7za.exe a -r -tzip "$BACKUP_DIR\lamsDictionaryBak-${VERSION}.zip" "*"'
+    Strcpy $4 '$INSTDIR\zip\7za.exe a -r -tzip "$BACKUP_DIR\lamsDictionaryBak-$OLD_VERSION.zip" "*"'
     nsExec::ExecToStack $4 
     pop $8
     pop $9
@@ -528,9 +531,13 @@ Function updateDatabase
     setoutpath "$INSTDIR"
     File /a updateLocales.sql
     File /a LanguagePack.xml
-    File /r "..\apache-ant-1.6.5"
-    #File /a "..\apache-ant-1.6.5\bin\ant.bat"
-    #File /a "..\apache-ant-1.6.5\lib\ant.jar"
+    
+    
+    setoutpath "$INSTDIR\apache-ant-1.6.5\bin"
+    File /a "..\apache-ant-1.6.5\bin\*"
+    
+    setoutpath "$INSTDIR\apache-ant-1.6.5\lib"
+    File /a "..\apache-ant-1.6.5\lib\*"
     
     ; update locals must be stored as a procedure first
     ; nsExec wont let me do "mysql < insertLocale.sql"  so i had to use ant

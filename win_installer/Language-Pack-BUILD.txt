@@ -2,9 +2,14 @@ BUILDING language-pack.nsi
 --------------------------
 
 - Builds to win_installer\build
+- Language files are lacked up on installation at: 
+  [LAMSDIR]\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\backup
+
+STEPS
+-----
 
 1) Make sure you have all the latest language files in your lams workspace, you
-   can do this by simply synchronising with the CVS repository
+   can do this by simply synchronising and updating with the CVS repository
 2) Put the date that you want for the install at this line (around line 35):
    !define VERSION "2006-20-12" (example)
    Make sure it is in the form "yyyy-mm-dd"
