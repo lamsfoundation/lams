@@ -95,21 +95,6 @@
 
 		</target>
 
-		<!-- =================================================================== -->
-		<!-- Run hbm2java for learningdesign                                                       -->
-		<!-- =================================================================== -->
-		<target name="hbm2java" description="Generate .java from .hbm files.">
-			<taskdef  name="hbm2java"
-	         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
-	         classpathref="all-libs"
-	      />
-		
-		  <hbm2java output="${src.java.dir}">
-				<fileset dir="${conf.hibernate.mapping.dir}/${laqa11.path}">
-					<include name="*.hbm.xml"/>
-				</fileset>
-			</hbm2java>
-		</target>
 	
 		<!-- ================================================================ -->
 		<!-- Preparations									                  -->
@@ -393,7 +378,23 @@
 			</generateDeployProperties>
 		</target>
 	
-		<target name="deploy-tool" depends="create-deploy-package" 
+		<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">
+			<!-- delete old war folder tree -->
+			<delete quiet="true" includeemptydirs="true">
+				<fileset dir="${jboss.deploy}/${product}.war">
+				    <include name="**"/>
+				</fileset>
+			</delete>
+			<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
+			<delete quiet="true" includeemptydirs="true">
+				<fileset dir="${jboss.deploy}/temp-${product}.war">
+				    <include name="**"/>
+				</fileset>
+			</delete>
+		</target>
+		
+
+		<target name="deploy-tool" depends="delete-exploded-tool-folder,create-deploy-package" 
 			description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
 
 			<path id="deploy.classpath">
@@ -476,7 +477,7 @@
 	        </copy>
 	    </target>
 	
-	<target name="explode-tool" depends="" description="explode tool jar and war package to a war folder">
+	<target name="explode-tool" depends="deploy-tool" description="explode tool jar and war package to a war folder">
 		<!-- rename war file to avoid name conflict -->
 		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
 		<!-- explode the ear -->
