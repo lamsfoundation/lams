@@ -42,8 +42,8 @@ import mx.events.*
 */
 class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 	
-	private static var MARGIN:Number = 10;
-	private static var SPACING:Number = 10;
+	private static var MARGIN:Number = 5;
+	private static var SPACING:Number = 30;
 	private var _canvasModel:CanvasModel;
 	private var _canvasController:CanvasController;
 	private var _msg:String;
@@ -149,10 +149,15 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number){
-	  okBtn._x = MARGIN;
+	  var wid:Number = okBtn._width + retBtn._width + (2*MARGIN);
+	  
+	  okBtn._x = (w/2) - (wid/2);
 	  okBtn._y =  h - okBtn._height - MARGIN;
-	  retBtn._x = okBtn._width + (2*MARGIN);
+	  retBtn._x = (w/2) - (wid/2) + okBtn._width + (2*MARGIN);
 	  retBtn._y =  h - retBtn._height - MARGIN;
+	  
+	  
+	  
     }
 	
 	/**
