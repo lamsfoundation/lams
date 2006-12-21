@@ -22,8 +22,6 @@
  */
 
 # includes
-#!include "TextFunc.nsh"
-
 !include "Functions.nsh"
 !include "MUI.nsh"
 !include "LogicLib.nsh"
@@ -32,18 +30,11 @@
 
 
 # constants
-!define VERSION "2006-20-12" ; DATE of language pack in fromat YYYYMMDD
+!define VERSION "2006-12-20" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
-# display finish page stuff
-!define MUI_FINISHPAGE_RUN $LAMS_DIR\lams-start.exe
-!define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now"
-;!define MUI_FINISHPAGE_TEXT "The LAMS Server has been successfully installed on your computer."
-!define MUI_FINISHPAGE_SHOWREADME $LAMS_DIR\readme.txt
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the readme file"
-!define MUI_FINISHPAGE_LINK "Visit LAMS Community"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
+
 
 # installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
@@ -82,9 +73,16 @@ VIAddVersionKey LegalCopyright ""
                                  $\t "(lams install directory)\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\lams-dictionary.zip"$\n$\n\
                                  Language Files will then be overwritten by the new LAMS Language Pack ${VERSION}'
 
-# set instfiles page to wait when done
+ReserveFile "finish.ini"
+
+
+!define MUI_FINISHPAGE
+!define MUI_FINISHPAGE_TITLE "LAMS Language Pack ${VERSION} Installation Successfull"
+!define MUI_FINISHPAGE_TITLE_3LINES
+!define MUI_FINISHPAGE_TEXT "The LAMS Language Pack ${VERSION} has been successfully installed on your computer. \
+                             \r\n\r\nPlease restart LAMS so the changes made by the Language Pack can take effect"
+
 !define MUI_FINISHPAGE_NOAUTOCLOSE
-!define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # installer screen pages
 ;--------------------------------
@@ -95,60 +93,7 @@ VIAddVersionKey LegalCopyright ""
 !insertmacro MUI_PAGE_FINISH
 ;--------------------------------
 
-# supported translations
-!insertmacro MUI_LANGUAGE "English" # first language is the default language
-/*  
-  !insertmacro MUI_LANGUAGE "French"
-  !insertmacro MUI_LANGUAGE "German"
-  !insertmacro MUI_LANGUAGE "Spanish"
-  !insertmacro MUI_LANGUAGE "SimpChinese"
-  !insertmacro MUI_LANGUAGE "Korean"
-  !insertmacro MUI_LANGUAGE "Italian"
-  !insertmacro MUI_LANGUAGE "Dutch"
-  !insertmacro MUI_LANGUAGE "Danish"
-  !insertmacro MUI_LANGUAGE "Norwegian"
-  !insertmacro MUI_LANGUAGE "NorwegianNynorsk"  
-  !insertmacro MUI_LANGUAGE "Portuguese"
-  !insertmacro MUI_LANGUAGE "PortugueseBR"
-  !insertmacro MUI_LANGUAGE "Greek"
-  !insertmacro MUI_LANGUAGE "Russian"
-  !insertmacro MUI_LANGUAGE "Polish"
-  !insertmacro MUI_LANGUAGE "Bulgarian"  
-  !insertmacro MUI_LANGUAGE "Thai"
-  !insertmacro MUI_LANGUAGE "Arabic"
-  !insertmacro MUI_LANGUAGE "TradChinese"
-  !insertmacro MUI_LANGUAGE "Japanese"
-  !insertmacro MUI_LANGUAGE "Swedish"
-  !insertmacro MUI_LANGUAGE "Finnish"
-  !insertmacro MUI_LANGUAGE "Ukrainian"
-  !insertmacro MUI_LANGUAGE "Czech"
-  !insertmacro MUI_LANGUAGE "Slovak"
-  !insertmacro MUI_LANGUAGE "Croatian"
-  !insertmacro MUI_LANGUAGE "Hungarian"
-  !insertmacro MUI_LANGUAGE "Romanian"
-  !insertmacro MUI_LANGUAGE "Latvian"
-  !insertmacro MUI_LANGUAGE "Macedonian"
-  !insertmacro MUI_LANGUAGE "Estonian"
-  !insertmacro MUI_LANGUAGE "Turkish"
-  !insertmacro MUI_LANGUAGE "Lithuanian"
-  !insertmacro MUI_LANGUAGE "Catalan"
-  !insertmacro MUI_LANGUAGE "Slovenian"
-  !insertmacro MUI_LANGUAGE "Serbian"
-  !insertmacro MUI_LANGUAGE "SerbianLatin"
-  !insertmacro MUI_LANGUAGE "Farsi"
-  !insertmacro MUI_LANGUAGE "Hebrew"
-  !insertmacro MUI_LANGUAGE "Indonesian"
-  !insertmacro MUI_LANGUAGE "Mongolian"
-  !insertmacro MUI_LANGUAGE "Luxembourgish"
-  !insertmacro MUI_LANGUAGE "Albanian"
-  !insertmacro MUI_LANGUAGE "Breton"
-  !insertmacro MUI_LANGUAGE "Belarusian"
-  !insertmacro MUI_LANGUAGE "Icelandic"
-  !insertmacro MUI_LANGUAGE "Malay"
-  !insertmacro MUI_LANGUAGE "Bosnian"
-  !insertmacro MUI_LANGUAGE "Kurdish"
-  !insertmacro MUI_LANGUAGE "Irish"
-*/
+!insertmacro MUI_LANGUAGE "English"
 
 # Variables
 ;--------------------------------
@@ -197,18 +142,12 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     
     ; Finally, add rows in the database (lams_supported_locale) for all new language files
     call updateDatabase
+    
+    DetailPrint "LAMS Language Pack ${VERSION} install successfull"
+    DetailPrint "$TEMP"
+
 SectionEnd
 
-;--------------------------------
-;Descriptions
-  ;Language strings
-  LangString DESC_LanguagePack ${LANG_ENGLISH} "LAMS 2.0 Language pack update ${VERSION} "
-
-  ;Assign language strings to sections
-  !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${LanguagePack} $(DESC_LanguagePack)
-  !insertmacro MUI_FUNCTION_DESCRIPTION_END
-;--------------------------------
 
 # Installer functions
 Function .onInit
@@ -259,6 +198,7 @@ FunctionEnd
 Function .onInstSuccess
     RMDir /r "$EXEDIR\zip"
     RMDir /r "$EXEDIR\build"
+    rmdir /r $TEMP\installer.properties"
 FunctionEnd
 
 Function .onInstFailed
@@ -270,6 +210,7 @@ Function .onInstFailed
     delete "$INSTDIR\installer.properties"
     rmdir /r $TEMP
     rmdir /r "$INSTDIR\apache-ant-1.6.5" 
+    rmdir /r $TEMP\installer.properties"
 FunctionEnd
 
 ;backup existing language files 
@@ -318,6 +259,7 @@ Function getVersionInt
     call Strtok
     pop $0
     strcpy $VERSION_INT "$VERSION_INT$0"
+    
 FunctionEnd
 
 ; copies all the lams_blah project language files from lams_blah/conf/languages
@@ -581,6 +523,7 @@ FunctionEnd
 ;checks if the languages in the language pack exist
 ;inserts rows into lams_supported_locale iff the languages dont exist 
 Function updateDatabase
+    
     ; get the procedure scripts required
     setoutpath "$INSTDIR"
     File /a updateLocales.sql
@@ -633,6 +576,7 @@ Function updateDatabase
     DetailPrint "Database insert output: $1"
     
     goto done
+    
     error:
         DetailPrint "Ant configure-deploy failed."
         MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
@@ -643,9 +587,8 @@ Function updateDatabase
         delete "$INSTDIR\updateLocales.sql"
         delete "$INSTDIR\LanguagePack.xml"
         delete "$INSTDIR\installer.properties"
-        rmdir /r $TEMP
         rmdir /r "$INSTDIR\apache-ant-1.6.5"
-        
+       
 FunctionEnd
 
 
