@@ -5,8 +5,8 @@ BUILDING language-pack.nsi
 - Language files are lacked up on installation at: 
   [LAMSDIR]\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\backup
 
-STEPS
------
+STEPS TO BUILD
+--------------
 
 1) Make sure you have all the latest language files in your lams workspace, you
    can do this by simply synchronising and updating with the CVS repository

@@ -30,7 +30,7 @@
 
 
 # constants
-!define VERSION "2006-12-23" ; DATE of language pack in fromat YYYYMMDD
+!define VERSION "2006-12-22" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams is deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 
@@ -81,7 +81,8 @@ ReserveFile "finish.ini"
 !define MUI_FINISHPAGE_TITLE_3LINES
 !define MUI_FINISHPAGE_TEXT "The LAMS Language Pack ${VERSION} has been successfully installed on your computer. \
                              \r\n\r\nPlease restart LAMS so the changes made by the Language Pack can take effect"
-
+!define MUI_FINISHPAGE_LINK "Visit LAMS Community"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.lamscommunity.org"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 
 # installer screen pages
@@ -461,6 +462,12 @@ Function executeSQLScript
     detailprint $SQL_QUERY  
     pop $0 
     pop $1
+    
+    #check for errors and write result to install window
+    ${if} $0 != 0 
+        goto Errors
+    ${endif}
+
     strcpy $1 $1 -2
     push $1
     
@@ -486,15 +493,11 @@ Function executeSQLScript
         ${endif} 
     ${endwhile}
     
-    #check for errors and write result to install window
-    ${if} $0 != 0 
-        goto Errors
-    ${endif}
-    
     goto Finish
-    
     Errors:
         DetailPrint "Can't read from $MYSQL_DIR\$DB_NAME database"
+        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check you database name, user and password are set the same as when you installed LAMS$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
     Finish:
         clearerrors
     
