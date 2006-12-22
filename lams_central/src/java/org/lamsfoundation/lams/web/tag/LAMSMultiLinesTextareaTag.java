@@ -19,8 +19,8 @@ public class LAMSMultiLinesTextareaTag  extends BodyTagSupport implements Dynami
 
 
 	private static final String TAG_NAME= "textarea";
-	private List<String> keys;
-	private List<Object> values;
+	private List<String> keys = new ArrayList<String>();;
+	private List<Object> values = new ArrayList<Object>();;
 
 	private String id;
 	private String name;
@@ -29,8 +29,7 @@ public class LAMSMultiLinesTextareaTag  extends BodyTagSupport implements Dynami
 
 	@Override
 	public int doStartTag() throws JspException {
-		keys = new ArrayList<String>();
-		values = new ArrayList<Object>();
+
 		
 		return super.doStartTag();
 	}
