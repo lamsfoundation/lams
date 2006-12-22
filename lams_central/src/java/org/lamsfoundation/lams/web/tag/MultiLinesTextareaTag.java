@@ -114,10 +114,11 @@ public class MultiLinesTextareaTag extends TextareaTag {
             data = this.lookupProperty(this.name, this.property);
         }
     	if(data != null){
-    		//change back
-    		if(os.toLowerCase().indexOf("win") != -1)
-    			data = data.replaceAll("<BR>","\r\n");
-    		else
+    		//comment: although window OS should be \r\n format, but in some case, it only include "\n" as well.
+    		//so it is not safe to do replacement   
+//    		if(os.toLowerCase().indexOf("win") != -1)
+//    			data = data.replaceAll("<BR>","\r\n");
+//    		else
     			data = data.replaceAll("<BR>","\n");
     	}
     	return data == null?"":data;
