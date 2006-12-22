@@ -751,15 +751,33 @@ Function ImportDatabase
     */
     
      ${if} $RETAIN_FILES == '1'      
-         #replace the install dump with the retained dump    
-         #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase"   
-         CopyFiles "$INSTDIR\backup\lamsDump.sql" "dump.sql"     
-         DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"     
+        #unzip repository files
+        setoutpath "$INSTDIR\backup"
+        strcpy $4 '$INSTDIR\zip\7za.exe x -aoa "backup.zip"'
+        nsExec::ExecToStack $4
+        pop $5
+        pop $6
+        ${if} $5 != 0
+            Detailprint  "7za Unzip error: $\r$\n$\r$\n$6"
+            MessageBox MB_OK|MB_ICONSTOP "7za Unzip error:$\r$\nError:$\r$\n$\r$\n$6"
+            Abort "Lams configuration failed"
+        ${endif}
+         
+        #replace the install dump with the retained dump    
+        #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase"   
+        CopyFiles "$INSTDIR\backup\lamsDump.sql" "$TEMP\dump.sql"     
+        DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
+        
+        RMdir /r  "$INSTDIR\backup\jboss-4.0.2"
+        RMdir /r  "$INSTDIR\backup\repository"
+        delete  "$INSTDIR\backup\lamsDump.sql"
+        
+        Detailprint  "FINISHED COPYTING lamsdump.sql"
      ${endif}
     
     
     
-    
+    SetOutPath $TEMP
     # use Ant to import database
     DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat import-db'
     nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat import-db'
@@ -886,7 +904,7 @@ Function RemoveTempFiles
 FunctionEnd
 
 Function .onInstFailed
-    Call RemoveTempFiles
+    
     
     ;remove all files from the instdir excluding the backed up files
     RMDir /r "$INSTDIR\jboss-4.0.2"
@@ -921,6 +939,8 @@ Function .onInstFailed
         MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
         DetailPrint "Failed to remove LAMS database."
     ${EndIf}
+    
+    Call RemoveTempFiles
 FunctionEnd
 
 Function .onInstSuccess
