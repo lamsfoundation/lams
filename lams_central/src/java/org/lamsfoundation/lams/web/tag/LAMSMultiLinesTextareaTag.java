@@ -83,6 +83,9 @@ public class LAMSMultiLinesTextareaTag  extends BodyTagSupport implements Dynami
 			throw new JspException(e);
 		}
 
+		keys.clear();
+		values.clear();
+		
 		return super.doEndTag();
 	}
 
