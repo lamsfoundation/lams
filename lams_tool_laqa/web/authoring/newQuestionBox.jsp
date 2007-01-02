@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="field-name space-top">
 				<fmt:message key="label.feedback"></fmt:message>
 			</div>
-			<html:textarea property="feedback" rows="3" cols="75"></html:textarea>
+			<lams:STRUTS-textarea property="feedback" rows="3" cols="75"/>
 			
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('newQuestionForm').submit();"
