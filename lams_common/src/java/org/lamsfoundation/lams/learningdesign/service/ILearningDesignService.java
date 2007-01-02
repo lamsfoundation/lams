@@ -55,9 +55,24 @@ public interface ILearningDesignService{
 	public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
 	
 	/**
-	 * Get the DTO list of all learning libraries.
+	 * Get the DTO list of all valid learning libraries, which equals getAllLearningLibraryDetails(true) method.
 	 * @return list of LearningLibraryDTO
 	 * @throws IOException
 	 */
 	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails() throws IOException;
+	/**
+	 * Get the DTO list of all learning libraries whatever it is valid or not.
+	 * @param valid
+	 * @return
+	 * @throws IOException
+	 */
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid) throws IOException;
+	
+	/**
+	 * Set valid flag to learning library.
+	 * @param learningLibraryId
+	 * @param valid
+	 */
+	public void setValid(Long learningLibraryId, boolean valid);
+	
 }

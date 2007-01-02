@@ -148,6 +148,11 @@ public class LearningDesignService implements ILearningDesignService{
 		
 	}
 	
+	public void setValid(Long learningLibraryId, boolean valid) {
+		LearningLibrary library = learningLibraryDAO.getLearningLibraryById(learningLibraryId);
+		library.setValidLibrary(valid);
+		learningLibraryDAO.update(library);
+	}
 	/**
 	 * Cleans up multiple and redundant error messages in the list.
 	 * @param errors	List of errors to cleanup.
@@ -462,7 +467,11 @@ public class LearningDesignService implements ILearningDesignService{
 	
 
 	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails()throws IOException{
-		Iterator iterator= learningLibraryDAO.getAllLearningLibraries().iterator();
+		//only return valid learning library
+		return getAllLearningLibraryDetails(true);
+	}
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid)throws IOException{
+		Iterator iterator= learningLibraryDAO.getAllLearningLibraries(valid).iterator();
 		ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
 		while(iterator.hasNext()){
 			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();		
@@ -523,4 +532,6 @@ public class LearningDesignService implements ILearningDesignService{
 			}
 		}
 	}
+
+	
 }

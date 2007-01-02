@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 
@@ -37,6 +36,8 @@ public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
 
 	private static final String FIND_VALID_LIB ="from "+LearningLibrary.class.getName()
 		+" l where l.validLibrary=true";
+	private static final String FIND_ALL_LIB ="from "+LearningLibrary.class.getName()
+	+" l";
 
 	/**
 	 * (non-Javadoc)
@@ -52,5 +53,13 @@ public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
 	 */
 	public List getAllLearningLibraries() {
 			return getSession().createQuery(FIND_VALID_LIB).list();
+	}
+	
+	public List getAllLearningLibraries(boolean valid){
+		if(valid)
+			return getAllLearningLibraries();
+		else
+			return getHibernateTemplate().find(FIND_ALL_LIB);
+		
 	}
 }

@@ -23,15 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dto;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.List;
+import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -47,6 +46,7 @@ public class LearningLibraryDTO extends BaseDTO {
 	private String description;
 	private String title;
 	private Boolean validFlag;
+	private Date createDateTime;
 	private Vector templateActivities;
 	
 	
@@ -54,12 +54,13 @@ public class LearningLibraryDTO extends BaseDTO {
 		
 	}
 	public LearningLibraryDTO(Long learningLibraryID, String description,
-			String title, Boolean validFlag,
+			String title, Boolean validFlag,Date createDateTime,
 			Vector templateActivities) {		
 		this.learningLibraryID = learningLibraryID;
 		this.description = description;
 		this.title = title;
 		this.validFlag = validFlag;		
+		this.createDateTime = createDateTime;
 		this.templateActivities = templateActivities;
 	} 
 	
@@ -68,7 +69,8 @@ public class LearningLibraryDTO extends BaseDTO {
 		this.learningLibraryID = learningLibrary.getLearningLibraryId();
 		this.description = learningLibrary.getDescription();
 		this.title = learningLibrary.getTitle();
-		this.validFlag = learningLibrary.getValidLibrary();		
+		this.validFlag = learningLibrary.getValidLibrary();
+		this.createDateTime = learningLibrary.getCreateDateTime();
 		this.templateActivities = populateActivities(learningLibrary.getActivities().iterator());
 	}
 	
@@ -78,6 +80,7 @@ public class LearningLibraryDTO extends BaseDTO {
 		this.description = learningLibrary.getDescription();
 		this.title = learningLibrary.getTitle();
 		this.validFlag = learningLibrary.getValidLibrary();	
+		this.createDateTime = learningLibrary.getCreateDateTime();
 		this.templateActivities = populateActivities(templateActivity.iterator());
 	}
 	
@@ -146,6 +149,12 @@ public class LearningLibraryDTO extends BaseDTO {
 			}			
 		}
 		return activities;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
 	}
 	
 	

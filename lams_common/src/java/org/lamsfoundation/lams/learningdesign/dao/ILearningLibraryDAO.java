@@ -34,7 +34,14 @@ import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 public interface ILearningLibraryDAO extends IBaseDAO {
 	
 	public LearningLibrary getLearningLibraryById(Long learningLibraryId);
-	/** Get all valid learning libraries */
+	/** 
+	 * Get all valid learning libraries, it eaquals getAllLearningLibraries(true);
+	 */
 	public List getAllLearningLibraries();
+	/**
+	 * Get all learning libraries whatever the library is valid or invalid. 
+	 * @return
+	 */
+	public List getAllLearningLibraries(boolean valid);
 
 }
