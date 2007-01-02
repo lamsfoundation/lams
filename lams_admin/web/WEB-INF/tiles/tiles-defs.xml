@@ -70,6 +70,10 @@
 		<put name="title" value="admin.list.job"/>
 		<put name="content" value="joblist.jsp" />	
 	</definition>
+	<definition name=".librarylist" path="/template.jsp">
+		<put name="title" value="sysadmin.library.management"/>
+		<put name="content" value="librarylist.jsp" />	
+	</definition>
 
 	<definition name=".sysadmin" path="/template.jsp">
 		<put name="title" value="sysadmin.maintain"/>

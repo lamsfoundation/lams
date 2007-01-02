@@ -208,6 +208,18 @@
       />
     </action>
     <action
+      path="/libraryManage"
+      type="org.lamsfoundation.lams.admin.web.LibraryManageAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".librarylist"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/serverlist"
       type="org.lamsfoundation.lams.admin.web.ServerListAction"
       unknown="false"
@@ -510,6 +522,20 @@
       />
     </action>
     <action
+      path="/importexcel"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelAction"
+      name="ImportExcelForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importexcel"
+        path=".importexcel"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/register"
       type="org.lamsfoundation.lams.admin.web.RegisterAction"
       name="RegisterForm"
@@ -537,20 +563,6 @@
       <forward
         name="error"
         path=".error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/importexcel"
-      type="org.lamsfoundation.lams.admin.web.ImportExcelAction"
-      name="ImportExcelForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="importexcel"
-        path=".importexcel"
         redirect="false"
       />
     </action>
