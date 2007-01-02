@@ -236,9 +236,23 @@ Function zipLanguages
     ${if} $8 != 0
         goto failedzip
     ${endif}
-    
     detailprint $8
     detailprint $9
+    
+    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war\"
+    Strcpy $4 '$INSTDIR\zip\7za.exe a -r -tzip "$BACKUP_DIR\lamsDictionaryBak-$OLD_VERSION.zip" "flashxml\*"'
+    nsExec::ExecToStack $4 
+    pop $8
+    pop $9
+    
+    #MessageBox MB_OK|MB_ICONSTOP "$9"
+    ${if} $8 != 0
+        goto failedzip
+    ${endif}
+    detailprint $8
+    detailprint $9
+    
+    
     detailprint 'backupdir: $BACKUP_DIR'
     detailprint 'instdir: $INSTDIR'
     detailprint '$4'
@@ -441,6 +455,8 @@ Function copyllid
     
     ; copy all the folders for llid Resource and Forum
     IntOp $R0 "$RF_FOLDERS_UBound" + 1
+    ; copy all the folders for llid Forum and Scribe
+    IntOp $R0 "$FS_FOLDERS_UBound" + 1
     ${do}
         ${RF_FOLDERS->Get} $RF_FOLDERS_UBound $R1
         ${RF_FOLDERS->Delete} $RF_FOLDERS_UBound
@@ -450,7 +466,7 @@ Function copyllid
         detailprint "Copying language files for resource and forum"
         file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\*"
     ${loopuntil} $R0 == "0"
- 
+
 FunctionEnd
 
 

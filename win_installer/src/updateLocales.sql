@@ -38,7 +38,6 @@ INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direc
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('vi','VN','Tiếng Việt','LTR','vi,VN');
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('zh','TW','Chinese (Taiwan)','LTR','zh,TW');
 
-
 INSERT INTO lams_supported_locale (language_iso_code, country_iso_code, description, direction) 
 (SELECT t.language_iso_code, t.country_iso_code, t.description, t.direction
 FROM locale_temp t WHERE t.combined NOT IN
