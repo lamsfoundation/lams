@@ -51,8 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  <p><strong><fmt:message key="label.answer" /></strong>
 					</p>
 					
-					<textarea name="answer<c:out value="${questionEntry.key}" />" rows="5"
-						cols="60" class="text-area"><c:out value="${answerEntry.value}" escapeXml="false" /></textarea>
+					<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
 					
 		</div>
 		

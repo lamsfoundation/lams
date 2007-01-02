@@ -39,7 +39,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css />
 
 	<title><fmt:message key="activity.title" /></title>
-
+	
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
 		{
