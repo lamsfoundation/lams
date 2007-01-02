@@ -1,10 +1,15 @@
 <%@ include file="/taglibs.jsp"%>
 
 <h2><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> : <fmt:message key="sysadmin.library.management" /></h2>
+<logic:messagesPresent>
+<p class="warning">
+        <html:messages id="error">
+            <c:out value="${error}" escapeXml="false"/><br/>
+        </html:messages>
+</p>
+</logic:messagesPresent>
 <table class=alternative-color width=100%>
 	<tr>
-		<th><fmt:message key="sysadmin.library.title" /></th>
-		<th><fmt:message key="sysadmin.library.description" /></th>
 		<th><fmt:message key="sysadmin.library.activity.title" /></th>
 		<th><fmt:message key="sysadmin.library.activity.description" /></th>
 		<th><fmt:message key="sysadmin.library.createtime" /></th>
@@ -12,8 +17,6 @@
 	</tr>
 	<c:forEach items="${libraries}" var="library">
 	<tr>
-		<td><c:out value="${library.title}" /></td>
-		<td><c:out value="${library.description}" /></td>
 		<c:forEach var="act" items="${library.templateActivities}" varStatus="status">
 			<c:if test="${status.first}">
 				<td><c:out value="${act.activityTitle}" /></td>

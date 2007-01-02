@@ -14,7 +14,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -50,13 +49,14 @@ public class LibraryManageAction extends Action {
 		String param = request.getParameter(PARAM_ACTION);
 		// ---------------------------
 		if (StringUtils.equals(param,"enable")) {
-			if(!checkPriviledge(request)){
-				return mapping.findForward("success");
+			if(checkPriviledge(request)){
+				enableLibray(mapping, form, request, response);
 			}
-			enableLibray(mapping, form, request, response);
 		}
 		if (StringUtils.equals(param,"disable")) {
-			disableLibray(mapping, form, request, response);
+			if(checkPriviledge(request)){
+				disableLibray(mapping, form, request, response);
+			}
 		}
 
 		// ---------------------------
