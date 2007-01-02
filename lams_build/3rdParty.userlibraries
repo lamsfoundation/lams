@@ -5,7 +5,7 @@
 <archive path="/lams_build/lib/axis/jaxrpc.jar"/>
 <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
 <archive path="/lams_build/lib/dom4j/dom4j-1.5.2.jar"/>
-<archive path="/lams_build/lib/ehcache/ehcache-1.1.jar"/>
+<archive path="/lams_build/lib/ehcache/ehcache-1.2.jar"/>
 <archive path="/lams_build/lib/hibernate/hibernate3.jar" source="/lams_build/lib/hibernate/src/hibernate-src.zip"/>
 <archive path="/lams_build/lib/httpunit/httpunit.jar"/>
 <archive path="/lams_build/lib/httpunit/js.jar"/>
