@@ -25,11 +25,11 @@
 				<fmt:message key="403.title" />
 			</h1>
 
-
+<!-- 
 			<p class="space-bottom">
 				<fmt:message key="403.message" />
 			</p>
-
+ -->
 		</div>
 		<!--closes content-->
 
