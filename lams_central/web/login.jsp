@@ -100,8 +100,10 @@ j_security_login_page
 						
 					//-->
 				</script>
-			  	<c:set var="url"><lams:LAMSURL/>www/news.html</c:set>
-		  		<c:import url="${url}" charEncoding="utf-8" />
+ 				<%try{%>
+				  	<c:set var="url"><lams:LAMSURL/>www/news.html</c:set>
+		  			<c:import url="${url}" charEncoding="utf-8" />
+		  		<%}catch(Exception e){}%>
 			  </div>
 				<!--closes left col-->
 				
