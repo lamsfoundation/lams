@@ -36,6 +36,9 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "firstName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "lastName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "email"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
         };
         _oper = new org.apache.axis.description.OperationDesc("createUser", _params, new javax.xml.namespace.QName("", "createUserReturn"));
         _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
@@ -55,9 +58,9 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
     public RegisterServiceSoapBindingSkeleton(org.lamsfoundation.lams.webservice.Register impl) {
         this.impl = impl;
     }
-    public boolean createUser(String username, String password, String firstName, String lastName, String email) throws java.rmi.RemoteException
+    public boolean createUser(String username, String password, String firstName, String lastName, String email, String serverId, String datetime, String hash) throws java.rmi.RemoteException
     {
-        boolean ret = impl.createUser(username, password, firstName, lastName, email);
+        boolean ret = impl.createUser(username, password, firstName, lastName, email, serverId, datetime, hash);
         return ret;
     }
 

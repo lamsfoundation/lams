@@ -66,7 +66,7 @@
 		<parameter name="allowedMethods" value="*" />
 	</service>
 
-	<service name="RegisterService" provider="java:RPC" style="rpc"
+	<!-- <service name="RegisterService" provider="java:RPC" style="rpc"
 		use="encoded">
 		<parameter name="wsdlTargetNamespace"
 			value="http://webservice.lams.lamsfoundation.org" />
@@ -77,7 +77,7 @@
 		<parameter name="wsdlPortType" value="Register" />
 		<parameter name="typeMappingVersion" value="1.2" />
 		<parameter name="allowedMethods" value="*" />
-	</service>
+	</service> -->
 
 	<service name="VerificationService" provider="java:RPC" style="rpc"
 		use="encoded">

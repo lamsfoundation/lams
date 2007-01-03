@@ -8,5 +8,12 @@
 package org.lamsfoundation.lams.webservice;
 
 public interface Register extends java.rmi.Remote {
-    public boolean createUser(String username, String password, String firstName, String lastName, String email) throws java.rmi.RemoteException;
+    public boolean createUser(String username, 
+    		String password, 
+    		String firstName, 
+    		String lastName, 
+    		String email, 
+    		String serverId, 
+    		String datetime, 
+    		String hash) throws java.rmi.RemoteException;
 }

@@ -50,4 +50,6 @@ public interface IIntegrationService {
 	List getAllExtServerOrgMaps();
 	
 	void saveExtServerOrgMap(ExtServerOrgMap map);
+	
+	String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
 }

@@ -263,7 +263,7 @@ public class IntegrationService implements IIntegrationService{
 		}
 	}
 
-	private String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
+	public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
         String serverId = serverMap.getServerid();
         String serverKey = serverMap.getServerkey();
         String plaintext = timestamp.trim().toLowerCase()+extUsername.trim().toLowerCase()+serverId.trim().toLowerCase()+serverKey.trim().toLowerCase();

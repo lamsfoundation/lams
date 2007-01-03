@@ -16,13 +16,14 @@ import javax.servlet.http.HttpServlet;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.security.Authenticator;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -37,8 +38,6 @@ public class RegisterServiceSoapBindingImpl implements Register {
 
 	Logger log = Logger.getLogger(RegisterServiceSoapBindingImpl.class);
 
-	private static final String DEMO_ORG_NAME = "Demo Course";
-
 	private static MessageContext context = MessageContext.getCurrentContext();
 
 	private static IUserManagementService service = (IUserManagementService) WebApplicationContextUtils
@@ -51,9 +50,16 @@ public class RegisterServiceSoapBindingImpl implements Register {
 					((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
 							.getServletContext()).getBean("lessonService");
 
+	private static IIntegrationService integrationService = (IIntegrationService) WebApplicationContextUtils
+	.getRequiredWebApplicationContext(
+			((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
+					.getServletContext()).getBean("integrationService");
+	
 	public boolean createUser(String username, String password, String firstName, String lastName,
-			String email) throws java.rmi.RemoteException {
+			String email, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
 		try {
+			ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(extServer, datetime,	hash);
 			if (service.getUserByLogin(username) != null)
 				return false;
 			User user = new User();
@@ -80,7 +86,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
 				user.setHtmlTheme(htmlTheme);
 			}
 			service.save(user);
-			Organisation org = getDemoOrg(user);
+			Organisation org = extServer.getOrganisation();
 			addMemberships(user, org);
 			addUserToLessons(user, org);
 			return true;
@@ -123,27 +129,6 @@ public class RegisterServiceSoapBindingImpl implements Register {
 				log.debug("Added " + user.getLogin() + " to " + lesson.getLessonName());
 			}
 		}
-	}
-
-	private Organisation getDemoOrg(User user) {
-		Organisation org = null;
-		List list = service.findByProperty(Organisation.class, "name", DEMO_ORG_NAME);
-		if (list != null && list.size() > 0) {
-			org = (Organisation) list.get(0);
-		}
-		if (org == null) {
-			org = new Organisation();
-			org.setName(DEMO_ORG_NAME);
-			org.setParentOrganisation(service.getRootOrganisation());
-			org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
-					OrganisationType.COURSE_TYPE));
-			org.setOrganisationState((OrganisationState) service.findById(OrganisationState.class,
-					OrganisationState.ACTIVE));
-			org.setLocale(getLocale());
-			service.saveOrganisation(org, user.getUserId());
-		}
-		log.debug(" Got org " + org.getOrganisationId());
-		return org;
 	}
 
 }
