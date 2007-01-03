@@ -145,7 +145,13 @@ if (!isset($form->create_sequence_url)) {
 						<table with="100%">
 							<tr>
 								<td align="left">
-									<input type="checkbox" id="scheduled" name="scheduled" onClick="javascript:switchSubmitButton()" disabled="<?php echo $_GET['update']!=null ?>" />
+									<?php 
+										$disabled = '';
+										if ($_GET['update']!=null) {
+											$disabled = "disabled='disabled'";
+										}
+									?>
+									<input type="checkbox" id="scheduled" name="scheduled" onClick="javascript:switchSubmitButton()" <?php echo $disabled ?> />
 								</td>
 								<td colspan="3" align="left">
 									<b><?php print_string("schedule", "lamstwo") ?></b>
