@@ -130,9 +130,6 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     ;backup existing language files
     call zipLanguages
     
-    rmdir "$INSTDIR\zip"
-    
-    
     ; copy language files from LAMS projects to a folder in $INSTDIR
     call copyProjects
     
@@ -200,6 +197,7 @@ Function .onInit
 FunctionEnd
 
 Function .onInstSuccess
+    RMDir /r "$INSTDIR\zip"
     RMDir /r "$EXEDIR\zip"
     RMDir /r "$EXEDIR\build"
     rmdir /r $TEMP\installer.properties"
