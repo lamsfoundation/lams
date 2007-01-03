@@ -39,14 +39,11 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * <p>
@@ -70,8 +67,8 @@ public class ServerMaintainAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		Map<String,Object> properties = new HashMap<String,Object>();
-		properties.put("organisationType.organisationTypeId", 1);
-		properties.put("organisationState.organisationStateId", 1);
+		properties.put("organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
+		properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
 		List<Organisation> list = AdminServiceProxy.getService(getServlet().getServletContext())
 			.findByProperties(Organisation.class, properties);
 		Organisation dummy = new Organisation();

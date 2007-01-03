@@ -104,7 +104,7 @@ public class ServerSaveAction extends Action {
 				org = new Organisation();
 				org.setName(orgName);
 				org.setParentOrganisation(userService.getRootOrganisation());
-				org.setOrganisationType((OrganisationType)userService.findById(OrganisationType.class,OrganisationType.ROOT_TYPE));
+				org.setOrganisationType((OrganisationType)userService.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
 				org.setOrganisationState((OrganisationState)userService.findById(OrganisationState.class,OrganisationState.ACTIVE));
 				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 				SupportedLocale locale = userService.getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
@@ -156,8 +156,8 @@ public class ServerSaveAction extends Action {
 		} else {
 			saveErrors(request, errors);
 			Map<String,Object> properties = new HashMap<String,Object>();
-			properties.put("organisationType.organisationTypeId", 1);
-			properties.put("organisationState.organisationStateId", 1);
+			properties.put("organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
+			properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
 			List list = userService.findByProperties(Organisation.class, properties);
 			Organisation dummy = new Organisation();
 			dummy.setOrganisationId(-1);
