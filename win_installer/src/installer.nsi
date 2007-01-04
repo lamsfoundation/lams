@@ -925,10 +925,11 @@ Function .onInstFailed
     Delete "$INSTDIR\readme.txt"
     
     ; remove the db 
-    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_mysql"
-    ReadRegStr $1 HKLM "${REG_HEAD}" "db_name"
-    ReadRegStr $2 HKLM "${REG_HEAD}" "db_user"
-    ReadRegStr $3 HKLM "${REG_HEAD}" "db_pass"
+    strcpy $0 $MYSQL_DIR
+    strcpy $1 $DB_NAME
+    strcpy $2 $DB_USER
+    strcpy $3 $DB_PASS
+
     StrLen $9 $3
     StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
     DetailPrint $4
