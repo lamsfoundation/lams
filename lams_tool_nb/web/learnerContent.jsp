@@ -48,25 +48,23 @@
 		    </div>
 		</c:if>
 	
-		<c:if test="${!NbLearnerForm.readOnly}">
-			<div class="space-bottom-top align-right">
-				<c:choose>
-					<c:when test="${reflectOnActivity}">
-						<html:submit property="method" styleClass="button">
-							<fmt:message key="button.continue" />
-						</html:submit>
-					</c:when>
-					<c:otherwise>
+		<div class="space-bottom-top align-right">
+			<c:choose>
+				<c:when test="${reflectOnActivity}">
+					<html:submit property="method" styleClass="button">
+						<fmt:message key="button.continue" />
+					</html:submit>
+				</c:when>
+				<c:otherwise>
+					
+					<input type="hidden" name="method" value="<fmt:message key="button.finish" />">
 						
-						<input type="hidden" name="method" value="<fmt:message key="button.finish" />">
-							
-						<html:submit styleClass="button" styleId="finishButton">
-							<fmt:message key="button.finish" />
-						</html:submit>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</c:if>
+					<html:submit styleClass="button" styleId="finishButton">
+						<fmt:message key="button.finish" />
+					</html:submit>
+				</c:otherwise>
+			</c:choose>
+		</div>
 	</html:form>
 </div>
 
