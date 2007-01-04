@@ -11,3 +11,6 @@ update lams_configuration set config_value='@WILDFIRE_CONFERENCE@' where config_
 update lams_configuration set config_value='@WILDFIRE_USER@' where config_key='XmppAdmin';
 update lams_configuration set config_value='@WILDFIRE_PASS@' where config_key='XmppPassword';
 update lams_user set login='@LAMS_USER@', password=sha1('@LAMS_PASS@') where user_id=1;
+select locale_id from lams_supported_locale where language_iso_code='es' and country_iso_code='ES';
+select locale_id from lams_supported_locale where language_iso_code='@LAMS_LANGUAGE_ISO_CODE@' and country_iso_code='@LAMS_LANGUAGE_ISO_CODE@';
+update lams_user set locale_id=(select locale_id from lams_supported_locale where language_iso_code=(SELECT SUBSTRING_INDEX('@LOCALE@', '_', 1)) and country_iso_code=(SELECT SUBSTRING_INDEX('@LOCALE@', '_', -1))) where user_id=1;

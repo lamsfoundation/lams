@@ -567,7 +567,9 @@ Function DeployConfig
     File "..\templates\lamsauthentication.xml"
     File "..\templates\update_lams_configuration.sql"
     File "..\templates\login-config.xml"
-        
+      
+
+      
     # create installer.properties
     ClearErrors
     FileOpen $0 $TEMP\installer.properties w
@@ -614,6 +616,7 @@ Function DeployConfig
     ${Else}
         FileWrite $0 "LOCALE_DIRECTION=LTR$\r$\n"
     ${EndIf}
+      
     FileWrite $0 "WILDFIRE_DOMAIN=$WILDFIRE_DOMAIN$\r$\n"
     FileWrite $0 "WILDFIRE_CONFERENCE=conference.$WILDFIRE_DOMAIN$\r$\n"
     FileWrite $0 "WILDFIRE_USER=$WILDFIRE_USER$\r$\n"
