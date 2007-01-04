@@ -36,6 +36,10 @@ import org.lamsfoundation.lams.web.util.TokenProcessor;
  * Reason for this unknown as the coder who implemented it failed to say why!
  * </OL>
  * 
+ * @deprecated LookupDispatchAction will break when the locale handling / I18N breaks, 
+ * 				as LookupDispatchAction depends heavily on the name of the button, 
+ * 				as given in the applicationResources.properties file.
+ * 
  * @author Fiona Malikoff
  */
 public abstract class LamsLookupDispatchAction extends LookupDispatchAction {
