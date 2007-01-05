@@ -10,7 +10,7 @@
 </c:if>
 
 <html:form action="${formAction}" target="_self">
-<div class="right-buttons">
+<div class="space-bottom-top align-right">
 	<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
 </div>
 </html:form>
