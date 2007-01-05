@@ -59,7 +59,7 @@ LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree"
 # set welcome page
 !define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\
-    Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x.\r\n\r\n\
+    Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x. or 1.6.x\r\n\r\n\
     Click Next to continue."
 
 # set components page type
