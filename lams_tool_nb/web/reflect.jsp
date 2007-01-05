@@ -20,7 +20,7 @@
 		<div align="right" class="space-bottom-top">
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />
-			<html:hidden property="method" value="Finish"/>
+			<html:hidden property="method" value="finish"/>
 			<html:submit styleClass="button" styleId="finishButton">
 				<fmt:message key="button.finish" />
 			</html:submit>

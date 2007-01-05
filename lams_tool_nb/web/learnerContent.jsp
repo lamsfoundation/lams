@@ -8,6 +8,12 @@
 			finishButton.disabled = true;
 		}
 	}
+	function submitForm(methodName){
+		var f = document.getElementById('learnerForm');
+		var m = document.getElementById('methodVar');
+		m.value=methodName
+		f.submit();
+	}
 </script>
 
 <div id="content">
@@ -18,9 +24,10 @@
 		<c:out value="${NbLearnerForm.content}" escapeXml="false" />
 	</p>
   	 
- 	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();"> 
+ 	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="learnerForm"> 
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
+		<input type="hidden" id="methodVar" name="method"">
   	 
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="small-space-top">
@@ -41,27 +48,23 @@
 					</c:otherwise>
 		            
 				</c:choose>
-		 
-				<html:submit property="method" styleClass="button">
-					<fmt:message key="button.edit" />
-				</html:submit>
+
 		    </div>
 		</c:if>
 	
 		<div class="space-bottom-top align-right">
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
-					<html:submit property="method" styleClass="button">
+					<html:button property="continueButton" styleClass="button" onclick="submitForm('reflect')">
 						<fmt:message key="button.continue" />
-					</html:submit>
+					</html:button>
 				</c:when>
 				<c:otherwise>
 					
-					<input type="hidden" name="method" value="<fmt:message key="button.finish" />">
 						
-					<html:submit styleClass="button" styleId="finishButton">
+					<html:button property="finishButton" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
 						<fmt:message key="button.finish" />
-					</html:submit>
+					</html:button>
 				</c:otherwise>
 			</c:choose>
 		</div>

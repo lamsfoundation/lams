@@ -56,7 +56,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -80,19 +80,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action-forward name="reflectOnActivity" path=".reflectOnActivity"
  * ----------------XDoclet Tags--------------------
  */
-public class NbLearnerAction extends LamsLookupDispatchAction {
+public class NbLearnerAction extends LamsDispatchAction {
 
     static Logger logger = Logger.getLogger(NbLearnerAction.class.getName());
-    
-    protected Map getKeyMethodMap()
-	{
-		Map map = new HashMap();
-		map.put(NoticeboardConstants.BUTTON_FINISH, "finish");
-		map.put(NoticeboardConstants.BUTTON_CONTINUE, "reflect");
-		map.put(NoticeboardConstants.BUTTON_EDIT, "reflect");
-		return map;
-	}
-    
+
     /** Get the user id from the shared session */
 	public Long getUserID(HttpServletRequest request) {
 		// set up the user details

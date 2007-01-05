@@ -26,10 +26,8 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,7 +56,7 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -89,7 +87,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * ----------------XDoclet Tags--------------------
  */
 
-public class NbAuthoringAction extends LamsLookupDispatchAction {
+public class NbAuthoringAction extends LamsDispatchAction {
     static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
     public final static String FORM="NbAuthoringForm";
     
@@ -106,16 +104,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			throw new NbApplicationException(error);
 		}
 		return user;
-	}
-
-    protected Map getKeyMethodMap()
-	{
-		Map map = new HashMap();
-		map.put(NoticeboardConstants.BUTTON_SAVE, "save");
-		map.put(NoticeboardConstants.BUTTON_UPLOAD, "upload");
-		map.put(NoticeboardConstants.LINK_DELETE, "deleteAttachment");
-		
-		return map;
 	}
 
     

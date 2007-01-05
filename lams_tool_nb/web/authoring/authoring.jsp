@@ -42,13 +42,13 @@
         }
         
 		function deleteAttachment(uuid) {
-			document.NbAuthoringForm.method.value = '<fmt:message key="link.delete"/>';
+			document.NbAuthoringForm.method.value = 'deleteAttachment';
 			document.NbAuthoringForm.deleteFileUuid.value = uuid;
 			document.NbAuthoringForm.submit();
 		}        
 		
 		function doUpload() {
-			document.NbAuthoringForm.method.value = '<fmt:message key="button.upload" />';
+			document.NbAuthoringForm.method.value = 'upload';
 			document.NbAuthoringForm.submit();
 		}        
      </script>
@@ -111,10 +111,7 @@
 				</c:if>
 
 				<!-- Button Row -->
-				<c:set var="dispatchMethodName">
-					<fmt:message key="button.save" />
-				</c:set>
-				<html:hidden property="method" value="${dispatchMethodName}" />
+				<html:hidden property="method" value="save" />
 				<lams:AuthoringButton formID="authoringForm"
 					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
 					toolContentID="${formBean.toolContentID}"
