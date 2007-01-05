@@ -358,9 +358,12 @@ FunctionEnd
 
 Function CheckJava
     # check for JDK
-    ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.5" "JavaHome"
+    ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.6" "JavaHome"
     ${If} $JDK_DIR == ""
-        MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 installation.  Please ensure you have JDK 1.5 installed."
+        ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.5" "JavaHome"
+        ${if} $JDK_DIR == ""
+            MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 or 1.6 installation.  Please ensure you have JDK 1.5 or 1.6 installed."
+        ${EndIf}
     ${EndIf}
 FunctionEnd
 
@@ -503,10 +506,13 @@ Function PostLAMSConfig
     nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
     Pop $0
     Pop $1
-    ${StrStr} $0 $1 "1.5"
+    ${StrStr} $0 $1 "1.6"
     ${If} $0 == ""
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, please check your JDK directory."
-        Abort
+        ${StrStr} $0 $1 "1.5"
+        ${If} $0 == ""
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, please check your JDK directory."
+            Abort
+        ${EndIf}
     ${EndIf}
 FunctionEnd
 
