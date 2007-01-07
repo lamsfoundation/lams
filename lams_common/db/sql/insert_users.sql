@@ -52,7 +52,7 @@ insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,use
 values(8,null,'Four Test',8,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(40,1,'Moodle Test',1,'20041223','20041223',1);
+values(40,1,'Moodle Test',1,'20041223','20041223',2);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(41,40,'Lesson Sequence Folder',1,'20041223','20041223',2);
