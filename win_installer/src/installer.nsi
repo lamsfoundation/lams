@@ -510,7 +510,7 @@ Function PostLAMSConfig
     ${If} $0 == ""
         ${StrStr} $0 $1 "1.5"
         ${If} $0 == ""
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, please check your JDK directory."
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, or JDK 1.6. Please check your JDK directory."
             Abort
         ${EndIf}
     ${EndIf}
