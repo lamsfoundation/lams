@@ -227,6 +227,7 @@ SectionGroup /e "!Install LAMS"
         File /a "..\build\lams-start.exe"
         File /a "..\build\lams-stop.exe"
         File /a "..\license.txt"
+        File /a "..\license-wrapper.txt"
         File /a "..\readme.txt"
         Call SetupStartMenu
         
