@@ -76,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<div class="field-name">
 							<fmt:message key="label.feedback"></fmt:message>
 						</div>
-						<html:textarea property="feedback" rows="3" cols="60"></html:textarea>							
+						<lams:STRUTS-textarea property="feedback" rows="3" cols="60"></lams:STRUTS-textarea>							
 					</td>
 				</tr>
 				

@@ -135,13 +135,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																			</c:if> 						
 																	 	</td>	  	 
 																	</tr>
-		
+		 
 																	<tr>
 																		 <td colspan=4 valign=top>   
 																			<c:if test="${userData.visible != 'true' }"> 			
 																                         <i><fmt:message key="label.response.hidden"/> </i> 
 																			</c:if> 								
-											 						 			<textarea name="updatedResponse" rows=6 cols=60><c:out value="${userData.response}" escapeXml="false"/></textarea>
+											 						 		<lams:textarea name="updatedResponse" rows="6" cols="60"><c:out value="${userData.response}" escapeXml="false"/></lams:textarea>
 																		 </td>
 																	</tr>
 																	
