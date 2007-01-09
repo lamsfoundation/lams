@@ -127,15 +127,15 @@ public class ThirdPartyLibraryListGenerator {
 	static void init() throws IOException {
 		File file = new File("liblist.txt");
 		if (file.exists()) {
-			final Integer NOT_STARTED = 0;
+/*			final Integer NOT_STARTED = 0;
 			final Integer DEPLOYED_STARTING = 1;
 			final Integer DEPLOYED_STARTED = 2;
 			final Integer BUILD_STARTING = 3;
 			final Integer BUILD_STARTED = 4;
-			BufferedReader br = new BufferedReader(new FileReader(file));
+*/			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
-			Integer status = NOT_STARTED;
-			while ((line = br.readLine()) != null) {
+/*			Integer status = NOT_STARTED;
+*/			while ((line = br.readLine()) != null) {
 				if (line.startsWith(DEPLOYED_LIBS)) {
 					continue;
 				}
