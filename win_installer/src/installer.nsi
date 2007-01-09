@@ -952,6 +952,7 @@ Function .onInstFailed
     ${EndIf}
     
     Call RemoveTempFiles
+    DeleteRegKey HKLM "${REG_HEAD}"
 FunctionEnd
 
 Function .onInstSuccess
