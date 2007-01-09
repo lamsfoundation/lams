@@ -4,6 +4,7 @@ detailed below.
 
 Library/Package				License
 --------------------------------------------------------------------------------
+wrapper.jar				Silver Egg Techology License (see license-wrapper.txt)
 antlr.jar					BSD Antlr 3 License
 axis-ant.jar 				Apache License 2.0
 axis.jar					Apache License 2.0
