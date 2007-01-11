@@ -4,23 +4,49 @@
 	<property file="build.conf" />
 	
 	<target name="check_jboss" description="Checking jboss-4.0.2 Directory">		
-		<echo message="checking jboss"/>
-		
-		<condition property="jbossExists">
+		<condition property="jbossNotExists">
 			<not>
 				<available file="${JBOSS_DIR}"/>
 			</not>
 		</condition>		
 	</target>
-	<target name="confirm-jboss" depends="check_jboss" if="jbossExists">
+	<target name="confirm-jboss" depends="check_jboss" if="jbossNotExists">
 		<fail message="jboss-4.0.2 directory not found at ${JBOSS_DIR}. Check your build.conf file"/>
 	</target>
 	
-	<target name="check_java" depends="check_jboss" description="Checking java 1.5 or 1.6 is installed">
+	
+	<target name="check-java" description="Checking java 1.5 or 1.6 is installed">
+		<condition property="notJavaVersion">
+			<not>
+				<available file="${JDK_DIR}"/>
+			</not>
+		</condition>
+		<exec executable="java" outputproperty="javaVersion">
+			<arg line="-version"/>
+		</exec>
+		
+		<echo message="${javaVersion}"/>
 
+		
+		<condition property="notJavaVersion">
+			<and>
+				<not>
+					<contains string="${javaVersion}" substring="1.6" />
+				</not>
+				<not>
+					<contains string="${javaVersion}" substring="1.5" />
+				</not>
+			</and>
+		</condition>
+
+
+		
+	</target>
+	<target name="confirm-java" depends="check-java" if="notJavaVersion">
+		<fail message="Could not verify java version 1.5 or 1.6 on your machine"/>
 	</target>
 	
-	<target name="check_mysql" depends="check_java" description="Checking mysql 5.0.x is installed">
+	<target name="check-mysql" depends="check-java" description="Checking mysql 5.0.x is installed">
 
 	</target>
 		
