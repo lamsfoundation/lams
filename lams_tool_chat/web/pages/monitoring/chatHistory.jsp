@@ -75,8 +75,8 @@ function closeEditPane() {
 						<br />
 
 						<html:textarea property="messageBody" value="${message.body}"
-							cols="80" rows="3" />
-						<br />
+							style="width:95%" rows="3" />
+						<br /><br />
 
 						<html:submit styleClass="button">
 							<fmt:message>button.save</fmt:message>
