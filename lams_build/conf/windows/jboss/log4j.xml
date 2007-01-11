@@ -220,6 +220,11 @@
    <category name="org.apache">
       <priority value="INFO"/>
    </category>
+   
+   <!--  To avoid LDEV-881 exception info -->
+   <category name="org.apache.catalina.session">
+      <priority value="WARN"/>
+   </category>
 
    <!-- Limit the org.jgroups category to WARN as its INFO is verbose -->
    <category name="org.jgroups">
