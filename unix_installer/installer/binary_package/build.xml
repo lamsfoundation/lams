@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="lams-unix-installer" basedir=".">
+	<property file="build.conf" />
+	
+	<target name="check_jboss" description="Checking jboss-4.0.2 Directory">		
+		<echo message="checking jboss"/>
+		
+		<condition property="jbossExists">
+			<not>
+				<available file="${JBOSS_DIR}"/>
+			</not>
+		</condition>		
+	</target>
+	<target name="confirm-jboss" depends="check_jboss" if="jbossExists">
+		<fail message="jboss-4.0.2 directory not found at ${JBOSS_DIR}. Check your build.conf file"/>
+	</target>
+	
+	<target name="check_java" depends="check_jboss" description="Checking java 1.5 or 1.6 is installed">
+
+	</target>
+	
+	<target name="check_mysql" depends="check_java" description="Checking mysql 5.0.x is installed">
+
+	</target>
+		
+</project>
