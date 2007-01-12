@@ -74,9 +74,6 @@ public class ThemeAction extends LamsDispatchAction {
 	
 	
 	
-	/** for sending acknowledgment/error messages back to flash */
-	private FlashMessage flashMessage;
-	
 	public IThemeService getThemeService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IThemeService) webContext.getBean(ThemeConstants.THEME_SERVICE_BEAN_NAME);		
@@ -157,7 +154,7 @@ public class ThemeAction extends LamsDispatchAction {
 		IThemeService themeService = getThemeService();
 		MessageService messageService = themeService.getMessageService();
 		
-		flashMessage = null;
+		FlashMessage flashMessage= null;
 		
 		try {
 			if(type==null)

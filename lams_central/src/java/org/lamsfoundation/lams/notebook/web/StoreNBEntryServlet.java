@@ -56,9 +56,6 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 	private static Logger log = Logger.getLogger(StoreNBEntryServlet.class);
 	public static final String STORE_NBENTRY_MESSAGE_KEY = "storeNotebookEntry";
 	
-	/** for sending acknowledgment/error messages back to flash */
-	private FlashMessage flashMessage;
-
 	public ICoreNotebookService getNotebookService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 		return (ICoreNotebookService) webContext.getBean("coreNotebookService");		
@@ -81,7 +78,7 @@ public class StoreNBEntryServlet extends AbstractStoreWDDXPacketServlet {
 		{
 				
 		ICoreNotebookService notebookService = getNotebookService();
-		
+		FlashMessage flashMessage= null;
 
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(entryDetails);
 		NotebookEntry notebookEntry = new NotebookEntry();

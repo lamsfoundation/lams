@@ -133,8 +133,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public void setGroupingDAO(GroupingDAO groupingDAO) {
 		this.groupingDAO = groupingDAO;
 	}
-	/** for sending acknowledgment/error messages back to flash */
-	private FlashMessage flashMessage;
 	
 	/**
 	 * @param transitionDAO The transitionDAO  to set
@@ -249,6 +247,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
 	 */
 	public String getLearningDesignDetails(Long learningDesignID)throws IOException{
+		FlashMessage flashMessage= null;
 		LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID);
 		if(learningDesignDTO==null)
 			flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",learningDesignID);
@@ -558,7 +557,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public String getAllLearningDesignDetails()throws IOException{
 		Iterator iterator= getAllLearningDesigns().iterator();
 		ArrayList arrayList = createDesignDetailsPacket(iterator);
-		flashMessage = new FlashMessage("getAllLearningDesignDetails",arrayList);		
+		FlashMessage flashMessage = new FlashMessage("getAllLearningDesignDetails",arrayList);		
 		return flashMessage.serializeMessage();
 	}
 	/**
@@ -585,7 +584,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public String getLearningDesignsForUser(Long userID) throws IOException{
 		List list = learningDesignDAO.getLearningDesignByUserId(userID);
 		ArrayList arrayList = createDesignDetailsPacket(list.iterator());
-		flashMessage = new FlashMessage("getLearningDesignsForUser",arrayList);
+		FlashMessage flashMessage = new FlashMessage("getLearningDesignsForUser",arrayList);
 		return flashMessage.serializeMessage();
 	}	
 	/**
@@ -593,7 +592,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
 	 */
 	public String getAllLearningLibraryDetails()throws IOException{
-		flashMessage = new FlashMessage("getAllLearningLibraryDetails",learningDesignService.getAllLearningLibraryDetails());
+		FlashMessage flashMessage = new FlashMessage("getAllLearningLibraryDetails",learningDesignService.getAllLearningLibraryDetails());
 		return flashMessage.serializeMessage();
 	}
 	
@@ -609,7 +608,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	   }
 	   
 	   Long newContentID = contentIDGenerator.getNextToolContentIDFor(tool);
-	   flashMessage = new FlashMessage("getToolContentID", newContentID);
+	   FlashMessage flashMessage = new FlashMessage("getToolContentID", newContentID);
 	   
 	   return flashMessage.serializeMessage();
 	}
@@ -667,8 +666,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public String generateUniqueContentFolder() throws FileUtilException, IOException {
 		
 		String newUniqueContentFolderID = null;
-		FlashMessage flashMessag = null;
-		
 		Properties props = new Properties();
 		
 		IdentifierGenerator uuidGen = new UUIDHexGenerator();
@@ -677,7 +674,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		// lowercase to resolve OS issues
 		newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
 		
-		flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
+		FlashMessage flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
 		
 		return flashMessage.serializeMessage();
 	}
@@ -685,8 +682,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getHelpURL() */
 	public String getHelpURL() throws Exception {
 		
-		String helpURL = Configuration.get(ConfigurationKeys.HELP_URL);
+		FlashMessage flashMessage =null;
 		
+		String helpURL = Configuration.get(ConfigurationKeys.HELP_URL);
 		if(helpURL != null)
 			flashMessage = new FlashMessage("getHelpURL", helpURL);
 		else 
