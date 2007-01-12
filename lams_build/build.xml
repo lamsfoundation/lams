@@ -128,7 +128,6 @@
 					<include name="axis/*.jar" />
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />
-					<include name="ehcache/*.jar" />
 					<include name="fckeditor/*.jar" />
 					<include name="hibernate/*.jar" />
 					<include name="j2ee/*.jar" />

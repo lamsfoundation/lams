@@ -88,9 +88,6 @@
 		<java>dom4j-1.5.2.jar</java>
 	</module>
 	<module>
-		<java>ehcache-1.2.jar</java>
-	</module>
-	<module>
 		<java>hibernate3.jar</java>
 	</module>
 	<module>

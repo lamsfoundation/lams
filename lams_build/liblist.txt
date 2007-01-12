@@ -15,8 +15,6 @@ concurrent        concurrent-1.3.4.jar                  1.3.4
 
 dom4j             dom4j-1.5.2.jar                       1.5.2                                                MetaStuff Ltd.                   dom4j : XML framework for Java
 
-ehcache           ehcache-1.1.jar                       1.1                    Apache Software License 1.1                                    
-
 fckeditor         FCKeditor-2.3.jar                     2.3                                                                                   
 
 hibernate         hibernate3.jar                        3.2.0.cr2                                            hibernate.org                    JBoss
@@ -85,6 +83,8 @@ Build Related Libraries
 Folder           Library                                Version              License                       Vendor       Description
 
 catalina         catalina.jar                           4.0.2                                              JBoss Inc.   JBoss
+
+ehcache           ehcache-1.2.jar                       1.2                    Apache Software License 1.1                                    
 
 httpunit         httpunit.jar                           1.6                                                             
                  js.jar                                                                                                 
