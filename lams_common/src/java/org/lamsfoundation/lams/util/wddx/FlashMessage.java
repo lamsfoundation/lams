@@ -29,9 +29,11 @@ import java.io.Serializable;
 /**
  * @author Manpreet Minhas
  * This class represents the message sent by the server to the 
- * Flash client.
- * 
- * TODO Flash messages require internationalisation.
+ * Flash client. The error messages in this class should only
+ * be generic error messages that may be used in various modules.
+ * The errors are not I18N'd as we assume Flash will not show the
+ * error to the user - but the error is included in the Flash dump
+ * file so it should still be meaningful.
  */
 public class FlashMessage implements Serializable {
 	
@@ -116,7 +118,7 @@ public class FlashMessage implements Serializable {
     	} 
     	return wddxPacket;
     }
-    public static FlashMessage getNoSuchUserExists(String methodName, Integer userID){
+    public static  FlashMessage getNoSuchUserExists(String methodName, Integer userID){
     	return new FlashMessage(methodName,
     							"No such User with a user_id of :" + userID + " exists",
 								ERROR);    	

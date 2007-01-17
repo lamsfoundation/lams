@@ -58,10 +58,6 @@ public class ThemeService implements IThemeService {
 	protected MessageService messageService;
 	protected IUserManagementService userManagementService;
 	
-	/** for sending acknowledgment/error messages back to flash */
-	private FlashMessage flashMessage;
-	
-	
 	public ThemeService() {
 		
 	}
@@ -123,6 +119,7 @@ public class ThemeService implements IThemeService {
 	 */
 	public String storeTheme(String wddxPacket) throws Exception {
 		
+		FlashMessage flashMessage= null;
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 		
 		CSSThemeDTO themeDTO = new CSSThemeDTO(table);
@@ -157,6 +154,7 @@ public class ThemeService implements IThemeService {
 	 * @throws Exception
 	 */
 	public String getTheme(Long themeId)throws IOException {
+		FlashMessage flashMessage= null;
 	    CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
 		if(theme==null)
 			flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
@@ -177,6 +175,7 @@ public class ThemeService implements IThemeService {
 	 * @throws IOException
 	 */
 	public String getThemes() throws IOException {
+		FlashMessage flashMessage= null;
 	    List themes = themeDAO.getAllThemes();
 		ArrayList<CSSThemeBriefDTO> themeList = new ArrayList<CSSThemeBriefDTO>();
 		Iterator iterator = themes.iterator();
@@ -195,6 +194,7 @@ public class ThemeService implements IThemeService {
 	 * @throws IOException
 	 */
 	private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException, UserException {
+		FlashMessage flashMessage= null;
 		User user = (User)userManagementService.findById(User.class,userId);
 		CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
 		
