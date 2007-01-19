@@ -24,7 +24,6 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.service;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -61,7 +60,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(TestLearnerService.class);
+	// private static Logger log = Logger.getLogger(TestLearnerService.class);
 	
     private ICoreLearnerService learnerService;
     private IUserManagementService usermanageService;
@@ -72,7 +71,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     //---------------------------------------------------------------------
     // Testing Data - Constants
     //---------------------------------------------------------------------
-    private final Integer TEST_USER_ID = new Integer(4);
+    //private final Integer TEST_USER_ID = new Integer(4);
     private final String TEST_USER_LOGIN = "mmm";
     private final Long Test_Lesson_ID = new Long(2);
     private final long TEST_TOOL_SESSION_ID = 1;
@@ -94,18 +93,18 @@ public class TestLearnerService extends AbstractLamsTestCase
     private static final long TEST_CHAT_ACTIVITY_UIID = 7;
     private static final long TEST_QNA_ACTIVITY_UIID = 24;
     private static final long TEST_OPTIONS_ACTIVITY_UIID = 12;
-    private static final long TEST_CNB_ACTIVITY_UIID = 2;
+    //private static final long TEST_CNB_ACTIVITY_UIID = 2;
     private static final long TEST_PARALLEL_ACTIVITY_UIID = 13;
-    private static final long TEST_CQNA_ACTIVITY_UIID = 4;
+    //private static final long TEST_CQNA_ACTIVITY_UIID = 4;
     private static final long TEST_WAITING_ACTIVITY_UIID = -1;
-    private static final long TEST_MB_ACTIVITY_UIID = 5;
+    //private static final long TEST_MB_ACTIVITY_UIID = 5;
     private static final long TEST_SEQUENCE_ACTIVITY_UIID = 14;
     private static final long TEST_SR_ACTIVITY_UIID = 8;
     private static final long TEST_SQNA_ACTIVITY_UIID = 25;
     private static final long TEST_SCHEDULE_GATE_ACTIVITY_UIID = 27;
     private static final long TEST_PERMISSION_GATE_ACTIVITY_UIID = 28;
     private static final String HOST="http://localhost:8080/lams/learning";
-    private static final String LOAD_TOOL_URL="/LoadToolActivity.do";
+    //private static final String LOAD_TOOL_URL="/LoadToolActivity.do";
     private static final String GATE_URL="/gate.do";
     private static final String PARAM_ACTIVITY_ID="?activityId=";
 
@@ -309,7 +308,8 @@ public class TestLearnerService extends AbstractLamsTestCase
 
     public void testExitLesson()
     {
-        learnerService.exitLesson(testProgress.getLearnerProgressId());
+        learnerService.exitLesson(testProgress.getUser().getUserId(), 
+        		testProgress.getLesson().getLessonId());
         
         LearnerProgress progress = learnerProgressDao.getLearnerProgressByLearner(testUser.getUserId(),testLesson.getLessonId());
 
