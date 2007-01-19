@@ -150,7 +150,7 @@ public class ActivityMapping implements Serializable
                 {
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
-                    this.getRedirectForward(progress, redirect);
+                	actionForward = this.getRedirectForward(progress, redirect);
                 }
                 else
                 {
