@@ -194,6 +194,10 @@ class Monitor {
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID) + '&userID=' + _root.userID,callback, false);
 	}
 	
+	public function closeAndRefresh() {
+		ApplicationParent.extCall("closeWindowRefresh", null);
+	}
+	
 	public function reloadLessonToMonitor(){
 		loadLessonToMonitor(_root.lessonID);
 	}

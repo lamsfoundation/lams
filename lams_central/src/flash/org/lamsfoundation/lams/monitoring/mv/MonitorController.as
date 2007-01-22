@@ -372,6 +372,17 @@ class MonitorController extends AbstractController {
 			setBusy();
 			var stateID:Number = evt.target.changeStatus_cmb.selectedItem.data;
 			switch(stateID){
+				case LessonTabView.REMOVE_CBI :
+					trace('removing...');
+					var confirmMsg:String = Dictionary.getValue('ls_remove_confirm_msg');
+					var warningMsg:String = Dictionary.getValue('ls_remove_warning_msg', [_monitorModel.getSequence().getSequenceName()]);
+					
+					var warningNoHandler = Proxy.create(_monitorModel, _monitorModel.removeSequence);
+					var confirmOkHandler = Proxy.create(this, removalAlert, warningMsg, null, warningNoHandler);
+					
+					removalAlert(confirmMsg, confirmOkHandler, null);
+					
+					break;
 				case LessonTabView.NULL_CBI :
 					// error msg
 					trace('nothing selected...');
@@ -391,16 +402,6 @@ class MonitorController extends AbstractController {
 				case LessonTabView.UNARCHIVE_CBI :
 					trace('unarchiving...');
 					_monitorModel.unarchiveSequence();
-				case LessonTabView.REMOVE_CBI :
-					trace('removing...');
-					var confirmMsg:String = Dictionary.getValue('ls_remove_confirm_msg');
-					var warningMsg:String = Dictionary.getValue('ls_remove_warning_msg', [_monitorModel.getSequence().getSequenceName()]);
-					
-					var warningNoHandler = Proxy.create(_monitorModel, _monitorModel.removeSequence);
-					var confirmOkHandler = Proxy.create(this, removalAlert, warningMsg, null, warningNoHandler);
-					
-					removalAlert(confirmMsg, confirmOkHandler, null);
-					
 					break;
 				default :
 					trace('no such combo box item');

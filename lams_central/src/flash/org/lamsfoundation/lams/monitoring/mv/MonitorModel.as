@@ -194,7 +194,7 @@ class MonitorModel extends Observable{
 	}
 	
 	public function removeSequence():Void{
-		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
+		var callback:Function = Proxy.create(_monitor, _monitor.closeAndRefresh);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=removeLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
 	}
 
