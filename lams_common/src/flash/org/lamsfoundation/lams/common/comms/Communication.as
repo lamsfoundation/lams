@@ -205,20 +205,15 @@ class org.lamsfoundation.lams.common.comms.Communication {
                 //user friendly error
 				var e = new LFError(responseObj.messageValue,"onServerResponse",this);
 				dispatchToHandlerByID(queueID,e);
-				//var somemsg =" this is just a test so please ignore as i am testing the max number of"
+				
 				var sendMsg:String = Dictionary.getValue('sys_error_msg_start')+"\n\n"+Dictionary.getValue('sys_error_msg_finish')+"\n\n\n";
-				//LFMessage.showMessageAlert(responseObj.messageValue, null, null);
+				
 				LFError.showSendErrorRequest(sendMsg, 'sys_error', Debugger.crashDataDump, null);
-                //TODO: Make sure that things that have requested server responses can handle an error object
-				//showAlert("Oops", responseObj.body, "sad");
+                
             }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
-				//var somemsg =" this is just a test so please ignore as i am testing the max number of character possible to show in the alert window. Hope I will be able to get success if this task."
-				//var sendMsg:String = Dictionary.getValue('sys_error_msg_start')+"/n"+somemsg+"/n"+Dictionary.getValue('sys_error_msg_finish');
 				var sendMsg:String = Dictionary.getValue('sys_error_msg_start')+"\n\n"+Dictionary.getValue('sys_error_msg_finish');
-				//LFMessage.showMessageAlert(responseObj.messageValue, null, null);
 				LFError.showSendErrorRequest(sendMsg, 'sys_error', Debugger.crashDataDump, null);
-                //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
-            }else{
+			}else{
                 //Everything is fine so lookup callback handler on queue 
                 if(responseObj.messageValue != null){
 					dispatchToHandlerByID(queueID,responseObj.messageValue);
@@ -230,9 +225,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
 			//Now delete the XML 
             delete wrappedPacketXML;
         }else {
-            //TODO DI 12/04/05 Handle onLoad error
-            //showAlert("System error", "<p>Communication Error</p>", "sad");
-			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');
+            Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');
 			var e = new LFError("Communication with the server has failed. \nPlease check you are connected to the internet and/or LAMS server","onServerResponse",this,'Server URL:'+_serverURL);
 			e.showMessageConfirm();
 		

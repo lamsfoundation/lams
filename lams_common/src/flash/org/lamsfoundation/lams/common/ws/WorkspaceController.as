@@ -315,9 +315,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			}
 
 		}else if(tgt.indexOf("delete_btn") != -1){
-			//find out the selected folderID:
-			//get the selected node:
+			
+			if(isUserPrivateFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
+			
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+			
 			if(snodeData != null){
 				//TODO Check permission code to make sure we can do this!
 				//check if we can write to this folder
@@ -335,6 +337,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		}else if(tgt.indexOf("new_btn") != -1){
 			//check we can create a folder here
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+			
 			if(snodeData != null){
 				
 				
@@ -352,7 +355,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			//_workspaceModel.getWorkspace().requestCreateFolder();
 			
 		}else if(tgt.indexOf("rename_btn") != -1){
-			//check we can create a folder here
+			//check we can rename a folder here
+			
+			if(isUserPrivateFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
+			
+			
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
 				//check if we can write to this folder
@@ -409,6 +416,21 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		_workspaceModel.folderIDPendingRefresh = selectedFolderID;
 		//TODO: Validate is allowed name
 		_workspaceModel.getWorkspace().requestNewFolder(selectedFolderID,newName);
+	}
+	
+	/**
+	 * Determine if node is representing the user's private folder
+	 * 
+	 * @param   snode Node to check
+	 * @return  
+	 */
+	
+	private function isUserPrivateFolder(snode:XMLNode) {
+		if(_workspaceModel.getWorkspaceResource(_workspaceModel.RT_FOLDER + "_" + WorkspaceModel.ROOT_VFOLDER).firstChild == snode) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public function setBusy(){

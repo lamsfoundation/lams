@@ -154,8 +154,8 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public function generalWorkspaceOperationResponseHandler(dto:Object){
 		if(dto instanceof LFError){
 			dto.showErrorAlert();
-			
 		}
+		
 		//make a copy as the function deletes it after its finished.
 		var toRefresh = workspaceModel.folderIDPendingRefresh;
 		Debugger.log('reponse ID:'+dto,Debugger.GEN,'generalWorkspaceOperationResponseHandler','Workspace');
