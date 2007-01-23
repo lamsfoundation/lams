@@ -213,6 +213,7 @@ class WorkspaceDialog extends MovieClip{
 		WorkspaceModel(_workspaceView.getModel()).addEventListener('viewUpdate',this);
 		
 		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		
 		//get a ref to the controller and kkep it here to listen for events:
 		_workspaceController = _workspaceView.getController();
 		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
@@ -222,11 +223,11 @@ class WorkspaceDialog extends MovieClip{
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
 		switchView_tab.addEventListener("change",Delegate.create(this, switchTab));
+		
 		//think this is failing....
 		switchView_tab.setSelectedIndex(0); 
 		
 		new_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		//cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		copy_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		paste_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		delete_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
@@ -251,7 +252,6 @@ class WorkspaceDialog extends MovieClip{
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//Update view from info object
-        //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
        var wm:WorkspaceModel = event.target;
 	   //set a permenent ref to the model for ease (sorry mvc guru)
 	   _workspaceModel = wm;
@@ -326,15 +326,7 @@ class WorkspaceDialog extends MovieClip{
 	private function refreshTree(){
 		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		
-		
 		 treeview.refresh();// this is USELESS
-
-		//var oBackupDP = treeview.dataProvider;
-		//treeview.dataProvider = null; // clear
-		//treeview.dataProvider = oBackupDP;
-		
-		//treeview.setIsOpen(treeview.getNodeDisplayedAt(0),false);
-		//treeview.setIsOpen(treeview.getNodeDisplayedAt(0),true);
 
 	}
 	
@@ -351,6 +343,7 @@ class WorkspaceDialog extends MovieClip{
 		//open the node
 		nodeToOpen.attributes.isOpen = true;
 		treeview.setIsOpen(nodeToOpen,true);
+		treeview.selectedNode = nodeToOpen;
 		
 		Debugger.log('openFolder forced:'+wm.isForced() ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		
@@ -359,11 +352,6 @@ class WorkspaceDialog extends MovieClip{
 			treeview.selectedNode = nodeToOpen.firstChild;
 			dispatchEvent({type:'change', target:this.treeview});
 			
-			// no longer force open the Organisation virtual folder
-			//var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
-			//if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !treeview.getIsOpen(virNode)){
-			//	openFolder(virNode, wm);
-			//}
 		}
 		
 		refreshTree();
@@ -701,7 +689,7 @@ class WorkspaceDialog extends MovieClip{
         //cancel_btn.setStyle('styleName',styleObj);
         
         //Get label style and apply to label
-       var styleObj = themeManager.getStyleObject('label');
+		var styleObj = themeManager.getStyleObject('label');
         name_lbl.setStyle('styleName',styleObj);
 
         //Apply treeview style 
@@ -1005,11 +993,6 @@ class WorkspaceDialog extends MovieClip{
 		}else if(e.newIndex ==1){
 			dispatchEvent({type:'propertiesTabClick',target:this});
 		}
-		/*
-		for (var item:String in e) {	
-			trace("Item: " + item + "=" + e[item]);
-		}
-		*/
 	}
     
     /**
@@ -1048,12 +1031,6 @@ class WorkspaceDialog extends MovieClip{
 			for (var i = 0; i<node.childNodes.length; i++) {
 				var cNode = node.getTreeNodeAt(i);
 				setBranches(cNode);
-				/*
-				if(cNode.hasChildNodes()){
-					treeview.setIsBranch(cNode, true);
-					setBranches(cNode);
-				}
-				*/
 				
 			}
 		}
