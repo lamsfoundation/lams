@@ -287,6 +287,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			Debugger.log('Did not find:'+dto.resourceType+'_'+dto.workspaceFolderID+' Something bad has happened',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		}
 		
+		// do not populate folder if already contains contents
+		if(nodeToUpdate.hasChildNodes()) { return; }
+		
 		// sort contents for content folders
 		if(nodeToUpdate.attributes.data.resourceID >= 0) { 
 			dto.contents.sortOn("name", Array.CASEINSENSITIVE); 

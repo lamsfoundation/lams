@@ -141,11 +141,14 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		//if this ndoe has children then the 
 		//data has already been got, nothing to do
 		
-		if(!nodeToOpen.hasChildNodes()){
+		if(!nodeToOpen.hasChildNodes() && !_isBusy){
+			setBusy();
 			// DC24-01-06 this resource ID must refer to a folder as its been marked as a branch
 			var resourceToOpen = nodeToOpen.attributes.data.resourceID;
 			//must be a folder ID, depoends if this event is fired for an "open" reousrce click
 			_workspaceModel.openFolderInTree(resourceToOpen, false);
+			
+			clearBusy();
 		}else{
 			Debugger.log('nodeToOpen already has children in cache',Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
 			
