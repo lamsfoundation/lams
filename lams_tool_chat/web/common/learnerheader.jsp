@@ -11,7 +11,14 @@
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
-	<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
+	<c:choose>
+		<c:when test="${page_direction != 'RTL'}">
+			<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
+		</c:when>
+		<c:otherwise>
+			<link href="${tool}includes/css/chat_rtl.css" rel="stylesheet" type="text/css">
+		</c:otherwise>
+	</c:choose>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>	
 	<tiles:insert attribute="headItems" />

@@ -1,0 +1,72 @@
+/* ==================== COMMON ==================== */
+.message {
+	padding-bottom: 4px;
+}
+
+.private_message {
+	font-style: italic;
+	background-color: #efefef;
+}
+
+.messageFrom {
+	font-weight: bold;
+}
+
+/* ==================== LEARNING PAGE STYLES ==================== */
+
+
+#iResp {
+	height: 260px;
+	width: 75%;
+	overflow: auto;
+	border: 1px solid #999;
+	padding: 2px;
+	padding-right:5px;
+}
+
+#roster {
+	width: 20%;
+	height: 260px;
+	overflow: auto;
+	border: 1px solid #999;
+	font-weight: bold;
+	padding: 2px;
+	float: left;
+}
+
+#send-button {
+	float: left;
+	width: 105px;
+	overflow: auto;
+}
+	
+#send-message-area {
+	margin-left: 12px;
+	overflow: auto;
+}
+
+.selected {
+	background-color: #ececec;
+	padding: 2px;
+	cursor: pointer;
+}
+
+.unselected {
+	background-color: white;
+	padding: 2px;
+	cursor: pointer;
+}
+
+#msgArea {
+	width: 95%;
+	margin:0;
+	margin-left:20px;
+	border: 1px solid #999;
+}
+
+/* ================== MONITORING ================== */
+.edit-pane {
+	display: none;;
+	border: 1px solid;
+	padding: 8px;
+}
