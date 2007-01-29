@@ -130,8 +130,8 @@ public class LearnerAction extends LamsDispatchAction
 	}
 
     /**
-     * <p>The structs dispatch action that joins a learner into a lesson. The
-     * learner could either start a lesson or resume a lesson.</p>
+     * <p>The structs dispatch action that joins a learner into a lesson. This 
+     * call is used for a user to start a lesson.</p>
      * 
      * @param mapping An ActionMapping class that will be used by the Action class to tell
      * the ActionServlet where to send the end-user.
@@ -171,13 +171,74 @@ public class LearnerAction extends LamsDispatchAction
 	        
 	        if(log.isDebugEnabled())
 	            log.debug("The learner ["+learner+"] joined lesson. The"
+	                      +"progress data is:"+learnerProgress.toString());
+	        
+			LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
+			
+			String url = "learning/" +  mapping.findForward(DISPLAY_ACTIVITY).getPath() + "?lessonID=" + lessonID;
+			
+			redirectToURL(mapping, response, url);
+	
+    	} catch (Exception e ) {
+    		// handle exception
+    		if(log.isDebugEnabled())
+ 	           log.debug("An error occurred while attempting to join the lesson.");
+    		return mapping.findForward(ActivityMapping.ERROR);
+    	}
+    	
+        return null;
+    }
+    
+    /**
+     * <p>The structs dispatch action that joins a learner into a lesson. This
+     * call is used for a user to resume a lesson. </p>
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * 
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * 
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward resumeLesson(ActionMapping mapping,
+                                    ActionForm form,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        //initialize service object
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+        FlashMessage message = null;
+    	try {
+	
+	        //get user and lesson based on request.
+	        Integer learner = LearningWebUtil.getUserId();
+	        long lessonID = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+	
+	        
+	        if(log.isDebugEnabled())
+	            log.debug("The learner ["+learner+"] is joining the lesson ["+lessonID+"]");
+	
+	        //join user to the lesson on the server
+	        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
+	        
+	        if(log.isDebugEnabled())
+	            log.debug("The learner ["+learner+"] joined lesson. The"
 	                      +"porgress data is:"+learnerProgress.toString());
 	        
 			LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
 	
 	        //serialize a acknowledgement flash message with the path of display next
 	        //activity
-	        message = new FlashMessage("joinLesson", mapping.findForward(DISPLAY_ACTIVITY).getPath());
+	        
+			message = new FlashMessage("joinLesson", mapping.findForward(DISPLAY_ACTIVITY).getPath());
 	
     	} catch (Exception e ) {
     		message = handleException(e, "joinLesson", learnerService);
@@ -191,8 +252,6 @@ public class LearnerAction extends LamsDispatchAction
         response.getWriter().print(wddxPacket);
         return null;
     }
-    
-
 
     /**
      * <p>Exit the current lesson that is running in the leaner window. It 

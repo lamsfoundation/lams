@@ -49,6 +49,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					doAlert(args);
 				}else if (command == "openPopUp"){
 					openPopUpFS(args);
+				}else if (command == "closeWindow"){
+					closeWindow(args);
 				}
 			
 			}
@@ -88,6 +90,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				var toolbar = params[8];
 				
 				openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
+			}
+			
+			function closeWindow() {
+				top.window.close();
 			}
 		//-->
 		</script>

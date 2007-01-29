@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:otherwise>
 			<frameset rows="*" cols="160,*">
 				<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if>" name="controlFrame" scrolling="NO">
-				<frame src="content.do" name="contentFrame" scrolling="YES">
+				<frame src="content.do?lessonID=<c:out value="${param.lessonID}"/>" name="contentFrame" scrolling="YES">
 			</frameset>
 		</c:otherwise>
 	</c:choose>
