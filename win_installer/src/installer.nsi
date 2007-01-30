@@ -44,7 +44,7 @@ Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
 OutFile "..\build\LAMS-${VERSION}.exe"
-InstallDir "C:\lams"
+InstallDir "C:\lams-2.0"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
 LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
 
@@ -672,7 +672,10 @@ Function DeployConfig
     DetailPrint "Setting MySQL transaction-isolation to READ-COMMITTED"
     ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
     IfErrors 0 +2
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
+        clearerrors
+        ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"
+        IfErrors 0 +2
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
     DetailPrint "MySQL will need to be restarted for this to take effect."
     goto done
     error:
