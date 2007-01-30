@@ -127,8 +127,7 @@ class Lesson {
 		
 		// call action
 		var lessonId:Number = lessonModel.ID;
-		//var userId:Number = Application.getInstance().getUserID();
-
+		
 		// do request
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&lessonID='+String(lessonId), callback, false);
 			
@@ -146,7 +145,7 @@ class Lesson {
 		//var userId:Number = Application.getInstance().getUserID();
 
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&lessonID='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=resumeLesson&lessonID='+String(lessonId), callback, false);
 			
 		return true;
 	}
@@ -169,7 +168,7 @@ class Lesson {
 	}
 	
 	public function exitConfirm(pkt:Object){
-		if(pkt) { getURL('javascript:top.window.close();'); }
+		if(pkt) { fscommand('closeWindow', null); }
 	}
 	
 	public function exportLesson(){
@@ -182,8 +181,7 @@ class Lesson {
 	
 	private function storeLessonData(dto:Object){
 		lessonModel.populateFromDTO(dto);
-		joinLesson();
-			
+		openLearningDesign();			
 	}
 	
 	private function startLesson(pkt:Object){
@@ -270,13 +268,26 @@ class Lesson {
 	}
 	
 	public function updateProgressData(attempted:Array, completed:Array, current:Number):Void{
+		if(!finishedDesign) {
+			getFlashProgress();
+			return;
+		}
+		
 		var p:Progress = lessonModel.progressData;
+		
 		if(p){
 			p.currentActivityId = current;
 			p.attemptedActivities = attempted;
 			p.completedActivities = completed;
-			lessonModel.broadcastViewUpdate("PROGRESS_UPDATE", null);
+		} else {
+			p = new Progress();
+			p.currentActivityId = current;
+			p.attemptedActivities = attempted;
+			p.completedActivities = completed;
+			lessonModel.setProgressData(p);
 		}
+		
+		lessonModel.broadcastViewUpdate("PROGRESS_UPDATE", null);
 	}
 	
 	private function closeLesson(pkt:Object){
@@ -312,6 +323,9 @@ class Lesson {
 			var model:DesignDataModel = new DesignDataModel();
 			model.setDesign(learningDesignDTO);
 			lessonModel.setLearningDesignModel(model);
+			
+			// set lesson as active
+			lessonModel.setActive();
 		}
 		
 	}
