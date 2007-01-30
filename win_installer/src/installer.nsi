@@ -847,7 +847,7 @@ FunctionEnd
 
 Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "dir_jdk" $JDK_DIR
-    WriteRegStr HKLM "${REG_HEAD}" "dir_mysql" $MYSQL_DIR
+    WriteRegStr HKLM "${REG_HEAD}" "dir_mysql" "$MYSQL_DIR\"
     WriteRegStr HKLM "${REG_HEAD}" "dir_inst" $INSTDIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_repository" $LAMS_REPOSITORY
     WriteRegStr HKLM "${REG_HEAD}" "version" "${VERSION}"

@@ -73,7 +73,7 @@ VIAddVersionKey LegalCopyright ""
                                  $\t "(lams install directory)\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\lams-dictionary.zip"$\n$\n\
                                  Language Files will then be overwritten by the new LAMS Language Pack ${VERSION}'
 
-ReserveFile "finish.ini"
+
 
 
 !define MUI_FINISHPAGE
@@ -402,7 +402,7 @@ Function copyllid
 
     ; getting the rows for Chat and Scribe
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $SQL_QUERY '"$MYSQL_DIR\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "0"
     call executeSQLScript
     pop $0
@@ -410,7 +410,7 @@ Function copyllid
     
     ; getting the rows for Forum and Scribe
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Forum and Scribe$\';"'
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $SQL_QUERY '"$MYSQL_DIR\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "1"
     call executeSQLScript
     pop $0
@@ -418,7 +418,7 @@ Function copyllid
     
     ; getting the rows for Resources and Forum
     strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Resources and Forum$\';"'
-    strcpy $SQL_QUERY '"$MYSQL_DIRbin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
+    strcpy $SQL_QUERY '"$MYSQL_DIR\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
     strcpy $FOLDER_FLAG "2"
     call executeSQLScript
     pop $0
