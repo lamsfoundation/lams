@@ -23,21 +23,20 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
-import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
+import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+
 public class CSSThemeUtil {
 	
-	private static Logger log = Logger.getLogger(CSSThemeUtil.class);
+	// private static Logger log = Logger.getLogger(CSSThemeUtil.class);
+	public static String DEFAULT_HTML_THEME = "defaultHTML";
 	
 	/**
 	 * Will return a list of stylesheets for the current user.
@@ -46,36 +45,39 @@ public class CSSThemeUtil {
 	 * The default stylesheet will always be included in this list.
 	 * @return
 	 */
-	public static List getAllUserThemes()
+	public static List<String> getAllUserThemes()
 	{
-		CSSThemeBriefDTO theme = null;
+		List<String> themeList = new ArrayList<String>();
+		
+		// Always have default as that defines everything. Other themes
+		// define changes.
+   		themeList.add(DEFAULT_HTML_THEME); 	   	
 
-		String defaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-		boolean userThemeIsDefault = false;
-		
-		List themeList = new ArrayList();
-		
+   		boolean userThemeFound = false;
 	   	HttpSession ss = SessionManager.getSession();
 	   	if ( ss != null ) {
 	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	   		if ( user != null ) {
-	   			theme = user.getHtmlTheme();
+	   			CSSThemeBriefDTO theme = user.getHtmlTheme();
 	   			
 	   			if (theme != null ) {
+	   				userThemeFound = true;
 	   				String themeName = theme.getName();
-	   				if ( themeName != null) {
+	   				if ( themeName != null && ! themeName.equals(DEFAULT_HTML_THEME) ) {
 	   					themeList.add(theme.getName());
-	   					if ( themeName.equals(defaultTheme) ) {
-	   						userThemeIsDefault = true;
-	   					}
 	   				}
 	   			}
 	   		}
 	   		
 	   	}
 	 
-	   	if ( ! userThemeIsDefault ) {
-	   		themeList.add(defaultTheme);
+	   	// if we haven't got a user theme, we are probably on the login page
+	   	// so we'd better include the default server theme (if it isn't the LAMS default theme
+	   	if ( !userThemeFound ) {
+	   		String serverDefaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+	   		if ( serverDefaultTheme != null && ! serverDefaultTheme.equals(DEFAULT_HTML_THEME) ) {
+	   					themeList.add(serverDefaultTheme);
+	   		}
 	   	}
 	   	
 	   	return themeList;
