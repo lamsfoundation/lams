@@ -96,6 +96,22 @@ public class FileUtil {
 	
 	}
 	
+	public static boolean isEmptyDirectory(String directoryName) throws FileUtilException {
+		
+		if(directoryName == null || directoryName.length() == 0)
+			throw new FileUtilException("A directory name must be specified");
+		
+		File dir = new File(directoryName);
+		if(dir.exists()) {
+			if(dir.listFiles().length > 0)
+				return false;
+			else 
+				return true;
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * Create a temporary directory with the name in the form
 	 * lamstmp_timestamp_suffix inside the default temporary-file directory 

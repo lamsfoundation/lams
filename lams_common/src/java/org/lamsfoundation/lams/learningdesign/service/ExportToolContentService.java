@@ -468,11 +468,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
 				String ldContentDir = FileUtil.getFullPath(secureDir,ldDto.getContentFolderID());
 				
-				if(FileUtil.directoryExist(ldContentDir)) {
-					log.debug("Create export Learning Design content target zip file. File name is " + targetContentZipFileName);
-					ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
+				if(!FileUtil.isEmptyDirectory(ldContentDir)) {
+						log.debug("Create export Learning Design content target zip file. File name is " + targetContentZipFileName);
+						ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
 				} else {
-					log.error("No such directory:" + ldContentDir);
+					log.error("No such directory (or empty directory):" + ldContentDir);
 				}
 				
 			} catch (Exception e) {
