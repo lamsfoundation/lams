@@ -32,12 +32,20 @@ import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.Config;
 
 class Header extends MovieClip {
 	
 	private var _header_mc:MovieClip;
 	private var _container:MovieClip;		// Holding Container
-	private var lams:MovieClip; 			// LAMS logo
+	private var logo:MovieClip; 			// LAMS logo
+	
+	public static var LOGO_WIDTH:Number = 67;
+	public static var LOGO_HEIGHT:Number = 25;
+	public static var LOGO_X:Number = 7;
+	public static var LOGO_Y:Number = 4;
+	public static var LOGO_PATH:String = "www/images/learner.logo.swf";
+	
 	private var resume_btn:MovieClip;         //Resume and Exit buttons
     private var exit_btn:MovieClip;
 	private var lessonHead_pnl:MovieClip;
@@ -88,6 +96,8 @@ class Header extends MovieClip {
 		
 		_header_mc = this;
 		
+		loadLogo();
+		
 		setLabels();
 		resize(Stage.width);
 		
@@ -124,6 +134,16 @@ class Header extends MovieClip {
 		export_lbl._visible = false;
 		this.onEnterFrame = setLabels;
 		
+	}
+	
+	private function loadLogo():Void{
+		logo = this.createEmptyMovieClip("logo", this.getNextHighestDepth());
+		var ml = new MovieLoader(Config.getInstance().serverUrl+Header.LOGO_PATH,setUpLogo,this,logo);	
+	}
+	
+	private function setUpLogo(logo):Void{
+		logo._x = Header.LOGO_X;
+		logo._y = Header.LOGO_Y;
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{

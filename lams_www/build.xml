@@ -96,6 +96,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="*.*"/>
 				<include name="secure/*.*"/>
+				<include name="images/*.*"/>
 				<exclude name="web.xml"/>
 			</fileset>
 		</war>
