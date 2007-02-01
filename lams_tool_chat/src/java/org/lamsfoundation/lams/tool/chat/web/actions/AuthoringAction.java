@@ -373,8 +373,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	private void updateChat(Chat chat, AuthoringForm authForm) {
 		chat.setTitle(authForm.getTitle());
 		chat.setInstructions(authForm.getInstructions());
-		chat.setOfflineInstructions(authForm.getOnlineInstruction());
-		chat.setOnlineInstructions(authForm.getOfflineInstruction());
+		chat.setOfflineInstructions(authForm.getOfflineInstruction());
+		chat.setOnlineInstructions(authForm.getOnlineInstruction());
 		chat.setLockOnFinished(authForm.isLockOnFinished());
 		chat.setReflectOnActivity(authForm.isReflectOnActivity());
 		chat.setReflectInstructions(authForm.getReflectInstructions());
