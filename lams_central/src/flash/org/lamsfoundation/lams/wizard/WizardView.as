@@ -930,8 +930,8 @@ class WizardView extends AbstractView {
 			resultDTO.selectedStaff = selectedStaff;
 			resultDTO.selectedLearners = selectedLearners;
 			var orgName:String = snode.attributes.data.name;
-			resultDTO.staffGroupName = orgName + 'staff';
-			resultDTO.learnersGroupName = orgName + 'learners';
+			resultDTO.staffGroupName = Dictionary.getValue('staff_group_name', [orgName]);
+			resultDTO.learnersGroupName = Dictionary.getValue('learners_group_name', [orgName]);
 			
 			trace('selected org ID is: ' + selectedOrgID);
 			
