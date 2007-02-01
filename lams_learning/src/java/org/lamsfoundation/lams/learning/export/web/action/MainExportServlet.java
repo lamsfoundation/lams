@@ -137,7 +137,7 @@ public class MainExportServlet extends HttpServlet {
 			
 			
 			//bundle the stylesheet with the package
-			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir);
+			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
 			bundler.bundleStylesheet();
 			
 			// zip up the contents of the temp export folder 

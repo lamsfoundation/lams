@@ -24,10 +24,13 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export.service;
 
+import java.util.Collection;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.export.Portfolio;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 /**
  * @author mtruong
@@ -108,5 +111,9 @@ public interface IExportPortfolioService {
 	/** Generate the main notebook page, given this portfolio */
 	public void generateNotebookPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies);
 
+	 /** Gets the themes for the current user. This is used to determine the stylesheets
+	  * included in the export file. We need the full theme, not just the name, so we can get
+	  * the directory names for the images. */
+	public Collection<CSSThemeVisualElement> getUserThemes();
 	
 }

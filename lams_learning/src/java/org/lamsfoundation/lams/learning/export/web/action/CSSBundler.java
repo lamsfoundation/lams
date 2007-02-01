@@ -33,8 +33,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +42,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.CSSThemeUtil;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
@@ -60,16 +60,18 @@ public class CSSBundler {
 	String outputDirectory  = null;
 	String centralPath  = null;
 	boolean rtl = false;
+	Collection<CSSThemeVisualElement> themes = null;
 
 	/**
  	 * @param centralPath the directory path to the lams-central.war. Assumes that it is an expanded war.
 	 */
-	public CSSBundler(HttpServletRequest request, Cookie[] cookies, String outputDirectory) {
+	public CSSBundler(HttpServletRequest request, Cookie[] cookies, String outputDirectory, Collection<CSSThemeVisualElement> themes) {
 		filesToCopy = new HashMap<String,File>();
 		directoriesRequired = new ArrayList<String>();
 		this.request = request;
 		this.cookies = cookies;
 		this.outputDirectory = outputDirectory;
+		this.themes = themes != null ? themes : new ArrayList<CSSThemeVisualElement>();
 		
 		this.centralPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 		if ( centralPath == null )  {
@@ -123,20 +125,15 @@ public class CSSBundler {
 		
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 
-		List themeList = CSSThemeUtil.getAllUserThemes();
-		
-		Iterator i = themeList.iterator();
-		
-		while (i.hasNext())
-		{
-			String theme = (String)i.next();
+		for ( CSSThemeVisualElement theme : themes) {
+			String themeName = theme.getName();
 			
-			String url = (!rtl)? basePath + "/lams/css/" + theme + ".css" : basePath + "/lams/css/" + theme + "_" + RTL_DIR + ".css";
-			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? theme + ".css" :  theme + "_" + RTL_DIR + ".css", cookies); //cookies aren't really needed here.
+			String url = (!rtl)? basePath + "/lams/css/" + themeName + ".css" : basePath + "/lams/css/" + themeName + "_" + RTL_DIR + ".css";
+			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? themeName + ".css" :  themeName + "_" + RTL_DIR + ".css", cookies); //cookies aren't really needed here.
 
-			url = (!rtl)? basePath + "/lams/css/" + theme + "_learner.css" : basePath + "/lams/css/" + theme + "_" + RTL_DIR + "_learner.css" ;
-			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? theme + "_learner.css" : theme + "_" + RTL_DIR + "_learner.css", cookies); //cookies aren't really needed here.
-}
+			url = (!rtl)? basePath + "/lams/css/" + themeName + "_learner.css" : basePath + "/lams/css/" + themeName + "_" + RTL_DIR + "_learner.css" ;
+			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? themeName + "_learner.css" : themeName + "_" + RTL_DIR + "_learner.css", cookies); //cookies aren't really needed here.
+		}
 		
 		// include the special IE stylesheet
 		String url = basePath + "/lams/css/ie-styles.css";
@@ -172,16 +169,14 @@ public class CSSBundler {
 		String cssDirectory = outputDirectory+File.separatorChar+"css";
 		directoriesRequired.add(cssDirectory);
 		
-		List themeList = CSSThemeUtil.getAllUserThemes();
-		Iterator i = themeList.iterator();
-		while (i.hasNext())
-		{
-			String theme = (String)i.next();
+		for ( CSSThemeVisualElement theme : themes) {
 
-			String themeFilename = (!rtl) ? theme + ".css" : theme + "_" + RTL_DIR + ".css";
+			String themeName = theme.getName();
+			
+			String themeFilename = (!rtl) ? themeName + ".css" : themeName + "_" + RTL_DIR + ".css";
 			addThemeFile(cssDirectory, themeFilename);
 
-			themeFilename = (!rtl) ? theme + "_learner.css" : theme + "_" + RTL_DIR + "_learner.css";
+			themeFilename = (!rtl) ? themeName + "_learner.css" : themeName + "_" + RTL_DIR + "_learner.css";
 			addThemeFile(cssDirectory, themeFilename);
 		}
 		
@@ -200,23 +195,31 @@ public class CSSBundler {
 	}
 
 	private void setupImageList() {
-		
-		// TODO add an entry in the theme definition that defines where to find all the stylesheet images.
-		String imageDirectory = centralPath+File.separatorChar+"images"+File.separatorChar+"css";
-		String outputImageDirectory = outputDirectory+File.separatorChar+"images"+File.separatorChar+"css";
-		directoriesRequired.add(outputImageDirectory);
-		
-		File dir = new File(imageDirectory);
-		if ( ! dir.canRead() || ! dir.isDirectory() ) {
-			log.error("Unable to read css image directory "+dir.getAbsolutePath());
-			
-		}  else {
 
-			File[] files = dir.listFiles();
-			for ( File imageFile: files ) {
-				filesToCopy.put(outputImageDirectory+File.separatorChar+imageFile.getName(),imageFile);
+		for ( CSSThemeVisualElement theme : themes) {
+
+			String dirName = theme.getImageDirectory();
+			if ( dirName != null ) {				
+				
+				String imageDirectory = centralPath+File.separatorChar+"images"+File.separatorChar+dirName;
+				String outputImageDirectory = outputDirectory+File.separatorChar+"images"+File.separatorChar+dirName;
+				
+				directoriesRequired.add(outputImageDirectory);
+		
+				File dir = new File(imageDirectory);
+				if ( ! dir.canRead() || ! dir.isDirectory() ) {
+					log.error("Unable to read css image directory "+dir.getAbsolutePath());
+					
+				}  else {
+		
+					File[] files = dir.listFiles();
+					for ( File imageFile: files ) {
+						filesToCopy.put(outputImageDirectory+File.separatorChar+imageFile.getName(),imageFile);
+					}
+				}
 			}
 		}
+
 	}
 	
 	private void createDirectories() {

@@ -65,6 +65,7 @@
 				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 				<property name="baseDAO"><ref bean="baseDAO"/></property>
 				<property name="messageService"><ref bean="learningMessageService"/></property>
+				<property name="themeService"><ref bean="themeService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">

@@ -81,7 +81,19 @@
             not-null="true"
         </meta>    
     </property>
-
+   <property
+        name="imageDirectory"
+        type="java.lang.String"
+        column="image_directory"
+        length="100"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="image_directory"
+            length="100"
+        </meta>    
+    </property>
     <!-- Associations -->
   
     

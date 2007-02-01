@@ -69,7 +69,7 @@ public class TestThemeService extends AbstractLamsTestCase {
     }
 
 	public void testGetTheme() throws Exception{		
-		String str = themeService.getTheme(TEST_THEME_ID);
+		String str = themeService.getThemeWDDX(TEST_THEME_ID);
 		System.out.println(str);
 		assertTrue("Finds ruby theme", str.indexOf("ruby") != -1);
 	} 

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
 
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.themes.exception.ThemeException;
@@ -72,12 +73,21 @@ public interface IThemeService {
 	/**
 	 * Returns a string representing the requested theme in WDDX format
 	 * 
-	 * @param learningDesignID The learning_design_id of the design whose WDDX packet is requested 
-	 * @return String The requested LearningDesign in WDDX format
+	 * @param themeId The id of the theme whose WDDX packet is requested 
+	 * @return String The requested theme in WDDX format
 	 * @throws Exception
 	 */
-	public String getTheme(Long themeId)throws IOException;
+	public String getThemeWDDX(Long themeId)throws IOException;
 
+	/**
+	 * Returns a theme
+	 */
+	public CSSThemeVisualElement getTheme(Long themeId);
+
+	/**
+	 * Returns a theme based on the name.
+	 */
+	public CSSThemeVisualElement getTheme(String themeName);
 
 	/**
 	 * This method returns a list of all available themes in

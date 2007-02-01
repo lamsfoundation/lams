@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class CSSThemeUtil {
 	
 	// private static Logger log = Logger.getLogger(CSSThemeUtil.class);
-	public static String DEFAULT_HTML_THEME = "defaultHTML";
+	private static String DEFAULT_HTML_THEME = "defaultHTML";
 	
 	/**
 	 * Will return a list of stylesheets for the current user.
@@ -63,7 +63,7 @@ public class CSSThemeUtil {
 	   			if (theme != null ) {
 	   				userThemeFound = true;
 	   				String themeName = theme.getName();
-	   				if ( themeName != null && ! themeName.equals(DEFAULT_HTML_THEME) ) {
+	   				if ( themeName != null && ! isLAMSDefaultTheme(themeName) ) {
 	   					themeList.add(theme.getName());
 	   				}
 	   			}
@@ -97,5 +97,11 @@ public class CSSThemeUtil {
 	   	
 	   	return theme;
 	   	
+	}
+	
+	// Is this theme the LAMS basic theme, which must always be included on a web page?
+	// This is NOT the server default theme - which may be a custom theme.
+	public static boolean isLAMSDefaultTheme(String themeName) {
+		return themeName.equals(DEFAULT_HTML_THEME);
 	}
 }

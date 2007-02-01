@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -149,13 +150,13 @@ public class ThemeService implements IThemeService {
 	/**
 	 * Returns a string representing the requested theme in WDDX format
 	 * 
-	 * @param learningDesignID The learning_design_id of the design whose WDDX packet is requested 
-	 * @return String The requested LearningDesign in WDDX format
+	 * @param themeId The id of the theme whose WDDX packet is requested 
+	 * @return String The requested theme in WDDX format
 	 * @throws Exception
 	 */
-	public String getTheme(Long themeId)throws IOException {
+	public String getThemeWDDX(Long themeId)throws IOException {
 		FlashMessage flashMessage= null;
-	    CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
+	    CSSThemeVisualElement theme = getTheme(themeId);
 		if(theme==null)
 			flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
 		else{
@@ -163,6 +164,26 @@ public class ThemeService implements IThemeService {
 			flashMessage = new FlashMessage("getTheme",dto);
 		}
 		return flashMessage.serializeMessage();
+	}
+
+
+	/**
+	 * Returns a theme
+	 */
+	public CSSThemeVisualElement getTheme(Long themeId) {
+	    return themeDAO.getThemeById(themeId);
+	}
+
+
+	/**
+	 * Returns a theme based on the name.
+	 */
+	public CSSThemeVisualElement getTheme(String themeName) {
+	    List themes = themeDAO.getThemeByName(themeName);
+	    if ( themes != null && themes.size() > 0 )
+	    	return (CSSThemeVisualElement) themes.get(0);
+	    else
+	    	return null;
 	}
 
 

@@ -57,6 +57,10 @@ public class CSSThemeVisualElement implements Serializable {
 
     /** persistent field */
     private boolean theme;
+    
+    /** persistent field */
+    private String imageDirectory;
+        
 
     /** nullable persistent field */
     private CSSThemeVisualElement parentTheme;
@@ -68,11 +72,12 @@ public class CSSThemeVisualElement implements Serializable {
     private Set elements;
 
     /** full constructor */
-    public CSSThemeVisualElement(Long id, String name, String description, boolean theme, CSSThemeVisualElement parentTheme, Set styles, Set elements) {
+    public CSSThemeVisualElement(Long id, String name, String description, boolean theme, String imageDirectory, CSSThemeVisualElement parentTheme, Set styles, Set elements) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.theme = theme;
+        this.imageDirectory = imageDirectory;
         this.parentTheme = parentTheme;
         this.styles = styles;
         this.elements = elements;
@@ -149,6 +154,20 @@ public class CSSThemeVisualElement implements Serializable {
     }
 
     /** 
+     *            @hibernate.property
+     *             column="image_directory"
+     *             length="100"
+     *         
+     */
+    public String getImageDirectory() {
+        return this.imageDirectory;
+    }
+
+    public void setImageDirectory(String imageDirectory) {
+        this.imageDirectory = imageDirectory;
+    }
+
+   /** 
      * If a theme, then this is the base style. If a visual element, then
      * it is the style for this element.
      */

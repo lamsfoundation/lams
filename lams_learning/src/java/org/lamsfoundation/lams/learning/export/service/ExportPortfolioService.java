@@ -31,8 +31,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.http.Cookie;
@@ -41,9 +44,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.export.ActivityPortfolio;
-import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
+import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
 import org.lamsfoundation.lams.learning.export.Portfolio;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -51,10 +54,13 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
@@ -88,6 +94,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     private IBaseDAO baseDAO;
     private ILessonDAO lessonDAO;
     protected MessageService messageService;
+    private IThemeService themeService;
     
   
 	/**
@@ -131,6 +138,10 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
+	}
+
+	public void setThemeService(IThemeService themeService) {
+		this.themeService = themeService;
 	}
 
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#exportPortfolioForTeacher(org.lamsfoundation.lams.lesson.Lesson) */
@@ -530,5 +541,21 @@ public class ExportPortfolioService implements IExportPortfolioService {
 			 log.error("Exception occured trying to write out error message to file.",e);
 		 }
 	}
+	 
+	 /** Gets the themes for the current user. This is used to determine the stylesheets
+	  * included in the export file. We need the full theme, not just the name, so we can get
+	  * the directory names for the images. */
+	 public Collection<CSSThemeVisualElement> getUserThemes() {
+		 List<String> themeNames = CSSThemeUtil.getAllUserThemes();
+		 Set<CSSThemeVisualElement> userThemes = new HashSet<CSSThemeVisualElement>();
+		 for ( String themeName: themeNames)  {
+			 CSSThemeVisualElement theme = themeService.getTheme(themeName);
+			 if ( theme != null ) {
+				 userThemes.add(theme);
+			 }
+		 }
+		 return userThemes;
+	 }
+
 	 
 }

@@ -250,6 +250,7 @@ CREATE TABLE lams_css_theme_ve (
      , description VARCHAR(100)
      , parent_id BIGINT(20)
      , theme_flag TINYINT(1) NOT NULL DEFAULT 0
+     , image_directory VARCHAR(100)
      , PRIMARY KEY (theme_ve_id)
      , INDEX (parent_id)
      , CONSTRAINT FK_lams_css_theme_ve_2 FOREIGN KEY (parent_id)
