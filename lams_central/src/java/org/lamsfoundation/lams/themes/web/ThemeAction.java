@@ -113,7 +113,7 @@ public class ThemeAction extends LamsDispatchAction {
 
 		Long themeId = new Long(WebUtil.readLongParam(request,THEME_ID_PARAMETER));
 		IThemeService themeService = getThemeService();
-		String message = themeService.getTheme(themeId);
+		String message = themeService.getThemeWDDX(themeId);
 		return outputPacket(mapping, request, response, message, "message");
 	}
 

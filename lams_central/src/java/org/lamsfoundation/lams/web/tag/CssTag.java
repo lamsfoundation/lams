@@ -92,13 +92,9 @@ public class CssTag extends TagSupport {
 					if(pageDirection.toLowerCase().equals(RTL_DIR))
 						rtl = true;
 				
-				List themeList = CSSThemeUtil.getAllUserThemes();
+				List<String> themeList = CSSThemeUtil.getAllUserThemes();
 				
-				Iterator i = themeList.iterator();
-				
-				while (i.hasNext())
-				{
-					String theme = (String)i.next();
+				for ( String theme: themeList) {
 					if ( theme != null) {
 						theme = appendStyle(theme, rtl);
 						if (localLinkPath != null)
