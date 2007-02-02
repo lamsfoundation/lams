@@ -278,6 +278,7 @@
 		    <url-pattern>/download/</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
+    		<role-name>LEARNER</role-name>
     		<role-name>AUTHOR</role-name>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
