@@ -671,11 +671,12 @@ Function DeployConfig
     # TODO doesn't take effect until mysql server is restarted
     DetailPrint "Setting MySQL transaction-isolation to READ-COMMITTED"
     ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
-    IfErrors 0 +2
+    IfErrors 0 myini
         clearerrors
-        ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"
-        IfErrors 0 +2
+        ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"    
+            IfErrors 0 myini
             MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
+    myini:
     DetailPrint "MySQL will need to be restarted for this to take effect."
     goto done
     error:
