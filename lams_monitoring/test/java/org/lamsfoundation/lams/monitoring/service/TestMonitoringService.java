@@ -246,7 +246,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	System.out.print(packet);
     }
     public void testGetLessonLearners() throws IOException{
-    	String packet = monitoringService.getLessonLearners(TEST_LESSION_ID);    	
+    	String packet = monitoringService.getLessonLearners(TEST_LESSION_ID,TEST_STAFF_ID);    	
     	System.out.println(packet);
     }
     public void testGetLessonDesign()throws IOException{
@@ -254,11 +254,11 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	System.out.println(packet);
     }
     public void testGetAllLearnersProgress() throws IOException{
-    	String packet = monitoringService.getAllLearnersProgress(TEST_LESSION_ID);    	
+    	String packet = monitoringService.getAllLearnersProgress(TEST_LESSION_ID,TEST_STAFF_ID);    	
     	System.out.println(packet);
     }
     public void testGetLearnerActivityURL() throws Exception{
-    	String url = monitoringService.getLearnerActivityURL(TEST_LESSION_ID, new Long(29),TEST_LEARNER_ID);    	
+    	String url = monitoringService.getLearnerActivityURL(TEST_LESSION_ID, new Long(29),TEST_LEARNER_ID,TEST_STAFF_ID);    	
     	System.out.println(url);
     }
     public void  testGellAllContributeActivities()throws IOException, LearningDesignProcessorException{

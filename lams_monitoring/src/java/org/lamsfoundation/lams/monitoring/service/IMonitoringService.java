@@ -165,12 +165,13 @@ public interface IMonitoringService
      * activity will be complete as well.
      * 
      * @param learnerId
+     * @param requesterId the user id of the person requesting the force complete. For security check
      * @param lessonId
      * @param activityId force complete to this activity(this activity will be force complete as well). 
      * 		If null value, force will complete all activities in this lesson.
      * @return success message.
      */
-    public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId);
+    public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId,Long activityId);
     
     /**
      * Archive the specified lesson. When archived, the data is retained
@@ -243,21 +244,23 @@ public interface IMonitoringService
      * Returns a list of learners participating in the given Lesson
      * 
      * @param lessonID The lesson_id of the Lesson
+     * @param userID The user id of the user requesting the lesson learners
      * @return String The requested list in wddx format
      * 
      * @throws IOException
      */
-    public String getLessonLearners(Long lessonID)throws IOException;
+    public String getLessonLearners(Long lessonID, Integer userID)throws IOException;
     
     /**
      * Returns a list of staff participating in the given Lesson
      * 
      * @param lessonID The lesson_id of the Lesson
+     * @param userID The user id of the user requesting the lesson staff members
      * @return String The requested list in wddx format
      * 
      * @throws IOException
      */
-    public String getLessonStaff(Long lessonID)throws IOException;
+    public String getLessonStaff(Long lessonID, Integer userID)throws IOException;
     
     
     /**
@@ -274,10 +277,11 @@ public interface IMonitoringService
      * in a given Lesson.
      * 
      * @param lessonID The lesson_id of the Lesson whose progress information is required
+     * @param userID The user id of the user requesting the progress details
      * @return String The requested information in wddx format
      * @throws IOException
      */
-    public String getAllLearnersProgress(Long lessonID)throws IOException;
+    public String getAllLearnersProgress(Long lessonID, Integer userID)throws IOException;
     
     /**
      * This method is called when the user clicks the 'Contribute' tab in the 
@@ -305,12 +309,13 @@ public interface IMonitoringService
      * @param lessonID The lesson_id of the Lesson for which the information has
      * 					to be fetched. 
      * @param activityID The activity_id of the activity for which the URL is required 
-     * @param userID The user_id of the Learner for whom the URL is being fetched
+     * @param learnerID The user_id of the Learner for whom the URL is being fetched
+     * @param requesterID The user_id of the user who is requesting the url
      * @return String The required information in WDDX format
      * @throws IOException
      * @throws LamsToolServiceException
      */
-    public String getLearnerActivityURL(Long lessonID, Long activityID,Integer userID)throws IOException,LamsToolServiceException;
+    public String getLearnerActivityURL(Long lessonID, Long activityID,Integer learnerUserID, Integer requestingUserId)throws IOException,LamsToolServiceException;
     
     /**
      * This method returns the define later url for the given activity. 
@@ -318,10 +323,11 @@ public interface IMonitoringService
      * @param lessonID The lesson_id of the Lesson for which the information has
      * 					to be fetched. 
      * @param activityID The activity_id of the Activity whose URL will be returned
+     * @param userID The user id of the user requesting the url.
      * @return String the url
      * @throws IOException
      */
-    public String getActivityDefineLaterURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException;
+    public String getActivityDefineLaterURL(Long lessonID, Long activityID, Integer userID)throws IOException, LamsToolServiceException;
 
     /**
      * This method returns the monitor url for the given activity
@@ -329,10 +335,11 @@ public interface IMonitoringService
      * @param lessonID The lesson_id of the Lesson for which the information has
      * 					to be fetched. 
      * @param activityID The activity_id of the Activity whose URL will be returned
+     * @param userID The user id of the user requesting the url.
      * @return String The required information in WDDX format
      * @throws IOException
      */
-    public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID)throws IOException, LamsToolServiceException;
+    public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)throws IOException, LamsToolServiceException;
   
    /**
      * This method moves the learning design corresponding to the given

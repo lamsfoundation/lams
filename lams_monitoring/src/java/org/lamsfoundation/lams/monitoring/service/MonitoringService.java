@@ -880,9 +880,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @throws LamsToolServiceException 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
      */
-    public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId) 
+    public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId,Long activityId) 
     {
-
+    	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
+    	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
+    	
     	User learner = (User)baseDAO.find(User.class,learnerId);
         
        	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
@@ -1047,6 +1049,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
      */
     public String getLessonDetails(Long lessonID, Integer userID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
+    	checkOwnerOrStaffMember(userID, lesson, "get lesson deatils");
+
     	User user = (User)baseDAO.find(User.class,userID);
     	LessonDetailsDTO dto = lessonService.getLessonDetails(lessonID);
     	
@@ -1073,9 +1078,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonLearners(java.lang.Long)
      */
-    public String getLessonLearners(Long lessonID)throws IOException{
-    	Vector lessonLearners = new Vector();
+    public String getLessonLearners(Long lessonID, Integer userID)throws IOException{
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	checkOwnerOrStaffMember(userID, lesson, "get lesson learners");
+
+    	Vector lessonLearners = new Vector();
     	FlashMessage flashMessage;
     	if(lesson!=null){
     		Iterator iterator = lesson.getLessonClass().getLearners().iterator();
@@ -1095,9 +1102,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonStaff(java.lang.Long)
      */
-    public String getLessonStaff(Long lessonID)throws IOException{
-    	Vector lessonStaff = new Vector();
+    public String getLessonStaff(Long lessonID, Integer userID)throws IOException{
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	checkOwnerOrStaffMember(userID, lesson, "get lesson staff");
+
+    	Vector lessonStaff = new Vector();
     	FlashMessage flashMessage;
     	if(lesson!=null){
     		Iterator iterator = lesson.getLessonClass().getStaffGroup().getUsers().iterator();
@@ -1125,9 +1134,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long)
      */
-    public String getAllLearnersProgress(Long lessonID)throws IOException {
-    	Vector progressData = new Vector();
+    public String getAllLearnersProgress(Long lessonID, Integer userID)throws IOException {
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	checkOwnerOrStaffMember(userID, lesson, "get all learners progress");
+
+    	Vector progressData = new Vector();
     	FlashMessage flashMessage;
     	if(lesson!=null){
     		Iterator iterator = lesson.getLearnerProgresses().iterator();
@@ -1194,15 +1205,17 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearnerActivityURL(java.lang.Long, java.lang.Integer)
      */
-    public String getLearnerActivityURL(Long lessonID, Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
+    public String getLearnerActivityURL(Long lessonID, Long activityID,Integer learnerUserID, Integer requestingUserId)throws IOException, LamsToolServiceException{    	
+       	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	checkOwnerOrStaffMember(requestingUserId, lesson, "get monitoring learner progress url");
+
     	Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	User user = (User)baseDAO.find(User.class,userID);
+    	User learner = (User)baseDAO.find(User.class,learnerUserID);
     	
-    	if(activity==null || user==null){
-    		log.error("getLearnerActivityURL activity or user missing. Activity ID "+activityID+" activity " +activity+" userID "+userID+" user "+user);
-    		
+    	if(activity==null || learner==null){
+    		log.error("getLearnerActivityURL activity or user missing. Activity ID "+activityID+" activity " +activity+" userID "+learnerUserID+" user "+learner);   		
     	} else if ( activity.isToolActivity() || activity.isSystemToolActivity() ){
-        	return lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity,user);
+        	return lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity,learner);
     	}
     	return null;
     }	
@@ -1210,8 +1223,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityDefineLaterURL(java.lang.Long)
 	 */
-	public String getActivityDefineLaterURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException{
-		Activity activity = activityDAO.getActivityByActivityId(activityID);
+	public String getActivityDefineLaterURL(Long lessonID, Long activityID, Integer userID)throws IOException, LamsToolServiceException{
+       	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	checkOwnerOrStaffMember(userID, lesson, "get activity define later url");
+
+    	Activity activity = activityDAO.getActivityByActivityId(activityID);
     	if(activity==null){
     		log.error("getActivityMonitorURL activity missing. Activity ID "+activityID+" activity " +activity);
     		
@@ -1226,7 +1242,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityMonitorURL(java.lang.Long)
 	 */
-	public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID)throws IOException, LamsToolServiceException{
+	public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)throws IOException, LamsToolServiceException{
+      	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	checkOwnerOrStaffMember(userID, lesson, "get activity define later url");
+
 		Activity activity = activityDAO.getActivityByActivityId(activityID);
     	
     	if(activity==null){

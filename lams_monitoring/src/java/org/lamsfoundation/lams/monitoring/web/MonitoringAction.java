@@ -31,8 +31,8 @@ import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,15 +42,15 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -550,7 +550,8 @@ public class MonitoringAction extends LamsDispatchAction
     	try {
         	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
         	Integer learnerId = new Integer(WebUtil.readIntParam(request,MonitoringConstants.PARAM_LEARNER_ID));
-    		String message = monitoringService.forceCompleteLessonByUser(learnerId,lessonId,activityId);
+        	Integer requesterId = getUserId();
+    		String message = monitoringService.forceCompleteLessonByUser(learnerId,requesterId,lessonId,activityId);
     		if ( log.isDebugEnabled() ) {
     			log.debug("Force complete for learner "+learnerId+" lesson "+lessonId+". "+message);
     		}
@@ -592,7 +593,7 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	try{
 	    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-	    	wddxPacket = monitoringService.getLessonLearners(lessonID);
+	    	wddxPacket = monitoringService.getLessonLearners(lessonID, getUserId());
     	}catch (Exception e) {
      		wddxPacket = handleException(e, "getLessonLearners", monitoringService).serializeMessage();
     	}
@@ -609,7 +610,7 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	try{
     		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    		wddxPacket = monitoringService.getLessonStaff(lessonID);
+    		wddxPacket = monitoringService.getLessonStaff(lessonID, getUserId());
     	}catch (Exception e) {
      		wddxPacket = handleException(e, "getLessonStaff", monitoringService).serializeMessage();
     	}
@@ -642,7 +643,7 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	try{
     		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    		wddxPacket = monitoringService.getAllLearnersProgress(lessonID);
+    		wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId());
      	}catch (Exception e) {
      		wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
     	}
@@ -681,11 +682,11 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletResponse response)throws IOException,LamsToolServiceException{
 
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Integer learnerUserID = new Integer(WebUtil.readIntParam(request,"userID")); 	     	
+    	Integer learnerUserID = new Integer(WebUtil.readIntParam(request,"userID")); 	
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	
-    	String url = monitoringService.getLearnerActivityURL(lessonID,activityID,learnerUserID);
+    	String url = monitoringService.getLearnerActivityURL(lessonID,activityID,learnerUserID,getUserId());
     	return redirectToURL(mapping, response, url);
     }
     /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
@@ -697,7 +698,7 @@ public class MonitoringAction extends LamsDispatchAction
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
-    	String url = monitoringService.getActivityMonitorURL(lessonID,activityID,contentFolderID);
+    	String url = monitoringService.getActivityMonitorURL(lessonID,activityID,contentFolderID,getUserId());
     	
     	return redirectToURL(mapping, response, url);
     }
@@ -710,7 +711,7 @@ public class MonitoringAction extends LamsDispatchAction
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	
-    	String url = monitoringService.getActivityDefineLaterURL(lessonID,activityID);
+    	String url = monitoringService.getActivityDefineLaterURL(lessonID,activityID,getUserId());
     	return redirectToURL(mapping, response, url);
     }
 
