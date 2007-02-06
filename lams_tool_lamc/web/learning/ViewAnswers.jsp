@@ -209,8 +209,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 			</c:if>
 
-			<c:choose>
-			<c:when test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
+			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
 			
 				<c:choose>
 					<c:when test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.reportViewOnly!='true'}">
@@ -252,19 +251,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</div>
 					</c:otherwise>	
 				</c:choose>
-			</c:when>
 
-			<c:otherwise>
-				<%-- Is monitoring screen. Can only do finish --%>
-				<div class="space-bottom-top align-right">
-						<html:hidden property="learnerFinished" value="Finished" />
-														  			  		
-						<html:submit styleClass="button" styleId="finishButton">
-							<fmt:message key="label.finished"/>
-						</html:submit>
-				</div>
-			</c:otherwise>
-			</c:choose>
+			</c:if>
 
 			<p>							
 			<html:hidden property="doneLearnerProgress" />
