@@ -155,7 +155,7 @@ public class LearningAction extends Action {
 //		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
 		ResourceUser resourceUser = null;
-		if ( mode.equals(ToolAccessMode.TEACHER) ) {
+		if ( mode != null && mode.isTeacher() ) {
 			//monitoring mode - user is specified in URL
 			resourceUser = getSpecifiedUser(service, sessionId, 
 					WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
