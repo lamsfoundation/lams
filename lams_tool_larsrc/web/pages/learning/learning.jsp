@@ -138,11 +138,12 @@
 		</table>
 
 
-		<p>
-			<a href="#" onclick="return checkNew()" class="button"> <fmt:message
-					key="label.check.for.new" /> </a>
-		</p>
-
+		<c:if test="${mode != 'teacher'}">
+			<p>
+				<a href="#" onclick="return checkNew()" class="button"> <fmt:message
+						key="label.check.for.new" /> </a>
+			</p>
+		</c:if>
 
 		<c:if test="${mode != 'teacher' && (not finishedLock)}">
 			<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
@@ -231,10 +232,12 @@
 					</c:otherwise>
 				</c:choose>
 				
-				<html:button property="FinishButton"
-					onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.edit" />
-				</html:button>											
+				<c:if test="${mode != 'teacher'}">
+					<html:button property="FinishButton"
+						onclick="return continueReflect()" styleClass="button">
+						<fmt:message key="label.edit" />
+					</html:button>											
+				</c:if>
 			</div>
 		</c:if>
 

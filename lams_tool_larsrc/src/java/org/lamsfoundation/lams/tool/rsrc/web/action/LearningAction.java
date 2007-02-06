@@ -154,7 +154,14 @@ public class LearningAction extends Action {
 		
 //		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
-		ResourceUser resourceUser = getCurrentUser(service,sessionId);
+		ResourceUser resourceUser = null;
+		if ( mode.equals(ToolAccessMode.TEACHER) ) {
+			//monitoring mode - user is specified in URL
+			resourceUser = getSpecifiedUser(service, sessionId, 
+					WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+		} else {
+			resourceUser = getCurrentUser(service,sessionId);
+		}
 
 		List<ResourceItem> items = null;
 		Resource resource;
@@ -561,6 +568,15 @@ public class LearningAction extends Action {
 		}
 		return resourceUser;
 	}
+	private ResourceUser getSpecifiedUser(IResourceService service, Long sessionId, Integer userId) {
+		ResourceUser resourceUser = service.getUserByIDAndSession(new Long(userId.intValue()),sessionId);
+		if ( resourceUser == null ) {
+			log.error("Unable to find specified user for share resources activity. Screens are likely to fail. SessionId="
+					+sessionId+" UserId="+userId);
+		}
+		return resourceUser;
+	}
+
 	/**
 	 * @param itemForm
 	 * @return
