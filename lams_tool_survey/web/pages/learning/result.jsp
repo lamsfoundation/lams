@@ -124,12 +124,13 @@
 			</div>
 		</c:if>
 
+		<c:if test="${sessionMap.mode != 'teacher'}">
 		<table>
 			<tr>
 				<td>
 					<span class="right-buttons"> <c:choose>
 							<c:when
-								test="${sessionMap.reflectOn && mode != 'teacher' && (not sessionMap.userFinished)}">
+								test="${sessionMap.reflectOn}">
 								<html:button property="ContinueButton"
 									onclick="return continueReflect()" styleClass="button">
 									<fmt:message key="label.continue" />
@@ -145,6 +146,7 @@
 				</td>
 			</tr>
 		</table>
+		</c:if>
 	</div>
 	<!--closes content-->
 

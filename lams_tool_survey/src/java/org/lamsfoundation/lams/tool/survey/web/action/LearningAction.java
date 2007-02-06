@@ -142,7 +142,14 @@ public class LearningAction extends Action {
 		
 //		get back the survey and question list and display them on page
 		ISurveyService service = getSurveyService();
-		SurveyUser surveyUser = getCurrentUser(service,sessionId);
+		SurveyUser surveyUser = null;
+		if ( mode != null && mode.isTeacher() ) {
+			//monitoring mode - user is specified in URL
+			surveyUser = getSpecifiedUser(service, sessionId, 
+					WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+		} else {
+			surveyUser = getCurrentUser(service,sessionId);
+		}
 
 		Survey survey;
 		List<AnswerDTO> answers =  service.getQuestionAnswers(sessionId,surveyUser.getUid());
@@ -570,6 +577,9 @@ public class LearningAction extends Action {
 			service.createUser(surveyUser);
 		}
 		return surveyUser;
+	}
+	private SurveyUser getSpecifiedUser(ISurveyService service, Long sessionId, Integer userId) {
+		return service.getUserByIDAndSession(new Long(userId.intValue()),sessionId);
 	}
 
 }
