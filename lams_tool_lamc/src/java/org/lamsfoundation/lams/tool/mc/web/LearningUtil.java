@@ -91,12 +91,12 @@ public class LearningUtil implements McAppConstants {
 		 	logger.debug("learnerProgress: " + learnerProgress);
 		 	mcLearningForm.setLearnerProgress(learnerProgress);
 		 	logger.debug("form is populated with learnerProgress");
+		 	String learnerProgressUserId=request.getParameter("learnerProgressUserId");
+		 	logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+		 	mcLearningForm.setLearnerProgressUserId(learnerProgressUserId);
+
 	 	}
 	 	
-	 	String learnerProgressUserId=request.getParameter("learnerProgressUserId");
-	 	logger.debug("learnerProgressUserId: " + learnerProgressUserId);
-	 	mcLearningForm.setLearnerProgressUserId(learnerProgressUserId);
-
 	 	String questionListingMode=request.getParameter("questionListingMode");
 	 	logger.debug("questionListingMode: " + questionListingMode);
 	 	mcLearningForm.setQuestionListingMode(questionListingMode);

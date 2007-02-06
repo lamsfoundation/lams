@@ -181,17 +181,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 				</c:if>				
 
-
-			<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}">
-				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
-
+			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
+				<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}">
 					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
-
 						<html:submit property="redoQuestions" styleClass="button">
 							<fmt:message key="label.redo.questions" />
 						</html:submit>
-						
-						<div class="right-buttons">
+					</c:if>
+				</c:if>
+			</c:if>
+									
+			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
+				<h2>
+							<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
+				</h2>
+
+				<p>
+					<c:choose>
+						<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
+							<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>
+						</c:when>
+						<c:otherwise>
+							<em><fmt:message key="message.no.reflection.available" /></em>  
+						</c:otherwise>
+					</c:choose>
+				</p>
+				
+			</c:if>
+
+			<c:choose>
+			<c:when test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
+			
+				<c:choose>
+					<c:when test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.reportViewOnly!='true'}">
+						<div class="space-bottom-top align-right">
 							<c:if
 								test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
 								<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
@@ -209,13 +232,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:if>
 							</c:if>
 						</div>
-
-					</c:if>
-
-
-					<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
-
-						<div class="right-buttons">
+					</c:when>
+					
+					<c:otherwise>
+						<div class="space-bottom-top align-right">
 							<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 								<html:hidden property="learnerFinished" value="Finished" />
 																  			  		
@@ -229,37 +249,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<fmt:message key="label.continue" />
 								</html:submit>
 							</c:if>
-
 						</div>
+					</c:otherwise>	
+				</c:choose>
+			</c:when>
 
-					</c:if>
+			<c:otherwise>
+				<%-- Is monitoring screen. Can only do finish --%>
+				<div class="space-bottom-top align-right">
+						<html:hidden property="learnerFinished" value="Finished" />
+														  			  		
+						<html:submit styleClass="button" styleId="finishButton">
+							<fmt:message key="label.finished"/>
+						</html:submit>
+				</div>
+			</c:otherwise>
+			</c:choose>
 
-
-				</c:if>
-			</c:if>
-			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
-				<h2>
-							<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
-				</h2>
-
-				<p>
-					<c:choose>
-						<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-							<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>
-						</c:when>
-						<c:otherwise>
-							<em><fmt:message key="message.no.reflection.available" /></em>  
-						</c:otherwise>
-					</c:choose>
-				</p>
-				
-				<html:submit property="forwardtoReflection" styleClass="button">
-					<fmt:message key="label.edit" />
-				</html:submit>
-			</c:if>
-							
+			<p>							
 			<html:hidden property="doneLearnerProgress" />
-
+			</p>
+			
 		</html:form>
 
 	</div>
@@ -270,7 +280,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-
+	
 
 
 
