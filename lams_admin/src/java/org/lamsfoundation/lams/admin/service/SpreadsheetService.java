@@ -23,7 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +41,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.AdminConstants;
+import org.lamsfoundation.lams.admin.web.dto.V1OrgRightDTO;
+import org.lamsfoundation.lams.admin.web.dto.V1OrganisationDTO;
+import org.lamsfoundation.lams.admin.web.dto.V1UserDTO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -151,6 +156,134 @@ public class SpreadsheetService implements ISpreadsheetService {
 			return parseRolesSpreadsheet(fileItem);
 		}
 		return new ArrayList();
+	}
+	
+	public List<List> parseV1UsersFile(FormFile fileItem, boolean includeIntegrated) throws IOException {
+		ArrayList<V1UserDTO> users = new ArrayList<V1UserDTO>();
+		ArrayList<V1OrganisationDTO> orgs = new ArrayList<V1OrganisationDTO>();
+		ArrayList<List> results = new ArrayList<List>();
+		ArrayList<String> integPrefixes = new ArrayList<String>();
+		ArrayList<String> integOrgid = new ArrayList<String>();		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fileItem.getInputStream()));
+		
+		// get username prefixes, for integrations on the lams 1 server
+		String line = reader.readLine();
+		while (!line.startsWith("login\tpassword")) {
+			if (!line.startsWith("prefix")) {
+				String[] lineArray = line.split("\t");
+				if (lineArray.length > 0) {
+					integPrefixes.add(lineArray[0]);
+				}
+				if (lineArray.length > 1) {
+					integOrgid.add(lineArray[1]);
+				}
+			}
+			line = reader.readLine();
+		}
+		
+		// get user details
+		// login, password, fname, lname, email
+		line = reader.readLine();  // skip line containing column headings
+		while (!line.startsWith("sid\tname")) {
+			String[] userDetails = line.split("\t");
+			line = reader.readLine();
+			if (!includeIntegrated && isIntegratedUser(integPrefixes, userDetails[0])) {
+				continue;
+			}
+			V1UserDTO userDTO = new V1UserDTO(
+					userDetails[0], userDetails[1], userDetails[2], userDetails[3]);
+			if (userDetails.length > 4 && !StringUtils.equals(userDetails[4], "NULL")) {
+				userDTO.setEmail(userDetails[4]);
+			}
+			users.add(userDTO);
+		}
+		
+		// get organisations
+		// sid, name, description, account_organisation
+		line = reader.readLine();
+		while (!line.startsWith("login\tg")) {
+			String[] orgDetails = line.split("\t");
+			line = reader.readLine();
+			if (orgDetails.length != 4) {
+				log.debug("LAMS 1 text file has troublesome organisation: ");
+				for (int i=0; i<orgDetails.length; i++) {
+					log.debug("column: "+orgDetails[i]);
+				}
+				continue;
+			}
+			if (!includeIntegrated) {
+				if (integOrgid.contains(orgDetails[0])) {
+					continue;
+				}
+			}
+			V1OrganisationDTO org = new V1OrganisationDTO(
+					orgDetails[0], orgDetails[1], orgDetails[2], orgDetails[3]);
+			orgs.add(org);
+		}
+		
+		// gather user roles which are 1 role per user per line, into a dto of roles for the user
+		// login, role id
+		line = reader.readLine();
+		ArrayList<String> currentRoles = new ArrayList<String>();
+		String currentLogin = "";
+		while (!line.startsWith("login\tsid")) {
+			String[] userRole = line.split("\t");
+			line = reader.readLine();
+			if (!includeIntegrated && isIntegratedUser(integPrefixes, userRole[0])) {
+				continue;
+			}
+			if (!StringUtils.equals(userRole[0], currentLogin)) {
+				if (!currentRoles.isEmpty()) {
+					int index = users.indexOf(new V1UserDTO(currentLogin));
+					V1UserDTO userDTO = users.get(index);
+					userDTO.setRoleIds(new ArrayList<String>(currentRoles));
+					users.set(index, userDTO);
+				}
+				currentLogin = userRole[0];
+				currentRoles.clear();
+			}
+			currentRoles.add(userRole[1]);
+		}
+		int index = users.indexOf(new V1UserDTO(currentLogin));
+		V1UserDTO userDTO = users.get(index);
+		userDTO.setRoleIds(new ArrayList<String>(currentRoles));
+		users.set(index, userDTO);
+		
+		// get user rights
+		// login, org id, right id
+		line = reader.readLine();
+		while (line!=null) {
+			String[] userRight = line.split("\t");
+			line = reader.readLine();
+			if (!includeIntegrated && isIntegratedUser(integPrefixes, userRight[0])) {
+				continue;
+			}
+			V1OrgRightDTO orgRightDTO = new V1OrgRightDTO(userRight[1], userRight[2]);
+			index = users.indexOf(new V1UserDTO(userRight[0]));
+			userDTO = users.get(index);
+			List<V1OrgRightDTO> orgRights = userDTO.getOrgRights();
+			if (orgRights==null) {
+				orgRights = new ArrayList<V1OrgRightDTO>();
+			}
+			orgRights.add(orgRightDTO);
+			userDTO.setOrgRights(orgRights);
+			users.set(index, userDTO);
+		}
+		
+		results.add(users);
+		results.add(orgs);
+		
+		return results;
+	}
+	
+	private boolean isIntegratedUser(List<String> integPrefixes, String login) {
+		int underscore = login.indexOf('_');
+		if (underscore >= 0) {
+			if (integPrefixes.contains(login.substring(0, underscore))) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public List parseUserSpreadsheet(FormFile fileItem) throws IOException {
@@ -411,13 +544,13 @@ public class SpreadsheetService implements ISpreadsheetService {
 				} else {
 					return null;
 				}
-				log.debug("string cell value: "+cell.getStringCellValue().trim());
+				//log.debug("string cell value: "+cell.getStringCellValue().trim());
 				return cell.getStringCellValue().trim();
 			} catch(Exception e) {
 				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 				double d = cell.getNumericCellValue();
 				emptyRow = false;
-				log.debug("numeric cell value: "+d);
+				//log.debug("numeric cell value: "+d);
 				return (new Long(new Double(d).longValue()).toString());
 			}
 		}

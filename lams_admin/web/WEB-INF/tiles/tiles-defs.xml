@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
+	<definition name=".importv1result" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="import/importv1result.jsp" />	
+	</definition>
+
+	<definition name=".importv1contents" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="import/importv1contents.jsp" />	
+	</definition>
+
+	<definition name=".importv1" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="import/importv1.jsp" />	
+	</definition>
+
 	<definition name=".toolcontentlist" path="/template.jsp">
 		<put name="title" value="sysadmin.edit.default.tool.content"/>
 		<put name="content" value="toolcontent/toolcontentlist.jsp" />	

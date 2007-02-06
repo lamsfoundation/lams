@@ -66,6 +66,8 @@ public class SysAdminStartAction extends Action {
 			links.add(linkBean);
 			linkBean = new LinkBean("importexcel.do", "admin.user.import");
 			links.add(linkBean);
+			linkBean = new LinkBean("importv1.do", "admin.importv1.title");
+			links.add(linkBean);
 			linkBean = new LinkBean("disabledmanage.do", "admin.list.disabled.users");
 			links.add(linkBean);
 			linkBean = new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage");
@@ -83,6 +85,8 @@ public class SysAdminStartAction extends Action {
 			LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
 			links.add(linkBean);
 			linkBean = new LinkBean("importexcel.do", "admin.user.import");
+			links.add(linkBean);
+			linkBean = new LinkBean("importv1.do", "admin.importv1.title");
 			links.add(linkBean);
 			linkBean = new LinkBean("disabledmanage.do", "admin.list.disabled.users");
 			links.add(linkBean);

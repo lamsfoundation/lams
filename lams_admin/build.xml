@@ -184,6 +184,7 @@
 	   			<fileset dir="${conf.web.dir}">
 						<include name="**/*.jsp"/>
 						<include name="file/*.xls"/>
+	   					<include name="file/*.sql"/>
 				</fileset>
 	   			
 	   	   </war>
