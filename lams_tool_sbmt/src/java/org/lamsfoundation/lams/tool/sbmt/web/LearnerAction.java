@@ -121,9 +121,16 @@ public class LearnerAction extends DispatchAction {
 		
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Integer userID = user.getUserID();
+		
+		Integer userID = null;
+		if ( mode != null && mode.isTeacher() ) {
+			//monitoring mode - user is specified in URL
+			userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false);
+		} else {
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			userID = user.getUserID();
+		}
+
 		
 		ISubmitFilesService submitFilesService = getService();
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
