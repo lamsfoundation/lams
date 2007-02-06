@@ -101,6 +101,11 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         return new Long(user.getUserID().longValue());
 	}
 
+    /** Get the user id from the url - needed for the monitoring mode */
+	public Long getUserIDFromURLCall(HttpServletRequest request) {
+		return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
+    }
+
     public ActionForward unspecified(
     		ActionMapping mapping,
     		ActionForm form,
@@ -122,7 +127,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userID = getUserID(request);
         Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
         
         if (toolSessionID == null)
@@ -147,25 +151,22 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
 	    }
 	    
-	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
 
 	    boolean readOnly = false;
         ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
+        Long userID = null;
         if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR )
         {
-        	if ( ! nbContent.isContentInUse() ) {
+            userID = getUserID(request);
+    	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
+            
+            if ( ! nbContent.isContentInUse() ) {
 	            /* Set the ContentInUse flag to true, and defineLater flag to false */
 	            nbContent.setContentInUse(true);
 	            nbService.saveNoticeboard(nbContent);
         	}
         	
-            if (nbUser != null)
-	        {
-            	if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED)) {
-            		readOnly = true;
-            	}
-	        }
-            else
+            if (nbUser == null)
             {
             	//create a new user with this session id
             	nbUser = new NoticeboardUser(userID);
@@ -175,7 +176,9 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             	nbService.addUser(toolSessionID, nbUser);
             }
         } else {
-    		readOnly = true;
+            userID = getUserIDFromURLCall(request);
+    	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
+     		readOnly = true;
         }
         
         learnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());

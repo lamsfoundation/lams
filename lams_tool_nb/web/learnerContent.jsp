@@ -53,20 +53,22 @@
 		</c:if>
 	
 		<div class="space-bottom-top align-right">
-			<c:choose>
-				<c:when test="${reflectOnActivity}">
-					<html:button property="continueButton" styleClass="button" onclick="submitForm('reflect')">
-						<fmt:message key="button.continue" />
-					</html:button>
-				</c:when>
-				<c:otherwise>
-					
+			<c:if test="${not NbLearnerForm.readOnly}">
+				<c:choose>
+					<c:when test="${reflectOnActivity}">
+						<html:button property="continueButton" styleClass="button" onclick="submitForm('reflect')">
+							<fmt:message key="button.continue" />
+						</html:button>
+					</c:when>
+					<c:otherwise>
 						
-					<html:button property="finishButton" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-						<fmt:message key="button.finish" />
-					</html:button>
-				</c:otherwise>
-			</c:choose>
+							
+						<html:button property="finishButton" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+							<fmt:message key="button.finish" />
+						</html:button>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
 		</div>
 	</html:form>
 </div>
