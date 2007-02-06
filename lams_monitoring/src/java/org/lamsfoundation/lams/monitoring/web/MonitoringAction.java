@@ -670,17 +670,22 @@ public class MonitoringAction extends LamsDispatchAction
         return null;
     }
     
-    /** Calls the server to bring up the learner progress page. Assumes destination is a new window */
+    /** Calls the server to bring up the learner progress page. 
+     * Assumes destination is a new window. The userid that comes from
+     * Flash is the user id of the learner for which we are calculating
+     * the url. This is different to all the other calls.
+     */
     public ActionForward getLearnerActivityURL(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException,LamsToolServiceException{
+
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Integer userID = getUserId();
+    	Integer learnerUserID = new Integer(WebUtil.readIntParam(request,"userID")); 	     	
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	
-    	String url = monitoringService.getLearnerActivityURL(lessonID,activityID,userID);
+    	String url = monitoringService.getLearnerActivityURL(lessonID,activityID,learnerUserID);
     	return redirectToURL(mapping, response, url);
     }
     /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
