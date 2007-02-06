@@ -656,7 +656,10 @@ public class UserManagementService implements IUserManagementService {
 			uo = new UserOrganisation(user, org);
 			save(uo);
 			log.debug("added "+user.getLogin()+" to "+org.getName());
-			Set uos = org.getUserOrganisations();
+			Set uos;
+			if ((uos=org.getUserOrganisations())==null) {
+				uos = new HashSet();
+			}
 			uos.add(uo);
 		}
 		
