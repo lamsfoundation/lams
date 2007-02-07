@@ -156,7 +156,8 @@ public class LearningAction extends Action {
 		IResourceService service = getResourceService();
 		ResourceUser resourceUser = null;
 		if ( mode != null && mode.isTeacher() ) {
-			//monitoring mode - user is specified in URL
+			// monitoring mode - user is specified in URL
+			// resourceUser may be null if the user was force completed.
 			resourceUser = getSpecifiedUser(service, sessionId, 
 					WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 		} else {
@@ -169,7 +170,7 @@ public class LearningAction extends Action {
 		resource = service.getResourceBySessionId(sessionId);
 
 		//check whehter finish lock is on/off
-		boolean lock = resource.getLockWhenFinished() && resourceUser.isSessionFinished();
+		boolean lock = resource.getLockWhenFinished() && resourceUser !=null && resourceUser.isSessionFinished();
 		
 		
 		//check whether there is only one resource item and run auto flag is true or not.
@@ -189,18 +190,19 @@ public class LearningAction extends Action {
 		
 		// get notebook entry
 		String entryText = new String();
-		NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
-				ResourceConstants.TOOL_SIGNATURE, resourceUser.getUserId().intValue());
-		
-		if (notebookEntry != null) {
-			entryText = notebookEntry.getEntry();
+		if ( resourceUser != null ) {
+			NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+					ResourceConstants.TOOL_SIGNATURE, resourceUser.getUserId().intValue());
+			if (notebookEntry != null) {
+				entryText = notebookEntry.getEntry();
+			}
 		}
 		
 		//basic information
 		sessionMap.put(ResourceConstants.ATTR_TITLE,resource.getTitle());
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE_INSTRUCTION,resource.getInstructions());
 		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK,lock);
-		sessionMap.put(ResourceConstants.ATTR_USER_FINISHED, resourceUser.isSessionFinished());
+		sessionMap.put(ResourceConstants.ATTR_USER_FINISHED, resourceUser !=null && resourceUser.isSessionFinished());
 		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		sessionMap.put(AttributeNames.ATTR_MODE,mode);
@@ -244,7 +246,8 @@ public class LearningAction extends Action {
 		}
 		
 		//set complete flag for display purpose
-		service.retrieveComplete(resourceItemList, resourceUser);
+		if ( resourceUser !=null )
+			service.retrieveComplete(resourceItemList, resourceUser);
 		
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE,resource);
 		

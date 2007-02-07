@@ -176,6 +176,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             	nbService.addUser(toolSessionID, nbUser);
             }
         } else {
+        	// user will not exist if force completed.
             userID = getUserIDFromURLCall(request);
     	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
      		readOnly = true;
@@ -190,10 +191,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
 	    request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
 	    
-	    Boolean userFinished = false;
-	    if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED)) {
-	    	userFinished = true;	    	
-	    }
+	    Boolean userFinished = (nbUser!=null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
         request.setAttribute("userFinished", userFinished);
 	    
 	    /*
