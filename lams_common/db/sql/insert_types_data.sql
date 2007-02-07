@@ -136,7 +136,7 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
 	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
 VALUES (1, 2, 'Grouping', 'All types of grouping including random and chosen.', 
 	'learning/grouping.do?method=performGrouping', 'learning/grouping.do?method=performGrouping', 
-	'learning/grouping.do?method=viewGrouping', 'learning/groupingExportPortfolio?mode=learner', 
+	'learning/grouping.do?method=viewGrouping&mode=teacher', 'learning/groupingExportPortfolio?mode=learner', 
 	'learning/groupingExportPortfolio?mode=teacher', 
 	'monitoring/grouping.do?method=startGrouping', 
 	'monitoring/grouping.do?method=startGrouping', now() );
