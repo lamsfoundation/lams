@@ -309,6 +309,7 @@ CREATE TABLE lams_user (
      , chat_id VARCHAR(255)
      , locale_id INTEGER
      , portrait_uuid BIGINT(20)
+     , change_password TINYINT DEFAULT 0
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
