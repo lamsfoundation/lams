@@ -119,6 +119,7 @@ public class PasswordChangeAction extends Action {
 					{
 			        	//service.updatePassword(login, HashUtil.sha1(password));
 						user.setPassword(HashUtil.sha1(password));
+						user.setChangePassword(false);
 						service.save(user);
 						
 						// make 'password changed' audit log entry

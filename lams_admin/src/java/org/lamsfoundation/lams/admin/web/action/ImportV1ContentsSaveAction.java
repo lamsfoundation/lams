@@ -243,6 +243,7 @@ public class ImportV1ContentsSaveAction extends Action {
 		
 		// password must be sha1'ed, not md5'ed as in v1; so we use the login as the password
 		newUser.setPassword(HashUtil.sha1(user.getLogin()));
+		newUser.setChangePassword(true);
 		
 		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 		List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);

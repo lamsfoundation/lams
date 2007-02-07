@@ -97,6 +97,12 @@ public class IndexAction extends Action {
 			setAdminLinks(request);
 		}
 		
+		// check if user is flagged as needing to change their password
+		User loggedInUser = getService().getUserByLogin(request.getRemoteUser());
+		if (loggedInUser.getChangePassword()) {
+			return mapping.findForward("password");
+		}
+		
 		String tab = WebUtil.readStrParam(request, "tab", true);
 		if (StringUtils.equals(tab, "profile")) {
 			return mapping.findForward("profile");

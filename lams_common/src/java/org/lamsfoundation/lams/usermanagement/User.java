@@ -147,8 +147,11 @@ public class User implements Serializable,Comparable {
     /** persistent field */
     private Long portraitUuid;
     
+    /** persistent field */
+    private Boolean changePassword;
+    
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String postcode, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons, Long portraitUuid) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String postcode, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons, Long portraitUuid, Boolean changePassword) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -180,6 +183,7 @@ public class User implements Serializable,Comparable {
         this.learningDesigns = learningDesigns;
         this.lessons = lessons;
         this.portraitUuid = portraitUuid;
+        this.changePassword = changePassword;
     }
 
     /** default constructor */
@@ -809,5 +813,20 @@ public class User implements Serializable,Comparable {
 
     public void setPortraitUuid(Long portraitUuid) {
         this.portraitUuid = portraitUuid;
+    }
+    
+    /** 
+     *            @hibernate.property
+     *             column="change_password"
+     *             length="1"
+     *             not-null="true"
+     *         
+     */
+    public Boolean getChangePassword() {
+        return this.changePassword;
+    }
+
+    public void setChangePassword(Boolean changePassword) {
+        this.changePassword = changePassword;
     }
 }

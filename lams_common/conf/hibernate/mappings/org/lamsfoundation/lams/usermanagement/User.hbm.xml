@@ -473,5 +473,20 @@
             length="20"
         </meta>    
     </property>
+    
+    <property
+        name="changePassword"
+        type="java.lang.Boolean"
+        column="change_password"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="change_password"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
 </class>
 </hibernate-mapping>
