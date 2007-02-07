@@ -37,6 +37,13 @@
 							styleClass="text-area"></html:textarea>
 					</c:otherwise>
 				</c:choose>
+
+				<div class="space-bottom-top align-right">
+					<html:submit styleClass="button" styleId="finishButton">
+						<fmt:message>button.finish</fmt:message>
+					</html:submit>
+				</div>
+
 			</c:when>
 
 			<c:otherwise>
@@ -44,10 +51,5 @@
 				</c:otherwise>
 		</c:choose>
 
-		<div class="space-bottom-top align-right">
-			<html:submit styleClass="button" styleId="finishButton">
-				<fmt:message>button.finish</fmt:message>
-			</html:submit>
-		</div>
 	</html:form>
 </div>

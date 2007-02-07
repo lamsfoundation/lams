@@ -139,8 +139,10 @@ public class LearningAction extends LamsDispatchAction {
 		}
 		
 		// get any existing notebook entry
-		NotebookEntry nbEntry = notebookService.getEntry(notebookUser
-				.getEntryUID());
+		NotebookEntry nbEntry = null;
+		if ( notebookUser != null ) {
+			nbEntry = notebookService.getEntry(notebookUser.getEntryUID());
+		}
 		if (nbEntry != null) {
 			learningForm.setEntryText(nbEntry.getEntry());
 		}
