@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -184,11 +185,14 @@ public class GroupingAction extends LamsDispatchAction
         if ( grouping != null)
         	groups.addAll(grouping.getGroups());
         
-        request.setAttribute(GROUPS,groups);
-        request.setAttribute(FINISHED_BUTTON,Boolean.TRUE);
+
+		request.setAttribute(GROUPS,groups);
         request.setAttribute(LOCAL_FILES,Boolean.FALSE);
         request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
         request.setAttribute(TITLE,activity.getTitle());
+
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, true);
+        request.setAttribute(FINISHED_BUTTON,new Boolean(mode == null || ! mode.isTeacher()));
         
         return mapping.findForward(SHOW_GROUP);
     }

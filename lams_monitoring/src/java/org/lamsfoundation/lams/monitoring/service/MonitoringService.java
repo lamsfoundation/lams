@@ -950,7 +950,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 						log.error("Force complete failed. Learner "+learner+" lessonId "+lessonId+" processing activity "+activity,e);
 	            		stopReason = messageService.getMessage(FORCE_COMPLETE_STOP_MESSAGE_GROUPING_ERROR,new Object[]{activity.getTitle()});
 					}
-        			learnerService.completeActivity(learner.getUserId(),activity);
+        			learnerService.completeActivity(learner.getUserId(),activity,lessonId);
         			if ( log.isDebugEnabled()) {
         				log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
         			}
@@ -960,7 +960,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		}
         	}else{
         		//if group already exist
-        		learnerService.completeActivity(learner.getUserId(),activity);
+        		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
        			if ( log.isDebugEnabled()) {
        				log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
        			}
@@ -970,7 +970,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	GateActivity gate = (GateActivity) activity;
         	if(learnerService.knockGate(gate,learner,false)){
         		//the gate is opened, continue to next activity to complete
-        		learnerService.completeActivity(learner.getUserId(),activity);
+        		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
        			if ( log.isDebugEnabled()) {
        				log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
        			}
