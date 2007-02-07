@@ -36,7 +36,7 @@ import org.apache.struts.upload.FormFile;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  * @author <a href="mailto:jliew@melcoe.mq.edu.au">Jun-Dir Liew</a>
  */
-public interface ISpreadsheetService {
+public interface IImportService {
 	
 	public static final String SEPARATOR = "|";
 	public static final String IMPORT_HELP_PAGE = "Import+Users";

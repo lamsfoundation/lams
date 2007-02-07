@@ -8,7 +8,7 @@
 		<property name="messageSource"><ref local="adminMessageSource"/></property>										
 	</bean>
 	
-	<bean id="spreadsheetService" class="org.lamsfoundation.lams.admin.service.SpreadsheetService">
+	<bean id="importService" class="org.lamsfoundation.lams.admin.service.ImportService">
    		<property name="service">
    			<ref bean="userManagementService"/>
    		</property>

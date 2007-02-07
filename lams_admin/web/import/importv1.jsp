@@ -1,24 +1,26 @@
 <%@ include file="/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.admin.service.ISpreadsheetService" %>
+<%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.importv1.title" />
 </h2>
 
-<lams:help page="<%= ISpreadsheetService.IMPORTV1_HELP_PAGE %>"/>
+<lams:help page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 
 <p>
-<ol>
-	<li><fmt:message key="msg.importv1.1"/> <a href="file/lams1_user_org_export.sql">lams1_user_org_export.sql</a>.</li>
+<ul>
+	<li><fmt:message key="msg.importv1.1"/></li>
+		<ul><li><p><a href="file/lams1_user_org_export.sql">lams1_user_org_export.sql</a></p></li></ul>
 	<li><fmt:message key="msg.importv1.2"/>:
-		<p>shell> mysql lamsone < lams1_user_org_export.sql -u root -p > lams1_users_orgs.txt</p>
+		<ul><li><p>shell> mysql lamsone < lams1_user_org_export.sql -u root -p > lams1_users_orgs.txt</p></li></ul>
 	</li>
 	<li><fmt:message key="msg.importv1.3a"/> lams1_users_orgs.txt <fmt:message key="msg.importv1.3b"/>&nbsp;&nbsp;
 	<fmt:message key="msg.importv1.4"/></li>
-</ol>
+	<li><fmt:message key="msg.importv1.5"/></li>
+</ul>
 </p>
 
 <p>&nbsp;</p>

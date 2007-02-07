@@ -35,7 +35,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.admin.service.ISpreadsheetService;
+import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -63,12 +63,12 @@ public class ImportExcelSaveAction extends Action {
 		}
 		
 		MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		ISpreadsheetService spreadsheetService = AdminServiceProxy.getSpreadsheetService(getServlet().getServletContext());
+		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
 		ImportExcelForm importExcelForm = (ImportExcelForm)form;
 		FormFile file = importExcelForm.getFile();
 		
-		List results = spreadsheetService.parseSpreadsheet(file);
-		String successMessageKey = (spreadsheetService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
+		List results = importService.parseSpreadsheet(file);
+		String successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
 		
 		int successful = 0;
 		for(int i=0; i<results.size(); i++) {

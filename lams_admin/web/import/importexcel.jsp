@@ -1,12 +1,12 @@
 <%@ include file="/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.admin.service.ISpreadsheetService" %>
+<%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.user.import" />
 </h2>
 
-<lams:help page="<%= ISpreadsheetService.IMPORT_HELP_PAGE %>"/>
+<lams:help page="<%= IImportService.IMPORT_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 
@@ -18,11 +18,11 @@
 	</li>
 	<li>
 		<fmt:message key="msg.import.2"/>
-		<ul><li><a href="file/lams_users_template.xls">lams_users_template.xls</a></li></ul>
+		<ul><li><p><a href="file/lams_users_template.xls">lams_users_template.xls</a></p></li></ul>
 	</li>
 	<li>
 		<fmt:message key="msg.import.3"/>
-		<ul><li><a href="file/lams_roles_template.xls">lams_roles_template.xls</a></li></ul>
+		<ul><li><p><a href="file/lams_roles_template.xls">lams_roles_template.xls</a></p></li></ul>
 	</li>
 </ul>
 </p>

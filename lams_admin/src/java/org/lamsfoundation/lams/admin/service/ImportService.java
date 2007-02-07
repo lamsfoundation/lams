@@ -66,9 +66,9 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  * @author <a href="mailto:jliew@melcoe.mq.edu.au">Jun-Dir Liew</a>
  */
-public class SpreadsheetService implements ISpreadsheetService {
+public class ImportService implements IImportService {
 
-	private static Logger log = Logger.getLogger(SpreadsheetService.class);
+	private static Logger log = Logger.getLogger(ImportService.class);
 	public IUserManagementService service;
 	public MessageService messageService;
 	public IAuditService auditService;

@@ -1,9 +1,12 @@
 <%@ include file="/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.importv1.title" />
 </h2>
+
+<lams:help page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 
@@ -72,7 +75,7 @@ function toggleSessions(){
 	<!--<input type="submit" class="button" value="Ok"
 		onclick="javascript:document.location='sysadminstart.do';" />
 	-->	
-	<html:submit styleClass="button"><fmt:message key="admin.save"/></html:submit>
+	<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit>
 	<html:reset styleClass="button"><fmt:message key="admin.reset"/></html:reset>
 	<html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>

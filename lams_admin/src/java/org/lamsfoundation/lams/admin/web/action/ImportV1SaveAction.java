@@ -35,7 +35,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.admin.service.ISpreadsheetService;
+import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.dto.V1OrganisationDTO;
 import org.lamsfoundation.lams.admin.web.dto.V1UserDTO;
 import org.lamsfoundation.lams.admin.web.form.ImportV1Form;
@@ -67,12 +67,12 @@ public class ImportV1SaveAction extends Action {
 		}
 		
 		//MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		ISpreadsheetService spreadsheetService = AdminServiceProxy.getSpreadsheetService(getServlet().getServletContext());
+		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
 		ImportV1Form importV1Form = (ImportV1Form)form;
 		FormFile file = importV1Form.getFile();
 		boolean includeIntegrated = importV1Form.getIntegrated();
 		
-		List<List> results = spreadsheetService.parseV1UsersFile(file, includeIntegrated);
+		List<List> results = importService.parseV1UsersFile(file, includeIntegrated);
 		List<V1UserDTO> users = results.get(0);
 		List<V1OrganisationDTO> orgs = results.get(1);
 		

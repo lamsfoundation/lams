@@ -32,3 +32,10 @@
 </logic:iterate>
 </table>
 </logic:notEmpty>
+
+<p>&nbsp;</p>
+
+<p>
+	<input type="submit" class="button" value="Ok"
+		onclick="javascript:document.location='sysadminstart.do';" />
+</p>
