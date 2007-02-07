@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -96,8 +97,19 @@ public class ImportV1ContentsSaveAction extends Action {
 		
 		// import options
 		ImportV1ContentsForm importV1ContentsForm = (ImportV1ContentsForm)form;
-		List<String> orgSids = Arrays.asList(importV1ContentsForm.getOrgSids());
-		List<String> sessSids = Arrays.asList(importV1ContentsForm.getSessSids());
+		String[] sids;
+		List<String> orgSids;
+		if ((sids=importV1ContentsForm.getOrgSids())==null) {
+			orgSids = new ArrayList<String>();
+		} else {
+			orgSids = Arrays.asList(sids);
+		}
+		List<String> sessSids;
+		if ((sids=importV1ContentsForm.getSessSids())==null) {
+			sessSids = new ArrayList<String>();
+		} else {
+			sessSids = Arrays.asList(sids);
+		}
 		boolean onlyMembers = importV1ContentsForm.getOnlyMembers();
 		
 		// default import options
@@ -228,6 +240,10 @@ public class ImportV1ContentsSaveAction extends Action {
 		
 		User newUser = new User();
 		BeanUtils.copyProperties(newUser, user);
+		
+		// password must be sha1'ed, not md5'ed as in v1; so we use the login as the password
+		newUser.setPassword(HashUtil.sha1(user.getLogin()));
+		
 		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 		List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
 		if (list!=null) {
