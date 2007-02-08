@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -233,6 +234,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	        logger.debug("error during validation");
 	    }
 	    
+	    // this is the user id of the current user, set up in validateParameters
 	    String userID=qaLearningForm.getUserID();
 		logger.debug("userID: " + userID);
 		
@@ -447,38 +449,39 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	/* by now, we know that the mode is either teacher or learner
     	 * check if the mode is teacher and request is for Learner Progress
     	 */
-		logger.debug("userID: " + userID);
-		String learnerProgressUserId=request.getParameter(USER_ID);
-		logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+		logger.debug("current userID: " + userID);
+		String learnerProgressUserIdString = WebUtil.readStrParam(request, AttributeNames.PARAM_USER_ID, true);
+		logger.debug("learnerProgressUserId: " + learnerProgressUserIdString);
 		
-		if ((learnerProgressUserId != null) && (mode.equals("teacher")))
+		if ((learnerProgressUserIdString != null) && (mode.equals("teacher")))
 		{
 			logger.debug("start generating learner progress report for toolSessionID: " + toolSessionID);
-	    	
-	    	/* the report should have only this user's entries(with userId)*/
+			
+	    	/* the report should have the all entries for the users in this tool session,
+	    	 * and display under the "my answers" section the answers for the user id in the url */
+			qaLearningForm.setUserID(learnerProgressUserIdString);
+			Long learnerProgressUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
 	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 	    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    	generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 	    	
-	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, toolSessionID, learnerProgressUserId, 
+	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, qaContent.isUsernameVisible(), true, 
+	    			toolSessionID, learnerProgressUserIdString, 
 	    	        generalLearnerFlowDTO, false, toolSessionID);
     		
 	    	logger.debug("presenting teacher's report");
 	    	
-	    	
-    	    HttpSession ss = SessionManager.getSession();
-    	    /* get back login user DTO */
-    	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-        	Long userId=new Long(toolUser.getUserID().longValue());
+        	QaQueUsr qaQueUsrLocal=qaService.getQaUserBySession(learnerProgressUserId, qaSession.getUid());
         	
-        	QaQueUsr qaQueUsrLocal=qaService.getQaUserBySession(userId, qaSession.getUid());
-        	logger.debug("qaQueUsrLocal: " + qaQueUsrLocal);
-        	logger.debug("qaQueUsrLocal uid : " + qaQueUsrLocal.getUid());
+        	if ( qaQueUsrLocal != null ) {
+        		logger.debug("qaQueUsrLocal uid : " + qaQueUsrLocal.getUid());
+        		generalLearnerFlowDTO.setUserUid(qaQueUsrLocal.getUid().toString());
+        	} else {
+        		generalLearnerFlowDTO.setUserUid(null);     		
+        	}
         	
-    	    generalLearnerFlowDTO.setUserUid(qaQueUsrLocal.getUid().toString());
-	    	
 	    	logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
     		
     		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		    		
@@ -557,7 +560,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 		    		    	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
-		    		    	        currentToolSessionID.toString(), null, generalLearnerFlowDTO, false, toolSessionID);
+		    		    	        currentToolSessionID.toString(), userID, generalLearnerFlowDTO, false, toolSessionID);
 		    		    	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 
 		    			    logger.debug("current sessionMap: " + sessionMap);

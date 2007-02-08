@@ -1660,10 +1660,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
     
     /**
-     * populates data for summary screen
-     * refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
-			
+     * populates data for summary screen, view all results screen and export portfolio.
+ 	 *
+	 * User id is needed if isUserNamesVisible is false && learnerRequest is true, 
+	 * as it is required to work out if the data being analysed is the current user.
+	 *
      * @param request
      * @param qaContent
      * @param qaService

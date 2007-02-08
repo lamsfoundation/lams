@@ -38,22 +38,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			<div id="content">
 		
-			<h1>
 			<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-				<c:if test="${(portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
-				<c:if test="${(portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/> </h1></c:if>			
+				<c:if test="${(portfolioExportMode == 'learner')}"><h1><fmt:message key="label.export.learner"/></h1></c:if>			
+				<c:if test="${(portfolioExportMode != 'learner')}"><h1><fmt:message key="label.export.teacher"/></h1></c:if>			
 			</c:if>
-	        </h1>
 			
-				<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
-						<table align="center">
-							<tr> 
-								<td NOWRAP valign=top align=center> 
-									<b>  <fmt:message key="error.noLearnerActivity"/> </b>
-								</td> 
-							<tr>
-						</table>
-				</c:if>			
+			<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+					<table align="center">
+						<tr> 
+							<td NOWRAP valign=top align=center> 
+								<b>  <fmt:message key="error.noLearnerActivity"/> </b>
+							</td> 
+						<tr>
+					</table>
+			</c:if>			
 		
 		
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
@@ -179,40 +177,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 					
-						<tr>			
-							<td valign=top class="align-left">
-								<table align=center>
+				<c:forEach var="currentDto" items="${reflectionsContainerDTO}" varStatus="status">
+				
+					<%-- Reflection heading - do first time through loop --%>								
+					<c:if test="${status.first}">
+						<tr><td valign=top class="align-left">
+						<table align=center>
 								
-										<tr>			
-											<td colspan=3 valign=top align=center>
-												<b>  <fmt:message key="label.reflection"/>  </b> 
-											 </td>
-										</tr>	
-								
-								
-									<c:forEach var="currentDto" items="${reflectionsContainerDTO}">
-							  	 		<c:set var="userName" scope="request" value="${currentDto.userName}"/>
-							  	 		<c:set var="userId" scope="request" value="${currentDto.userId}"/>
-							  	 		<c:set var="sessionId" scope="request" value="${currentDto.sessionId}"/>
-							  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
-							  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
-										<tr>			
-											<td valign=top class="align-left">
-												  <b>  <fmt:message key="label.user"/>:  </b>
-											 </td>
+							<tr>			
+								<td colspan=3 valign=top align=center>
+									<b>  <fmt:message key="label.reflection"/>  </b> 
+								 </td>
+							</tr>			
+					</c:if>						
 
-											<td valign=top class="align-left">
-	 												  <c:out value="${userName}" escapeXml="false"/> 
-											 </td>
+					<%-- The actual output of a reflection --%>								
+				  	 		<c:set var="userName" scope="request" value="${currentDto.userName}"/>
+				  	 		<c:set var="userId" scope="request" value="${currentDto.userId}"/>
+				  	 		<c:set var="sessionId" scope="request" value="${currentDto.sessionId}"/>
+				  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
+				  	 		<c:set var="entry" scope="request" value="${currentDto.entry}"/>
+							<tr>			
+								<td valign=top class="align-left">
+									  <b>  <fmt:message key="label.user"/>:  </b>
+								 </td>
 
-											<td valign=top class="align-left">
-												 <c:out value="${entry}" escapeXml="false"/> 
-											 </td>
-										</tr>	
-									</c:forEach>		
-								</table>  	
-							 </td>
-						</tr>	
+								<td valign=top class="align-left">
+											  <c:out value="${userName}" escapeXml="false"/> 
+								 </td>
+
+								<td valign=top class="align-left">
+									 <c:out value="${entry}" escapeXml="false"/> 
+								 </td>
+							</tr>	
+
+					<%-- Close off table / rows - do last time through loop --%>								
+					<c:if test="${status.last}">
+						</table>  	
+						</td></tr>	
+					</c:if>								
+				</c:forEach>		
 
 					
 			</table>			

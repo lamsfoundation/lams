@@ -552,6 +552,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
     
     /**
+     * Stores all results and moves onto the next step.
+     * If view other users answers = true, then goes to the 
+     * view all answers screen, otherwise goes straight
+     * to the reflection screen (if any).
+     * 
 	 * returns Learner Report for a session
 	 * ActionForward viewAllResults(ActionMapping mapping,
             ActionForm form,
@@ -567,7 +572,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-    public ActionForward viewAllResults(ActionMapping mapping,
+    public ActionForward storeAllResults(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
@@ -627,12 +632,23 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         learningUtil.setContentInUse(new Long(toolContentID).longValue(), qaService);
         logger.debug("content has been set in use");
         
-        logger.debug("start generating learning report...");
+        if ( qaContent.isShowOtherAnswers() ) {
+        	return prepareViewAllAnswers(mapping, request, qaLearningForm, qaService, toolSessionID, userID, qaSession, toolContentID, qaContent, generalLearnerFlowDTO, isUserNamesVisible);
+        } else if ( qaContent.isReflect() ) {
+        	return forwardtoReflection(mapping, request, qaContent, qaService, toolSessionID, userID, qaLearningForm);
+        } else {
+        	return endLearning(mapping, qaLearningForm, request, response);
+        }
+	}
+
+    /** Set up the data for the view all answers screen */
+	private ActionForward prepareViewAllAnswers(ActionMapping mapping, HttpServletRequest request, QaLearningForm qaLearningForm, IQaService qaService, String toolSessionID, String userID, QaSession qaSession, String toolContentID, QaContent qaContent, GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean isUserNamesVisible) {
+		logger.debug("start generating learning report...");
         logger.debug("toolContentID: " + toolContentID);
 
 
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, null, 
+    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, userID, 
     	        generalLearnerFlowDTO, false , toolSessionID);
 
 		generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -787,7 +803,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID, null, 
+    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
+    			toolSessionID, userID, 
     	        generalLearnerFlowDTO, false , toolSessionID);
 
 		generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -1261,7 +1278,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
     	logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, 
-    	        toolSessionID, null, generalLearnerFlowDTO, false, toolSessionID);
+    	        toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
     	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
     	
     	
@@ -1440,7 +1457,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	 	String userID=request.getParameter("userID");
 	 	logger.debug("userID: " + userID);	 	
 	 	qaLearningForm.setUserID(userID);
-
+	 	
+	 	return forwardtoReflection(mapping, request, qaContent, qaService, toolSessionID, userID, qaLearningForm) ;
+	}
+	 	
+	private ActionForward forwardtoReflection(ActionMapping mapping, HttpServletRequest request, 
+			QaContent qaContent, IQaService qaService, String toolSessionID,
+			String userID, QaLearningForm qaLearningForm)  {
 	    
         GeneralLearnerFlowDTO generalLearnerFlowDTO= new GeneralLearnerFlowDTO();
         generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());

@@ -114,7 +114,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(content);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
-    	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, true, toolSessionID.toString(), 
+    	qaMonitoringAction.refreshSummaryData(request, content, qaService, content.isUsernameVisible(), true, toolSessionID.toString(), 
     	        userID.toString(), generalLearnerFlowDTO, false, toolSessionID.toString());
     	logger.debug("end refreshSummaryData for learner mode.");
     	

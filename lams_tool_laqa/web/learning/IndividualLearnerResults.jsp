@@ -144,7 +144,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${generalLearnerFlowDTO.showOtherAnswers == 'true'}">
 				<html:button property="viewAllResults"
-					onclick="submitMethod('viewAllResults');" styleClass="button">
+					onclick="submitMethod('storeAllResults');" styleClass="button">
 					<fmt:message key="label.allResponses" />
 				</html:button>
 			</c:if>				
@@ -152,7 +152,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${generalLearnerFlowDTO.showOtherAnswers != 'true'}">
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 					<html:button property="endLearning" styleId="finishButton"
-						onclick="javascript:submitMethod('endLearning');"
+						onclick="javascript:submitMethod('storeAllResults');"
 						styleClass="button">
 						<fmt:message key="button.endLearning" />
 					</html:button>
@@ -160,7 +160,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
 					<html:button property="forwardtoReflection"
-						onclick="javascript:submitMethod('forwardtoReflection');"
+						onclick="javascript:submitMethod('storeAllResults');"
 						styleClass="button">
 						<fmt:message key="label.continue" />
 					</html:button>
