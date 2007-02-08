@@ -166,6 +166,7 @@ public class IndexAction extends Action {
 				orgBeans.add(iob);
 			}
 		}
+		Collections.sort(orgBeans);
 		request.setAttribute("orgBeans",orgBeans);
 		if(state.equals(OrganisationState.ACTIVE))
 			return mapping.findForward("main");
@@ -287,6 +288,7 @@ public class IndexAction extends Action {
 					childOrgBeans.add(createOrgBean(organisation,classRoles,username,isSysAdmin));
 				}
 			}
+			Collections.sort(childOrgBeans);
 			orgBean.setChildIndexOrgBeans(childOrgBeans);
 		}
 		return orgBean;

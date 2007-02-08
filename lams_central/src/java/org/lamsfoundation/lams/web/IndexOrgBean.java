@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.lamsfoundation.lams.usermanagement.Role;
+
 /**
  * @version
  *
@@ -37,7 +39,7 @@ import java.util.List;
  *
  * Created at 10:01:23 on 14/06/2006
  */
-public class IndexOrgBean {
+public class IndexOrgBean implements Comparable {
 	
 	private String name;
 	private Date archivedDate;
@@ -126,5 +128,10 @@ public class IndexOrgBean {
 	public void setArchivedDate(Date archivedDate) {
 		this.archivedDate = archivedDate;
 	}
+	
+	public int compareTo(Object indexOrgBean){
+    	IndexOrgBean b = (IndexOrgBean)indexOrgBean;
+	    return name.compareTo(b.getName());
+    }
 
 }
