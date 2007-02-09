@@ -201,6 +201,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					escapeXml="false" />
 			
 
+				<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 				<br>
 						<html:button property="forwardtoReflection" styleClass="button"
 							onclick="submitMethod('forwardtoReflection');"> 
@@ -208,13 +209,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</html:button>
 
 
-
-			<div class="space-bottom-top align-right">
-				<html:submit property="learnerFinished" styleClass="button" styleId="finishButton"
-					onclick="submitMethod('learnerFinished');">
-					<fmt:message key="label.finished" />
-				</html:submit>
-			</div>
+					<div class="space-bottom-top align-right">
+						<html:submit property="learnerFinished" styleClass="button" styleId="finishButton"
+							onclick="submitMethod('learnerFinished');">
+							<fmt:message key="label.finished" />
+						</html:submit>
+					</div>
+				</c:if>
 
 		</html:form>
 

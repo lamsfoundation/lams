@@ -78,13 +78,6 @@
 	        path="/monitoring/LearnerRep.jsp"
 		    redirect="false"
 	      />
-
-	    <forward
-	        name="individualLearnerReport"
-	        path="/learning/LearnerRep.jsp"
-		    redirect="false"
-	      />
-
 	  	
 	  	<forward
 		    name="viewAnswers"
@@ -160,6 +153,7 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -309,21 +303,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	logger.debug("is vote lockOnFinish: " + voteContent.isLockOnFinish());
 	 
 	
-	logger.debug("attempt getting notebookEntry: ");
-	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
-			CoreNotebookConstants.NOTEBOOK_TOOL,
-			MY_SIGNATURE, new Integer(userID));
-	
-    logger.debug("notebookEntry: " + notebookEntry);
-	
-	if (notebookEntry != null) {
-	    String notebookEntryPresentable=VoteUtils.replaceNewLines(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-	}
-
-    
-    
-    
 	/* Is the request for a preview by the author?
 	Preview The tool must be able to show the specified content as if it was running in a lesson. 
 	It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
@@ -361,29 +340,44 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	
 	if ((learnerProgressUserId != null) && (mode.equals("teacher")))
 	{
-		logger.debug("start generating learner progress report.");
-		String currentToolSessionId=voteLearningForm.getToolSessionID();
-    	logger.debug("currentToolSessionId: " + currentToolSessionId);
-    	
-    	/* the report should have only this user's entries(with userId)*/
-        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+		VoteQueUsr voteQueUsr=voteService.getVoteUserBySession(new Long(learnerProgressUserId), voteSession.getUid());
 
-    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
-    	voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, true, currentToolSessionId.toString(), 
-    	        learnerProgressUserId, true, voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, null);
-    	
-    	voteGeneralLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
-    	voteGeneralLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
-    	voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
-    	
-    	logger.debug("learner progress voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
-    	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
-		logger.debug("fwd'ing to for learner progress" + INDIVIDUAL_LEARNER_REPORT);
-		return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));		
+		if ( voteQueUsr != null ) {
 
+			Long sessionUid=voteQueUsr.getVoteSessionId();
+	
+    		logger.debug("start building MAP_GENERAL_CHECKED_OPTIONS_CONTENT");
+    		String toolContentId=voteLearningForm.getToolContentID();
+	    	logger.debug("toolContentId: " + toolContentId);
+
+	    	putMapQuestionsContentIntoRequest(request, voteService, voteQueUsr);
+    
+     		logger.debug("geting user answers for user uid and sessionUid" + voteQueUsr.getUid() + " " + sessionUid);
+     		Set userAttempts=voteService.getAttemptsForUserAndSessionUseOpenAnswer(voteQueUsr.getUid(), sessionUid);
+    		logger.debug("userAttempts: "+ userAttempts);
+    		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+    		
+		} else {
+			request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, new TreeMap(new VoteComparator()));
+			request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, new HashSet());
+		}
+		
+        logger.debug("since this is progress view, present a screen which can not be edited");
+ 		voteLearningForm.setReportViewOnly(new Boolean(true).toString());
+ 		voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
+ 		voteGeneralLearnerFlowDTO.setLearningMode(mode);
+ 		putNotebookEntryIntoVoteGeneralLearnerFlowDTO(voteService, voteGeneralLearnerFlowDTO, toolSessionID, learnerProgressUserId);
+	    
+ 		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
+	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+
+   	    logger.debug("fwd'ing to: " + EXIT_PAGE);
+   	    return (mapping.findForward(EXIT_PAGE));
 	}
 	
 	/* by now, we know that the mode is learner*/
+	putNotebookEntryIntoVoteGeneralLearnerFlowDTO(voteService, voteGeneralLearnerFlowDTO, toolSessionID, userID);
     
     /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
     boolean isRunOffline=VoteUtils.isRunOffline(voteContent);
@@ -448,133 +442,148 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     
     String learningMode=voteLearningForm.getLearningMode();
     logger.debug("users learning mode is: " + learningMode);
-    
-    boolean finalScreenRequested=false; 
-    
+        
     /*the user's session id AND user id exists in the tool tables 
      *goto this screen if the OverAll Results scren has been already called up by this user*/
-    if (voteQueUsr != null) 
+    if (voteQueUsr != null && voteQueUsr.isFinalScreenRequested()) 
     {
-        finalScreenRequested=voteQueUsr.isFinalScreenRequested(); 
-        logger.debug("finalScreenRequested:" + finalScreenRequested);
-        
-        if (finalScreenRequested)
-        {
-        	Long sessionUid=voteQueUsr.getVoteSessionId();
-        	logger.debug("users sessionUid: " + sessionUid);
-        	VoteSession voteUserSession= voteService.getVoteSessionByUID(sessionUid);
-        	logger.debug("voteUserSession: " + voteUserSession);
-        	String userSessionId=voteUserSession.getVoteSessionId().toString();
-        	logger.debug("userSessionId: " + userSessionId);
-        	logger.debug("current toolSessionID: " + toolSessionID);
+    	Long sessionUid=voteQueUsr.getVoteSessionId();
+    	logger.debug("users sessionUid: " + sessionUid);
+    	VoteSession voteUserSession= voteService.getVoteSessionByUID(sessionUid);
+    	logger.debug("voteUserSession: " + voteUserSession);
+    	String userSessionId=voteUserSession.getVoteSessionId().toString();
+    	logger.debug("userSessionId: " + userSessionId);
+    	logger.debug("current toolSessionID: " + toolSessionID);
 
-        	if (toolSessionID.toString().equals(userSessionId))
-        	{
-        	    logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
-        	    
-        		logger.debug("start building MAP_GENERAL_CHECKED_OPTIONS_CONTENT");
-        		String toolContentId=voteLearningForm.getToolContentID();
-    	    	logger.debug("toolContentId: " + toolContentId);
+    	if (toolSessionID.toString().equals(userSessionId))
+    	{
+    	    logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+    	    
+    		logger.debug("start building MAP_GENERAL_CHECKED_OPTIONS_CONTENT");
+    		String toolContentId=voteLearningForm.getToolContentID();
+	    	logger.debug("toolContentId: " + toolContentId);
 
-    	    	List attempts=voteService.getAttemptsForUser(voteQueUsr.getUid());
-    	    	logger.debug("attempts: " + attempts);
-    	    	
-    	    	Map localMapQuestionsContent= new TreeMap(new VoteComparator());
-    			Iterator listIterator=attempts.iterator();
-    			int order=0;
-    	    	while (listIterator.hasNext())
-    	    	{
-    	    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
-    	        	logger.debug("attempt: " + attempt);
-    	        	VoteQueContent voteQueContent=attempt.getVoteQueContent();
-    	        	logger.debug("voteQueContent: " + voteQueContent);        	
-    	        	order++;
-    	    		if (voteQueContent != null)
-    	    		{
-    	    		    String entry=voteQueContent.getQuestion(); 
-    	    		    logger.debug("entry: " + entry);
-    	    		    
-    	    		    String voteQueContentId=attempt.getVoteQueContentId().toString();	    
-    	    		    logger.debug("voteQueContentId: " + voteQueContentId);
-    	    		    if (entry != null)
-    	    		    {
-    		    		    if (entry.equals("sample nomination")  &&  (voteQueContentId.equals("1")))
-    		    		    {
-    		    		        logger.debug("this nomination entry points to a user entered nomination: " + attempt.getUserEntry());
-    		    		        localMapQuestionsContent.put(new Integer(order).toString(), attempt.getUserEntry());
-    		    		    }
-    		    		    else
-    		    		    {
-    		    		        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
-    		    		        localMapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());    
-    		    		    }
-    	    		    }
-    	    		}
-    	    	}
-    	    	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
-        		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
-        
-        	    boolean isResponseFinalised=voteQueUsr.isResponseFinalised();
-        	    logger.debug("isResponseFinalised: " + isResponseFinalised);
-        	    if (isResponseFinalised)
-        	    {
-        	        logger.debug("since the response is finalised present a screen which can not be edited");
-             		voteLearningForm.setReportViewOnly(new Boolean(true).toString());
-             		voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
-        	    }
-        	    
-         		logger.debug("geting user answers for user uid and sessionUid" + voteQueUsr.getUid() + " " + sessionUid);
-         		Set userAttempts=voteService.getAttemptsForUserAndSessionUseOpenAnswer(voteQueUsr.getUid(), sessionUid);
-        		logger.debug("userAttempts: "+ userAttempts);
-        		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+	    	putMapQuestionsContentIntoRequest(request, voteService, voteQueUsr);
+    
+    	    boolean isResponseFinalised=voteQueUsr.isResponseFinalised();
+    	    logger.debug("isResponseFinalised: " + isResponseFinalised);
+    	    if (isResponseFinalised)
+    	    {
+    	        logger.debug("since the response is finalised present a screen which can not be edited");
+         		voteLearningForm.setReportViewOnly(new Boolean(true).toString());
+         		voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
+    	    }
+    	    
+     		logger.debug("geting user answers for user uid and sessionUid" + voteQueUsr.getUid() + " " + sessionUid);
+     		Set userAttempts=voteService.getAttemptsForUserAndSessionUseOpenAnswer(voteQueUsr.getUid(), sessionUid);
+    		logger.debug("userAttempts: "+ userAttempts);
+    		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
-        		
-         		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
-        	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-        	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+    		
+     		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+    	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
+    	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
 
-        	    
-        	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
-        	    logger.debug("isContentLockOnFinish: " + isContentLockOnFinish);
-        	    if ((isContentLockOnFinish.equals(new Boolean(true).toString()) && (isResponseFinalised == true)))
-                {
-            	    logger.debug("user with session id: "  + userSessionId + " should not redo votes. session  is locked.");
-            	    logger.debug("fwd'ing to: " + EXIT_PAGE);
-            	    return (mapping.findForward(EXIT_PAGE));
-                }
-        	    
-        		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " voteQueUsr: " + 
-        				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
-        		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
-        		voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(true).toString());
-         		logger.debug("preparing chart data for readonly mode");
+    	    
+    	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
+    	    logger.debug("isContentLockOnFinish: " + isContentLockOnFinish);
+    	    if ((isContentLockOnFinish.equals(new Boolean(true).toString()) && (isResponseFinalised == true)))
+            {
+        	    logger.debug("user with session id: "  + userSessionId + " should not redo votes. session  is locked.");
+        	    logger.debug("fwd'ing to: " + EXIT_PAGE);
+        	    return (mapping.findForward(EXIT_PAGE));
+            }
+    	    
+    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " voteQueUsr: " + 
+    				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
+    		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
+    		voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(true).toString());
+     		logger.debug("preparing chart data for readonly mode");
 
-         		
-         		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
-         		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
-         		
-        	    if ((isContentLockOnFinish.equals(new Boolean(false).toString()) && (isResponseFinalised == true)))
-        	    {
-            	    logger.debug("isContentLockOnFinish is false, enable redo of votes : ");
-        	    	logger.debug("fwd'ing to: " + REVISITED_ALL_NOMINATIONS);
-        	    	return (mapping.findForward(REVISITED_ALL_NOMINATIONS));
-        	    }
+     		
+     		logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
+     		request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO,voteGeneralLearnerFlowDTO);
+     		
+    	    if ((isContentLockOnFinish.equals(new Boolean(false).toString()) && (isResponseFinalised == true)))
+    	    {
+        	    logger.debug("isContentLockOnFinish is false, enable redo of votes : ");
+    	    	logger.debug("fwd'ing to: " + REVISITED_ALL_NOMINATIONS);
+    	    	return (mapping.findForward(REVISITED_ALL_NOMINATIONS));
+    	    }
 
-         		
-         		logger.debug("fwd'ing to: " + ALL_NOMINATIONS);
-        		return (mapping.findForward(ALL_NOMINATIONS));
-        	}
-        }
-    }
-    else if (learningMode.equals("teacher"))
-    {
-    	VoteLearningAction voteLearningAction= new VoteLearningAction();
-    	logger.debug("present to teacher learners progress...");
-    	return null;
+     		
+     		logger.debug("fwd'ing to: " + ALL_NOMINATIONS);
+    		return (mapping.findForward(ALL_NOMINATIONS));
+    	}
     }
     logger.debug("presenting standard learner screen..");
     return (mapping.findForward(LOAD_LEARNER));	
 }
+
+	private void putNotebookEntryIntoVoteGeneralLearnerFlowDTO(IVoteService voteService, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO, String toolSessionID, String userID) {
+		logger.debug("attempt getting notebookEntry: ");
+		NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				MY_SIGNATURE, new Integer(userID));
+		
+		logger.debug("notebookEntry: " + notebookEntry);
+		
+		if (notebookEntry != null) {
+		    String notebookEntryPresentable=VoteUtils.replaceNewLines(notebookEntry.getEntry());
+		    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+		}
+	}
+
+	/** Build the attempts map and put it in the request, based on the supplied user. 
+	 * If the user is null then the map will be set but it will be empty 
+	 * TODO This shouldn't go in the request, it should go in our special session map. */
+	private void putMapQuestionsContentIntoRequest(HttpServletRequest request, IVoteService voteService, VoteQueUsr voteQueUsr) {
+		List attempts=null;
+		if ( voteQueUsr != null ) {
+			attempts = voteService.getAttemptsForUser(voteQueUsr.getUid());
+		} 
+		logger.debug("attempts: " + attempts);
+
+		Map localMapQuestionsContent= new TreeMap(new VoteComparator());
+
+		if ( attempts != null ) {
+		
+			Iterator listIterator=attempts.iterator();
+			int order=0;
+			while (listIterator.hasNext())
+			{
+			    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+				logger.debug("attempt: " + attempt);
+				VoteQueContent voteQueContent=attempt.getVoteQueContent();
+				logger.debug("voteQueContent: " + voteQueContent);        	
+				order++;
+				if (voteQueContent != null)
+				{
+				    String entry=voteQueContent.getQuestion(); 
+				    logger.debug("entry: " + entry);
+				    
+				    String voteQueContentId=attempt.getVoteQueContentId().toString();	    
+				    logger.debug("voteQueContentId: " + voteQueContentId);
+				    if (entry != null)
+				    {
+					    if (entry.equals("sample nomination")  &&  (voteQueContentId.equals("1")))
+					    {
+					        logger.debug("this nomination entry points to a user entered nomination: " + attempt.getUserEntry());
+					        localMapQuestionsContent.put(new Integer(order).toString(), attempt.getUserEntry());
+					    }
+					    else
+					    {
+					        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
+					        localMapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());    
+					    }
+				    }
+				}
+			}
+		}
+		
+		request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
+		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
+	}
 
 
 	/**
