@@ -30,7 +30,7 @@
 
 
 # constants
-!define VERSION "2006-12-22" ; DATE of language pack in fromat YYYYMMDD
+!define VERSION "2007-02-09" ; DATE of language pack in fromat YYYYMMDD
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams is deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 

@@ -16,7 +16,7 @@ create table locale_temp  (
 -- given by SELECT CONCAT_WS(',',l.language_iso_code,l.country_iso_code) FROM lams_supported_locale l
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('en','AU','English (Australia)','LTR','en,AU');
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('es','ES','Español','LTR','es,ES');
---INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('mi','NZ','Māori','LTR','mi,NZ');
+INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('mi','NZ','Māori','LTR','mi,NZ');
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('de','DE','Deutsch','LTR','de,DE');
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('zh','CN','简体中文','LTR','zh,CN');
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('fr','FR','Français','LTR','fr,FR');
@@ -28,7 +28,7 @@ INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direc
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('pt','BR','Português (Brasil)','LTR','pt,BR');
 --INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('hu','HU','Magyar','LTR','hu,HU');
 --INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('bg','BG','Български','LTR','bg,BG');
---INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('cy','GB','Cymraeg (Cymru)','LTR','cy,GB');
+INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('cy','GB','Cymraeg (Cymru)','LTR','cy,GB');
 --INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('th','TH','Thai','LTR','th,TH');
 INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('el','GR','Ελληνικά','LTR','el,GR');
 --INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined) VALUES ('nl','BE','Nederlands (België)','LTR','nl,BE');
@@ -43,6 +43,6 @@ INSERT INTO lams_supported_locale (language_iso_code, country_iso_code, descript
 FROM locale_temp t WHERE t.combined NOT IN
 (SELECT CONCAT_WS(',',l.language_iso_code,l.country_iso_code) FROM lams_supported_locale l));
 
-UPDATE lams_configuration set config_value='2006-12-22' WHERE config_key='DictionaryDateCreated';
+UPDATE lams_configuration set config_value='2007-02-09' WHERE config_key='DictionaryDateCreated';
 
 drop table if exists locale_temp;
