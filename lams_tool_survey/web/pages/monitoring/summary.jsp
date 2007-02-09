@@ -166,7 +166,7 @@
 					<tr>
 						<td >
 							<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="button">
-									<fmt:message key="label.monitoring..button.export.excel" />
+									<fmt:message key="label.monitoring.button.export.excel" />
 							</html:link>
 						</td>
 					</tr>		
