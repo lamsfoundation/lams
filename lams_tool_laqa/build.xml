@@ -394,8 +394,7 @@
 		</target>
 		
 
-		<target name="deploy-tool" depends="delete-exploded-tool-folder,create-deploy-package" 
-			description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
+		<target name="run-deploy-package" description="Run the deploy tool.">
 
 			<path id="deploy.classpath">
 				<fileset dir="${build.deploy}">
@@ -413,6 +412,10 @@
 					<arg value="True"/> 
 			</java>
 						
+		</target>
+		
+		<target name="deploy-tool" depends="create-deploy-package, run-deploy-package" 
+	   		description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
 		</target>
 	
 			<target name="test-report" depends="compile.test"> 
