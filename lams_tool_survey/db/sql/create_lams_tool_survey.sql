@@ -35,7 +35,7 @@ question_uid bigint,
 user_uid bigint, 
 answer_choices varchar(255), 
 udpate_date datetime, 
-answer_text varchar(255), 
+answer_text text, 
 primary key (uid)
 );
 
