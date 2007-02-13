@@ -55,7 +55,7 @@ VALUES
 'Voting',
 'Voting',
 'vote',
-'20061113',
+'@tool_version@',
 NULL,
 NULL,
 0,

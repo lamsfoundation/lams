@@ -36,7 +36,7 @@ VALUES
 'Survey',
 'Survey',
 'survey',
-'20070208',
+'@tool_version@',
 NULL,
 NULL,
 0,
