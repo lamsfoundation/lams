@@ -34,7 +34,7 @@ VALUES
 'Forum',
 'Forum / Message Boards',
 'forum',
-'20061102',
+'@tool_version@',
 NULL,
 NULL,
 0,
