@@ -302,8 +302,16 @@ Ant build file.
 						<include name="create_lams_tool_example.sql"/>
 						<include name="activity_insert.sql"/>
 						<include name="library_insert.sql"/>
-						<include name="tool_insert.sql"/>
 					</fileset>
+				</copy>
+			
+				<copy overwrite="yes" todir="${build.deploy}/sql">
+								<fileset dir="${db.scripts}/">
+									<include name="tool_insert.sql" />
+								</fileset>	
+								<filterset>
+									<filter token="tool_version" value="${tool.version}" />
+								</filterset>
 				</copy>
 
 				<copy overwrite="yes" todir="${build.deploy}/">
