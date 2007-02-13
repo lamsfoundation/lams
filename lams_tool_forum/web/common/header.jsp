@@ -18,7 +18,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <!-- ********************  CSS ********************** -->
-<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
 <c:choose>
 	<c:when test="${not empty localLinkPath}">
 		<lams:css localLinkPath="${localLinkPath}" />
