@@ -350,8 +350,16 @@ Ant build file.
 				<include name="create_lams_tool_chat.sql" />
 				<include name="activity_insert.sql" />
 				<include name="library_insert.sql" />
-				<include name="tool_insert.sql" />
 			</fileset>
+		</copy>
+		
+		<copy overwrite="yes" todir="${build.deploy}/sql">
+					<fileset dir="${db.scripts}/">
+						<include name="tool_insert.sql" />
+					</fileset>	
+					<filterset>
+						<filter token="tool_version" value="${tool.version}" />
+					</filterset>
 		</copy>
 
 		<copy overwrite="yes" todir="${build.deploy}/">
@@ -386,7 +394,8 @@ Ant build file.
 			dbDriverClass="com.mysql.jdbc.Driver" 
 			deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar" 
 			toolJarFileName="${product}.jar"
-			toolSignature="${signature}" 
+			toolSignature="${signature}"
+			toolVersion="${tool.version}"
 			toolTablesScriptPath="${db.scripts}/create_lams_tool_chat.sql" 
 			toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_chat.sql" 
 			toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql" 

@@ -34,7 +34,7 @@ VALUES
 'Chat',
 'Chat',
 'chat',
-'1.1',
+'@tool_version@',
 NULL,
 NULL,
 0,
