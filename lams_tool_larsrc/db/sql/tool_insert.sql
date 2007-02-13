@@ -36,7 +36,7 @@ VALUES
 'Shared Resources',
 'Shared Resources',
 'sharedresources',
-'20061102',
+'@tool_version@',
 NULL,
 NULL,
 0,

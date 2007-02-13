@@ -34,7 +34,7 @@ VALUES
 'Scribe',
 'Scribe',
 'scribe',
-'20061024',
+'@tool_version@',
 NULL,
 NULL,
 0,

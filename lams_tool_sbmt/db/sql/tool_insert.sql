@@ -34,7 +34,7 @@ VALUES
 'Submit File',
 'Submit File Tool Description',
 'submitfile',
-'20061102',
+'@tool_version@',
 NULL,
 NULL,
 0,

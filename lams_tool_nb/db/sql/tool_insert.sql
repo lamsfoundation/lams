@@ -34,7 +34,7 @@ VALUES
 'NoticeboardX',
 'Displays a NoticeboardX',
 'nb',
-'20061102',
+'@tool_version@',
 NULL,
 NULL,
 0,

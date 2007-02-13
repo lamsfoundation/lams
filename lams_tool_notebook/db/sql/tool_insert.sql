@@ -34,7 +34,7 @@ VALUES
 'Notebook',
 'Notebook',
 'notebook',
-'20061102',
+'@tool_version@',
 NULL,
 NULL,
 0,
