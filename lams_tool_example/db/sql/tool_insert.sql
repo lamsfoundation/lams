@@ -34,7 +34,7 @@ VALUES
 'Example',
 'Example',
 'example',
-'20061102',
+'@tool_version@',
 NULL,
 NULL,
 0,

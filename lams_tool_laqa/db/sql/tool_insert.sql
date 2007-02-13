@@ -55,7 +55,7 @@ VALUES
 'Question and Answer',
 'Q/A Tool',
 'qa',
-'20061113',
+'@tool_version@',
 NULL,
 NULL,
 0,
