@@ -63,7 +63,12 @@ public class DeployToolConfig extends DeployConfig {
      * Holds value of property toolSignature.
      */
     private String toolSignature;
-
+    
+    /**
+     * Holds value of property toolVersion.
+     */
+    private String toolVersion;
+    
     /**
      * Holds value of property toolWebUri.
      */
@@ -168,6 +173,11 @@ public class DeployToolConfig extends DeployConfig {
        if ( key.equalsIgnoreCase(TOOL_SIGNATURE) ) {
           
            toolSignature = value;
+       }
+       
+       if ( key.equalsIgnoreCase(TOOL_VERSION) ) {
+           
+           toolVersion = value;
        }
 
        if ( key.equalsIgnoreCase(TOOL_WEB_URI) ) {
@@ -277,6 +287,8 @@ public class DeployToolConfig extends DeployConfig {
 	   super.copyProperties(config);
        if (config.getToolSignature() != null)
            this.toolSignature = config.getToolSignature();
+       if (config.getToolVersion() != null)
+           this.toolVersion = config.getToolVersion();
        if (config.getToolWebUri() != null)
            this.toolWebUri = config.getToolWebUri();
        if (config.getToolContext() != null)
@@ -307,6 +319,7 @@ public class DeployToolConfig extends DeployConfig {
    {
 	   super.printObjectProperties();
        System.out.println("Tool Signature: " + this.toolSignature);
+       System.out.println("Tool Version: " + this.toolVersion);
        System.out.println("ToolWebUri: " + this.toolWebUri);
        System.out.println("ToolContext: " + this.toolContext);
        System.out.println("ToolInsertScriptPath: " + this.toolInsertScriptPath);
@@ -402,10 +415,22 @@ public class DeployToolConfig extends DeployConfig {
         return toolSignature;
     }
     /**
+     * @return Returns the toolVersion.
+     */
+    public String getToolVersion() {
+        return toolVersion;
+    }
+    /**
      * @param toolSignature The toolSignature to set.
      */
     public void setToolSignature(String toolSignature) {
         this.toolSignature = toolSignature;
+    }
+    /**
+     * @param toolVersion The toolVersion to set.
+     */
+    public void setToolVersion(String toolVersion) {
+        this.toolVersion = toolVersion;
     }
     /**
      * @return Returns the toolTablesDeleteScriptPath.

@@ -10,6 +10,7 @@
         <property name="src.dir" value="src/java"/>
         <property name="test.src.dir" value="test/java"/>
         <property name="jar.file" value="${build.dir}/lams-tool-deploy.jar"/>
+		<property name="deploy.tool.dir" value="../lams_build/deploy-tool/lib"/>
         <property name="test.dir" value="test"/>
         <property name="test.file.dir" value="test/file"/>
         <property name="debug" value="on"/>
@@ -69,6 +70,10 @@
         <target name="build" depends="compile">
             <jar destfile="${jar.file}" basedir="${classes.dir}"/>
         </target>
+	
+		<target name="copy-jar" depends="build" description="Builds and copies the jar to lams_build/deploy/lib">
+			<copy todir="${deploy.tool.dir}" file="${jar.file}"/>	
+		</target>
         
         
         <target name="junit" depends="compile" description="Build and test the project">

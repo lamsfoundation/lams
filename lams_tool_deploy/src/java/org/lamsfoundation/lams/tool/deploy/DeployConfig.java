@@ -64,7 +64,8 @@ public abstract class DeployConfig {
     public static final String DB_PASSWORD = "dbPassword";
     public static final String DB_DRIVER_CLASS = "dbDriverClass";
     public static final String DB_DRIVER_URL = "dbDriverUrl";
-    public static final String TOOL_SIGNATURE = "toolSignature";    
+    public static final String TOOL_SIGNATURE = "toolSignature";
+    public static final String TOOL_VERSION = "toolVersion";
     public static final String TOOL_ACTIVITY_INSERT_SCRIPT_PATH = "toolActivityInsertScriptPath";
     public static final String LAMS_EAR_PATH = "lamsEarPath";
     public static final String I8N_LANGUAGE_FILES_PACKAGE = "languageFilesPackage";
