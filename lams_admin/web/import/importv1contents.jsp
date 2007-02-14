@@ -1,6 +1,23 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
+<script language="javascript" type="text/JavaScript">
+function toggleOrgs(){
+	for (var i=0; i<<c:out value="${numOrgs}"/>; i++) { 
+		document.ImportV1ContentsForm.orgSids[i].checked=document.ImportV1ContentsForm.allOrgs.checked;
+	}
+}
+function toggleSessions(){
+	for (var i=0; i<<c:out value="${numSessionOrgs}"/>; i++) { 
+		document.ImportV1ContentsForm.sessSids[i].checked=document.ImportV1ContentsForm.allSessions.checked;
+	}
+}
+function loading(){
+	document.getElementById('loading').style.display="";
+	document.getElementById('list').style.display="none";
+}
+</script>
+
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.importv1.title" />
@@ -10,24 +27,17 @@
 
 <p>&nbsp;</p>
 
+<div id="loading" style="display:none">
+	<h3>Please wait while creating new users and groups...</h3>
+	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif"/></p>
+</div>
+
+<div id="list">
+
 <html:form action="/importv1contentssave.do" method="post">
 
 <h3><fmt:message key="heading.importv1.users" /></h3>
 <c:out value="${msgNumUsers}"/>
-
-<script language="javascript" type="text/JavaScript">
-var numOrgs=<c:out value="${numOrgs}"/>;
-function toggleOrgs(){
-	for (var i=0; i<=numOrgs; i++) { 
-		document.ImportV1ContentsForm.orgSids[i].checked=document.ImportV1ContentsForm.allOrgs.checked;
-	}
-}
-function toggleSessions(){
-	for (var i=0; i<=numOrgs; i++) { 
-		document.ImportV1ContentsForm.sessSids[i].checked=document.ImportV1ContentsForm.allSessions.checked;
-	}
-}
-</script>
 
 <p>
 <h3><fmt:message key="heading.importv1.account.organisations" /></h3>
@@ -75,9 +85,11 @@ function toggleSessions(){
 	<!--<input type="submit" class="button" value="Ok"
 		onclick="javascript:document.location='sysadminstart.do';" />
 	-->	
-	<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit>
+	<html:submit styleClass="button" onclick="loading();" onkeydown="loading();"><fmt:message key="label.import"/></html:submit>
 	<html:reset styleClass="button"><fmt:message key="admin.reset"/></html:reset>
 	<html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 
 </html:form>
+
+</div>

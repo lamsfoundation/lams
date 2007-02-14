@@ -1,6 +1,13 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
+<script language="javascript" type="text/JavaScript">
+function loading(){
+	document.getElementById('loading').style.display="";
+	document.getElementById('instructions').style.display="none";
+}
+</script>
+
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.importv1.title" />
@@ -9,6 +16,13 @@
 <lams:help page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
+
+<div id="loading" style="display:none">
+	<h3>Please wait while importing...</h3>
+	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif"/></p>
+</div>
+
+<div id="instructions">
 
 <p>
 <ul>
@@ -38,8 +52,10 @@
 	</tr>
 </table>
 <p align="center">
-<html:submit styleClass="button"><fmt:message key="label.continue"/></html:submit> &nbsp; 	
+<html:submit styleClass="button" onclick="loading();" onkeydown="loading();"><fmt:message key="label.continue"/></html:submit> &nbsp; 	
 <html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 
 </html:form>
+
+</div>
