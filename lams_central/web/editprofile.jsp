@@ -29,63 +29,63 @@
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.title"/>:</td>
-		<td><html:text property="title" size="20" maxlength="32" /></td>
+		<td><html:text property="title" size="32" maxlength="32" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.first_name"/> *:</td>
-		<td><html:text property="firstName" size="20" maxlength="64" /></td>
+		<td><html:text property="firstName" size="50" maxlength="128" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.last_name"/> *:</td>
-		<td><html:text property="lastName" size="20" maxlength="128" /></td>
+		<td><html:text property="lastName" size="50" maxlength="128" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.email"/> *:</td>
-		<td><html:text property="email" size="20" maxlength="128" /></td>
+		<td><html:text property="email" size="50" maxlength="128" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_1"/>:</td>
-		<td><html:text property="addressLine1" size="20" maxlength="64" /></td>
+		<td><html:text property="addressLine1" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_2"/>:</td>
-		<td><html:text property="addressLine2" size="20" maxlength="64" /></td>
+		<td><html:text property="addressLine2" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_3"/>:</td>
-		<td><html:text property="addressLine3" size="20" maxlength="64" /></td>
+		<td><html:text property="addressLine3" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.city"/>:</td>
-		<td><html:text property="city" size="20" maxlength="64" /></td>
+		<td><html:text property="city" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.state"/>:</td>
-		<td><html:text property="state" size="20" maxlength="64" /></td>
+		<td><html:text property="state" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.postcode"/>:</td>
-		<td><html:text property="postcode" size="20" maxlength="10" /></td>
+		<td><html:text property="postcode" size="10" maxlength="10" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.country"/>:</td>
-		<td><html:text property="country" size="20" maxlength="64" /></td>
+		<td><html:text property="country" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.day_phone"/>:</td>
-		<td><html:text property="dayPhone" size="20" maxlength="64" /></td>
+		<td><html:text property="dayPhone" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.evening_phone"/>:</td>
-		<td><html:text property="eveningPhone" size="20" maxlength="64" /></td>
+		<td><html:text property="eveningPhone" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.mobile_phone"/>:</td>
-		<td><html:text property="mobilePhone" size="20" maxlength="64" /></td>
+		<td><html:text property="mobilePhone" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
-		<td><html:text property="fax" size="20" maxlength="64" /></td>
+		<td><html:text property="fax" size="50" maxlength="64" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
