@@ -272,9 +272,11 @@ public class ImportV1ContentsSaveAction extends Action {
 	// is the user a member of one of the orgs to be imported
 	private boolean isUserMember(V1UserDTO user, List<String> orgSids, List<String> sessSids) {
 		List<V1OrgRightDTO> orgRights = user.getOrgRights();
-		for (V1OrgRightDTO orgRight : orgRights) {
-			if (orgSids.contains(orgRight.getOrgSid()) || sessSids.contains(orgRight.getOrgSid())) {
-				return true;
+		if (orgRights != null) {
+			for (V1OrgRightDTO orgRight : orgRights) {
+				if (orgSids.contains(orgRight.getOrgSid()) || sessSids.contains(orgRight.getOrgSid())) {
+					return true;
+				}
 			}
 		}
 		return false;
