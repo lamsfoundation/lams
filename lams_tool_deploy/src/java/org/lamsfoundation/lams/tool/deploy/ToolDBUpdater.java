@@ -25,7 +25,10 @@ package org.lamsfoundation.lams.tool.deploy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.apache.commons.dbutils.DbUtils;
 
 /**
  * Checks if the tool version to be installed exists and is a newer version
@@ -46,8 +49,19 @@ public class ToolDBUpdater extends DBTask
     // Holds value of property toolVersion
     private String toolVersion;
     
-    // Creates instance of ToolDBUpdater
-    public ToolDBUpdater () {}
+    // Holds the value of property toolExists
+    private boolean toolExists;
+    
+    // Holds the value of property toolNewer
+    private boolean toolNewer;
+    
+    /**
+     * Creates instance of ToolDBUpdater
+     */ 
+    public ToolDBUpdater () 
+    {
+    	
+    }
     
     /**
      * Updates the lams_tool table and the learning library
@@ -58,36 +72,92 @@ public class ToolDBUpdater extends DBTask
     }
     
     /**
-     * Checks if the tool is installed by checking the db
-     * @param toolSig The tool signature of the tool to be installed
-     * @return True if the tool signature is present in the db
+     * Checks the tool is installed in the db, sets property toolExists
+     * Checks the tool version in the db, sets the property toolNewer
      */
-    public boolean checkInstalled(String toolSig)
+    public void checkInstalledVersion()
     {
-    	return false;
+        Connection conn = getConnection();
+    	PreparedStatement stmt = null;
+        ResultSet results = null;
+        try
+        {
+            stmt = conn.prepareStatement("SELECT tool_version FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
+            results = stmt.executeQuery();
+            System.out.println("SELECT tool_version FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
+            if (results.first())
+            {
+            	toolExists = true;
+            	double dbVersion = java.lang.Double.parseDouble(results.getString("tool_version"));            	
+            	double instVersion = java.lang.Double.parseDouble(toolVersion);
+            	
+            	System.out.println("TEST: dbVersion = " + dbVersion);
+            	System.out.println("TEST: instVersion = " + instVersion);
+            	
+            	if (instVersion > dbVersion)
+            	{
+            		toolNewer = true;
+            	}
+            	else
+            	{
+            		toolNewer = false;
+            	}            	
+            }
+            else
+            {
+            	toolExists = false;
+            } 
+            
+            conn.close();
+        }
+        catch (SQLException sqlex)
+        {
+            throw new DeployException("Could not get tool version", sqlex);
+        }
+        finally
+        {
+            DbUtils.closeQuietly(stmt);
+            DbUtils.closeQuietly(results);
+        }
     }
+    
+
+    
+    
     
     /**
-     * Checks if the currently installed version is equal or newer than the 
-     * version to be installed
-     * @param toolVer String of the version to be installed
-     * @return True if the current version is older than the version to be installed
+     * set method for toolId
+     * @param toolId The toolId to be set
      */
-    public boolean checkVersion(String toolVer)
-    {
-    	return false;
-    }
-    
-    
-    // set method for toolId
     public void setToolId(long toolId) {this.toolId = toolId;}
     
-    // set method for learningLibraryId
+    /**
+     * set method for learningLibraryId
+     * @param id The LearningLibrayId to be set
+     */
     public void setLearningLibraryId(long id) {this.learningLibraryId = id;}
     
-    // set method for toolSignature
+    /**
+     * set method for toolSignature
+     * @param sig The toolSignature to be set 
+     */
     public void setToolSignature(String sig) {this.toolSignature = sig;}
     
-    // set method for toolVersion
+    /**
+     * set method for toolVersion
+     * @param ver the toolVersion to be set
+     */
     public void setToolVersion(String ver) {this.toolVersion = ver;}
+    
+    /**
+     * get method for toolExists
+     * @return True if the tool signature exists in the database
+     */
+    public boolean getToolExists() {return this.toolExists;}
+    
+    /**
+     * get method for toolNewer
+     * @return True if the tool to be installed is a newer version than the version in the datbase
+     */
+    public boolean getToolNewer() {return this.toolNewer;}
  }

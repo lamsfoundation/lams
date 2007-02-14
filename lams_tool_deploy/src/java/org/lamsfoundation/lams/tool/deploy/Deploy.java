@@ -71,6 +71,48 @@ public class Deploy
             System.out.println("Reading Configuration File"+args[0]);
             DeployToolConfig config =  new DeployToolConfig(args[0]);
             
+            String toolSignature = config.getToolSignature();
+            String toolVersionStr = config.getToolVersion();
+                    
+            /**
+             * Checking if the tool is installed, if not continue to install the new tool
+             * If it is, check if the tool to be installed is newer than the current
+             * If it is newer, update the db, jar and war files, otherwise
+             * put up a message that the tool is already up to date and do nothing 
+             */
+            ToolDBUpdater dbUpdater = new ToolDBUpdater();
+            dbUpdater.setDbUsername(config.getDbUsername());
+            dbUpdater.setDbPassword(config.getDbPassword());
+            dbUpdater.setDbDriverClass(config.getDbDriverClass());
+            dbUpdater.setDbDriverUrl(config.getDbDriverUrl());
+            dbUpdater.setToolSignature(config.getToolSignature());
+            dbUpdater.setToolVersion(config.getToolVersion());
+            dbUpdater.checkInstalledVersion();
+            if (dbUpdater.getToolExists())
+            {
+            	if (dbUpdater.getToolNewer())
+            	{
+            		System.out.println("Updating tool: " +toolSignature+ " with version " +toolVersionStr);
+            		// TODO copy the .jar and .war from build/deploy
+            		// TODO update scripts
+            		dbUpdater.execute();
+            		System.exit(0);
+            	}
+            	else
+            	{
+            		System.out.println("The tool to be installed: " +toolSignature+ " " +toolVersionStr+ " is already up to date.");
+            		System.exit(0);
+            	}
+            }
+            else
+            {
+            	System.out.println("The tool to be installed: " +toolSignature+ " does not exist in database");
+            	System.out.println("Continuing with full install");
+            	// Do nothing, continue with full install
+            }
+            
+            
+            
             Boolean forceDB = Boolean.FALSE;
             if ( args.length == 2 &&  args[1] != null) {
                 forceDB = new Boolean(args[1]);

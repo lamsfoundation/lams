@@ -73,6 +73,11 @@ public abstract class DeployConfig {
     protected transient String validationError = "";
     protected transient XStream xstream;
     
+    /**
+     * Holds value of property toolVersion.
+     */
+    protected String toolVersion;
+    
     
     /**
      * Holds value of property dbDriverClass.
@@ -127,6 +132,8 @@ public abstract class DeployConfig {
     * @throws DeployException
     */
     public abstract void validateProperties() throws DeployException;
+    
+    
     
     
     /**
@@ -327,6 +334,15 @@ public abstract class DeployConfig {
     public void setLamsEarPath(String lamsEarPath) {
         this.lamsEarPath = lamsEarPath;
     }
+    
+    /**
+     * @return Returns the toolVersion.
+     */
+    public String getToolVersion()
+    {
+    	return toolVersion;
+    }
+    
 
   /** Used for testing purposes only */
    public void printObjectProperties()

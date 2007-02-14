@@ -67,7 +67,7 @@ public class DeployToolConfig extends DeployConfig {
     /**
      * Holds value of property toolVersion.
      */
-    private String toolVersion;
+    //private String toolVersion;
     
     /**
      * Holds value of property toolWebUri.
@@ -417,9 +417,9 @@ public class DeployToolConfig extends DeployConfig {
     /**
      * @return Returns the toolVersion.
      */
-    public String getToolVersion() {
-        return toolVersion;
-    }
+    //public String getToolVersion() {
+    //    return toolVersion;
+    //}
     /**
      * @param toolSignature The toolSignature to set.
      */
@@ -432,6 +432,7 @@ public class DeployToolConfig extends DeployConfig {
     public void setToolVersion(String toolVersion) {
         this.toolVersion = toolVersion;
     }
+    
     /**
      * @return Returns the toolTablesDeleteScriptPath.
      */
