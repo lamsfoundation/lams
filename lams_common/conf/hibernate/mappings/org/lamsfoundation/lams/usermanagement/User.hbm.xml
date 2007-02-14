@@ -46,14 +46,14 @@
         column="login"
         not-null="true"
         unique="true"
-        length="20"
+        length="255"
     >
         <meta attribute="use-in-equals">true</meta>
         <meta attribute="field-description">
            @hibernate.property
             column="login"
             unique="true"
-            length="20"
+            length="255"
             not-null="true"
         </meta>    
     </property>
@@ -87,12 +87,12 @@
         name="firstName"
         type="java.lang.String"
         column="first_name"
-        length="64"
+        length="128"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="first_name"
-            length="64"
+            length="128"
         </meta>    
     </property>
     <property

@@ -7,7 +7,13 @@ SET learner_progress_url = "learning/grouping.do?method=viewGrouping&mode=teache
 WHERE tool_display_name = "Grouping";
 
 ALTER TABLE lams_user
+CHANGE COLUMN login varchar(255);
+
+ALTER TABLE lams_user
 ADD COLUMN change_password TINYINT DEFAULT 0;
+
+ALTER TABLE lams_workspace_folder
+CHANGE COLUMN name name VARCHAR(255) NOT NULL;
 
 UPDATE lams_user 
 SET change_password = 0

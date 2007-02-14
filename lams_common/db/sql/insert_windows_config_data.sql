@@ -2,7 +2,7 @@ insert into lams_configuration (config_key, config_value) values ('ServerURL','h
 insert into lams_configuration (config_key, config_value) values ('Version','2.0');
 insert into lams_configuration (config_key, config_value) values ('TempDir','C:/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','C:/lams/dump');
-insert into lams_configuration (config_key, config_value) values ('EARDir','D:/jboss-4.0.2/server/default/deploy/lams.ear');
+insert into lams_configuration (config_key, config_value) values ('EARDir','C:/jboss-4.0.2/server/default/deploy/lams.ear');
 insert into lams_configuration (config_key, config_value) values ('SMTPServer','mail.lib.mq.edu.au');
 insert into lams_configuration (config_key, config_value) values ('LamsSupportEmail','lams_support@melcoe.mq.edu.au');
 insert into lams_configuration (config_key, config_value) values ('ContentRepositoryPath','C:/lams/repository');

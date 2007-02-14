@@ -38,8 +38,8 @@
         <generator class="native" />
     </id>
     
-    <property name="name" type="java.lang.String" column="name" length="65535">
-        <meta attribute="field-description">@hibernate.property column="name" length="65535" </meta>    
+    <property name="name" type="java.lang.String" column="name" length="255">
+        <meta attribute="field-description">@hibernate.property column="name" length="255" </meta>    
     </property>
 
 

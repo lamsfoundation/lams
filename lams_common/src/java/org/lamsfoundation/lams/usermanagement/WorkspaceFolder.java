@@ -167,7 +167,7 @@ public class WorkspaceFolder implements Serializable {
     /** 
      *            @hibernate.property
      *             column="name"
-     *             length="64"
+     *             length="255"
      *             not-null="true"
      *         
      */

@@ -171,7 +171,7 @@ CREATE TABLE lams_authentication_method (
 CREATE TABLE lams_workspace_folder (
        workspace_folder_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , parent_folder_id BIGINT(20)
-     , name VARCHAR(64) NOT NULL
+     , name VARCHAR(255) NOT NULL
      , user_id BIGINT(20) NOT NULL
      , create_date_time DATETIME NOT NULL
      , last_modified_date_time DATETIME
@@ -283,7 +283,7 @@ CREATE TABLE lams_css_property (
 
 CREATE TABLE lams_user (
        user_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , login VARCHAR(20) NOT NULL
+     , login VARCHAR(255) NOT NULL
      , password VARCHAR(50) NOT NULL
      , title VARCHAR(32)
      , first_name VARCHAR(128)

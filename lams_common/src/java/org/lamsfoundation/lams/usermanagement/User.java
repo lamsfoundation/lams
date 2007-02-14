@@ -226,7 +226,7 @@ public class User implements Serializable,Comparable {
     /** 
      *            @hibernate.property
      *             column="login"
-     *             length="20"
+     *             length="255"
      *			   unique="true"
      *             not-null="true"
      *         
@@ -271,7 +271,7 @@ public class User implements Serializable,Comparable {
     /** 
      *            @hibernate.property
      *             column="first_name"
-     *             length="64"
+     *             length="128"
      *         
      */
     public String getFirstName() {
