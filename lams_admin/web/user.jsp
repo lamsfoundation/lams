@@ -36,75 +36,75 @@
 			<table>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.login"/> *:</td>
-					<td><html-el:text property="login" size="20" maxlength="20" /></td>
+					<td><html-el:text property="login" size="50" maxlength="255" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.password"/> *:</td>
-					<td><html-el:password property="password" size="20" maxlength="50" /></td>
+					<td><html-el:password property="password" size="50" maxlength="50" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.password.confirm"/> *:</td>
-					<td><html-el:password property="password2" size="20" maxlength="50" /></td>
+					<td><html-el:password property="password2" size="50" maxlength="50" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.title"/>:</td>
-					<td><html-el:text property="title" size="20" maxlength="32" /></td>
+					<td><html-el:text property="title" size="32" maxlength="32" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.first_name"/> *:</td>
-					<td><html-el:text property="firstName" size="20" maxlength="64" /></td>
+					<td><html-el:text property="firstName" size="50" maxlength="128" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.last_name"/> *:</td>
-					<td><html-el:text property="lastName" size="20" maxlength="128" /></td>
+					<td><html-el:text property="lastName" size="50" maxlength="128" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.email"/> *:</td>
-					<td><html-el:text property="email" size="20" maxlength="128" /></td>
+					<td><html-el:text property="email" size="50" maxlength="128" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.address_line_1"/>:</td>
-					<td><html-el:text property="addressLine1" size="20" maxlength="64" /></td>
+					<td><html-el:text property="addressLine1" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.address_line_2"/>:</td>
-					<td><html-el:text property="addressLine2" size="20" maxlength="64" /></td>
+					<td><html-el:text property="addressLine2" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.address_line_3"/>:</td>
-					<td><html-el:text property="addressLine3" size="20" maxlength="64" /></td>
+					<td><html-el:text property="addressLine3" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.city"/>:</td>
-					<td><html-el:text property="city" size="20" maxlength="64" /></td>
+					<td><html-el:text property="city" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.postcode"/>:</td>
-					<td><html-el:text property="postcode" size="20" maxlength="10" /></td>
+					<td><html-el:text property="postcode" size="10" maxlength="10" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.state"/>:</td>
-					<td><html-el:text property="state" size="20" maxlength="64" /></td>
+					<td><html-el:text property="state" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.country"/>:</td>
-					<td><html-el:text property="country" size="20" maxlength="64" /></td>
+					<td><html-el:text property="country" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.day_phone"/>:</td>
-					<td><html-el:text property="dayPhone" size="20" maxlength="64" /></td>
+					<td><html-el:text property="dayPhone" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.evening_phone"/>:</td>
-					<td><html-el:text property="eveningPhone" size="20" maxlength="64" /></td>
+					<td><html-el:text property="eveningPhone" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.mobile_phone"/>:</td>
-					<td><html-el:text property="mobilePhone" size="20" maxlength="64" /></td>
+					<td><html-el:text property="mobilePhone" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.fax"/>:</td>
-					<td><html-el:text property="fax" size="20" maxlength="64" /></td>
+					<td><html-el:text property="fax" size="50" maxlength="64" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.organisation.locale"/>:</td>
