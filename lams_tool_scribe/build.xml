@@ -403,6 +403,8 @@ Ant build file.
 			toolJarFileName="${product}.jar"
 			toolSignature="${signature}" 
 			toolVersion="${tool.version}"
+			hideTool="${hideTool}"
+			toolUpdateScriptPath="${build.deploy}/sql/updateTo${tool.version}.sql"
 			toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_scribe.sql" 
 			toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_scribe.sql" 
 			toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" 
@@ -439,13 +441,13 @@ Ant build file.
 			<arg value="True" />
 		</java>
 
-		<echo>Marking activity as invalid - set it to valid if debugging or use the combined chat/scribe or forum/scribe activity. This is not an error.</echo>
+		<!-- echo>Marking activity as invalid - set it to valid if debugging or use the combined chat/scribe or forum/scribe activity. This is not an error.</echo>
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}" password="${db.password}" encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}" />
 			</classpath>
 			<transaction src="${db.scripts}/make_activity_invalid.sql" />
-		</sql>
+		</sql -->
 
 	</target>
 	

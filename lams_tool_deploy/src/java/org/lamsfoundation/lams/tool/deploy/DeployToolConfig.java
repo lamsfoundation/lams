@@ -96,6 +96,11 @@ public class DeployToolConfig extends DeployConfig {
     private String toolLibraryInsertScriptPath;
     
     /**
+     * Holds the value of property hideTool
+     */
+    private boolean hideTool;
+    
+    /**
      * Holds value of property toolActivityInsertScriptPath.
      */
     private String toolActivityInsertScriptPath;
@@ -186,8 +191,7 @@ public class DeployToolConfig extends DeployConfig {
            toolVersion = value;
        }
        
-       if ( key.equalsIgnoreCase(TOOL_VERSION) ) {
-           
+       if ( key.equalsIgnoreCase(HIDE_TOOL) ) {
            hideTool = java.lang.Boolean.parseBoolean(value);
        }
 
@@ -523,6 +527,8 @@ public class DeployToolConfig extends DeployConfig {
 	public ArrayList<String> getLanguageFiles() {
 		return languageFiles;
 	}
+	
+	
 
 	public void setLanguageFiles(ArrayList<String> languageFiles) {
 		this.languageFiles = languageFiles;

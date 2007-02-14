@@ -98,8 +98,9 @@ public class Deploy
             	if (dbUpdater.getToolNewer())
             	{
             		System.out.println("Updating tool: " +toolSignature+ " with version " +toolVersionStr);
-
+            		
             		// Disabling the tool while update takes place
+            		System.out.println("Disabling tool for update, valid flags set to 0.");
             		dbUpdater.activateTool(toolSignature, 0);
             		
             		// updates the lams_tool table with the lams_version
@@ -124,9 +125,18 @@ public class Deploy
         	            deployLanguageFilesTask.execute();
                     }                    
                     
-                    // Enabling the tool so it can now be used by LAMS
-                    dbUpdater.activateTool(toolSignature, 1);
-                    
+                    // Enabling the tool so it can now be used by LAMS (if not to be hidden)
+                    if (config.getHideTool()==false)
+                    {
+                    	System.out.println("Enabling Tool, valid flags set to 1");
+                    	dbUpdater.activateTool(toolSignature, 1);
+                    }
+                    else
+                    {
+                    	System.out.println("Hiding Tool, valid flags set to 0");
+                    	dbUpdater.activateTool(toolSignature, 0);
+                    }
+                    	
                     System.out.println("Tool update completed");
                     System.exit(0);
             	}
@@ -201,15 +211,26 @@ public class Deploy
             updateWebXmlTask.setJarFileName(config.getToolJarFileName());
             updateWebXmlTask.execute();
 
-	        System.out.println("Activating Tool in LAMS");
-            ToolDBActivateTask dbActivateTask = new ToolDBActivateTask();
-            dbActivateTask.setDbUsername(config.getDbUsername());
-            dbActivateTask.setDbPassword(config.getDbPassword());
-            dbActivateTask.setDbDriverClass(config.getDbDriverClass());
-            dbActivateTask.setDbDriverUrl(config.getDbDriverUrl());
-            dbActivateTask.setLearningLibraryId(dbDeployTask.getLearningLibraryId());
-            dbActivateTask.setToolId(dbDeployTask.getToolId());
-            dbActivateTask.execute();
+            
+            if (config.getHideTool()==false)
+            {
+            	System.out.println("Activating Tool: " + config.getToolSignature());
+                dbUpdater.activateTool(config.getToolSignature(), 1);
+            	
+            	/*ToolDBActivateTask dbActivateTask = new ToolDBActivateTask();
+                dbActivateTask.setDbUsername(config.getDbUsername());
+                dbActivateTask.setDbPassword(config.getDbPassword());
+                dbActivateTask.setDbDriverClass(config.getDbDriverClass());
+                dbActivateTask.setDbDriverUrl(config.getDbDriverUrl());
+                dbActivateTask.setLearningLibraryId(dbDeployTask.getLearningLibraryId());
+                dbActivateTask.setToolId(dbDeployTask.getToolId());
+                dbActivateTask.execute();*/
+            }
+            else
+            {
+            	System.out.println("Hiding tool: " + config.getToolSignature());
+            	dbUpdater.activateTool(config.getToolSignature(), 0);
+            }
             
             System.out.println("Tool Deployed");
         }

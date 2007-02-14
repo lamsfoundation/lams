@@ -80,10 +80,7 @@ public abstract class DeployConfig {
      */
     protected String toolVersion;
     
-    /**
-     * Holds the value of property hideTool
-     */
-    protected boolean hideTool;
+    
     
     /**
      * Holds value of property dbDriverClass.
@@ -349,10 +346,7 @@ public abstract class DeployConfig {
     	return toolVersion;
     }
     
-    public boolean getHideTool()
-    {
-    	return hideTool;
-    }
+    
     
 
   /** Used for testing purposes only */

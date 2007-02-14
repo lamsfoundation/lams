@@ -36,13 +36,7 @@ import org.apache.commons.dbutils.DbUtils;
  * @author Luke Foxton
  */
 public class ToolDBUpdater extends DBTask
-{
-	// Holds value of property toolId
-	private long toolId;
-    
-    // Holds value of property learningLibraryId.
-    private long learningLibraryId;
-    
+{  
     // Holds value of property toolSignature
     private String toolSignature;
 	
@@ -74,7 +68,6 @@ public class ToolDBUpdater extends DBTask
     	PreparedStatement stmt = null;
     	try
         {
-            System.out.println("TEST: UPDATE lams_tool SET tool_version = \"" +toolVersion+ "\" WHERE tool_signature  = \"" +toolSignature+ "\"");
     		stmt = conn.prepareStatement("UPDATE lams_tool SET tool_version = \"" +toolVersion+ "\" WHERE tool_signature  = \"" +toolSignature+ "\"");
             stmt.execute();
         }
@@ -101,16 +94,12 @@ public class ToolDBUpdater extends DBTask
         {
             stmt = conn.prepareStatement("SELECT tool_version FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
             results = stmt.executeQuery();
-            System.out.println("SELECT tool_version FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
             if (results.first())
             {
             	toolExists = true;
             	double dbVersion = java.lang.Double.parseDouble(results.getString("tool_version"));            	
             	double instVersion = java.lang.Double.parseDouble(toolVersion);
-            	
-            	System.out.println("TEST: dbVersion = " + dbVersion);
-            	System.out.println("TEST: instVersion = " + instVersion);
-            	
+            	          	
             	if (instVersion > dbVersion)
             	{
             		toolNewer = true;
@@ -148,10 +137,22 @@ public class ToolDBUpdater extends DBTask
     {
         Connection conn = getConnection();
     	PreparedStatement stmt = null;
+    	ResultSet results = null;
         try
         {
             stmt = conn.prepareStatement("UPDATE lams_tool SET valid_flag = "+flag+" WHERE tool_signature  = \"" +toolSig+ "\"");
             stmt.execute();
+            
+            stmt = conn.prepareStatement("SELECT learning_library_id FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
+            results = stmt.executeQuery();
+            
+            if (results.first())
+            {
+	            double llid = results.getDouble("learning_library_id");
+            	
+            	stmt = conn.prepareStatement("UPDATE lams_learning_library SET valid_flag = "+flag+" WHERE learning_library_id  = \"" +llid+ "\"");
+	            stmt.execute();
+            }
         }
         catch (SQLException se)
         {
@@ -162,22 +163,6 @@ public class ToolDBUpdater extends DBTask
             DbUtils.closeQuietly(stmt);
         }
     }
-    
-
-    
-    
-    
-    /**
-     * set method for toolId
-     * @param toolId The toolId to be set
-     */
-    public void setToolId(long toolId) {this.toolId = toolId;}
-    
-    /**
-     * set method for learningLibraryId
-     * @param id The LearningLibrayId to be set
-     */
-    public void setLearningLibraryId(long id) {this.learningLibraryId = id;}
     
     /**
      * set method for toolSignature
