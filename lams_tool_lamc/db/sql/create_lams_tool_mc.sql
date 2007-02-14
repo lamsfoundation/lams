@@ -67,8 +67,8 @@ CREATE TABLE tl_lamc11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
      , mc_session_id BIGINT(20) NOT NULL
-     , username VARCHAR(100)
-     , fullname VARCHAR(100)
+     , username VARCHAR(255)
+     , fullname VARCHAR(255)
      , responseFinalised TINYINT(1) NOT NULL DEFAULT 0
      , viewSummaryRequested TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
