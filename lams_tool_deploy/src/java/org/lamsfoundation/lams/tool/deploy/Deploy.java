@@ -41,7 +41,7 @@ import java.util.List;
  * Only use forceDB for development - not designed for production. If forceDB is set, 
  * then toolSignature and toolTablesDeleteScriptPath are needed.
  *
- * @author Chris Perfect, modifications by Fiona Malikoff
+ * @author Chris Perfect, modifications by Fiona Malikoff, Luke Foxton
  */
 public class Deploy
 {
@@ -64,6 +64,11 @@ public class Deploy
             		"\nforceDB deletes the old database entries before creating the new entries." +
             		"\nSo it should be set to false for production and true for development");
         }
+        Boolean forceDB = Boolean.FALSE;
+        if ( args.length == 2 &&  args[1] != null) {
+            forceDB = new Boolean(args[1]);
+        }
+        
         
         System.out.println("Starting Tool Deploy");
         try
@@ -88,15 +93,42 @@ public class Deploy
             dbUpdater.setToolSignature(config.getToolSignature());
             dbUpdater.setToolVersion(config.getToolVersion());
             dbUpdater.checkInstalledVersion();
-            if (dbUpdater.getToolExists())
+            if (dbUpdater.getToolExists() && forceDB==false)
             {
             	if (dbUpdater.getToolNewer())
             	{
             		System.out.println("Updating tool: " +toolSignature+ " with version " +toolVersionStr);
-            		// TODO copy the .jar and .war from build/deploy
-            		// TODO update scripts
+
+            		// Disabling the tool while update takes place
+            		dbUpdater.activateTool(toolSignature, 0);
+            		
+            		// updates the lams_tool table with the lams_version
             		dbUpdater.execute();
-            		System.exit(0);
+            		
+            		// TODO update scripts
+            		
+            		// deploy the jar and war files
+            		System.out.println("Deploying files to ear");
+                    DeployFilesTask deployFilesTask = new DeployFilesTask();
+                    deployFilesTask.setLamsEarPath(config.getLamsEarPath());
+                    deployFilesTask.setDeployFiles(config.getDeployFiles());
+                    deployFilesTask.execute();
+                    
+                    // deploy the language files
+                    List<String> files = config.getLanguageFiles();
+                    if ( files != null && files.size() > 0 ) {
+        	            DeployLanguageFilesTask deployLanguageFilesTask = new DeployLanguageFilesTask();
+        	            deployLanguageFilesTask.setLamsEarPath(config.getLamsEarPath());
+        	            deployLanguageFilesTask.setDictionaryPacket(config.getLanguageFilesPackage());
+        	            deployLanguageFilesTask.setDeployFiles(config.getLanguageFiles());
+        	            deployLanguageFilesTask.execute();
+                    }                    
+                    
+                    // Enabling the tool so it can now be used by LAMS
+                    dbUpdater.activateTool(toolSignature, 1);
+                    
+                    System.out.println("Tool update completed");
+                    System.exit(0);
             	}
             	else
             	{
@@ -111,12 +143,6 @@ public class Deploy
             	// Do nothing, continue with full install
             }
             
-            
-            
-            Boolean forceDB = Boolean.FALSE;
-            if ( args.length == 2 &&  args[1] != null) {
-                forceDB = new Boolean(args[1]);
-            }
             
             if ( forceDB.booleanValue() ) {
                 System.out.println("Removing old tool entries from database");

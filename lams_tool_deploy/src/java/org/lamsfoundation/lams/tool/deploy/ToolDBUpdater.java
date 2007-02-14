@@ -64,11 +64,27 @@ public class ToolDBUpdater extends DBTask
     }
     
     /**
-     * Updates the lams_tool table and the learning library
+     * Updates the lams_tool table
+     * TODO: possibly add a update_date collumn for system admin use
      */
     public void execute()
     {
-    	
+    	Connection conn = getConnection();
+    	PreparedStatement stmt = null;
+    	try
+        {
+            System.out.println("TEST: UPDATE lams_tool SET tool_version = \"" +toolVersion+ "\" WHERE tool_signature  = \"" +toolSignature+ "\"");
+    		stmt = conn.prepareStatement("UPDATE lams_tool SET tool_version = \"" +toolVersion+ "\" WHERE tool_signature  = \"" +toolSignature+ "\"");
+            stmt.execute();
+        }
+    	catch (SQLException sqlex)
+        {
+            throw new DeployException("Could not set tool version", sqlex);
+        }
+        finally
+        {
+            DbUtils.closeQuietly(stmt);
+        }
     }
     
     /**
@@ -118,6 +134,31 @@ public class ToolDBUpdater extends DBTask
         {
             DbUtils.closeQuietly(stmt);
             DbUtils.closeQuietly(results);
+        }
+    }
+    
+    /**
+     * Activates/de-activates tool in db based on the flag 
+     * @param toolSig The signature of the tool to activate/de-activate
+     * @param flag Set to 1 for activate, 0 for de-activate
+     * @throws SQLException
+     */
+    public void activateTool(String toolSig, int flag) throws SQLException
+    {
+        Connection conn = getConnection();
+    	PreparedStatement stmt = null;
+        try
+        {
+            stmt = conn.prepareStatement("UPDATE lams_tool SET valid_flag = "+flag+" WHERE tool_signature  = \"" +toolSig+ "\"");
+            stmt.execute();
+        }
+        catch (SQLException se)
+        {
+        	throw new DeployException("Could not activate/de-activate tool for update");
+        }
+        finally
+        {
+            DbUtils.closeQuietly(stmt);
         }
     }
     
