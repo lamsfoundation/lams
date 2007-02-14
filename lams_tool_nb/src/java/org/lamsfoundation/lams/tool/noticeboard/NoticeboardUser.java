@@ -89,7 +89,7 @@ public class NoticeboardUser implements Serializable {
     /**
      * @hibernate.property 
      * 		column="fullname" 
-     * 		length="50"
+     * 		length="255"
      * 
      * @return Returns the fullname.
      */
@@ -156,7 +156,7 @@ public class NoticeboardUser implements Serializable {
     /**
      * @hibernate.property 
      * 		column="username" 
-     * 		length="50"
+     * 		length="255"
      * 
      * @return Returns the username.
      */

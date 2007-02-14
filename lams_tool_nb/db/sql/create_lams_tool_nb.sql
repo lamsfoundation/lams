@@ -36,8 +36,8 @@ CREATE TABLE tl_lanb11_user (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , user_id BIGINT(20) NOT NULL
      , nb_session_uid BIGINT(20) NOT NULL
-     , username VARCHAR(50)
-     , fullname VARCHAR(50)
+     , username VARCHAR(255)
+     , fullname VARCHAR(255)
      , user_status VARCHAR(50)
      , PRIMARY KEY (uid)
      , INDEX (nb_session_uid)

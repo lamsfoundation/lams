@@ -38,10 +38,10 @@ CREATE TABLE tl_laqa11_session (
 CREATE TABLE tl_laqa11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
-     , username VARCHAR(100)
+     , username VARCHAR(255)
      , responseFinalized TINYINT(1) NOT NULL DEFAULT 0
      , qa_session_id BIGINT(20) NOT NULL
-     , fullname VARCHAR(100)
+     , fullname VARCHAR(255)
      , learnerFinished TINYINT(1) NOT NULL
      , PRIMARY KEY (uid)
      , INDEX (qa_session_id)

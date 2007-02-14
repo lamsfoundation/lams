@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<clay-model clay-version="1.1.0">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<clay-model clay-version="1.2.0">
 <database-model alias="" author="Ozgur Demirtas" begin-script="" end-script="" name="q/a" remarks="" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" version="1.0">
 <database-model-description>QA Tool for Lams 1.1</database-model-description>
 <schema-list>
 <schema alias="" name="lams" remarks="">
-<schema-description></schema-description>
+<schema-description/>
 <domain-list/>
 <table-list>
 <table alias="" name="tl_laqa11_session" remarks="">
-<table-description></table-description>
+<table-description/>
 <table-figure-bounds height="124" width="181" x="118" y="106"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -25,7 +25,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_session_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -38,33 +38,33 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="session_start_date" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="session_end_date" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="100" decimal-digits="0" default-value="" mandatory="false" name="session_name" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="100" decimal-digits="0" default-value="" mandatory="false" name="session_status" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_content_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -78,13 +78,13 @@
 </column>
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_SESSION" remarks="">
-<primary-key-description></primary-key-description>
+<primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
 <foreign-key alias="" name="FK_tl_laqa11_session_1" on-delete="" on-update="" referenced-key="PK_TL_LAQA11_CONTENT" referenced-table="tl_laqa11_content" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
+<foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
@@ -94,11 +94,11 @@
 <index-list/>
 </table>
 <table alias="" name="tl_laqa11_content" remarks="">
-<table-description></table-description>
+<table-description/>
 <table-figure-bounds height="271" width="211" x="96" y="408"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -111,7 +111,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_content_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -124,31 +124,31 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="title" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="instructions" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="creation_date" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="update_date" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="reflect" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -161,7 +161,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="questions_sequenced" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -174,7 +174,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="username_visible" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -187,7 +187,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="0" mandatory="true" name="created_by" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -200,7 +200,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="false" name="run_offline" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -213,7 +213,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="define_later" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -226,7 +226,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="synch_in_monitor" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -239,19 +239,19 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="offline_instructions" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="online_instructions" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="false" name="content_inUse" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -264,13 +264,13 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="reflectionSubject" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="1" mandatory="true" name="lockWhenFinished" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -283,10 +283,10 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="1" mandatory="true" name="showOtherAnswers" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
@@ -297,7 +297,7 @@
 </column>
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_CONTENT" remarks="">
-<primary-key-description></primary-key-description>
+<primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
 <unique-key-list/>
@@ -305,11 +305,11 @@
 <index-list/>
 </table>
 <table alias="" name="tl_laqa11_que_usr" remarks="">
-<table-description></table-description>
-<table-figure-bounds height="116" width="187" x="517" y="104"/>
+<table-description/>
+<table-figure-bounds height="165" width="187" x="517" y="55"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -322,7 +322,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="que_usr_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -334,15 +334,15 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="100" decimal-digits="0" default-value="" mandatory="false" name="username" remarks="">
-<column-description></column-description>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="username" remarks="">
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="responseFinalized" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -355,7 +355,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_session_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -367,15 +367,15 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="100" decimal-digits="0" default-value="" mandatory="false" name="fullname" remarks="">
-<column-description></column-description>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="fullname" remarks="">
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="true" name="learnerFinished" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -389,13 +389,13 @@
 </column>
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_QUE_USR" remarks="">
-<primary-key-description></primary-key-description>
+<primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
 <foreign-key alias="" name="FK_tl_laqa11_que_usr_1" on-delete="" on-update="" referenced-key="PK_TL_LAQA11_SESSION" referenced-table="tl_laqa11_session" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
+<foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
@@ -405,11 +405,11 @@
 <index-list/>
 </table>
 <table alias="" name="tl_laqa11_que_content" remarks="">
-<table-description></table-description>
+<table-description/>
 <table-figure-bounds height="93" width="179" x="786" y="491"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -422,19 +422,19 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="question" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="feedback" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="5" decimal-digits="0" default-value="1" mandatory="false" name="display_order" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
 <variant type-name-pattern="INT"/>
@@ -447,7 +447,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_content_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -461,13 +461,13 @@
 </column>
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_QUE_CONTENT" remarks="">
-<primary-key-description></primary-key-description>
+<primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
 <foreign-key alias="" name="FK_tl_laqa11_que_content_1" on-delete="" on-update="" referenced-key="PK_TL_LAQA11_CONTENT" referenced-table="tl_laqa11_content" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
+<foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
@@ -477,11 +477,11 @@
 <index-list/>
 </table>
 <table alias="" name="tl_laqa11_usr_resp" remarks="">
-<table-description></table-description>
+<table-description/>
 <table-figure-bounds height="135" width="181" x="987" y="97"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="response_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -494,7 +494,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="false" name="hidden" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -507,26 +507,26 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="answer" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="time_zone" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="attempt_time" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="que_usr_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -539,7 +539,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_que_content_id" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -552,7 +552,7 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="1" mandatory="true" name="visible" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -566,20 +566,20 @@
 </column>
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_USR_RESP" remarks="">
-<primary-key-description></primary-key-description>
+<primary-key-description/>
 <primary-key-column name="response_id"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
 <foreign-key alias="" name="FK_tl_laqa11_usr_resp_3" on-delete="" on-update="" referenced-key="PK_TL_LAQA11_QUE_USR" referenced-table="tl_laqa11_que_usr" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
+<foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="que_usr_id" referenced-key-column-name="uid"/>
 </foreign-key>
 <foreign-key alias="" name="FK_tl_laqa11_usr_resp_2" on-delete="" on-update="" referenced-key="PK_TL_LAQA11_QUE_CONTENT" referenced-table="tl_laqa11_que_content" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
+<foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
@@ -589,11 +589,11 @@
 <index-list/>
 </table>
 <table alias="" name="tl_laqa11_uploadedfile" remarks="">
-<table-description></table-description>
+<table-description/>
 <table-figure-bounds height="94" width="153" x="450" y="246"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="submissionId" remarks="just an auto increment id and has no business relationship">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -606,14 +606,14 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="true" name="uuid" remarks="value returned from rep service">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="true" name="isOnline_File" remarks="whether file is online or offline, online 1, and offline is 0">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
@@ -626,14 +626,14 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="true" name="filename" remarks="">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_content_id" remarks="what content file belongs to">
-<column-description></column-description>
+<column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
@@ -647,13 +647,13 @@
 </column>
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_UPLOADEDFILE" remarks="">
-<primary-key-description></primary-key-description>
+<primary-key-description/>
 <primary-key-column name="submissionId"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
 <foreign-key alias="" name="FK_tl_laqa11_uploadedfile_1" on-delete="" on-update="" referenced-key="PK_TL_LAQA11_CONTENT" referenced-table="tl_laqa11_content" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
+<foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>

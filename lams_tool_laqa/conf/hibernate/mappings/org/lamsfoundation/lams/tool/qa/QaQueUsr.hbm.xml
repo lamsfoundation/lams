@@ -31,14 +31,14 @@
         name="username"
         type="java.lang.String"
         column="username"
-        length="100"
+        length="255"
     >
     </property>
     <property
         name="fullname"
         type="java.lang.String"
         column="fullname"
-        length="100"
+        length="255"
     >
     </property>
     

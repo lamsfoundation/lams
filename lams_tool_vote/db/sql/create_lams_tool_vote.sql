@@ -39,8 +39,8 @@ CREATE TABLE tl_lavote11_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , user_id BIGINT(20) NOT NULL
      , vote_session_id BIGINT(20) NOT NULL
-     , username VARCHAR(100)
-     , fullname VARCHAR(20)
+     , username VARCHAR(255)
+     , fullname VARCHAR(255)
      , responseFinalised TINYINT(1) NOT NULL DEFAULT 0
      , finalScreenRequested TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)

@@ -31,7 +31,7 @@
             update="true"
             insert="true"
             column="fullname"
-            length="50"
+            length="255"
         />
 
         <many-to-one
@@ -63,7 +63,7 @@
             update="true"
             insert="true"
             column="username"
-            length="50"
+            length="255"
         />
 
         <property
