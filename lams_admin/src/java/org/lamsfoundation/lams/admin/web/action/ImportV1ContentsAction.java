@@ -77,7 +77,14 @@ public class ImportV1ContentsAction extends Action {
 		args[0] = String.valueOf(users.size());
 		request.setAttribute("msgNumUsers", messageService
 				.getMessage("msg.importv1.found.users", args));
-		request.setAttribute("numOrgs", orgs.size());
+		int numOrgs = 0;
+		for (V1OrganisationDTO org : orgs) {
+			if (org.getAccountOrganisation().equals("1")) {
+				numOrgs++;
+			}
+		}
+		request.setAttribute("numOrgs", numOrgs);
+		request.setAttribute("numSessionOrgs", orgs.size()-numOrgs);
 		
 		return mapping.findForward("importv1contents");
 	}
