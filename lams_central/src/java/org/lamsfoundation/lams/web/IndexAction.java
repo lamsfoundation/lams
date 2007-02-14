@@ -99,8 +99,10 @@ public class IndexAction extends Action {
 		
 		// check if user is flagged as needing to change their password
 		User loggedInUser = getService().getUserByLogin(request.getRemoteUser());
-		if (loggedInUser.getChangePassword()) {
-			return mapping.findForward("password");
+		if (loggedInUser.getChangePassword()!=null) {
+			if (loggedInUser.getChangePassword()) {
+				return mapping.findForward("password");
+			}
 		}
 		
 		String tab = WebUtil.readStrParam(request, "tab", true);
