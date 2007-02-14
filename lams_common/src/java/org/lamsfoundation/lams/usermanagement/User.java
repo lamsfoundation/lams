@@ -188,6 +188,7 @@ public class User implements Serializable,Comparable {
 
     /** default constructor */
     public User() {
+    	this.changePassword = false;
     }
 
     /** minimal constructor */
@@ -204,6 +205,7 @@ public class User implements Serializable,Comparable {
         this.userGroups = userGroups;
         this.learningDesigns = learningDesigns;
         this.lessons = lessons;
+        this.changePassword = false;
     }
 
     /** 
