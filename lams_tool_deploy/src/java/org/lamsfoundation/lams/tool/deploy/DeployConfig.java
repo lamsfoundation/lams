@@ -66,6 +66,8 @@ public abstract class DeployConfig {
     public static final String DB_DRIVER_URL = "dbDriverUrl";
     public static final String TOOL_SIGNATURE = "toolSignature";
     public static final String TOOL_VERSION = "toolVersion";
+    public static final String HIDE_TOOL = "hideTool";
+    public static final String TOOL_UPDATE_SCRIPT_PATH = "toolUpdateScriptPath";
     public static final String TOOL_ACTIVITY_INSERT_SCRIPT_PATH = "toolActivityInsertScriptPath";
     public static final String LAMS_EAR_PATH = "lamsEarPath";
     public static final String I8N_LANGUAGE_FILES_PACKAGE = "languageFilesPackage";
@@ -78,6 +80,10 @@ public abstract class DeployConfig {
      */
     protected String toolVersion;
     
+    /**
+     * Holds the value of property hideTool
+     */
+    protected boolean hideTool;
     
     /**
      * Holds value of property dbDriverClass.
@@ -341,6 +347,11 @@ public abstract class DeployConfig {
     public String getToolVersion()
     {
     	return toolVersion;
+    }
+    
+    public boolean getHideTool()
+    {
+    	return hideTool;
     }
     
 

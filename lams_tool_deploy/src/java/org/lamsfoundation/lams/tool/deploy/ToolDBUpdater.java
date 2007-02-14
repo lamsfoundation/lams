@@ -55,6 +55,7 @@ public class ToolDBUpdater extends DBTask
     // Holds the value of property toolNewer
     private boolean toolNewer;
     
+    
     /**
      * Creates instance of ToolDBUpdater
      */ 

@@ -58,6 +58,7 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_JAR_FILE_NAME = "toolJarFileName";
     private static final String DEPLOY_FILES= "deployFiles";
     protected static final String LANGUAGE_FILES= "languageFiles";
+   
   
     /**
      * Holds value of property toolSignature.
@@ -78,6 +79,11 @@ public class DeployToolConfig extends DeployConfig {
      * Holds value of property toolContextRoot.
      */
     private String toolContext;
+    
+    /**
+     * Holds value of propert toolUpdateScriptPath
+     */
+    private String toolUpdateScriptPath;
     
     /**
      * Holds value of property toolInsertScriptPath.
@@ -179,6 +185,11 @@ public class DeployToolConfig extends DeployConfig {
            
            toolVersion = value;
        }
+       
+       if ( key.equalsIgnoreCase(TOOL_VERSION) ) {
+           
+           hideTool = java.lang.Boolean.parseBoolean(value);
+       }
 
        if ( key.equalsIgnoreCase(TOOL_WEB_URI) ) {
            toolWebUri = value;
@@ -187,7 +198,11 @@ public class DeployToolConfig extends DeployConfig {
        if ( key.equalsIgnoreCase(TOOL_CONTEXT) ) {
            toolContext = value;
        }
-
+       
+       if ( key.equalsIgnoreCase(TOOL_UPDATE_SCRIPT_PATH) ) {
+           toolUpdateScriptPath  = value;
+       }
+       
        if ( key.equalsIgnoreCase(TOOL_INSERT_SCRIPT_PATH) ) {
            toolInsertScriptPath  = value;
        }
@@ -260,6 +275,7 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(toolContext, TOOL_CONTEXT);
        valid = valid && validateStringProperty(getLamsEarPath(), LAMS_EAR_PATH);
        valid = valid && validateListProperty(getLanguageFiles(),LANGUAGE_FILES);
+       valid = valid && validateStringProperty(toolUpdateScriptPath, TOOL_UPDATE_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolInsertScriptPath, TOOL_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolLibraryInsertScriptPath, TOOL_LIBRARY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolActivityInsertScriptPath, TOOL_ACTIVITY_INSERT_SCRIPT_PATH);
@@ -288,11 +304,14 @@ public class DeployToolConfig extends DeployConfig {
        if (config.getToolSignature() != null)
            this.toolSignature = config.getToolSignature();
        if (config.getToolVersion() != null)
-           this.toolVersion = config.getToolVersion();
+           this.toolVersion = config.getToolVersion(); 
+       this.hideTool = config.getHideTool();
        if (config.getToolWebUri() != null)
            this.toolWebUri = config.getToolWebUri();
        if (config.getToolContext() != null)
            this.toolContext = config.getToolContext();
+       if (config.getToolInsertScriptPath() != null)
+           this.toolUpdateScriptPath = config.getToolUpdateScriptPath();
        if (config.getToolInsertScriptPath() != null)
            this.toolInsertScriptPath = config.getToolInsertScriptPath();
        if (config.getToolLibraryInsertScriptPath() != null)
@@ -320,8 +339,10 @@ public class DeployToolConfig extends DeployConfig {
 	   super.printObjectProperties();
        System.out.println("Tool Signature: " + this.toolSignature);
        System.out.println("Tool Version: " + this.toolVersion);
+       System.out.println("Hide Tool: " + this.hideTool);
        System.out.println("ToolWebUri: " + this.toolWebUri);
        System.out.println("ToolContext: " + this.toolContext);
+       System.out.println("ToolUpdateScriptPath: " + this.toolUpdateScriptPath);
        System.out.println("ToolInsertScriptPath: " + this.toolInsertScriptPath);
        System.out.println("ToolLibraryInsertScriptPath: " + this.toolLibraryInsertScriptPath);
        System.out.println("ToolActivityInsertScriptPath: " + this.toolActivityInsertScriptPath);
@@ -383,6 +404,34 @@ public class DeployToolConfig extends DeployConfig {
     public void setToolContext(String toolContextRoot) {
         this.toolContext = toolContextRoot;
     }
+    
+    /**
+     * @return Returns the thideTool.
+     */
+    public boolean getHideTool() {
+        return hideTool;
+    }
+    /**
+     * @param hideTool The toolContextRoot to set.
+     */
+    public void setHideTool(boolean hideTool) {
+        this.hideTool = hideTool;
+    }
+    
+    /**
+     * @return Returns the toolInstertScriptPath
+     */
+    public String getToolUpdateScriptPath() {
+        return toolUpdateScriptPath;
+    }
+    
+    /**
+     * @param toolUpdateScriptPath The toolInsertScriptPath to set.
+     */
+    public void setToolUpdateScriptPath(String toolUpdateScriptPath) {
+        this.toolUpdateScriptPath = toolUpdateScriptPath;
+    }
+    
     /**
      * @return Returns the toolInsertScriptPath.
      */
@@ -432,6 +481,7 @@ public class DeployToolConfig extends DeployConfig {
     public void setToolVersion(String toolVersion) {
         this.toolVersion = toolVersion;
     }
+    
     
     /**
      * @return Returns the toolTablesDeleteScriptPath.
